@@ -43,13 +43,14 @@
         .controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 40px;
             flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 15px 30px;
+        .btn, .breed-selector {
+            padding: 14px 28px;
             font-size: 1rem;
             border: none;
             border-radius: 50px;
@@ -57,6 +58,9 @@
             transition: all 0.3s ease;
             font-weight: 600;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            height: 48px;
+            line-height: 20px;
+            font-family: inherit;
         }
 
         .btn-primary {
@@ -193,21 +197,15 @@
         }
 
         .breed-selector {
-            padding: 15px 25px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 50px;
             background: white;
             color: #667eea;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .breed-selector:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            padding-right: 45px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
         }
 
         @media (max-width: 768px) {
@@ -273,6 +271,123 @@
         const modalImage = document.getElementById('modalImage');
         const modalClose = document.querySelector('.modal-close');
 
+        const breedNames = {
+            'affenpinscher': '猴头梗',
+            'african': '非洲猎犬',
+            'airedale': '万能梗',
+            'akita': '秋田犬',
+            'appenzeller': '阿彭策尔山犬',
+            'australian': '澳大利亚牧羊犬',
+            'basenji': '巴仙吉犬',
+            'beagle': '比格犬',
+            'bluetick': '蓝斑浣熊猎犬',
+            'borzoi': '俄罗斯猎狼犬',
+            'bouvier': '法兰德斯畜牧犬',
+            'boxer': '拳狮犬',
+            'brabancon': '布鲁塞尔格里芬',
+            'briard': '伯瑞犬',
+            'buhund': '挪威布哈德犬',
+            'bulldog': '斗牛犬',
+            'bullterrier': '斗牛梗',
+            'cairn': '凯恩梗',
+            'cattledog': '牧牛犬',
+            'chihuahua': '吉娃娃',
+            'chow': '松狮犬',
+            'clumber': '克伦伯猎鹬犬',
+            'cockapoo': '可卡布犬',
+            'collie': '牧羊犬',
+            'coonhound': '猎浣熊犬',
+            'cotondetulear': '图莱亚尔绒毛犬',
+            'dachshund': '腊肠犬',
+            'dalmatian': '大麦町犬',
+            'dane': '大丹犬',
+            'deerhound': '猎鹿犬',
+            'dhole': '豺犬',
+            'dingo': '澳洲野犬',
+            'doberman': '杜宾犬',
+            'elkhound': '猎麋犬',
+            'entlebucher': '恩特雷布赫山犬',
+            'eskimo': '爱斯基摩犬',
+            'finnish': '芬兰拉普猎犬',
+            'frise': '比熊犬',
+            'germanshepherd': '德国牧羊犬',
+            'greyhound': '灵缇犬',
+            'groenendael': '格罗安达犬',
+            'havanese': '哈瓦那犬',
+            'hound': '猎犬',
+            'husky': '哈士奇',
+            'keeshond': '荷兰毛狮犬',
+            'kelpie': '凯尔皮犬',
+            'komondor': '可蒙犬',
+            'kuvasz': '库瓦兹犬',
+            'labrador': '拉布拉多',
+            'leonberg': '兰波格犬',
+            'lhasa': '拉萨犬',
+            'malamute': '阿拉斯加雪橇犬',
+            'malinois': '马里努阿犬',
+            'maltese': '马尔济斯',
+            'mastiff': '马士提夫獒犬',
+            'mexicanhairless': '墨西哥无毛犬',
+            'mix': '混种犬',
+            'mountain': '山地犬',
+            'newfoundland': '纽芬兰犬',
+            'otterhound': '猎水獭犬',
+            'ovcharka': '高加索犬',
+            'papillon': '蝴蝶犬',
+            'pekinese': '京巴犬',
+            'pembroke': '彭布罗克威尔士柯基',
+            'pinscher': '宾沙犬',
+            'pitbull': '比特犬',
+            'pointer': '指示犬',
+            'pomeranian': '博美犬',
+            'poodle': '贵宾犬',
+            'pug': '巴哥犬',
+            'puggle': '帕格犬',
+            'pyrenees': '大白熊犬',
+            'redbone': '红骨猎浣熊犬',
+            'retriever': '寻回犬',
+            'ridgeback': '罗得西亚脊背犬',
+            'rottweiler': '罗威纳犬',
+            'saluki': '萨路基猎犬',
+            'samoyed': '萨摩耶',
+            'schipperke': '舒柏奇犬',
+            'schnauzer': '雪纳瑞',
+            'segugio': '意大利猎犬',
+            'setter': '雪达犬',
+            'sharpei': '沙皮狗',
+            'sheepdog': '牧羊犬',
+            'shiba': '柴犬',
+            'shihtzu': '西施犬',
+            'spaniel': '西班牙猎犬',
+            'springer': '史宾格犬',
+            'stbernard': '圣伯纳犬',
+            'terrier': '㹴犬',
+            'tervuren': '特弗伦犬',
+            'vizsla': '维兹拉犬',
+            'waterdog': '水犬',
+            'weimaraner': '威玛猎犬',
+            'whippet': '惠比特犬',
+            'wolfhound': '爱尔兰猎狼犬',
+            'yorkshire': '约克夏梗'
+        };
+
+        function getChineseBreedName(breed) {
+            if (!breed) return '未知品种';
+            const lowerBreed = breed.toLowerCase();
+            if (breedNames[lowerBreed]) {
+                return breedNames[lowerBreed];
+            }
+            if (lowerBreed.includes('-')) {
+                const parts = lowerBreed.split('-');
+                const mainBreed = parts[0];
+                const subBreed = parts[1];
+                if (breedNames[mainBreed]) {
+                    return breedNames[mainBreed] + '(' + subBreed.charAt(0).toUpperCase() + subBreed.slice(1) + ')';
+                }
+            }
+            return breed.charAt(0).toUpperCase() + breed.slice(1);
+        }
+
         let images = [];
         let currentBreed = '';
 
@@ -288,11 +403,34 @@
                 const data = await response.json();
                 
                 if (data.status === 'success') {
+                    const breedOptions = [];
+                    
                     Object.keys(data.message).forEach(breed => {
-                        const option = document.createElement('option');
-                        option.value = breed;
-                        option.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
-                        breedSelector.appendChild(option);
+                        const subBreeds = data.message[breed];
+                        
+                        if (subBreeds.length === 0) {
+                            breedOptions.push({
+                                value: breed,
+                                label: getChineseBreedName(breed)
+                            });
+                        } else {
+                            subBreeds.forEach(subBreed => {
+                                const fullBreed = `${breed}-${subBreed}`;
+                                breedOptions.push({
+                                    value: fullBreed,
+                                    label: getChineseBreedName(breed) + '(' + subBreed.charAt(0).toUpperCase() + subBreed.slice(1) + ')'
+                                });
+                            });
+                        }
+                    });
+                    
+                    breedOptions.sort((a, b) => a.label.localeCompare(b.label, 'zh'));
+                    
+                    breedOptions.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.label;
+                        breedSelector.appendChild(opt);
                     });
                 }
             } catch (error) {
@@ -376,12 +514,8 @@
         function getBreedFromUrl(url) {
             const match = url.match(/breeds\/([^\/]+)/);
             if (match) {
-                let breed = match[1];
-                if (breed.includes('-')) {
-                    const parts = breed.split('-');
-                    breed = parts[0] + ' ' + parts[1];
-                }
-                return breed.charAt(0).toUpperCase() + breed.slice(1);
+                const breed = match[1];
+                return getChineseBreedName(breed);
             }
             return '可爱小狗';
         }
