@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可爱小狗图库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .card-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card-info h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .card-info p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: white;
+            font-size: 3rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #FF6B6B;
+        }
+
+        .error {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            font-size: 1.2rem;
+        }
+
+        .breed-selector {
+            padding: 15px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .breed-selector:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card img {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐕 可爱小狗图库</h1>
+            <p class="subtitle">浏览来自世界各地的可爱狗狗图片</p>
+        </header>
+
+        <div class="controls">
+            <select id="breedSelector" class="breed-selector">
+                <option value="">所有品种</option>
+            </select>
+            <button id="refreshBtn" class="btn btn-primary">🔄 刷新图片</button>
+            <button id="moreBtn" class="btn btn-secondary">➕ 加载更多</button>
+        </div>
+
+        <div id="gallery" class="gallery">
+            <div class="loading">
+                <div class="spinner"></div>
+                <span>加载中...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <span class="modal-close">&times;</span>
+        <img id="modalImage" src="" alt="大图">
+    </div>
+
+    <script>
+        const API_BASE = 'https://dog.ceo/api';
+        const gallery = document.getElementById('gallery');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const moreBtn = document.getElementById('moreBtn');
+        const breedSelector = document.getElementById('breedSelector');
+        const modal = document.getElementById('modal');
+        const modalImage = document.getElementById('modalImage');
+        const modalClose = document.querySelector('.modal-close');
+
+        let images = [];
+        let currentBreed = '';
+
+        async function init() {
+            await loadBreeds();
+            await loadImages();
+            setupEventListeners();
+        }
+
+        async function loadBreeds() {
+            try {
+                const response = await fetch(`${API_BASE}/breeds/list/all`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    Object.keys(data.message).forEach(breed => {
+                        const option = document.createElement('option');
+                        option.value = breed;
+                        option.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
+                        breedSelector.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading breeds:', error);
+            }
+        }
+
+        async function fetchRandomImages(count = 12, breed = '') {
+            try {
+                let url;
+                if (breed) {
+                    url = `${API_BASE}/breed/${breed}/images/random/${count}`;
+                } else {
+                    url = `${API_BASE}/breeds/image/random/${count}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    return data.message;
+                }
+            } catch (error) {
+                console.error('Error fetching images:', error);
+                throw error;
+            }
+        }
+
+        async function loadImages(append = false) {
+            gallery.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>加载中...</span>
+                </div>
+            `;
+
+            try {
+                const newImages = await fetchRandomImages(12, currentBreed);
+                
+                if (append) {
+                    images = [...images, ...newImages];
+                } else {
+                    images = newImages;
+                }
+
+                renderGallery();
+            } catch (error) {
+                gallery.innerHTML = `
+                    <div class="error">
+                        <p>😢 加载图片失败，请稍后重试</p>
+                        <p>错误: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderGallery() {
+            if (images.length === 0) {
+                gallery.innerHTML = `
+                    <div class="error">
+                        <p>没有找到图片</p>
+                    </div>
+                `;
+                return;
+            }
+
+            gallery.innerHTML = images.map((imageUrl, index) => {
+                const breed = getBreedFromUrl(imageUrl);
+                return `
+                    <div class="card" data-index="${index}">
+                        <img src="${imageUrl}" alt="${breed}" loading="lazy">
+                        <div class="card-info">
+                            <h3>${breed}</h3>
+                            <p>点击查看大图</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getBreedFromUrl(url) {
+            const match = url.match(/breeds\/([^\/]+)/);
+            if (match) {
+                let breed = match[1];
+                if (breed.includes('-')) {
+                    const parts = breed.split('-');
+                    breed = parts[0] + ' ' + parts[1];
+                }
+                return breed.charAt(0).toUpperCase() + breed.slice(1);
+            }
+            return '可爱小狗';
+        }
+
+        function openModal(imageUrl) {
+            modalImage.src = imageUrl;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modalImage.src = '';
+            document.body.style.overflow = '';
+        }
+
+        function setupEventListeners() {
+            refreshBtn.addEventListener('click', () => {
+                loadImages(false);
+            });
+
+            moreBtn.addEventListener('click', () => {
+                loadImages(true);
+            });
+
+            breedSelector.addEventListener('change', (e) => {
+                currentBreed = e.target.value;
+                loadImages(false);
+            });
+
+            gallery.addEventListener('click', (e) => {
+                const card = e.target.closest('.card');
+                if (card) {
+                    const index = parseInt(card.dataset.index);
+                    openModal(images[index]);
+                }
+            });
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
