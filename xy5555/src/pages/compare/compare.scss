@@ -1,0 +1,677 @@
+.compare-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f9fafb;
+}
+
+/* 空状态 */
+.empty-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 40rpx;
+  line-height: 1.6;
+}
+
+.empty-btn {
+  padding: 20rpx 60rpx;
+  background-color: #10b981;
+  border-radius: 40rpx;
+}
+
+.empty-btn text {
+  font-size: 30rpx;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* 页面头部 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 30rpx;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #e5e7eb;
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-right: 12rpx;
+}
+
+.header-count {
+  font-size: 26rpx;
+  color: #9ca3af;
+}
+
+.clear-btn {
+  padding: 12rpx 24rpx;
+  border-radius: 20rpx;
+  border: 2rpx solid #e5e7eb;
+}
+
+.clear-btn text {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+/* 标签切换 */
+.tabs-container {
+  display: flex;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #e5e7eb;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24rpx 0;
+  position: relative;
+}
+
+.tab-item text {
+  font-size: 30rpx;
+  color: #6b7280;
+}
+
+.tab-item.active text {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background-color: #10b981;
+  border-radius: 2rpx;
+}
+
+/* 内容滚动区域 */
+.content-scroll {
+  flex: 1;
+  padding: 20rpx;
+}
+
+/* 对比区块 */
+.comparison-section {
+  margin-bottom: 20rpx;
+}
+
+/* 方案头部 */
+.plan-headers {
+  display: flex;
+  margin-bottom: 20rpx;
+}
+
+.plan-header {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin: 0 10rpx;
+  position: relative;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.plan-header:first-child {
+  margin-left: 0;
+}
+
+.plan-header:last-child {
+  margin-right: 0;
+}
+
+.plan-header-image {
+  width: 100%;
+  height: 180rpx;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+}
+
+.header-image {
+  width: 100%;
+  height: 100%;
+}
+
+.plan-header-info {
+  margin-bottom: 12rpx;
+}
+
+.plan-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.plan-tag {
+  font-size: 20rpx;
+  color: #10b981;
+  background-color: #ecfdf5;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-right: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.remove-btn text {
+  font-size: 24rpx;
+  color: #ffffff;
+}
+
+/* 对比详情 */
+.comparison-details {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.comparison-row {
+  display: flex;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.comparison-row:last-child {
+  border-bottom: none;
+}
+
+.comparison-row.highlight {
+  background-color: #f9fafb;
+}
+
+.comparison-label {
+  width: 180rpx;
+  padding: 24rpx 20rpx;
+  background-color: #f9fafb;
+  border-right: 1rpx solid #e5e7eb;
+  display: flex;
+  align-items: center;
+}
+
+.comparison-label text {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.comparison-value {
+  flex: 1;
+  padding: 24rpx 20rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.comparison-value:last-child {
+  border-right: none;
+}
+
+.value-text {
+  font-size: 26rpx;
+  color: #1f2937;
+  text-align: center;
+}
+
+.value-text.highlight {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+
+/* 家具区块 */
+.furniture-section {
+  margin-bottom: 20rpx;
+}
+
+.space-group {
+  margin-bottom: 30rpx;
+}
+
+.space-header {
+  padding: 16rpx 20rpx;
+  background-color: #f3f4f6;
+  border-radius: 12rpx 12rpx 0 0;
+  margin-bottom: 1rpx;
+}
+
+.space-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.furniture-comparison {
+  display: flex;
+  background-color: #ffffff;
+  border-radius: 0 0 16rpx 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.plan-furniture {
+  flex: 1;
+  padding: 20rpx;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.plan-furniture:last-child {
+  border-right: none;
+}
+
+.furniture-item {
+  display: flex;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx dashed #e5e7eb;
+}
+
+.furniture-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.furniture-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.furniture-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.furniture-name {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.furniture-price {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #10b981;
+  margin-bottom: 4rpx;
+}
+
+.furniture-material {
+  font-size: 20rpx;
+  color: #9ca3af;
+}
+
+.no-furniture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.no-furniture-text {
+  font-size: 24rpx;
+  color: #9ca3af;
+}
+
+.space-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx;
+  background-color: #f9fafb;
+  border-radius: 12rpx;
+  margin-top: 16rpx;
+}
+
+.summary-label {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.summary-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* 汇总 */
+.total-summary {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.summary-row {
+  display: flex;
+  border-bottom: 1rpx solid #f3f4f6;
+  padding: 20rpx 0;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.summary-label {
+  width: 180rpx;
+  padding-right: 20rpx;
+}
+
+.summary-label text {
+  font-size: 28rpx;
+  color: #6b7280;
+}
+
+.summary-value {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.summary-value:last-child {
+  border-right: none;
+}
+
+.summary-value text {
+  font-size: 28rpx;
+  color: #1f2937;
+}
+
+.summary-value text.highlight {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 30rpx;
+}
+
+/* 预算区块 */
+.budget-section {
+  margin-bottom: 20rpx;
+}
+
+.total-budget-comparison {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.comparison-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24rpx;
+}
+
+.budget-bars {
+  display: flex;
+  flex-direction: column;
+}
+
+.budget-bar-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24rpx;
+}
+
+.budget-bar-container:last-child {
+  margin-bottom: 0;
+}
+
+.bar-label {
+  margin-bottom: 12rpx;
+}
+
+.bar-name {
+  font-size: 28rpx;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.bar-wrapper {
+  height: 40rpx;
+  background-color: #f3f4f6;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: #10b981;
+  border-radius: 20rpx;
+  transition: width 0.3s ease;
+}
+
+.bar-value {
+  text-align: right;
+}
+
+.bar-value text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* 预算明细表格 */
+.budget-breakdown {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.breakdown-table {
+  width: 100%;
+}
+
+.breakdown-header {
+  display: flex;
+  border-bottom: 2rpx solid #e5e7eb;
+  padding-bottom: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.header-cell {
+  width: 180rpx;
+  padding-right: 20rpx;
+}
+
+.header-cell text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.header-cell:last-child {
+  width: auto;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding-right: 0;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.header-cell:last-child:last-child {
+  border-right: none;
+}
+
+.short-name {
+  font-size: 24rpx;
+  color: #1f2937;
+}
+
+.breakdown-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.breakdown-row:last-child {
+  border-bottom: none;
+}
+
+.breakdown-cell {
+  width: 180rpx;
+  padding-right: 20rpx;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.breakdown-cell:last-child {
+  width: auto;
+  flex: 1;
+  justify-content: center;
+  padding-right: 0;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.breakdown-cell:last-child:last-child {
+  border-right: none;
+}
+
+.cell-label {
+  font-size: 26rpx;
+  color: #6b7280;
+  margin-right: 8rpx;
+}
+
+.cell-percentage {
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.cell-value {
+  font-size: 26rpx;
+  color: #1f2937;
+}
+
+/* 性价比分析 */
+.value-analysis {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.analysis-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-item {
+  display: flex;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.analysis-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.analysis-label {
+  width: 180rpx;
+  padding-right: 20rpx;
+}
+
+.analysis-label text {
+  font-size: 28rpx;
+  color: #6b7280;
+}
+
+.analysis-value {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1rpx solid #f3f4f6;
+}
+
+.analysis-value:last-child {
+  border-right: none;
+}
+
+.analysis-value text {
+  font-size: 28rpx;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* 底部留白 */
+.bottom-space {
+  height: 40rpx;
+}
