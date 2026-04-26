@@ -1,0 +1,119 @@
+<view class="page" wx:if="{{!loading && product}}">
+  <!-- 商品图片 -->
+  <view class="product-image-wrap">
+    <image class="product-image" src="{{product.image}}" mode="aspectFill" />
+    <view class="product-tags" wx:if="{{product.tags && product.tags.length > 0}}">
+      <text class="product-tag" wx:for="{{product.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="product-info">
+    <view class="price-section">
+      <view class="price-row">
+        <text class="current-price">{{product.price}}</text>
+        <text class="original-price" wx:if="{{product.originalPrice > product.price}}">¥{{product.originalPrice}}</text>
+      </view>
+      <view class="sales-row">
+        <text class="sales-text">已售{{product.sales}}</text>
+        <text class="rating-text">⭐{{product.rating}}分</text>
+        <text class="stock-text">库存{{product.stock}}</text>
+      </view>
+    </view>
+
+    <view class="name-section">
+      <text class="product-name">{{product.name}}</text>
+      <text class="product-desc">{{product.description}}</text>
+    </view>
+
+    <!-- 规格选择 -->
+    <view class="spec-section" wx:if="{{product.specifications && product.specifications.length > 0}}">
+      <text class="spec-label">规格</text>
+      <view class="spec-list">
+        <view 
+          wx:for="{{product.specifications}}" 
+          wx:key="*this" 
+          class="spec-item {{currentSpec === index ? 'active' : ''}}"
+          bindtap="onSpecChange"
+          data-index="{{index}}"
+        >
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数量选择 -->
+    <view class="quantity-section">
+      <text class="quantity-label">数量</text>
+      <view class="quantity-control">
+        <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="onQuantityChange" data-type="decrease">
+          <text>−</text>
+        </view>
+        <text class="quantity-value">{{quantity}}</text>
+        <view class="quantity-btn" bindtap="onQuantityChange" data-type="increase">
+          <text>+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品详情 -->
+  <view class="detail-section">
+    <view class="section-header">
+      <text class="section-title">商品详情</text>
+    </view>
+    <view class="detail-content">
+      <text class="detail-text">{{product.detail}}</text>
+    </view>
+  </view>
+
+  <!-- 营养信息 -->
+  <view class="nutrition-section" wx:if="{{product.nutrition}}">
+    <view class="section-header">
+      <text class="section-title">营养信息</text>
+    </view>
+    <view class="nutrition-list">
+      <view class="nutrition-item">
+        <text class="nutrition-label">热量</text>
+        <text class="nutrition-value">{{product.nutrition.calories}}kcal</text>
+      </view>
+      <view class="nutrition-item">
+        <text class="nutrition-label">蛋白质</text>
+        <text class="nutrition-value">{{product.nutrition.protein}}g</text>
+      </view>
+      <view class="nutrition-item">
+        <text class="nutrition-label">碳水化合物</text>
+        <text class="nutrition-value">{{product.nutrition.carbs}}g</text>
+      </view>
+      <view class="nutrition-item">
+        <text class="nutrition-label">脂肪</text>
+        <text class="nutrition-value">{{product.nutrition.fat}}g</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bar-left">
+      <view class="action-item" bindtap="onCartTap">
+        <text class="action-icon">🛒</text>
+        <view class="cart-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+        <text class="action-text">购物车</text>
+      </view>
+    </view>
+    <view class="bar-right">
+      <view class="action-btn add-btn" bindtap="onAddToCart">
+        <text>加入购物车</text>
+      </view>
+      <view class="action-btn buy-btn" bindtap="onBuyNow">
+        <text>立即购买</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-state" wx:if="{{loading}}">
+  <text class="loading-icon">⏳</text>
+  <text class="loading-text">加载中...</text>
+</view>

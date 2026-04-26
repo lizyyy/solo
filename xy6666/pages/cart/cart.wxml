@@ -1,0 +1,170 @@
+<!-- 空状态 -->
+<view class="empty-cart" wx:if="{{cart.length === 0}}">
+  <view class="empty-icon">🛒</view>
+  <text class="empty-text">购物车是空的</text>
+  <text class="empty-subtext">快去选择您喜欢的饮品吧</text>
+  <view class="go-index-btn" bindtap="goToIndex">
+    <text class="go-index-text">去选购</text>
+  </view>
+</view>
+
+<!-- 购物车列表 -->
+<view class="cart-content" wx:else>
+  <scroll-view class="cart-scroll" scroll-y="true">
+    <!-- 购物车商品列表 -->
+    <view class="cart-list">
+      <view class="cart-item" wx:for="{{cart}}" wx:key="index">
+        <view class="item-image-wrap">
+          <image class="item-image" src="{{item.drinkImage}}" mode="aspectFill" />
+        </view>
+        <view class="item-info">
+          <view class="item-name-row">
+            <text class="item-name">{{item.drinkName}}</text>
+            <view class="item-delete" data-index="{{index}}" bindtap="removeItem">
+              <text class="delete-icon">×</text>
+            </view>
+          </view>
+          <view class="item-specs">
+            <text class="spec-text">{{item.size}} | {{item.sugar}} | {{item.ice}}</text>
+          </view>
+          <view class="item-toppings" wx:if="{{item.selectedToppings.length > 0}}">
+            <text class="toppings-label">加料：</text>
+            <text class="toppings-text">{{item.selectedToppings.map(t => t.name).join('、')}}</text>
+          </view>
+          <view class="item-bottom">
+            <view class="item-price-row">
+              <text class="price-symbol">¥</text>
+              <text class="price-amount">{{item.price}}</text>
+              <text class="toppings-price" wx:if="{{item.selectedToppings.length > 0}}">
+                +¥{{item.selectedToppings.reduce((sum, t) => sum + t.price, 0)}}
+              </text>
+            </view>
+            <view class="quantity-control-cart">
+              <view class="quantity-btn-cart {{item.quantity <= 1 ? 'disabled' : ''}}" data-index="{{index}}" bindtap="decreaseQuantity">
+                <text class="quantity-icon-cart">-</text>
+              </view>
+              <view class="quantity-value-cart">{{item.quantity}}</view>
+              <view class="quantity-btn-cart" data-index="{{index}}" bindtap="increaseQuantity">
+                <text class="quantity-icon-cart">+</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 清空购物车 -->
+    <view class="clear-cart-row">
+      <view class="clear-cart-btn" bindtap="clearCart">
+        <text class="clear-cart-text">清空购物车</text>
+      </view>
+    </view>
+
+    <!-- 顾客信息填写 -->
+    <view class="customer-info-section card">
+      <view class="section-header-cart">
+        <text class="section-title-cart">顾客信息</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">姓名</text>
+        <input 
+          class="info-input" 
+          placeholder="请输入您的姓名" 
+          value="{{customerName}}"
+          bindinput="inputName"
+          maxlength="20"
+        />
+      </view>
+      <view class="info-item">
+        <text class="info-label">电话</text>
+        <input 
+          class="info-input" 
+          placeholder="请输入手机号" 
+          type="number"
+          value="{{phone}}"
+          bindinput="inputPhone"
+          maxlength="11"
+        />
+      </view>
+      <view class="info-item">
+        <text class="info-label">备注</text>
+        <textarea 
+          class="info-textarea" 
+          placeholder="选填，如：少放冰、不要打包等" 
+          value="{{remark}}"
+          bindinput="inputRemark"
+          maxlength="100"
+        />
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 底部结算栏 -->
+<view class="fixed-bottom-cart" wx:if="{{cart.length > 0}}">
+  <view class="total-info">
+    <text class="total-label">共{{cart.reduce((sum, item) => sum + item.quantity, 0)}}件商品</text>
+    <view class="total-price-row">
+      <text class="total-text">合计：</text>
+      <text class="total-symbol">¥</text>
+      <text class="total-amount-cart">{{totalPrice}}</text>
+    </view>
+  </view>
+  <view class="checkout-btn" bindtap="showConfirmModal">
+    <text class="checkout-text">去结算</text>
+  </view>
+</view>
+
+<!-- 确认订单弹窗 -->
+<view class="confirm-modal {{showOrderConfirm ? 'show' : ''}}">
+  <view class="modal-mask" bindtap="hideConfirmModal"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">确认订单</text>
+    </view>
+    <view class="modal-body">
+      <view class="order-summary">
+        <view class="summary-item">
+          <text class="summary-label">顾客：</text>
+          <text class="summary-value">{{customerName || '未填写'}}</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">电话：</text>
+          <text class="summary-value">{{phone || '未填写'}}</text>
+        </view>
+        <view class="summary-item" wx:if="{{remark}}">
+          <text class="summary-label">备注：</text>
+          <text class="summary-value">{{remark}}</text>
+        </view>
+      </view>
+      <view class="divider-modal"></view>
+      <view class="order-items">
+        <view class="order-item" wx:for="{{cart}}" wx:key="index">
+          <view class="order-item-name">
+            <text>{{item.drinkName}}</text>
+            <text class="order-item-spec">x{{item.quantity}}</text>
+          </view>
+          <view class="order-item-price">
+            <text>¥{{(item.price + item.selectedToppings.reduce((sum, t) => sum + t.price, 0)) * item.quantity}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="divider-modal"></view>
+      <view class="order-total">
+        <text class="order-total-label">订单金额</text>
+        <view class="order-total-price">
+          <text class="order-total-symbol">¥</text>
+          <text class="order-total-amount">{{totalPrice}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel-btn" bindtap="hideConfirmModal">
+        <text class="modal-btn-text">取消</text>
+      </view>
+      <view class="modal-btn confirm-btn" bindtap="confirmOrder">
+        <text class="modal-btn-text">确认支付</text>
+      </view>
+    </view>
+  </view>
+</view>

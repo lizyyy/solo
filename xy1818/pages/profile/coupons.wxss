@@ -1,0 +1,253 @@
+.page {
+  min-height: 100vh;
+  background-color: #FFF5F5;
+}
+
+.tabs {
+  display: flex;
+  background-color: #FFFFFF;
+  border-bottom: 2rpx solid #F0F0F0;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28rpx 0;
+  position: relative;
+}
+
+.tab-text {
+  font-size: 30rpx;
+  color: #666666;
+  font-weight: 500;
+}
+
+.tab-item.active .tab-text {
+  color: #D32F2F;
+  font-weight: bold;
+}
+
+.tab-line {
+  position: absolute;
+  bottom: 0;
+  width: 60rpx;
+  height: 6rpx;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  border-radius: 3rpx;
+}
+
+.tab-content {
+  padding: 20rpx 30rpx;
+}
+
+.coupon-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.coupon-card {
+  display: flex;
+  background-color: #FFFFFF;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+
+.coupon-card.available .coupon-left {
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+}
+
+.coupon-card.valid .coupon-left {
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+}
+
+.coupon-card.used .coupon-left {
+  background: linear-gradient(135deg, #9E9E9E 0%, #BDBDBD 100%);
+}
+
+.coupon-left {
+  width: 180rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 20rpx;
+  position: relative;
+}
+
+.coupon-left::before {
+  content: '';
+  position: absolute;
+  right: -10rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20rpx;
+  height: 20rpx;
+  background-color: #FFF5F5;
+  border-radius: 50%;
+}
+
+.coupon-value {
+  display: flex;
+  align-items: baseline;
+}
+
+.value-text {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.value-unit {
+  font-size: 24rpx;
+  color: #FFFFFF;
+  margin-left: 4rpx;
+}
+
+.coupon-condition {
+  margin-top: 8rpx;
+}
+
+.condition-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.coupon-middle {
+  width: 2rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10rpx 0;
+  position: relative;
+}
+
+.coupon-dots {
+  flex: 1;
+  background-image: radial-gradient(circle, #E0E0E0 3rpx, transparent 3rpx);
+  background-size: 100% 20rpx;
+}
+
+.coupon-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24rpx 20rpx 24rpx 30rpx;
+}
+
+.coupon-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.coupon-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.coupon-desc {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.coupon-valid {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.coupon-status {
+  font-size: 22rpx;
+  color: #4CAF50;
+  margin-top: 8rpx;
+}
+
+.coupon-status.used {
+  color: #999999;
+}
+
+.coupon-action {
+  margin-top: 16rpx;
+  align-self: flex-start;
+}
+
+.action-text {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  padding: 10rpx 28rpx;
+  border-radius: 30rpx;
+  font-weight: 500;
+}
+
+.coupon-action.disabled .action-text {
+  background-color: #E0E0E0;
+  color: #999999;
+}
+
+.coupon-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mask-text {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #999999;
+  transform: rotate(-15deg);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 30rpx;
+}
+
+.empty-btn {
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  padding: 16rpx 48rpx;
+  border-radius: 40rpx;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
