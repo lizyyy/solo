@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-xl font-medium shadow-lg shadow-pink-200 hover:bg-pink-500 transition-all duration-200 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary border-2 border-primary px-6 py-3 rounded-xl font-medium hover:bg-pink-50 transition-all duration-200 active:scale-95;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-md p-4 border border-gray-100;
+  }
+
+  .safe-area {
+    @apply max-w-md mx-auto min-h-screen bg-gradient-to-b from-pink-50 to-white;
+  }
+
+  .screen-container {
+    @apply pb-24 px-4 pt-4;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center justify-center p-2 transition-all duration-200;
+  }
+
+  .nav-item-active {
+    @apply text-primary;
+  }
+
+  .nav-item-inactive {
+    @apply text-gray-400;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-pink-200 outline-none transition-all duration-200;
+  }
+
+  .chip {
+    @apply px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .section-title {
+    @apply text-lg font-bold text-gray-800 mb-3;
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffb7b2;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff6b8a;
+}

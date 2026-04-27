@@ -1,0 +1,169 @@
+<view class="container">
+  <!-- 顶部Tab -->
+  <view class="card tab-card">
+    <view class="tabs flex">
+      <view 
+        class="tab-item {{selectedTab === 'points' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="points"
+      >
+        积分榜
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'carbon' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="carbon"
+      >
+        低碳榜
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'checkin' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="checkin"
+      >
+        签到榜
+      </view>
+    </view>
+  </view>
+
+  <!-- 个人排名卡片 -->
+  <view class="card my-rank-card">
+    <view class="my-rank-header flex flex-between flex-center">
+      <view class="my-info flex flex-center">
+        <view class="my-avatar">👤</view>
+        <view class="my-detail">
+          <view class="my-name">我的排名</view>
+          <view class="my-stats text-secondary text-small" wx:if="{{rankingData}}">
+            当前第 {{rankingData.userRank.rank}} 名
+          </view>
+        </view>
+      </view>
+      <view class="my-score" wx:if="{{rankingData}}">
+        <view class="score-value text-primary text-bold">{{rankingData.userRank.points}}</view>
+        <view class="score-label text-secondary text-small">绿色积分</view>
+      </view>
+    </view>
+    
+    <view class="my-stats-grid grid-3 mt-16">
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{userPoints}}</view>
+        <view class="stat-label text-secondary text-small">总积分</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{userCheckIns}}</view>
+        <view class="stat-label text-secondary text-small">签到次数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{userTasks}}</view>
+        <view class="stat-label text-secondary text-small">完成任务</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排行榜列表 -->
+  <view class="card ranking-card">
+    <view class="card-title flex flex-between">
+      <text>环保达人榜</text>
+      <text class="text-secondary text-small">实时更新</text>
+    </view>
+    
+    <!-- 前三名展示 -->
+    <view class="top-three flex flex-center mt-16" wx:if="{{rankingData}}">
+      <view class="top-item second flex flex-column flex-center">
+        <view class="top-avatar">🥈</view>
+        <view class="top-name text-small">{{rankingData.topList[1] ? rankingData.topList[1].nickname : '--'}}</view>
+        <view class="top-score text-bold">{{rankingData.topList[1] ? rankingData.topList[1].points : 0}}</view>
+      </view>
+      
+      <view class="top-item first flex flex-column flex-center">
+        <view class="top-avatar">🥇</view>
+        <view class="top-name">{{rankingData.topList[0] ? rankingData.topList[0].nickname : '--'}}</view>
+        <view class="top-score text-bold text-primary">{{rankingData.topList[0] ? rankingData.topList[0].points : 0}}</view>
+        <view class="top-crown">👑</view>
+      </view>
+      
+      <view class="top-item third flex flex-column flex-center">
+        <view class="top-avatar">🥉</view>
+        <view class="top-name text-small">{{rankingData.topList[2] ? rankingData.topList[2].nickname : '--'}}</view>
+        <view class="top-score text-bold">{{rankingData.topList[2] ? rankingData.topList[2].points : 0}}</view>
+      </view>
+    </view>
+    
+    <!-- 排名列表 -->
+    <view class="ranking-list mt-24" wx:if="{{rankingData}}">
+      <view 
+        wx:for="{{rankingData.topList}}" 
+        wx:key="rank" 
+        wx:if="{{index >= 3}}"
+        class="ranking-item flex flex-between flex-center"
+      >
+        <view class="rank-left flex flex-center">
+          <view class="rank-number" style="color: {{getRankColor(item.rank)}}">
+            {{getRankBadge(item.rank) || item.rank}}
+          </view>
+          <view class="rank-avatar">👤</view>
+          <view class="rank-info">
+            <view class="rank-name">{{item.nickname}}</view>
+            <view class="rank-level text-secondary text-small">Lv.{{item.level}}</view>
+          </view>
+        </view>
+        <view class="rank-right">
+          <view class="rank-score text-primary text-bold">{{item.points}}</view>
+          <view class="rank-label text-secondary text-small">积分</view>
+        </view>
+      </view>
+      
+      <!-- 我的排名在列表中 -->
+      <view 
+        class="ranking-item my-item flex flex-between flex-center" 
+        wx:if="{{rankingData.userRank.rank > 3}}"
+      >
+        <view class="rank-left flex flex-center">
+          <view class="rank-number text-primary">
+            {{rankingData.userRank.rank}}
+          </view>
+          <view class="rank-avatar">👤</view>
+          <view class="rank-info">
+            <view class="rank-name text-primary">{{rankingData.userRank.nickname}}</view>
+            <view class="rank-level text-secondary text-small">Lv.{{rankingData.userRank.level}} (我)</view>
+          </view>
+        </view>
+        <view class="rank-right">
+          <view class="rank-score text-primary text-bold">{{rankingData.userRank.points}}</view>
+          <view class="rank-label text-secondary text-small">积分</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 排行榜说明 -->
+  <view class="card info-card">
+    <view class="card-title">排行榜规则</view>
+    <view class="info-list mt-16">
+      <view class="info-item">
+        <view class="info-icon">📊</view>
+        <view class="info-text text-secondary text-small">
+          积分榜：根据用户总积分排名，每日更新
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">🌍</view>
+        <view class="info-text text-secondary text-small">
+          低碳榜：根据累计减少碳排放量排名
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">📅</view>
+        <view class="info-text text-secondary text-small">
+          签到榜：根据连续签到天数和总签到次数排名
+        </view>
+      </view>
+      <view class="info-item">
+        <view class="info-icon">🏆</view>
+        <view class="info-text text-secondary text-small">
+          前三名用户将获得专属徽章展示
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
