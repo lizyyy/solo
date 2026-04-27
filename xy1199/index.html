@@ -1,0 +1,2277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日吃什么 - 智能饮食助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        * {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 8px white;
+        }
+        
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ef4444;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            border-radius: 50%;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5);
+        }
+        
+        .food-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .food-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            color: white;
+        }
+        
+        .category-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .category-chip:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        
+        .category-chip.selected {
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calendar-day:hover {
+            background: #fef2f2;
+        }
+        
+        .calendar-day.has-record {
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            color: white;
+        }
+        
+        .stat-bar {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ef4444);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .pros-cons-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .pros-tag {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .cons-tag {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item.active {
+            color: #ef4444;
+        }
+        
+        .nav-item.active svg {
+            color: #ef4444;
+        }
+        
+        .page {
+            display: none;
+            padding-bottom: 80px;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .spin-button {
+            background: linear-gradient(135deg, #ff6b6b, #ef4444);
+            color: white;
+            padding: 14px 48px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        
+        .spin-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+        }
+        
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-modal {
+            animation: popIn 0.3s ease;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .avoided-tag {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .recommended-tag {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .body-type-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .body-type-tag:hover {
+            border-color: #ef4444;
+        }
+        
+        .body-type-tag.selected {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        
+        .heat-gauge {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#ef4444 var(--progress), #f3f4f6 var(--progress));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .heat-gauge-inner {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .poster-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 16px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            0% { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        .food-detail-modal {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- 首页 - 转盘和推荐 -->
+    <div id="page-home" class="page active">
+        <div class="bg-gradient-to-br from-red-500 to-pink-500 text-white p-6 pb-8">
+            <h1 class="text-2xl font-bold mb-2">🍽️ 今日吃什么</h1>
+            <p class="text-red-100 text-sm">让选择变得简单，让每一餐都精彩</p>
+        </div>
+        
+        <!-- 转盘选择器 -->
+        <div class="flex justify-center gap-2 p-4 bg-white">
+            <button class="tab-btn active px-4 py-2 rounded-full text-sm font-medium transition-all" data-meal="breakfast">🌅 早餐</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-gray-100 transition-all" data-meal="lunch">☀️ 午餐</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-gray-100 transition-all" data-meal="dinner">🌙 晚餐</button>
+            <button class="tab-btn px-4 py-2 rounded-full text-sm font-medium text-gray-600 bg-gray-100 transition-all" data-meal="supper">🍜 夜宵</button>
+        </div>
+        
+        <!-- 转盘区域 -->
+        <div class="bg-white p-6">
+            <div class="wheel-container" id="wheelContainer">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="wheel">
+                    <div class="wheel-segment" style="background: #ff6b6b; transform: rotate(0deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #feca57; transform: rotate(45deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #48dbfb; transform: rotate(90deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #1dd1a1; transform: rotate(135deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #ff9ff3; transform: rotate(180deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #54a0ff; transform: rotate(225deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #5f27cd; transform: rotate(270deg) skewY(-45deg);"></div>
+                    <div class="wheel-segment" style="background: #ff9f43; transform: rotate(315deg) skewY(-45deg);"></div>
+                </div>
+                <div class="wheel-center" id="spinBtn">
+                    <span>GO!</span>
+                </div>
+            </div>
+            
+            <div class="text-center mt-6">
+                <p class="text-gray-500 text-sm mb-4" id="currentMealDesc">点击转盘开始抽取今日早餐</p>
+                <button class="spin-button" id="spinButton">开始抽取</button>
+            </div>
+        </div>
+        
+        <!-- 今日推荐 -->
+        <div class="p-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <span class="mr-2">✨</span>今日精选推荐
+            </h2>
+            <div id="recommendations" class="grid grid-cols-2 gap-4">
+            </div>
+        </div>
+        
+        <!-- 快速分类 -->
+        <div class="p-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+                <span class="mr-2">🏷️</span>按分类选择
+            </h3>
+            <div class="flex flex-wrap gap-2" id="categoryTags">
+                <span class="category-chip selected" data-category="减脂餐">减脂餐</span>
+                <span class="category-chip" data-category="家常菜">家常菜</span>
+                <span class="category-chip" data-category="外卖">外卖</span>
+                <span class="category-chip" data-category="小吃">小吃</span>
+                <span class="category-chip" data-category="快餐">快餐</span>
+                <span class="category-chip" data-category="面食">面食</span>
+                <span class="category-chip" data-category="甜品">甜品</span>
+            </div>
+            <div id="categoryFoods" class="mt-4 space-y-3">
+            </div>
+        </div>
+    </div>
+    
+    <!-- 食物库页面 -->
+    <div id="page-foods" class="page">
+        <div class="bg-gradient-to-br from-orange-500 to-red-500 text-white p-6">
+            <h1 class="text-2xl font-bold mb-2">🍳 食物库</h1>
+            <p class="text-orange-100 text-sm">自定义食物，自由搭配三餐</p>
+        </div>
+        
+        <!-- 搜索框 -->
+        <div class="p-4 bg-white">
+            <div class="flex gap-2">
+                <input type="text" id="searchFood" placeholder="搜索食物..." class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-red-400">
+                <button id="addCustomFood" class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium">
+                    + 添加
+                </button>
+            </div>
+        </div>
+        
+        <!-- 筛选标签 -->
+        <div class="p-4 bg-white mt-2">
+            <div class="flex gap-2 overflow-x-auto pb-2">
+                <button class="filter-btn active px-4 py-2 rounded-full text-sm font-medium bg-red-500 text-white whitespace-nowrap" data-filter="all">全部</button>
+                <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 whitespace-nowrap" data-filter="breakfast">早餐</button>
+                <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 whitespace-nowrap" data-filter="lunch">午餐</button>
+                <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 whitespace-nowrap" data-filter="dinner">晚餐</button>
+                <button class="filter-btn px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 whitespace-nowrap" data-filter="supper">夜宵</button>
+            </div>
+        </div>
+        
+        <!-- 食物列表 -->
+        <div class="p-4" id="foodList">
+        </div>
+    </div>
+    
+    <!-- 记录统计页面 -->
+    <div id="page-records" class="page">
+        <div class="bg-gradient-to-br from-green-500 to-teal-500 text-white p-6">
+            <h1 class="text-2xl font-bold mb-2">📊 记录统计</h1>
+            <p class="text-green-100 text-sm">记录每一餐，了解你的饮食习惯</p>
+        </div>
+        
+        <!-- Tab切换 -->
+        <div class="flex bg-white" id="recordTabs">
+            <button class="record-tab flex-1 py-3 text-center font-medium border-b-2 border-red-500 text-red-500" data-tab="diary">饮食日记</button>
+            <button class="record-tab flex-1 py-3 text-center font-medium text-gray-500" data-tab="calendar">饮食日历</button>
+            <button class="record-tab flex-1 py-3 text-center font-medium text-gray-500" data-tab="stats">统计分析</button>
+            <button class="record-tab flex-1 py-3 text-center font-medium text-gray-500" data-tab="avoid">避雷记录</button>
+        </div>
+        
+        <!-- 日记内容 -->
+        <div id="tab-diary" class="tab-content">
+            <div class="p-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-gray-800" id="todayDate">2026年4月27日</h3>
+                        <button id="addTodayMeal" class="text-red-500 text-sm font-medium">+ 添加</button>
+                    </div>
+                    <div class="space-y-3" id="todayMeals">
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-3">📝 最近记录</h3>
+                <div id="recentRecords" class="space-y-3">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 日历内容 -->
+        <div id="tab-calendar" class="tab-content hidden">
+            <div class="p-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="prevMonth" class="p-2 hover:bg-gray-100 rounded-lg">◀</button>
+                        <h3 class="font-bold text-gray-800" id="currentMonth">2026年4月</h3>
+                        <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-lg">▶</button>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center text-sm mb-2">
+                        <div class="text-gray-400">日</div>
+                        <div class="text-gray-400">一</div>
+                        <div class="text-gray-400">二</div>
+                        <div class="text-gray-400">三</div>
+                        <div class="text-gray-400">四</div>
+                        <div class="text-gray-400">五</div>
+                        <div class="text-gray-400">六</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1" id="calendarDays">
+                    </div>
+                </div>
+                <div id="calendarDetail" class="mt-4 hidden">
+                    <div class="bg-white rounded-xl p-4 shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-3" id="selectedDateTitle">2026年4月27日</h3>
+                        <div id="selectedDateMeals" class="space-y-2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 统计内容 -->
+        <div id="tab-stats" class="tab-content hidden">
+            <div class="p-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                    <h3 class="font-bold text-gray-800 mb-4">📈 常吃食物排行</h3>
+                    <div id="foodRanking" class="space-y-3">
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                    <h3 class="font-bold text-gray-800 mb-4">📊 饮食多样性分析</h3>
+                    <div id="diversityStats" class="space-y-3">
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-4">🔥 热量摄入趋势</h3>
+                    <div id="calorieTrend" class="text-center py-8 text-gray-500">
+                        记录更多数据后显示
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 避雷记录 -->
+        <div id="tab-avoid" class="tab-content hidden">
+            <div class="p-4">
+                <div class="bg-white rounded-xl p-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800">⚠️ 避雷清单</h3>
+                        <button id="addAvoidFood" class="text-red-500 text-sm font-medium">+ 添加</button>
+                    </div>
+                    <div id="avoidList" class="space-y-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 设置页面 -->
+    <div id="page-settings" class="page">
+        <div class="bg-gradient-to-br from-purple-500 to-indigo-500 text-white p-6">
+            <h1 class="text-2xl font-bold mb-2">⚙️ 个人设置</h1>
+            <p class="text-purple-100 text-sm">定制你的专属饮食推荐</p>
+        </div>
+        
+        <!-- 体质选择 -->
+        <div class="p-4">
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                <h3 class="font-bold text-gray-800 mb-3">💪 选择体质（可多选）</h3>
+                <div class="flex flex-wrap gap-2" id="bodyTypeTags">
+                    <span class="body-type-tag" data-type="宫寒">🥶 宫寒</span>
+                    <span class="body-type-tag" data-type="易上火">🔥 易上火</span>
+                    <span class="body-type-tag" data-type="长痘">😫 长痘</span>
+                    <span class="body-type-tag" data-type="减脂">🏃 减脂</span>
+                    <span class="body-type-tag" data-type="胃病">🩹 胃病</span>
+                    <span class="body-type-tag" data-type="熬夜">😴 熬夜</span>
+                    <span class="body-type-tag" data-type="体虚">💪 体虚</span>
+                </div>
+            </div>
+            
+            <!-- 忌口设置 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                <h3 class="font-bold text-gray-800 mb-3">🚫 忌口食物</h3>
+                <div class="flex flex-wrap gap-2" id="allergyTags">
+                </div>
+                <div class="mt-3 flex gap-2">
+                    <input type="text" id="newAllergy" placeholder="添加忌口..." class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400">
+                    <button id="addAllergy" class="bg-purple-500 text-white px-4 py-2 rounded-lg text-sm">添加</button>
+                </div>
+            </div>
+            
+            <!-- 热量目标 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                <h3 class="font-bold text-gray-800 mb-3">🔥 每日热量目标</h3>
+                <div class="flex items-center gap-4">
+                    <input type="range" id="calorieTarget" min="1200" max="3000" value="2000" class="flex-1">
+                    <span id="calorieTargetValue" class="text-lg font-bold text-red-500">2000 kcal</span>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>1200</span>
+                    <span>3000</span>
+                </div>
+            </div>
+            
+            <!-- 热量计算器 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+                <h3 class="font-bold text-gray-800 mb-3">🧮 三餐热量计算器</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">早餐</span>
+                        <div class="flex items-center gap-2">
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="breakfast" data-action="minus">-</button>
+                            <span class="w-20 text-center font-medium" id="calcBreakfast">400</span>
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="breakfast" data-action="plus">+</button>
+                            <span class="text-gray-400 text-sm">kcal</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">午餐</span>
+                        <div class="flex items-center gap-2">
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="lunch" data-action="minus">-</button>
+                            <span class="w-20 text-center font-medium" id="calcLunch">600</span>
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="lunch" data-action="plus">+</button>
+                            <span class="text-gray-400 text-sm">kcal</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">晚餐</span>
+                        <div class="flex items-center gap-2">
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="dinner" data-action="minus">-</button>
+                            <span class="w-20 text-center font-medium" id="calcDinner">500</span>
+                            <button class="calorie-adjust w-8 h-8 rounded-full bg-gray-100 text-gray-600" data-meal="dinner" data-action="plus">+</button>
+                            <span class="text-gray-400 text-sm">kcal</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex justify-center">
+                        <div class="heat-gauge" id="heatGauge" style="--progress: 75%">
+                            <div class="heat-gauge-inner">
+                                <span class="text-2xl font-bold text-gray-800" id="calcTotal">1500</span>
+                                <span class="text-xs text-gray-500">kcal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center mt-3" id="calorieAdvice">
+                        <span class="text-green-500 font-medium">✅ 热量适中，不会长胖</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 生成海报 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <h3 class="font-bold text-gray-800 mb-3">🖼️ 生成今日吃什么海报</h3>
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 text-center">
+                    <div class="text-4xl mb-2">📸</div>
+                    <p class="text-gray-600 text-sm mb-3">生成今日饮食海报，分享给朋友</p>
+                    <button id="generatePoster" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full font-medium">
+                        生成海报
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around items-center py-2 z-50">
+        <div class="nav-item active" data-page="home">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span class="text-xs mt-1">首页</span>
+        </div>
+        <div class="nav-item" data-page="foods">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+            <span class="text-xs mt-1">食物库</span>
+        </div>
+        <div class="nav-item" data-page="records">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <span class="text-xs mt-1">记录</span>
+        </div>
+        <div class="nav-item" data-page="settings">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span class="text-xs mt-1">设置</span>
+        </div>
+    </nav>
+    
+    <!-- 转盘结果弹窗 -->
+    <div id="resultModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-sm w-full result-modal">
+            <div class="text-center">
+                <div class="text-6xl mb-4" id="resultEmoji">🍜</div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2" id="resultName">牛肉面</h2>
+                <p class="text-gray-500 text-sm mb-4" id="resultDesc">经典面食，饱腹暖胃</p>
+                
+                <div class="bg-gray-50 rounded-xl p-3 mb-4 text-left">
+                    <div class="flex justify-between text-sm mb-2">
+                        <span class="text-gray-500">热量</span>
+                        <span class="font-medium" id="resultCalories">450 kcal</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">分类</span>
+                        <span class="font-medium" id="resultCategory">面食</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-500 mb-2">营养利弊</p>
+                    <div id="resultProsCons" class="text-left">
+                    </div>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="acceptResult" class="flex-1 bg-gradient-to-r from-green-500 to-teal-500 text-white py-3 rounded-xl font-medium">
+                        就吃这个！
+                    </button>
+                    <button id="rejectResult" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-medium">
+                        再抽一次
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 食物详情弹窗 -->
+    <div id="foodDetailModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800" id="foodDetailName">食物详情</h2>
+                <button id="closeFoodDetail" class="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div id="foodDetailContent">
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加自定义食物弹窗 -->
+    <div id="addFoodModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">添加自定义食物</h2>
+            <div class="space-y-3">
+                <input type="text" id="newFoodName" placeholder="食物名称" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                <input type="number" id="newFoodCalories" placeholder="热量 (kcal)" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                <select id="newFoodCategory" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                    <option value="家常菜">家常菜</option>
+                    <option value="外卖">外卖</option>
+                    <option value="小吃">小吃</option>
+                    <option value="快餐">快餐</option>
+                    <option value="面食">面食</option>
+                    <option value="甜品">甜品</option>
+                    <option value="减脂餐">减脂餐</option>
+                </select>
+                <select id="newFoodMealType" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                    <option value="breakfast,lunch,dinner">适合各餐</option>
+                    <option value="breakfast">仅早餐</option>
+                    <option value="lunch,dinner">午晚餐</option>
+                    <option value="supper">仅夜宵</option>
+                </select>
+                <textarea id="newFoodPros" placeholder="优点（用逗号分隔）" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400 text-sm"></textarea>
+                <textarea id="newFoodCons" placeholder="缺点（用逗号分隔）" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400 text-sm"></textarea>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button id="cancelAddFood" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-medium">取消</button>
+                <button id="confirmAddFood" class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 rounded-xl font-medium">添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加今日饮食弹窗 -->
+    <div id="addMealModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">记录今日饮食</h2>
+            <div class="space-y-3">
+                <select id="mealTypeSelect" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                    <option value="breakfast">早餐</option>
+                    <option value="lunch">午餐</option>
+                    <option value="dinner">晚餐</option>
+                    <option value="supper">夜宵</option>
+                </select>
+                <div>
+                    <label class="text-sm text-gray-500 mb-2 block">选择食物（可多选）</label>
+                    <div class="space-y-2 max-h-60 overflow-y-auto" id="foodSelectList">
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="markAsAvoid" class="w-4 h-4">
+                    <label for="markAsAvoid" class="text-sm text-gray-600">标记为避雷（吃完不舒服）</label>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button id="cancelAddMeal" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-medium">取消</button>
+                <button id="confirmAddMeal" class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 rounded-xl font-medium">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 海报弹窗 -->
+    <div id="posterModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full max-h-[85vh] overflow-y-auto">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">📸 今日吃什么海报</h2>
+            <div id="posterContent" class="poster-container mb-4">
+                <div class="text-white">
+                    <h3 class="text-2xl font-bold mb-2 text-center">🍽️ 今日食谱</h3>
+                    <p class="text-sm text-purple-200 mb-6 text-center" id="posterDate">2026年4月27日</p>
+                    <div id="posterMeals" class="space-y-3">
+                    </div>
+                    <p class="text-xs text-purple-200 mt-6 text-center">—— 来自「今日吃什么」小程序 ——</p>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mb-4 text-center">长按截图或保存图片分享给朋友</p>
+            <button id="closePoster" class="w-full bg-gray-100 text-gray-600 py-3 rounded-xl font-medium">关闭</button>
+        </div>
+    </div>
+    
+    <!-- 避雷添加弹窗 -->
+    <div id="addAvoidModal" class="modal">
+        <div class="bg-white rounded-2xl p-6 m-4 max-w-md w-full">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">添加避雷食物</h2>
+            <div class="space-y-3">
+                <input type="text" id="avoidFoodName" placeholder="食物名称" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                <select id="avoidReason" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-400">
+                    <option value="肠胃不舒服">肠胃不舒服</option>
+                    <option value="过敏">过敏</option>
+                    <option value="太油腻">太油腻</option>
+                    <option value="热量太高">热量太高</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button id="cancelAddAvoid" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-medium">取消</button>
+                <button id="confirmAddAvoid" class="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 rounded-xl font-medium">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 数据结构 ====================
+        
+        // 食物数据库
+        const foodDatabase = {
+            breakfast: [
+                { id: 1, name: "小米粥", emoji: "🥣", calories: 150, category: "家常菜", mealType: ["breakfast"],
+                  pros: ["养胃", "易消化", "低热量"], cons: ["营养较单一", "饱腹感不强"],
+                  nutrition: { carbs: 30, protein: 4, fat: 1, fiber: 2 },
+                  suitableFor: ["胃病", "体虚"],
+                  avoidFor: [] },
+                { id: 2, name: "豆浆油条", emoji: "🥛", calories: 380, category: "小吃", mealType: ["breakfast"],
+                  pros: ["经典搭配", "饱腹感强"], cons: ["油条油炸", "热量较高", "铝残留风险"],
+                  nutrition: { carbs: 45, protein: 12, fat: 18, fiber: 3 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "胃病"] },
+                { id: 3, name: "鸡蛋煎饼", emoji: "🥞", calories: 320, category: "小吃", mealType: ["breakfast"],
+                  pros: ["营养均衡", "美味可口", "方便快捷"], cons: ["油多", "热量不低"],
+                  nutrition: { carbs: 35, protein: 15, fat: 14, fiber: 2 },
+                  suitableFor: [],
+                  avoidFor: ["减脂"] },
+                { id: 4, name: "燕麦粥", emoji: "🌾", calories: 200, category: "减脂餐", mealType: ["breakfast"],
+                  pros: ["高纤维", "降胆固醇", "饱腹感强"], cons: ["口感一般"],
+                  nutrition: { carbs: 30, protein: 10, fat: 5, fiber: 8 },
+                  suitableFor: ["减脂", "胃病"],
+                  avoidFor: [] },
+                { id: 5, name: "包子", emoji: "🥟", calories: 280, category: "小吃", mealType: ["breakfast", "lunch"],
+                  pros: ["方便", "选择多样", "饱腹感强"], cons: ["皮厚热量高", "馅料不透明"],
+                  nutrition: { carbs: 40, protein: 12, fat: 8, fiber: 3 },
+                  suitableFor: [],
+                  avoidFor: ["减脂"] },
+                { id: 6, name: "三明治", emoji: "🥪", calories: 350, category: "快餐", mealType: ["breakfast", "lunch"],
+                  pros: ["营养均衡", "方便携带", "可自定义"], cons: ["面包热量", "沙拉酱高热量"],
+                  nutrition: { carbs: 35, protein: 18, fat: 15, fiber: 4 },
+                  suitableFor: [],
+                  avoidFor: [] },
+                { id: 7, name: "白粥配咸菜", emoji: "🍚", calories: 120, category: "家常菜", mealType: ["breakfast"],
+                  pros: ["清淡", "易消化", "开胃"], cons: ["咸菜高盐", "营养不足"],
+                  nutrition: { carbs: 25, protein: 3, fat: 0, fiber: 1 },
+                  suitableFor: ["胃病"],
+                  avoidFor: ["体虚", "高血压"] },
+                { id: 8, name: "牛奶麦片", emoji: "🥛", calories: 280, category: "减脂餐", mealType: ["breakfast"],
+                  pros: ["高蛋白", "高钙", "方便快捷"], cons: ["部分麦片含糖高"],
+                  nutrition: { carbs: 35, protein: 15, fat: 8, fiber: 5 },
+                  suitableFor: ["体虚", "减脂"],
+                  avoidFor: [] }
+            ],
+            lunch: [
+                { id: 101, name: "红烧肉", emoji: "🍖", calories: 550, category: "家常菜", mealType: ["lunch", "dinner"],
+                  pros: ["美味", "补充能量", "富含胶原蛋白"], cons: ["高脂肪", "高热量", "不易消化"],
+                  nutrition: { carbs: 15, protein: 25, fat: 45, fiber: 1 },
+                  suitableFor: ["体虚"],
+                  avoidFor: ["减脂", "胃病", "易上火"] },
+                { id: 102, name: "宫保鸡丁", emoji: "🍗", calories: 380, category: "家常菜", mealType: ["lunch", "dinner"],
+                  pros: ["高蛋白", "花生补气血", "味道好"], cons: ["油炸花生", "热量不低", "辛辣"],
+                  nutrition: { carbs: 25, protein: 35, fat: 20, fiber: 3 },
+                  suitableFor: ["体虚"],
+                  avoidFor: ["长痘", "易上火", "胃病"] },
+                { id: 103, name: "清蒸鲈鱼", emoji: "🐟", calories: 200, category: "减脂餐", mealType: ["lunch", "dinner"],
+                  pros: ["高蛋白低脂肪", "易消化", "补脑"], cons: ["价格较高", "需新鲜"],
+                  nutrition: { carbs: 0, protein: 40, fat: 5, fiber: 0 },
+                  suitableFor: ["减脂", "胃病", "体虚"],
+                  avoidFor: [] },
+                { id: 104, name: "麻婆豆腐", emoji: "🧈", calories: 320, category: "家常菜", mealType: ["lunch", "dinner"],
+                  pros: ["植物蛋白", "下饭", "补钙"], cons: ["辛辣", "油多", "含豆瓣酱高盐"],
+                  nutrition: { carbs: 15, protein: 25, fat: 20, fiber: 4 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火"] },
+                { id: 105, name: "番茄炒蛋", emoji: "🍳", calories: 250, category: "家常菜", mealType: ["lunch", "dinner", "breakfast"],
+                  pros: ["经典搭配", "维生素丰富", "易消化"], cons: ["油多", "番茄可能催熟"],
+                  nutrition: { carbs: 12, protein: 18, fat: 15, fiber: 3 },
+                  suitableFor: ["胃病"],
+                  avoidFor: [] },
+                { id: 106, name: "水煮肉片", emoji: "🥩", calories: 450, category: "川菜", mealType: ["lunch", "dinner"],
+                  pros: ["高蛋白", "麻辣开胃"], cons: ["辛辣刺激", "油多", "高热量"],
+                  nutrition: { carbs: 10, protein: 35, fat: 30, fiber: 5 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火", "减脂"] },
+                { id: 107, name: "扬州炒饭", emoji: "🍚", calories: 480, category: "快餐", mealType: ["lunch", "dinner"],
+                  pros: ["主食配菜一体", "方便", "配料丰富"], cons: ["油多", "热量高", "碳水过多"],
+                  nutrition: { carbs: 65, protein: 18, fat: 18, fiber: 3 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "糖尿病"] },
+                { id: 108, name: "蔬菜沙拉", emoji: "🥗", calories: 180, category: "减脂餐", mealType: ["lunch", "dinner"],
+                  pros: ["高纤维", "维生素丰富", "低热量"], cons: ["沙拉酱高热量", "体寒者不宜多吃"],
+                  nutrition: { carbs: 15, protein: 8, fat: 10, fiber: 8 },
+                  suitableFor: ["减脂", "易上火", "长痘"],
+                  avoidFor: ["宫寒", "胃病"] }
+            ],
+            dinner: [
+                { id: 201, name: "白切鸡", emoji: "🍗", calories: 280, category: "家常菜", mealType: ["dinner", "lunch"],
+                  pros: ["高蛋白", "原汁原味", "低油"], cons: ["皮含脂肪", "需熟透"],
+                  nutrition: { carbs: 0, protein: 35, fat: 15, fiber: 0 },
+                  suitableFor: ["减脂", "胃病"],
+                  avoidFor: [] },
+                { id: 202, name: "蒜蓉西兰花", emoji: "🥦", calories: 120, category: "减脂餐", mealType: ["dinner", "lunch"],
+                  pros: ["高纤维", "抗癌", "维生素C丰富"], cons: ["胀气", "体寒者慎食"],
+                  nutrition: { carbs: 10, protein: 5, fat: 5, fiber: 6 },
+                  suitableFor: ["减脂", "易上火", "长痘"],
+                  avoidFor: ["宫寒", "胃病"] },
+                { id: 203, name: "糖醋排骨", emoji: "🍖", calories: 480, category: "家常菜", mealType: ["dinner", "lunch"],
+                  pros: ["美味", "补钙", "富含胶原蛋白"], cons: ["高糖", "高热量", "不易消化"],
+                  nutrition: { carbs: 30, protein: 28, fat: 30, fiber: 1 },
+                  suitableFor: ["体虚"],
+                  avoidFor: ["减脂", "糖尿病", "胃病"] },
+                { id: 204, name: "清蒸南瓜", emoji: "🎃", calories: 80, category: "减脂餐", mealType: ["dinner", "breakfast"],
+                  pros: ["低糖", "高纤维", "养胃"], cons: ["寒性", "胀气"],
+                  nutrition: { carbs: 20, protein: 2, fat: 0, fiber: 4 },
+                  suitableFor: ["减脂", "胃病", "糖尿病"],
+                  avoidFor: ["宫寒"] },
+                { id: 205, name: "可乐鸡翅", emoji: "🍗", calories: 380, category: "家常菜", mealType: ["dinner", "lunch"],
+                  pros: ["美味", "孩子喜欢", "高蛋白"], cons: ["高糖", "可乐添加剂", "热量高"],
+                  nutrition: { carbs: 25, protein: 25, fat: 20, fiber: 1 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "糖尿病", "长痘"] },
+                { id: 206, name: "凉拌黄瓜", emoji: "🥒", calories: 50, category: "小吃", mealType: ["dinner", "lunch"],
+                  pros: ["极低热量", "清热", "补水"], cons: ["寒性", "添加剂多"],
+                  nutrition: { carbs: 8, protein: 2, fat: 1, fiber: 2 },
+                  suitableFor: ["减脂", "易上火", "长痘"],
+                  avoidFor: ["宫寒", "胃病"] },
+                { id: 207, name: "红烧茄子", emoji: "🍆", calories: 280, category: "家常菜", mealType: ["dinner", "lunch"],
+                  pros: ["美味下饭", "花青素"], cons: ["吸油多", "热量高", "辛辣"],
+                  nutrition: { carbs: 15, protein: 3, fat: 22, fiber: 4 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "胃病"] },
+                { id: 208, name: "玉米排骨汤", emoji: "🌽", calories: 320, category: "家常菜", mealType: ["dinner", "lunch"],
+                  pros: ["营养丰富", "补钙", "易消化"], cons: ["汤含脂肪", "嘌呤高"],
+                  nutrition: { carbs: 25, protein: 25, fat: 15, fiber: 4 },
+                  suitableFor: ["体虚", "胃病"],
+                  avoidFor: ["痛风", "减脂"] }
+            ],
+            supper: [
+                { id: 301, name: "小龙虾", emoji: "🦞", calories: 150, category: "小吃", mealType: ["supper"],
+                  pros: ["高蛋白", "低脂肪", "美味"], cons: ["嘌呤高", "辛辣", "不卫生风险"],
+                  nutrition: { carbs: 5, protein: 25, fat: 3, fiber: 1 },
+                  suitableFor: [],
+                  avoidFor: ["痛风", "胃病", "长痘", "易上火"] },
+                { id: 302, name: "烤串", emoji: "🍢", calories: 250, category: "小吃", mealType: ["supper"],
+                  pros: ["美味", "社交"], cons: ["致癌风险", "高盐", "辛辣"],
+                  nutrition: { carbs: 10, protein: 20, fat: 15, fiber: 1 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火", "减脂"] },
+                { id: 303, name: "泡面", emoji: "🍜", calories: 450, category: "快餐", mealType: ["supper"],
+                  pros: ["方便", "便宜", "快捷"], cons: ["高盐", "油炸", "防腐剂"],
+                  nutrition: { carbs: 60, protein: 10, fat: 18, fiber: 3 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "高血压", "减脂"] },
+                { id: 304, name: "炸鸡", emoji: "🍗", calories: 550, category: "快餐", mealType: ["supper", "lunch"],
+                  pros: ["美味", "高蛋白"], cons: ["油炸", "高热量", "反式脂肪"],
+                  nutrition: { carbs: 30, protein: 30, fat: 35, fiber: 2 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "胃病", "长痘", "易上火"] },
+                { id: 305, name: "麻辣烫", emoji: "🍲", calories: 400, category: "小吃", mealType: ["supper", "lunch", "dinner"],
+                  pros: ["选择多样", "可以加蔬菜"], cons: ["辛辣", "汤底反复煮", "高盐"],
+                  nutrition: { carbs: 40, protein: 20, fat: 18, fiber: 5 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火", "减脂"] },
+                { id: 306, name: "烧烤", emoji: "🍖", calories: 350, category: "小吃", mealType: ["supper"],
+                  pros: ["美味", "社交氛围"], cons: ["致癌", "高盐", "油腻"],
+                  nutrition: { carbs: 15, protein: 28, fat: 22, fiber: 2 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火", "减脂"] },
+                { id: 307, name: "酸辣粉", emoji: "🍜", calories: 380, category: "小吃", mealType: ["supper", "lunch", "dinner"],
+                  pros: ["酸辣开胃", "方便"], cons: ["辛辣", "高盐", "添加剂"],
+                  nutrition: { carbs: 55, protein: 8, fat: 12, fiber: 3 },
+                  suitableFor: [],
+                  avoidFor: ["胃病", "长痘", "易上火"] },
+                { id: 308, name: "糖水", emoji: "🥤", calories: 200, category: "甜品", mealType: ["supper"],
+                  pros: ["美味", "滋润"], cons: ["高糖", "热量高", "睡前吃易胖"],
+                  nutrition: { carbs: 40, protein: 2, fat: 5, fiber: 1 },
+                  suitableFor: [],
+                  avoidFor: ["减脂", "糖尿病", "长痘"] }
+            ]
+        };
+        
+        // 全部食物列表（用于搜索和筛选）
+        const allFoods = [
+            ...foodDatabase.breakfast,
+            ...foodDatabase.lunch,
+            ...foodDatabase.dinner,
+            ...foodDatabase.supper
+        ];
+        
+        // 用户设置
+        let userSettings = {
+            bodyTypes: [],
+            allergies: [],
+            calorieTarget: 2000,
+            customFoods: []
+        };
+        
+        // 饮食记录
+        let dietRecords = [];
+        
+        // 避雷记录
+        let avoidRecords = [];
+        
+        // 当前状态
+        let currentMealType = 'breakfast';
+        let currentCategory = '减脂餐';
+        let isSpinning = false;
+        let currentRotation = 0;
+        let selectedResult = null;
+        let currentMonth = new Date();
+        
+        // ==================== 工具函数 ====================
+        
+        // 保存数据到localStorage
+        function saveData() {
+            localStorage.setItem('userSettings', JSON.stringify(userSettings));
+            localStorage.setItem('dietRecords', JSON.stringify(dietRecords));
+            localStorage.setItem('avoidRecords', JSON.stringify(avoidRecords));
+        }
+        
+        // 从localStorage加载数据
+        function loadData() {
+            const savedSettings = localStorage.getItem('userSettings');
+            const savedRecords = localStorage.getItem('dietRecords');
+            const savedAvoid = localStorage.getItem('avoidRecords');
+            
+            if (savedSettings) userSettings = JSON.parse(savedSettings);
+            if (savedRecords) dietRecords = JSON.parse(savedRecords);
+            if (savedAvoid) avoidRecords = JSON.parse(savedAvoid);
+        }
+        
+        // 显示Toast提示
+        function showToast(message) {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // 获取当前日期字符串
+        function getTodayString() {
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        }
+        
+        // 格式化日期显示
+        function formatDate(dateStr) {
+            const parts = dateStr.split('-');
+            return `${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+        }
+        
+        // 获取餐类型名称
+        function getMealTypeName(type) {
+            const names = {
+                breakfast: '早餐',
+                lunch: '午餐',
+                dinner: '晚餐',
+                supper: '夜宵'
+            };
+            return names[type] || type;
+        }
+        
+        // 获取所有可用食物（考虑体质筛选）
+        function getAvailableFoods(mealType) {
+            let foods = [...foodDatabase[mealType]];
+            
+            if (userSettings.customFoods.length > 0) {
+                const customFoods = userSettings.customFoods.filter(f => 
+                    f.mealType.includes(mealType)
+                );
+                foods = [...foods, ...customFoods];
+            }
+            
+            if (userSettings.bodyTypes.length > 0) {
+                foods = foods.filter(food => {
+                    const avoidFor = food.avoidFor || [];
+                    return !avoidFor.some(condition => userSettings.bodyTypes.includes(condition));
+                });
+            }
+            
+            if (avoidRecords.length > 0) {
+                const avoidNames = avoidRecords.map(a => a.name.toLowerCase());
+                foods = foods.filter(food => !avoidNames.includes(food.name.toLowerCase()));
+            }
+            
+            if (userSettings.allergies.length > 0) {
+                const allergyNames = userSettings.allergies.map(a => a.toLowerCase());
+                foods = foods.filter(food => !allergyNames.includes(food.name.toLowerCase()));
+            }
+            
+            return foods;
+        }
+        
+        function getFoodsByCategory(category) {
+            let foods = allFoods.filter(f => f.category === category);
+            
+            if (userSettings.customFoods.length > 0) {
+                const customFoods = userSettings.customFoods.filter(f => f.category === category);
+                foods = [...foods, ...customFoods];
+            }
+            
+            return foods;
+        }
+        
+        function updateWheel() {
+            const wheel = document.getElementById('wheel');
+            const foods = getAvailableFoods(currentMealType);
+            
+            if (foods.length < 8) {
+                while (foods.length < 8) {
+                    foods.push(...foods.slice(0, 8 - foods.length));
+                }
+            }
+            
+            const segments = wheel.querySelectorAll('.wheel-segment');
+            const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#ff9ff3', '#54a0ff', '#5f27cd', '#ff9f43'];
+            
+            segments.forEach((segment, index) => {
+                const food = foods[index % foods.length];
+                segment.style.background = colors[index];
+                segment.setAttribute('data-food-id', food.id);
+                segment.setAttribute('data-food-name', food.name);
+            });
+            
+            const desc = document.getElementById('currentMealDesc');
+            const mealNames = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐', supper: '夜宵' };
+            desc.textContent = `点击转盘开始抽取今日${mealNames[currentMealType]}`;
+        }
+        
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            const foods = getAvailableFoods(currentMealType);
+            if (foods.length === 0) {
+                showToast('当前没有可选择的食物，请检查体质和忌口设置');
+                return;
+            }
+            
+            isSpinning = true;
+            const spinButton = document.getElementById('spinButton');
+            spinButton.disabled = true;
+            
+            const randomIndex = Math.floor(Math.random() * Math.min(foods.length, 8));
+            const segmentAngle = 45;
+            const targetAngle = randomIndex * segmentAngle;
+            
+            const extraSpins = 360 * 5;
+            const newRotation = currentRotation + extraSpins + (360 - targetAngle);
+            
+            const wheel = document.getElementById('wheel');
+            wheel.style.transform = `rotate(${newRotation}deg)`;
+            currentRotation = newRotation;
+            
+            setTimeout(() => {
+                selectedResult = foods[randomIndex % foods.length];
+                showResultModal(selectedResult);
+                isSpinning = false;
+                spinButton.disabled = false;
+            }, 4200);
+        }
+        
+        function showResultModal(food) {
+            const modal = document.getElementById('resultModal');
+            
+            document.getElementById('resultEmoji').textContent = food.emoji;
+            document.getElementById('resultName').textContent = food.name;
+            document.getElementById('resultCalories').textContent = `${food.calories} kcal`;
+            document.getElementById('resultCategory').textContent = food.category;
+            
+            const description = `${food.category}，${food.pros ? food.pros[0] || '美味可口' : '美味可口'}`;
+            document.getElementById('resultDesc').textContent = description;
+            
+            const prosConsDiv = document.getElementById('resultProsCons');
+            let prosHtml = '';
+            let consHtml = '';
+            
+            if (food.pros && food.pros.length > 0) {
+                prosHtml = food.pros.map(p => `<span class="pros-cons-tag pros-tag">✓ ${p}</span>`).join('');
+            }
+            if (food.cons && food.cons.length > 0) {
+                consHtml = food.cons.map(c => `<span class="pros-cons-tag cons-tag">✗ ${c}</span>`).join('');
+            }
+            
+            prosConsDiv.innerHTML = prosHtml + consHtml;
+            
+            modal.classList.add('show');
+        }
+        
+        function showRecommendations() {
+            const container = document.getElementById('recommendations');
+            let foods = [...allFoods];
+            
+            if (userSettings.bodyTypes.length > 0) {
+                foods = foods.filter(food => {
+                    const suitable = food.suitableFor || [];
+                    const isSuitable = suitable.some(s => userSettings.bodyTypes.includes(s));
+                    
+                    if (isSuitable) return true;
+                    
+                    const avoidFor = food.avoidFor || [];
+                    const isAvoid = avoidFor.some(a => userSettings.bodyTypes.includes(a));
+                    
+                    return !isAvoid;
+                });
+            }
+            
+            const shuffled = foods.sort(() => 0.5 - Math.random());
+            const recommended = shuffled.slice(0, 4);
+            
+            container.innerHTML = recommended.map(food => `
+                <div class="food-card cursor-pointer" onclick="showFoodDetail(${food.id})">
+                    <div class="h-24 flex items-center justify-center text-4xl bg-gradient-to-br from-pink-50 to-orange-50">
+                        ${food.emoji}
+                    </div>
+                    <div class="p-3">
+                        <h4 class="font-medium text-gray-800 text-sm">${food.name}</h4>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-gray-400">${food.category}</span>
+                            <span class="text-xs text-red-500 font-medium">${food.calories} kcal</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showFoodDetail(id) {
+            let food = allFoods.find(f => f.id === id);
+            if (!food && userSettings.customFoods) {
+                food = userSettings.customFoods.find(f => f.id === id);
+            }
+            
+            if (!food) return;
+            
+            const modal = document.getElementById('foodDetailModal');
+            document.getElementById('foodDetailName').textContent = `${food.emoji} ${food.name}`;
+            
+            const content = document.getElementById('foodDetailContent');
+            
+            let suitableText = '所有体质';
+            if (food.suitableFor && food.suitableFor.length > 0) {
+                suitableText = food.suitableFor.join('、');
+            }
+            
+            let avoidText = '无';
+            if (food.avoidFor && food.avoidFor.length > 0) {
+                avoidText = food.avoidFor.join('、');
+            }
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-400">分类</span>
+                                <p class="font-medium">${food.category}</p>
+                            </div>
+                            <div>
+                                <span class="text-gray-400">热量</span>
+                                <p class="font-medium text-red-500">${food.calories} kcal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${food.nutrition ? `
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">📊 营养成分</h4>
+                        <div class="grid grid-cols-4 gap-2 text-center">
+                            <div class="bg-blue-50 rounded-lg p-2">
+                                <p class="text-xs text-gray-500">碳水</p>
+                                <p class="font-bold text-blue-600">${food.nutrition.carbs}g</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-2">
+                                <p class="text-xs text-gray-500">蛋白质</p>
+                                <p class="font-bold text-green-600">${food.nutrition.protein}g</p>
+                            </div>
+                            <div class="bg-yellow-50 rounded-lg p-2">
+                                <p class="text-xs text-gray-500">脂肪</p>
+                                <p class="font-bold text-yellow-600">${food.nutrition.fat}g</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-2">
+                                <p class="text-xs text-gray-500">纤维</p>
+                                <p class="font-bold text-purple-600">${food.nutrition.fiber}g</p>
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">✅ 优点</h4>
+                        <div class="flex flex-wrap gap-1">
+                            ${(food.pros || []).map(p => `<span class="pros-cons-tag pros-tag">${p}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">⚠️ 注意事项</h4>
+                        <div class="flex flex-wrap gap-1">
+                            ${(food.cons || []).map(c => `<span class="pros-cons-tag cons-tag">${c}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-2">👤 体质适配</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center">
+                                <span class="text-gray-400 w-20">推荐体质:</span>
+                                <span class="recommended-tag text-xs px-2 py-1 rounded">${suitableText}</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-400 w-20">不适合:</span>
+                                <span class="avoided-tag text-xs px-2 py-1 rounded">${avoidText}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2 border-t">
+                        <button onclick="recordMealFromDetail(${food.id})" class="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-2 rounded-lg font-medium">
+                            📝 记录到今天饮食
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('show');
+        }
+        
+        function recordMealFromDetail(id) {
+            let food = allFoods.find(f => f.id === id);
+            if (!food && userSettings.customFoods) {
+                food = userSettings.customFoods.find(f => f.id === id);
+            }
+            
+            if (!food) return;
+            
+            const today = getTodayString();
+            let todayRecord = dietRecords.find(r => r.date === today);
+            
+            if (!todayRecord) {
+                todayRecord = {
+                    date: today,
+                    meals: {
+                        breakfast: [],
+                        lunch: [],
+                        dinner: [],
+                        supper: []
+                    }
+                };
+                dietRecords.push(todayRecord);
+            }
+            
+            let mealType = 'lunch';
+            if (food.mealType && food.mealType.includes('breakfast')) mealType = 'breakfast';
+            else if (food.mealType && food.mealType.includes('dinner')) mealType = 'dinner';
+            else if (food.mealType && food.mealType.includes('supper')) mealType = 'supper';
+            
+            todayRecord.meals[mealType].push({
+                id: food.id,
+                name: food.name,
+                emoji: food.emoji,
+                calories: food.calories,
+                category: food.category
+            });
+            
+            saveData();
+            document.getElementById('foodDetailModal').classList.remove('show');
+            showToast(`已添加到今日${getMealTypeName(mealType)}`);
+        }
+        
+        function updateCategoryFoods() {
+            const foods = getFoodsByCategory(currentCategory);
+            const container = document.getElementById('categoryFoods');
+            
+            if (foods.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">暂无该分类的食物</p>';
+                return;
+            }
+            
+            container.innerHTML = foods.map(food => `
+                <div class="bg-white rounded-xl p-3 shadow-sm flex items-center gap-3 cursor-pointer" onclick="showFoodDetail(${food.id})">
+                    <div class="w-12 h-12 flex items-center justify-center text-2xl bg-gray-50 rounded-lg">
+                        ${food.emoji}
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">${food.name}</h4>
+                        <div class="flex gap-2 mt-1">
+                            ${(food.pros || []).slice(0, 2).map(p => `<span class="text-xs pros-cons-tag pros-tag">${p}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-red-500 font-bold">${food.calories}</p>
+                        <p class="text-xs text-gray-400">kcal</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateFoodList(filter = 'all') {
+            const container = document.getElementById('foodList');
+            let foods = [...allFoods];
+            
+            if (userSettings.customFoods.length > 0) {
+                foods = [...foods, ...userSettings.customFoods];
+            }
+            
+            if (filter !== 'all') {
+                foods = foods.filter(f => f.mealType && f.mealType.includes(filter));
+            }
+            
+            const searchValue = document.getElementById('searchFood').value.toLowerCase();
+            if (searchValue) {
+                foods = foods.filter(f => 
+                    f.name.toLowerCase().includes(searchValue) ||
+                    f.category.toLowerCase().includes(searchValue)
+                );
+            }
+            
+            if (foods.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-8">没有找到食物</p>';
+                return;
+            }
+            
+            container.innerHTML = foods.map(food => `
+                <div class="bg-white rounded-xl p-3 shadow-sm mb-3 flex items-center gap-3 cursor-pointer" onclick="showFoodDetail(${food.id})">
+                    <div class="w-14 h-14 flex items-center justify-center text-3xl bg-gradient-to-br from-pink-50 to-orange-50 rounded-xl">
+                        ${food.emoji}
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">${food.name}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-500">${food.category}</span>
+                            <span class="text-xs text-gray-400">${food.mealType.map(m => getMealTypeName(m)).join('/')}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-red-500 font-bold text-lg">${food.calories}</p>
+                        <p class="text-xs text-gray-400">kcal</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateTodayMeals() {
+            const today = getTodayString();
+            const todayRecord = dietRecords.find(r => r.date === today);
+            
+            const container = document.getElementById('todayMeals');
+            document.getElementById('todayDate').textContent = formatDate(today);
+            
+            if (!todayRecord || Object.values(todayRecord.meals).every(m => m.length === 0)) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">还没有记录今天的饮食，点击右上角添加</p>';
+                return;
+            }
+            
+            const mealTypes = ['breakfast', 'lunch', 'dinner', 'supper'];
+            let html = '';
+            
+            mealTypes.forEach(type => {
+                const meals = todayRecord.meals[type];
+                if (meals.length > 0) {
+                    const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+                    html += `
+                        <div class="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-700">${getMealTypeName(type)}</span>
+                                <span class="text-red-500 text-sm font-medium">${totalCalories} kcal</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${meals.map(m => `
+                                    <span class="bg-gray-50 px-2 py-1 rounded text-sm flex items-center gap-1">
+                                        ${m.emoji} ${m.name}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function updateRecentRecords() {
+            const container = document.getElementById('recentRecords');
+            
+            if (dietRecords.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">还没有饮食记录</p>';
+                return;
+            }
+            
+            const recent = [...dietRecords].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+            
+            container.innerHTML = recent.map(record => {
+                const allMeals = [...record.meals.breakfast, ...record.meals.lunch, ...record.meals.dinner, ...record.meals.supper];
+                const totalCalories = allMeals.reduce((sum, m) => sum + m.calories, 0);
+                
+                return `
+                    <div class="bg-white rounded-xl p-3 shadow-sm cursor-pointer" onclick="showDateDetail('${record.date}')">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium text-gray-700">${formatDate(record.date)}</span>
+                            <span class="text-red-500 text-sm font-medium">${totalCalories} kcal</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${allMeals.slice(0, 5).map(m => `<span class="text-2xl">${m.emoji}</span>`).join('')}
+                            ${allMeals.length > 5 ? `<span class="text-gray-400 text-sm">+${allMeals.length - 5}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function showDateDetail(date) {
+            const record = dietRecords.find(r => r.date === date);
+            
+            const detailContainer = document.getElementById('calendarDetail');
+            document.getElementById('selectedDateTitle').textContent = formatDate(date);
+            
+            const mealsContainer = document.getElementById('selectedDateMeals');
+            
+            if (!record) {
+                mealsContainer.innerHTML = '<p class="text-gray-400 text-center py-8">当天没有饮食记录</p>';
+                detailContainer.classList.remove('hidden');
+                return;
+            }
+            
+            const mealTypes = ['breakfast', 'lunch', 'dinner', 'supper'];
+            
+            let html = '';
+            mealTypes.forEach(type => {
+                const meals = record.meals[type];
+                if (meals.length > 0) {
+                    const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+                    html += `
+                        <div class="bg-gray-50 rounded-lg p-3 mb-2">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium">${getMealTypeName(type)}</span>
+                                <span class="text-red-500 text-sm">${totalCalories} kcal</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${meals.map(m => `
+                                    <span class="bg-white px-2 py-1 rounded text-sm">
+                                        ${m.emoji} ${m.name}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (!html) {
+                html = '<p class="text-gray-400 text-center py-8">当天没有饮食记录</p>';
+            }
+            
+            mealsContainer.innerHTML = html;
+            detailContainer.classList.remove('hidden');
+        }
+        
+        function updateCalendar() {
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+            
+            document.getElementById('currentMonth').textContent = `${year}年${month + 1}月`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const container = document.getElementById('calendarDays');
+            let html = '';
+            
+            for (let i = 0; i < firstDay; i++) {
+                html += '<div class="calendar-day"></div>';
+            }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasRecord = dietRecords.some(r => r.date === dateStr);
+                const isToday = dateStr === getTodayString();
+                
+                html += `
+                    <div class="calendar-day ${hasRecord ? 'has-record' : ''} ${isToday ? 'ring-2 ring-red-400' : ''}" 
+                         onclick="showDateDetail('${dateStr}')">
+                        <span class="text-sm">${day}</span>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function updateStats() {
+            const foodCount = {};
+            const categoryCount = {};
+            const dailyCalories = {};
+            
+            dietRecords.forEach(record => {
+                const allMeals = [...record.meals.breakfast, ...record.meals.lunch, ...record.meals.dinner, ...record.meals.supper];
+                const totalCalories = allMeals.reduce((sum, m) => sum + m.calories, 0);
+                dailyCalories[record.date] = totalCalories;
+                
+                allMeals.forEach(meal => {
+                    foodCount[meal.name] = (foodCount[meal.name] || 0) + 1;
+                    categoryCount[meal.category] = (categoryCount[meal.category] || 0) + 1;
+                });
+            });
+            
+            const rankingContainer = document.getElementById('foodRanking');
+            const sortedFoods = Object.entries(foodCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            
+            if (sortedFoods.length === 0) {
+                rankingContainer.innerHTML = '<p class="text-gray-400 text-center py-4">记录更多数据后显示</p>';
+            } else {
+                const maxCount = sortedFoods[0][1];
+                rankingContainer.innerHTML = sortedFoods.map(([name, count], index) => `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600'}">${index + 1}</span>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium">${name}</span>
+                                <span class="text-xs text-gray-400">${count}次</span>
+                            </div>
+                            <div class="stat-bar">
+                                <div class="stat-bar-fill" style="width: ${(count / maxCount) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            const diversityContainer = document.getElementById('diversityStats');
+            const totalCategories = Object.keys(categoryCount).length;
+            const totalFoods = Object.keys(foodCount).length;
+            
+            let diversityHtml = '';
+            
+            if (totalCategories === 0) {
+                diversityHtml = '<p class="text-gray-400 text-center py-4">记录更多数据后显示</p>';
+            } else {
+                const diversityScore = Math.min((totalCategories / 7) * 100, 100);
+                const varietyAdvice = diversityScore >= 80 ? '饮食非常丰富！' : 
+                                      diversityScore >= 50 ? '饮食还可以，建议更多样化' :
+                                      '饮食较单一，建议多尝试不同种类';
+                
+                diversityHtml = `
+                    <div class="text-center mb-4">
+                        <div class="text-3xl font-bold text-red-500">${totalFoods}</div>
+                        <div class="text-sm text-gray-400">尝试过的食物种类</div>
+                    </div>
+                    <div class="text-center mb-4">
+                        <div class="text-3xl font-bold text-orange-500">${totalCategories}</div>
+                        <div class="text-sm text-gray-400">涉及的分类</div>
+                    </div>
+                    <div class="pt-3 border-t">
+                        <p class="text-sm text-gray-600">${varietyAdvice}</p>
+                    </div>
+                `;
+            }
+            
+            diversityContainer.innerHTML = diversityHtml;
+            
+            const calorieTrendContainer = document.getElementById('calorieTrend');
+            const sortedDates = Object.keys(dailyCalories).sort((a, b) => a.localeCompare(b));
+            
+            if (sortedDates.length === 0) {
+                calorieTrendContainer.innerHTML = '<p class="text-gray-400 text-center py-4">记录更多数据后显示</p>';
+            } else {
+                const recentDates = sortedDates.slice(-7);
+                const target = userSettings.calorieTarget;
+                
+                calorieTrendContainer.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-xs text-gray-400 mb-2">
+                            <span>日期</span>
+                            <span>热量摄入 (目标: ${target} kcal)</span>
+                        </div>
+                        ${recentDates.map(date => {
+                            const calories = dailyCalories[date];
+                            const percentage = Math.min((calories / target) * 100, 150);
+                            const isOver = calories > target;
+                            const isUnder = calories < target * 0.8;
+                            const colorClass = isOver ? 'bg-red-400' : isUnder ? 'bg-blue-400' : 'bg-green-400';
+                            const labelClass = isOver ? 'text-red-500' : isUnder ? 'text-blue-500' : 'text-green-500';
+                            
+                            return `
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs text-gray-500 w-20 flex-shrink-0">${date.slice(5)}</span>
+                                    <div class="flex-1">
+                                        <div class="flex justify-between mb-1">
+                                            <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                                                <div class="h-full ${colorClass} rounded-full" style="width: ${Math.min(percentage, 100)}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs ${labelClass} font-medium w-16 text-right">${calories}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                        <div class="flex justify-center gap-4 mt-4 pt-3 border-t text-xs">
+                            <span class="flex items-center gap-1">
+                                <span class="w-3 h-3 bg-green-400 rounded-full"></span>
+                                正常
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+                                偏低
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <span class="w-3 h-3 bg-red-400 rounded-full"></span>
+                                偏高
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function updateAvoidList() {
+            const container = document.getElementById('avoidList');
+            
+            if (avoidRecords.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">还没有避雷记录</p>';
+                return;
+            }
+            
+            container.innerHTML = avoidRecords.map((record, index) => `
+                <div class="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
+                    <div>
+                        <span class="font-medium">${record.name}</span>
+                        <span class="text-xs text-gray-400 ml-2">${record.reason}</span>
+                    </div>
+                    <button onclick="removeAvoid(${index})" class="text-red-400 hover:text-red-600 text-sm">移除</button>
+                </div>
+            `).join('');
+        }
+        
+        function removeAvoid(index) {
+            avoidRecords.splice(index, 1);
+            saveData();
+            updateAvoidList();
+            showToast('已从避雷清单移除');
+        }
+        
+        function updateBodyTypeTags() {
+            document.querySelectorAll('.body-type-tag').forEach(tag => {
+                const type = tag.getAttribute('data-type');
+                if (userSettings.bodyTypes.includes(type)) {
+                    tag.classList.add('selected');
+                } else {
+                    tag.classList.remove('selected');
+                }
+            });
+        }
+        
+        function updateAllergyTags() {
+            const container = document.getElementById('allergyTags');
+            
+            if (userSettings.allergies.length === 0) {
+                container.innerHTML = '<span class="text-gray-400 text-sm">还没有添加忌口食物</span>';
+                return;
+            }
+            
+            container.innerHTML = userSettings.allergies.map((allergy, index) => `
+                <span class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    ${allergy}
+                    <button onclick="removeAllergy(${index})" class="text-red-400 hover:text-red-600">×</button>
+                </span>
+            `).join('');
+        }
+        
+        function removeAllergy(index) {
+            userSettings.allergies.splice(index, 1);
+            saveData();
+            updateAllergyTags();
+            showToast('已移除忌口');
+        }
+        
+        function updateCalorieCalculator() {
+            const breakfast = parseInt(document.getElementById('calcBreakfast').textContent);
+            const lunch = parseInt(document.getElementById('calcLunch').textContent);
+            const dinner = parseInt(document.getElementById('calcDinner').textContent);
+            
+            const total = breakfast + lunch + dinner;
+            const target = userSettings.calorieTarget;
+            
+            document.getElementById('calcTotal').textContent = total;
+            
+            const progress = Math.min((total / target) * 100, 100);
+            document.getElementById('heatGauge').style.setProperty('--progress', `${progress}%`);
+            
+            const advice = document.getElementById('calorieAdvice');
+            if (total < target * 0.8) {
+                advice.innerHTML = '<span class="text-blue-500 font-medium">⚠️ 热量偏低，建议适当增加</span>';
+            } else if (total > target * 1.2) {
+                advice.innerHTML = '<span class="text-red-500 font-medium">⚠️ 热量偏高，可能会发胖</span>';
+            } else {
+                advice.innerHTML = '<span class="text-green-500 font-medium">✅ 热量适中，不会长胖</span>';
+            }
+        }
+        
+        function generatePoster() {
+            const today = getTodayString();
+            const todayRecord = dietRecords.find(r => r.date === today);
+            
+            document.getElementById('posterDate').textContent = formatDate(today);
+            
+            const mealsContainer = document.getElementById('posterMeals');
+            let html = '';
+            
+            if (todayRecord) {
+                const mealTypes = ['breakfast', 'lunch', 'dinner', 'supper'];
+                
+                mealTypes.forEach(type => {
+                    const meals = todayRecord.meals[type];
+                    if (meals.length > 0) {
+                        const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+                        html += `
+                            <div class="bg-white/10 rounded-lg p-3 mb-2">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-medium">${getMealTypeName(type)}</span>
+                                    <span class="text-yellow-300 text-sm">${totalCalories} kcal</span>
+                                </div>
+                                <div class="space-y-1">
+                                    ${meals.map(m => `
+                                        <div class="flex items-center gap-2 text-white">
+                                            <span class="text-lg">${m.emoji}</span>
+                                            <span class="text-sm">${m.name}</span>
+                                            <span class="text-yellow-300 text-xs ml-auto">${m.calories} kcal</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (!html) {
+                html = '<p class="text-purple-200 text-center py-4">还没有记录今天的饮食</p>';
+            }
+            
+            mealsContainer.innerHTML = html;
+            document.getElementById('posterModal').classList.add('show');
+        }
+        
+        function populateFoodSelectList() {
+            const container = document.getElementById('foodSelectList');
+            let foods = [...allFoods];
+            
+            if (userSettings.customFoods.length > 0) {
+                foods = [...foods, ...userSettings.customFoods];
+            }
+            
+            if (avoidRecords.length > 0) {
+                const avoidNames = avoidRecords.map(a => a.name.toLowerCase());
+                foods = foods.filter(f => !avoidNames.includes(f.name.toLowerCase()));
+            }
+            
+            container.innerHTML = foods.map(food => `
+                <label class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100">
+                    <input type="checkbox" value="${food.id}" class="food-checkbox w-4 h-4 text-red-500">
+                    <span class="text-xl">${food.emoji}</span>
+                    <div class="flex-1">
+                        <span class="text-sm">${food.name}</span>
+                        <span class="text-xs text-gray-400 ml-2">${food.calories} kcal</span>
+                    </div>
+                </label>
+            `).join('');
+        }
+        
+        function addCustomFood() {
+            const name = document.getElementById('newFoodName').value.trim();
+            const calories = parseInt(document.getElementById('newFoodCalories').value);
+            const category = document.getElementById('newFoodCategory').value;
+            const mealTypeStr = document.getElementById('newFoodMealType').value;
+            const prosStr = document.getElementById('newFoodPros').value.trim();
+            const consStr = document.getElementById('newFoodCons').value.trim();
+            
+            if (!name || isNaN(calories)) {
+                showToast('请填写食物名称和热量');
+                return;
+            }
+            
+            const newFood = {
+                id: Date.now(),
+                name: name,
+                emoji: '🍽️',
+                calories: calories,
+                category: category,
+                mealType: mealTypeStr.split(','),
+                pros: prosStr ? prosStr.split(',').map(s => s.trim()) : [],
+                cons: consStr ? consStr.split(',').map(s => s.trim()) : [],
+                nutrition: { carbs: 0, protein: 0, fat: 0, fiber: 0 },
+                suitableFor: [],
+                avoidFor: [],
+                isCustom: true
+            };
+            
+            userSettings.customFoods.push(newFood);
+            saveData();
+            
+            document.getElementById('addFoodModal').classList.remove('show');
+            document.getElementById('newFoodName').value = '';
+            document.getElementById('newFoodCalories').value = '';
+            document.getElementById('newFoodPros').value = '';
+            document.getElementById('newFoodCons').value = '';
+            
+            updateFoodList();
+            showToast('自定义食物添加成功');
+        }
+        
+        function initEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.getAttribute('data-page');
+                    
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    
+                    item.classList.add('active');
+                    document.getElementById(`page-${page}`).classList.add('active');
+                    
+                    if (page === 'records') {
+                        updateTodayMeals();
+                        updateRecentRecords();
+                        updateCalendar();
+                        updateStats();
+                        updateAvoidList();
+                    } else if (page === 'foods') {
+                        updateFoodList();
+                    } else if (page === 'settings') {
+                        updateBodyTypeTags();
+                        updateAllergyTags();
+                        updateCalorieCalculator();
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const meal = btn.getAttribute('data-meal');
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.add('bg-gray-100', 'text-gray-600');
+                    });
+                    
+                    btn.classList.add('active');
+                    btn.classList.remove('bg-gray-100', 'text-gray-600');
+                    
+                    currentMealType = meal;
+                    updateWheel();
+                });
+            });
+            
+            document.querySelectorAll('.category-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const category = chip.getAttribute('data-category');
+                    
+                    document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('selected'));
+                    chip.classList.add('selected');
+                    
+                    currentCategory = category;
+                    updateCategoryFoods();
+                });
+            });
+            
+            document.getElementById('spinButton').addEventListener('click', spinWheel);
+            document.getElementById('spinBtn').addEventListener('click', spinWheel);
+            
+            document.getElementById('rejectResult').addEventListener('click', () => {
+                document.getElementById('resultModal').classList.remove('show');
+                spinWheel();
+            });
+            
+            document.getElementById('acceptResult').addEventListener('click', () => {
+                if (selectedResult) {
+                    const today = getTodayString();
+                    let todayRecord = dietRecords.find(r => r.date === today);
+                    
+                    if (!todayRecord) {
+                        todayRecord = {
+                            date: today,
+                            meals: {
+                                breakfast: [],
+                                lunch: [],
+                                dinner: [],
+                                supper: []
+                            }
+                        };
+                        dietRecords.push(todayRecord);
+                    }
+                    
+                    todayRecord.meals[currentMealType].push({
+                        id: selectedResult.id,
+                        name: selectedResult.name,
+                        emoji: selectedResult.emoji,
+                        calories: selectedResult.calories,
+                        category: selectedResult.category
+                    });
+                    
+                    saveData();
+                    document.getElementById('resultModal').classList.remove('show');
+                    showToast(`已添加到今日${getMealTypeName(currentMealType)}`);
+                }
+            });
+            
+            document.getElementById('closeFoodDetail').addEventListener('click', () => {
+                document.getElementById('foodDetailModal').classList.remove('show');
+            });
+            
+            document.getElementById('addCustomFood').addEventListener('click', () => {
+                document.getElementById('addFoodModal').classList.add('show');
+            });
+            
+            document.getElementById('cancelAddFood').addEventListener('click', () => {
+                document.getElementById('addFoodModal').classList.remove('show');
+            });
+            
+            document.getElementById('confirmAddFood').addEventListener('click', addCustomFood);
+            
+            document.getElementById('addTodayMeal').addEventListener('click', () => {
+                populateFoodSelectList();
+                document.getElementById('addMealModal').classList.add('show');
+            });
+            
+            document.getElementById('cancelAddMeal').addEventListener('click', () => {
+                document.getElementById('addMealModal').classList.remove('show');
+            });
+            
+            document.getElementById('confirmAddMeal').addEventListener('click', () => {
+                const mealType = document.getElementById('mealTypeSelect').value;
+                const markAsAvoid = document.getElementById('markAsAvoid').checked;
+                
+                const checkboxes = document.querySelectorAll('.food-checkbox:checked');
+                const selectedFoodIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                
+                if (selectedFoodIds.length === 0) {
+                    showToast('请选择至少一个食物');
+                    return;
+                }
+                
+                const today = getTodayString();
+                let todayRecord = dietRecords.find(r => r.date === today);
+                
+                if (!todayRecord) {
+                    todayRecord = {
+                        date: today,
+                        meals: {
+                            breakfast: [],
+                            lunch: [],
+                            dinner: [],
+                            supper: []
+                        }
+                    };
+                    dietRecords.push(todayRecord);
+                }
+                
+                selectedFoodIds.forEach(id => {
+                    let food = allFoods.find(f => f.id === id);
+                    if (!food && userSettings.customFoods) {
+                        food = userSettings.customFoods.find(f => f.id === id);
+                    }
+                    
+                    if (food) {
+                        todayRecord.meals[mealType].push({
+                            id: food.id,
+                            name: food.name,
+                            emoji: food.emoji,
+                            calories: food.calories,
+                            category: food.category
+                        });
+                        
+                        if (markAsAvoid && !avoidRecords.some(a => a.name === food.name)) {
+                            avoidRecords.push({
+                                name: food.name,
+                                reason: '吃完肠胃不舒服',
+                                date: getTodayString()
+                            });
+                        }
+                    }
+                });
+                
+                saveData();
+                document.getElementById('addMealModal').classList.remove('show');
+                updateTodayMeals();
+                updateRecentRecords();
+                showToast('饮食记录已保存');
+            });
+            
+            document.querySelectorAll('.record-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.getAttribute('data-tab');
+                    
+                    document.querySelectorAll('.record-tab').forEach(t => {
+                        t.classList.remove('border-b-2', 'border-red-500', 'text-red-500');
+                        t.classList.add('text-gray-500');
+                    });
+                    
+                    tab.classList.add('border-b-2', 'border-red-500', 'text-red-500');
+                    tab.classList.remove('text-gray-500');
+                    
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+                    
+                    if (targetTab === 'calendar') {
+                        updateCalendar();
+                    } else if (targetTab === 'stats') {
+                        updateStats();
+                    } else if (targetTab === 'avoid') {
+                        updateAvoidList();
+                    }
+                });
+            });
+            
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() - 1);
+                updateCalendar();
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() + 1);
+                updateCalendar();
+            });
+            
+            document.querySelectorAll('.body-type-tag').forEach(tag => {
+                tag.addEventListener('click', () => {
+                    const type = tag.getAttribute('data-type');
+                    const index = userSettings.bodyTypes.indexOf(type);
+                    
+                    if (index > -1) {
+                        userSettings.bodyTypes.splice(index, 1);
+                    } else {
+                        userSettings.bodyTypes.push(type);
+                    }
+                    
+                    saveData();
+                    updateBodyTypeTags();
+                    updateWheel();
+                    showRecommendations();
+                });
+            });
+            
+            document.getElementById('addAllergy').addEventListener('click', () => {
+                const input = document.getElementById('newAllergy');
+                const allergy = input.value.trim();
+                
+                if (allergy && !userSettings.allergies.includes(allergy)) {
+                    userSettings.allergies.push(allergy);
+                    saveData();
+                    updateAllergyTags();
+                    updateWheel();
+                    input.value = '';
+                    showToast('已添加忌口');
+                }
+            });
+            
+            document.getElementById('calorieTarget').addEventListener('input', (e) => {
+                userSettings.calorieTarget = parseInt(e.target.value);
+                document.getElementById('calorieTargetValue').textContent = `${userSettings.calorieTarget} kcal`;
+                saveData();
+                updateCalorieCalculator();
+            });
+            
+            document.querySelectorAll('.calorie-adjust').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const meal = btn.getAttribute('data-meal');
+                    const action = btn.getAttribute('data-action');
+                    const element = document.getElementById(`calc${meal.charAt(0).toUpperCase() + meal.slice(1)}`);
+                    let value = parseInt(element.textContent);
+                    
+                    if (action === 'plus') {
+                        value = Math.min(value + 50, 2000);
+                    } else {
+                        value = Math.max(value - 50, 0);
+                    }
+                    
+                    element.textContent = value;
+                    updateCalorieCalculator();
+                });
+            });
+            
+            document.getElementById('generatePoster').addEventListener('click', generatePoster);
+            
+            document.getElementById('closePoster').addEventListener('click', () => {
+                document.getElementById('posterModal').classList.remove('show');
+            });
+            
+            document.getElementById('addAvoidFood').addEventListener('click', () => {
+                document.getElementById('addAvoidModal').classList.add('show');
+            });
+            
+            document.getElementById('cancelAddAvoid').addEventListener('click', () => {
+                document.getElementById('addAvoidModal').classList.remove('show');
+            });
+            
+            document.getElementById('confirmAddAvoid').addEventListener('click', () => {
+                const name = document.getElementById('avoidFoodName').value.trim();
+                const reason = document.getElementById('avoidReason').value;
+                
+                if (!name) {
+                    showToast('请输入食物名称');
+                    return;
+                }
+                
+                if (avoidRecords.some(a => a.name === name)) {
+                    showToast('该食物已在避雷清单中');
+                    return;
+                }
+                
+                avoidRecords.push({
+                    name: name,
+                    reason: reason,
+                    date: getTodayString()
+                });
+                
+                saveData();
+                document.getElementById('addAvoidModal').classList.remove('show');
+                document.getElementById('avoidFoodName').value = '';
+                updateAvoidList();
+                updateWheel();
+                showToast('已添加到避雷清单');
+            });
+            
+            document.getElementById('searchFood').addEventListener('input', () => {
+                updateFoodList();
+            });
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active', 'bg-red-500', 'text-white');
+                        b.classList.add('bg-gray-100', 'text-gray-600');
+                    });
+                    
+                    btn.classList.add('active', 'bg-red-500', 'text-white');
+                    btn.classList.remove('bg-gray-100', 'text-gray-600');
+                    
+                    updateFoodList(filter);
+                });
+            });
+            
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('show');
+                    }
+                });
+            });
+        }
+        
+        function init() {
+            loadData();
+            initEventListeners();
+            
+            updateWheel();
+            showRecommendations();
+            updateCategoryFoods();
+        }
+        
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
