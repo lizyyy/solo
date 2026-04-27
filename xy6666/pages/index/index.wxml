@@ -1,0 +1,108 @@
+<!-- 首页顶部横幅 -->
+<view class="banner">
+  <view class="banner-text">
+    <text class="banner-title">欢迎使用自助饮料机</text>
+    <text class="banner-subtitle">新鲜制作，即刻享用</text>
+  </view>
+</view>
+
+<!-- 推荐饮品区域 -->
+<view class="section recommended-section">
+  <view class="section-header">
+    <text class="section-title">🔥 人气推荐</text>
+    <text class="section-more">更多</text>
+  </view>
+  <scroll-view class="recommended-scroll" scroll-x="true">
+    <view class="recommended-list">
+      <view 
+        class="recommended-item {{item.stock <= 0 ? 'sold-out' : ''}}" 
+        wx:for="{{recommendedDrinks}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goToDrinkDetail"
+      >
+        <view class="recommended-image-wrap">
+          <image class="recommended-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="stock-badge {{item.stock <= 3 ? 'warning' : ''}}">
+            {{item.stock > 0 ? '剩余' + item.stock + '杯' : '已售罄'}}
+          </view>
+        </view>
+        <view class="recommended-info">
+          <text class="recommended-name">{{item.name}}</text>
+          <view class="recommended-price-row">
+            <text class="recommended-price">¥{{item.price}}</text>
+            <text class="recommended-sales">月售{{item.sales}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 分类导航和饮品列表 -->
+<view class="main-content">
+  <!-- 左侧分类导航 -->
+  <scroll-view class="category-nav" scroll-y="true">
+    <view 
+      class="category-item {{currentCategoryId === item.id ? 'active' : ''}}" 
+      wx:for="{{categories}}" 
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="selectCategory"
+    >
+      <text class="category-icon">{{item.icon}}</text>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 右侧饮品列表 -->
+  <scroll-view class="drink-list" scroll-y="true" scroll-top="{{scrollTop}}">
+    <view class="drink-items">
+      <view 
+        class="drink-item {{item.stock <= 0 ? 'sold-out' : ''}}" 
+        wx:for="{{drinks}}" 
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="goToDrinkDetail"
+      >
+        <view class="drink-image-wrap">
+          <image class="drink-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="stock-info">
+            <text class="stock-text {{item.stock <= 0 ? 'sold' : item.stock <= 3 ? 'low' : ''}}">
+              {{item.stock > 0 ? (item.stock <= 3 ? '仅剩' + item.stock + '杯' : '库存充足') : '已售罄'}}
+            </text>
+          </view>
+        </view>
+        <view class="drink-info">
+          <view class="drink-name-row">
+            <text class="drink-name">{{item.name}}</text>
+            <view wx:if="{{item.isRecommended}}" class="recommend-tag">推荐</view>
+          </view>
+          <text class="drink-desc">{{item.description}}</text>
+          <view class="drink-bottom">
+            <view class="drink-price-row">
+              <text class="drink-price">¥{{item.price}}</text>
+              <text class="drink-sales">月售{{item.sales}}</text>
+            </view>
+            <view class="add-btn {{item.stock <= 0 ? 'disabled' : ''}}">
+              <text class="add-icon">+</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view wx:if="{{drinks.length === 0}}" class="empty-drinks">
+      <text class="empty-text">该分类暂无饮品</text>
+    </view>
+  </scroll-view>
+</view>
+
+<!-- 购物车悬浮按钮 -->
+<view class="cart-float" wx:if="{{cartCount > 0}}" bindtap="goToCart">
+  <view class="cart-icon">
+    <text class="cart-icon-text">🛒</text>
+    <view class="cart-badge">{{cartCount}}</view>
+  </view>
+  <text class="cart-tip">去结算</text>
+</view>

@@ -1,0 +1,177 @@
+<!-- 饮料图片区域 -->
+<view class="drink-image-section" wx:if="{{drink}}">
+  <image class="drink-main-image" src="{{drink.image}}" mode="aspectFill" />
+  <view class="stock-overlay">
+    <view class="stock-badge-detail {{drink.stock <= 3 ? 'warning' : ''}}">
+      {{drink.stock > 0 ? (drink.stock <= 3 ? '仅剩' + drink.stock + '杯' : '库存充足') : '已售罄'}}
+    </view>
+  </view>
+</view>
+
+<!-- 饮料基本信息 -->
+<view class="drink-info-section card" wx:if="{{drink}}">
+  <view class="drink-name-detail">{{drink.name}}</view>
+  <view class="drink-desc-detail">{{drink.description}}</view>
+  <view class="drink-meta">
+    <view class="meta-item">
+      <text class="meta-label">月售</text>
+      <text class="meta-value">{{drink.sales}}杯</text>
+    </view>
+    <view class="meta-divider"></view>
+    <view class="meta-item">
+      <text class="meta-label">好评率</text>
+      <text class="meta-value">98%</text>
+    </view>
+  </view>
+  <view class="price-row-detail">
+    <text class="price-symbol">¥</text>
+    <text class="price-amount">{{drink.price}}</text>
+    <text class="price-unit">/杯</text>
+  </view>
+</view>
+
+<!-- 规格选择区域 -->
+<view class="options-section card" wx:if="{{drink}}">
+  <!-- 甜度选择 -->
+  <view class="option-group">
+    <view class="option-header">
+      <text class="option-title">甜度</text>
+      <text class="option-selected">{{selectedSugar}}</text>
+    </view>
+    <view class="option-items">
+      <view 
+        class="option-item {{selectedSugar === item ? 'active' : ''}}" 
+        wx:for="{{drink.options.sugar}}" 
+        wx:key="*this"
+        data-sugar="{{item}}"
+        bindtap="selectSugar"
+      >
+        <text class="option-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="divider-line"></view>
+
+  <!-- 冰量选择 -->
+  <view class="option-group">
+    <view class="option-header">
+      <text class="option-title">冰量/温度</text>
+      <text class="option-selected">{{selectedIce}}</text>
+    </view>
+    <view class="option-items">
+      <view 
+        class="option-item {{selectedIce === item ? 'active' : ''}}" 
+        wx:for="{{drink.options.ice}}" 
+        wx:key="*this"
+        data-ice="{{item}}"
+        bindtap="selectIce"
+      >
+        <text class="option-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="divider-line"></view>
+
+  <!-- 杯型选择 -->
+  <view class="option-group">
+    <view class="option-header">
+      <text class="option-title">杯型</text>
+      <text class="option-selected">{{selectedSize}}</text>
+    </view>
+    <view class="option-items">
+      <view 
+        class="option-item {{selectedSize === item ? 'active' : ''}}" 
+        wx:for="{{drink.options.size}}" 
+        wx:key="*this"
+        data-size="{{item}}"
+        bindtap="selectSize"
+      >
+        <text class="option-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="divider-line" wx:if="{{drink.options.toppings && drink.options.toppings.length > 0}}"></view>
+
+  <!-- 加料选择 -->
+  <view class="option-group" wx:if="{{drink.options.toppings && drink.options.toppings.length > 0}}">
+    <view class="option-header">
+      <text class="option-title">加料</text>
+      <text class="option-selected" wx:if="{{selectedToppings.length > 0}}">已选{{selectedToppings.length}}项</text>
+      <text class="option-selected" wx:else>可选</text>
+    </view>
+    <view class="option-items">
+      <view 
+        class="option-item {{selectedToppings.some(t => t.name === item.name) ? 'active' : ''}}" 
+        wx:for="{{drink.options.toppings}}" 
+        wx:key="name"
+        data-topping="{{item}}"
+        bindtap="toggleTopping"
+      >
+        <text class="option-text">{{item.name}}</text>
+        <text class="option-price">+¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 已选规格展示 -->
+<view class="selected-summary card" wx:if="{{selectedToppings.length > 0}}">
+  <view class="summary-header">
+    <text class="summary-title">已选规格</text>
+  </view>
+  <view class="summary-content">
+    <view class="summary-item">
+      <text class="summary-label">甜度：</text>
+      <text class="summary-value">{{selectedSugar}}</text>
+    </view>
+    <view class="summary-item">
+      <text class="summary-label">冰量：</text>
+      <text class="summary-value">{{selectedIce}}</text>
+    </view>
+    <view class="summary-item">
+      <text class="summary-label">杯型：</text>
+      <text class="summary-value">{{selectedSize}}</text>
+    </view>
+    <view class="summary-item" wx:if="{{selectedToppings.length > 0}}">
+      <text class="summary-label">加料：</text>
+      <text class="summary-value">{{selectedToppings.map(t => t.name).join('、')}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 底部固定栏 -->
+<view class="fixed-bottom-bar">
+  <view class="quantity-control">
+    <text class="quantity-label">数量</text>
+    <view class="quantity-buttons">
+      <view class="quantity-btn {{quantity <= 1 ? 'disabled' : ''}}" bindtap="decreaseQuantity">
+        <text class="quantity-icon">-</text>
+      </view>
+      <view class="quantity-value">{{quantity}}</view>
+      <view class="quantity-btn {{quantity >= drink.stock ? 'disabled' : ''}}" bindtap="increaseQuantity">
+        <text class="quantity-icon">+</text>
+      </view>
+    </view>
+  </view>
+  <view class="price-total">
+    <text class="total-label">合计</text>
+    <text class="total-symbol">¥</text>
+    <text class="total-amount">{{totalPrice}}</text>
+  </view>
+  <view class="action-buttons">
+    <view class="btn-add-cart" bindtap="addToCart">
+      <text class="btn-text">加入购物车</text>
+    </view>
+  </view>
+</view>
+
+<!-- 成功提示 -->
+<view class="success-toast {{showSuccessToast ? 'show' : ''}}">
+  <view class="toast-content">
+    <text class="toast-icon">✓</text>
+    <text class="toast-text">已加入购物车</text>
+  </view>
+</view>
