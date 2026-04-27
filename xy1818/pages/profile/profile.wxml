@@ -1,0 +1,148 @@
+<view class="page">
+  <view class="profile-header">
+    <view class="header-bg"></view>
+    <view class="user-section">
+      <view class="user-avatar" wx:if="{{userInfo}}">
+        <image class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+      </view>
+      <view class="user-avatar" wx:else>
+        <text class="avatar-placeholder">😊</text>
+      </view>
+      <view class="user-info">
+        <view class="user-name-row">
+          <text class="user-name">{{userInfo ? userInfo.nickName : '未登录'}}</text>
+          <view class="member-badge" wx:if="{{memberInfo}}">
+            <text class="member-icon">👑</text>
+            <text class="member-level">{{memberInfo.levelName}}</text>
+          </view>
+        </view>
+        <view class="user-balance" wx:if="{{memberInfo}}">
+          <text class="balance-label">余额：</text>
+          <text class="balance-value">¥{{memberInfo.balance}}</text>
+          <text class="balance-points"> | 积分：{{memberInfo.points}}</text>
+        </view>
+        <view class="login-tip" wx:else>
+          <text class="tip-text">点击登录，享受更多优惠</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-actions card">
+    <view class="action-item" bindtap="onOrderTap" data-status="pending">
+      <view class="action-icon-wrap">
+        <text class="action-icon">💳</text>
+        <view class="action-badge" wx:if="{{orderStats.pending > 0}}">{{orderStats.pending}}</view>
+      </view>
+      <text class="action-text">待支付</text>
+    </view>
+    <view class="action-item" bindtap="onOrderTap" data-status="paid">
+      <view class="action-icon-wrap">
+        <text class="action-icon">📦</text>
+        <view class="action-badge" wx:if="{{orderStats.paid > 0}}">{{orderStats.paid}}</view>
+      </view>
+      <text class="action-text">待收货</text>
+    </view>
+    <view class="action-item" bindtap="onOrderTap" data-status="completed">
+      <view class="action-icon-wrap">
+        <text class="action-icon">✅</text>
+        <view class="action-badge" wx:if="{{orderStats.completed > 0}}">{{orderStats.completed}}</view>
+      </view>
+      <text class="action-text">已完成</text>
+    </view>
+    <view class="action-item" bindtap="onCouponsTap">
+      <view class="action-icon-wrap">
+        <text class="action-icon">🎫</text>
+        <view class="action-badge" wx:if="{{coupons.length > 0}}">{{coupons.length}}</view>
+      </view>
+      <text class="action-text">优惠券</text>
+    </view>
+  </view>
+
+  <view class="menu-section card">
+    <view class="menu-item" bindtap="onMenuTap" data-id="coupons" data-path="/pages/profile/coupons">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[0].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[0].name}}</text>
+          <text class="menu-desc">{{menuItems[0].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onMenuTap" data-id="member" data-path="/pages/profile/member">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[1].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[1].name}}</text>
+          <text class="menu-desc">{{menuItems[1].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item highlight" bindtap="onMenuTap" data-id="recharge" data-path="/pages/profile/recharge">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[2].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[2].name}}</text>
+          <text class="menu-desc">{{menuItems[2].desc}}</text>
+        </view>
+      </view>
+      <view class="menu-right">
+        <text class="hot-tag">HOT</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-section card">
+    <view class="menu-item" bindtap="onMenuTap" data-id="orders" data-path="/pages/order/order">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[3].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[3].name}}</text>
+          <text class="menu-desc">{{menuItems[3].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onMenuTap" data-id="address" data-path="">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[4].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[4].name}}</text>
+          <text class="menu-desc">{{menuItems[4].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="menu-section card">
+    <view class="menu-item" bindtap="onMenuTap" data-id="service" data-path="">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[5].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[5].name}}</text>
+          <text class="menu-desc">{{menuItems[5].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="onMenuTap" data-id="settings" data-path="">
+      <view class="menu-left">
+        <text class="menu-icon">{{menuItems[6].icon}}</text>
+        <view class="menu-info">
+          <text class="menu-name">{{menuItems[6].name}}</text>
+          <text class="menu-desc">{{menuItems[6].desc}}</text>
+        </view>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="footer-info">
+    <text class="footer-text">甜蜜烘焙 · 用心做好每一块面包</text>
+    <text class="footer-version">版本 1.0.0</text>
+  </view>
+</view>

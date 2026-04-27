@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/calendar/calendar",
+    "pages/ranking/ranking",
+    "pages/air/air",
+    "pages/recycle/recycle",
+    "pages/footprint/footprint",
+    "pages/habits/habits",
+    "pages/diary/diary"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#4CAF50",
+    "navigationBarTitleText": "快乐地球",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#E8F5E9"
+  },
+
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

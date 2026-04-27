@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情绪垃圾桶 - 安全释放你的情绪</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 页面1: 主页面 - 输入烦恼和选择情绪 -->
+        <div id="page-home" class="page active">
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">情绪垃圾桶</h1>
+                    <p class="subtitle">安全释放，匿名倾诉</p>
+                </header>
+
+                <div class="form-section">
+                    <div class="input-group">
+                        <label class="input-label">你的烦恼是什么？</label>
+                        <textarea 
+                            id="worries-textarea" 
+                            class="worries-textarea" 
+                            placeholder="在这里写下你的烦恼、压力或想说的话..."></textarea>
+                        <div class="char-count">
+                            <span id="char-count">0</span>/500
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">你现在的情绪是？</label>
+                        <div class="emotions-grid" id="emotions-grid">
+                            <!-- 情绪选项将通过JS动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">选择处理方式</label>
+                        <div class="mode-options">
+                            <div class="mode-option" data-mode="shredder">
+                                <div class="mode-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 3H19C20.1046 3 21 3.89543 21 5V13C21 14.1046 20.1046 15 19 15H5C3.89543 15 3 14.1046 3 13V5C3 3.89543 3.89543 3 5 3Z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M8 19V15" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M12 19V15" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M16 19V15" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M7 9L17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <span class="mode-name">粉碎</span>
+                                <span class="mode-desc">永远消失，彻底释放</span>
+                            </div>
+                            <div class="mode-option" data-mode="treehole">
+                                <div class="mode-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M8 12C8 14.2091 9.79086 16 12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <span class="mode-name">匿名树洞</span>
+                                <span class="mode-desc">陌生人倾听，阅后即焚</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-next" class="btn btn-primary btn-large" disabled>
+                        继续
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面2: 情绪强度评估 - 情绪温度计 -->
+        <div id="page-thermometer" class="page">
+            <div class="container">
+                <header class="header">
+                    <button id="btn-back-home" class="btn-back">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="title">情绪温度计</h1>
+                    <p class="subtitle">评估你此刻的情绪强度</p>
+                </header>
+
+                <div class="thermometer-section">
+                    <div class="selected-emotion-preview">
+                        <span class="selected-emotion-icon" id="preview-emotion-icon"></span>
+                        <span class="selected-emotion-name" id="preview-emotion-name"></span>
+                    </div>
+
+                    <div class="thermometer-container">
+                        <div class="thermometer">
+                            <div class="thermometer-scale">
+                                <div class="scale-mark"><span class="scale-number">10</span><span class="scale-label">极度强烈</span></div>
+                                <div class="scale-mark"><span class="scale-number">9</span></div>
+                                <div class="scale-mark"><span class="scale-number">8</span></div>
+                                <div class="scale-mark"><span class="scale-number">7</span></div>
+                                <div class="scale-mark"><span class="scale-number">6</span></div>
+                                <div class="scale-mark"><span class="scale-number">5</span><span class="scale-label">中等</span></div>
+                                <div class="scale-mark"><span class="scale-number">4</span></div>
+                                <div class="scale-mark"><span class="scale-number">3</span></div>
+                                <div class="scale-mark"><span class="scale-number">2</span></div>
+                                <div class="scale-mark"><span class="scale-number">1</span><span class="scale-label">轻微</span></div>
+                            </div>
+                            <div class="thermometer-bar">
+                                <div class="thermometer-fill" id="thermometer-fill"></div>
+                            </div>
+                            <input 
+                                type="range" 
+                                id="thermometer-slider" 
+                                min="1" 
+                                max="10" 
+                                value="5"
+                                class="thermometer-slider"
+                            >
+                        </div>
+                        <div class="current-intensity">
+                            <span class="intensity-label">当前情绪强度:</span>
+                            <span class="intensity-value" id="intensity-value">5</span>
+                            <span class="intensity-level" id="intensity-level">中等</span>
+                        </div>
+                    </div>
+
+                    <div class="intensity-hint" id="intensity-hint">
+                        <!-- 强度提示将动态生成 -->
+                    </div>
+
+                    <button id="btn-continue" class="btn btn-primary btn-large">
+                        继续
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面3: 情绪反馈 -->
+        <div id="page-feedback" class="page">
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">情绪反馈</h1>
+                </header>
+
+                <div class="feedback-section">
+                    <div class="emotion-summary">
+                        <div class="summary-icon" id="feedback-emotion-icon"></div>
+                        <div class="summary-text">
+                            <p>你正在经历 <span id="feedback-emotion-name" class="highlight"></span></p>
+                            <p>情绪强度: <span id="feedback-intensity" class="highlight"></span>/10</p>
+                        </div>
+                    </div>
+
+                    <div class="feedback-card" id="feedback-card">
+                        <div class="feedback-type" id="feedback-type"></div>
+                        <div class="feedback-content" id="feedback-content"></div>
+                    </div>
+
+                    <div class="breathing-guide" id="breathing-guide" style="display: none;">
+                        <div class="breathing-circle" id="breathing-circle">
+                            <span id="breathing-text">开始</span>
+                        </div>
+                        <p class="breathing-instruction" id="breathing-instruction">点击开始呼吸练习</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="btn-to-shredder" class="btn btn-primary btn-large" style="display: none;">
+                            开始粉碎
+                        </button>
+                        <button id="btn-to-treehole" class="btn btn-primary btn-large" style="display: none;">
+                            进入树洞
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面4: 粉碎模式 -->
+        <div id="page-shredder" class="page">
+            <div class="container">
+                <header class="header">
+                    <button id="btn-back-feedback" class="btn-back">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="title">情绪粉碎机</h1>
+                    <p class="subtitle">让烦恼永远消失</p>
+                </header>
+
+                <div class="shredder-section">
+                    <div class="shredder-machine" id="shredder-machine">
+                        <div class="shredder-top">
+                            <div class="shredder-slot">
+                                <div class="paper-slip" id="paper-slip">
+                                    <div class="paper-content" id="paper-content"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="shredder-body">
+                            <div class="shredder-blades" id="shredder-blades"></div>
+                            <div class="shredded-particles" id="shredded-particles"></div>
+                        </div>
+                        <div class="shredder-bottom">
+                            <div class="waste-bin" id="waste-bin"></div>
+                        </div>
+                    </div>
+
+                    <div class="shredder-status" id="shredder-status">
+                        准备就绪
+                    </div>
+
+                    <button id="btn-start-shred" class="btn btn-danger btn-large">
+                        开始粉碎
+                    </button>
+
+                    <div class="shred-complete" id="shred-complete" style="display: none;">
+                        <div class="complete-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <p class="complete-text">粉碎完成！</p>
+                        <p class="complete-subtext">你的烦恼已经永远消失了</p>
+                        
+                        <div class="psychological-hint" id="psychological-hint"></div>
+
+                        <button id="btn-finish-shred" class="btn btn-primary btn-large">
+                            完成
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面5: 树洞模式 - 匹配 -->
+        <div id="page-treehole-match" class="page">
+            <div class="container">
+                <header class="header">
+                    <button id="btn-back-feedback2" class="btn-back">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <h1 class="title">匿名树洞</h1>
+                    <p class="subtitle">寻找倾听者</p>
+                </header>
+
+                <div class="match-section">
+                    <div class="match-status" id="match-status">
+                        <div class="matching-animation" id="matching-animation">
+                            <div class="pulse-ring"></div>
+                            <div class="match-icon">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20.005 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89317 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="match-text" id="match-text">正在寻找匹配的倾听者...</p>
+                        <p class="match-subtext" id="match-subtext">平均等待时间: 15秒</p>
+                    </div>
+
+                    <button id="btn-start-match" class="btn btn-primary btn-large">
+                        开始匹配
+                    </button>
+
+                    <button id="btn-cancel-match" class="btn btn-secondary btn-large" style="display: none;">
+                        取消匹配
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面6: 树洞模式 - 聊天 -->
+        <div id="page-treehole-chat" class="page">
+            <div class="container chat-container">
+                <header class="chat-header">
+                    <button id="btn-leave-chat" class="btn-leave-chat">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="chat-partner">
+                        <div class="partner-avatar" id="partner-avatar">
+                            <span id="partner-initial"></span>
+                        </div>
+                        <div class="partner-info">
+                            <span class="partner-name" id="partner-name">陌生人</span>
+                            <span class="partner-status" id="partner-status">正在倾听</span>
+                        </div>
+                    </div>
+                    <div class="chat-timer" id="chat-timer">
+                        <span id="timer-display">03:00</span>
+                    </div>
+                </header>
+
+                <div class="chat-messages" id="chat-messages">
+                    <!-- 消息将动态添加 -->
+                </div>
+
+                <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="chat-input" 
+                            class="chat-input" 
+                            placeholder="输入消息..."
+                            maxlength="200"
+                        ></textarea>
+                        <button id="btn-send" class="btn-send" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="quick-replies" id="quick-replies">
+                        <!-- 快捷回复将动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面7: 聊天结束 -->
+        <div id="page-chat-end" class="page">
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">会话结束</h1>
+                    <p class="subtitle">感谢你的分享</p>
+                </header>
+
+                <div class="chat-end-section">
+                    <div class="session-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">聊天时长</span>
+                            <span class="summary-value" id="summary-duration">00:00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">消息数量</span>
+                            <span class="summary-value" id="summary-messages">0</span>
+                        </div>
+                    </div>
+
+                    <div class="end-message">
+                        <p>本次对话已阅后即焚</p>
+                        <p>所有聊天记录已永久删除</p>
+                    </div>
+
+                    <div class="rating-section" id="rating-section">
+                        <p class="rating-label">这次倾听对你有帮助吗？</p>
+                        <div class="rating-stars" id="rating-stars">
+                            <span class="star" data-rating="1">★</span>
+                            <span class="star" data-rating="2">★</span>
+                            <span class="star" data-rating="3">★</span>
+                            <span class="star" data-rating="4">★</span>
+                            <span class="star" data-rating="5">★</span>
+                        </div>
+                    </div>
+
+                    <button id="btn-finish-chat" class="btn btn-primary btn-large">
+                        完成
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面8: 完成页面 -->
+        <div id="page-complete" class="page">
+            <div class="container">
+                <header class="header">
+                    <h1 class="title">已完成</h1>
+                </header>
+
+                <div class="complete-section">
+                    <div class="big-complete-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <p class="complete-main-text">情绪释放完成</p>
+                    <p class="complete-sub-text">你做得很好，学会表达情绪是重要的一步</p>
+
+                    <div class="session-record" id="session-record"></div>
+
+                    <button id="btn-start-new" class="btn btn-primary btn-large">
+                        开始新的释放
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

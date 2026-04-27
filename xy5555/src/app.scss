@@ -1,0 +1,212 @@
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f9fafb;
+  color: #333;
+  font-size: 28rpx;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  padding: 20rpx;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  justify-content: space-between;
+}
+
+.flex-around {
+  justify-content: space-around;
+}
+
+.flex-align-center {
+  align-items: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-primary {
+  color: #10b981;
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.text-muted {
+  color: #9ca3af;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.bg-primary {
+  background-color: #10b981;
+}
+
+.border-radius {
+  border-radius: 16rpx;
+}
+
+.shadow-sm {
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.shadow {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+}
+
+.mt-10 {
+  margin-top: 10rpx;
+}
+
+.mt-20 {
+  margin-top: 20rpx;
+}
+
+.mt-30 {
+  margin-top: 30rpx;
+}
+
+.mb-10 {
+  margin-bottom: 10rpx;
+}
+
+.mb-20 {
+  margin-bottom: 20rpx;
+}
+
+.mb-30 {
+  margin-bottom: 30rpx;
+}
+
+.p-20 {
+  padding: 20rpx;
+}
+
+.p-30 {
+  padding: 30rpx;
+}
+
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  border: none;
+}
+
+.btn-primary {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.btn-outline {
+  background-color: #ffffff;
+  color: #10b981;
+  border: 2rpx solid #10b981;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16rpx;
+}
+
+.card-content {
+  font-size: 28rpx;
+  color: #6b7280;
+  line-height: 1.8;
+}
+
+.divider {
+  height: 1rpx;
+  background-color: #e5e7eb;
+  margin: 20rpx 0;
+}
+
+// 深色模式样式
+.dark-mode {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+.dark-mode .bg-white {
+  background-color: #1f2937;
+}
+
+.dark-mode .text-primary {
+  color: #34d399;
+}
+
+.dark-mode .text-secondary {
+  color: #9ca3af;
+}
+
+.dark-mode .text-muted {
+  color: #6b7280;
+}
+
+.dark-mode .bg-primary {
+  background-color: #059669;
+}
+
+.dark-mode .shadow-sm,
+.dark-mode .shadow {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .card {
+  background-color: #1f2937;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .card-title {
+  color: #f3f4f6;
+}
+
+.dark-mode .card-content {
+  color: #d1d5db;
+}
+
+.dark-mode .divider {
+  background-color: #374151;
+}
+
+.dark-mode .btn-primary {
+  background-color: #059669;
+}
+
+.dark-mode .btn-outline {
+  background-color: #1f2937;
+  border-color: #34d399;
+  color: #34d399;
+}

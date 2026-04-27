@@ -1,0 +1,380 @@
+/* 饮料详情页样式 */
+page {
+  background-color: #F5F5F5;
+  padding-bottom: 180rpx;
+}
+
+/* 饮料图片区域 */
+.drink-image-section {
+  position: relative;
+  width: 100%;
+  height: 500rpx;
+  background-color: #FFFFFF;
+}
+
+.drink-main-image {
+  width: 100%;
+  height: 100%;
+}
+
+.stock-overlay {
+  position: absolute;
+  bottom: 20rpx;
+  right: 20rpx;
+}
+
+.stock-badge-detail {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+}
+
+.stock-badge-detail.warning {
+  background-color: rgba(255, 77, 79, 0.9);
+}
+
+/* 饮料基本信息 */
+.drink-info-section {
+  margin: 20rpx;
+  padding: 30rpx;
+}
+
+.drink-name-detail {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 15rpx;
+}
+
+.drink-desc-detail {
+  font-size: 28rpx;
+  color: #666666;
+  margin-bottom: 25rpx;
+  line-height: 1.6;
+}
+
+.drink-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25rpx;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.meta-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-right: 8rpx;
+}
+
+.meta-value {
+  font-size: 24rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.meta-divider {
+  width: 1rpx;
+  height: 30rpx;
+  background-color: #EEEEEE;
+  margin: 0 25rpx;
+}
+
+.price-row-detail {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-symbol {
+  font-size: 28rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.price-amount {
+  font-size: 48rpx;
+  color: #FF6B35;
+  font-weight: 600;
+  margin-left: 4rpx;
+}
+
+.price-unit {
+  font-size: 24rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+
+/* 规格选择区域 */
+.options-section {
+  margin: 20rpx;
+  padding: 30rpx;
+}
+
+.option-group {
+  margin-bottom: 0;
+}
+
+.option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.option-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.option-selected {
+  font-size: 26rpx;
+  color: #FF6B35;
+}
+
+.option-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 30rpx;
+  background-color: #F8F8F8;
+  border-radius: 8rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.option-item:active {
+  opacity: 0.8;
+}
+
+.option-item.active {
+  background-color: rgba(255, 107, 53, 0.1);
+  border-color: #FF6B35;
+}
+
+.option-text {
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.option-item.active .option-text {
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.option-price {
+  font-size: 24rpx;
+  color: #FF6B35;
+  margin-left: 8rpx;
+}
+
+.divider-line {
+  height: 1rpx;
+  background-color: #F0F0F0;
+  margin: 25rpx 0;
+}
+
+/* 已选规格展示 */
+.selected-summary {
+  margin: 20rpx;
+  padding: 25rpx 30rpx;
+  background-color: #FFF8F5;
+  border: 1rpx solid #FFE5D9;
+}
+
+.summary-header {
+  margin-bottom: 15rpx;
+}
+
+.summary-title {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #FF6B35;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: 26rpx;
+  color: #666666;
+  flex-shrink: 0;
+}
+
+.summary-value {
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+/* 底部固定栏 */
+.fixed-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #FFFFFF;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.quantity-control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 30rpx;
+}
+
+.quantity-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 10rpx;
+}
+
+.quantity-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-btn {
+  width: 56rpx;
+  height: 56rpx;
+  background-color: #F8F8F8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.quantity-btn:active:not(.disabled) {
+  background-color: #EEEEEE;
+}
+
+.quantity-btn.disabled {
+  opacity: 0.5;
+}
+
+.quantity-icon {
+  font-size: 36rpx;
+  color: #333333;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.quantity-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 24rpx;
+  min-width: 40rpx;
+  text-align: center;
+}
+
+.price-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.total-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 6rpx;
+}
+
+.total-symbol {
+  font-size: 26rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.total-amount {
+  font-size: 44rpx;
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.btn-add-cart {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  padding: 24rpx 50rpx;
+  border-radius: 50rpx;
+  box-shadow: 0 4rpx 15rpx rgba(255, 107, 53, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-add-cart:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 10rpx rgba(255, 107, 53, 0.2);
+}
+
+.btn-text {
+  font-size: 30rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 成功提示 */
+.success-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 40rpx 60rpx;
+  border-radius: 16rpx;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.success-toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toast-icon {
+  font-size: 60rpx;
+  color: #52C41A;
+  margin-bottom: 15rpx;
+}
+
+.toast-text {
+  font-size: 28rpx;
+  color: #FFFFFF;
+}

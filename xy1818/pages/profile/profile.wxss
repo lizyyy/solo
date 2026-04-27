@@ -1,0 +1,254 @@
+.page {
+  min-height: 100vh;
+  background-color: #FFF5F5;
+  padding-bottom: 40rpx;
+}
+
+.profile-header {
+  position: relative;
+  padding: 40rpx 30rpx 60rpx;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 320rpx;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 50%, #FFB3B3 100%);
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.user-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-placeholder {
+  font-size: 60rpx;
+}
+
+.user-info {
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.user-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.user-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.member-badge {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 20rpx;
+  padding: 6rpx 16rpx;
+  margin-left: 16rpx;
+}
+
+.member-icon {
+  font-size: 24rpx;
+  margin-right: 6rpx;
+}
+
+.member-level {
+  font-size: 22rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.user-balance {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: baseline;
+}
+
+.balance-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.balance-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.balance-points {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.login-tip {
+  margin-top: 12rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.quick-actions {
+  margin: -30rpx 30rpx 20rpx;
+  display: flex;
+  justify-content: space-around;
+  padding: 30rpx 20rpx;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.action-icon-wrap {
+  position: relative;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+  border-radius: 50%;
+}
+
+.action-icon {
+  font-size: 40rpx;
+}
+
+.action-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  background-color: #D32F2F;
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: bold;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8rpx;
+}
+
+.action-text {
+  font-size: 24rpx;
+  color: #666666;
+  margin-top: 12rpx;
+}
+
+.menu-section {
+  margin: 0 30rpx 20rpx;
+  padding: 0;
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx 30rpx;
+  border-bottom: 2rpx solid #F5F5F5;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item.highlight {
+  background-color: #FFEBEE;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.menu-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.menu-desc {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.menu-right {
+  display: flex;
+  align-items: center;
+}
+
+.hot-tag {
+  font-size: 18rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF6B6B 0%, #D32F2F 100%);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  margin-right: 12rpx;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: #CCCCCC;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 60rpx;
+  padding: 20rpx;
+}
+
+.footer-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.footer-version {
+  font-size: 20rpx;
+  color: #CCCCCC;
+  margin-top: 8rpx;
+}
