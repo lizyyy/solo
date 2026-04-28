@@ -1,0 +1,99 @@
+<view class="container">
+  <view class="form-section">
+    <view class="form-item">
+      <view class="form-label">选择分类</view>
+      <view class="category-list">
+        <view class="category-item {{selectedCategory === item.id ? 'active' : ''}}" 
+              wx:for="{{categories}}" wx:key="id"
+              bindtap="selectCategory" data-category="{{item.id}}">
+          <view class="category-icon">{{item.icon}}</view>
+          <view class="category-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <view class="form-label">帖子内容</view>
+      <textarea class="content-input" 
+                placeholder="分享你的打工人生活，记录真实状态..."
+                value="{{postContent}}"
+                bindinput="onContentInput"
+                maxlength="500"
+                show-confirm-bar="{{false}}" />
+      <view class="word-count">{{postContent.length}}/500</view>
+    </view>
+    
+    <view class="form-item">
+      <view class="form-label">添加图片 (最多9张)</view>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{selectedImages}}" wx:key="index" bindtap="removeImage" data-index="{{index}}">
+          <view class="image-preview">{{item}}</view>
+          <view class="image-remove">✕</view>
+        </view>
+        <view class="image-add" wx:if="{{selectedImages.length < 9}}" bindtap="addImage">
+          <view class="add-icon">+</view>
+          <view class="add-text">添加图片</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <view class="form-label">添加话题标签</view>
+      <view class="tag-list">
+        <view class="tag-item {{selectedTags.includes(item) ? 'active' : ''}}" 
+              wx:for="{{suggestedTags}}" wx:key="index"
+              bindtap="toggleTag" data-tag="{{item}}">
+          #{{item}}
+        </view>
+      </view>
+      <view class="custom-tag">
+        <input class="tag-input" 
+               type="text" 
+               placeholder="自定义话题，按回车添加"
+               value="{{customTag}}"
+               bindinput="onTagInput"
+               bindconfirm="addCustomTag" />
+      </view>
+    </view>
+    
+    <view class="form-item">
+      <view class="form-label">公开设置</view>
+      <view class="settings-list">
+        <view class="setting-item" bindtap="toggleShowSalary">
+          <view class="setting-left">
+            <view class="setting-icon">💰</view>
+            <view class="setting-text">
+              <view class="setting-title">显示薪资档位</view>
+              <view class="setting-desc">让同档位用户更容易找到你</view>
+            </view>
+          </view>
+          <view class="setting-switch {{showSalary ? 'on' : ''}}">
+            <view class="switch-dot"></view>
+          </view>
+        </view>
+        
+        <view class="setting-item" bindtap="toggleShowLocation">
+          <view class="setting-left">
+            <view class="setting-icon">📍</view>
+            <view class="setting-text">
+              <view class="setting-title">显示同城</view>
+              <view class="setting-desc">让同城打工人可以交流</view>
+            </view>
+          </view>
+          <view class="setting-switch {{showLocation ? 'on' : ''}}">
+            <view class="switch-dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-actions">
+    <view class="action-btn draft-btn" bindtap="saveDraft">
+      存为草稿
+    </view>
+    <view class="action-btn publish-btn" bindtap="publishPost">
+      发布帖子
+    </view>
+  </view>
+</view>
