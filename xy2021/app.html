@@ -1,0 +1,3274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>快乐地球 - 绿色环保小程序</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+    .phone-frame {
+      width: 390px;
+      max-width: 100%;
+      background: #FFFFFF;
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(76, 175, 80, 0.3);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 844px;
+    }
+    .status-bar {
+      height: 44px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      background: #F5F5F5;
+      padding-bottom: 70px;
+    }
+    .page { padding: 16px; display: none; }
+    .page.active { display: block; }
+    .card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .card-header {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+      color: #FFFFFF;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    .card-title::before {
+      content: '';
+      width: 4px;
+      height: 18px;
+      background: #4CAF50;
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+    .user-info { display: flex; justify-content: space-between; align-items: center; }
+    .user-left { display: flex; align-items: center; }
+    .avatar {
+      width: 56px; height: 56px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 28px;
+    }
+    .nickname { font-size: 18px; font-weight: 600; }
+    .level { font-size: 12px; opacity: 0.9; margin-top: 2px; }
+    .points-display { text-align: right; }
+    .points-label { font-size: 12px; opacity: 0.9; }
+    .points-value { font-size: 32px; font-weight: 700; color: #FFD700; }
+    .checkin-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .checkin-info { display: flex; justify-content: space-between; align-items: center; }
+    .streak-info { font-size: 14px; }
+    .streak-number { font-size: 24px; font-weight: 700; color: #FFD700; margin: 0 4px; }
+    .btn {
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+    }
+    .btn-primary { background: rgba(255, 255, 255, 0.3); color: #FFFFFF; }
+    .btn-primary:hover { background: rgba(255, 255, 255, 0.4); transform: scale(1.02); }
+    .btn-primary.disabled { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.6); cursor: not-allowed; }
+    .week-days { display: flex; justify-content: space-between; margin-top: 16px; }
+    .day-item { text-align: center; flex: 1; padding: 8px 4px; border-radius: 8px; }
+    .day-item.today { background: rgba(255, 255, 255, 0.3); }
+    .day-name { font-size: 11px; opacity: 0.8; }
+    .day-date { font-size: 14px; margin-top: 2px; }
+    .day-date.today { color: #FFD700; font-weight: 700; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .stat-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F1F8E9 100%);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      border: 1px solid rgba(76, 175, 80, 0.15);
+    }
+    .stat-number { font-size: 20px; font-weight: 700; color: #2E7D32; }
+    .stat-label { font-size: 11px; color: #666; margin-top: 4px; }
+    .more-link {
+      text-align: center;
+      color: #4CAF50;
+      font-size: 13px;
+      margin-top: 12px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .more-link:hover { text-decoration: underline; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-item.completed { opacity: 0.5; }
+    .task-icon { font-size: 28px; margin-right: 12px; }
+    .task-content { flex: 1; }
+    .task-title { font-size: 14px; font-weight: 500; color: #1A1A1A; }
+    .task-desc { font-size: 12px; color: #999; margin-top: 2px; }
+    .task-right { text-align: right; }
+    .task-points { font-size: 14px; font-weight: 600; color: #4CAF50; }
+    .task-status { font-size: 12px; color: #999; margin-top: 2px; }
+    .task-status.done { color: #4CAF50; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .feature-item:hover { background: #E8F5E9; transform: translateY(-2px); }
+    .feature-icon { font-size: 28px; margin-bottom: 6px; }
+    .feature-name { font-size: 11px; color: #666; text-align: center; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-reason { font-size: 14px; color: #1A1A1A; }
+    .history-date { font-size: 11px; color: #999; margin-top: 2px; }
+    .history-points { font-size: 16px; font-weight: 600; color: #4CAF50; }
+    .empty-state { text-align: center; padding: 32px 20px; }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-text { font-size: 14px; color: #999; }
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #E8E8E8;
+      padding-bottom: 8px;
+      z-index: 100;
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .tab-item:hover { background: #F5F5F5; }
+    .tab-item.active .tab-icon { color: #4CAF50; }
+    .tab-item.active .tab-name { color: #4CAF50; font-weight: 600; }
+    .tab-icon { font-size: 22px; margin-bottom: 2px; }
+    .tab-name { font-size: 10px; color: #999; }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-content {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 24px;
+      width: 320px;
+      max-width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: center;
+      animation: modalIn 0.3s ease;
+    }
+    @keyframes modalIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon { font-size: 48px; margin-bottom: 12px; }
+    .modal-title { font-size: 18px; font-weight: 600; color: #1A1A1A; margin-bottom: 8px; }
+    .modal-message {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    .modal-btn {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .modal-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+    .modal-btn.secondary { background: #F5F5F5; color: #666; margin-right: 8px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: center; }
+    .form-section { text-align: left; margin-bottom: 16px; }
+    .form-label { font-size: 14px; color: #1A1A1A; font-weight: 500; margin-bottom: 8px; display: block; }
+    .form-radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .form-radio {
+      padding: 8px 16px;
+      background: #F5F5F5;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .form-radio:hover { background: #E8F5E9; }
+    .form-radio.selected { background: #E8F5E9; border-color: #4CAF50; color: #2E7D32; font-weight: 500; }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #E8E8E8;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { outline: none; border-color: #4CAF50; }
+    .form-tip { font-size: 12px; color: #999; margin-top: 6px; text-align: left; }
+    .form-tip.error { color: #F44336; }
+    .calculation-result { background: #E8F5E9; border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: left; }
+    .result-item { display: flex; justify-content: space-between; padding: 6px 0; }
+    .result-label { color: #666; font-size: 14px; }
+    .result-value { color: #2E7D32; font-weight: 600; font-size: 16px; }
+    .result-value.primary { color: #4CAF50; }
+    .tabs { display: flex; border-bottom: 2px solid #F0F0F0; margin-bottom: 16px; }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+    }
+    .tab.active { color: #4CAF50; border-bottom-color: #4CAF50; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .page-header { font-size: 18px; font-weight: 600; color: #1A1A1A; margin-bottom: 16px; text-align: center; }
+    .page-title { text-align: center; font-size: 18px; font-weight: 600; padding: 12px 0; background: #FFFFFF; margin-bottom: 12px; }
+    .back-btn {
+      position: absolute;
+      top: 52px;
+      left: 20px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 50;
+      padding: 8px;
+    }
+    .back-btn.hidden { display: none; }
+    
+    /* 日历样式 */
+    .calendar-header {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+      color: #FFFFFF;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .month-nav { display: flex; justify-content: space-between; align-items: center; }
+    .nav-btn { padding: 8px 16px; cursor: pointer; font-size: 18px; }
+    .month-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+    .today-btn {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 4px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .week-header { display: flex; justify-content: space-around; margin-top: 16px; }
+    .week-day { font-size: 12px; opacity: 0.9; width: 14%; text-align: center; }
+    .calendar-grid { display: flex; flex-wrap: wrap; margin-top: 8px; }
+    .calendar-day {
+      width: 14.28%;
+      padding: 8px 0;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 2px 0;
+      transition: all 0.2s;
+    }
+    .calendar-day:hover { background: rgba(255, 255, 255, 0.1); }
+    .calendar-day.other-month { opacity: 0.3; }
+    .calendar-day.today { background: rgba(255, 255, 255, 0.3); }
+    .calendar-day.selected { background: rgba(255, 255, 255, 0.5); }
+    .calendar-day.selected .day-number { color: #FFD700; font-weight: 700; }
+    .day-number { font-size: 14px; color: #FFFFFF; }
+    .day-marks { margin-top: 2px; display: flex; justify-content: center; gap: 2px; }
+    .mark-task { font-size: 8px; color: #FFD700; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stat-item { text-align: center; padding: 12px; }
+    
+    /* 碳足迹样式 */
+    .quick-add-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+    .quick-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .quick-item:hover { background: #E8F5E9; transform: translateY(-2px); }
+    .quick-icon { font-size: 28px; margin-bottom: 4px; }
+    .quick-name { font-size: 11px; color: #666; }
+    .transport-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .transport-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background: #F5F5F5;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .transport-item:hover { background: #E8F5E9; }
+    .transport-item.selected { background: #E8F5E9; border-color: #4CAF50; }
+    .transport-icon { font-size: 24px; margin-bottom: 4px; }
+    .transport-name { font-size: 11px; color: #666; }
+    .food-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #F5F5F5;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .food-item:hover { background: #E8F5E9; }
+    .food-item.selected { background: #E8F5E9; border-color: #4CAF50; }
+    .food-icon { font-size: 28px; margin-right: 12px; }
+    .food-info { flex: 1; }
+    .food-name { font-size: 14px; font-weight: 600; color: #1A1A1A; }
+    .food-desc { font-size: 11px; color: #999; }
+    .food-check { font-size: 18px; color: #4CAF50; }
+    .input-group { display: flex; align-items: center; }
+    .amount-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #E8E8E8;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    .amount-input:focus { outline: none; border-color: #4CAF50; }
+    .input-unit { margin-left: 12px; font-size: 14px; color: #666; }
+    .input-tip { font-size: 12px; color: #999; margin-top: 8px; }
+    .section-title { font-size: 14px; font-weight: 500; color: #1A1A1A; margin-bottom: 12px; }
+    .progress-section { margin-top: 16px; }
+    .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-bar { height: 8px; background: #E8E8E8; border-radius: 4px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50 0%, #81C784 100%);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    .category-stats { margin-top: 16px; }
+    .category-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .category-item:last-child { border-bottom: none; }
+    .category-left { display: flex; align-items: center; }
+    .category-icon { font-size: 24px; margin-right: 12px; }
+    .category-name { font-size: 14px; color: #1A1A1A; }
+    .category-amount { font-size: 12px; color: #999; margin-top: 2px; }
+    .category-percentage { font-size: 14px; font-weight: 600; color: #4CAF50; }
+    .progress-bar-small {
+      height: 4px;
+      background: #E8E8E8;
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .progress-fill-small { height: 100%; border-radius: 2px; }
+    .weekly-chart { margin-top: 16px; }
+    .chart-bars {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 100px;
+      padding: 0 8px;
+    }
+    .bar-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .bar-value { font-size: 10px; color: #4CAF50; margin-bottom: 4px; }
+    .bar-container {
+      width: 24px;
+      height: 70px;
+      background: #E8E8E8;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, #4CAF50, #81C784);
+      border-radius: 4px;
+      min-height: 4px;
+      transition: height 0.5s ease;
+    }
+    .bar-label { font-size: 11px; color: #666; margin-top: 8px; }
+    
+    /* 排行榜样式 */
+    .my-rank-card { background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); }
+    .my-rank-header { display: flex; justify-content: space-between; align-items: center; }
+    .my-info { display: flex; align-items: center; }
+    .my-avatar { font-size: 28px; margin-right: 12px; }
+    .my-name { font-size: 14px; font-weight: 600; color: #2E7D32; }
+    .my-stats { font-size: 12px; color: #666; margin-top: 2px; }
+    .my-score { text-align: right; }
+    .score-value { font-size: 24px; font-weight: 700; color: #4CAF50; }
+    .score-label { font-size: 11px; color: #666; }
+    .top-three { display: flex; justify-content: center; align-items: flex-end; margin: 20px 0; gap: 16px; }
+    .top-item { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .top-item.first { order: 2; }
+    .top-item.second { order: 1; }
+    .top-item.third { order: 3; }
+    .top-avatar { font-size: 36px; margin-bottom: 8px; }
+    .top-name { font-size: 12px; font-weight: 600; color: #1A1A1A; }
+    .top-score { font-size: 14px; font-weight: 700; color: #4CAF50; margin-top: 4px; }
+    .ranking-list { margin-top: 12px; }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .ranking-item:last-child { border-bottom: none; }
+    .rank-left { display: flex; align-items: center; }
+    .rank-number { width: 32px; font-size: 16px; font-weight: 700; color: #1A1A1A; }
+    .rank-avatar { font-size: 24px; margin-right: 12px; }
+    .rank-name { font-size: 14px; font-weight: 500; color: #1A1A1A; }
+    .rank-level { font-size: 11px; color: #999; margin-top: 2px; }
+    .rank-right { text-align: right; margin-left: auto; }
+    .rank-score { font-size: 16px; font-weight: 700; color: #4CAF50; }
+    .rank-label { font-size: 11px; color: #999; }
+    
+    /* 空气质量样式 */
+    .air-header {
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+      color: #FFFFFF;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .air-city { font-size: 14px; opacity: 0.9; }
+    .air-level { font-size: 24px; font-weight: 700; margin: 8px 0; }
+    .aqi-value { font-size: 48px; font-weight: 700; }
+    .aqi-label { font-size: 12px; opacity: 0.9; }
+    .pollutants-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .pollutant-item { background: #FAFAFA; border-radius: 12px; padding: 12px; }
+    .pollutant-header { display: flex; justify-content: space-between; }
+    .pollutant-name { font-size: 12px; color: #666; }
+    .pollutant-unit { font-size: 10px; color: #999; }
+    .pollutant-value { font-size: 20px; font-weight: 700; margin-top: 8px; }
+    .pollutant-bar { margin-top: 8px; }
+    .bar-bg { height: 6px; background: #E8E8E8; border-radius: 3px; overflow: hidden; }
+    .levels-list { margin-top: 12px; }
+    .level-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .level-item:last-child { border-bottom: none; }
+    .level-color { width: 16px; height: 16px; border-radius: 4px; margin-right: 12px; }
+    .level-info { flex: 1; }
+    .level-name { font-size: 14px; font-weight: 500; color: #1A1A1A; }
+    .level-range { font-size: 11px; color: #999; margin-top: 2px; }
+    .level-desc { font-size: 12px; color: #666; }
+    
+    /* 戒掉打卡样式 */
+    .habits-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
+    .habit-stat-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F1F8E9 100%);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(76, 175, 80, 0.15);
+    }
+    .habit-stat-number { font-size: 28px; font-weight: 700; }
+    .habit-stat-number.avoided { color: #4CAF50; }
+    .habit-stat-number.used { color: #FF9800; }
+    .habit-stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+    .disposable-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .disposable-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 8px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .disposable-item:hover { background: #E8F5E9; }
+    .disposable-item.selected { background: #E8F5E9; border: 2px solid #4CAF50; }
+    .disposable-icon { font-size: 32px; margin-bottom: 8px; }
+    .disposable-name { font-size: 11px; color: #666; text-align: center; }
+    
+    /* 日记样式 */
+    .earth-message {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .earth-icon { font-size: 48px; margin-bottom: 12px; }
+    .earth-title { font-size: 16px; font-weight: 600; color: #2E7D32; margin-bottom: 8px; }
+    .earth-content { font-size: 13px; color: #666; line-height: 1.8; }
+    .healing-quote {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+      border-left: 4px solid #4CAF50;
+    }
+    .healing-text { font-size: 14px; color: #2E7D32; line-height: 1.6; font-style: italic; }
+    .refresh-quote {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-top: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .mood-selector { display: flex; justify-content: center; gap: 16px; margin: 16px 0; }
+    .mood-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    .mood-item:hover { background: #F5F5F5; }
+    .mood-item.selected { background: #E8F5E9; }
+    .mood-emoji { font-size: 32px; margin-bottom: 4px; }
+    .mood-label { font-size: 11px; color: #666; }
+    .diary-input {
+      width: 100%;
+      min-height: 100px;
+      padding: 16px;
+      border: 2px solid #E8E8E8;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .diary-input:focus { outline: none; border-color: #4CAF50; }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.3s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3); }
+    .diary-item {
+      padding: 16px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .diary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .diary-date { font-size: 12px; color: #999; }
+    .diary-mood { font-size: 20px; }
+    .diary-content { font-size: 14px; color: #1A1A1A; line-height: 1.6; }
+    .wish-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    .wish-item:last-child { border-bottom: none; }
+    .wish-avatar {
+      width: 36px;
+      height: 36px;
+      background: #E8F5E9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .wish-content { flex: 1; }
+    .wish-text { font-size: 14px; color: #1A1A1A; line-height: 1.5; }
+    .wish-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .wish-date { font-size: 11px; color: #999; }
+    .wish-likes { display: flex; align-items: center; cursor: pointer; font-size: 12px; color: #666; }
+    .wish-likes:hover { color: #F44336; }
+    .wish-likes-icon { margin-right: 4px; }
+    
+    /* 回收估值样式 */
+    .recycle-category {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .recycle-category:hover { background: #E8F5E9; }
+    .recycle-category.selected { background: #E8F5E9; border: 2px solid #4CAF50; }
+    .recycle-icon { font-size: 36px; margin-right: 16px; }
+    .recycle-info { flex: 1; }
+    .recycle-name { font-size: 15px; font-weight: 600; color: #1A1A1A; }
+    .recycle-examples { font-size: 12px; color: #999; margin-top: 4px; }
+    .recycle-value { text-align: right; }
+    .recycle-points { font-size: 14px; font-weight: 600; color: #4CAF50; }
+    .recycle-points-label { font-size: 11px; color: #999; }
+    .weight-input-section { margin-top: 16px; }
+    .weight-input-group { display: flex; align-items: center; gap: 12px; }
+    .weight-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #E8E8E8;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    .weight-input:focus { outline: none; border-color: #4CAF50; }
+    .weight-unit { font-size: 14px; color: #666; }
+    .valuation-result {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .valuation-title { font-size: 14px; color: #666; margin-bottom: 12px; }
+    .valuation-item { display: flex; justify-content: space-between; padding: 8px 0; }
+    .valuation-label { font-size: 14px; color: #666; }
+    .valuation-value { font-size: 18px; font-weight: 700; color: #2E7D32; }
+    .valuation-value.points { color: #FFD700; }
+    .confusing-item { padding: 12px 0; border-bottom: 1px solid #F5F5F5; }
+    .confusing-item:last-child { border-bottom: none; }
+    .confusing-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1A1A1A;
+      display: flex;
+      align-items: center;
+    }
+    .confusing-correct {
+      font-size: 11px;
+      color: #4CAF50;
+      margin-left: 8px;
+      background: #E8F5E9;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    .confusing-reason { font-size: 12px; color: #999; margin-top: 4px; }
+    .type-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .type-item:hover { background: #E8F5E9; }
+    .type-icon { font-size: 32px; margin-right: 16px; }
+    .type-info { flex: 1; }
+    .type-name { font-size: 15px; font-weight: 600; color: #1A1A1A; }
+    .type-desc { font-size: 12px; color: #999; margin-top: 4px; }
+    .arrow { font-size: 20px; color: #999; }
+    .game-area { margin-top: 16px; }
+    .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .trash-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 8px;
+      background: #FAFAFA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      animation: bounce 1s infinite;
+    }
+    .trash-item:hover { background: #E8F5E9; transform: scale(1.05); }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .trash-icon { font-size: 32px; margin-bottom: 8px; }
+    .trash-name { font-size: 11px; color: #666; text-align: center; }
+    .info-list { margin-top: 12px; }
+    .info-item { display: flex; padding: 10px 0; }
+    .info-icon { font-size: 20px; margin-right: 12px; }
+    .info-text { font-size: 13px; color: #666; line-height: 1.5; }
+    .tips-card { background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%); }
+    .tip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .tip-title { font-size: 14px; font-weight: 600; color: #F57F17; }
+    .tip-text { font-size: 13px; color: #666; line-height: 1.6; }
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 2000;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .toast.success { background: rgba(76, 175, 80, 0.9); }
+    .toast.error { background: rgba(244, 67, 54, 0.9); }
+    .hidden { display: none !important; }
+    .clickable { cursor: pointer; }
+    .flex { display: flex; }
+    .flex-between { justify-content: space-between; }
+    .flex-center { align-items: center; }
+    .flex-1 { flex: 1; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #F1F1F1; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: #C8E6C9; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #81C784; }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span id="statusTime">09:41</span>
+      <span id="statusBattery">🔋</span>
+    </div>
+    
+    <div class="back-btn hidden" id="backBtn" onclick="goBack()">←</div>
+    
+    <div class="app-content" id="appContent">
+      <!-- 首页 -->
+      <div class="page active" id="page-index">
+        <div class="card-header">
+          <div class="user-info">
+            <div class="user-left">
+              <div class="avatar">🌱</div>
+              <div>
+                <div class="nickname">环保小达人</div>
+                <div class="level">Lv.3 环保新手</div>
+              </div>
+            </div>
+            <div class="points-display">
+              <div class="points-label">绿色积分</div>
+              <div class="points-value" id="indexPoints">0</div>
+            </div>
+          </div>
+          
+          <div class="checkin-section">
+            <div class="checkin-info">
+              <div class="streak-info">
+                连续签到 <span class="streak-number" id="indexStreak">0</span> 天
+              </div>
+              <button class="btn btn-primary" id="indexCheckinBtn" onclick="handleCheckin()">
+                立即签到
+              </button>
+            </div>
+            <div class="week-days" id="indexWeekDays">
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="grid-3">
+            <div class="stat-card">
+              <div class="stat-number" id="indexCarbonTotal">0</div>
+              <div class="stat-label">碳足迹(kg)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="indexTasksDone">0</div>
+              <div class="stat-label">完成任务</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="indexRecycle">0</div>
+              <div class="stat-label">回收次数</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">功能入口</div>
+          <div class="features-grid">
+            <div class="feature-item" onclick="openAirPage()">
+              <div class="feature-icon">🌤️</div>
+              <div class="feature-name">空气质量</div>
+            </div>
+            <div class="feature-item" onclick="openRecyclePage()">
+              <div class="feature-icon">♻️</div>
+              <div class="feature-name">回收估值</div>
+            </div>
+            <div class="feature-item" onclick="openHabitsPage()">
+              <div class="feature-icon">🚫</div>
+              <div class="feature-name">戒掉打卡</div>
+            </div>
+            <div class="feature-item" onclick="openDiaryPage()">
+              <div class="feature-icon">📔</div>
+              <div class="feature-name">地球日记</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">今日任务</div>
+          <div id="indexTaskList">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">积分记录</div>
+          <div id="indexHistoryList">
+          </div>
+        </div>
+      </div>
+      
+      <!-- 日历页 -->
+      <div class="page" id="page-calendar">
+        <div class="calendar-header">
+          <div class="month-nav">
+            <div class="nav-btn" onclick="prevMonth()">◀</div>
+            <div class="month-title">
+              <span id="calendarMonth">2026年4月</span>
+              <span class="today-btn" onclick="goToToday()">今天</span>
+            </div>
+            <div class="nav-btn" onclick="nextMonth()">▶</div>
+          </div>
+          <div class="week-header">
+            <div class="week-day">日</div>
+            <div class="week-day">一</div>
+            <div class="week-day">二</div>
+            <div class="week-day">三</div>
+            <div class="week-day">四</div>
+            <div class="week-day">五</div>
+            <div class="week-day">六</div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">本月统计</div>
+          <div class="grid-3">
+            <div class="stat-item">
+              <div class="stat-number" id="calendarCheckinDays">0</div>
+              <div class="stat-label">签到天数</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="calendarTasksDone">0</div>
+              <div class="stat-label">完成任务</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="calendarCarbon">0</div>
+              <div class="stat-label">碳减排(kg)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 碳足迹页 -->
+      <div class="page" id="page-footprint">
+        <div class="card-header">
+          <div style="text-align: center;">
+            <div style="font-size: 14px; opacity: 0.9;">总碳足迹</div>
+            <div style="font-size: 36px; font-weight: 700; margin-top: 8px;" id="footprintTotal">0.0 kg</div>
+            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">记录将持续累积</div>
+          </div>
+        </div>
+        
+        <div class="tabs">
+          <div class="tab active" data-tab="record" onclick="switchFootprintTab('record')">📝 记录</div>
+          <div class="tab" data-tab="stats" onclick="switchFootprintTab('stats')">📊 统计</div>
+          <div class="tab" data-tab="history" onclick="switchFootprintTab('history')">📋 历史</div>
+        </div>
+        
+        <!-- 记录标签 -->
+        <div class="tab-content active" id="footprint-tab-record">
+          <div class="card">
+            <div class="card-title">快速记录</div>
+            <div class="quick-add-grid">
+              <div class="quick-item" onclick="quickAddFootprint('bike')">
+                <div class="quick-icon">🚴</div>
+                <div class="quick-name">骑车</div>
+              </div>
+              <div class="quick-item" onclick="quickAddFootprint('walk')">
+                <div class="quick-icon">🚶</div>
+                <div class="quick-name">步行</div>
+              </div>
+              <div class="quick-item" onclick="quickAddFootprint('bus')">
+                <div class="quick-icon">🚌</div>
+                <div class="quick-name">公交</div>
+              </div>
+              <div class="quick-item" onclick="quickAddFootprint('subway')">
+                <div class="quick-icon">🚇</div>
+                <div class="quick-name">地铁</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">出行方式</div>
+            <div class="transport-grid" id="transportGrid">
+              <div class="transport-item" onclick="selectTransport('taxi', '打车', 0.21)" data-type="taxi">
+                <div class="transport-icon">🚖</div>
+                <div class="transport-name">打车</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('privateCar', '私家车', 0.25)" data-type="privateCar">
+                <div class="transport-icon">🚗</div>
+                <div class="transport-name">私家车</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('bus', '公交', 0.08)" data-type="bus">
+                <div class="transport-icon">🚌</div>
+                <div class="transport-name">公交</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('subway', '地铁', 0.05)" data-type="subway">
+                <div class="transport-icon">🚇</div>
+                <div class="transport-name">地铁</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('bike', '骑行', 0)" data-type="bike">
+                <div class="transport-icon">🚴</div>
+                <div class="transport-name">骑行</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('walk', '步行', 0)" data-type="walk">
+                <div class="transport-icon">🚶</div>
+                <div class="transport-name">步行</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('train', '火车', 0.06)" data-type="train">
+                <div class="transport-icon">🚄</div>
+                <div class="transport-name">火车</div>
+              </div>
+              <div class="transport-item" onclick="selectTransport('flight', '飞机', 0.255)" data-type="flight">
+                <div class="transport-icon">✈️</div>
+                <div class="transport-name">飞机</div>
+              </div>
+            </div>
+            
+            <div class="mt-16">
+              <div class="form-label">出行距离</div>
+              <div class="input-group">
+                <input type="number" class="amount-input" id="footprintDistance" min="0" step="0.1" placeholder="请输入公里数" oninput="handleDistanceInput()">
+                <div class="input-unit">公里</div>
+              </div>
+              <div class="input-tip" id="footprintDistanceTip">提示：打车每公里约0.21kg碳排放，骑行/步行碳排放为0</div>
+            </div>
+            
+            <div class="calculation-result hidden" id="footprintResult">
+              <div class="result-item">
+                <span class="result-label">出行方式</span>
+                <span class="result-value" id="footprintResultTransport">-</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">距离</span>
+                <span class="result-value" id="footprintResultDistance">-</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">碳排放量</span>
+                <span class="result-value primary" id="footprintResultCarbon">-</span>
+              </div>
+              <div class="result-item" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(76, 175, 80, 0.2);">
+                <span class="result-label">替代开车可减少</span>
+                <span class="result-value" id="footprintResultSaved">-</span>
+              </div>
+            </div>
+            
+            <button class="submit-btn mt-16" onclick="submitFootprint()" id="footprintSubmitBtn" style="opacity: 0.5; pointer-events: none;">
+              记录碳足迹
+            </button>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">其他碳足迹</div>
+            
+            <div class="section-title">用电</div>
+            <div class="input-group">
+              <input type="number" class="amount-input" id="footprintElectricity" min="0" placeholder="请输入用电量" oninput="updateElectricityResult()">
+              <div class="input-unit">度</div>
+            </div>
+            <div class="input-tip">每度电约0.785kg碳排放</div>
+            <div class="calculation-result hidden" id="electricityResult">
+              <div class="result-item">
+                <span class="result-label">碳排放量</span>
+                <span class="result-value primary" id="electricityResultCarbon">-</span>
+              </div>
+            </div>
+            <button class="submit-btn mt-12" onclick="submitElectricity()">记录用电</button>
+            
+            <div class="section-title mt-16">用餐</div>
+            <div id="foodSelection">
+              <div class="food-item" onclick="selectFood('fastFood', '快餐', 2.5)" data-type="fastFood">
+                <div class="food-icon">🍔</div>
+                <div class="food-info">
+                  <div class="food-name">快餐</div>
+                  <div class="food-desc">每顿约2.5kg碳排放</div>
+                </div>
+                <div class="food-check hidden">✓</div>
+              </div>
+              <div class="food-item" onclick="selectFood('takeout', '外卖', 1.8)" data-type="takeout">
+                <div class="food-icon">🥡</div>
+                <div class="food-info">
+                  <div class="food-name">外卖</div>
+                  <div class="food-desc">每顿约1.8kg碳排放</div>
+                </div>
+                <div class="food-check hidden">✓</div>
+              </div>
+              <div class="food-item" onclick="selectFood('homeCook', '家常', 0.5)" data-type="homeCook">
+                <div class="food-icon">🍳</div>
+                <div class="food-info">
+                  <div class="food-name">家常</div>
+                  <div class="food-desc">每顿约0.5kg碳排放</div>
+                </div>
+                <div class="food-check hidden">✓</div>
+              </div>
+              <div class="food-item" onclick="selectFood('vegetarian', '素食', 0.3)" data-type="vegetarian">
+                <div class="food-icon">🥗</div>
+                <div class="food-info">
+                  <div class="food-name">素食</div>
+                  <div class="food-desc">每顿约0.3kg碳排放</div>
+                </div>
+                <div class="food-check hidden">✓</div>
+              </div>
+            </div>
+            <button class="submit-btn mt-12" onclick="submitFood()">记录用餐</button>
+          </div>
+        </div>
+        
+        <!-- 统计标签 -->
+        <div class="tab-content" id="footprint-tab-stats">
+          <div class="card">
+            <div class="card-title">分类统计</div>
+            <div class="category-stats" id="footprintCategoryStats">
+              <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <div class="empty-text">暂无统计数据</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">本周趋势</div>
+            <div class="weekly-chart">
+              <div class="chart-bars" id="footprintWeeklyChart">
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">月度目标</div>
+            <div class="progress-section">
+              <div class="progress-header">
+                <span>碳减排进度</span>
+                <span id="footprintProgressPercent">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="footprintProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="input-tip mt-8" id="footprintGoalText">目标：每月减少50kg碳排放</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 历史标签 -->
+        <div class="tab-content" id="footprint-tab-history">
+          <div class="card" id="footprintHistoryList">
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <div class="empty-text">暂无碳足迹记录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 排行榜页 -->
+      <div class="page" id="page-ranking">
+        <div class="tabs">
+          <div class="tab active" data-tab="points" onclick="switchRankingTab('points')">🏆 积分排名</div>
+          <div class="tab" data-tab="carbon" onclick="switchRankingTab('carbon')">🌱 低碳排名</div>
+          <div class="tab" data-tab="checkin" onclick="switchRankingTab('checkin')">📅 签到排名</div>
+        </div>
+        
+        <div class="tab-content active" id="ranking-tab-points">
+          <div class="card my-rank-card">
+            <div class="my-rank-header">
+              <div class="my-info">
+                <div class="my-avatar">🌱</div>
+                <div>
+                  <div class="my-name">环保小达人</div>
+                  <div class="my-stats">Lv.3 环保新手</div>
+                </div>
+              </div>
+              <div class="my-score">
+                <div class="score-value" id="myPointsRank">4</div>
+                <div class="score-label">我的排名</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="top-three">
+              <div class="top-item second">
+                <div class="top-avatar">🥈</div>
+                <div class="top-name">环保小王</div>
+                <div class="top-score">1280分</div>
+              </div>
+              <div class="top-item first">
+                <div class="top-avatar">🥇</div>
+                <div class="top-name">绿色先锋</div>
+                <div class="top-score">1560分</div>
+              </div>
+              <div class="top-item third">
+                <div class="top-avatar">🥉</div>
+                <div class="top-name">地球守护者</div>
+                <div class="top-score">980分</div>
+              </div>
+            </div>
+            
+            <div class="ranking-list" id="rankingList">
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="ranking-tab-carbon">
+          <div class="card my-rank-card">
+            <div class="my-rank-header">
+              <div class="my-info">
+                <div class="my-avatar">🌱</div>
+                <div>
+                  <div class="my-name">环保小达人</div>
+                  <div class="my-stats">已减排 12.5kg</div>
+                </div>
+              </div>
+              <div class="my-score">
+                <div class="score-value">3</div>
+                <div class="score-label">低碳排名</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="ranking-list">
+              <div class="ranking-item">
+                <div class="rank-left">
+                  <div class="rank-number">1</div>
+                  <div class="rank-avatar">🌳</div>
+                  <div>
+                    <div class="rank-name">低碳达人</div>
+                    <div class="rank-level">已减排 45.8kg</div>
+                  </div>
+                </div>
+                <div class="rank-right">
+                  <div class="rank-score">-45.8kg</div>
+                </div>
+              </div>
+              <div class="ranking-item">
+                <div class="rank-left">
+                  <div class="rank-number">2</div>
+                  <div class="rank-avatar">🌿</div>
+                  <div>
+                    <div class="rank-name">绿行者</div>
+                    <div class="rank-level">已减排 32.1kg</div>
+                  </div>
+                </div>
+                <div class="rank-right">
+                  <div class="rank-score">-32.1kg</div>
+                </div>
+              </div>
+              <div class="ranking-item">
+                <div class="rank-left">
+                  <div class="rank-number">3</div>
+                  <div class="rank-avatar">🌱</div>
+                  <div>
+                    <div class="rank-name">环保小达人</div>
+                    <div class="rank-level">已减排 12.5kg</div>
+                  </div>
+                </div>
+                <div class="rank-right">
+                  <div class="rank-score">-12.5kg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="ranking-tab-checkin">
+          <div class="card my-rank-card">
+            <div class="my-rank-header">
+              <div class="my-info">
+                <div class="my-avatar">🌱</div>
+                <div>
+                  <div class="my-name">环保小达人</div>
+                  <div class="my-stats">连续签到 7天</div>
+                </div>
+              </div>
+              <div class="my-score">
+                <div class="score-value">5</div>
+                <div class="score-label">签到排名</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="ranking-list">
+              <div class="ranking-item">
+                <div class="rank-left">
+                  <div class="rank-number">1</div>
+                  <div class="rank-avatar">🌟</div>
+                  <div>
+                    <div class="rank-name">签到王</div>
+                    <div class="rank-level">连续签到 99天</div>
+                  </div>
+                </div>
+                <div class="rank-right">
+                  <div class="rank-score">99天</div>
+                </div>
+              </div>
+              <div class="ranking-item">
+                <div class="rank-left">
+                  <div class="rank-number">2</div>
+                  <div class="rank-avatar">⭐</div>
+                  <div>
+                    <div class="rank-name">坚持达人</div>
+                    <div class="rank-level">连续签到 65天</div>
+                  </div>
+                </div>
+                <div class="rank-right">
+                  <div class="rank-score">65天</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 空气质量页 -->
+      <div class="page" id="page-air">
+        <div class="page-title">空气质量</div>
+        
+        <div class="air-header" id="airHeader">
+          <div class="air-city">北京</div>
+          <div class="aqi-value" id="aqiValue">75</div>
+          <div class="aqi-label">AQI 指数</div>
+          <div class="air-level" id="airLevel">良</div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">污染物详情</div>
+          <div class="pollutants-grid" id="pollutantsGrid">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">健康建议</div>
+          <div class="info-text" id="airSuggestion">空气质量可接受，基本无空气污染，可正常进行户外活动。</div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">空气质量等级</div>
+          <div class="levels-list" id="airLevelsList">
+          </div>
+        </div>
+      </div>
+      
+      <!-- 戒掉打卡页 -->
+      <div class="page" id="page-habits">
+        <div class="page-title">戒掉打卡</div>
+        
+        <div class="habits-stats">
+          <div class="habit-stat-card">
+            <div class="habit-stat-number avoided" id="avoidedCount">0</div>
+            <div class="habit-stat-label">今日已避免</div>
+          </div>
+          <div class="habit-stat-card">
+            <div class="habit-stat-number used" id="usedCount">0</div>
+            <div class="habit-stat-label">今日使用</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">一次性用品</div>
+          <div class="section-title">点击记录已避免使用</div>
+          <div class="disposable-grid" id="disposableGrid">
+            <div class="disposable-item" onclick="avoidDisposable('plasticBag')">
+              <div class="disposable-icon">🛍️</div>
+              <div class="disposable-name">塑料袋</div>
+            </div>
+            <div class="disposable-item" onclick="avoidDisposable('straw')">
+              <div class="disposable-icon">🥤</div>
+              <div class="disposable-name">吸管</div>
+            </div>
+            <div class="disposable-item" onclick="avoidDisposable('chopsticks')">
+              <div class="disposable-icon">🥢</div>
+              <div class="disposable-name">一次性筷子</div>
+            </div>
+            <div class="disposable-item" onclick="avoidDisposable('waterBottle')">
+              <div class="disposable-icon">🧴</div>
+              <div class="disposable-name">瓶装水</div>
+            </div>
+            <div class="disposable-item" onclick="avoidDisposable('coffeeCup')">
+              <div class="disposable-icon">☕</div>
+              <div class="disposable-name">一次性杯</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">今日记录</div>
+          <div id="habitsHistoryList">
+            <div class="empty-state">
+              <div class="empty-icon">📝</div>
+              <div class="empty-text">今日暂无记录</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card tips-card">
+          <div class="tip-header">
+            <div class="tip-title">💡 环保小贴士</div>
+          </div>
+          <div class="tip-text">中国每年消耗约460亿个一次性塑料袋，每个塑料袋需要约200年才能完全降解。使用环保袋不仅可以减少污染，还能获得绿色积分奖励！</div>
+        </div>
+      </div>
+      
+      <!-- 回收估值页 -->
+      <div class="page" id="page-recycle">
+        <div class="page-title">回收估值</div>
+        
+        <div class="tabs">
+          <div class="tab active" data-tab="value" onclick="switchRecycleTab('value')">💰 估值</div>
+          <div class="tab" data-tab="guide" onclick="switchRecycleTab('guide')">📖 分类指南</div>
+          <div class="tab" data-tab="history" onclick="switchRecycleTab('history')">📋 历史</div>
+        </div>
+        
+        <div class="tab-content active" id="recycle-tab-value">
+          <div class="card">
+            <div class="card-title">选择回收物品类型</div>
+            <div id="recycleCategoryList">
+              <div class="recycle-category" onclick="selectRecycleCategory('paper')" data-type="paper">
+                <div class="recycle-icon">📄</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">纸张</div>
+                  <div class="recycle-examples">书籍、报纸、纸箱</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">5分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+              <div class="recycle-category" onclick="selectRecycleCategory('plastic')" data-type="plastic">
+                <div class="recycle-icon">🧴</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">塑料</div>
+                  <div class="recycle-examples">塑料瓶、塑料盒</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">8分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+              <div class="recycle-category" onclick="selectRecycleCategory('metal')" data-type="metal">
+                <div class="recycle-icon">🥫</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">金属</div>
+                  <div class="recycle-examples">易拉罐、金属盒</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">10分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+              <div class="recycle-category" onclick="selectRecycleCategory('glass')" data-type="glass">
+                <div class="recycle-icon">🍾</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">玻璃</div>
+                  <div class="recycle-examples">玻璃瓶、玻璃杯</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">6分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+              <div class="recycle-category" onclick="selectRecycleCategory('fabric')" data-type="fabric">
+                <div class="recycle-icon">👕</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">织物</div>
+                  <div class="recycle-examples">旧衣服、布料</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">7分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+              <div class="recycle-category" onclick="selectRecycleCategory('electronics')" data-type="electronics">
+                <div class="recycle-icon">📱</div>
+                <div class="recycle-info">
+                  <div class="recycle-name">电子产品</div>
+                  <div class="recycle-examples">旧手机、电池</div>
+                </div>
+                <div class="recycle-value">
+                  <div class="recycle-points">25分/kg</div>
+                  <div class="recycle-points-label">回收积分</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="weight-input-section">
+              <div class="form-label">输入重量</div>
+              <div class="weight-input-group">
+                <input type="number" class="weight-input" id="recycleWeight" min="0" step="0.1" placeholder="请输入重量" oninput="updateRecycleValuation()">
+                <div class="weight-unit">公斤</div>
+              </div>
+              <div class="input-tip">提示：1公斤约等于2瓶500ml矿泉水的重量</div>
+            </div>
+            
+            <div class="valuation-result hidden" id="recycleValuationResult">
+              <div class="valuation-title">估值结果</div>
+              <div class="valuation-item">
+                <span class="valuation-label">减少碳排放</span>
+                <span class="valuation-value" id="recycleCarbonSaved">-</span>
+              </div>
+              <div class="valuation-item">
+                <span class="valuation-label">获得积分</span>
+                <span class="valuation-value points" id="recyclePoints">-</span>
+              </div>
+            </div>
+            
+            <button class="submit-btn mt-16" onclick="submitRecycle()" id="recycleSubmitBtn" style="opacity: 0.5; pointer-events: none;">
+              提交回收记录
+            </button>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="recycle-tab-guide">
+          <div class="card">
+            <div class="card-title">垃圾分类</div>
+            <div id="garbageTypesList">
+              <div class="type-item" onclick="showGarbageDetail('recyclable')">
+                <div class="type-icon">♻️</div>
+                <div class="type-info">
+                  <div class="type-name">可回收物</div>
+                  <div class="type-desc">可循环利用的废弃物</div>
+                </div>
+                <div class="arrow">›</div>
+              </div>
+              <div class="type-item" onclick="showGarbageDetail('kitchen')">
+                <div class="type-icon">🍃</div>
+                <div class="type-info">
+                  <div class="type-name">厨余垃圾</div>
+                  <div class="type-desc">易腐烂的生物质废弃物</div>
+                </div>
+                <div class="arrow">›</div>
+              </div>
+              <div class="type-item" onclick="showGarbageDetail('harmful')">
+                <div class="type-icon">☠️</div>
+                <div class="type-info">
+                  <div class="type-name">有害垃圾</div>
+                  <div class="type-desc">对人体健康或自然环境有害</div>
+                </div>
+                <div class="arrow">›</div>
+              </div>
+              <div class="type-item" onclick="showGarbageDetail('other')">
+                <div class="type-icon">🗑️</div>
+                <div class="type-info">
+                  <div class="type-name">其他垃圾</div>
+                  <div class="type-desc">除上述之外的其他废弃物</div>
+                </div>
+                <div class="arrow">›</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">容易分错的垃圾</div>
+            <div id="confusingList">
+              <div class="confusing-item">
+                <div class="confusing-name">大骨头 <span class="confusing-correct">其他垃圾</span></div>
+                <div class="confusing-reason">大骨头难以粉碎，不适合堆肥处理</div>
+              </div>
+              <div class="confusing-item">
+                <div class="confusing-name">外卖餐盒 <span class="confusing-correct">其他垃圾</span></div>
+                <div class="confusing-reason">被油污污染，难以清洗回收</div>
+              </div>
+              <div class="confusing-item">
+                <div class="confusing-name">卫生纸 <span class="confusing-correct">其他垃圾</span></div>
+                <div class="confusing-reason">遇水即溶，不可回收</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card tips-card">
+            <div class="tip-header">
+              <div class="tip-title">💡 分类小技巧</div>
+            </div>
+            <div class="tip-text">记住四步法：1. 认清分类标识；2. 清洁干燥后投放；3. 大件单独投放；4. 有害垃圾单独包装。正确分类，让垃圾变废为宝！</div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="recycle-tab-history">
+          <div class="card" id="recycleHistoryList">
+            <div class="empty-state">
+              <div class="empty-icon">♻️</div>
+              <div class="empty-text">暂无回收记录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 地球日记页 -->
+      <div class="page" id="page-diary">
+        <div class="tabs">
+          <div class="tab active" data-tab="diary" onclick="switchDiaryTab('diary')">📝 写日记</div>
+          <div class="tab" data-tab="history" onclick="switchDiaryTab('history')">📚 历史</div>
+          <div class="tab" data-tab="wishes" onclick="switchDiaryTab('wishes')">💚 愿望墙</div>
+        </div>
+        
+        <div class="tab-content active" id="diary-tab-diary">
+          <div class="earth-message">
+            <div class="earth-icon" id="earthIcon">🌍</div>
+            <div class="earth-title" id="earthTitle">地球的呼吸</div>
+            <div class="earth-content" id="earthContent">每一片树叶都是地球的肺，每一滴清水都是地球的血液。我们的每一个环保行动，都是在帮助地球更健康地呼吸。</div>
+          </div>
+          
+          <div class="card healing-quote">
+            <div class="healing-text" id="healingQuote">大自然是最伟大的治愈师。</div>
+            <div class="refresh-quote" onclick="refreshQuote()">🔄 换一句</div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">今天的环保心情</div>
+            <div class="mood-selector" id="moodSelector">
+              <div class="mood-item" onclick="selectMood('happy')">
+                <div class="mood-emoji">😊</div>
+                <div class="mood-label">开心</div>
+              </div>
+              <div class="mood-item" onclick="selectMood('peaceful')">
+                <div class="mood-emoji">😌</div>
+                <div class="mood-label">平静</div>
+              </div>
+              <div class="mood-item" onclick="selectMood('hopeful')">
+                <div class="mood-emoji">🌟</div>
+                <div class="mood-label">期待</div>
+              </div>
+              <div class="mood-item" onclick="selectMood('sad')">
+                <div class="mood-emoji">😢</div>
+                <div class="mood-label">担忧</div>
+              </div>
+            </div>
+            
+            <div class="form-label">写下今天的环保感悟</div>
+            <textarea class="diary-input" id="diaryContent" placeholder="记录今天为地球做了什么，或者对环保的感悟..."></textarea>
+            
+            <button class="submit-btn" onclick="submitDiary()">发布日记</button>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">环保小游戏</div>
+            <div class="game-area">
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="info-icon">🎮</div>
+                  <div class="info-text">垃圾分类小游戏即将上线，敬请期待！</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-icon">🌳</div>
+                  <div class="info-text">收集积分可以种植虚拟树，为真实世界的环保贡献力量！</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="diary-tab-history">
+          <div class="card" id="diaryHistoryList">
+            <div class="empty-state">
+              <div class="empty-icon">📖</div>
+              <div class="empty-text">暂无日记记录</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="tab-content" id="diary-tab-wishes">
+          <div class="card">
+            <div class="card-title">发布环保愿望</div>
+            <textarea class="diary-input" id="wishContent" placeholder="写下你的环保愿望，让更多人看到..."></textarea>
+            <button class="submit-btn" onclick="submitWish()">发布愿望</button>
+          </div>
+          
+          <div class="card">
+            <div class="card-title">愿望墙</div>
+            <div id="wishesList">
+              <div class="wish-item">
+                <div class="wish-avatar">🌳</div>
+                <div class="wish-content">
+                  <div class="wish-text">希望未来的每一天，都能看到蓝天白云，呼吸新鲜空气。</div>
+                  <div class="wish-footer">
+                    <div class="wish-date">2026-04-25</div>
+                    <div class="wish-likes">
+                      <span class="wish-likes-icon">❤️</span>
+                      <span>128</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="wish-item">
+                <div class="wish-avatar">🌿</div>
+                <div class="wish-content">
+                  <div class="wish-text">从今天起，我要坚持自带水杯，拒绝一次性瓶装水！</div>
+                  <div class="wish-footer">
+                    <div class="wish-date">2026-04-24</div>
+                    <div class="wish-likes">
+                      <span class="wish-likes-icon">❤️</span>
+                      <span>86</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="wish-item">
+                <div class="wish-avatar">🌱</div>
+                <div class="wish-content">
+                  <div class="wish-text">想在阳台上种更多的绿植，让家里变成小森林。</div>
+                  <div class="wish-footer">
+                    <div class="wish-date">2026-04-23</div>
+                    <div class="wish-likes">
+                      <span class="wish-likes-icon">❤️</span>
+                      <span>64</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-bar" id="tabBar">
+      <div class="tab-item active" onclick="switchPage('index')" data-page="index">
+        <span class="tab-icon">🏠</span>
+        <span class="tab-name">首页</span>
+      </div>
+      <div class="tab-item" onclick="switchPage('calendar')" data-page="calendar">
+        <span class="tab-icon">📅</span>
+        <span class="tab-name">日历</span>
+      </div>
+      <div class="tab-item" onclick="switchPage('footprint')" data-page="footprint">
+        <span class="tab-icon">🌱</span>
+        <span class="tab-name">碳足迹</span>
+      </div>
+      <div class="tab-item" onclick="switchPage('ranking')" data-page="ranking">
+        <span class="tab-icon">🏆</span>
+        <span class="tab-name">排行榜</span>
+      </div>
+      <div class="tab-item" onclick="switchPage('diary')" data-page="diary">
+        <span class="tab-icon">📔</span>
+        <span class="tab-name">日记</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-icon" id="modal-icon">🎉</div>
+      <div class="modal-title" id="modal-title">签到成功</div>
+      <div class="modal-message" id="modal-message">获得 10 绿色积分</div>
+      <div class="modal-actions" id="modal-actions">
+        <button class="modal-btn" onclick="closeModal()">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = {
+      CARBON_FACTORS: {
+        transport: { taxi: 0.21, bus: 0.08, subway: 0.05, bike: 0, walk: 0, privateCar: 0.25, train: 0.06, flight: 0.255 },
+        electricity: 0.785,
+        food: { fastFood: 2.5, takeout: 1.8, homeCook: 0.5, vegetarian: 0.3 },
+        disposable: { straw: 0.005, plasticBag: 0.03, chopsticks: 0.02, waterBottle: 0.08, coffeeCup: 0.06 },
+        recycle: { paper: 2.5, plastic: 6.0, glass: 1.4, metal: 8.0, fabric: 2.0, electronics: 15.0 }
+      },
+      POINTS_RULES: {
+        checkIn: { base: 10, streakBonus: 1 },
+        taskComplete: 20,
+        recycle: { paper: 5, plastic: 8, glass: 6, metal: 10, fabric: 7, electronics: 25 },
+        avoidDisposable: { straw: 2, plasticBag: 5, chopsticks: 3, waterBottle: 8, coffeeCup: 6 },
+        carbonReduction: 10
+      },
+      AIR_QUALITY_LEVELS: [
+        { level: '优', min: 0, max: 50, color: '#4CAF50', suggestion: '空气质量令人满意，基本无空气污染，可正常进行户外活动。' },
+        { level: '良', min: 51, max: 100, color: '#8BC34A', suggestion: '空气质量可接受，但某些污染物可能对极少数异常敏感人群健康有较弱影响，建议极少数异常敏感人群应减少户外活动。' },
+        { level: '轻度污染', min: 101, max: 150, color: '#FFEB3B', suggestion: '易感人群症状有轻度加剧，健康人群出现刺激症状，建议儿童、老年人及心脏病、呼吸系统疾病患者应减少长时间、高强度的户外锻炼。' },
+        { level: '中度污染', min: 151, max: 200, color: '#FF9800', suggestion: '进一步加剧易感人群症状，可能对健康人群心脏、呼吸系统有影响，建议疾病患者避免长时间、高强度的户外锻练，一般人群适量减少户外运动。' },
+        { level: '重度污染', min: 201, max: 300, color: '#F44336', suggestion: '心脏病和肺病患者症状显著加剧，运动耐受力降低，健康人群普遍出现症状，建议儿童、老年人和心脏病、肺病患者应停留在室内，停止户外运动，一般人群减少户外运动。' },
+        { level: '严重污染', min: 301, max: 500, color: '#880E4F', suggestion: '健康人群运动耐受力降低，有明显强烈症状，提前出现某些疾病，建议儿童、老年人和病人应当留在室内，避免体力消耗，一般人群应避免户外活动。' }
+      ],
+      DAILY_TASKS: [
+        { id: 1, title: '自带购物袋', description: '去超市购物时使用环保袋', points: 10, category: 'shopping', icon: '🛍️' },
+        { id: 2, title: '步行或骑车出行', description: '短距离出行选择步行或骑车', points: 15, category: 'transport', icon: '🚲' },
+        { id: 3, title: '关灯节电', description: '离开房间时随手关灯', points: 5, category: 'electricity', icon: '💡' },
+        { id: 4, title: '节约用水', description: '缩短洗澡时间，关紧水龙头', points: 5, category: 'water', icon: '💧' },
+        { id: 5, title: '光盘行动', description: '吃饭不浪费，践行光盘', points: 10, category: 'food', icon: '🍽️' },
+        { id: 6, title: '拒绝一次性吸管', description: '喝饮料时不用吸管', points: 5, category: 'disposable', icon: '🥤' },
+        { id: 7, title: '垃圾分类', description: '正确分类投放垃圾', points: 10, category: 'recycle', icon: '♻️' },
+        { id: 8, title: '乘坐公共交通', description: '选择公交、地铁出行', points: 12, category: 'transport', icon: '🚌' },
+        { id: 9, title: '自带水杯', description: '使用自己的水杯，拒绝瓶装水', points: 8, category: 'disposable', icon: '🥤' },
+        { id: 10, title: '少用外卖', description: '自己做饭或堂食', points: 15, category: 'food', icon: '🍳' },
+        { id: 11, title: '旧物利用', description: '将旧物改造成新用品', points: 20, category: 'recycle', icon: '🔨' },
+        { id: 12, title: '种植绿植', description: '在家中或办公室种植绿色植物', points: 15, category: 'nature', icon: '🌱' }
+      ],
+      GARBAGE_CATEGORIES: [
+        { id: 'recyclable', name: '可回收物', color: '#2196F3', icon: '♻️', description: '可循环利用的废弃物', examples: ['纸张', '塑料瓶', '玻璃瓶', '金属', '织物'], tips: ['轻投轻放', '清洁干燥', '避免污染', '废纸尽量平整'] },
+        { id: 'kitchen', name: '厨余垃圾', color: '#4CAF50', icon: '🍃', description: '易腐烂的生物质废弃物', examples: ['剩菜剩饭', '果皮', '茶渣', '蛋壳', '蔬菜'], tips: ['沥干水分', '去除包装物', '纯流质直接倒入下水口'] },
+        { id: 'harmful', name: '有害垃圾', color: '#F44336', icon: '☠️', description: '对人体健康或自然环境有害的废弃物', examples: ['废电池', '废灯管', '废药品', '废油漆', '消毒剂'], tips: ['单独投放', '轻拿轻放', '易破损包装后投放'] },
+        { id: 'other', name: '其他垃圾', color: '#9E9E9E', icon: '🗑️', description: '除上述垃圾之外的其他生活废弃物', examples: ['砖瓦陶瓷', '渣土', '卫生间废纸', '纸巾', '烟蒂'], tips: ['尽量沥干水分', '难以辨识类别的投入其他垃圾'] }
+      ],
+      HEALING_QUOTES: [
+        '大自然是最伟大的治愈师。',
+        '每一片落叶都是大地的情书。',
+        '绿水青山就是金山银山。',
+        '保护地球，从保护每一滴水开始。',
+        '我们不是继承了地球，而是向后代借用了它。',
+        '种下一棵树，就是种下一个希望。',
+        '减少一份污染，增加一份清新。',
+        '环保不是口号，而是每一天的行动。',
+        '让天空更蓝，让河水更清。',
+        '地球只有一个，让我们共同守护。'
+      ],
+      TRANSPORT_NAMES: {
+        taxi: '打车', privateCar: '私家车', bus: '公交', subway: '地铁',
+        bike: '骑行', walk: '步行', train: '火车', flight: '飞机'
+      },
+      FOOD_NAMES: {
+        fastFood: '快餐', takeout: '外卖', homeCook: '家常', vegetarian: '素食'
+      },
+      DISPOSABLE_NAMES: {
+        plasticBag: '塑料袋', straw: '吸管', chopsticks: '一次性筷子',
+        waterBottle: '瓶装水', coffeeCup: '一次性杯'
+      },
+      RECYCLE_NAMES: {
+        paper: '纸张', plastic: '塑料', metal: '金属',
+        glass: '玻璃', fabric: '织物', electronics: '电子产品'
+      },
+      MOOD_EMOJIS: {
+        happy: '😊', peaceful: '😌', hopeful: '🌟', sad: '😢'
+      },
+      MOOD_NAMES: {
+        happy: '开心', peaceful: '平静', hopeful: '期待', sad: '担忧'
+      }
+    };
+
+    let state = {
+      points: 0,
+      streak: 0,
+      todayChecked: false,
+      carbonTotal: 0,
+      carbonTransport: 0,
+      carbonElectricity: 0,
+      carbonFood: 0,
+      completedTasks: new Set(),
+      pointsHistory: [],
+      carbonHistory: [],
+      recycleHistory: [],
+      habitsHistory: [],
+      diaryHistory: [],
+      avoidCount: 0,
+      useCount: 0,
+      recycleCount: 0,
+      tasksDone: 0,
+      currentMonth: new Date().getMonth(),
+      currentYear: new Date().getFullYear()
+    };
+
+    let currentPage = 'index';
+    let pageHistory = ['index'];
+    let selectedTransport = { id: null, name: '', factor: 0 };
+    let selectedFood = { id: null, name: '', factor: 0 };
+    let selectedRecycle = { type: null, name: '' };
+    let selectedMood = null;
+
+    function getTodayKey() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('happyEarthState');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        state = {
+          ...state,
+          ...parsed,
+          completedTasks: new Set(parsed.completedTasks || [])
+        };
+        
+        const today = getTodayKey();
+        if (state.lastCheckinDate !== today) {
+          state.todayChecked = false;
+        }
+      }
+      updateUI();
+      initWeekDays();
+      initCalendar();
+      initAirQuality();
+      initRankingList();
+    }
+
+    function saveState() {
+      const toSave = {
+        ...state,
+        completedTasks: Array.from(state.completedTasks)
+      };
+      localStorage.setItem('happyEarthState', JSON.stringify(toSave));
+    }
+
+    function updateUI() {
+      document.getElementById('indexPoints').textContent = state.points;
+      document.getElementById('indexStreak').textContent = state.streak;
+      document.getElementById('indexCarbonTotal').textContent = state.carbonTotal.toFixed(1);
+      document.getElementById('indexTasksDone').textContent = state.tasksDone;
+      document.getElementById('indexRecycle').textContent = state.recycleCount;
+      document.getElementById('footprintTotal').textContent = state.carbonTotal.toFixed(1) + ' kg';
+      
+      const checkinBtn = document.getElementById('indexCheckinBtn');
+      if (state.todayChecked) {
+        checkinBtn.classList.add('disabled');
+        checkinBtn.textContent = '✓ 已签到';
+        checkinBtn.disabled = true;
+      }
+      
+      updateTaskList();
+      updateHistoryList();
+      updateFootprintStats();
+      updateFootprintHistory();
+      updateWeeklyChart();
+      updateProgressBar();
+    }
+
+    function initWeekDays() {
+      const now = new Date();
+      const today = now.getDate();
+      const todayDay = now.getDay();
+      const weekNames = ['日', '一', '二', '三', '四', '五', '六'];
+      
+      const weekDays = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now);
+        date.setDate(today - todayDay + i);
+        weekDays.push({
+          dayName: weekNames[i],
+          dayDate: date.getDate(),
+          isToday: i === todayDay
+        });
+      }
+      
+      const weekDaysEl = document.getElementById('indexWeekDays');
+      weekDaysEl.innerHTML = weekDays.map(day => `
+        <div class="day-item ${day.isToday ? 'today' : ''}">
+          <div class="day-name">${day.dayName}</div>
+          <div class="day-date ${day.isToday ? 'today' : ''}">${day.dayDate}</div>
+        </div>
+      `).join('');
+    }
+
+    function initCalendar() {
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const now = new Date();
+      const year = state.currentYear;
+      const month = state.currentMonth;
+      
+      document.getElementById('calendarMonth').textContent = `${year}年${month + 1}月`;
+      
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+      
+      const prevMonthLastDay = new Date(year, month, 0).getDate();
+      
+      let html = '';
+      
+      for (let i = startDay - 1; i >= 0; i--) {
+        html += `<div class="calendar-day other-month"><div class="day-number">${prevMonthLastDay - i}</div></div>`;
+      }
+      
+      const today = new Date();
+      const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+      
+      for (let i = 1; i <= totalDays; i++) {
+        const isToday = isCurrentMonth && i === today.getDate();
+        const hasRecord = checkDateHasRecord(year, month, i);
+        
+        html += `
+          <div class="calendar-day ${isToday ? 'today' : ''}" onclick="selectCalendarDay(${year}, ${month}, ${i})">
+            <div class="day-number">${i}</div>
+            ${hasRecord ? '<div class="day-marks"><span class="mark-task">✓</span></div>' : ''}
+          </div>
+        `;
+      }
+      
+      const remainingDays = 42 - (startDay + totalDays);
+      for (let i = 1; i <= remainingDays; i++) {
+        html += `<div class="calendar-day other-month"><div class="day-number">${i}</div></div>`;
+      }
+      
+      document.getElementById('calendarGrid').innerHTML = html;
+      
+      document.getElementById('calendarCheckinDays').textContent = getMonthCheckinDays();
+      document.getElementById('calendarTasksDone').textContent = getMonthTasksDone();
+      document.getElementById('calendarCarbon').textContent = getMonthCarbon().toFixed(1);
+    }
+
+    function checkDateHasRecord(year, month, day) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      return state.pointsHistory.some(h => h.date === dateStr) ||
+             state.carbonHistory.some(h => h.date === dateStr);
+    }
+
+    function getMonthCheckinDays() {
+      let count = 0;
+      const year = state.currentYear;
+      const month = state.currentMonth;
+      
+      state.pointsHistory.forEach(h => {
+        if (h.reason.includes('签到')) {
+          const hDate = new Date(h.date);
+          if (hDate.getFullYear() === year && hDate.getMonth() === month) {
+            count++;
+          }
+        }
+      });
+      return count;
+    }
+
+    function getMonthTasksDone() {
+      let count = 0;
+      const year = state.currentYear;
+      const month = state.currentMonth;
+      
+      state.pointsHistory.forEach(h => {
+        if (h.reason.includes('任务')) {
+          const hDate = new Date(h.date);
+          if (hDate.getFullYear() === year && hDate.getMonth() === month) {
+            count++;
+          }
+        }
+      });
+      return count;
+    }
+
+    function getMonthCarbon() {
+      let total = 0;
+      const year = state.currentYear;
+      const month = state.currentMonth;
+      
+      state.carbonHistory.forEach(h => {
+        const hDate = new Date(h.date);
+        if (hDate.getFullYear() === year && hDate.getMonth() === month) {
+          total += h.carbonSaved || h.amount || 0;
+        }
+      });
+      return total;
+    }
+
+    function prevMonth() {
+      state.currentMonth--;
+      if (state.currentMonth < 0) {
+        state.currentMonth = 11;
+        state.currentYear--;
+      }
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      state.currentMonth++;
+      if (state.currentMonth > 11) {
+        state.currentMonth = 0;
+        state.currentYear++;
+      }
+      renderCalendar();
+    }
+
+    function goToToday() {
+      const now = new Date();
+      state.currentYear = now.getFullYear();
+      state.currentMonth = now.getMonth();
+      renderCalendar();
+    }
+
+    function selectCalendarDay(year, month, day) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const records = [];
+      
+      state.pointsHistory.forEach(h => {
+        if (h.date === dateStr) {
+          records.push({ type: 'points', ...h });
+        }
+      });
+      
+      state.carbonHistory.forEach(h => {
+        if (h.date === dateStr) {
+          records.push({ type: 'carbon', ...h });
+        }
+      });
+      
+      if (records.length > 0) {
+        let message = `${dateStr}\n\n`;
+        records.forEach(r => {
+          if (r.type === 'points') {
+            message += `✅ ${r.reason} (+${r.points}分)\n`;
+          } else {
+            message += `🌱 ${r.typeName || '碳足迹记录'}: ${r.amount || r.carbonSaved || 0}kg\n`;
+          }
+        });
+        showModal('📅', '当日记录', message);
+      }
+    }
+
+    function initAirQuality() {
+      const baseAqi = Math.floor(Math.random() * 150) + 30;
+      const level = getAirQualityLevel(baseAqi);
+      
+      document.getElementById('aqiValue').textContent = baseAqi;
+      document.getElementById('airLevel').textContent = level.level;
+      document.getElementById('airSuggestion').textContent = level.suggestion;
+      
+      const header = document.getElementById('airHeader');
+      header.style.background = `linear-gradient(135deg, ${level.color} 0%, ${adjustColor(level.color, 20)} 100%)`;
+      
+      const pollutants = {
+        pm25: Math.floor(Math.random() * 100) + 10,
+        pm10: Math.floor(Math.random() * 150) + 20,
+        o3: Math.floor(Math.random() * 80) + 20,
+        no2: Math.floor(Math.random() * 60) + 10,
+        so2: Math.floor(Math.random() * 20) + 5,
+        co: (Math.random() * 2 + 0.5).toFixed(1)
+      };
+      
+      const pollutantNames = {
+        pm25: { name: 'PM2.5', unit: 'μg/m³' },
+        pm10: { name: 'PM10', unit: 'μg/m³' },
+        o3: { name: '臭氧', unit: 'μg/m³' },
+        no2: { name: '二氧化氮', unit: 'μg/m³' },
+        so2: { name: '二氧化硫', unit: 'μg/m³' },
+        co: { name: '一氧化碳', unit: 'mg/m³' }
+      };
+      
+      let html = '';
+      Object.keys(pollutants).forEach(key => {
+        const info = pollutantNames[key];
+        const value = pollutants[key];
+        const maxValues = { pm25: 75, pm10: 150, o3: 160, no2: 80, so2: 150, co: 4 };
+        const percent = Math.min((parseFloat(value) / maxValues[key]) * 100, 100);
+        const barColor = percent < 50 ? '#4CAF50' : percent < 75 ? '#FFEB3B' : '#F44336';
+        
+        html += `
+          <div class="pollutant-item">
+            <div class="pollutant-header">
+              <span class="pollutant-name">${info.name}</span>
+              <span class="pollutant-unit">${info.unit}</span>
+            </div>
+            <div class="pollutant-value" style="color: ${barColor}">${value}</div>
+            <div class="pollutant-bar">
+              <div class="bar-bg">
+                <div style="width: ${percent}%; height: 100%; background: ${barColor}; border-radius: 3px;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('pollutantsGrid').innerHTML = html;
+      
+      let levelsHtml = '';
+      DATA.AIR_QUALITY_LEVELS.forEach(l => {
+        levelsHtml += `
+          <div class="level-item">
+            <div class="level-color" style="background: ${l.color}"></div>
+            <div class="level-info">
+              <div class="level-name">${l.level}</div>
+              <div class="level-range">${l.min}-${l.max}</div>
+            </div>
+            <div class="level-desc">${l.suggestion.substring(0, 20)}...</div>
+          </div>
+        `;
+      });
+      document.getElementById('airLevelsList').innerHTML = levelsHtml;
+    }
+
+    function getAirQualityLevel(aqi) {
+      for (const level of DATA.AIR_QUALITY_LEVELS) {
+        if (aqi >= level.min && aqi <= level.max) {
+          return level;
+        }
+      }
+      return DATA.AIR_QUALITY_LEVELS[DATA.AIR_QUALITY_LEVELS.length - 1];
+    }
+
+    function adjustColor(color, amount) {
+      const hex = color.replace('#', '');
+      const r = Math.min(255, parseInt(hex.substring(0, 2), 16) + amount);
+      const g = Math.min(255, parseInt(hex.substring(2, 4), 16) + amount);
+      const b = Math.min(255, parseInt(hex.substring(4, 6), 16) + amount);
+      return `#${String(r.toString(16)).padStart(2, '0')}${String(g.toString(16)).padStart(2, '0')}${String(b.toString(16)).padStart(2, '0')}`;
+    }
+
+    function initRankingList() {
+      const mockRankings = [
+        { rank: 4, name: '环保达人', avatar: '🌳', score: 860, level: 'Lv.4' },
+        { rank: 5, name: '绿行者', avatar: '🌿', score: 720, level: 'Lv.3' },
+        { rank: 6, name: '地球之友', avatar: '🌍', score: 650, level: 'Lv.3' },
+        { rank: 7, name: '低碳生活家', avatar: '💚', score: 580, level: 'Lv.3' },
+        { rank: 8, name: '环保新手', avatar: '🌱', score: 420, level: 'Lv.2' }
+      ];
+      
+      let html = '';
+      mockRankings.forEach(r => {
+        html += `
+          <div class="ranking-item">
+            <div class="rank-left">
+              <div class="rank-number">${r.rank}</div>
+              <div class="rank-avatar">${r.avatar}</div>
+              <div>
+                <div class="rank-name">${r.name}</div>
+                <div class="rank-level">${r.level}</div>
+              </div>
+            </div>
+            <div class="rank-right">
+              <div class="rank-score">${r.score}</div>
+              <div class="rank-label">积分</div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('rankingList').innerHTML = html;
+    }
+
+    function updateTaskList() {
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const dayOfMonth = today.getDate();
+      
+      const selectedTasks = [];
+      const taskCount = 5;
+      
+      for (let i = 0; i < taskCount; i++) {
+        const index = (dayOfMonth + dayOfWeek * 7 + i) % DATA.DAILY_TASKS.length;
+        if (!selectedTasks.find(t => t.id === DATA.DAILY_TASKS[index].id)) {
+          selectedTasks.push({...DATA.DAILY_TASKS[index], completed: state.completedTasks.has(DATA.DAILY_TASKS[index].id)});
+        }
+      }
+      
+      let html = '';
+      selectedTasks.forEach(task => {
+        html += `
+          <div class="task-item ${task.completed ? 'completed' : ''}" id="task${task.id}">
+            <div class="task-icon">${task.icon}</div>
+            <div class="task-content">
+              <div class="task-title">${task.title}</div>
+              <div class="task-desc">${task.description}</div>
+            </div>
+            <div class="task-right">
+              <div class="task-points">+${task.points}</div>
+              <div class="task-status ${task.completed ? 'done' : ''}" onclick="completeTask(${task.id}, ${task.points})" style="cursor: pointer; ${task.completed ? '' : 'color: #4CAF50; font-weight: 500;'}">
+                ${task.completed ? '已完成' : '去完成'}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('indexTaskList').innerHTML = html;
+    }
+
+    function completeTask(taskId, points) {
+      if (state.completedTasks.has(taskId)) return;
+      
+      state.completedTasks.add(taskId);
+      state.points += points;
+      state.tasksDone++;
+      
+      const task = DATA.DAILY_TASKS.find(t => t.id === taskId);
+      
+      state.pointsHistory.unshift({
+        points: points,
+        reason: `完成任务: ${task ? task.title : '环保任务'}`,
+        date: getTodayKey()
+      });
+      
+      const randomCarbon = Math.random() * 0.5;
+      state.carbonTotal += randomCarbon;
+      
+      state.carbonHistory.unshift({
+        type: 'task',
+        typeName: task ? task.title : '环保任务',
+        carbonSaved: randomCarbon,
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      
+      showModal('🎉', '任务完成', `获得 ${points} 绿色积分\n减少碳排放约 ${randomCarbon.toFixed(2)} kg`);
+    }
+
+    function updateHistoryList() {
+      const historyList = document.getElementById('indexHistoryList');
+      
+      if (state.pointsHistory.length === 0) {
+        historyList.innerHTML = `
+          <div class="empty-state" style="padding: 16px;">
+            <div class="empty-text">暂无积分变动记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      state.pointsHistory.slice(0, 5).forEach(item => {
+        html += `
+          <div class="history-item">
+            <div>
+              <div class="history-reason">${item.reason}</div>
+              <div class="history-date">${item.date}</div>
+            </div>
+            <div class="history-points">+${item.points}</div>
+          </div>
+        `;
+      });
+      
+      historyList.innerHTML = html;
+    }
+
+    function handleCheckin() {
+      if (state.todayChecked) return;
+      
+      state.streak++;
+      const basePoints = 10;
+      const streakBonus = Math.min(state.streak, 7);
+      const totalPoints = basePoints + streakBonus;
+      
+      state.points += totalPoints;
+      state.todayChecked = true;
+      state.lastCheckinDate = getTodayKey();
+      
+      state.pointsHistory.unshift({
+        points: totalPoints,
+        reason: `每日签到 (连续${state.streak}天)`,
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      
+      showModal('🎉', '签到成功', `获得 ${totalPoints} 绿色积分\n连续签到 ${state.streak} 天`);
+    }
+
+    function selectTransport(id, name, factor) {
+      selectedTransport = { id, name, factor };
+      
+      document.querySelectorAll('#transportGrid .transport-item').forEach(el => {
+        el.classList.remove('selected');
+        if (el.dataset.type === id) {
+          el.classList.add('selected');
+        }
+      });
+      
+      const distance = parseFloat(document.getElementById('footprintDistance').value);
+      if (distance && distance > 0) {
+        calculateCarbon();
+      }
+    }
+
+    function handleDistanceInput() {
+      const input = document.getElementById('footprintDistance');
+      const tip = document.getElementById('footprintDistanceTip');
+      let value = parseFloat(input.value);
+      
+      if (value < 0) {
+        input.value = '';
+        tip.textContent = '⚠️ 距离不能为负数，请输入大于0的数值';
+        tip.style.color = '#F44336';
+        document.getElementById('footprintResult').classList.add('hidden');
+        const submitBtn = document.getElementById('footprintSubmitBtn');
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.pointerEvents = 'none';
+        return;
+      }
+      
+      tip.textContent = '提示：打车每公里约0.21kg碳排放，骑行/步行碳排放为0';
+      tip.style.color = '#999';
+      
+      if (value > 0 && selectedTransport.id) {
+        calculateCarbon();
+      }
+    }
+
+    function calculateCarbon() {
+      const distance = parseFloat(document.getElementById('footprintDistance').value);
+      
+      if (!selectedTransport.id || !distance || distance <= 0) {
+        document.getElementById('footprintResult').classList.add('hidden');
+        return;
+      }
+      
+      const carbonEmission = selectedTransport.factor * distance;
+      const savedCarbon = selectedTransport.id !== 'bike' && selectedTransport.id !== 'walk' 
+        ? carbonEmission 
+        : 0;
+      
+      document.getElementById('footprintResult').classList.remove('hidden');
+      document.getElementById('footprintResultTransport').textContent = selectedTransport.name;
+      document.getElementById('footprintResultDistance').textContent = distance + ' 公里';
+      document.getElementById('footprintResultCarbon').textContent = carbonEmission.toFixed(2) + ' kg CO₂';
+      document.getElementById('footprintResultSaved').textContent = 
+        selectedTransport.id === 'bike' || selectedTransport.id === 'walk'
+          ? '绿色出行，真棒！'
+          : carbonEmission.toFixed(2) + ' kg';
+      
+      const submitBtn = document.getElementById('footprintSubmitBtn');
+      submitBtn.style.opacity = '1';
+      submitBtn.style.pointerEvents = 'auto';
+    }
+
+    function quickAddFootprint(type) {
+      const names = { bike: '骑行', walk: '步行', bus: '公交', subway: '地铁' };
+      const factors = { bike: 0, walk: 0, bus: 0.08, subway: 0.05 };
+      
+      showModal('🌱', '快速记录', `已记录 ${names[type]} 出行\n\n（如需精确记录，请填写距离后提交）`);
+      
+      if (type === 'bike' || type === 'walk') {
+        state.points += 3;
+        state.pointsHistory.unshift({
+          points: 3,
+          reason: `绿色出行: ${names[type]}`,
+          date: getTodayKey()
+        });
+        saveState();
+        updateUI();
+      }
+    }
+
+    function submitFootprint() {
+      const distance = parseFloat(document.getElementById('footprintDistance').value);
+      
+      if (!selectedTransport.id || !distance || distance <= 0) {
+        showModal('⚠️', '提示', '请选择出行方式并输入距离');
+        return;
+      }
+      
+      const carbonEmission = selectedTransport.factor * distance;
+      
+      state.carbonTotal += carbonEmission;
+      
+      if (['taxi', 'privateCar', 'bus', 'subway', 'train', 'flight'].includes(selectedTransport.id)) {
+        state.carbonTransport += carbonEmission;
+      }
+      
+      state.carbonHistory.unshift({
+        type: 'transport',
+        typeName: selectedTransport.name,
+        subtype: selectedTransport.id,
+        amount: carbonEmission,
+        distance: distance,
+        date: getTodayKey()
+      });
+      
+      if (selectedTransport.id === 'bike' || selectedTransport.id === 'walk') {
+        const bonusPoints = 5;
+        state.points += bonusPoints;
+        state.pointsHistory.unshift({
+          points: bonusPoints,
+          reason: `绿色出行: ${selectedTransport.name}`,
+          date: getTodayKey()
+        });
+      }
+      
+      saveState();
+      updateUI();
+      
+      selectedTransport = { id: null, name: '', factor: 0 };
+      document.getElementById('footprintDistance').value = '';
+      document.getElementById('footprintResult').classList.add('hidden');
+      document.querySelectorAll('#transportGrid .transport-item').forEach(el => {
+        el.classList.remove('selected');
+      });
+      const submitBtn = document.getElementById('footprintSubmitBtn');
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.pointerEvents = 'none';
+      
+      const message = selectedTransport.id === 'bike' || selectedTransport.id === 'walk'
+        ? `绿色出行！获得 5 积分奖励\n碳排放量: 0 kg`
+        : `已记录 ${selectedTransport.name} 出行\n碳排放量: ${carbonEmission.toFixed(2)} kg CO₂`;
+      
+      showModal('📊', '记录成功', message);
+    }
+
+    function updateElectricityResult() {
+      const input = document.getElementById('footprintElectricity');
+      const value = parseFloat(input.value);
+      
+      if (!value || value <= 0) {
+        document.getElementById('electricityResult').classList.add('hidden');
+        return;
+      }
+      
+      const carbonEmission = value * DATA.CARBON_FACTORS.electricity;
+      document.getElementById('electricityResult').classList.remove('hidden');
+      document.getElementById('electricityResultCarbon').textContent = carbonEmission.toFixed(2) + ' kg CO₂';
+    }
+
+    function submitElectricity() {
+      const value = parseFloat(document.getElementById('footprintElectricity').value);
+      
+      if (!value || value <= 0) {
+        showModal('⚠️', '提示', '请输入用电量');
+        return;
+      }
+      
+      const carbonEmission = value * DATA.CARBON_FACTORS.electricity;
+      
+      state.carbonTotal += carbonEmission;
+      state.carbonElectricity += carbonEmission;
+      
+      state.carbonHistory.unshift({
+        type: 'electricity',
+        typeName: '用电',
+        amount: carbonEmission,
+        electricity: value,
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      
+      document.getElementById('footprintElectricity').value = '';
+      document.getElementById('electricityResult').classList.add('hidden');
+      
+      showModal('⚡', '记录成功', `用电量: ${value} 度\n碳排放量: ${carbonEmission.toFixed(2)} kg CO₂`);
+    }
+
+    function selectFood(id, name, factor) {
+      selectedFood = { id, name, factor };
+      
+      document.querySelectorAll('#foodSelection .food-item').forEach(el => {
+        el.classList.remove('selected');
+        const check = el.querySelector('.food-check');
+        if (check) check.classList.add('hidden');
+        
+        if (el.dataset.type === id) {
+          el.classList.add('selected');
+          if (check) check.classList.remove('hidden');
+        }
+      });
+    }
+
+    function submitFood() {
+      if (!selectedFood.id) {
+        showModal('⚠️', '提示', '请选择用餐类型');
+        return;
+      }
+      
+      state.carbonTotal += selectedFood.factor;
+      state.carbonFood += selectedFood.factor;
+      
+      state.carbonHistory.unshift({
+        type: 'food',
+        typeName: selectedFood.name,
+        subtype: selectedFood.id,
+        amount: selectedFood.factor,
+        date: getTodayKey()
+      });
+      
+      if (selectedFood.id === 'homeCook' || selectedFood.id === 'vegetarian') {
+        const bonusPoints = 5;
+        state.points += bonusPoints;
+        state.pointsHistory.unshift({
+          points: bonusPoints,
+          reason: `低碳饮食: ${selectedFood.name}`,
+          date: getTodayKey()
+        });
+      }
+      
+      saveState();
+      updateUI();
+      
+      selectedFood = { id: null, name: '', factor: 0 };
+      document.querySelectorAll('#foodSelection .food-item').forEach(el => {
+        el.classList.remove('selected');
+        const check = el.querySelector('.food-check');
+        if (check) check.classList.add('hidden');
+      });
+      
+      showModal('🍽️', '记录成功', `用餐类型: ${selectedFood.name || '已记录'}\n碳排放量: ${selectedFood.factor || 0} kg CO₂`);
+    }
+
+    function updateFootprintStats() {
+      const statsEl = document.getElementById('footprintCategoryStats');
+      
+      const categories = [];
+      if (state.carbonTransport > 0) {
+        categories.push({ name: '交通出行', icon: '🚗', amount: state.carbonTransport, color: '#4CAF50' });
+      }
+      if (state.carbonElectricity > 0) {
+        categories.push({ name: '用电', icon: '⚡', amount: state.carbonElectricity, color: '#FF9800' });
+      }
+      if (state.carbonFood > 0) {
+        categories.push({ name: '饮食', icon: '🍽️', amount: state.carbonFood, color: '#E91E63' });
+      }
+      
+      if (categories.length === 0) {
+        statsEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <div class="empty-text">暂无统计数据</div>
+          </div>
+        `;
+        return;
+      }
+      
+      const total = categories.reduce((sum, c) => sum + c.amount, 0);
+      
+      let html = '';
+      categories.forEach(cat => {
+        const percent = Math.round((cat.amount / total) * 100);
+        html += `
+          <div class="category-item">
+            <div class="category-left">
+              <div class="category-icon">${cat.icon}</div>
+              <div>
+                <div class="category-name">${cat.name}</div>
+                <div class="category-amount">${cat.amount.toFixed(1)} kg</div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div class="category-percentage">${percent}%</div>
+              <div class="progress-bar-small">
+                <div class="progress-fill-small" style="width: ${percent}%; background: ${cat.color}"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      statsEl.innerHTML = html;
+    }
+
+    function updateFootprintHistory() {
+      const historyEl = document.getElementById('footprintHistoryList');
+      
+      if (state.carbonHistory.length === 0) {
+        historyEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">暂无碳足迹记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      state.carbonHistory.slice(0, 10).forEach(h => {
+        const icons = { transport: '🚗', electricity: '⚡', food: '🍽️', task: '✅' };
+        html += `
+          <div class="history-item">
+            <div>
+              <div class="history-reason">${icons[h.type] || '📊'} ${h.typeName}</div>
+              <div class="history-date">${h.date}</div>
+            </div>
+            <div class="history-points">${h.amount ? h.amount.toFixed(2) : h.carbonSaved.toFixed(2)} kg</div>
+          </div>
+        `;
+      });
+      
+      historyEl.innerHTML = html;
+    }
+
+    function updateRecycleHistory() {
+      const historyEl = document.getElementById('recycleHistoryList');
+      
+      if (state.recycleHistory.length === 0) {
+        historyEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">♻️</div>
+            <div class="empty-text">暂无回收记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      const icons = { paper: '📄', plastic: '🧴', metal: '🥫', glass: '🍾', fabric: '👕', electronics: '📱' };
+      
+      let html = '';
+      state.recycleHistory.slice(0, 10).forEach(h => {
+        html += `
+          <div class="history-item">
+            <div>
+              <div class="history-reason">${icons[h.type] || '♻️'} 回收${h.typeName} ${h.weight}kg</div>
+              <div class="history-date">${h.date}</div>
+            </div>
+            <div class="history-points">+${h.points}</div>
+          </div>
+        `;
+      });
+      
+      historyEl.innerHTML = html;
+    }
+
+    function updateWeeklyChart() {
+      const chartEl = document.getElementById('footprintWeeklyChart');
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      const today = new Date();
+      const todayDay = today.getDay();
+      
+      const weeklyData = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - todayDay + i);
+        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        
+        let total = 0;
+        state.carbonHistory.forEach(h => {
+          if (h.date === dateStr) {
+            total += h.amount || h.carbonSaved || 0;
+          }
+        });
+        
+        weeklyData.push({
+          day: weekDays[i],
+          value: total,
+          isToday: i === todayDay
+        });
+      }
+      
+      const maxValue = Math.max(...weeklyData.map(d => d.value), 1);
+      
+      let html = '';
+      weeklyData.forEach(d => {
+        const heightPercent = Math.max((d.value / maxValue) * 100, 5);
+        html += `
+          <div class="bar-item">
+            <div class="bar-value" style="opacity: ${d.value > 0 ? 1 : 0.3}">${d.value.toFixed(1)}</div>
+            <div class="bar-container">
+              <div class="bar-fill" style="height: ${heightPercent}%; background: ${d.isToday ? '#4CAF50' : '#81C784'}"></div>
+            </div>
+            <div class="bar-label" style="color: ${d.isToday ? '#4CAF50' : '#666'}; font-weight: ${d.isToday ? 600 : 400}">${d.day}</div>
+          </div>
+        `;
+      });
+      
+      chartEl.innerHTML = html;
+    }
+
+    function updateProgressBar() {
+      const goal = 50;
+      const progress = Math.min((state.carbonTotal / goal) * 100, 100);
+      
+      document.getElementById('footprintProgressPercent').textContent = Math.round(progress) + '%';
+      document.getElementById('footprintProgressBar').style.width = progress + '%';
+      document.getElementById('footprintGoalText').textContent = `目标：每月减少${goal}kg碳排放（当前: ${state.carbonTotal.toFixed(1)}kg）`;
+    }
+
+    function selectRecycleCategory(type) {
+      selectedRecycle = { type, name: DATA.RECYCLE_NAMES[type] };
+      
+      document.querySelectorAll('#recycleCategoryList .recycle-category').forEach(el => {
+        el.classList.remove('selected');
+        if (el.dataset.type === type) {
+          el.classList.add('selected');
+        }
+      });
+      
+      const weight = parseFloat(document.getElementById('recycleWeight').value);
+      if (weight && weight > 0) {
+        updateRecycleValuation();
+      }
+    }
+
+    function updateRecycleValuation() {
+      const weight = parseFloat(document.getElementById('recycleWeight').value);
+      
+      if (!selectedRecycle.type || !weight || weight <= 0) {
+        document.getElementById('recycleValuationResult').classList.add('hidden');
+        return;
+      }
+      
+      const carbonSaved = weight * (DATA.CARBON_FACTORS.recycle[selectedRecycle.type] || 0);
+      const points = Math.floor((DATA.POINTS_RULES.recycle[selectedRecycle.type] || 0) * weight);
+      
+      document.getElementById('recycleValuationResult').classList.remove('hidden');
+      document.getElementById('recycleCarbonSaved').textContent = carbonSaved.toFixed(2) + ' kg CO₂';
+      document.getElementById('recyclePoints').textContent = '+' + points + ' 分';
+      
+      const submitBtn = document.getElementById('recycleSubmitBtn');
+      submitBtn.style.opacity = '1';
+      submitBtn.style.pointerEvents = 'auto';
+    }
+
+    function submitRecycle() {
+      const weight = parseFloat(document.getElementById('recycleWeight').value);
+      
+      if (!selectedRecycle.type || !weight || weight <= 0) {
+        showModal('⚠️', '提示', '请选择回收物品类型并输入重量');
+        return;
+      }
+      
+      const carbonSaved = weight * (DATA.CARBON_FACTORS.recycle[selectedRecycle.type] || 0);
+      const points = Math.floor((DATA.POINTS_RULES.recycle[selectedRecycle.type] || 0) * weight);
+      
+      state.points += points;
+      state.recycleCount++;
+      
+      state.pointsHistory.unshift({
+        points: points,
+        reason: `回收: ${selectedRecycle.name} ${weight}kg`,
+        date: getTodayKey()
+      });
+      
+      state.recycleHistory.unshift({
+        type: selectedRecycle.type,
+        typeName: selectedRecycle.name,
+        weight: weight,
+        carbonSaved: carbonSaved,
+        points: points,
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      
+      const recycleName = selectedRecycle.name;
+      
+      selectedRecycle = { type: null, name: '' };
+      document.getElementById('recycleWeight').value = '';
+      document.getElementById('recycleValuationResult').classList.add('hidden');
+      document.querySelectorAll('#recycleCategoryList .recycle-category').forEach(el => {
+        el.classList.remove('selected');
+      });
+      const submitBtn = document.getElementById('recycleSubmitBtn');
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.pointerEvents = 'none';
+      
+      showModal('♻️', '回收成功', `回收物品: ${recycleName} ${weight}kg\n获得积分: +${points}\n减少碳排放: ${carbonSaved.toFixed(2)} kg CO₂`);
+    }
+
+    function showGarbageDetail(typeId) {
+      const category = DATA.GARBAGE_CATEGORIES.find(c => c.id === typeId);
+      if (!category) return;
+      
+      showModal(category.icon, category.name, 
+        `${category.description}\n\n` +
+        `常见物品：${category.examples.join('、')}\n\n` +
+        `投放建议：\n${category.tips.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+      );
+    }
+
+    function avoidDisposable(type) {
+      const name = DATA.DISPOSABLE_NAMES[type];
+      const points = DATA.POINTS_RULES.avoidDisposable[type] || 2;
+      const carbonSaved = DATA.CARBON_FACTORS.disposable[type] || 0;
+      
+      state.points += points;
+      state.avoidCount++;
+      
+      state.pointsHistory.unshift({
+        points: points,
+        reason: `避免使用: ${name}`,
+        date: getTodayKey()
+      });
+      
+      state.habitsHistory.unshift({
+        type: type,
+        typeName: name,
+        action: 'avoid',
+        points: points,
+        carbonSaved: carbonSaved,
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      updateHabitsUI();
+      
+      showModal('🎉', '太棒了！', `已记录避免使用 ${name}\n获得积分: +${points}\n减少碳排放: ${carbonSaved.toFixed(3)} kg CO₂`);
+    }
+
+    function updateHabitsUI() {
+      document.getElementById('avoidedCount').textContent = state.avoidCount;
+      document.getElementById('usedCount').textContent = state.useCount;
+      
+      const historyEl = document.getElementById('habitsHistoryList');
+      const todayRecords = state.habitsHistory.filter(h => h.date === getTodayKey());
+      
+      if (todayRecords.length === 0) {
+        historyEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <div class="empty-text">今日暂无记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      todayRecords.forEach(h => {
+        const icon = h.action === 'avoid' ? '✅' : '⚠️';
+        const label = h.action === 'avoid' ? '避免使用' : '使用了';
+        html += `
+          <div class="history-item">
+            <div>
+              <div class="history-reason">${icon} ${label}: ${h.typeName}</div>
+              <div class="history-date">${new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})}</div>
+            </div>
+            <div class="history-points" style="color: ${h.action === 'avoid' ? '#4CAF50' : '#FF9800'}">
+              ${h.action === 'avoid' ? '+' + h.points : '-'}
+            </div>
+          </div>
+        `;
+      });
+      
+      historyEl.innerHTML = html;
+    }
+
+    function selectMood(mood) {
+      selectedMood = mood;
+      
+      document.querySelectorAll('#moodSelector .mood-item').forEach(el => {
+        el.classList.remove('selected');
+      });
+      
+      event.currentTarget.classList.add('selected');
+    }
+
+    function refreshQuote() {
+      const quotes = DATA.HEALING_QUOTES;
+      const currentQuote = document.getElementById('healingQuote').textContent;
+      let newQuote;
+      do {
+        newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      } while (newQuote === currentQuote && quotes.length > 1);
+      
+      document.getElementById('healingQuote').textContent = newQuote;
+    }
+
+    function submitDiary() {
+      const content = document.getElementById('diaryContent').value.trim();
+      
+      if (!content) {
+        showModal('⚠️', '提示', '请写下你的环保感悟');
+        return;
+      }
+      
+      const diary = {
+        id: Date.now(),
+        content: content,
+        mood: selectedMood || 'peaceful',
+        moodEmoji: DATA.MOOD_EMOJIS[selectedMood || 'peaceful'],
+        date: getTodayKey(),
+        time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+      };
+      
+      state.diaryHistory.unshift(diary);
+      
+      state.points += 3;
+      state.pointsHistory.unshift({
+        points: 3,
+        reason: '发布环保日记',
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      updateDiaryHistory();
+      
+      document.getElementById('diaryContent').value = '';
+      selectedMood = null;
+      document.querySelectorAll('#moodSelector .mood-item').forEach(el => {
+        el.classList.remove('selected');
+      });
+      
+      showModal('📝', '发布成功', '你的环保感悟已记录\n获得积分: +3');
+    }
+
+    function submitWish() {
+      const content = document.getElementById('wishContent').value.trim();
+      
+      if (!content) {
+        showModal('⚠️', '提示', '请写下你的环保愿望');
+        return;
+      }
+      
+      state.points += 2;
+      state.pointsHistory.unshift({
+        points: 2,
+        reason: '发布环保愿望',
+        date: getTodayKey()
+      });
+      
+      saveState();
+      updateUI();
+      
+      document.getElementById('wishContent').value = '';
+      
+      showModal('💚', '愿望发布', '你的环保愿望已发送\n获得积分: +2');
+    }
+
+    function updateDiaryHistory() {
+      const historyEl = document.getElementById('diaryHistoryList');
+      
+      if (state.diaryHistory.length === 0) {
+        historyEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📖</div>
+            <div class="empty-text">暂无日记记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      state.diaryHistory.slice(0, 10).forEach(d => {
+        html += `
+          <div class="diary-item">
+            <div class="diary-header">
+              <div class="diary-date">${d.date} ${d.time}</div>
+              <div class="diary-mood">${d.moodEmoji}</div>
+            </div>
+            <div class="diary-content">${d.content}</div>
+          </div>
+        `;
+      });
+      
+      historyEl.innerHTML = html;
+    }
+
+    function switchPage(page) {
+      currentPage = page;
+      pageHistory = [page];
+      
+      document.querySelectorAll('.page').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const pageEl = document.getElementById('page-' + page);
+      if (pageEl) {
+        pageEl.classList.add('active');
+      }
+      
+      document.querySelectorAll('.tab-bar .tab-item').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.page === page) {
+          el.classList.add('active');
+        }
+      });
+      
+      document.getElementById('backBtn').classList.add('hidden');
+      document.getElementById('tabBar').classList.remove('hidden');
+    }
+
+    function goBack() {
+      if (pageHistory.length > 1) {
+        pageHistory.pop();
+        const prevPage = pageHistory[pageHistory.length - 1];
+        
+        document.querySelectorAll('.page').forEach(el => {
+          el.classList.remove('active');
+        });
+        
+        const pageEl = document.getElementById('page-' + prevPage);
+        if (pageEl) {
+          pageEl.classList.add('active');
+        }
+        
+        if (['index', 'calendar', 'footprint', 'ranking', 'diary'].includes(prevPage)) {
+          document.getElementById('backBtn').classList.add('hidden');
+          document.getElementById('tabBar').classList.remove('hidden');
+          
+          document.querySelectorAll('.tab-bar .tab-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.dataset.page === prevPage) {
+              el.classList.add('active');
+            }
+          });
+        }
+      }
+    }
+
+    function openAirPage() {
+      document.querySelectorAll('.page').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById('page-air').classList.add('active');
+      pageHistory.push('air');
+      
+      document.getElementById('backBtn').classList.remove('hidden');
+      document.getElementById('tabBar').classList.add('hidden');
+    }
+
+    function openRecyclePage() {
+      document.querySelectorAll('.page').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById('page-recycle').classList.add('active');
+      pageHistory.push('recycle');
+      
+      document.getElementById('backBtn').classList.remove('hidden');
+      document.getElementById('tabBar').classList.add('hidden');
+    }
+
+    function openHabitsPage() {
+      document.querySelectorAll('.page').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById('page-habits').classList.add('active');
+      pageHistory.push('habits');
+      
+      document.getElementById('backBtn').classList.remove('hidden');
+      document.getElementById('tabBar').classList.add('hidden');
+      
+      updateHabitsUI();
+    }
+
+    function openDiaryPage() {
+      switchPage('diary');
+      updateDiaryHistory();
+    }
+
+    function switchFootprintTab(tab) {
+      document.querySelectorAll('#page-footprint .tabs .tab').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.tab === tab) {
+          el.classList.add('active');
+        }
+      });
+      
+      document.querySelectorAll('#page-footprint .tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const tabEl = document.getElementById('footprint-tab-' + tab);
+      if (tabEl) {
+        tabEl.classList.add('active');
+      }
+      
+      if (tab === 'stats') {
+        updateFootprintStats();
+        updateWeeklyChart();
+        updateProgressBar();
+      } else if (tab === 'history') {
+        updateFootprintHistory();
+      }
+    }
+
+    function switchRankingTab(tab) {
+      document.querySelectorAll('#page-ranking .tabs .tab').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.tab === tab) {
+          el.classList.add('active');
+        }
+      });
+      
+      document.querySelectorAll('#page-ranking .tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const tabEl = document.getElementById('ranking-tab-' + tab);
+      if (tabEl) {
+        tabEl.classList.add('active');
+      }
+    }
+
+    function switchRecycleTab(tab) {
+      document.querySelectorAll('#page-recycle .tabs .tab').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.tab === tab) {
+          el.classList.add('active');
+        }
+      });
+      
+      document.querySelectorAll('#page-recycle .tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const tabEl = document.getElementById('recycle-tab-' + tab);
+      if (tabEl) {
+        tabEl.classList.add('active');
+      }
+      
+      if (tab === 'history') {
+        updateRecycleHistory();
+      }
+    }
+
+    function switchDiaryTab(tab) {
+      document.querySelectorAll('#page-diary .tabs .tab').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.tab === tab) {
+          el.classList.add('active');
+        }
+      });
+      
+      document.querySelectorAll('#page-diary .tab-content').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      const tabEl = document.getElementById('diary-tab-' + tab);
+      if (tabEl) {
+        tabEl.classList.add('active');
+      }
+      
+      if (tab === 'history') {
+        updateDiaryHistory();
+      }
+    }
+
+    function showModal(icon, title, message) {
+      document.getElementById('modal-icon').textContent = icon;
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-message').textContent = message;
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('show');
+    }
+
+    function showToast(message, type = 'default') {
+      const toast = document.createElement('div');
+      toast.className = 'toast' + (type === 'success' ? ' success' : type === 'error' ? ' error' : '');
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 2000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadState();
+      
+      document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeModal();
+        }
+      });
+      
+      const now = new Date();
+      document.getElementById('statusTime').textContent = 
+        now.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'});
+    });
+  </script>
+</body>
+</html>
