@@ -1,0 +1,2146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>快乐地球 - 绿色环保小程序</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #E8F5E9;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .phone-frame {
+      width: 375px;
+      max-width: 100%;
+      background-color: #FFFFFF;
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(76, 175, 80, 0.3);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 812px;
+    }
+    
+    .phone-notch {
+      height: 30px;
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .notch-camera {
+      width: 150px;
+      height: 30px;
+      background-color: #000;
+      border-radius: 0 0 20px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .camera-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #333;
+      border-radius: 50%;
+    }
+    
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #E8F5E9;
+      padding-bottom: 70px;
+    }
+    
+    .page {
+      padding: 16px;
+      display: none;
+    }
+    
+    .page.active {
+      display: block;
+    }
+    
+    .card {
+      background-color: #FFFFFF;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(76, 175, 80, 0.1);
+    }
+    
+    .card.clickable {
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .card.clickable:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.2);
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #2E7D32;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background-color: #4CAF50;
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+    
+    .header-card {
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: #FFFFFF;
+    }
+    
+    .header-card .card-title {
+      color: #FFFFFF;
+    }
+    
+    .header-card .card-title::before {
+      background-color: #FFFFFF;
+    }
+    
+    .user-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .user-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .avatar-box {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 28px;
+    }
+    
+    .nickname {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .level {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+    
+    .points-box {
+      text-align: right;
+      cursor: pointer;
+    }
+    
+    .points-label {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    
+    .points-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #FFD700;
+    }
+    
+    .checkin-section {
+      margin-top: 16px;
+    }
+    
+    .checkin-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .streak-text {
+      font-size: 14px;
+    }
+    
+    .streak-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #FFD700;
+      margin: 0 4px;
+    }
+    
+    .btn {
+      padding: 10px 24px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: rgba(255, 255, 255, 0.3);
+      color: #FFFFFF;
+    }
+    
+    .btn-primary:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+    }
+    
+    .btn-primary.disabled {
+      background: rgba(255, 255, 255, 0.15);
+      color: rgba(255, 255, 255, 0.7);
+      cursor: not-allowed;
+    }
+    
+    .week-days {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+    
+    .day-item {
+      text-align: center;
+      flex: 1;
+      padding: 8px 0;
+      border-radius: 8px;
+    }
+    
+    .day-item.today {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .day-name {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .day-date {
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    
+    .day-date.today {
+      color: #FFD700;
+      font-weight: bold;
+    }
+    
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F1F8E9 100%);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    
+    .stat-number {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2E7D32;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    .more-link {
+      text-align: center;
+      color: #4CAF50;
+      font-size: 13px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    
+    .more-link:hover {
+      text-decoration: underline;
+    }
+    
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F0F0F0;
+    }
+    
+    .task-item:last-child {
+      border-bottom: none;
+    }
+    
+    .task-item.completed {
+      opacity: 0.6;
+    }
+    
+    .task-icon {
+      font-size: 28px;
+      margin-right: 12px;
+    }
+    
+    .task-content {
+      flex: 1;
+    }
+    
+    .task-title {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .task-desc {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .task-right {
+      text-align: right;
+    }
+    
+    .task-points {
+      font-size: 14px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .task-btn {
+      margin-top: 4px;
+      padding: 4px 12px;
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .task-btn.done {
+      background: #E0E0E0;
+      color: #999;
+      cursor: not-allowed;
+    }
+    
+    .feature-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background-color: #F8F9FA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .feature-item:hover {
+      background-color: #E8F5E9;
+      transform: translateY(-2px);
+    }
+    
+    .feature-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+    
+    .feature-name {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .air-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .air-city {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .air-level {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    
+    .aqi-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .aqi-label {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .history-reason {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .history-date {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .history-points {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #E0E0E0;
+      padding-bottom: 10px;
+    }
+    
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .tab-item:hover {
+      background: #F5F5F5;
+    }
+    
+    .tab-item.active .tab-icon {
+      color: #4CAF50;
+    }
+    
+    .tab-item.active .tab-name {
+      color: #4CAF50;
+      font-weight: bold;
+    }
+    
+    .tab-icon {
+      font-size: 22px;
+      margin-bottom: 2px;
+    }
+    
+    .tab-name {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 24px;
+      width: 320px;
+      max-width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: center;
+      animation: modalIn 0.3s ease;
+    }
+    
+    @keyframes modalIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .modal-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .modal-message {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+    
+    .modal-btn {
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 25px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .modal-btn.secondary {
+      background: #F5F5F5;
+      color: #666;
+      margin-right: 8px;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    
+    .form-section {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: block;
+    }
+    
+    .form-radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .form-radio {
+      padding: 8px 16px;
+      background: #F5F5F5;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .form-radio:hover {
+      background: #E8F5E9;
+    }
+    
+    .form-radio.selected {
+      background: #E8F5E9;
+      border-color: #4CAF50;
+      color: #2E7D32;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #E8F5E9;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    
+    .form-tip {
+      font-size: 12px;
+      color: #999;
+      margin-top: 6px;
+      text-align: left;
+    }
+    
+    .calculation-result {
+      background: #E8F5E9;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+    
+    .result-label {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .result-value {
+      color: #2E7D32;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .result-value.primary {
+      color: #4CAF50;
+    }
+    
+    .calendar-header {
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: #FFFFFF;
+    }
+    
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-btn {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    
+    .month-title {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .today-btn {
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 4px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    
+    .week-header {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 16px;
+    }
+    
+    .week-day {
+      font-size: 12px;
+      opacity: 0.9;
+      width: 14%;
+      text-align: center;
+    }
+    
+    .calendar-grid {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    
+    .calendar-day {
+      width: 14.28%;
+      padding: 8px 0;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 2px 0;
+    }
+    
+    .calendar-day:hover {
+      background: #F5F5F5;
+    }
+    
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+    
+    .calendar-day.today {
+      background: rgba(76, 175, 80, 0.2);
+    }
+    
+    .calendar-day.selected {
+      background: #4CAF50;
+      color: #FFFFFF;
+    }
+    
+    .calendar-day.selected .day-number {
+      color: #FFFFFF;
+    }
+    
+    .day-number {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .day-marks {
+      margin-top: 2px;
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+    }
+    
+    .mark-task {
+      font-size: 8px;
+      color: #4CAF50;
+    }
+    
+    .mark-complete {
+      font-size: 8px;
+      color: #FFD700;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 12px;
+    }
+    
+    .progress-section {
+      margin-top: 16px;
+    }
+    
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: #E8F5E9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50 0%, #81C784 100%);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #E8F5E9;
+      margin-bottom: 16px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    
+    .tab.active {
+      color: #4CAF50;
+      border-bottom-color: #4CAF50;
+      font-weight: bold;
+    }
+    
+    .category-stats {
+      margin-top: 16px;
+    }
+    
+    .category-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    
+    .category-item:last-child {
+      border-bottom: none;
+    }
+    
+    .category-left {
+      display: flex;
+      align-items: center;
+    }
+    
+    .category-icon {
+      font-size: 24px;
+      margin-right: 12px;
+    }
+    
+    .category-name {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .category-amount {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .category-percentage {
+      font-size: 14px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .progress-bar-small {
+      height: 4px;
+      background: #E8F5E9;
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill-small {
+      height: 100%;
+      border-radius: 2px;
+    }
+    
+    .weekly-chart {
+      margin-top: 16px;
+    }
+    
+    .chart-bars {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 120px;
+      padding: 0 8px;
+    }
+    
+    .bar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .bar-value {
+      font-size: 10px;
+      color: #4CAF50;
+      margin-bottom: 4px;
+    }
+    
+    .bar-container {
+      width: 24px;
+      height: 80px;
+      background: #E8F5E9;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-end;
+    }
+    
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, #4CAF50, #81C784);
+      border-radius: 4px;
+      min-height: 4px;
+    }
+    
+    .bar-label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 8px;
+    }
+    
+    .quick-add-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    
+    .quick-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background: #F8F9FA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .quick-item:hover {
+      background: #E8F5E9;
+      transform: translateY(-2px);
+    }
+    
+    .quick-icon {
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+    
+    .quick-name {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .type-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: #F8F9FA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .type-item:hover {
+      background: #E8F5E9;
+    }
+    
+    .type-icon {
+      font-size: 32px;
+      margin-right: 16px;
+    }
+    
+    .type-info {
+      flex: 1;
+    }
+    
+    .type-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .type-desc {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .arrow {
+      font-size: 20px;
+      color: #999;
+    }
+    
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    
+    .ranking-item:last-child {
+      border-bottom: none;
+    }
+    
+    .ranking-badge {
+      width: 32px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .ranking-avatar {
+      width: 40px;
+      height: 40px;
+      background: #E8F5E9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 12px;
+      font-size: 20px;
+    }
+    
+    .ranking-info {
+      flex: 1;
+    }
+    
+    .ranking-nickname {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .ranking-level {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .ranking-points {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .user-ranking {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .user-ranking .ranking-nickname {
+      color: #2E7D32;
+    }
+    
+    .pollutants-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+    
+    .pollutant-item {
+      text-align: center;
+      padding: 12px;
+      background: #F8F9FA;
+      border-radius: 12px;
+    }
+    
+    .pollutant-name {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .pollutant-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 4px;
+    }
+    
+    .pollutant-unit {
+      font-size: 10px;
+      color: #999;
+    }
+    
+    .suggestion-text {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+    
+    .habits-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .habit-stat-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F1F8E9 100%);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    
+    .habit-stat-number {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .habit-stat-number.avoided {
+      color: #4CAF50;
+    }
+    
+    .habit-stat-number.used {
+      color: #FF9800;
+    }
+    
+    .habit-stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    .disposable-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .disposable-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 8px;
+      background: #F8F9FA;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .disposable-item:hover {
+      background: #E8F5E9;
+    }
+    
+    .disposable-item.selected {
+      background: #E8F5E9;
+      border: 2px solid #4CAF50;
+    }
+    
+    .disposable-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .disposable-name {
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    }
+    
+    .diary-input {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      border: 2px solid #E8F5E9;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: inherit;
+    }
+    
+    .diary-input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    
+    .mood-selector {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 16px 0;
+    }
+    
+    .mood-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+    
+    .mood-item:hover {
+      background: #F5F5F5;
+    }
+    
+    .mood-item.selected {
+      background: #E8F5E9;
+    }
+    
+    .mood-emoji {
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+    
+    .mood-label {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .diary-item {
+      padding: 16px;
+      background: #F8F9FA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .diary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .diary-date {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .diary-mood {
+      font-size: 20px;
+    }
+    
+    .diary-content {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .wish-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    
+    .wish-item:last-child {
+      border-bottom: none;
+    }
+    
+    .wish-avatar {
+      width: 36px;
+      height: 36px;
+      background: #E8F5E9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    .wish-content {
+      flex: 1;
+    }
+    
+    .wish-text {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.5;
+    }
+    
+    .wish-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    
+    .wish-date {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .wish-likes {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .wish-likes:hover {
+      color: #F44336;
+    }
+    
+    .wish-likes-icon {
+      margin-right: 4px;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .recycle-category {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      background: #F8F9FA;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .recycle-category:hover {
+      background: #E8F5E9;
+    }
+    
+    .recycle-category.selected {
+      background: #E8F5E9;
+      border: 2px solid #4CAF50;
+    }
+    
+    .recycle-icon {
+      font-size: 36px;
+      margin-right: 16px;
+    }
+    
+    .recycle-info {
+      flex: 1;
+    }
+    
+    .recycle-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .recycle-examples {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .recycle-value {
+      text-align: right;
+    }
+    
+    .recycle-points {
+      font-size: 14px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .recycle-points-label {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .weight-input-section {
+      margin-top: 16px;
+    }
+    
+    .weight-input-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .weight-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #E8F5E9;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    
+    .weight-input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    
+    .weight-unit {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .valuation-result {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+    
+    .valuation-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+    
+    .valuation-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    
+    .valuation-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .valuation-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2E7D32;
+    }
+    
+    .valuation-value.points {
+      color: #FFD700;
+    }
+    
+    .confusing-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #F5F5F5;
+    }
+    
+    .confusing-item:last-child {
+      border-bottom: none;
+    }
+    
+    .confusing-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      align-items: center;
+    }
+    
+    .confusing-correct {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-left: 8px;
+      background: #E8F5E9;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+    
+    .confusing-reason {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .earth-message {
+      background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .earth-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .earth-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2E7D32;
+      margin-bottom: 8px;
+    }
+    
+    .earth-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+    }
+    
+    .healing-quote {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+      border-left: 4px solid #4CAF50;
+    }
+    
+    .healing-text {
+      font-size: 14px;
+      color: #2E7D32;
+      line-height: 1.6;
+      font-style: italic;
+    }
+    
+    .refresh-quote {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+    
+    .page-header {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2E7D32;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .transport-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    
+    .transport-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 8px;
+      background: #F5F5F5;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .transport-item:hover {
+      background: #E8F5E9;
+    }
+    
+    .transport-item.selected {
+      background: #E8F5E9;
+      border-color: #4CAF50;
+    }
+    
+    .transport-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    
+    .transport-name {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .food-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #F5F5F5;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .food-item:hover {
+      background: #E8F5E9;
+    }
+    
+    .food-item.selected {
+      background: #E8F5E9;
+      border-color: #4CAF50;
+    }
+    
+    .food-icon {
+      font-size: 28px;
+      margin-right: 12px;
+    }
+    
+    .food-info {
+      flex: 1;
+    }
+    
+    .food-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .food-desc {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .food-check {
+      font-size: 18px;
+      color: #4CAF50;
+    }
+    
+    .input-group {
+      display: flex;
+      align-items: center;
+    }
+    
+    .amount-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #E8F5E9;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+    
+    .amount-input:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+    
+    .input-unit {
+      margin-left: 12px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .input-tip {
+      font-size: 12px;
+      color: #999;
+      margin-top: 8px;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-notch">
+      <div class="notch-camera">
+        <div class="camera-dot"></div>
+      </div>
+    </div>
+    
+    <div class="app-content">
+      <div id="page-index" class="page active">
+        <div class="card header-card">
+          <div class="user-info">
+            <div class="user-left">
+              <div class="avatar-box">🌍</div>
+              <div>
+                <div class="nickname" id="nickname">环保达人</div>
+                <div class="level">Lv.1</div>
+              </div>
+            </div>
+            <div class="points-box" onclick="showPointsDetail()">
+              <div class="points-label">绿色积分</div>
+              <div class="points-value" id="pointsValue">0</div>
+            </div>
+          </div>
+          
+          <div class="checkin-section">
+            <div class="checkin-info">
+              <div>
+                <span class="streak-text">连续签到</span>
+                <span class="streak-number" id="streakCount">0</span>
+                <span class="streak-text">天</span>
+              </div>
+              <button class="btn btn-primary" id="checkinBtn" onclick="handleCheckin()">
+                立即签到
+              </button>
+            </div>
+            
+            <div class="week-days" id="weekDays">
+            </div>
+          </div>
+        </div>
+        
+        <div class="card clickable" onclick="navigateTo('air')">
+          <div class="card-title">今日空气质量</div>
+          <div class="air-content" id="airContent">
+            <div>
+              <div class="air-city">北京</div>
+              <div class="air-level" style="color: #4CAF50;">优</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="aqi-value" style="color: #4CAF50;">68</div>
+              <div class="aqi-label">AQI</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card clickable" onclick="navigateTo('footprint')">
+          <div class="card-title">我的碳足迹</div>
+          <div class="grid-3">
+            <div class="stat-card">
+              <div class="stat-number" id="carbonTotal">0.0</div>
+              <div class="stat-label">总碳排放(kg)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="carbonTransport">0.0</div>
+              <div class="stat-label">出行(kg)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="carbonElectricity">0.0</div>
+              <div class="stat-label">用电(kg)</div>
+            </div>
+          </div>
+          <div class="more-link" onclick="event.stopPropagation(); navigateTo('footprint')">
+            点击记录你的低碳生活 →
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title" onclick="navigateTo('calendar')" style="cursor: pointer;">
+            今日低碳任务
+            <span class="more-link" style="margin-left: auto; margin-top: 0;">查看全部 →</span>
+          </div>
+          <div id="tasksList">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">环保工具箱</div>
+          <div class="grid-4">
+            <div class="feature-item" onclick="navigateTo('ranking')">
+              <div class="feature-icon">🏆</div>
+              <div class="feature-name">排行榜</div>
+            </div>
+            <div class="feature-item" onclick="navigateTo('recycle')">
+              <div class="feature-icon">♻️</div>
+              <div class="feature-name">回收估值</div>
+            </div>
+            <div class="feature-item" onclick="navigateTo('habits')">
+              <div class="feature-icon">🚫</div>
+              <div class="feature-name">戒掉打卡</div>
+            </div>
+            <div class="feature-item" onclick="navigateTo('diary')">
+              <div class="feature-icon">📔</div>
+              <div class="feature-name">地球日记</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" id="historyCard">
+          <div class="card-title">积分变动</div>
+          <div id="historyList">
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <div class="empty-text">暂无积分变动记录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-calendar" class="page">
+        <div class="page-header">📅 环保日历</div>
+        
+        <div class="card calendar-header">
+          <div class="month-nav">
+            <div class="nav-btn" onclick="prevMonth()">◀</div>
+            <div class="month-title">
+              <span id="monthTitle">2026年4月</span>
+              <div class="today-btn" onclick="goToToday()">今天</div>
+            </div>
+            <div class="nav-btn" onclick="nextMonth()">▶</div>
+          </div>
+          
+          <div class="week-header">
+            <div class="week-day">日</div>
+            <div class="week-day">一</div>
+            <div class="week-day">二</div>
+            <div class="week-day">三</div>
+            <div class="week-day">四</div>
+            <div class="week-day">五</div>
+            <div class="week-day">六</div>
+          </div>
+          
+          <div class="calendar-grid" id="calendarGrid">
+          </div>
+        </div>
+        
+        <div class="card" id="monthlyStatsCard">
+          <div class="card-title">本月环保统计</div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number" id="activeDays">0</div>
+              <div class="stat-label">活跃天数</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="totalCompleted">0</div>
+              <div class="stat-label">完成任务</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="totalDays">30</div>
+              <div class="stat-label">本月天数</div>
+            </div>
+          </div>
+          
+          <div class="progress-section">
+            <div class="progress-header">
+              <span class="text-secondary">本月活跃度</span>
+              <span id="activePercent" class="text-primary">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="activeProgress" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="task-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div class="card-title" style="margin-bottom: 0;" id="selectedDateTitle">
+              今日任务
+            </div>
+            <div class="task-progress">
+              <span class="text-primary text-bold" id="completedCount">0</span>
+              <span class="text-secondary">/<span id="totalCount">0</span></span>
+            </div>
+          </div>
+          <div id="dateTasksList">
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-footprint" class="page">
+        <div class="page-header">🌱 碳足迹</div>
+        
+        <div class="card">
+          <div class="tabs">
+            <div class="tab active" onclick="switchFootprintTab('overview')">数据概览</div>
+            <div class="tab" onclick="switchFootprintTab('history')">历史记录</div>
+            <div class="tab" onclick="switchFootprintTab('add')">添加记录</div>
+          </div>
+          
+          <div id="footprint-overview">
+            <div class="card total-card">
+              <div class="card-title" onclick="showCarbonInfo()">
+                总碳排放量
+                <span class="info-icon">ℹ️</span>
+              </div>
+              <div class="total-content flex flex-center flex-column">
+                <div class="total-value text-warning" id="totalCarbon">
+                  0.00
+                </div>
+                <div class="total-unit">kg CO₂</div>
+              </div>
+              
+              <div class="category-stats" id="categoryStats">
+              </div>
+            </div>
+            
+            <div class="card weekly-card">
+              <div class="card-title">近7天碳排放趋势</div>
+              <div class="weekly-chart">
+                <div class="chart-bars" id="weeklyChart">
+                </div>
+              </div>
+            </div>
+            
+            <div class="card quick-add-card">
+              <div class="card-title">快速记录</div>
+              <div class="quick-add-grid">
+                <div class="quick-item" onclick="openAddModal('transport')">
+                  <div class="quick-icon">🚗</div>
+                  <div class="quick-name">出行</div>
+                </div>
+                <div class="quick-item" onclick="openAddModal('electricity')">
+                  <div class="quick-icon">⚡</div>
+                  <div class="quick-name">用电</div>
+                </div>
+                <div class="quick-item" onclick="openAddModal('food')">
+                  <div class="quick-icon">🍽️</div>
+                  <div class="quick-name">饮食</div>
+                </div>
+                <div class="quick-item" onclick="openAddModal('disposable')">
+                  <div class="quick-icon">🚫</div>
+                  <div class="quick-name">一次性</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="footprint-history" class="hidden">
+            <div id="footprintHistoryList">
+            </div>
+          </div>
+          
+          <div id="footprint-add" class="hidden">
+            <div class="type-item" onclick="openAddModal('transport')">
+              <div class="type-icon">🚗</div>
+              <div class="type-info">
+                <div class="type-name">出行记录</div>
+                <div class="type-desc">打车、公交、地铁、自驾等</div>
+              </div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="type-item" onclick="openAddModal('electricity')">
+              <div class="type-icon">⚡</div>
+              <div class="type-info">
+                <div class="type-name">用电记录</div>
+                <div class="type-desc">家庭用电、办公用电等</div>
+              </div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="type-item" onclick="openAddModal('food')">
+              <div class="type-icon">🍽️</div>
+              <div class="type-info">
+                <div class="type-name">饮食记录</div>
+                <div class="type-desc">外卖、快餐、家常菜等</div>
+              </div>
+              <div class="arrow">›</div>
+            </div>
+            <div class="type-item" onclick="openAddModal('disposable')">
+              <div class="type-icon">🚫</div>
+              <div class="type-info">
+                <div class="type-name">一次性用品</div>
+                <div class="type-desc">吸管、塑料袋、一次性筷子等</div>
+              </div>
+              <div class="arrow">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-ranking" class="page">
+        <div class="page-header">🏆 排行榜</div>
+        
+        <div class="user-ranking" id="userRanking">
+        </div>
+        
+        <div class="card">
+          <div class="card-title">积分榜 TOP 10</div>
+          <div id="rankingList">
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-air" class="page">
+        <div class="page-header">🌤️ 空气质量</div>
+        
+        <div class="card header-card">
+          <div class="air-content">
+            <div>
+              <div class="air-city" id="airCity">北京</div>
+              <div class="air-level" id="airLevel" style="color: #4CAF50;">优</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="aqi-value" id="airAqi" style="color: #4CAF50;">68</div>
+              <div class="aqi-label">AQI</div>
+            </div>
+          </div>
+          <div class="suggestion-text" id="airSuggestion">
+            空气质量令人满意，基本无空气污染，可正常进行户外活动。
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">污染物详情</div>
+          <div class="pollutants-grid" id="pollutantsGrid">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">空气质量指数说明</div>
+          <div id="airLevelsList">
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-recycle" class="page">
+        <div class="page-header">♻️ 回收估值</div>
+        
+        <div class="card">
+          <div class="card-title">垃圾分类指南</div>
+          <div id="garbageCategories">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">垃圾避雷指南</div>
+          <div id="confusingGarbage">
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">可回收物品估值</div>
+          <div id="recycleCategories">
+          </div>
+          
+          <div class="weight-input-section hidden" id="weightSection">
+            <div class="section-title">输入重量（公斤）</div>
+            <div class="weight-input-group">
+              <input type="number" class="weight-input" id="recycleWeight" placeholder="例如: 2.5" oninput="calculateRecycleValue()">
+              <span class="weight-unit">kg</span>
+            </div>
+          </div>
+          
+          <div class="valuation-result hidden" id="valuationResult">
+            <div class="valuation-title">估值结果</div>
+            <div class="valuation-item">
+              <span class="valuation-label">减少碳排放</span>
+              <span class="valuation-value" id="carbonSaved">0.00 kg</span>
+            </div>
+            <div class="valuation-item">
+              <span class="valuation-label">获得积分</span>
+              <span class="valuation-value points" id="pointsEarned">0</span>
+            </div>
+          </div>
+          
+          <button class="submit-btn hidden" id="bookRecycleBtn" onclick="bookRecycle()">
+            预约上门回收
+          </button>
+        </div>
+      </div>
+      
+      <div id="page-habits" class="page">
+        <div class="page-header">🚫 戒掉打卡</div>
+        
+        <div class="card">
+          <div class="habits-stats">
+            <div class="habit-stat-card">
+              <div class="habit-stat-number avoided" id="totalAvoided">0</div>
+              <div class="habit-stat-label">已避免使用</div>
+            </div>
+            <div class="habit-stat-card">
+              <div class="habit-stat-number used" id="totalUsed">0</div>
+              <div class="habit-stat-label">已使用</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">记录今日使用情况</div>
+          <div class="disposable-grid" id="disposableGrid">
+          </div>
+          
+          <div class="hidden" id="habitActionSection">
+            <div class="section-title" style="margin-top: 16px;">选择操作</div>
+            <div class="modal-actions">
+              <button class="modal-btn secondary" onclick="recordHabit(false)">避免使用 (+5积分)</button>
+              <button class="modal-btn" onclick="recordHabit(true)">已使用</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">近30天统计</div>
+          <div id="habitsByType">
+          </div>
+        </div>
+      </div>
+      
+      <div id="page-diary" class="page">
+        <div class="page-header">📔 地球日记</div>
+        
+        <div class="earth-message" id="earthMessage">
+          <div class="earth-icon">🌍</div>
+          <div class="earth-title">地球的呼吸</div>
+          <div class="earth-content">
+            每一片树叶都是地球的肺，每一滴清水都是地球的血液。我们的每一个环保行动，都是在帮助地球更健康地呼吸。
+          </div>
+        </div>
+        
+        <div class="healing-quote">
+          <div class="healing-text" id="healingQuote">
+            "大自然是最伟大的治愈师。"
+          </div>
+          <div class="refresh-quote" onclick="refreshQuote()">🔄 换一句</div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">写日记</div>
+          <div class="mood-selector">
+            <div class="mood-item" data-mood="happy" onclick="selectMood('happy')">
+              <div class="mood-emoji">😊</div>
+              <div class="mood-label">开心</div>
+            </div>
+            <div class="mood-item" data-mood="peaceful" onclick="selectMood('peaceful')">
+              <div class="mood-emoji">😌</div>
+              <div class="mood-label">平静</div>
+            </div>
+            <div class="mood-item" data-mood="worried" onclick="selectMood('worried')">
+              <div class="mood-emoji">😟</div>
+              <div class="mood-label">担忧</div>
+            </div>
+            <div class="mood-item" data-mood="hopeful" onclick="selectMood('hopeful')">
+              <div class="mood-emoji">🤞</div>
+              <div class="mood-label">期待</div>
+            </div>
+          </div>
+          <textarea class="diary-input" id="diaryContent" placeholder="记录今天的环保心情..."></textarea>
+          <button class="submit-btn" onclick="submitDiary()">发布日记</button>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">环保许愿墙</div>
+          <div class="weight-input-group" style="margin-bottom: 12px;">

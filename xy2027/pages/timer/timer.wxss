@@ -1,0 +1,418 @@
+.timer-page {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.header-card {
+  background: linear-gradient(135deg, #3498DB 0%, #2980b9 100%);
+  padding: 30rpx;
+  border-bottom-left-radius: 30rpx;
+  border-bottom-right-radius: 30rpx;
+}
+
+.header-icon {
+  font-size: 48rpx;
+  margin-bottom: 10rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6rpx;
+}
+
+.header-subtitle {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tabs {
+  display: flex;
+  background: #fff;
+  padding: 10rpx 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: #999;
+  border-radius: 8rpx;
+  transition: all 0.3s;
+}
+
+.tab-item.active {
+  color: #3498DB;
+  background: rgba(52, 152, 219, 0.1);
+  font-weight: 500;
+}
+
+.tab-content {
+  padding: 30rpx 20rpx;
+}
+
+.timer-display {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.display-value {
+  font-size: 96rpx;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 10rpx;
+}
+
+.display-label {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.duration-setting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+  gap: 16rpx;
+}
+
+.setting-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.duration-picker {
+  background: #fff;
+  padding: 16rpx 32rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  color: #3498DB;
+  font-weight: 500;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 30rpx;
+}
+
+.control-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+}
+
+.control-btn.main {
+  width: 180rpx;
+  height: 180rpx;
+  background: linear-gradient(135deg, #3498DB 0%, #2980b9 100%);
+}
+
+.control-btn.main.pause {
+  background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+}
+
+.control-btn.pomodoro-main {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.btn-icon {
+  font-size: 40rpx;
+  margin-bottom: 6rpx;
+}
+
+.control-btn.main .btn-icon {
+  font-size: 56rpx;
+  margin-bottom: 8rpx;
+}
+
+.btn-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.control-btn.main .btn-text {
+  color: #fff;
+  font-size: 26rpx;
+}
+
+.laps-list {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  max-height: 300rpx;
+  overflow-y: auto;
+}
+
+.lap-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.lap-item:last-child {
+  border-bottom: none;
+}
+
+.lap-index {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.lap-time {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  font-family: 'Courier New', monospace;
+}
+
+.pomodoro-panel {
+  text-align: center;
+}
+
+.pomodoro-status {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+
+.status-badge.work {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.status-badge.break {
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+.cycle-info {
+  display: flex;
+  justify-content: center;
+  gap: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.completed {
+  color: #2ecc71;
+}
+
+.pomodoro-display {
+  border: 4rpx solid rgba(231, 76, 60, 0.2);
+}
+
+.pomodoro-settings {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 30rpx;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.setting-row:last-child {
+  margin-bottom: 0;
+}
+
+.setting-picker {
+  background: #f8f9fa;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 26rpx;
+  color: #3498DB;
+}
+
+.history-list {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.history-item {
+  padding: 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.history-project {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.history-type {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  color: #fff;
+}
+
+.history-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-duration {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.duration-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.duration-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #3498DB;
+}
+
+.history-time {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.history-action {
+  margin-top: 16rpx;
+  text-align: right;
+}
+
+.delete-text {
+  font-size: 24rpx;
+  color: #dc3545;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #999;
+  margin-bottom: 10rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #ccc;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.project-modal {
+  width: 80%;
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.project-input {
+  width: 100%;
+  height: 80rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #f5f5f5;
+}
+
+.modal-footer .btn {
+  flex: 1;
+  border-radius: 0;
+  height: 90rpx;
+}
+
+.modal-footer .btn:first-child {
+  border-right: 1rpx solid #f5f5f5;
+}

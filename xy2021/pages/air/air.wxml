@@ -1,0 +1,158 @@
+<view class="container">
+  <!-- 城市选择和刷新 -->
+  <view class="card header-card">
+    <view class="header-content flex flex-between flex-center">
+      <view class="city-select flex flex-center" bindtap="toggleCityPicker">
+        <text class="location-icon">📍</text>
+        <text class="city-name">{{cityName}}</text>
+        <text class="arrow">▼</text>
+      </view>
+      <view class="refresh-btn" bindtap="refreshData">
+        <text class="refresh-icon">🔄</text>
+        <text class="refresh-text">刷新</text>
+      </view>
+    </view>
+    
+    <!-- 城市选择器 -->
+    <view class="city-picker {{showCityPicker ? 'show' : ''}}" wx:if="{{showCityPicker}}">
+      <view class="picker-title">选择城市</view>
+      <view class="city-list">
+        <view 
+          wx:for="{{cities}}" 
+          wx:key="index" 
+          class="city-item {{item === cityName ? 'active' : ''}}"
+          bindtap="selectCity"
+          data-city="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空气质量概览 -->
+  <view class="card overview-card" wx:if="{{airData}}">
+    <view class="overview-content flex flex-center flex-column" style="background: linear-gradient(135deg, {{airData.color}}40, {{airData.color}}20);">
+      <view class="aqi-value" style="color: {{airData.color}}">
+        {{airData.aqi}}
+      </view>
+      <view class="aqi-level" style="color: {{airData.color}}">
+        {{airData.level}}
+      </view>
+      <view class="update-time text-secondary text-small mt-8">
+        更新时间：{{airData.updateTime}}
+      </view>
+    </view>
+    
+    <!-- 建议提示 -->
+    <view class="suggestion-section mt-16" wx:if="{{aqiLevelInfo}}">
+      <view class="suggestion-icon">💡</view>
+      <view class="suggestion-text text-secondary text-small">
+        {{aqiLevelInfo.suggestion}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 污染物详情 -->
+  <view class="card pollutants-card" wx:if="{{airData}}">
+    <view class="card-title">污染物详情</view>
+    <view class="pollutants-grid grid-2 mt-16">
+      <view 
+        wx:for="{{pollutants}}" 
+        wx:key="key" 
+        class="pollutant-item"
+      >
+        <view class="pollutant-header flex flex-between">
+          <text class="pollutant-name text-secondary">{{item.name}}</text>
+          <text class="pollutant-unit text-secondary text-small">{{item.unit}}</text>
+        </view>
+        <view class="pollutant-value mt-8">
+          <text class="value-number text-bold" style="color: {{getPollutantLevel(item.key, airData.pollutants[item.key]).color}}">
+            {{airData.pollutants[item.key]}}
+          </text>
+        </view>
+        <view class="pollutant-bar mt-8">
+          <view class="bar-bg">
+            <view 
+              class="bar-fill" 
+              style="width: {{Math.min(airData.pollutants[item.key] / 500 * 100, 100)}}%; background-color: {{getPollutantLevel(item.key, airData.pollutants[item.key]).color}};"
+            ></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空气质量等级说明 -->
+  <view class="card levels-card">
+    <view class="card-title">空气质量等级</view>
+    <view class="levels-list mt-16">
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #4CAF50;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">优</view>
+          <view class="level-range text-secondary text-small">0-50 AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">空气质量令人满意</view>
+      </view>
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #8BC34A;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">良</view>
+          <view class="level-range text-secondary text-small">51-100 AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">空气质量可接受</view>
+      </view>
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #FFEB3B;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">轻度污染</view>
+          <view class="level-range text-secondary text-small">101-150 AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">易感人群有症状</view>
+      </view>
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #FF9800;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">中度污染</view>
+          <view class="level-range text-secondary text-small">151-200 AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">健康人群受影响</view>
+      </view>
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #F44336;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">重度污染</view>
+          <view class="level-range text-secondary text-small">201-300 AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">心脏病肺病加剧</view>
+      </view>
+      <view class="level-item flex flex-center">
+        <view class="level-color" style="background-color: #880E4F;"></view>
+        <view class="level-info flex-1">
+          <view class="level-name">严重污染</view>
+          <view class="level-range text-secondary text-small">300+ AQI</view>
+        </view>
+        <view class="level-desc text-secondary text-small">健康人群普遍症状</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史趋势 -->
+  <view class="card history-card" wx:if="{{airHistory.length > 0}}">
+    <view class="card-title">最近查询记录</view>
+    <view class="history-list mt-16">
+      <view 
+        wx:for="{{airHistory}}" 
+        wx:key="time" 
+        class="history-item flex flex-between flex-center"
+      >
+        <view class="history-time text-secondary">{{item.time}}</view>
+        <view class="history-level">
+          <text class="history-aqi text-bold">{{item.aqi}}</text>
+          <text class="history-text text-secondary">{{item.level}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
