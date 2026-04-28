@@ -1,0 +1,190 @@
+<view class="dashboard-page">
+  <view class="header-card">
+    <view class="header-icon">📊</view>
+    <view class="header-title">数据汇总</view>
+    <view class="header-subtitle">管理你的缝纫工作室</view>
+  </view>
+
+  <view class="tabs">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="key" 
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="{{item.key}}"
+    >
+      {{item.name}}
+    </view>
+  </view>
+
+  <view class="tab-content">
+    <view class="overview-panel" wx:if="{{activeTab === 'overview'}}">
+      <view class="section">
+        <view class="section-title">库存统计</view>
+        <view class="stats-grid">
+          <view class="stat-card" bindtap="goToPage" data-path="/pages/fabric/fabric">
+            <view class="stat-icon" style="background: rgba(255, 107, 107, 0.1);">🧶</view>
+            <view class="stat-info">
+              <view class="stat-value">{{overview.totalFabrics}}</view>
+              <view class="stat-label">成衣柜</view>
+            </view>
+          </view>
+          <view class="stat-card" bindtap="goToPage" data-path="/pages/pattern/pattern">
+            <view class="stat-icon" style="background: rgba(212, 165, 116, 0.1);">📐</view>
+            <view class="stat-info">
+              <view class="stat-value">{{overview.totalPatterns}}</view>
+              <view class="stat-label">纸样库</view>
+            </view>
+          </view>
+          <view class="stat-card" bindtap="goToPage" data-path="/pages/materials/materials">
+            <view class="stat-icon" style="background: rgba(78, 205, 196, 0.1);">🔗</view>
+            <view class="stat-info">
+              <view class="stat-value">{{overview.totalMaterials}}</view>
+              <view class="stat-label">辅料</view>
+              <view class="stat-warning" wx:if="{{overview.lowStockMaterials > 0}}">{{overview.lowStockMaterials}}项库存不足</view>
+            </view>
+          </view>
+          <view class="stat-card" bindtap="goToPage" data-path="/pages/tools/tools">
+            <view class="stat-icon" style="background: rgba(155, 89, 182, 0.1);">🔧</view>
+            <view class="stat-info">
+              <view class="stat-value">{{overview.totalTools}}</view>
+              <view class="stat-label">工具箱</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-title">投资统计</view>
+        <view class="big-stat-card">
+          <view class="big-stat-label">总投资金额</view>
+          <view class="big-stat-value">¥{{overview.totalInvestment}}</view>
+          <view class="big-stat-hint">包括面料、纸样、辅料、工具</view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-title">缝纫记录</view>
+        <view class="stats-row">
+          <view class="stat-item">
+            <view class="stat-number">{{overview.totalSessions}}</view>
+            <view class="stat-name">完成次数</view>
+          </view>
+          <view class="stat-item">
+            <view class="stat-number">{{overview.totalSewingTime}}</view>
+            <view class="stat-name">累计时长</view>
+          </view>
+          <view class="stat-item">
+            <view class="stat-number">{{overview.totalPosts}}</view>
+            <view class="stat-name">社区帖子</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="section">
+        <view class="section-title">快捷入口</view>
+        <view class="quick-grid">
+          <view class="quick-item" bindtap="goToPage" data-path="/pages/timer/timer">
+            <text class="quick-icon">⏱️</text>
+            <text class="quick-text">开始计时</text>
+          </view>
+          <view class="quick-item" bindtap="goToPage" data-path="/pages/community/community">
+            <text class="quick-icon">✏️</text>
+            <text class="quick-text">发布帖子</text>
+          </view>
+          <view class="quick-item" bindtap="goToPage" data-path="/pages/fabric/fabric">
+            <text class="quick-icon">➕</text>
+            <text class="quick-text">添加面料</text>
+          </view>
+          <view class="quick-item" bindtap="goToPage" data-path="/pages/materials/materials">
+            <text class="quick-icon">🔗</text>
+            <text class="quick-text">管理辅料</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="purchases-panel" wx:if="{{activeTab === 'purchases'}}">
+      <view class="summary-card">
+        <view class="summary-row">
+          <view class="summary-item">
+            <view class="summary-label">购买次数</view>
+            <view class="summary-value">{{purchaseStats.purchaseCount}}</view>
+          </view>
+          <view class="summary-item">
+            <view class="summary-label">总支出</view>
+            <view class="summary-value highlight">¥{{purchaseStats.totalAmount}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="list-section">
+        <view class="list-header">购买记录</view>
+        <view class="purchase-list" wx:if="{{purchases.length > 0}}">
+          <view class="purchase-item" wx:for="{{purchases}}" wx:key="id">
+            <view class="purchase-left">
+              <view class="purchase-type" style="background: {{getItemTypeColor(item.itemType)}}20; color: {{getItemTypeColor(item.itemType)}};">
+                {{getItemTypeLabel(item.itemType)}}
+              </view>
+              <view class="purchase-info">
+                <view class="purchase-name">{{item.name}}</view>
+                <view class="purchase-detail">
+                  <text>{{item.quantity}}{{item.unit}}</text>
+                  <text class="dot">·</text>
+                  <text>{{item.purchaseDate}}</text>
+                </view>
+              </view>
+            </view>
+            <view class="purchase-amount">¥{{item.totalAmount}}</view>
+          </view>
+        </view>
+        <view class="empty-state" wx:else>
+          <text class="empty-icon">📋</text>
+          <text class="empty-text">暂无购买记录</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="sessions-panel" wx:if="{{activeTab === 'sessions'}}">
+      <view class="summary-card">
+        <view class="summary-row">
+          <view class="summary-item">
+            <view class="summary-label">完成次数</view>
+            <view class="summary-value">{{sewingStats.sessionCount}}</view>
+          </view>
+          <view class="summary-item">
+            <view class="summary-label">累计时长</view>
+            <view class="summary-value highlight">{{sewingStats.totalTime}}</view>
+          </view>
+          <view class="summary-item">
+            <view class="summary-label">平均时长</view>
+            <view class="summary-value">{{sewingStats.avgTime}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="list-section">
+        <view class="list-header">缝纫记录</view>
+        <view class="session-list" wx:if="{{sessions.length > 0}}">
+          <view class="session-item" wx:for="{{sessions}}" wx:key="id">
+            <view class="session-left">
+              <view class="session-type" style="background: {{getTypeColor(item.type)}}20; color: {{getTypeColor(item.type)}};">
+                {{getTypeLabel(item.type)}}
+              </view>
+              <view class="session-info">
+                <view class="session-project">{{item.projectName}}</view>
+                <view class="session-time">{{formatTimestamp(item.startTime)}}</view>
+              </view>
+            </view>
+            <view class="session-duration">{{formatDuration(item.actualDuration)}}</view>
+          </view>
+        </view>
+        <view class="empty-state" wx:else>
+          <text class="empty-icon">⏱️</text>
+          <text class="empty-text">暂无缝纫记录</text>
+          <text class="empty-hint">去计时页面开始你的缝纫时光吧</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
