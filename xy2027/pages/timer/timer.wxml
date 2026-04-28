@@ -1,0 +1,168 @@
+<view class="timer-page">
+  <view class="header-card">
+    <view class="header-icon">⏱️</view>
+    <view class="header-title">缝纫计时</view>
+    <view class="header-subtitle">专注你的缝纫时光</view>
+  </view>
+
+  <view class="tabs">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="key" 
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="{{item.key}}"
+    >
+      {{item.name}}
+    </view>
+  </view>
+
+  <view class="tab-content">
+    <view class="countdown-panel" wx:if="{{activeTab === 'countdown'}}">
+      <view class="timer-display">
+        <view class="display-value">{{countdownDisplay}}</view>
+        <view class="display-label">分钟倒计时</view>
+      </view>
+      
+      <view class="duration-setting" wx:if="{{!countdownRunning && !countdownPaused}}">
+        <text class="setting-label">设置时长(分钟):</text>
+        <picker mode="selector" range="{{[5, 10, 15, 20, 25, 30, 45, 60, 90]}}" value="{{countdownDuration}}" bindchange="onCountdownInput">
+          <view class="duration-picker">{{countdownDuration}} 分钟</view>
+        </picker>
+      </view>
+
+      <view class="timer-controls">
+        <view class="control-btn reset" bindtap="resetCountdown">
+          <text class="btn-icon">🔄</text>
+          <text class="btn-text">重置</text>
+        </view>
+        <view class="control-btn main {{countdownRunning ? 'pause' : ''}}" bindtap="{{countdownRunning ? 'pauseCountdown' : 'startCountdown'}}">
+          <text class="btn-icon">{{countdownRunning ? '⏸️' : (countdownPaused ? '▶️' : '▶️')}}</text>
+          <text class="btn-text">{{countdownRunning ? '暂停' : (countdownPaused ? '继续' : '开始')}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="stopwatch-panel" wx:if="{{activeTab === 'stopwatch'}}">
+      <view class="timer-display">
+        <view class="display-value">{{stopwatchDisplay}}</view>
+        <view class="display-label">正计时</view>
+      </view>
+
+      <view class="laps-list" wx:if="{{stopwatchLaps.length > 0}}">
+        <view class="lap-item" wx:for="{{stopwatchLaps}}" wx:key="index">
+          <text class="lap-index">#{{item.index}}</text>
+          <text class="lap-time">{{item.display}}</text>
+        </view>
+      </view>
+
+      <view class="timer-controls">
+        <view class="control-btn reset" bindtap="stopStopwatch" wx:if="{{stopwatchTime > 0}}">
+          <text class="btn-icon">✓</text>
+          <text class="btn-text">结束</text>
+        </view>
+        <view class="control-btn lap" bindtap="lapStopwatch" wx:if="{{stopwatchRunning}}">
+          <text class="btn-icon">📌</text>
+          <text class="btn-text">记次</text>
+        </view>
+        <view class="control-btn main {{stopwatchRunning ? 'pause' : ''}}" bindtap="{{stopwatchRunning ? 'pauseStopwatch' : 'startStopwatch'}}">
+          <text class="btn-icon">{{stopwatchRunning ? '⏸️' : '▶️'}}</text>
+          <text class="btn-text">{{stopwatchRunning ? '暂停' : '开始'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="pomodoro-panel" wx:if="{{activeTab === 'pomodoro'}}">
+      <view class="pomodoro-status">
+        <view class="status-badge {{pomodoroPhase === 'work' ? 'work' : 'break'}}">
+          {{pomodoroPhase === 'work' ? '工作中' : '休息中'}}
+        </view>
+        <view class="cycle-info">
+          <text>第 {{pomodoroCycle}} 个番茄钟</text>
+          <text class="completed">已完成 {{pomodoroCompleted}} 个</text>
+        </view>
+      </view>
+
+      <view class="timer-display pomodoro-display">
+        <view class="display-value">{{pomodoroDisplay}}</view>
+        <view class="display-label">{{pomodoroPhase === 'work' ? '专注工作' : '放松休息'}}</view>
+      </view>
+
+      <view class="pomodoro-settings" wx:if="{{!pomodoroRunning}}">
+        <view class="setting-row">
+          <text class="setting-label">工作时长:</text>
+          <picker mode="selector" range="{{[15, 20, 25, 30, 45, 60]}}" value="{{pomodoroWorkDuration}}" bindchange="onWorkDurationChange">
+            <view class="setting-picker">{{pomodoroWorkDuration}}分钟</view>
+          </picker>
+        </view>
+        <view class="setting-row">
+          <text class="setting-label">休息时长:</text>
+          <picker mode="selector" range="{{[3, 5, 10, 15]}}" value="{{pomodoroBreakDuration}}" bindchange="onBreakDurationChange">
+            <view class="setting-picker">{{pomodoroBreakDuration}}分钟</view>
+          </picker>
+        </view>
+      </view>
+
+      <view class="timer-controls">
+        <view class="control-btn reset" bindtap="resetPomodoro">
+          <text class="btn-icon">🔄</text>
+          <text class="btn-text">重置</text>
+        </view>
+        <view class="control-btn main pomodoro-main {{pomodoroRunning ? 'pause' : ''}}" bindtap="{{pomodoroRunning ? 'pausePomodoro' : 'startPomodoro'}}">
+          <text class="btn-icon">{{pomodoroRunning ? '⏸️' : '🍅'}}</text>
+          <text class="btn-text">{{pomodoroRunning ? '暂停' : '开始番茄钟'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="history-panel" wx:if="{{activeTab === 'history'}}">
+      <view class="history-list" wx:if="{{history.length > 0}}">
+        <view class="history-item" wx:for="{{history}}" wx:key="id">
+          <view class="history-header">
+            <view class="history-project">{{item.projectName}}</view>
+            <view class="history-type badge-{{item.type === 'pomodoro' ? 'success' : item.type === 'stopwatch' ? 'info' : 'warning'}}">
+              {{item.type === 'pomodoro' ? '番茄钟' : item.type === 'stopwatch' ? '正计时' : '倒计时'}}
+            </view>
+          </view>
+          <view class="history-content">
+            <view class="history-duration">
+              <text class="duration-label">用时:</text>
+              <text class="duration-value">{{formatDuration(item.actualDuration)}}</text>
+            </view>
+            <view class="history-time">
+              <text class="time-text">{{item.startTime ? (new Date(item.startTime).toLocaleString()) : ''}}</text>
+            </view>
+          </view>
+          <view class="history-action" bindtap="deleteHistory" data-id="{{item.id}}">
+            <text class="delete-text">删除</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state" wx:else>
+        <text class="empty-icon">📋</text>
+        <text class="empty-text">暂无计时记录</text>
+        <text class="empty-hint">开始计时后，记录将保存在这里</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showProjectInput}}" bindtap="hideProjectInput">
+    <view class="project-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">项目名称</text>
+      </view>
+      <view class="modal-body">
+        <input 
+          class="project-input" 
+          placeholder="请输入项目名称（选填）" 
+          value="{{projectName}}"
+          bindinput="onProjectInput"
+        />
+      </view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideProjectInput">取消</view>
+        <view class="btn btn-primary" bindtap="confirmProject">开始计时</view>
+      </view>
+    </view>
+  </view>
+</view>

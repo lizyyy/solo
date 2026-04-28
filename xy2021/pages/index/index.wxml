@@ -1,0 +1,180 @@
+<view class="container">
+  <!-- 头部用户信息和积分卡片 -->
+  <view class="card header-card">
+    <view class="user-info flex flex-between">
+      <view class="flex">
+        <view class="avatar-box">
+          <text class="avatar-text">🌍</text>
+        </view>
+        <view class="user-detail">
+          <view class="nickname">{{userInfo.nickname}}</view>
+          <view class="level">环保等级 Lv.{{userInfo.level}}</view>
+        </view>
+      </view>
+      <view class="points-box" bindtap="showPointsDetail">
+        <view class="points-label">绿色积分</view>
+        <view class="points-value text-primary text-bold">{{points}}</view>
+      </view>
+    </view>
+    
+    <!-- 签到区域 -->
+    <view class="checkin-section mt-16">
+      <view class="checkin-info flex flex-between">
+        <view>
+          <text class="streak-text">连续签到</text>
+          <text class="streak-number text-primary text-bold">{{checkInStreak}}</text>
+          <text class="streak-text">天</text>
+        </view>
+        <button 
+          class="btn-primary {{todayCheckedIn ? 'btn-disabled' : ''}}" 
+          bindtap="onCheckIn"
+          disabled="{{todayCheckedIn}}"
+        >
+          {{todayCheckedIn ? '✓ 已签到' : '立即签到'}}
+        </button>
+      </view>
+      
+      <!-- 星期展示 -->
+      <view class="week-days flex flex-between mt-16">
+        <view 
+          wx:for="{{weekDays}}" 
+          wx:key="dateStr" 
+          class="day-item {{item.isToday ? 'today' : ''}}"
+        >
+          <view class="day-name">{{item.weekDay}}</view>
+          <view class="day-date {{item.isToday ? 'text-primary text-bold' : ''}}">{{item.day}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日空气质量 -->
+  <view class="card air-card" bindtap="navigateToPage" data-page="air">
+    <view class="card-title">今日空气质量</view>
+    <view class="air-content flex flex-between" wx:if="{{todayAir}}">
+      <view class="air-left">
+        <view class="air-city">{{todayAir.city}}</view>
+        <view class="air-level" style="color: {{todayAir.color}}">
+          {{todayAir.level}}
+        </view>
+      </view>
+      <view class="air-right flex flex-center">
+        <view class="aqi-value" style="color: {{todayAir.color}}">
+          {{todayAir.aqi}}
+        </view>
+        <view class="aqi-label">AQI</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 碳足迹概览 -->
+  <view class="card footprint-card" bindtap="goToFootprint">
+    <view class="card-title">我的碳足迹</view>
+    <view class="footprint-stats grid-3">
+      <view class="stat-card">
+        <view class="stat-number">{{carbonFootprint.total.toFixed(1)}}</view>
+        <view class="stat-label">总碳排放(kg)</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-number">{{carbonFootprint.transport.toFixed(1)}}</view>
+        <view class="stat-label">出行(kg)</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-number">{{carbonFootprint.electricity.toFixed(1)}}</view>
+        <view class="stat-label">用电(kg)</view>
+      </view>
+    </view>
+    <view class="view-more text-center mt-16 text-secondary">
+      查看详情 →
+    </view>
+  </view>
+
+  <!-- 每日低碳任务 -->
+  <view class="card tasks-card">
+    <view class="card-title" bindtap="goToCalendar">
+      今日低碳任务
+      <text class="more-btn text-secondary">查看全部 →</text>
+    </view>
+    <view class="tasks-list">
+      <view 
+        wx:for="{{dailyTasks}}" 
+        wx:key="id" 
+        class="task-item {{item.completed ? 'completed' : ''}}"
+        bindtap="onCompleteTask"
+        data-id="{{item.id}}"
+      >
+        <view class="task-icon">{{item.icon}}</view>
+        <view class="task-content flex-1">
+          <view class="task-title">{{item.title}}</view>
+          <view class="task-desc text-secondary text-small">{{item.description}}</view>
+        </view>
+        <view class="task-right">
+          <view class="task-points text-primary">+{{item.points}}</view>
+          <view class="task-status {{item.completed ? 'done' : ''}}">
+            {{item.completed ? '✓ 已完成' : '去完成'}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能入口网格 -->
+  <view class="card features-card">
+    <view class="card-title">环保工具箱</view>
+    <view class="features-grid grid-4">
+      <view class="feature-item" bindtap="navigateToPage" data-page="ranking">
+        <view class="feature-icon icon-box icon-green">🏆</view>
+        <view class="feature-name">排行榜</view>
+      </view>
+      <view class="feature-item" bindtap="navigateToPage" data-page="recycle">
+        <view class="feature-icon icon-box icon-blue">♻️</view>
+        <view class="feature-name">回收估值</view>
+      </view>
+      <view class="feature-item" bindtap="navigateToPage" data-page="habits">
+        <view class="feature-icon icon-box icon-orange">🚫</view>
+        <view class="feature-name">戒掉打卡</view>
+      </view>
+      <view class="feature-item" bindtap="navigateToPage" data-page="diary">
+        <view class="feature-icon icon-box icon-green">📔</view>
+        <view class="feature-name">地球日记</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 积分变动记录 -->
+  <view class="card history-card" wx:if="{{pointsHistory.length > 0}}">
+    <view class="card-title">积分变动</view>
+    <view class="history-list">
+      <view wx:for="{{pointsHistory}}" wx:key="timestamp" class="history-item">
+        <view class="history-left">
+          <view class="history-reason">{{item.reason}}</view>
+          <view class="history-date text-secondary text-small">{{item.date}}</view>
+        </view>
+        <view class="history-right">
+          <view class="history-points text-primary">+{{item.points}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 签到成功弹窗 -->
+<view class="modal-mask {{showCheckInModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content checkin-modal">
+    <view class="modal-header">
+      <text class="close-btn" bindtap="closeCheckInModal">×</text>
+    </view>
+    <view class="checkin-icon animate-pulse">🎉</view>
+    <view class="checkin-title">签到成功！</view>
+    <view class="checkin-message" wx:if="{{checkInResult}}">
+      {{checkInResult.message}}
+    </view>
+    <view class="checkin-streak" wx:if="{{checkInResult}}">
+      连续签到 <text class="text-primary text-bold">{{checkInResult.streak}}</text> 天
+    </view>
+    <view class="checkin-bonus" wx:if="{{checkInResult && checkInResult.streak > 1}}">
+      连续签到额外奖励 {{checkInResult.streak - 1}} 积分
+    </view>
+    <button class="btn-primary mt-16" bindtap="closeCheckInModal">知道了</button>
+  </view>
+</view>

@@ -1,0 +1,318 @@
+<view class="fabric-page">
+  <view class="header-card">
+    <view class="sewing-icon">🧵</view>
+    <view class="header-title">成衣柜</view>
+    <view class="header-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{filteredFabrics.length}}</view>
+        <view class="stat-label">种类</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{totalQuantity}}</view>
+        <view class="stat-label">总数量(米)</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">¥{{totalValue}}</view>
+        <view class="stat-label">总价值</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索面料名称、类型、颜色..." 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+    <picker 
+      class="filter-picker" 
+      mode="selector" 
+      range="{{fabricTypes}}"
+      bindchange="onFilterChange"
+    >
+      <view class="filter-text">
+        <text class="filter-label">筛选:</text>
+        <text class="filter-value">{{filterType === 'all' ? '全部' : filterType}}</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="fabrics-list">
+    <view 
+      wx:for="{{filteredFabrics}}" 
+      wx:key="id" 
+      class="fabric-card"
+      bindtap="viewDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="fabric-header">
+        <view class="fabric-name">{{item.name}}</view>
+        <view class="fabric-type badge-info">{{item.type}}</view>
+      </view>
+      <view class="fabric-content">
+        <view class="fabric-info">
+          <view class="info-row">
+            <text class="info-label">颜色:</text>
+            <text class="info-value">{{item.color}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">数量:</text>
+            <text class="info-value">{{item.quantity}}{{item.unit}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">单价:</text>
+            <text class="info-value">¥{{item.price}}/{{item.unit}}</text>
+          </view>
+        </view>
+        <view class="fabric-total">
+          <view class="total-label">总价值</view>
+          <view class="total-value text-primary">¥{{item.totalValue}}</view>
+        </view>
+      </view>
+      <view class="fabric-footer">
+        <text class="footer-text">购买: {{item.purchaseDate}}</text>
+        <text class="footer-text">供应商: {{item.supplier}}</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredFabrics.length === 0}}">
+      <text class="empty-icon">🧶</text>
+      <text class="empty-text">暂无线面料记录</text>
+      <text class="empty-hint">点击下方按钮添加第一个面料</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加面料</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">添加面料</text>
+        <text class="modal-close" bindtap="hideAddModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <text class="form-label">面料名称 *</text>
+          <input class="form-input" placeholder="请输入面料名称" value="{{formData.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">面料类型</text>
+          <picker class="form-picker" mode="selector" range="{{['纯棉', '牛仔', '丝绸', '麻', '化纤', '针织', '其他']}}" data-field="type" bindchange="onPickerChange">
+            <view class="picker-text">{{formData.type || '请选择'}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">颜色</text>
+          <input class="form-input" placeholder="请输入颜色" value="{{formData.color}}" data-field="color" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">数量 *</text>
+            <input class="form-input" type="digit" placeholder="请输入数量" value="{{formData.quantity}}" data-field="quantity" bindinput="onFormInput" />
+          </view>
+          <view class="form-item form-item-small">
+            <text class="form-label">单位</text>
+            <picker class="form-picker" mode="selector" range="{{['米', '码', '件']}}" data-field="unit" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.unit}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">单价(元) *</text>
+          <input class="form-input" type="digit" placeholder="请输入单价" value="{{formData.price}}" data-field="price" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">购买日期</text>
+          <picker class="form-picker" mode="date" value="{{formData.purchaseDate}}" bindchange="onDateChange">
+            <view class="picker-text">{{formData.purchaseDate}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">供应商</text>
+          <input class="form-input" placeholder="请输入供应商" value="{{formData.supplier}}" data-field="supplier" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">门幅(cm)</text>
+          <input class="form-input" type="number" placeholder="请输入门幅宽度" value="{{formData.width}}" data-field="width" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">厚度</text>
+          <picker class="form-picker" mode="selector" range="{{['薄', '中薄', '中厚', '厚']}}" data-field="thickness" bindchange="onPickerChange">
+            <view class="picker-text">{{formData.thickness}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">用途</text>
+          <input class="form-input" placeholder="例如：T恤、衬衫、连衣裙等" value="{{formData.purpose}}" data-field="purpose" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="输入备注信息" value="{{formData.notes}}" data-field="notes" bindinput="onFormInput"></textarea>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideAddModal">取消</view>
+        <view class="btn btn-primary" bindtap="submitAddForm">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEditModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">编辑面料</text>
+        <text class="modal-close" bindtap="hideEditModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <text class="form-label">面料名称 *</text>
+          <input class="form-input" placeholder="请输入面料名称" value="{{formData.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">面料类型</text>
+          <picker class="form-picker" mode="selector" range="{{['纯棉', '牛仔', '丝绸', '麻', '化纤', '针织', '其他']}}" data-field="type" bindchange="onPickerChange">
+            <view class="picker-text">{{formData.type || '请选择'}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">颜色</text>
+          <input class="form-input" placeholder="请输入颜色" value="{{formData.color}}" data-field="color" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">数量 *</text>
+            <input class="form-input" type="digit" placeholder="请输入数量" value="{{formData.quantity}}" data-field="quantity" bindinput="onFormInput" />
+          </view>
+          <view class="form-item form-item-small">
+            <text class="form-label">单位</text>
+            <picker class="form-picker" mode="selector" range="{{['米', '码', '件']}}" data-field="unit" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.unit}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">单价(元) *</text>
+          <input class="form-input" type="digit" placeholder="请输入单价" value="{{formData.price}}" data-field="price" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">购买日期</text>
+          <picker class="form-picker" mode="date" value="{{formData.purchaseDate}}" bindchange="onDateChange">
+            <view class="picker-text">{{formData.purchaseDate}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">供应商</text>
+          <input class="form-input" placeholder="请输入供应商" value="{{formData.supplier}}" data-field="supplier" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">门幅(cm)</text>
+          <input class="form-input" type="number" placeholder="请输入门幅宽度" value="{{formData.width}}" data-field="width" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">厚度</text>
+          <picker class="form-picker" mode="selector" range="{{['薄', '中薄', '中厚', '厚']}}" data-field="thickness" bindchange="onPickerChange">
+            <view class="picker-text">{{formData.thickness}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">用途</text>
+          <input class="form-input" placeholder="例如：T恤、衬衫、连衣裙等" value="{{formData.purpose}}" data-field="purpose" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="输入备注信息" value="{{formData.notes}}" data-field="notes" bindinput="onFormInput"></textarea>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideEditModal">取消</view>
+        <view class="btn btn-primary" bindtap="submitEditForm">保存修改</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="modal-content detail-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">面料详情</text>
+        <text class="modal-close" bindtap="hideDetailModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y wx:if="{{currentFabric}}">
+        <view class="detail-section">
+          <view class="detail-title">基本信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">名称</text>
+              <text class="detail-value">{{currentFabric.name}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">类型</text>
+              <text class="detail-value">{{currentFabric.type}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">颜色</text>
+              <text class="detail-value">{{currentFabric.color}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">厚度</text>
+              <text class="detail-value">{{currentFabric.thickness}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section">
+          <view class="detail-title">库存信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">当前数量</text>
+              <text class="detail-value text-primary">{{currentFabric.quantity}}{{currentFabric.unit}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">单价</text>
+              <text class="detail-value">¥{{currentFabric.price}}/{{currentFabric.unit}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">总价值</text>
+              <text class="detail-value text-primary">¥{{currentFabric.totalValue}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentFabric.width}}">
+              <text class="detail-label">门幅</text>
+              <text class="detail-value">{{currentFabric.width}}cm</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section">
+          <view class="detail-title">采购信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">购买日期</text>
+              <text class="detail-value">{{currentFabric.purchaseDate}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">供应商</text>
+              <text class="detail-value">{{currentFabric.supplier}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentFabric.purpose}}">
+          <view class="detail-title">用途</view>
+          <view class="detail-text">{{currentFabric.purpose}}</view>
+        </view>
+        <view class="detail-section" wx:if="{{currentFabric.notes}}">
+          <view class="detail-title">备注</view>
+          <view class="detail-text">{{currentFabric.notes}}</view>
+        </view>
+      </scroll-view>
+      <view class="modal-footer detail-footer">
+        <view class="btn btn-outline" bindtap="useFabric" data-id="{{currentFabric.id}}">使用面料</view>
+        <view class="btn btn-secondary" bindtap="editFabric" data-id="{{currentFabric.id}}">编辑</view>
+        <view class="btn btn-danger" bindtap="deleteFabric" data-id="{{currentFabric.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+</view>

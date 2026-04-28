@@ -1,0 +1,242 @@
+.header-card, .overview-card, .pollutants-card, .levels-card, .history-card {
+  margin-top: 24rpx;
+}
+
+.header-content {
+  align-items: center;
+}
+
+.city-select {
+  align-items: center;
+  background-color: #F5F5F5;
+  padding: 12rpx 20rpx;
+  border-radius: 50rpx;
+}
+
+.location-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.city-name {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.arrow {
+  font-size: 20rpx;
+  color: #999999;
+  margin-left: 8rpx;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  background-color: #E8F5E9;
+  padding: 12rpx 20rpx;
+  border-radius: 50rpx;
+}
+
+.refresh-icon {
+  font-size: 24rpx;
+  margin-right: 6rpx;
+}
+
+.refresh-text {
+  font-size: 26rpx;
+  color: #4CAF50;
+}
+
+.city-picker {
+  display: none;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.city-picker.show {
+  display: block;
+}
+
+.picker-title {
+  font-size: 26rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+}
+
+.city-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.city-item {
+  font-size: 26rpx;
+  color: #333333;
+  background-color: #F5F5F5;
+  padding: 12rpx 24rpx;
+  border-radius: 50rpx;
+}
+
+.city-item.active {
+  background-color: #4CAF50;
+  color: #FFFFFF;
+}
+
+.overview-content {
+  padding: 48rpx 24rpx;
+  border-radius: 16rpx;
+}
+
+.aqi-value {
+  font-size: 96rpx;
+  font-weight: bold;
+}
+
+.aqi-level {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-top: 8rpx;
+}
+
+.update-time {
+  margin-top: 8rpx;
+}
+
+.suggestion-section {
+  display: flex;
+  align-items: flex-start;
+  background-color: #FFF9E6;
+  border-radius: 12rpx;
+  padding: 16rpx;
+}
+
+.suggestion-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  margin-top: 2rpx;
+}
+
+.suggestion-text {
+  flex: 1;
+  line-height: 1.6;
+}
+
+.pollutants-grid {
+  gap: 16rpx;
+}
+
+.pollutant-item {
+  background-color: #FAFAFA;
+  border-radius: 12rpx;
+  padding: 20rpx;
+}
+
+.pollutant-header {
+  align-items: center;
+}
+
+.pollutant-name {
+  font-size: 24rpx;
+}
+
+.pollutant-unit {
+  font-size: 20rpx;
+}
+
+.value-number {
+  font-size: 32rpx;
+}
+
+.bar-bg {
+  height: 8rpx;
+  background-color: #E0E0E0;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.levels-list {
+  margin-top: 16rpx;
+}
+
+.level-item {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+  align-items: center;
+}
+
+.level-item:last-child {
+  border-bottom: none;
+}
+
+.level-color {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-name {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.level-range {
+  margin-top: 2rpx;
+}
+
+.level-desc {
+  text-align: right;
+}
+
+.history-list {
+  margin-top: 16rpx;
+}
+
+.history-item {
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #F5F5F5;
+  align-items: center;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-time {
+  font-size: 26rpx;
+}
+
+.history-level {
+  display: flex;
+  align-items: baseline;
+}
+
+.history-aqi {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+}
+
+.history-text {
+  font-size: 24rpx;
+}
+
+.text-small {
+  font-size: 24rpx;
+}
+
+.mt-8 {
+  margin-top: 8rpx;
+}

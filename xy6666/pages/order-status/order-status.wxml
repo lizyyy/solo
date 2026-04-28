@@ -1,0 +1,144 @@
+<!-- 订单状态头部 -->
+<view class="status-header" wx:if="{{order}}">
+  <view class="status-icon {{order.status}}">
+    <text class="icon-text">{{order.status === 'ready' ? '✅' : order.status === 'making' ? '🍵' : order.status === 'preparing' ? '👨‍🍳' : '⏳'}}</text>
+  </view>
+  <view class="status-info">
+    <text class="status-title">{{order.status === 'ready' ? '饮品已做好啦！' : order.status === 'making' ? '正在制作中' : order.status === 'preparing' ? '正在准备原料' : '等待商家接单'}}</text>
+    <text class="status-subtitle" wx:if="{{order.status !== 'ready'}}">预计等待 {{countdown > 0 ? countdown : 0}} 分钟</text>
+    <text class="status-subtitle" wx:else>请前往取餐区取餐</text>
+  </view>
+</view>
+
+<!-- 进度步骤 -->
+<view class="progress-section card" wx:if="{{order}}">
+  <view class="progress-steps">
+    <view 
+      class="step-item {{index < currentStep ? 'completed' : index === currentStep ? 'active' : 'pending'}}" 
+      wx:for="{{statusSteps}}" 
+      wx:key="key"
+    >
+      <view class="step-icon-wrap">
+        <view class="step-circle">
+          <text class="step-icon">{{item.icon}}</text>
+        </view>
+        <view class="step-line" wx:if="{{index < statusSteps.length - 1}}"></view>
+      </view>
+      <view class="step-content">
+        <text class="step-name">{{item.name}}</text>
+        <text class="step-desc">{{item.description}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 订单详情 -->
+<view class="order-detail-section card" wx:if="{{order}}">
+  <view class="section-header-order">
+    <text class="section-title-order">订单详情</text>
+  </view>
+  
+  <!-- 订单信息 -->
+  <view class="order-info">
+    <view class="info-row">
+      <text class="info-label">订单号</text>
+      <text class="info-value">{{order.id}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">下单时间</text>
+      <text class="info-value">{{order.createTime}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">顾客姓名</text>
+      <text class="info-value">{{order.customerName}}</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">联系电话</text>
+      <text class="info-value">{{order.phone}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.remark}}">
+      <text class="info-label">备注</text>
+      <text class="info-value">{{order.remark}}</text>
+    </view>
+  </view>
+
+  <view class="divider-order"></view>
+
+  <!-- 商品列表 -->
+  <view class="order-items">
+    <view class="order-item" wx:for="{{order.items}}" wx:key="index">
+      <view class="item-image-wrap-order">
+        <image class="item-image-order" src="{{item.drinkImage}}" mode="aspectFill" />
+      </view>
+      <view class="item-info-order">
+        <view class="item-name-row-order">
+          <text class="item-name-order">{{item.drinkName}}</text>
+          <text class="item-quantity-order">x{{item.quantity}}</text>
+        </view>
+        <view class="item-specs-order">
+          <text class="spec-text-order">{{item.size}} | {{item.sugar}} | {{item.ice}}</text>
+        </view>
+        <view class="item-toppings-order" wx:if="{{item.selectedToppings.length > 0}}">
+          <text class="toppings-label-order">加料：</text>
+          <text class="toppings-text-order">{{item.selectedToppings.map(t => t.name).join('、')}}</text>
+        </view>
+        <view class="item-price-row-order">
+          <text class="price-symbol-order">¥</text>
+          <text class="price-amount-order">{{(item.price + item.selectedToppings.reduce((sum, t) => sum + t.price, 0)) * item.quantity}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="divider-order"></view>
+
+  <!-- 订单金额 -->
+  <view class="order-total-section">
+    <view class="total-row">
+      <text class="total-label-order">商品金额</text>
+      <text class="total-value-order">¥{{order.total}}</text>
+    </view>
+    <view class="total-row">
+      <text class="total-label-order">优惠金额</text>
+      <text class="total-value-order">¥0.00</text>
+    </view>
+    <view class="total-row final">
+      <text class="total-label-order">实付金额</text>
+      <view class="total-value-final">
+        <text class="total-symbol-order">¥</text>
+        <text class="total-amount-order">{{order.total}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 取餐提示 -->
+<view class="pickup-tip card" wx:if="{{order && order.status === 'ready'}}">
+  <view class="tip-header">
+    <text class="tip-icon">📍</text>
+    <text class="tip-title">取餐提示</text>
+  </view>
+  <view class="tip-content">
+    <text class="tip-text">您的饮品已制作完成，请前往取餐区取餐。</text>
+    <text class="tip-text">取餐码：{{order.id.slice(-4)}}</text>
+  </view>
+</view>
+
+<!-- 操作按钮 -->
+<view class="action-buttons-order" wx:if="{{order}}">
+  <view class="action-btn secondary" bindtap="contactMerchant">
+    <text class="action-btn-text">联系商家</text>
+  </view>
+  <view class="action-btn primary" bindtap="goToIndex">
+    <text class="action-btn-text">继续选购</text>
+  </view>
+</view>
+
+<!-- 空状态 -->
+<view class="empty-order" wx:if="{{!order}}">
+  <view class="empty-icon-order">📋</view>
+  <text class="empty-text-order">订单不存在</text>
+  <view class="go-index-btn-order" bindtap="goToIndex">
+    <text class="go-index-text-order">去首页</text>
+  </view>
+</view>
