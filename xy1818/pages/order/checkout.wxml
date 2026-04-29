@@ -1,0 +1,147 @@
+<view class="page" wx:if="{{!loading}}">
+  <!-- 配送方式 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">配送方式</text>
+    </view>
+    <picker 
+      mode="selector" 
+      range="{{deliveryModes}}" 
+      range-key="name"
+      value="{{deliveryModeIndex}}"
+      bindchange="onDeliveryModeChange"
+    >
+      <view class="delivery-section">
+        <view class="delivery-info">
+          <text class="delivery-icon">{{currentDeliveryMode.icon}}</text>
+          <view class="delivery-text">
+            <text class="delivery-name">{{currentDeliveryMode.name}}</text>
+            <text class="delivery-desc">{{currentDeliveryMode.description}}</text>
+          </view>
+        </view>
+        <text class="delivery-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="section" wx:if="{{deliveryMode === 'takeout'}}">
+    <view class="section-header">
+      <text class="section-title">收货地址</text>
+    </view>
+    <view class="address-section" bindtap="onChooseAddress">
+      <view wx:if="{{address}}" class="address-info">
+        <view class="address-header">
+          <text class="address-name">{{address.name}}</text>
+          <text class="address-phone">{{address.phone}}</text>
+        </view>
+        <text class="address-detail">{{address.fullAddress}}</text>
+      </view>
+      <view wx:else class="address-empty">
+        <text class="empty-text">请选择收货地址</text>
+      </view>
+      <text class="address-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">商品清单</text>
+    </view>
+    <view class="product-list">
+      <view class="product-item" wx:for="{{cart}}" wx:key="productId">
+        <image class="product-image" src="{{item.product.image}}" mode="aspectFill" />
+        <view class="product-info">
+          <text class="product-name">{{item.product.name}}</text>
+          <view class="product-bottom">
+            <text class="product-price">{{item.product.price}}</text>
+            <text class="product-quantity">x{{item.quantity}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 优惠券 -->
+  <view class="section" wx:if="{{coupons.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">优惠券</text>
+    </view>
+    <picker 
+      mode="selector" 
+      range="{{couponOptions}}" 
+      value="{{selectedCouponIndex}}"
+      bindchange="onCouponChange"
+    >
+      <view class="coupon-section">
+        <view class="coupon-info" wx:if="{{selectedCoupon}}">
+          <text class="coupon-value">-{{selectedCoupon.type === 'cash' ? selectedCoupon.amount + '元' : Math.floor((1-selectedCoupon.discount)*10) + '折'}}</text>
+          <text class="coupon-name">{{selectedCoupon.name}}</text>
+        </view>
+        <view wx:else class="coupon-empty">
+          <text class="empty-text">选择优惠券</text>
+          <text class="coupon-count">有{{coupons.length}}张可用</text>
+        </view>
+        <text class="coupon-arrow">›</text>
+      </view>
+    </picker>
+  </view>
+
+  <!-- 备注 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">备注</text>
+    </view>
+    <view class="remark-section">
+      <textarea 
+        class="remark-input" 
+        placeholder="选填，请输入您的备注信息" 
+        value="{{remark}}"
+        bindinput="onRemarkInput"
+        maxlength="100"
+      />
+    </view>
+  </view>
+
+  <!-- 价格明细 -->
+  <view class="section price-section">
+    <view class="price-item">
+      <text class="price-label">商品金额</text>
+      <text class="price-value">{{totalAmount}}</text>
+    </view>
+    <view class="price-item" wx:if="{{deliveryFee > 0}}">
+      <text class="price-label">配送费</text>
+      <text class="price-value">{{deliveryFee}}</text>
+    </view>
+    <view class="price-item">
+      <text class="price-label">打包费</text>
+      <text class="price-value">{{packFee}}</text>
+    </view>
+    <view class="price-item discount-item" wx:if="{{discountAmount > 0}}">
+      <text class="price-label">优惠减免</text>
+      <text class="price-value discount">-{{discountAmount}}</text>
+    </view>
+  </view>
+
+  <!-- 底部结算栏 -->
+  <view class="bottom-bar">
+    <view class="bar-left">
+      <view class="total-info">
+        <text class="total-label">实付:</text>
+        <text class="total-price">{{payAmount}}</text>
+      </view>
+    </view>
+    <view class="bar-right">
+      <view class="submit-btn" bindtap="onSubmitOrder">
+        <text>提交订单</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading-state" wx:if="{{loading}}">
+  <text class="loading-icon">⏳</text>
+  <text class="loading-text">加载中...</text>
+</view>

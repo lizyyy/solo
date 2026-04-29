@@ -1,0 +1,141 @@
+<view class="container">
+  <view class="header-card">
+    <view class="header-content">
+      <view class="header-title">💰 工资等级生存</view>
+      <view class="header-subtitle">找到你的档位，过好当下生活</view>
+    </view>
+    <view class="header-bg"></view>
+  </view>
+
+  <view class="user-card card" wx:if="{{userInfo}}">
+    <view class="user-info">
+      <view class="user-avatar">{{userInfo.avatar || '👤'}}</view>
+      <view class="user-detail">
+        <view class="user-name">{{userInfo.nickname || '打工人'}}</view>
+        <view class="user-tier" wx:if="{{currentTier}}">
+          <text class="tier-tag tier-{{currentTier}}-text">{{currentTierName}}</text>
+          <text class="tier-salary">月薪 ¥{{userSalary}}</text>
+        </view>
+        <view class="user-set-salary" wx:else bindtap="goToCalculator">
+          <text class="set-salary-text">👉 设置我的月薪</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="no-user-card card" wx:else>
+    <view class="no-user-content" bindtap="getUserProfile">
+      <view class="no-user-icon">👋</view>
+      <view class="no-user-text">点击登录，记录你的薪资档位</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">薪资档位</view>
+    <scroll-view class="tier-scroll" scroll-x>
+      <view class="tier-list">
+        <view 
+          class="tier-item tier-{{item.id}}" 
+          wx:for="{{tierList}}" 
+          wx:key="id"
+          bindtap="goToTierDetail"
+          data-tier="{{item.id}}"
+        >
+          <view class="tier-icon">{{item.icon}}</view>
+          <view class="tier-name">{{item.name}}</view>
+          <view class="tier-range">{{item.displayName}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">功能入口</view>
+    <view class="feature-grid">
+      <view class="feature-item" bindtap="goToCalculator">
+        <view class="feature-icon">🧮</view>
+        <view class="feature-name">薪资计算器</view>
+        <view class="feature-desc">一键分配薪资</view>
+      </view>
+      <view class="feature-item" bindtap="goToComparison">
+        <view class="feature-icon">📊</view>
+        <view class="feature-name">对照图鉴</view>
+        <view class="feature-desc">各档位对比</view>
+      </view>
+      <view class="feature-item" bindtap="goToMentalHealth">
+        <view class="feature-icon">💚</view>
+        <view class="feature-name">心态治愈</view>
+        <view class="feature-desc">缓解工资焦虑</view>
+      </view>
+      <view class="feature-item" bindtap="goToCheckin">
+        <view class="feature-icon">📝</view>
+        <view class="feature-name">打卡记录</view>
+        <view class="feature-desc">存钱/收入</view>
+      </view>
+      <view class="feature-item" bindtap="goToGoods">
+        <view class="feature-icon">🎁</view>
+        <view class="feature-name">好物推荐</view>
+        <view class="feature-desc">按档位推荐</view>
+      </view>
+      <view class="feature-item" bindtap="goToWallpaper">
+        <view class="feature-icon">📱</view>
+        <view class="feature-name">文案壁纸</view>
+        <view class="feature-desc">打工人共鸣</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">今日治愈</view>
+    <view class="quote-card card">
+      <view class="quote-icon">✨</view>
+      <view class="quote-content">{{dailyQuote}}</view>
+      <view class="quote-author">— 打工人语录</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">热门动态</view>
+    <view class="hot-posts">
+      <view 
+        class="post-item card" 
+        wx:for="{{hotPosts}}" 
+        wx:key="id"
+        bindtap="goToPostDetail"
+        data-post="{{item}}"
+      >
+        <view class="post-header">
+          <view class="post-user">
+            <view class="post-avatar">{{item.user.avatar}}</view>
+            <view class="post-user-info">
+              <view class="post-nickname">{{item.user.nickname}}</view>
+              <view class="post-meta">
+                <text class="post-tier tag tag-info">{{item.user.tier}}档</text>
+                <text class="post-city">{{item.user.city}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="post-time">{{item.createdAt}}</view>
+        </view>
+        <view class="post-content">{{item.content}}</view>
+        <view class="post-category tag tag-primary">{{item.category}}</view>
+        <view class="post-footer">
+          <view class="post-action">
+            <text class="action-icon">❤️</text>
+            <text class="action-count">{{item.likes}}</text>
+          </view>
+          <view class="post-action">
+            <text class="action-icon">💬</text>
+            <text class="action-count">{{item.comments.length}}</text>
+          </view>
+          <view class="post-action">
+            <text class="action-icon">🔗</text>
+            <text class="action-count">{{item.shares}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

@@ -1,0 +1,193 @@
+<view class="materials-page">
+  <view class="header-card">
+    <view class="header-icon">🔗</view>
+    <view class="header-title">辅料库</view>
+    <view class="header-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{filteredMaterials.length}}</view>
+        <view class="stat-label">种类</view>
+      </view>
+      <view class="stat-item warning-item" wx:if="{{lowStockCount > 0}}">
+        <view class="stat-value">{{lowStockCount}}</view>
+        <view class="stat-label">库存不足</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索辅料..." value="{{searchKeyword}}" bindinput="onSearchInput" />
+    </view>
+    <picker class="filter-picker" mode="selector" range="{{materialTypes}}" bindchange="onTypeFilter">
+      <view class="filter-text">{{filterType === 'all' ? '全部类型' : filterType}}</view>
+    </picker>
+  </view>
+
+  <view class="materials-list">
+    <view wx:for="{{filteredMaterials}}" wx:key="id" class="material-card" bindtap="viewDetail" data-id="{{item.id}}">
+      <view class="card-left">
+        <view class="material-name">{{item.name}}</view>
+        <view class="material-meta">
+          <text class="meta-text">{{item.type}}</text>
+          <text class="meta-text" wx:if="{{item.color}}">{{item.color}}</text>
+          <text class="meta-text" wx:if="{{item.brand}}">{{item.brand}}</text>
+        </view>
+        <view class="stock-info">
+          <text class="stock-label">库存:</text>
+          <text class="stock-value {{item.quantity <= (item.minimumStock || 5) ? 'low-stock' : ''}}">{{item.quantity}}{{item.unit}}</text>
+          <text class="stock-warning" wx:if="{{item.quantity <= (item.minimumStock || 5)}}">库存不足</text>
+        </view>
+      </view>
+      <view class="card-right">
+        <view class="material-price">¥{{item.price}}</view>
+        <view class="material-total">¥{{item.totalValue}}</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredMaterials.length === 0}}">
+      <text class="empty-icon">🔗</text>
+      <text class="empty-text">暂无辅料记录</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加辅料</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">添加辅料</text>
+        <text class="modal-close" bindtap="hideAddModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <text class="form-label">辅料名称 *</text>
+          <input class="form-input" placeholder="请输入辅料名称" value="{{formData.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">类型</text>
+            <picker class="form-picker" mode="selector" range="{{['缝纫线', '拉链', '纽扣', '松紧带', '衬布', '其他']}}" data-field="type" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.type}}</view>
+            </picker>
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">颜色</text>
+            <input class="form-input" placeholder="颜色" value="{{formData.color}}" data-field="color" bindinput="onFormInput" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">品牌</text>
+          <input class="form-input" placeholder="品牌" value="{{formData.brand}}" data-field="brand" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">数量 *</text>
+            <input class="form-input" type="digit" placeholder="数量" value="{{formData.quantity}}" data-field="quantity" bindinput="onFormInput" />
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">单位</text>
+            <picker class="form-picker" mode="selector" range="{{['卷', '条', '颗', '米', '件']}}" data-field="unit" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.unit}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">单价</text>
+            <input class="form-input" type="digit" placeholder="单价" value="{{formData.price}}" data-field="price" bindinput="onFormInput" />
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">最低库存</text>
+            <input class="form-input" type="number" placeholder="警戒值" value="{{formData.minimumStock}}" data-field="minimumStock" bindinput="onFormInput" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">供应商</text>
+          <input class="form-input" placeholder="供应商" value="{{formData.supplier}}" data-field="supplier" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="备注" value="{{formData.notes}}" data-field="notes" bindinput="onFormInput"></textarea>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideAddModal">取消</view>
+        <view class="btn btn-primary" bindtap="submitAddForm">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="modal-content detail-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">辅料详情</text>
+        <text class="modal-close" bindtap="hideDetailModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y wx:if="{{currentMaterial}}">
+        <view class="detail-section">
+          <view class="detail-title">基本信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">名称</text>
+              <text class="detail-value">{{currentMaterial.name}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">类型</text>
+              <text class="detail-value">{{currentMaterial.type}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentMaterial.color}}">
+              <text class="detail-label">颜色</text>
+              <text class="detail-value">{{currentMaterial.color}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentMaterial.brand}}">
+              <text class="detail-label">品牌</text>
+              <text class="detail-value">{{currentMaterial.brand}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section">
+          <view class="detail-title">库存信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">当前库存</text>
+              <text class="detail-value {{currentMaterial.quantity <= (currentMaterial.minimumStock || 5) ? 'low-stock' : ''}}">{{currentMaterial.quantity}}{{currentMaterial.unit}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">最低库存</text>
+              <text class="detail-value">{{currentMaterial.minimumStock || 5}}{{currentMaterial.unit}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">单价</text>
+              <text class="detail-value">¥{{currentMaterial.price}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">总价值</text>
+              <text class="detail-value">¥{{currentMaterial.totalValue}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentMaterial.supplier}}">
+          <view class="detail-title">采购信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">供应商</text>
+              <text class="detail-value">{{currentMaterial.supplier}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentMaterial.purchaseDate}}">
+              <text class="detail-label">购买日期</text>
+              <text class="detail-value">{{currentMaterial.purchaseDate}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="modal-footer detail-footer">
+        <view class="btn btn-secondary" bindtap="useMaterial" data-id="{{currentMaterial.id}}">使用</view>
+        <view class="btn btn-danger" bindtap="deleteMaterial" data-id="{{currentMaterial.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+</view>

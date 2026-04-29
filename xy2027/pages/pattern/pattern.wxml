@@ -1,0 +1,212 @@
+<view class="pattern-page">
+  <view class="header-card">
+    <view class="header-icon">📐</view>
+    <view class="header-title">纸样库</view>
+    <view class="header-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{filteredPatterns.length}}</view>
+        <view class="stat-label">总数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{patterns.filter(p => p.status === '进行中').length}}</view>
+        <view class="stat-label">进行中</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{patterns.filter(p => p.status === '已完成').length}}</view>
+        <view class="stat-label">已完成</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索纸样名称..." value="{{searchKeyword}}" bindinput="onSearchInput" />
+    </view>
+    <view class="filter-row">
+      <picker class="filter-picker" mode="selector" range="{{patternTypes}}" bindchange="onTypeFilter">
+        <view class="filter-text">类型: {{filterType === 'all' ? '全部' : filterType}}</view>
+      </picker>
+      <picker class="filter-picker" mode="selector" range="{{statusOptions}}" bindchange="onStatusFilter">
+        <view class="filter-text">状态: {{filterStatus === 'all' ? '全部' : filterStatus}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="patterns-list">
+    <view wx:for="{{filteredPatterns}}" wx:key="id" class="pattern-card" bindtap="viewDetail" data-id="{{item.id}}">
+      <view class="pattern-header">
+        <view class="pattern-name">{{item.name}}</view>
+        <view class="pattern-status badge-{{item.status === '已完成' ? 'success' : item.status === '进行中' ? 'info' : 'warning'}}">{{item.status}}</view>
+      </view>
+      <view class="pattern-content">
+        <view class="pattern-info">
+          <view class="info-row">
+            <text class="info-label">类型:</text>
+            <text class="info-value">{{item.type}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">难度:</text>
+            <text class="info-value difficulty-{{item.difficulty}}">{{item.difficulty}}</text>
+          </view>
+          <view class="info-row" wx:if="{{item.fabricQuantity}}">
+            <text class="info-label">用料:</text>
+            <text class="info-value">{{item.fabricQuantity}}米</text>
+          </view>
+        </view>
+        <view class="pattern-meta">
+          <view class="price" wx:if="{{item.price}}">¥{{item.price}}</view>
+          <view class="source" wx:if="{{item.source}}">{{item.source}}</view>
+        </view>
+      </view>
+      <view class="pattern-footer" wx:if="{{item.sizes && item.sizes.length > 0}}">
+        <view class="sizes-label">尺码:</view>
+        <view class="sizes-list">
+          <text wx:for="{{item.sizes}}" wx:for-item="size" wx:key="*this" class="size-tag">{{size}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredPatterns.length === 0}}">
+      <text class="empty-icon">📐</text>
+      <text class="empty-text">暂无纸样记录</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加纸样</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">添加纸样</text>
+        <text class="modal-close" bindtap="hideAddModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <text class="form-label">纸样名称 *</text>
+          <input class="form-input" placeholder="请输入纸样名称" value="{{formData.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">类型</text>
+            <picker class="form-picker" mode="selector" range="{{['上衣', '裤子', '连衣裙', '外套', '裙子', '其他']}}" data-field="type" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.type}}</view>
+            </picker>
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">难度</text>
+            <picker class="form-picker" mode="selector" range="{{['简单', '中等', '困难']}}" data-field="difficulty" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.difficulty}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">尺码(逗号分隔)</text>
+          <input class="form-input" placeholder="例如：S,M,L,XL" value="{{formData.sizes}}" data-field="sizes" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">适用面料</text>
+          <input class="form-input" placeholder="例如：针织、纯棉" value="{{formData.fabricType}}" data-field="fabricType" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">用料数量(米)</text>
+          <input class="form-input" type="digit" placeholder="请输入用料数量" value="{{formData.fabricQuantity}}" data-field="fabricQuantity" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">价格(元)</text>
+          <input class="form-input" type="digit" placeholder="请输入纸样价格" value="{{formData.price}}" data-field="price" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">来源</text>
+          <input class="form-input" placeholder="例如：网上下载、实体店购买" value="{{formData.source}}" data-field="source" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">状态</text>
+          <picker class="form-picker" mode="selector" range="{{['待开始', '进行中', '已完成']}}" data-field="status" bindchange="onPickerChange">
+            <view class="picker-text">{{formData.status}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="输入备注信息" value="{{formData.notes}}" data-field="notes" bindinput="onFormInput"></textarea>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideAddModal">取消</view>
+        <view class="btn btn-primary" bindtap="submitAddForm">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="modal-content detail-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">纸样详情</text>
+        <text class="modal-close" bindtap="hideDetailModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y wx:if="{{currentPattern}}">
+        <view class="detail-section">
+          <view class="detail-title">基本信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">名称</text>
+              <text class="detail-value">{{currentPattern.name}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">类型</text>
+              <text class="detail-value">{{currentPattern.type}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">难度</text>
+              <text class="detail-value difficulty-{{currentPattern.difficulty}}">{{currentPattern.difficulty}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">状态</text>
+              <text class="detail-value badge-{{currentPattern.status === '已完成' ? 'success' : currentPattern.status === '进行中' ? 'info' : 'warning'}}">{{currentPattern.status}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentPattern.sizes && currentPattern.sizes.length > 0}}">
+          <view class="detail-title">包含尺码</view>
+          <view class="sizes-list detail-sizes">
+            <text wx:for="{{currentPattern.sizes}}" wx:for-item="size" wx:key="*this" class="size-tag">{{size}}</text>
+          </view>
+        </view>
+        <view class="detail-section">
+          <view class="detail-title">制作信息</view>
+          <view class="detail-grid">
+            <view class="detail-item" wx:if="{{currentPattern.fabricType}}">
+              <text class="detail-label">适用面料</text>
+              <text class="detail-value">{{currentPattern.fabricType}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentPattern.fabricQuantity}}">
+              <text class="detail-label">用料数量</text>
+              <text class="detail-value">{{currentPattern.fabricQuantity}}米</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentPattern.price}}">
+              <text class="detail-label">纸样价格</text>
+              <text class="detail-value">¥{{currentPattern.price}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentPattern.source}}">
+              <text class="detail-label">来源</text>
+              <text class="detail-value">{{currentPattern.source}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentPattern.notes}}">
+          <view class="detail-title">备注</view>
+          <view class="detail-text">{{currentPattern.notes}}</view>
+        </view>
+      </scroll-view>
+      <view class="modal-footer detail-footer">
+        <view class="btn btn-secondary" wx:if="{{currentPattern.status !== '待开始'}}" bindtap="changeStatus" data-id="{{currentPattern.id}}" data-status="待开始">设为待开始</view>
+        <view class="btn btn-info" wx:if="{{currentPattern.status !== '进行中'}}" bindtap="changeStatus" data-id="{{currentPattern.id}}" data-status="进行中">开始制作</view>
+        <view class="btn btn-success" wx:if="{{currentPattern.status !== '已完成'}}" bindtap="changeStatus" data-id="{{currentPattern.id}}" data-status="已完成">完成</view>
+        <view class="btn btn-danger" bindtap="deletePattern" data-id="{{currentPattern.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+</view>

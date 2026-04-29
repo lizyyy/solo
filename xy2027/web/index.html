@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>缝纫工作室</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="page-container">
+            <div id="page-index" class="page active">
+                <div class="header-card">
+                    <div class="header-icon">
+                        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="32" width="48" height="20" rx="4" fill="#FFD93D"/>
+                            <rect x="28" y="8" width="16" height="28" rx="4" fill="#FFD93D"/>
+                            <rect x="24" y="28" width="24" height="8" rx="2" fill="#FFD93D"/>
+                            <circle cx="36" cy="16" r="8" fill="#FF6B6B" stroke="#EE5A5A" stroke-width="2"/>
+                            <circle cx="36" cy="16" r="3" fill="#EE5A5A"/>
+                            <rect x="34" y="32" width="4" height="6" fill="#333"/>
+                            <circle cx="36" cy="42" r="2" fill="#333"/>
+                            <rect x="12" y="36" width="16" height="4" rx="2" fill="#666"/>
+                            <circle cx="52" cy="42" r="4" fill="#FF6B6B"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">缝纫工作室</div>
+                    <div class="header-subtitle" id="greeting">你好，欢迎回来</div>
+                </div>
+                
+                <div class="stats-section">
+                    <div class="stats-card">
+                        <div class="stats-item">
+                            <div class="stats-value" id="today-time">00:00</div>
+                            <div class="stats-label">今日缝纫</div>
+                        </div>
+                        <div class="stats-divider"></div>
+                        <div class="stats-item">
+                            <div class="stats-value" id="total-time">00:00</div>
+                            <div class="stats-label">累计时长</div>
+                        </div>
+                        <div class="stats-divider"></div>
+                        <div class="stats-item">
+                            <div class="stats-value" id="total-investment">¥0.00</div>
+                            <div class="stats-label">总投资</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions-section">
+                    <div class="section-header">
+                        <text class="section-title">快捷入口</text>
+                    </div>
+                    <div class="quick-actions-grid">
+                        <div class="action-item" data-page="fabric">
+                            <div class="action-icon" style="background-color: rgba(255, 107, 107, 0.2);">
+                                <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="32" width="48" height="20" rx="4" fill="#FFD93D"/>
+                                    <rect x="28" y="8" width="16" height="28" rx="4" fill="#FFD93D"/>
+                                    <rect x="24" y="28" width="24" height="8" rx="2" fill="#FFD93D"/>
+                                    <circle cx="36" cy="16" r="8" fill="#FF6B6B"/>
+                                    <circle cx="36" cy="16" r="3" fill="#EE5A5A"/>
+                                    <rect x="34" y="32" width="4" height="6" fill="#333"/>
+                                    <circle cx="36" cy="42" r="2" fill="#333"/>
+                                    <rect x="12" y="36" width="16" height="4" rx="2" fill="#666"/>
+                                </svg>
+                            </div>
+                            <span class="action-name">成衣柜</span>
+                        </div>
+                        <div class="action-item" data-page="pattern">
+                            <div class="action-icon" style="background-color: rgba(212, 165, 116, 0.2);">
+                                <span style="color: #d4a574;">📐</span>
+                            </div>
+                            <span class="action-name">纸样库</span>
+                        </div>
+                        <div class="action-item" data-page="materials">
+                            <div class="action-icon" style="background-color: rgba(78, 205, 196, 0.2);">
+                                <span style="color: #4ECDC4;">🔗</span>
+                            </div>
+                            <span class="action-name">辅料</span>
+                        </div>
+                        <div class="action-item" data-page="tools">
+                            <div class="action-icon" style="background-color: rgba(155, 89, 182, 0.2);">
+                                <span style="color: #9B59B6;">🔧</span>
+                            </div>
+                            <span class="action-name">工具箱</span>
+                        </div>
+                        <div class="action-item" data-page="timer">
+                            <div class="action-icon" style="background-color: rgba(52, 152, 219, 0.2);">
+                                <span style="color: #3498DB;">⏱️</span>
+                            </div>
+                            <span class="action-name">开始计时</span>
+                        </div>
+                        <div class="action-item" data-page="dashboard">
+                            <div class="action-icon" style="background-color: rgba(230, 126, 34, 0.2);">
+                                <span style="color: #E67E22;">📊</span>
+                            </div>
+                            <span class="action-name">数据汇总</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-overview">
+                    <div class="section-header">
+                        <span class="section-title">库存概览</span>
+                    </div>
+                    <div class="inventory-grid">
+                        <div class="inventory-item" data-page="fabric">
+                            <div class="inventory-count" style="color: #FF6B6B;" id="fabrics-count">0</div>
+                            <div class="inventory-label">成衣柜</div>
+                        </div>
+                        <div class="inventory-item" data-page="pattern">
+                            <div class="inventory-count" style="color: #d4a574;" id="patterns-count">0</div>
+                            <div class="inventory-label">纸样库</div>
+                        </div>
+                        <div class="inventory-item" data-page="materials">
+                            <div class="inventory-count" style="color: #4ECDC4;" id="materials-count">0</div>
+                            <div class="inventory-label">辅料</div>
+                        </div>
+                        <div class="inventory-item" data-page="tools">
+                            <div class="inventory-count" style="color: #9B59B6;" id="tools-count">0</div>
+                            <div class="inventory-label">工具箱</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-fabric" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #FF6B6B 0%, #ff8a80 100%);">
+                    <div class="header-icon">
+                        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="8" y="32" width="48" height="20" rx="4" fill="#FFD93D"/>
+                            <rect x="28" y="8" width="16" height="28" rx="4" fill="#FFD93D"/>
+                            <rect x="24" y="28" width="24" height="8" rx="2" fill="#FFD93D"/>
+                            <circle cx="36" cy="16" r="8" fill="#fff" stroke="#ddd" stroke-width="2"/>
+                            <circle cx="36" cy="16" r="3" fill="#FF6B6B"/>
+                            <rect x="34" y="32" width="4" height="6" fill="#333"/>
+                            <circle cx="36" cy="42" r="2" fill="#333"/>
+                            <rect x="12" y="36" width="16" height="4" rx="2" fill="#666"/>
+                            <circle cx="52" cy="42" r="4" fill="#FFD93D"/>
+                        </svg>
+                    </div>
+                    <div class="header-title">成衣柜</div>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="fabric-search" placeholder="搜索面料名称、类型、颜色...">
+                    </div>
+                </div>
+
+                <div class="content-list" id="fabric-list"></div>
+
+                <div class="fab-btn" id="add-fabric-btn">
+                    <span class="fab-icon">+</span>
+                    <span class="fab-text">添加面料</span>
+                </div>
+            </div>
+
+            <div id="page-pattern" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #d4a574 0%, #e6b89c 100%);">
+                    <div class="header-icon">📐</div>
+                    <div class="header-title">纸样库</div>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="pattern-search" placeholder="搜索纸样...">
+                    </div>
+                </div>
+
+                <div class="content-list" id="pattern-list"></div>
+
+                <div class="fab-btn" style="background: linear-gradient(135deg, #d4a574 0%, #e6b89c 100%);" id="add-pattern-btn">
+                    <span class="fab-icon">+</span>
+                    <span class="fab-text">添加纸样</span>
+                </div>
+            </div>
+
+            <div id="page-materials" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #4ECDC4 0%, #44a08d 100%);">
+                    <div class="header-icon">🔗</div>
+                    <div class="header-title">辅料库</div>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="materials-search" placeholder="搜索辅料...">
+                    </div>
+                </div>
+
+                <div class="content-list" id="materials-list"></div>
+
+                <div class="fab-btn" style="background: linear-gradient(135deg, #4ECDC4 0%, #44a08d 100%);" id="add-materials-btn">
+                    <span class="fab-icon">+</span>
+                    <span class="fab-text">添加辅料</span>
+                </div>
+            </div>
+
+            <div id="page-tools" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%);">
+                    <div class="header-icon">🔧</div>
+                    <div class="header-title">工具箱</div>
+                </div>
+                
+                <div class="search-section">
+                    <div class="search-bar">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="tools-search" placeholder="搜索工具...">
+                    </div>
+                </div>
+
+                <div class="content-list" id="tools-list"></div>
+
+                <div class="fab-btn" style="background: linear-gradient(135deg, #9B59B6 0%, #8e44ad 100%);" id="add-tools-btn">
+                    <span class="fab-icon">+</span>
+                    <span class="fab-text">添加工具</span>
+                </div>
+            </div>
+
+            <div id="page-timer" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #3498DB 0%, #2980b9 100%);">
+                    <div class="header-icon">⏱️</div>
+                    <div class="header-title">缝纫计时</div>
+                    <div class="header-subtitle">专注你的缝纫时光</div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab-item active" data-tab="countdown">倒计时</div>
+                    <div class="tab-item" data-tab="stopwatch">正计时</div>
+                    <div class="tab-item" data-tab="pomodoro">番茄钟</div>
+                    <div class="tab-item" data-tab="history">历史记录</div>
+                </div>
+
+                <div class="tab-content">
+                    <div id="tab-countdown" class="timer-panel active">
+                        <div class="timer-display">
+                            <div class="display-value" id="countdown-display">25:00</div>
+                            <div class="display-label">分钟倒计时</div>
+                        </div>
+                        <div class="duration-setting" id="countdown-setting">
+                            <label class="setting-label">设置时长(分钟):</label>
+                            <select id="countdown-duration">
+                                <option value="5">5分钟</option>
+                                <option value="10">10分钟</option>
+                                <option value="15">15分钟</option>
+                                <option value="20">20分钟</option>
+                                <option value="25" selected>25分钟</option>
+                                <option value="30">30分钟</option>
+                                <option value="45">45分钟</option>
+                                <option value="60">60分钟</option>
+                            </select>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="control-btn reset" id="countdown-reset">
+                                <span class="btn-icon">🔄</span>
+                                <span class="btn-text">重置</span>
+                            </button>
+                            <button class="control-btn main" id="countdown-toggle">
+                                <span class="btn-icon">▶️</span>
+                                <span class="btn-text">开始</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-stopwatch" class="timer-panel">
+                        <div class="timer-display">
+                            <div class="display-value" id="stopwatch-display">00:00:00</div>
+                            <div class="display-label">正计时</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="control-btn reset" id="stopwatch-stop">
+                                <span class="btn-icon">✓</span>
+                                <span class="btn-text">结束</span>
+                            </button>
+                            <button class="control-btn lap" id="stopwatch-lap">
+                                <span class="btn-icon">📌</span>
+                                <span class="btn-text">记次</span>
+                            </button>
+                            <button class="control-btn main" id="stopwatch-toggle">
+                                <span class="btn-icon">▶️</span>
+                                <span class="btn-text">开始</span>
+                            </button>
+                        </div>
+                        <div class="laps-container" id="laps-container"></div>
+                    </div>
+
+                    <div id="tab-pomodoro" class="timer-panel">
+                        <div class="pomodoro-status">
+                            <div class="status-badge work" id="pomodoro-phase">工作中</div>
+                            <div class="cycle-info">
+                                <span>第 <span id="pomodoro-cycle">1</span> 个番茄钟</span>
+                                <span class="completed">已完成 <span id="pomodoro-completed">0</span> 个</span>
+                            </div>
+                        </div>
+                        <div class="timer-display">
+                            <div class="display-value" id="pomodoro-display">25:00</div>
+                            <div class="display-label" id="pomodoro-label">专注工作</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="control-btn reset" id="pomodoro-reset">
+                                <span class="btn-icon">🔄</span>
+                                <span class="btn-text">重置</span>
+                            </button>
+                            <button class="control-btn main pomodoro-main" id="pomodoro-toggle">
+                                <span class="btn-icon">🍅</span>
+                                <span class="btn-text">开始番茄钟</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="tab-history" class="timer-panel">
+                        <div class="history-list" id="timer-history"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-community" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #E67E22 0%, #d35400 100%);">
+                    <div class="header-icon">👥</div>
+                    <div class="header-title">手工作品分享圈</div>
+                    <div class="header-subtitle">分享你的缝纫作品和心得</div>
+                </div>
+
+                <div class="content-list" id="community-posts"></div>
+
+                <div class="fab-btn" style="background: linear-gradient(135deg, #E67E22 0%, #d35400 100%);" id="add-post-btn">
+                    <span class="fab-icon">✏️</span>
+                    <span class="fab-text">发布帖子</span>
+                </div>
+            </div>
+
+            <div id="page-dashboard" class="page">
+                <div class="header-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="header-icon">📊</div>
+                    <div class="header-title">数据汇总</div>
+                    <div class="header-subtitle">管理你的缝纫工作室</div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab-item active" data-dashboard-tab="overview">数据概览</div>
+                    <div class="tab-item" data-dashboard-tab="purchases">购买记录</div>
+                    <div class="tab-item" data-dashboard-tab="sessions">缝纫记录</div>
+                </div>
+
+                <div class="tab-content">
+                    <div id="dashboard-overview" class="dashboard-panel active">
+                        <div class="section">
+                            <div class="section-title">库存统计</div>
+                            <div class="stats-grid">
+                                <div class="stat-card" data-page="fabric">
+                                    <div class="stat-icon" style="background: rgba(255, 107, 107, 0.1);">
+                                        <svg width="26" height="26" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="8" y="32" width="48" height="20" rx="4" fill="#FFD93D"/>
+                                            <rect x="28" y="8" width="16" height="28" rx="4" fill="#FFD93D"/>
+                                            <rect x="24" y="28" width="24" height="8" rx="2" fill="#FFD93D"/>
+                                            <circle cx="36" cy="16" r="8" fill="#FF6B6B"/>
+                                            <circle cx="36" cy="16" r="3" fill="#EE5A5A"/>
+                                            <rect x="34" y="32" width="4" height="6" fill="#333"/>
+                                            <circle cx="36" cy="42" r="2" fill="#333"/>
+                                            <rect x="12" y="36" width="16" height="4" rx="2" fill="#666"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="dash-fabrics">0</div>
+                                        <div class="stat-label">成衣柜</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card" data-page="pattern">
+                                    <div class="stat-icon" style="background: rgba(212, 165, 116, 0.1);">📐</div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="dash-patterns">0</div>
+                                        <div class="stat-label">纸样库</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card" data-page="materials">
+                                    <div class="stat-icon" style="background: rgba(78, 205, 196, 0.1);">🔗</div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="dash-materials">0</div>
+                                        <div class="stat-label">辅料</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card" data-page="tools">
+                                    <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1);">🔧</div>
+                                    <div class="stat-info">
+                                        <div class="stat-value" id="dash-tools">0</div>
+                                        <div class="stat-label">工具箱</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">投资统计</div>
+                            <div class="big-stat-card">
+                                <div class="big-stat-label">总投资金额</div>
+                                <div class="big-stat-value" id="dash-investment">¥0.00</div>
+                                <div class="big-stat-hint">包括面料、纸样、辅料、工具</div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">缝纫记录</div>
+                            <div class="stats-row">
+                                <div class="stat-item">
+                                    <div class="stat-number" id="dash-sessions">0</div>
+                                    <div class="stat-name">完成次数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="dash-time">00:00</div>
+                                    <div class="stat-name">累计时长</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="dash-posts">0</div>
+                                    <div class="stat-name">社区帖子</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="dashboard-purchases" class="dashboard-panel">
+                        <div class="content-list" id="purchases-list"></div>
+                    </div>
+
+                    <div id="dashboard-sessions" class="dashboard-panel">
+                        <div class="content-list" id="sessions-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-bar">
+            <div class="tab-bar-item active" data-page="index">
+                <span class="tab-icon">🏠</span>
+                <span class="tab-label">首页</span>
+            </div>
+            <div class="tab-bar-item" data-page="fabric">
+                <span class="tab-icon">
+                    <svg width="22" height="22" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="32" width="48" height="20" rx="4" fill="#FFD93D"/>
+                        <rect x="28" y="8" width="16" height="28" rx="4" fill="#FFD93D"/>
+                        <rect x="24" y="28" width="24" height="8" rx="2" fill="#FFD93D"/>
+                        <circle cx="36" cy="16" r="8" fill="#FF6B6B"/>
+                        <circle cx="36" cy="16" r="3" fill="#EE5A5A"/>
+                        <rect x="34" y="32" width="4" height="6" fill="#333"/>
+                        <circle cx="36" cy="42" r="2" fill="#333"/>
+                        <rect x="12" y="36" width="16" height="4" rx="2" fill="#666"/>
+                    </svg>
+                </span>
+                <span class="tab-label">成衣柜</span>
+            </div>
+            <div class="tab-bar-item" data-page="timer">
+                <span class="tab-icon">⏱️</span>
+                <span class="tab-label">计时</span>
+            </div>
+            <div class="tab-bar-item" data-page="community">
+                <span class="tab-icon">👥</span>
+                <span class="tab-label">社区</span>
+            </div>
+            <div class="tab-bar-item" data-page="dashboard">
+                <span class="tab-icon">📊</span>
+                <span class="tab-label">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="modal" class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title">添加</span>
+                <span class="modal-close" id="modal-close">✕</span>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <div id="detail-modal-overlay" class="modal-overlay hidden">
+        <div id="detail-modal" class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="detail-modal-title">详情</span>
+                <span class="modal-close" id="detail-modal-close">✕</span>
+            </div>
+            <div class="modal-body" id="detail-modal-body"></div>
+            <div class="modal-footer" id="detail-modal-footer"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/initData.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

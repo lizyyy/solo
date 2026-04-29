@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/calculator/calculator",
+    "pages/salary-tier/tier-detail/tier-detail",
+    "pages/comparison/comparison",
+    "pages/mental-health/mental-health",
+    "pages/checkin/checkin",
+    "pages/goods/goods",
+    "pages/social/social",
+    "pages/post-detail/post-detail",
+    "pages/create-post/create-post",
+    "pages/wallpaper/wallpaper",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FF6B6B",
+    "navigationBarTitleText": "工资等级生存",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B6B",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/calculator/calculator",
+        "text": "计算器"
+      },
+      {
+        "pagePath": "pages/social/social",
+        "text": "社交圈"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

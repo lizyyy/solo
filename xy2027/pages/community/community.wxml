@@ -1,0 +1,140 @@
+<view class="community-page">
+  <view class="header-card">
+    <view class="header-icon">👥</view>
+    <view class="header-title">手工作品分享圈</view>
+    <view class="header-subtitle">分享你的缝纫作品和心得</view>
+  </view>
+
+  <view class="posts-list">
+    <view wx:for="{{posts}}" wx:key="id" class="post-card" bindtap="viewPostDetail" data-id="{{item.id}}">
+      <view class="post-header">
+        <view class="author-avatar">
+          <text class="avatar-text">{{item.userName.charAt(0)}}</text>
+        </view>
+        <view class="author-info">
+          <view class="author-name">{{item.userName}}</view>
+          <view class="post-time">{{formatTime(item.createTime)}}</view>
+        </view>
+      </view>
+      
+      <view class="post-content">
+        <view class="post-title">{{item.title}}</view>
+        <view class="post-text">{{item.content}}</view>
+      </view>
+      
+      <view class="post-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+        <text wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this" class="tag">#{{tag}}</text>
+      </view>
+      
+      <view class="post-footer">
+        <view class="action-item like-action {{item.isLiked ? 'liked' : ''}}" catchtap="toggleLike" data-id="{{item.id}}">
+          <text class="action-icon">{{item.isLiked ? '❤️' : '🤍'}}</text>
+          <text class="action-count">{{item.likes}}</text>
+        </view>
+        <view class="action-item">
+          <text class="action-icon">💬</text>
+          <text class="action-count">{{item.comments}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{posts.length === 0}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无帖子</text>
+      <text class="empty-hint">点击下方按钮发布第一个帖子</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddPostModal">
+    <text class="add-icon">✏️</text>
+    <text class="add-text">发布帖子</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="post-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-close" bindtap="hideAddModal">取消</text>
+        <text class="modal-title">发布帖子</text>
+        <view class="submit-btn" bindtap="submitPost">发布</view>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <input class="title-input" placeholder="请输入标题" value="{{newPostTitle}}" bindinput="onTitleInput" maxlength="50" />
+        </view>
+        <view class="form-item">
+          <textarea class="content-input" placeholder="分享你的缝纫作品、心得或问题..." value="{{newPostContent}}" bindinput="onContentInput" maxlength="1000" />
+        </view>
+        <view class="form-item">
+          <input class="tags-input" placeholder="标签（用逗号分隔，如：T恤,新手作品）" value="{{newPostTags}}" bindinput="onTagsInput" />
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="detail-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-close" bindtap="hideDetailModal">✕</text>
+        <text class="modal-title">帖子详情</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y wx:if="{{currentPost}}">
+        <view class="detail-header">
+          <view class="author-avatar">
+            <text class="avatar-text">{{currentPost.userName.charAt(0)}}</text>
+          </view>
+          <view class="author-info">
+            <view class="author-name">{{currentPost.userName}}</view>
+            <view class="post-time">{{formatTime(currentPost.createTime)}}</view>
+          </view>
+        </view>
+        
+        <view class="detail-content">
+          <view class="detail-title">{{currentPost.title}}</view>
+          <view class="detail-text">{{currentPost.content}}</view>
+        </view>
+        
+        <view class="detail-tags" wx:if="{{currentPost.tags && currentPost.tags.length > 0}}">
+          <text wx:for="{{currentPost.tags}}" wx:for-item="tag" wx:key="*this" class="tag">#{{tag}}</text>
+        </view>
+        
+        <view class="detail-footer">
+          <view class="action-item like-action {{currentPost.isLiked ? 'liked' : ''}}" catchtap="toggleLike" data-id="{{currentPost.id}}">
+            <text class="action-icon">{{currentPost.isLiked ? '❤️' : '🤍'}}</text>
+            <text class="action-count">{{currentPost.likes}} 赞</text>
+          </view>
+          <view class="action-item">
+            <text class="action-icon">💬</text>
+            <text class="action-count">{{currentPost.comments}} 评论</text>
+          </view>
+        </view>
+
+        <view class="comments-section" wx:if="{{currentPost.commentsList && currentPost.commentsList.length > 0}}">
+          <view class="section-title">评论 ({{currentPost.commentsList.length}})</view>
+          <view class="comments-list">
+            <view wx:for="{{currentPost.commentsList}}" wx:key="id" class="comment-item">
+              <view class="comment-header">
+                <view class="comment-avatar">
+                  <text class="avatar-text-small">{{item.userName.charAt(0)}}</text>
+                </view>
+                <view class="comment-info">
+                  <view class="comment-author">{{item.userName}}</view>
+                  <view class="comment-time">{{formatTime(item.createTime)}}</view>
+                </view>
+              </view>
+              <view class="comment-content">{{item.content}}</view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="comment-input-bar">
+        <input 
+          class="comment-input" 
+          placeholder="说点什么..." 
+          value="{{commentInput}}"
+          bindinput="onCommentInput"
+        />
+        <view class="send-btn" bindtap="submitComment">发送</view>
+      </view>
+    </view>
+  </view>
+</view>
