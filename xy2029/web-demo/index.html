@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>工资等级生存 - Web模拟版</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 小程序模拟手机框 -->
+    <div class="phone-frame">
+      <div class="phone-header">
+        <div class="camera"></div>
+      </div>
+      
+      <!-- 小程序内容区域 -->
+      <div class="miniprogram-container" id="miniprogram-container">
+        <!-- 页面内容将通过JavaScript动态加载 -->
+      </div>
+      
+      <!-- tabBar导航 -->
+      <div class="tabbar" id="tabbar">
+        <div class="tabbar-item active" data-page="index">
+          <span class="tabbar-icon">🏠</span>
+          <span class="tabbar-text">首页</span>
+        </div>
+        <div class="tabbar-item" data-page="calculator">
+          <span class="tabbar-icon">🧮</span>
+          <span class="tabbar-text">计算器</span>
+        </div>
+        <div class="tabbar-item" data-page="social">
+          <span class="tabbar-icon">👥</span>
+          <span class="tabbar-text">社交圈</span>
+        </div>
+        <div class="tabbar-item" data-page="profile">
+          <span class="tabbar-icon">👤</span>
+          <span class="tabbar-text">我的</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 右侧项目信息 -->
+    <div class="info-panel">
+      <div class="info-header">
+        <h1>📱 工资等级生存</h1>
+        <p class="subtitle">微信小程序 Web模拟版</p>
+      </div>
+      
+      <div class="info-section">
+        <h3>📋 功能列表</h3>
+        <ul class="feature-list">
+          <li>✅ 5个薪资档位专属页面</li>
+          <li>✅ 一键薪资分配计算器</li>
+          <li>✅ 薪资生活对照图鉴</li>
+          <li>✅ 心态治愈专区</li>
+          <li>✅ 存钱打卡功能</li>
+          <li>✅ 好物推荐板块</li>
+          <li>✅ 社交圈(帖子/评论/点赞)</li>
+          <li>✅ 文案壁纸分享</li>
+        </ul>
+      </div>
+      
+      <div class="info-section">
+        <h3>🚀 如何在微信开发者工具中运行</h3>
+        <ol class="instructions">
+          <li>下载并安装 <a href="https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html" target="_blank">微信开发者工具</a></li>
+          <li>打开微信开发者工具，选择"导入项目"</li>
+          <li>选择项目目录：<code>/Users/mac/pro/solocoder/pro/xy2029/xy2029</code></li>
+          <li>AppID选择"测试号"或填入你的AppID</li>
+          <li>点击"导入"即可预览</li>
+        </ol>
+      </div>
+      
+      <div class="info-section">
+        <h3>📁 项目结构</h3>
+        <div class="file-tree">
+          <div class="tree-item">
+            <span class="folder-icon">📁</span> xy2029/
+            <div class="tree-children">
+              <div class="tree-item"><span class="file-icon">📄</span> app.js (小程序入口)</div>
+              <div class="tree-item"><span class="file-icon">📄</span> app.json (全局配置)</div>
+              <div class="tree-item"><span class="file-icon">🎨</span> app.wxss (全局样式)</div>
+              <div class="tree-item">
+                <span class="folder-icon">📁</span> pages/
+                <div class="tree-children">
+                  <div class="tree-item"><span class="folder-icon">📁</span> index/ (首页)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> calculator/ (计算器)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> salary-tier/ (档位详情)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> comparison/ (对照图鉴)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> mental-health/ (心态治愈)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> checkin/ (打卡)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> goods/ (好物推荐)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> social/ (社交圈)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> wallpaper/ (文案壁纸)</div>
+                  <div class="tree-item"><span class="folder-icon">📁</span> profile/ (个人中心)</div>
+                </div>
+              </div>
+              <div class="tree-item">
+                <span class="folder-icon">📁</span> data/ (数据模块)
+              </div>
+              <div class="tree-item">
+                <span class="folder-icon">📁</span> utils/ (工具函数)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

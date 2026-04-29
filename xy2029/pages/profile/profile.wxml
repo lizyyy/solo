@@ -1,0 +1,153 @@
+<view class="container">
+  <view class="profile-header" wx:if="{{userInfo}}">
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <view class="user-avatar-large">{{userInfo.avatar || '👤'}}</view>
+      <view class="user-info">
+        <view class="user-name">{{userInfo.nickname || '打工人'}}</view>
+        <view class="user-tier-info" wx:if="{{currentTier}}">
+          <text class="tier-badge tier-{{currentTier}}">{{currentTierName}}</text>
+          <text class="user-salary">月薪 ¥{{formattedSalary}}</text>
+        </view>
+        <view class="user-set-salary" wx:else bindtap="goToCalculator">
+          <text class="set-salary-text">👉 设置我的月薪</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="no-user-header" wx:else>
+    <view class="header-bg"></view>
+    <view class="no-user-content" bindtap="getUserProfile">
+      <view class="no-user-icon">👋</view>
+      <view class="no-user-text">点击登录，记录你的薪资档位</view>
+    </view>
+  </view>
+
+  <view class="stats-card card" wx:if="{{userInfo}}">
+    <view class="stats-list">
+      <view class="stats-item">
+        <view class="stats-value">{{totalSavings}}</view>
+        <view class="stats-label">累计存钱(元)</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-value">{{checkinDays}}</view>
+        <view class="stats-label">打卡天数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-value">{{friendsCount}}</view>
+        <view class="stats-label">关注数</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-card card">
+      <view class="menu-item" bindtap="goToCheckin">
+        <view class="menu-left">
+          <view class="menu-icon">📝</view>
+          <view class="menu-text">
+            <view class="menu-title">打卡记录</view>
+            <view class="menu-desc">存钱打卡、收入记录</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="menu-item" bindtap="goToCalculator">
+        <view class="menu-left">
+          <view class="menu-icon">🧮</view>
+          <view class="menu-text">
+            <view class="menu-title">薪资计算器</view>
+            <view class="menu-desc">一键分配薪资</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+
+    <view class="menu-card card">
+      <view class="menu-item" bindtap="goToComparison">
+        <view class="menu-left">
+          <view class="menu-icon">📊</view>
+          <view class="menu-text">
+            <view class="menu-title">薪资对照图鉴</view>
+            <view class="menu-desc">各档位生活对比</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="menu-item" bindtap="goToMentalHealth">
+        <view class="menu-left">
+          <view class="menu-icon">💚</view>
+          <view class="menu-text">
+            <view class="menu-title">心态治愈专区</view>
+            <view class="menu-desc">缓解工资焦虑</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="menu-item" bindtap="goToGoods">
+        <view class="menu-left">
+          <view class="menu-icon">🎁</view>
+          <view class="menu-text">
+            <view class="menu-title">好物推荐</view>
+            <view class="menu-desc">按档位推荐好物</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="menu-item" bindtap="goToWallpaper">
+        <view class="menu-left">
+          <view class="menu-icon">📱</view>
+          <view class="menu-text">
+            <view class="menu-title">文案壁纸</view>
+            <view class="menu-desc">打工人共鸣文案</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+
+    <view class="menu-card card">
+      <view class="menu-item" bindtap="clearCache">
+        <view class="menu-left">
+          <view class="menu-icon">🗑️</view>
+          <view class="menu-text">
+            <view class="menu-title">清除缓存</view>
+            <view class="menu-desc">清除本地数据</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+      
+      <view class="divider"></view>
+      
+      <view class="menu-item" bindtap="aboutApp">
+        <view class="menu-left">
+          <view class="menu-icon">ℹ️</view>
+          <view class="menu-text">
+            <view class="menu-title">关于我们</view>
+            <view class="menu-desc">版本信息</view>
+          </view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

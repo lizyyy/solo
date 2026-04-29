@@ -1,0 +1,122 @@
+{
+  "pages": [
+    {
+      "path": "pages/schedule/index",
+      "style": {
+        "navigationBarTitleText": "日程",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/todo/index",
+      "style": {
+        "navigationBarTitleText": "待办",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/focus/index",
+      "style": {
+        "navigationBarTitleText": "专注",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/schedule/add",
+      "style": {
+        "navigationBarTitleText": "添加日程",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/schedule/edit",
+      "style": {
+        "navigationBarTitleText": "编辑日程",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/todo/add",
+      "style": {
+        "navigationBarTitleText": "添加任务",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/todo/edit",
+      "style": {
+        "navigationBarTitleText": "编辑任务",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/profile/settings",
+      "style": {
+        "navigationBarTitleText": "设置",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/profile/focus-records",
+      "style": {
+        "navigationBarTitleText": "专注记录",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/profile/achievements",
+      "style": {
+        "navigationBarTitleText": "成就勋章",
+        "navigationBarBackgroundColor": "#FFC0CB",
+        "navigationBarTextStyle": "white"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "HelloKitty计划助手",
+    "navigationBarBackgroundColor": "#FFC0CB",
+    "backgroundColor": "#FFF5F8"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF69B4",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/schedule/index",
+        "text": "日程"
+      },
+      {
+        "pagePath": "pages/todo/index",
+        "text": "待办"
+      },
+      {
+        "pagePath": "pages/focus/index",
+        "text": "专注"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  }
+}

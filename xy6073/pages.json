@@ -1,0 +1,58 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "冰箱小管家"
+			}
+		},
+		{
+			"path": "pages/add-food/add-food",
+			"style": {
+				"navigationBarTitleText": "添加食材"
+			}
+		},
+		{
+			"path": "pages/recipe/recipe",
+			"style": {
+				"navigationBarTitleText": "菜谱推荐"
+			}
+		},
+		{
+			"path": "pages/manage/manage",
+			"style": {
+				"navigationBarTitleText": "食材管理"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "冰箱小管家",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007AFF",
+		"borderStyle": "black",
+		"backgroundColor": "#F8F8F8",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/add-food/add-food",
+				"text": "添加"
+			},
+			{
+				"pagePath": "pages/recipe/recipe",
+				"text": "菜谱"
+			},
+			{
+				"pagePath": "pages/manage/manage",
+				"text": "管理"
+			}
+		]
+	}
+}

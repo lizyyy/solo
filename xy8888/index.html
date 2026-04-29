@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反诈训练营 - 守护您的财产安全</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 开始页面 -->
+        <div id="start-page" class="page active">
+            <div class="header">
+                <div class="icon">🛡️</div>
+                <h1>反诈训练营</h1>
+                <p class="subtitle">学习防骗知识，守护财产安全</p>
+            </div>
+            <div class="intro">
+                <div class="intro-item">
+                    <span class="intro-icon">📱</span>
+                    <span>识破电话诈骗</span>
+                </div>
+                <div class="intro-item">
+                    <span class="intro-icon">💊</span>
+                    <span>警惕保健品骗局</span>
+                </div>
+                <div class="intro-item">
+                    <span class="intro-icon">💰</span>
+                    <span>防范投资陷阱</span>
+                </div>
+            </div>
+            <button class="start-btn" onclick="gameController.goToChapterSelect()">
+                开始学习
+            </button>
+            <button class="review-btn" id="review-btn" style="display:none;" onclick="gameController.goToWrongAnswers()">
+                错题复习
+            </button>
+            <div class="progress-info" id="total-progress" style="display:none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="total-progress-fill"></div>
+                </div>
+                <p id="progress-text">已完成 0/3 章节</p>
+            </div>
+        </div>
+
+        <!-- 章节选择页面 -->
+        <div id="chapter-select-page" class="page">
+            <div class="header">
+                <h2>选择章节</h2>
+                <p class="subtitle">选择您想学习的防骗主题</p>
+            </div>
+            <div class="chapter-list" id="chapter-list">
+                <!-- 章节将通过JS动态生成 -->
+            </div>
+            <button class="back-btn" onclick="gameController.goToStart()">
+                返回首页
+            </button>
+        </div>
+
+        <!-- 关卡游戏页面 -->
+        <div id="game-page" class="page">
+            <div class="game-header">
+                <div class="chapter-info">
+                    <span id="current-chapter-name">电话诈骗</span>
+                    <span id="current-level">第 1 关</span>
+                </div>
+                <div class="level-progress">
+                    <div class="level-dots" id="level-dots">
+                        <!-- 关卡进度点 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="scenario-container">
+                <div class="scenario-icon" id="scenario-icon">📞</div>
+                <div class="scenario-content">
+                    <p id="scenario-text">这里是场景描述...</p>
+                </div>
+            </div>
+            
+            <div class="options-container" id="options-container">
+                <!-- 选项将通过JS动态生成 -->
+            </div>
+            
+            <div class="game-footer">
+                <button class="back-btn" onclick="gameController.goToChapterSelect()">
+                    返回章节
+                </button>
+            </div>
+        </div>
+
+        <!-- 反馈结果页面 -->
+        <div id="feedback-page" class="page">
+            <div class="feedback-container">
+                <div class="feedback-icon" id="feedback-icon">✅</div>
+                <h3 id="feedback-title">回答正确！</h3>
+                <p id="feedback-message">您成功识破了这个骗局。</p>
+                
+                <div class="tip-card">
+                    <div class="tip-header">
+                        <span class="tip-icon">💡</span>
+                        <span>防骗小知识</span>
+                    </div>
+                    <p id="tip-text">记住这个防骗小知识，保护好自己的财产安全。</p>
+                </div>
+                
+                <button class="next-btn" id="next-btn" onclick="gameController.nextLevel()">
+                    下一关
+                </button>
+            </div>
+        </div>
+
+        <!-- 章节完成页面 -->
+        <div id="chapter-complete-page" class="page">
+            <div class="complete-container">
+                <div class="complete-icon">🎊</div>
+                <h2>恭喜完成章节！</h2>
+                <p id="chapter-complete-text">您已成功完成本章节的学习。</p>
+                
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <span class="stat-value" id="correct-count">3</span>
+                        <span class="stat-label">答对</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="wrong-count">0</span>
+                        <span class="stat-label">答错</span>
+                    </div>
+                </div>
+                
+                <button class="next-chapter-btn" id="next-chapter-btn" onclick="gameController.nextChapter()">
+                    继续学习
+                </button>
+                <button class="back-btn" onclick="gameController.goToChapterSelect()">
+                    返回章节选择
+                </button>
+            </div>
+        </div>
+
+        <!-- 总完成页面 -->
+        <div id="game-complete-page" class="page">
+            <div class="complete-container">
+                <div class="complete-icon">🏆</div>
+                <h2>恭喜毕业！</h2>
+                <p>您已完成反诈训练营的全部课程！</p>
+                
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-correct-count">9</span>
+                        <span class="stat-label">总答对</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-wrong-count">0</span>
+                        <span class="stat-label">总答错</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="accuracy-rate">100%</span>
+                        <span class="stat-label">正确率</span>
+                    </div>
+                </div>
+                
+                <div class="badge-card">
+                    <span class="badge-icon">🎖️</span>
+                    <span class="badge-text">反诈卫士</span>
+                </div>
+                
+                <button class="review-btn" id="complete-review-btn" style="display:none;" onclick="gameController.goToWrongAnswers()">
+                    复习错题
+                </button>
+                <button class="restart-btn" onclick="gameController.restartGame()">
+                    重新开始
+                </button>
+                <button class="back-btn" onclick="gameController.goToStart()">
+                    返回首页
+                </button>
+            </div>
+        </div>
+
+        <!-- 错题复习页面 -->
+        <div id="wrong-answers-page" class="page">
+            <div class="header">
+                <div class="icon">📋</div>
+                <h2>错题复习</h2>
+                <p class="subtitle">复习答错的题目，加强记忆</p>
+            </div>
+            
+            <div class="wrong-list-header">
+                <div class="wrong-count-info">
+                    <span class="wrong-count-badge" id="wrong-count-badge">0</span>
+                    <span>道错题待复习</span>
+                </div>
+                <button class="clear-wrong-btn" id="clear-wrong-btn" onclick="gameController.clearWrongAnswers()">
+                    清空错题
+                </button>
+            </div>
+            
+            <div class="wrong-list" id="wrong-list">
+                <!-- 错题列表将通过JS动态生成 -->
+            </div>
+            
+            <div class="empty-wrong" id="empty-wrong" style="display:none;">
+                <div class="empty-icon">🎉</div>
+                <p>太棒了！没有错题</p>
+                <p class="empty-tip">继续加油，保持满分！</p>
+            </div>
+            
+            <button class="back-btn" onclick="gameController.goToStart()">
+                返回首页
+            </button>
+        </div>
+
+        <!-- 错题详情页面 -->
+        <div id="wrong-detail-page" class="page">
+            <div class="game-header">
+                <div class="chapter-info">
+                    <span id="wrong-chapter-name">电话诈骗</span>
+                    <span id="wrong-current-index">第 1 题</span>
+                </div>
+                <div class="level-progress">
+                    <div class="level-dots" id="wrong-dots">
+                        <!-- 错题进度点 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wrong-review-badge">
+                <span class="review-icon">📚</span>
+                <span>错题复习中</span>
+            </div>
+            
+            <div class="scenario-container">
+                <div class="scenario-icon" id="wrong-scenario-icon">📞</div>
+                <div class="scenario-content">
+                    <p id="wrong-scenario-text">这里是场景描述...</p>
+                </div>
+            </div>
+            
+            <div class="correct-answer-card">
+                <div class="correct-answer-header">
+                    <span class="correct-icon">✅</span>
+                    <span>正确答案</span>
+                </div>
+                <p id="correct-answer-text">这是正确答案</p>
+            </div>
+            
+            <div class="your-answer-card">
+                <div class="your-answer-header">
+                    <span class="wrong-icon">❌</span>
+                    <span>您的选择</span>
+                </div>
+                <p id="your-answer-text">这是您选择的错误答案</p>
+            </div>
+            
+            <div class="tip-card">
+                <div class="tip-header">
+                    <span class="tip-icon">💡</span>
+                    <span>防骗小知识</span>
+                </div>
+                <p id="wrong-tip-text">记住这个防骗小知识</p>
+            </div>
+            
+            <div class="wrong-actions">
+                <button class="mark-as-learned-btn" onclick="gameController.markAsLearned()">
+                    已学会，移出错题库
+                </button>
+                <button class="next-wrong-btn" id="next-wrong-btn" onclick="gameController.nextWrongAnswer()">
+                    下一题
+                </button>
+            </div>
+            
+            <button class="back-btn" onclick="gameController.goToWrongAnswers()">
+                返回错题列表
+            </button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

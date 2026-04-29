@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="header-section card">
+    <view class="header-icon">📊</view>
+    <view class="header-title">薪资生活对照图鉴</view>
+    <view class="header-desc">不同薪资档位的真实生活对比</view>
+  </view>
+
+  <view class="tier-cards">
+    <view class="tier-card card tier-3k" wx:for="{{tierList}}" wx:key="tier" bindtap="viewTierDetail" data-tier="{{item.tier}}">
+      <view class="tier-card-header">
+        <view class="tier-name">{{item.name}}</view>
+        <view class="tier-mode">{{item.mode}}</view>
+      </view>
+      <view class="tier-salary-range">{{item.salaryRange}}</view>
+      <view class="tier-features">
+        <view class="feature-item" wx:for="{{item.features}}" wx:for-item="feature" wx:key="index">
+          <text class="feature-icon">{{feature.icon}}</text>
+          <text class="feature-text">{{feature.text}}</text>
+        </view>
+      </view>
+      <view class="tier-go-detail">查看详情 →</view>
+    </view>
+  </view>
+
+  <view class="comparison-table card">
+    <view class="table-title">各档位生活维度对比</view>
+    
+    <view class="table-header">
+      <view class="header-col empty-col"></view>
+      <view class="header-col" wx:for="{{tierList}}" wx:key="tier">
+        {{item.tier}}
+      </view>
+    </view>
+    
+    <view class="table-row" wx:for="{{comparisonData}}" wx:key="category">
+      <view class="row-label">{{item.category}}</view>
+      <view class="row-values">
+        <view class="value-cell" wx:for="{{item.values}}" wx:for-item="value" wx:key="index">
+          {{value}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
