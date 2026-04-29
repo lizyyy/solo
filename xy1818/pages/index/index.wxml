@@ -1,0 +1,227 @@
+<view class="page">
+  <!-- 顶部配送方式选择 -->
+  <view class="delivery-header" bindtap="onDeliveryModeTap">
+    <view class="delivery-info">
+      <text class="delivery-icon">{{currentDeliveryMode.icon}}</text>
+      <view class="delivery-text">
+        <text class="delivery-name">{{currentDeliveryMode.name}}</text>
+        <text class="delivery-desc">{{currentDeliveryMode.description}}</text>
+      </view>
+      <text class="delivery-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-section">
+    <view class="search-box">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索面包、蛋糕、甜点..." 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+    <view class="search-actions">
+      <view class="action-item" bindtap="onCouponTap">
+        <text class="action-icon">🎫</text>
+        <text class="action-text">领券</text>
+      </view>
+      <view class="action-item" bindtap="onMemberTap">
+        <text class="action-icon">👑</text>
+        <text class="action-text">会员</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 轮播区域 -->
+  <view class="banner-section">
+    <view class="banner-card">
+      <view class="banner-content">
+        <view class="banner-text">
+          <text class="banner-title">新用户专享</text>
+          <text class="banner-subtitle">全场8折起</text>
+          <view class="banner-tags">
+            <text class="banner-tag">满50可用</text>
+            <text class="banner-tag">限时领取</text>
+          </view>
+        </view>
+        <view class="banner-image">
+          <text class="banner-emoji">🍰</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类导航 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="id" 
+          class="category-item {{currentCategory === item.id ? 'active' : ''}}"
+          bindtap="onCategoryTap"
+          data-id="{{item.id}}"
+        >
+          <text class="category-icon">{{item.icon}}</text>
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 热销商品 -->
+  <view class="section hot-section" wx:if="{{hotProducts.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">🔥 热销推荐</text>
+      <text class="section-more">查看更多 ›</text>
+    </view>
+    <scroll-view class="hot-scroll" scroll-x>
+      <view class="hot-list">
+        <view 
+          wx:for="{{hotProducts}}" 
+          wx:key="id" 
+          class="hot-item"
+          bindtap="onProductTap"
+          data-id="{{item.id}}"
+        >
+          <image class="hot-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="hot-info">
+            <text class="hot-name">{{item.name}}</text>
+            <view class="hot-price-row">
+              <text class="hot-price">{{item.price}}</text>
+              <text class="hot-original" wx:if="{{item.originalPrice > item.price}}">¥{{item.originalPrice}}</text>
+            </view>
+          </view>
+          <view class="hot-add-btn" catchtap="onAddToCart" data-id="{{item.id}}">
+            <text class="add-icon">+</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 新品上市 -->
+  <view class="section new-section" wx:if="{{newProducts.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">✨ 新品上市</text>
+      <text class="section-more">查看更多 ›</text>
+    </view>
+    <scroll-view class="new-scroll" scroll-x>
+      <view class="new-list">
+        <view 
+          wx:for="{{newProducts}}" 
+          wx:key="id" 
+          class="new-item"
+          bindtap="onProductTap"
+          data-id="{{item.id}}"
+        >
+          <view class="new-badge">NEW</view>
+          <image class="new-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="new-info">
+            <text class="new-name">{{item.name}}</text>
+            <text class="new-desc">{{item.description}}</text>
+            <view class="new-price-row">
+              <text class="new-price">{{item.price}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 全部商品 -->
+  <view class="section product-section">
+    <view class="section-header">
+      <text class="section-title">🍞 全部商品</text>
+    </view>
+    <view class="product-list" wx:if="{{products.length > 0}}">
+      <view 
+        wx:for="{{products}}" 
+        wx:key="id" 
+        class="product-card"
+        bindtap="onProductTap"
+        data-id="{{item.id}}"
+      >
+        <view class="product-image-wrap">
+          <image class="product-image" src="{{item.image}}" mode="aspectFill" />
+          <view class="product-tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text class="product-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+          </view>
+          <view class="product-stock" wx:if="{{item.stock <= 0}}">
+            <text>售罄</text>
+          </view>
+        </view>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <text class="product-desc">{{item.description}}</text>
+          <view class="product-meta">
+            <text class="product-sales">已售{{item.sales}}</text>
+            <text class="product-rating">⭐{{item.rating}}</text>
+          </view>
+          <view class="product-bottom">
+            <view class="product-price-row">
+              <text class="product-price">{{item.price}}</text>
+              <text class="product-original" wx:if="{{item.originalPrice > item.price}}">¥{{item.originalPrice}}</text>
+            </view>
+            <view class="product-add" catchtap="onAddToCart" data-id="{{item.id}}">
+              <text class="add-icon">+</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">🍞</text>
+      <text class="empty-text">暂无商品</text>
+    </view>
+  </view>
+
+  <!-- 购物车悬浮按钮 -->
+  <view class="cart-float" wx:if="{{cartCount > 0}}" bindtap="onCartTap">
+    <view class="cart-icon">
+      <text>🛒</text>
+      <view class="cart-badge">{{cartCount}}</view>
+    </view>
+  </view>
+
+  <!-- 配送方式选择弹窗 -->
+  <view class="modal-mask" wx:if="{{showDeliveryModal}}" bindtap="onCloseDeliveryModal">
+    <view class="modal-content delivery-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">选择配送方式</text>
+        <text class="modal-close" bindtap="onCloseDeliveryModal">×</text>
+      </view>
+      <view class="modal-body">
+        <view 
+          wx:for="{{deliveryModes}}" 
+          wx:key="id" 
+          class="delivery-option {{deliveryMode === item.id ? 'selected' : ''}}"
+          bindtap="onSelectDeliveryMode"
+          data-mode="{{item.id}}"
+        >
+          <view class="delivery-option-left">
+            <text class="option-icon">{{item.icon}}</text>
+            <view class="option-info">
+              <text class="option-name">{{item.name}}</text>
+              <text class="option-desc">{{item.description}}</text>
+            </view>
+          </view>
+          <view class="delivery-option-right">
+            <view class="option-fee" wx:if="{{item.fee > 0}}">
+              <text>配送费¥{{item.fee}}</text>
+              <text class="free-tip" wx:if="{{item.freeThreshold > 0}}">满{{item.freeThreshold}}免配送</text>
+            </view>
+            <view class="option-fee" wx:else>
+              <text class="free-text">免费</text>
+            </view>
+            <view class="option-check {{deliveryMode === item.id ? 'checked' : ''}}">
+              <text wx:if="{{deliveryMode === item.id}}">✓</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

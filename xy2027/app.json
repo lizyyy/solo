@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/fabric/fabric",
+    "pages/pattern/pattern",
+    "pages/materials/materials",
+    "pages/tools/tools",
+    "pages/timer/timer",
+    "pages/community/community",
+    "pages/dashboard/dashboard"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#d4a574",
+    "navigationBarTitleText": "缝纫工作室",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f8f9fa"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF6B6B",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/fabric/fabric",
+        "text": "成衣柜"
+      },
+      {
+        "pagePath": "pages/timer/timer",
+        "text": "计时"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社区"
+      },
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,75 @@
+<view class="container">
+  <view class="header-section card">
+    <view class="header-icon">📱</view>
+    <view class="header-title">打工人共鸣文案</view>
+    <view class="header-desc">每档薪资专属文案、壁纸、朋友圈文案</view>
+  </view>
+
+  <view class="tabs-section">
+    <view class="tabs">
+      <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
+        档位文案
+      </view>
+      <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
+        朋友圈文案
+      </view>
+      <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2">
+        治愈语录
+      </view>
+    </view>
+  </view>
+
+  <view class="tier-walls-section" wx:if="{{currentTab === 0}}">
+    <view class="wall-item card" wx:for="{{tierQuotes}}" wx:key="id">
+      <view class="wall-header">
+        <view class="wall-tier-badge tier-{{item.tier}}">{{item.tierName}}</view>
+      </view>
+      <view class="wall-content">"{{item.content}}"</view>
+      <view class="wall-actions">
+        <view class="action-btn" bindtap="copyQuote" data-content="{{item.content}}">
+          📋 复制
+        </view>
+        <view class="action-btn" bindtap="shareQuote" data-id="{{item.id}}">
+          📤 分享
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="moments-section" wx:if="{{currentTab === 1}}">
+    <view class="moment-item card" wx:for="{{momentQuotes}}" wx:key="id">
+      <view class="moment-scene">{{item.scene}}</view>
+      <view class="moment-content">"{{item.content}}"</view>
+      <view class="moment-tags">
+        <text class="moment-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="index">
+          #{{tag}}
+        </text>
+      </view>
+      <view class="wall-actions">
+        <view class="action-btn" bindtap="copyQuote" data-content="{{item.content}}">
+          📋 复制
+        </view>
+        <view class="action-btn" bindtap="shareQuote" data-id="{{item.id}}">
+          📤 分享
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="healing-section" wx:if="{{currentTab === 2}}">
+    <view class="healing-item card" wx:for="{{healingQuotes}}" wx:key="id">
+      <view class="healing-icon">{{item.icon}}</view>
+      <view class="healing-content">"{{item.content}}"</view>
+      <view class="wall-actions">
+        <view class="action-btn" bindtap="copyQuote" data-content="{{item.content}}">
+          📋 复制
+        </view>
+        <view class="action-btn" bindtap="shareQuote" data-id="{{item.id}}">
+          📤 分享
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
