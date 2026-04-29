@@ -1,0 +1,329 @@
+<view class="container">
+  <!-- 顶部Tab -->
+  <view class="card tab-card">
+    <view class="tabs flex">
+      <view 
+        class="tab-item {{selectedTab === 'overview' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="overview"
+      >
+        数据概览
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'history' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="history"
+      >
+        历史记录
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'add' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="add"
+      >
+        添加记录
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'overview'}}">
+    <!-- 总碳排放卡片 -->
+    <view class="card total-card">
+      <view class="card-title" bindtap="showCarbonInfo">
+        总碳排放量
+        <text class="info-icon">ℹ️</text>
+      </view>
+      <view class="total-content flex flex-center flex-column">
+        <view class="total-value text-warning">
+          {{carbonFootprint.total.toFixed(2)}}
+        </view>
+        <view class="total-unit">kg CO₂</view>
+      </view>
+      
+      <!-- 分类统计 -->
+      <view class="category-stats mt-24">
+        <view 
+          wx:for="{{categoryStats}}" 
+          wx:key="id" 
+          class="category-item flex flex-between flex-center"
+        >
+          <view class="category-left flex flex-center">
+            <view class="category-icon">{{item.icon}}</view>
+            <view class="category-info">
+              <view class="category-name">{{item.name}}</view>
+              <view class="category-amount text-secondary">{{item.value.toFixed(2)}} kg</view>
+            </view>
+          </view>
+          <view class="category-right">
+            <view class="category-percentage text-primary">{{item.percentage}}%</view>
+            <view class="progress-bar-small mt-4">
+              <view class="progress-fill-small" style="width: {{item.percentage}}%; background-color: {{item.color}}"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 近7天趋势 -->
+    <view class="card weekly-card">
+      <view class="card-title">近7天碳排放趋势</view>
+      <view class="weekly-chart">
+        <view class="chart-bars flex flex-between">
+          <view 
+            wx:for="{{weeklyData}}" 
+            wx:key="date" 
+            class="bar-item flex flex-column flex-center"
+          >
+            <view class="bar-value" wx:if="{{item.total > 0}}">{{item.total.toFixed(1)}}</view>
+            <view class="bar-container">
+              <view 
+                class="bar-fill" 
+                style="height: {{item.total > 0 ? Math.max(item.total / 2 * 100, 10) : 5}}rpx; background: linear-gradient(to top, #4CAF50, #81C784);"
+              ></view>
+            </view>
+            <view class="bar-label">{{item.dayName}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 快速添加入口 -->
+    <view class="card quick-add-card">
+      <view class="card-title">快速记录</view>
+      <view class="quick-add-grid grid-4">
+        <view class="quick-item" bindtap="openAddModal" data-type="transport">
+          <view class="quick-icon">🚗</view>
+          <view class="quick-name">出行</view>
+        </view>
+        <view class="quick-item" bindtap="openAddModal" data-type="electricity">
+          <view class="quick-icon">⚡</view>
+          <view class="quick-name">用电</view>
+        </view>
+        <view class="quick-item" bindtap="openAddModal" data-type="food">
+          <view class="quick-icon">🍽️</view>
+          <view class="quick-name">饮食</view>
+        </view>
+        <view class="quick-item" bindtap="openAddModal" data-type="disposable">
+          <view class="quick-icon">🚫</view>
+          <view class="quick-name">一次性</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'history'}}">
+    <view class="card history-card">
+      <view class="card-title">记录历史</view>
+      
+      <view class="history-list" wx:if="{{historyList.length > 0}}">
+        <view 
+          wx:for="{{historyList}}" 
+          wx:key="id" 
+          class="history-item"
+        >
+          <view class="history-left flex">
+            <view class="history-icon">{{getTypeIcon(item.type)}}</view>
+            <view class="history-info">
+              <view class="history-title">
+                {{item.subtypeName || getTypeName(item.type)}}
+              </view>
+              <view class="history-detail text-secondary text-small">
+                {{item.amount}} {{item.unit || ''}} · {{item.date}}
+              </view>
+            </view>
+          </view>
+          <view class="history-right flex flex-column">
+            <view class="history-carbon text-warning">+{{item.carbonKg.toFixed(2)}} kg</view>
+            <view class="delete-btn" bindtap="deleteRecord" data-id="{{item.id}}">删除</view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="empty-state" wx:else>
+        <view class="empty-icon">📊</view>
+        <view class="empty-text text-secondary">暂无碳排放记录</view>
+        <view class="empty-hint text-secondary mt-8">开始记录你的低碳生活吧！</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加记录 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'add'}}">
+    <view class="card add-card">
+      <view class="card-title">选择记录类型</view>
+      <view class="type-list">
+        <view class="type-item" bindtap="openAddModal" data-type="transport">
+          <view class="type-icon">🚗</view>
+          <view class="type-info">
+            <view class="type-name">出行记录</view>
+            <view class="type-desc text-secondary text-small">打车、公交、地铁、自驾等</view>
+          </view>
+          <view class="arrow">›</view>
+        </view>
+        <view class="type-item" bindtap="openAddModal" data-type="electricity">
+          <view class="type-icon">⚡</view>
+          <view class="type-info">
+            <view class="type-name">用电记录</view>
+            <view class="type-desc text-secondary text-small">家庭用电、办公用电等</view>
+          </view>
+          <view class="arrow">›</view>
+        </view>
+        <view class="type-item" bindtap="openAddModal" data-type="food">
+          <view class="type-icon">🍽️</view>
+          <view class="type-info">
+            <view class="type-name">饮食记录</view>
+            <view class="type-desc text-secondary text-small">外卖、快餐、家常菜等</view>
+          </view>
+          <view class="arrow">›</view>
+        </view>
+        <view class="type-item" bindtap="openAddModal" data-type="disposable">
+          <view class="type-icon">🚫</view>
+          <view class="type-info">
+            <view class="type-name">一次性用品</view>
+            <view class="type-desc text-secondary text-small">吸管、塑料袋、一次性筷子等</view>
+          </view>
+          <view class="arrow">›</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 添加记录弹窗 -->
+<view class="modal-mask {{showAddModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content add-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title">添加记录</text>
+      <text class="close-btn" bindtap="closeAddModal">×</text>
+    </view>
+    
+    <!-- 出行方式选择 -->
+    <view class="transport-section" wx:if="{{addType === 'transport'}}">
+      <view class="section-title">选择出行方式</view>
+      <view class="transport-grid grid-4">
+        <view 
+          wx:for="{{transportTypes}}" 
+          wx:key="id" 
+          class="transport-item {{selectedTransportType.id === item.id ? 'selected' : ''}}"
+          bindtap="selectTransportType"
+          data-type="{{item.id}}"
+        >
+          <view class="transport-icon">{{item.icon}}</view>
+          <view class="transport-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用电输入 -->
+    <view class="input-section" wx:if="{{addType === 'electricity'}}">
+      <view class="section-title">输入用电量</view>
+      <view class="input-group">
+        <input 
+          type="digit" 
+          class="amount-input" 
+          placeholder="请输入用电量（度）" 
+          value="{{addAmount}}"
+          bindinput="inputAmount"
+        />
+        <view class="input-unit">度</view>
+      </view>
+      <view class="input-tip text-secondary text-small mt-8">
+        提示：一般家庭每月用电约200-300度
+      </view>
+    </view>
+
+    <!-- 饮食选择 -->
+    <view class="food-section" wx:if="{{addType === 'food'}}">
+      <view class="section-title">选择饮食类型</view>
+      <view class="food-list">
+        <view 
+          wx:for="{{foodTypes}}" 
+          wx:key="id" 
+          class="food-item flex flex-center {{selectedFoodType.id === item.id ? 'selected' : ''}}"
+          bindtap="selectFoodType"
+          data-type="{{item.id}}"
+        >
+          <view class="food-icon">{{item.icon}}</view>
+          <view class="food-info">
+            <view class="food-name">{{item.name}}</view>
+            <view class="food-desc text-secondary text-small">{{item.desc}}</view>
+          </view>
+          <view class="food-check" wx:if="{{selectedFoodType.id === item.id}}">✓</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 一次性用品选择 -->
+    <view class="disposable-section" wx:if="{{addType === 'disposable'}}">
+      <view class="section-title">选择一次性用品类型</view>
+      <view class="disposable-grid grid-3">
+        <view 
+          wx:for="{{disposableTypes}}" 
+          wx:key="id" 
+          class="disposable-item flex flex-column flex-center {{selectedDisposableType.id === item.id ? 'selected' : ''}}"
+          bindtap="selectDisposableType"
+          data-type="{{item.id}}"
+        >
+          <view class="disposable-icon">{{item.icon}}</view>
+          <view class="disposable-name">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数量输入（除用电外） -->
+    <view class="amount-section" wx:if="{{addType !== 'electricity' && addType}}">
+      <view class="section-title">
+        {{addType === 'transport' ? '输入距离（公里）' : addType === 'food' ? '输入份数' : '输入数量'}}
+      </view>
+      <view class="input-group">
+        <input 
+          type="digit" 
+          class="amount-input" 
+          placeholder="请输入数量" 
+          value="{{addAmount}}"
+          bindinput="inputAmount"
+        />
+        <view class="input-unit">
+          {{addType === 'transport' ? (selectedTransportType.unit || '公里') : addType === 'food' ? '份' : '个'}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="modal-actions mt-24">
+      <button class="btn-secondary" bindtap="closeAddModal">取消</button>
+      <button class="btn-primary" bindtap="submitRecord">确认添加</button>
+    </view>
+  </view>
+</view>
+
+<!-- 结果展示弹窗 -->
+<view class="modal-mask {{showResultModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content result-modal">
+    <view class="result-icon animate-pulse">🌍</view>
+    <view class="result-title">记录已添加</view>
+    
+    <view class="result-detail" wx:if="{{resultData}}">
+      <view class="result-item flex flex-between">
+        <text class="text-secondary">类型</text>
+        <text>{{resultData.subtypeName || getTypeName(resultData.type)}}</text>
+      </view>
+      <view class="result-item flex flex-between">
+        <text class="text-secondary">数量</text>
+        <text>{{resultData.amount}}</text>
+      </view>
+      <view class="result-item flex flex-between highlight">
+        <text class="text-secondary">碳排放量</text>
+        <text class="text-warning text-bold">{{resultData.carbonKg.toFixed(2)}} kg CO₂</text>
+      </view>
+    </view>
+    
+    <view class="result-tip text-secondary mt-16">
+      💡 减少碳排放，从日常小事做起
+    </view>
+    
+    <button class="btn-primary mt-24" bindtap="closeResultModal">知道了</button>
+  </view>
+</view>

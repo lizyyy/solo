@@ -1,0 +1,67 @@
+<view class="container">
+  <view class="header-banner card">
+    <view class="banner-icon">💚</view>
+    <view class="banner-title">心态治愈专区</view>
+    <view class="banner-desc">拒绝焦虑，接受自己，安稳快乐生活</view>
+  </view>
+
+  <view class="daily-quote card">
+    <view class="quote-label">今日治愈语录</view>
+    <view class="quote-text">"{{currentQuote}}"</view>
+    <view class="quote-refresh" bindtap="refreshQuote">换一个 →</view>
+  </view>
+
+  <view class="tabs-section">
+    <view class="tabs">
+      <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
+        真实故事
+      </view>
+      <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
+        消费忠告
+      </view>
+      <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2">
+        心态文章
+      </view>
+    </view>
+  </view>
+
+  <view class="stories-section" wx:if="{{currentTab === 0}}">
+    <view class="story-item card" wx:for="{{realStories}}" wx:key="id" bindtap="viewStory" data-id="{{item.id}}">
+      <view class="story-header">
+        <view class="story-avatar">{{item.avatar}}</view>
+        <view class="story-user">
+          <view class="story-name">{{item.name}}</view>
+          <view class="story-tier">{{item.tier}}档 · {{item.location}}</view>
+        </view>
+      </view>
+      <view class="story-content">{{item.preview}}</view>
+      <view class="story-stats">
+        <view class="stat">❤️ {{item.likes}}</view>
+        <view class="stat">💬 {{item.comments}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="warnings-section" wx:if="{{currentTab === 1}}">
+    <view class="warning-item card" wx:for="{{warnings}}" wx:key="id">
+      <view class="warning-icon">{{item.icon}}</view>
+      <view class="warning-content">
+        <view class="warning-title">{{item.title}}</view>
+        <view class="warning-desc">{{item.description}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="articles-section" wx:if="{{currentTab === 2}}">
+    <view class="article-item card" wx:for="{{articles}}" wx:key="id" bindtap="viewArticle" data-id="{{item.id}}">
+      <view class="article-title">{{item.title}}</view>
+      <view class="article-preview">{{item.preview}}</view>
+      <view class="article-meta">
+        <view class="article-category">{{item.category}}</view>
+        <view class="article-read">阅读 {{item.readCount}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

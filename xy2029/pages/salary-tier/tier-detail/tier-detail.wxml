@@ -1,0 +1,206 @@
+<view class="container">
+  <view class="tier-header tier-{{tier}}">
+    <view class="tier-header-content">
+      <view class="tier-icon">{{tierInfo.icon}}</view>
+      <view class="tier-main">
+        <view class="tier-name">{{tierInfo.name}}</view>
+        <view class="tier-range">{{tierInfo.displayName}}</view>
+      </view>
+    </view>
+    <view class="tier-desc">{{tierInfo.description}}</view>
+  </view>
+
+  <view class="tab-bar">
+    <view 
+      class="tab-item {{activeTab === 'consumption' ? 'active' : ''}}" 
+      bindtap="switchTab"
+      data-tab="consumption"
+    >
+      消费水平
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'avoid' ? 'active' : ''}}" 
+      bindtap="switchTab"
+      data-tab="avoid"
+    >
+      避雷指南
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'joy' ? 'active' : ''}}" 
+      bindtap="switchTab"
+      data-tab="joy"
+    >
+      低成本快乐
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'mindset' ? 'active' : ''}}" 
+      bindtap="switchTab"
+      data-tab="mindset"
+    >
+      心态建议
+    </view>
+  </view>
+
+  <view class="tab-content" wx:if="{{activeTab === 'consumption'}}">
+    <view class="section">
+      <view class="section-title">真实日常消费水平</view>
+      
+      <view class="consumption-categories">
+        <view 
+          class="category-card card" 
+          wx:for="{{consumptionCategories}}" 
+          wx:key="key"
+        >
+          <view class="category-header">
+            <view class="category-icon">{{item.icon}}</view>
+            <view class="category-info">
+              <view class="category-name">{{item.data.title}}</view>
+              <view class="category-range">
+                <text wx:if="{{item.data.daily}}">{{item.data.daily}} / </text>
+                <text>{{item.data.monthly}}</text>
+              </view>
+            </view>
+          </view>
+          <view class="category-details">
+            <view class="detail-item" wx:for="{{item.data.details}}" wx:key="index">
+              <view class="detail-dot"></view>
+              <view class="detail-text">{{item}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">真实生活状态</view>
+      <view class="real-life-card card">
+        <view class="real-life-item">
+          <view class="real-life-label">💼 典型职业</view>
+          <view class="real-life-value">{{tierInfo.realLife.work}}</view>
+        </view>
+        <view class="divider"></view>
+        <view class="real-life-item">
+          <view class="real-life-label">📍 居住区域</view>
+          <view class="real-life-value">{{tierInfo.realLife.location}}</view>
+        </view>
+        <view class="divider"></view>
+        <view class="real-life-item">
+          <view class="real-life-label">🚇 通勤方式</view>
+          <view class="real-life-value">{{tierInfo.realLife.transportation}}</view>
+        </view>
+        <view class="divider"></view>
+        <view class="real-life-item">
+          <view class="real-life-label">⏰ 日常作息</view>
+          <view class="real-life-value">{{tierInfo.realLife.dailyRoutine}}</view>
+        </view>
+        <view class="divider"></view>
+        <view class="real-life-item">
+          <view class="real-life-label">💭 当前梦想</view>
+          <view class="real-life-value">{{tierInfo.realLife.dreams}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-content" wx:if="{{activeTab === 'avoid'}}">
+    <view class="section">
+      <view class="section-title">不该花的冤枉钱避雷</view>
+      <view class="avoid-list">
+        <view class="avoid-item card" wx:for="{{tierInfo.avoidWaste}}" wx:key="index">
+          <view class="avoid-icon">⚠️</view>
+          <view class="avoid-content">
+            <view class="avoid-text">{{item}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="warning-card card">
+        <view class="warning-icon">💡</view>
+        <view class="warning-text">
+          记住：省钱不是抠门，是把钱花在真正值得的地方。每一笔不必要的开支，都是在透支未来的可能性。
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-content" wx:if="{{activeTab === 'joy'}}">
+    <view class="section">
+      <view class="section-title">该享受的低成本快乐</view>
+      <view class="joy-list">
+        <view class="joy-item card" wx:for="{{tierInfo.cheapJoy}}" wx:key="index">
+          <view class="joy-icon">✨</view>
+          <view class="joy-content">
+            <view class="joy-text">{{item}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="encourage-card card">
+        <view class="encourage-icon">🌈</view>
+        <view class="encourage-text">
+          快乐不一定需要花钱。阳光、空气、亲情、友情、健康的身体、平静的内心，这些才是最珍贵的财富。
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tab-content" wx:if="{{activeTab === 'mindset'}}">
+    <view class="section">
+      <view class="section-title">当前档位心态建议</view>
+      <view class="mindset-list">
+        <view class="mindset-item card" wx:for="{{tierInfo.mindset.current}}" wx:key="index">
+          <view class="mindset-icon">💚</view>
+          <view class="mindset-content">
+            <view class="mindset-text">{{item}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{tierInfo.mindset.nextStep}}">
+      <view class="section-title">下一档位努力方向</view>
+      <view class="next-step-card card">
+        <view class="next-step-header">
+          <view class="next-step-target">🎯 目标档位：{{tierInfo.mindset.nextStep.target}}</view>
+        </view>
+        
+        <view class="next-step-section">
+          <view class="next-step-title">📋 需要达成的目标</view>
+          <view class="goal-list">
+            <view class="goal-item" wx:for="{{tierInfo.mindset.nextStep.goals}}" wx:key="index">
+              <view class="goal-dot"></view>
+              <view class="goal-text">{{item}}</view>
+            </view>
+          </view>
+        </view>
+
+        <view class="divider"></view>
+
+        <view class="next-step-section">
+          <view class="next-step-title">🛤️ 提升途径</view>
+          <view class="way-list">
+            <view class="way-item" wx:for="{{tierInfo.mindset.nextStep.ways}}" wx:key="index">
+              <view class="way-icon">💡</view>
+              <view class="way-text">{{item}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-actions">
+    <view class="action-btn secondary-btn" bindtap="goToCalculator">
+      计算薪资分配
+    </view>
+    <view class="action-btn primary-btn" bindtap="shareTier">
+      分享这个档位
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

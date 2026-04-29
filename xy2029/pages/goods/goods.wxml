@@ -1,0 +1,54 @@
+<view class="container">
+  <view class="header-section card">
+    <view class="header-icon">🎁</view>
+    <view class="header-title">省钱快乐好物推荐</view>
+    <view class="header-desc">按薪资档位推荐，不盲目种草</view>
+  </view>
+
+  <view class="tier-tabs">
+    <view class="tier-tab {{currentTier === '3k' ? 'active' : ''}}" bindtap="switchTier" data-tier="3k">
+      3k档
+    </view>
+    <view class="tier-tab {{currentTier === '9k' ? 'active' : ''}}" bindtap="switchTier" data-tier="9k">
+      9k档
+    </view>
+    <view class="tier-tab {{currentTier === '3w' ? 'active' : ''}}" bindtap="switchTier" data-tier="3w">
+      3w档
+    </view>
+  </view>
+
+  <view class="category-section">
+    <scroll-view scroll-x="true" class="category-scroll">
+      <view class="category-list">
+        <view class="category-item {{currentCategory === item.id ? 'active' : ''}}" 
+              wx:for="{{categories}}" wx:key="id"
+              bindtap="switchCategory" data-category="{{item.id}}">
+          {{item.name}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="goods-list">
+    <view class="good-item card" wx:for="{{filteredGoods}}" wx:key="id">
+      <view class="good-image">{{item.icon}}</view>
+      <view class="good-info">
+        <view class="good-name">{{item.name}}</view>
+        <view class="good-desc">{{item.description}}</view>
+        <view class="good-footer">
+          <view class="good-price">¥{{item.price}}</view>
+          <view class="good-action" bindtap="viewGood" data-id="{{item.id}}">
+            查看详情
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{filteredGoods.length === 0}}">
+    <view class="empty-icon">🎁</view>
+    <view class="empty-text">暂无该分类好物</view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
