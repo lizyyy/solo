@@ -1,0 +1,288 @@
+<view class="container">
+  <!-- 每日励志语 -->
+  <view class="card tip-card" bindtap="toggleTip">
+    <view class="tip-header flex flex-between flex-center">
+      <text class="tip-title">💡 今日环保心语</text>
+      <text class="refresh-icon" catchtap="refreshTip">🔄</text>
+    </view>
+    <view class="tip-content {{showTip ? 'show' : ''}}">
+      <text class="tip-text">{{currentTip}}</text>
+    </view>
+  </view>
+
+  <!-- 顶部Tab -->
+  <view class="card tab-card">
+    <view class="tabs flex">
+      <view 
+        class="tab-item {{selectedTab === 'track' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="track"
+      >
+        今日打卡
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'stats' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="stats"
+      >
+        统计分析
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日打卡 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'track'}}">
+    <!-- 今日概览 -->
+    <view class="card overview-card">
+      <view class="card-title flex flex-between">
+        <text>今日记录</text>
+        <text class="text-secondary text-small">{{new Date().toLocaleDateString()}}</text>
+      </view>
+      
+      <view class="today-stats grid-2 mt-16">
+        <view class="stat-item avoided">
+          <view class="stat-icon">✅</view>
+          <view class="stat-value text-primary text-bold">{{todayAvoided}}</view>
+          <view class="stat-label">避免使用</view>
+        </view>
+        <view class="stat-item used">
+          <view class="stat-icon">⚠️</view>
+          <view class="stat-value text-warning text-bold">{{todayUsed}}</view>
+          <view class="stat-label">使用</view>
+        </view>
+      </view>
+      
+      <!-- 进度条 -->
+      <view class="progress-section mt-24">
+        <view class="progress-header flex flex-between mb-8">
+          <text class="text-secondary">本月目标进度</text>
+          <text class="text-primary">{{habitsStats ? habitsStats.totalAvoided : 0}}/{{weeklyGoal}}</text>
+        </view>
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{getProgressPercentage()}}%"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 一次性用品列表 -->
+    <view class="card items-card">
+      <view class="card-title">选择记录</view>
+      <view class="items-list mt-16">
+        <view 
+          wx:for="{{disposableTypes}}" 
+          wx:key="id" 
+          class="item-card flex flex-between flex-center"
+          bindtap="openRecordModal"
+          data-type="{{item.id}}"
+        >
+          <view class="item-left flex flex-center">
+            <view class="item-icon">{{item.icon}}</view>
+            <view class="item-info">
+              <view class="item-name">{{item.name}}</view>
+              <view class="item-today text-secondary text-small">
+                今日：避免{{item.avoided}}次，使用{{item.used}}次
+              </view>
+            </view>
+          </view>
+          <view class="item-right">
+            <view class="item-status">
+              <text class="avoided-count text-primary">+{{item.avoided}}</text>
+              <text class="divider">|</text>
+              <text class="used-count text-warning">{{item.used}}</text>
+            </view>
+            <view class="record-btn text-secondary text-small">点击记录 →</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 环保小贴士 -->
+    <view class="card tips-card">
+      <view class="card-title">环保小贴士</view>
+      <view class="tips-list mt-16">
+        <view class="tip-item flex">
+          <view class="tip-bullet">🌱</view>
+          <view class="tip-text text-secondary text-small">
+            少用一个塑料袋，减少约0.03kg碳排放，相当于种植1棵树1天的吸收量
+          </view>
+        </view>
+        <view class="tip-item flex mt-12">
+          <view class="tip-bullet">🌱</view>
+          <view class="tip-text text-secondary text-small">
+            自带水杯可以减少瓶装水使用，每瓶水约产生0.08kg碳排放
+          </view>
+        </view>
+        <view class="tip-item flex mt-12">
+          <view class="tip-bullet">🌱</view>
+          <view class="tip-text text-secondary text-small">
+            拒绝一次性吸管，每年可减少约500根吸管的塑料污染
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计分析 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'stats'}}">
+    <view class="card stats-card" wx:if="{{habitsStats}}">
+      <view class="card-title flex flex-between">
+        <text>近30天统计</text>
+        <view class="detail-btn" bindtap="showAvoidedDetail">查看详情</view>
+      </view>
+      
+      <view class="stats-overview grid-2 mt-16">
+        <view class="overview-item">
+          <view class="overview-value text-primary text-bold">{{habitsStats.totalAvoided}}</view>
+          <view class="overview-label text-secondary text-small">累计避免</view>
+        </view>
+        <view class="overview-item">
+          <view class="overview-value text-warning text-bold">{{habitsStats.totalUsed}}</view>
+          <view class="overview-label text-secondary text-small">累计使用</view>
+        </view>
+      </view>
+      
+      <!-- 各类别统计 -->
+      <view class="category-stats mt-24">
+        <view class="section-title text-secondary text-small mb-12">各类别详情</view>
+        <view 
+          wx:for="{{disposableTypes}}" 
+          wx:key="id" 
+          class="category-item"
+        >
+          <view class="category-header flex flex-between flex-center">
+            <view class="category-left flex flex-center">
+              <view class="category-icon">{{item.icon}}</view>
+              <view class="category-name">{{item.name}}</view>
+            </view>
+            <view class="category-right">
+              <text class="avoided text-primary">避免{{habitsStats.byType[item.id] ? habitsStats.byType[item.id].avoided : 0}}</text>
+              <text class="divider">|</text>
+              <text class="used text-warning">使用{{habitsStats.byType[item.id] ? habitsStats.byType[item.id].used : 0}}</text>
+            </view>
+          </view>
+          <view class="category-progress mt-8">
+            <view class="progress-bar-small">
+              <view 
+                class="progress-fill-small" 
+                style="width: {{habitsStats.byType[item.id] && habitsStats.byType[item.id].avoided + habitsStats.byType[item.id].used > 0 ? (habitsStats.byType[item.id].avoided / (habitsStats.byType[item.id].avoided + habitsStats.byType[item.id].used) * 100) : 0}}%"
+              ></view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 每日趋势 -->
+      <view class="daily-trend mt-24" wx:if="{{habitsStats.dailyData.length > 0}}">
+        <view class="section-title text-secondary text-small mb-12">每日趋势（最近7天）</view>
+        <view class="trend-chart">
+          <view class="chart-bars flex flex-between">
+            <view 
+              wx:for="{{habitsStats.dailyData.slice(0, 7)}}" 
+              wx:key="date" 
+              wx:for-index="idx"
+              class="bar-item flex flex-column flex-center"
+            >
+              <view class="bar-values flex flex-center">
+                <view class="bar-avoided" style="height: {{Math.max(item.avoided * 20, 10)}}rpx;"></view>
+                <view class="bar-used" style="height: {{Math.max(item.used * 20, 10)}}rpx;"></view>
+              </view>
+              <view class="bar-label text-secondary text-small">{{item.date.slice(5)}}</view>
+            </view>
+          </view>
+          <view class="chart-legend flex flex-center mt-12">
+            <view class="legend-item flex flex-center">
+              <view class="legend-color avoided"></view>
+              <text class="legend-text text-secondary text-small">避免</text>
+            </view>
+            <view class="legend-item flex flex-center ml-24">
+              <view class="legend-color used"></view>
+              <text class="legend-text text-secondary text-small">使用</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 成就卡片 -->
+    <view class="card achievement-card">
+      <view class="card-title">环保成就</view>
+      <view class="achievement-list mt-16">
+        <view class="achievement-item unlocked">
+          <view class="achievement-icon">🎯</view>
+          <view class="achievement-info">
+            <view class="achievement-name">首次打卡</view>
+            <view class="achievement-desc text-secondary text-small">完成第一次避免一次性用品记录</view>
+          </view>
+          <view class="achievement-status text-primary">✓ 已达成</view>
+        </view>
+        <view class="achievement-item {{habitsStats && habitsStats.totalAvoided >= 50 ? 'unlocked' : 'locked'}}">
+          <view class="achievement-icon">🏆</view>
+          <view class="achievement-info">
+            <view class="achievement-name">环保达人</view>
+            <view class="achievement-desc text-secondary text-small">累计避免使用50次一次性用品</view>
+          </view>
+          <view class="achievement-status {{habitsStats && habitsStats.totalAvoided >= 50 ? 'text-primary' : 'text-secondary'}}">
+            {{habitsStats && habitsStats.totalAvoided >= 50 ? '✓ 已达成' : `进度 ${habitsStats ? habitsStats.totalAvoided : 0}/50`}}
+          </view>
+        </view>
+        <view class="achievement-item {{habitsStats && habitsStats.totalAvoided >= 100 ? 'unlocked' : 'locked'}}">
+          <view class="achievement-icon">👑</view>
+          <view class="achievement-info">
+            <view class="achievement-name">地球守护者</view>
+            <view class="achievement-desc text-secondary text-small">累计避免使用100次一次性用品</view>
+          </view>
+          <view class="achievement-status {{habitsStats && habitsStats.totalAvoided >= 100 ? 'text-primary' : 'text-secondary'}}">
+            {{habitsStats && habitsStats.totalAvoided >= 100 ? '✓ 已达成' : `进度 ${habitsStats ? habitsStats.totalAvoided : 0}/100`}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 记录弹窗 -->
+<view class="modal-mask {{showRecordModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content record-modal">
+    <view class="modal-header flex flex-center flex-column">
+      <view class="modal-icon" wx:if="{{currentType}}">{{currentType.icon}}</view>
+      <view class="modal-title" wx:if="{{currentType}}">{{currentType.name}}</view>
+    </view>
+    
+    <view class="record-type-select mt-24">
+      <view class="type-options flex">
+        <view 
+          class="type-option avoided {{recordType === 'avoid' ? 'active' : ''}} flex flex-center flex-column"
+          bindtap="selectRecordType"
+          data-type="avoid"
+        >
+          <view class="option-icon">✅</view>
+          <view class="option-name">避免使用</view>
+          <view class="option-bonus text-primary text-small">+5积分</view>
+        </view>
+        <view 
+          class="type-option used {{recordType === 'used' ? 'active' : ''}} flex flex-center flex-column"
+          bindtap="selectRecordType"
+          data-type="used"
+        >
+          <view class="option-icon">⚠️</view>
+          <view class="option-name">使用了</view>
+          <view class="option-warning text-warning text-small">记录使用</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="record-tip mt-16 text-center">
+      <text class="text-secondary text-small" wx:if="{{recordType === 'avoid'}}">
+        记录避免使用一次性用品，为地球做出贡献！
+      </text>
+      <text class="text-secondary text-small" wx:else>
+        诚实地记录使用，帮助你更好地了解自己的习惯
+      </text>
+    </view>
+    
+    <view class="modal-actions flex mt-24">
+      <button class="btn-secondary flex-1" bindtap="closeRecordModal">取消</button>
+      <button class="btn-primary flex-1" bindtap="submitRecord">确认记录</button>
+    </view>
+  </view>
+</view>

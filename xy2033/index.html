@@ -1,0 +1,425 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八卦大王 - 社会热点话题讨论社区</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header id="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">👑</span>
+                    <span class="logo-text">八卦大王</span>
+                </div>
+                <div class="header-right">
+                    <div id="userScore" class="score-display">
+                        <span class="score-icon">⭐</span>
+                        <span class="score-value">0</span>
+                    </div>
+                    <button id="themeToggle" class="theme-btn">🌙</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content">
+            <!-- 首页 - 话题列表 -->
+            <section id="home-page" class="page active">
+                <div class="page-header">
+                    <h1>🔥 热点话题</h1>
+                    <div class="sort-tabs">
+                        <button class="sort-btn active" data-sort="heat">热度排行</button>
+                        <button class="sort-btn" data-sort="new">最新</button>
+                        <button class="sort-btn" data-sort="comment">评论最多</button>
+                    </div>
+                </div>
+                <div id="topics-container" class="topics-container">
+                    <!-- 话题列表将通过JS渲染 -->
+                </div>
+            </section>
+
+            <!-- 话题详情页 -->
+            <section id="topic-detail-page" class="page">
+                <div class="page-nav">
+                    <button class="back-btn" onclick="App.goBack()">← 返回</button>
+                </div>
+                <div id="topic-detail-content" class="topic-detail">
+                    <!-- 话题详情将通过JS渲染 -->
+                </div>
+            </section>
+
+            <!-- 吐槽叠叠乐页面 -->
+            <section id="complaint-page" class="page">
+                <div class="page-header">
+                    <h1>🏢 吐槽叠叠乐</h1>
+                    <p class="subtitle">把不满一层一层叠起来！</p>
+                </div>
+                <div class="complaint-content">
+                    <div class="stack-stats">
+                        <span>当前层数: <strong id="current-layers">0</strong></span>
+                        <span>距离吐槽大王: <strong id="layers-remaining">15</strong> 层</span>
+                    </div>
+                    
+                    <div class="new-complaint-form">
+                        <input type="text" id="new-stack-title" placeholder="输入吐槽主题...">
+                        <button id="create-stack-btn" class="btn-primary">新建吐槽栈</button>
+                    </div>
+
+                    <div id="stacks-container" class="stacks-container">
+                        <!-- 吐槽栈列表 -->
+                    </div>
+                    
+                    <div id="stack-detail" class="stack-detail hidden">
+                        <div class="stack-header">
+                            <h3 id="stack-title"></h3>
+                            <button class="close-stack-btn" onclick="App.closeStackDetail()">✕</button>
+                        </div>
+                        <div class="tower-container">
+                            <div id="tower" class="tower">
+                                <!-- 吐槽层将通过JS渲染 -->
+                            </div>
+                        </div>
+                        <div class="add-layer-form">
+                            <input type="text" id="layer-content" placeholder="输入你的吐槽...">
+                            <button id="add-layer-btn" class="btn-primary">叠一层！</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 游戏页面 -->
+            <section id="game-page" class="page">
+                <div class="page-header">
+                    <h1>🧟 吐槽人大战僵尸</h1>
+                    <p class="subtitle">用豌豆消灭所有槽点僵尸！</p>
+                </div>
+                <div class="game-content">
+                    <div class="game-stats">
+                        <span>分数: <strong id="game-score">0</strong></span>
+                        <span>生命值: <strong id="game-lives">3</strong></span>
+                        <span>关卡: <strong id="game-level">1</strong></span>
+                    </div>
+                    
+                    <div id="game-canvas" class="game-canvas">
+                        <div class="game-controls">
+                            <button id="start-game-btn" class="btn-primary">开始游戏</button>
+                            <button id="pause-game-btn" class="btn-secondary" disabled>暂停</button>
+                            <button id="restart-game-btn" class="btn-secondary">重新开始</button>
+                        </div>
+                        
+                        <div class="peashooter-selection">
+                            <p>选择豌豆射手（点击后点击游戏区域放置）：</p>
+                            <div class="peashooter-options">
+                                <button class="peashooter-btn selected" data-type="green" data-cost="100">
+                                    🟢 绿豌豆<br><small>100阳光</small>
+                                </button>
+                                <button class="peashooter-btn" data-type="red" data-cost="175">
+                                    🔴 红豌豆<br><small>175阳光</small>
+                                </button>
+                                <button class="peashooter-btn" data-type="blue" data-cost="200">
+                                    🔵 蓝豌豆<br><small>200阳光</small>
+                                </button>
+                            </div>
+                            <div class="sun-display">
+                                阳光: <strong id="sun-count">200</strong>
+                            </div>
+                        </div>
+                        
+                        <div id="game-area" class="game-area">
+                            <!-- 游戏区域将通过JS渲染 -->
+                        </div>
+                        
+                        <div class="game-info">
+                            <p>操作说明：选择射手类型后，点击草地放置。僵尸会从右边出现，射手会自动发射豌豆。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 好友页面 -->
+            <section id="friends-page" class="page">
+                <div class="page-header">
+                    <h1>👥 消息与好友</h1>
+                </div>
+                <div class="friends-tabs">
+                    <button class="friends-tab-btn active" data-tab="messages">💬 消息</button>
+                    <button class="friends-tab-btn" data-tab="friends">👥 好友列表</button>
+                </div>
+                
+                <!-- 消息列表 -->
+                <div id="messages-tab" class="tab-content">
+                    <div id="conversations-container" class="conversations-container">
+                        <!-- 会话列表将通过JS渲染 -->
+                    </div>
+                </div>
+                
+                <!-- 好友列表 -->
+                <div id="friends-tab" class="tab-content hidden">
+                    <div id="friends-container" class="friends-container">
+                        <!-- 好友列表将通过JS渲染 -->
+                    </div>
+                </div>
+                
+                <!-- 好友详情弹窗 -->
+                <div id="friend-detail-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="friend-detail-name"></h3>
+                            <button class="close-modal-btn" onclick="App.closeFriendModal()">✕</button>
+                        </div>
+                        <div id="friend-detail-content" class="friend-detail-content">
+                            <!-- 好友详情将通过JS渲染 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 聊天页面 -->
+            <section id="chat-page" class="page">
+                <div class="page-nav">
+                    <button class="back-btn" onclick="App.goBack()">← 返回</button>
+                    <span id="chat-friend-name" class="chat-friend-name">--</span>
+                    <div class="chat-status" id="chat-status">--</div>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <!-- 聊天消息将通过JS渲染 -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="输入消息..." onkeypress="App.handleChatKeypress(event)">
+                    <button id="send-msg-btn" class="btn-primary" onclick="App.sendMessage()">发送</button>
+                </div>
+            </section>
+
+            <!-- 排行榜页面 -->
+            <section id="ranking-page" class="page">
+                <div class="page-header">
+                    <h1>🏆 八卦大王排行榜</h1>
+                    <p class="subtitle">前三名可获得大转盘抽奖机会！</p>
+                </div>
+                
+                <div class="ranking-content">
+                    <!-- 前三名展示 -->
+                    <div class="top-three">
+                        <div id="top2" class="top-card">
+                            <div class="rank-badge silver">2</div>
+                            <div class="top-avatar">🥈</div>
+                            <div id="top2-name" class="top-name">--</div>
+                            <div id="top2-score" class="top-score">0 分</div>
+                        </div>
+                        <div id="top1" class="top-card first">
+                            <div class="rank-badge gold">1</div>
+                            <div class="top-avatar">👑</div>
+                            <div id="top1-name" class="top-name">--</div>
+                            <div id="top1-score" class="top-score">0 分</div>
+                        </div>
+                        <div id="top3" class="top-card">
+                            <div class="rank-badge bronze">3</div>
+                            <div class="top-avatar">🥉</div>
+                            <div id="top3-name" class="top-name">--</div>
+                            <div id="top3-score" class="top-score">0 分</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 抽奖按钮 -->
+                    <div class="lottery-section">
+                        <button id="start-lottery-btn" class="btn-lottery" disabled>
+                            🎰 大转盘抽奖（需进入前三名）
+                        </button>
+                    </div>
+                    
+                    <!-- 完整排行列表 -->
+                    <div class="ranking-list-header">
+                        <h3>完整排行</h3>
+                    </div>
+                    <div id="ranking-list" class="ranking-list">
+                        <!-- 排行列表将通过JS渲染 -->
+                    </div>
+                    
+                    <!-- 当前用户排名 -->
+                    <div class="my-ranking">
+                        <div class="my-rank-label">我的排名:</div>
+                        <div id="my-rank" class="my-rank-value">--</div>
+                        <div id="my-score" class="my-score">0 分</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 个人中心页面 -->
+            <section id="profile-page" class="page">
+                <div class="page-header">
+                    <h1>👤 个人中心</h1>
+                </div>
+                <div class="profile-content">
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="profile-avatar">😎</div>
+                        <div class="profile-name" id="profile-name">八卦小达人</div>
+                        <div class="profile-tags" id="profile-tags">
+                            <!-- 标签将通过JS渲染 -->
+                        </div>
+                        <div class="profile-bio" id="profile-bio">热爱八卦，生活才有乐趣！</div>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-value" id="stat-score">0</div>
+                            <div class="stat-label">积分</div>
+                        </div>
+                        <div class="stat-item" onclick="App.showProfileTab('likes')">
+                            <div class="stat-icon">❤️</div>
+                            <div class="stat-value" id="stat-likes">0</div>
+                            <div class="stat-label">点赞</div>
+                        </div>
+                        <div class="stat-item" onclick="App.showProfileTab('collections')">
+                            <div class="stat-icon">📁</div>
+                            <div class="stat-value" id="stat-collections">0</div>
+                            <div class="stat-label">收藏</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="stat-friends">0</div>
+                            <div class="stat-label">好友</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 收藏/点赞列表区域 -->
+                    <div id="profile-lists" class="profile-lists">
+                        <div id="profile-likes" class="profile-list hidden">
+                            <div class="list-header">
+                                <h3>❤️ 我的点赞</h3>
+                            </div>
+                            <div id="likes-container" class="topic-list">
+                                <!-- 点赞列表将通过JS渲染 -->
+                            </div>
+                        </div>
+                        <div id="profile-collections" class="profile-list hidden">
+                            <div class="list-header">
+                                <h3>📁 我的收藏</h3>
+                            </div>
+                            <div id="collections-container" class="topic-list">
+                                <!-- 收藏列表将通过JS渲染 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-settings">
+                        <h3>设置</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">主题模式</span>
+                            <div class="setting-value">
+                                <button id="theme-switch-light" class="theme-option active">☀️ 浅色</button>
+                                <button id="theme-switch-dark" class="theme-option">🌙 深色</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">清除缓存</span>
+                            <button id="clear-cache-btn" class="btn-danger">清除数据</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav id="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </button>
+            <button class="nav-item" data-page="complaint">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-label">吐槽</span>
+            </button>
+            <button class="nav-item" data-page="game">
+                <span class="nav-icon">🎮</span>
+                <span class="nav-label">游戏</span>
+            </button>
+            <button class="nav-item" data-page="friends">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">好友</span>
+            </button>
+            <button class="nav-item" data-page="ranking">
+                <span class="nav-icon">🏆</span>
+                <span class="nav-label">排行</span>
+            </button>
+            <button class="nav-item" data-page="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">我的</span>
+            </button>
+        </nav>
+
+        <!-- 大转盘弹窗 -->
+        <div id="lottery-modal" class="modal hidden">
+            <div class="modal-content lottery-modal">
+                <div class="modal-header">
+                    <h3>🎰 大转盘抽奖</h3>
+                    <button class="close-modal-btn" onclick="App.closeLotteryModal()">✕</button>
+                </div>
+                <div class="wheel-container">
+                    <div id="wheel" class="wheel">
+                        <div class="wheel-segment" data-index="0">
+                            <span>💰 100积分</span>
+                        </div>
+                        <div class="wheel-segment" data-index="1">
+                            <span>🎁 神秘礼品</span>
+                        </div>
+                        <div class="wheel-segment" data-index="2">
+                            <span>⭐ 50积分</span>
+                        </div>
+                        <div class="wheel-segment" data-index="3">
+                            <span>🎉 谢谢参与</span>
+                        </div>
+                        <div class="wheel-segment" data-index="4">
+                            <span>💎 200积分</span>
+                        </div>
+                        <div class="wheel-segment" data-index="5">
+                            <span>🏅 专属勋章</span>
+                        </div>
+                        <div class="wheel-segment" data-index="6">
+                            <span>📝 会员体验</span>
+                        </div>
+                        <div class="wheel-segment" data-index="7">
+                            <span>🎯 再来一次</span>
+                        </div>
+                    </div>
+                    <div class="wheel-pointer">▼</div>
+                    <button id="spin-wheel-btn" class="btn-primary btn-spin">开始抽奖</button>
+                </div>
+                <div id="lottery-result" class="lottery-result hidden">
+                    <h4>恭喜获得:</h4>
+                    <p id="prize-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 吐槽大王动画弹窗 -->
+        <div id="complaint-king-modal" class="modal hidden">
+            <div class="modal-content complaint-king-modal">
+                <div class="complaint-king-content">
+                    <div class="crown-animation">👑</div>
+                    <h2 class="complaint-king-title">吐槽大王诞生！</h2>
+                    <p class="complaint-king-message">恭喜你叠到了15层！</p>
+                    <p class="complaint-king-subtitle">你就是真正的吐槽之王！</p>
+                    <div class="fireworks">
+                        <span>🎆</span><span>✨</span><span>🎇</span><span>✨</span><span>🎆</span>
+                    </div>
+                    <button id="close-king-modal" class="btn-primary">太棒了！</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast 提示 -->
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

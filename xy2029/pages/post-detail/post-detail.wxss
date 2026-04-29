@@ -1,0 +1,290 @@
+.post-card {
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+}
+
+.author-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+  margin-bottom: 6rpx;
+}
+
+.author-meta {
+  display: flex;
+  align-items: center;
+}
+
+.tier-badge {
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  color: #ffffff;
+  margin-right: 12rpx;
+}
+
+.tier-badge.tier-3k {
+  background-color: #95a5a6;
+}
+
+.tier-badge.tier-9k {
+  background-color: #3498db;
+}
+
+.tier-badge.tier-3w {
+  background-color: #27ae60;
+}
+
+.tier-badge.tier-5w {
+  background-color: #9b59b6;
+}
+
+.tier-badge.tier-10w {
+  background-color: #f39c12;
+}
+
+.post-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.follow-btn {
+  padding: 12rpx 24rpx;
+  background-color: rgba(255, 107, 107, 0.1);
+  color: #FF6B6B;
+  font-size: 24rpx;
+  border-radius: 20rpx;
+}
+
+.follow-btn.followed {
+  background-color: #f5f5f5;
+  color: #999999;
+}
+
+.post-content {
+  font-size: 30rpx;
+  color: #333333;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+.post-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 20rpx;
+}
+
+.image-item {
+  width: 200rpx;
+  height: 200rpx;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+}
+
+.post-tags {
+  margin-bottom: 20rpx;
+}
+
+.post-tag {
+  font-size: 22rpx;
+  color: #FF6B6B;
+  margin-right: 12rpx;
+}
+
+.post-stats {
+  display: flex;
+  border-top: 1rpx solid #f5f5f5;
+  padding-top: 20rpx;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.stat-icon {
+  font-size: 28rpx;
+}
+
+.stat-num {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.stat-item.liked .stat-num {
+  color: #FF6B6B;
+}
+
+.comments-section {
+  
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.comments-list {
+  
+}
+
+.comment-item {
+  display: flex;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.comment-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.comment-name {
+  font-size: 26rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.comment-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.comment-text {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.5;
+  margin-bottom: 12rpx;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 24rpx;
+}
+
+.comment-action {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.empty-comments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+}
+
+.empty-icon {
+  font-size: 64rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.comment-input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  border-top: 1rpx solid #e0e0e0;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.input-wrapper {
+  flex: 1;
+}
+
+.comment-input {
+  width: 100%;
+  height: 72rpx;
+  padding: 0 20rpx;
+  background-color: #f5f5f5;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}
+
+.send-btn {
+  padding: 16rpx 32rpx;
+  background-color: #FF6B6B;
+  color: #ffffff;
+  font-size: 28rpx;
+  border-radius: 20rpx;
+}

@@ -1,0 +1,537 @@
+/* 购物车页面样式 */
+page {
+  background-color: #F5F5F5;
+  padding-bottom: 140rpx;
+}
+
+/* 空状态 */
+.empty-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #333333;
+  margin-bottom: 15rpx;
+  font-weight: 500;
+}
+
+.empty-subtext {
+  font-size: 26rpx;
+  color: #999999;
+  margin-bottom: 40rpx;
+}
+
+.go-index-btn {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  padding: 24rpx 60rpx;
+  border-radius: 50rpx;
+  box-shadow: 0 4rpx 15rpx rgba(255, 107, 53, 0.3);
+}
+
+.go-index-text {
+  font-size: 30rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 购物车内容 */
+.cart-content {
+  height: calc(100vh - 140rpx);
+}
+
+.cart-scroll {
+  height: 100%;
+}
+
+/* 购物车列表 */
+.cart-list {
+  padding: 20rpx;
+}
+
+.cart-item {
+  display: flex;
+  background-color: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.03);
+}
+
+.item-image-wrap {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image {
+  width: 100%;
+  height: 100%;
+}
+
+.item-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.item-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+  flex: 1;
+}
+
+.item-delete {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #FFF0F0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 10rpx;
+}
+
+.delete-icon {
+  font-size: 32rpx;
+  color: #FF4D4F;
+  line-height: 1;
+}
+
+.item-specs {
+  margin-bottom: 8rpx;
+}
+
+.spec-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.item-toppings {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.toppings-label {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.toppings-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-symbol {
+  font-size: 24rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.price-amount {
+  font-size: 32rpx;
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.toppings-price {
+  font-size: 22rpx;
+  color: #FF6B35;
+  margin-left: 6rpx;
+}
+
+.quantity-control-cart {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-btn-cart {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #F8F8F8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.quantity-btn-cart:active:not(.disabled) {
+  background-color: #EEEEEE;
+}
+
+.quantity-btn-cart.disabled {
+  opacity: 0.5;
+}
+
+.quantity-icon-cart {
+  font-size: 32rpx;
+  color: #333333;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.quantity-value-cart {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 20rpx;
+  min-width: 36rpx;
+  text-align: center;
+}
+
+/* 清空购物车 */
+.clear-cart-row {
+  padding: 0 20rpx 20rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.clear-cart-btn {
+  padding: 10rpx 20rpx;
+}
+
+.clear-cart-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 顾客信息 */
+.customer-info-section {
+  margin: 0 20rpx 20rpx;
+  padding: 24rpx 30rpx;
+}
+
+.section-header-cart {
+  margin-bottom: 20rpx;
+}
+
+.section-title-cart {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666666;
+  width: 100rpx;
+  flex-shrink: 0;
+  padding-top: 4rpx;
+}
+
+.info-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.info-textarea {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  padding: 10rpx 0;
+  min-height: 80rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+/* 底部结算栏 */
+.fixed-bottom-cart {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #FFFFFF;
+  padding: 20rpx 30rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.total-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.total-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 6rpx;
+}
+
+.total-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.total-text {
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.total-symbol {
+  font-size: 26rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.total-amount-cart {
+  font-size: 40rpx;
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.checkout-btn {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C5A 100%);
+  padding: 24rpx 60rpx;
+  border-radius: 50rpx;
+  box-shadow: 0 4rpx 15rpx rgba(255, 107, 53, 0.3);
+}
+
+.checkout-btn:active {
+  transform: scale(0.98);
+}
+
+.checkout-text {
+  font-size: 30rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 确认订单弹窗 */
+.confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.confirm-modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 620rpx;
+  background-color: #FFFFFF;
+  border-radius: 20rpx;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.confirm-modal.show .modal-content {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-header {
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.modal-body {
+  padding: 30rpx;
+  max-height: 500rpx;
+  overflow-y: auto;
+}
+
+.order-summary {
+  margin-bottom: 20rpx;
+}
+
+.summary-item {
+  display: flex;
+  margin-bottom: 16rpx;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-size: 26rpx;
+  color: #999999;
+  width: 100rpx;
+  flex-shrink: 0;
+}
+
+.summary-value {
+  font-size: 26rpx;
+  color: #333333;
+  flex: 1;
+}
+
+.divider-modal {
+  height: 1rpx;
+  background-color: #F0F0F0;
+  margin: 20rpx 0;
+}
+
+.order-items {
+  margin-bottom: 20rpx;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.order-item:last-child {
+  margin-bottom: 0;
+}
+
+.order-item-name {
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.order-item-spec {
+  font-size: 24rpx;
+  color: #999999;
+  margin-left: 10rpx;
+}
+
+.order-item-price {
+  font-size: 26rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.order-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10rpx;
+}
+
+.order-total-label {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: 500;
+}
+
+.order-total-price {
+  display: flex;
+  align-items: baseline;
+}
+
+.order-total-symbol {
+  font-size: 26rpx;
+  color: #FF6B35;
+  font-weight: 500;
+}
+
+.order-total-amount {
+  font-size: 36rpx;
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 30rpx;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.modal-btn:active {
+  background-color: #F8F8F8;
+}
+
+.cancel-btn {
+  border-right: 1rpx solid #F0F0F0;
+}
+
+.modal-btn-text {
+  font-size: 30rpx;
+}
+
+.cancel-btn .modal-btn-text {
+  color: #999999;
+}
+
+.confirm-btn .modal-btn-text {
+  color: #FF6B35;
+  font-weight: 500;
+}
