@@ -1,0 +1,63 @@
+<view class="container">
+  <!-- 顶部提示 -->
+  <view class="tips-section card">
+    <view class="tips-icon">🔒</view>
+    <view class="tips-content">
+      <view class="tips-title">匿名发布</view>
+      <view class="tips-desc text-secondary">
+        你的帖子将以匿名形式发布，不用担心被识别。请真诚地倾诉你的心声。
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容输入 -->
+  <view class="content-section card">
+    <view class="section-title">倾诉内容</view>
+    <textarea 
+      class="content-textarea" 
+      placeholder="在这里写下你的心声... 可以是崩溃、自责、害怕，或者任何你想表达的情绪。"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="{{maxWords}}"
+      auto-height
+    />
+    <view class="word-count">
+      <text class="count-text text-secondary">{{wordCount}}</text>
+      <text class="max-text text-secondary">/{{maxWords}}</text>
+    </view>
+  </view>
+
+  <!-- 社区规范 -->
+  <view class="rules-section card">
+    <view class="rules-title">社区规范</view>
+    <view class="rules-list">
+      <view class="rule-item">
+        <text class="rule-icon">✅</text>
+        <text class="rule-text">鼓励真实情绪表达</text>
+      </view>
+      <view class="rule-item">
+        <text class="rule-icon">✅</text>
+        <text class="rule-text">可以倾诉崩溃、自责、害怕等情绪</text>
+      </view>
+      <view class="rule-item">
+        <text class="rule-icon">❌</text>
+        <text class="rule-text">禁止说教、评判他人</text>
+      </view>
+      <view class="rule-item">
+        <text class="rule-icon">❌</text>
+        <text class="rule-text">禁止发布违法违规内容</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer-section">
+    <view class="btn-secondary" bindtap="goBack">取消</view>
+    <view 
+      class="btn-primary {{isSubmitting ? 'disabled' : ''}}" 
+      bindtap="submitPost"
+    >
+      {{isSubmitting ? '发布中...' : '匿名发布'}}
+    </view>
+  </view>
+</view>

@@ -1,0 +1,109 @@
+<view class="container">
+  <!-- 登录提示 -->
+  <view class="login-section card" wx:if="{{!isLoggedIn}}">
+    <view class="login-content">
+      <view class="login-text">
+        <view class="login-title">登录后可以点赞和评论</view>
+      </view>
+    </view>
+    <view class="login-btn" bindtap="handleLogin">
+      立即登录
+    </view>
+  </view>
+
+  <!-- 动态内容 -->
+  <view class="moment-section card" wx:if="{{moment}}">
+    <!-- 用户信息 -->
+    <view class="moment-header" bindtap="goToUserProfile" data-userid="{{moment.userId}}">
+      <image class="user-avatar" src="{{moment.avatar}}" mode="aspectFill" />
+      <view class="user-info">
+        <view class="user-name">{{moment.userName}}</view>
+        <view class="post-time text-secondary">{{moment.createTime}}</view>
+      </view>
+      <view class="privacy-tag" wx:if="{{!moment.isPublic}}">
+        私密
+      </view>
+    </view>
+
+    <!-- 内容 -->
+    <view class="moment-content">
+      {{moment.content}}
+    </view>
+
+    <!-- 操作栏 -->
+    <view class="moment-actions">
+      <view class="action-item" bindtap="toggleLike">
+        <text class="action-icon {{moment.likeCount > 0 ? 'liked' : ''}}">❤️</text>
+        <text class="action-text">{{moment.likeCount > 0 ? moment.likeCount : '点赞'}}</text>
+      </view>
+      <view class="action-item" bindtap="toggleCommentInput">
+        <text class="action-icon">💬</text>
+        <text class="action-text">{{moment.commentCount > 0 ? moment.commentCount : '评论'}}</text>
+      </view>
+      <view class="action-item" bindtap="shareMoment">
+        <text class="action-icon">🔗</text>
+        <text class="action-text">分享</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评论列表 -->
+  <view class="comments-section" wx:if="{{moment && moment.comments && moment.comments.length > 0}}">
+    <view class="section-header">
+      <view class="section-title">全部评论</view>
+      <view class="comment-count text-secondary">{{moment.comments.length}} 条</view>
+    </view>
+
+    <view class="comments-list">
+      <view class="comment-item card" wx:for="{{moment.comments}}" wx:key="id">
+        <view class="comment-header" bindtap="goToUserProfile" data-userid="{{item.userId}}">
+          <image class="commenter-avatar" src="{{item.avatar}}" mode="aspectFill" />
+          <view class="commenter-info">
+            <view class="commenter-name">{{item.userName}}</view>
+            <view class="comment-time text-secondary">{{item.createTime}}</view>
+          </view>
+        </view>
+        <view class="comment-content">
+          {{item.content}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空评论状态 -->
+  <view class="empty-comments" wx:if="{{moment && (!moment.comments || moment.comments.length === 0)}}">
+    <view class="empty-icon">💭</view>
+    <view class="empty-text text-secondary">
+      还没有评论，快来发表第一条评论吧！
+    </view>
+  </view>
+
+  <!-- 评论输入区域 -->
+  <view class="comment-input-section" wx:if="{{showCommentInput}}">
+    <view class="input-wrapper">
+      <textarea 
+        class="comment-textarea" 
+        placeholder="写下你的评论..."
+        value="{{commentContent}}"
+        bindinput="onCommentInput"
+        maxlength="200"
+        auto-focus
+      />
+      <view class="input-actions">
+        <view class="cancel-btn" bindtap="toggleCommentInput">取消</view>
+        <view 
+          class="submit-btn {{!commentContent.trim() ? 'disabled' : ''}}" 
+          bindtap="submitComment"
+        >
+          发布
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部评论按钮 -->
+  <view class="footer-btn" bindtap="toggleCommentInput" wx:if="{{!showCommentInput}}">
+    <text class="btn-icon">💬</text>
+    <text class="btn-text">写评论</text>
+  </view>
+</view>

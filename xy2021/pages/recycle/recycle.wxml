@@ -1,0 +1,381 @@
+<view class="container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar card" catchtap="toggleSearch">
+    <view class="search-input flex flex-center">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索垃圾分类...</text>
+    </view>
+  </view>
+
+  <!-- 顶部Tab -->
+  <view class="card tab-card">
+    <view class="tabs flex">
+      <view 
+        class="tab-item {{selectedTab === 'guide' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="guide"
+      >
+        分类指南
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'estimate' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="estimate"
+      >
+        回收估值
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'orders' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="orders"
+      >
+        我的预约
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类指南 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'guide'}}">
+    <!-- 四大分类卡片 -->
+    <view class="card categories-card">
+      <view class="card-title">垃圾分类</view>
+      <view class="category-grid grid-2">
+        <view 
+          wx:for="{{garbageCategories}}" 
+          wx:key="id" 
+          class="category-card"
+          style="border-left-color: {{item.color}}"
+          bindtap="showCategoryDetail"
+          data-id="{{item.id}}"
+        >
+          <view class="category-header flex flex-center">
+            <view class="category-icon-large">{{item.icon}}</view>
+            <view class="category-info">
+              <view class="category-name-large" style="color: {{item.color}}">{{item.name}}</view>
+              <view class="category-desc text-secondary text-small">{{item.description}}</view>
+            </view>
+          </view>
+          <view class="category-examples mt-8">
+            <text class="example-item" wx:for="{{item.examples}}" wx:key="index" wx:for-item="example">{{example}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 垃圾避雷指南 -->
+    <view class="card confusing-card">
+      <view class="card-title">垃圾避雷指南 ⚠️</view>
+      <view class="card-subtitle text-secondary text-small mb-16">容易分错的垃圾汇总</view>
+      
+      <view class="confusing-list">
+        <view 
+          wx:for="{{confusingGarbage}}" 
+          wx:key="name" 
+          class="confusing-item"
+        >
+          <view class="confusing-name">{{item.name}}</view>
+          <view class="confusing-info flex flex-between mt-8">
+            <view class="info-item">
+              <text class="info-label text-secondary">正确分类：</text>
+              <text class="info-value correct">{{item.correct === 'recyclable' ? '可回收物' : item.correct === 'kitchen' ? '厨余垃圾' : item.correct === 'harmful' ? '有害垃圾' : '其他垃圾'}}</text>
+            </view>
+            <view class="info-item">
+              <text class="info-label text-secondary">易被误判：</text>
+              <text class="info-value wrong">{{item.wrong === 'recyclable' ? '可回收物' : item.wrong === 'kitchen' ? '厨余垃圾' : item.wrong === 'harmful' ? '有害垃圾' : '其他垃圾'}}</text>
+            </view>
+          </view>
+          <view class="confusing-reason text-small text-secondary mt-8">
+            💡 {{item.reason}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 回收估值 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'estimate'}}">
+    <!-- 物品类型选择 -->
+    <view class="card type-card">
+      <view class="card-title">选择回收物品类型</view>
+      <view class="type-grid grid-3">
+        <view 
+          wx:for="{{recycleTypes}}" 
+          wx:key="id" 
+          class="type-item flex flex-column flex-center {{selectedRecycleType.id === item.id ? 'selected' : ''}}"
+          style="border-color: {{item.color}}"
+          bindtap="selectRecycleType"
+          data-id="{{item.id}}"
+        >
+          <view class="type-icon-large">{{item.icon}}</view>
+          <view class="type-name-large" style="color: {{item.color}}">{{item.name}}</view>
+          <view class="type-unit text-secondary text-small">{{item.unit}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 重量输入 -->
+    <view class="card weight-card" wx:if="{{selectedRecycleType}}">
+      <view class="card-title">
+        {{selectedRecycleType.name}} - 输入{{selectedRecycleType.unit === '件' ? '数量' : '重量'}}
+      </view>
+      <view class="weight-input-section mt-16">
+        <view class="input-group">
+          <input 
+            type="digit" 
+            class="weight-input" 
+            placeholder="请输入{{selectedRecycleType.unit === '件' ? '数量' : '重量'}}" 
+            value="{{recycleWeight}}"
+            bindinput="inputWeight"
+          />
+          <view class="input-unit">{{selectedRecycleType.unit}}</view>
+        </view>
+        <view class="input-tip text-secondary text-small mt-8">
+          {{selectedRecycleType.description}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 估值结果 -->
+    <view class="card result-card" wx:if="{{estimatedResult}}">
+      <view class="card-title">估值结果</view>
+      <view class="result-content mt-16">
+        <view class="result-item flex flex-between">
+          <text class="text-secondary">物品类型</text>
+          <text>{{estimatedResult.typeName}}</text>
+        </view>
+        <view class="result-item flex flex-between">
+          <text class="text-secondary">{{estimatedResult.unit === '件' ? '数量' : '重量'}}</text>
+          <text>{{estimatedResult.weight}} {{estimatedResult.unit}}</text>
+        </view>
+        <view class="result-item flex flex-between highlight">
+          <text class="text-secondary">预计节省碳排放</text>
+          <text class="text-success text-bold">{{estimatedResult.carbonSaved.toFixed(2)}} kg</text>
+        </view>
+        <view class="result-item flex flex-between highlight">
+          <text class="text-secondary">预计获得积分</text>
+          <text class="text-primary text-bold">+{{estimatedResult.points}} 积分</text>
+        </view>
+      </view>
+      
+      <view class="result-actions flex mt-24">
+        <button class="btn-secondary flex-1" bindtap="closeEstimateResult">取消</button>
+        <button class="btn-primary flex-1" bindtap="addToOrder">加入订单</button>
+      </view>
+    </view>
+
+    <!-- 当前订单预览 -->
+    <view class="card order-preview-card" wx:if="{{orderForm.items.length > 0}}">
+      <view class="card-title flex flex-between">
+        <text>当前订单</text>
+        <text class="text-primary text-bold">预计 {{orderForm.estimatedPoints}} 积分</text>
+      </view>
+      
+      <view class="order-items mt-16">
+        <view 
+          wx:for="{{orderForm.items}}" 
+          wx:key="index" 
+          class="order-item flex flex-between flex-center"
+        >
+          <view class="item-left flex flex-center">
+            <view class="item-icon">{{item.icon}}</view>
+            <view class="item-info">
+              <view class="item-name">{{item.typeName}}</view>
+              <view class="item-detail text-secondary text-small">
+                {{item.weight}} {{item.unit}} · +{{item.points}}积分
+              </view>
+            </view>
+          </view>
+          <view class="remove-btn" bindtap="removeOrderItem" data-index="{{index}}">×</view>
+        </view>
+      </view>
+      
+      <view class="order-summary mt-16 pt-16 border-top">
+        <view class="summary-item flex flex-between">
+          <text class="text-secondary">物品数量</text>
+          <text>{{orderForm.items.length}} 项</text>
+        </view>
+        <view class="summary-item flex flex-between">
+          <text class="text-secondary">总重量</text>
+          <text>{{orderForm.totalWeight.toFixed(1)}} 公斤</text>
+        </view>
+      </view>
+      
+      <button class="btn-primary mt-16" bindtap="showOrderModal">预约上门回收</button>
+    </view>
+  </view>
+
+  <!-- 我的预约 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'orders'}}">
+    <view class="card orders-card">
+      <view class="card-title">回收预约记录</view>
+      
+      <view class="orders-list" wx:if="{{recycleOrders.length > 0}}">
+        <view 
+          wx:for="{{recycleOrders}}" 
+          wx:key="id" 
+          class="order-card"
+          bindtap="showOrderDetail"
+          data-id="{{item.id}}"
+        >
+          <view class="order-header flex flex-between">
+            <view class="order-id text-secondary text-small">
+              订单号：{{item.id}}
+            </view>
+            <view class="order-status" style="color: {{getOrderStatusColor(item.status)}}">
+              {{getOrderStatusText(item.status)}}
+            </view>
+          </view>
+          
+          <view class="order-content mt-12">
+            <view class="content-row flex">
+              <text class="content-label text-secondary">联系人：</text>
+              <text>{{item.name}}</text>
+            </view>
+            <view class="content-row flex mt-4">
+              <text class="content-label text-secondary">电话：</text>
+              <text>{{item.phone}}</text>
+            </view>
+            <view class="content-row flex mt-4">
+              <text class="content-label text-secondary">地址：</text>
+              <text class="content-text">{{item.address}}</text>
+            </view>
+          </view>
+          
+          <view class="order-footer flex flex-between mt-12 pt-12 border-top">
+            <view class="items-preview text-secondary text-small">
+              {{item.items.length}} 件物品
+            </view>
+            <view class="order-points text-primary">
+              预计 +{{item.estimatedPoints}} 积分
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="empty-state" wx:else>
+        <view class="empty-icon">📋</view>
+        <view class="empty-text text-secondary">暂无回收预约</view>
+        <view class="empty-hint text-secondary mt-8">
+          点击"回收估值"开始预约回收
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 分类详情弹窗 -->
+<view class="modal-mask {{showCategoryDetail ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content category-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title" wx:if="{{selectedCategory}}">{{selectedCategory.name}}</text>
+      <text class="close-btn" bindtap="closeCategoryDetail">×</text>
+    </view>
+    
+    <view class="category-detail" wx:if="{{selectedCategory}}">
+      <view class="detail-icon-large text-center" style="color: {{selectedCategory.color}}">
+        {{selectedCategory.icon}}
+      </view>
+      
+      <view class="detail-section mt-24">
+        <view class="section-title">什么是{{selectedCategory.name}}？</view>
+        <view class="section-content text-secondary">
+          {{selectedCategory.description}}
+        </view>
+      </view>
+      
+      <view class="detail-section mt-24">
+        <view class="section-title">常见物品</view>
+        <view class="examples-grid">
+          <view class="example-tag" wx:for="{{selectedCategory.examples}}" wx:key="index">
+            {{item}}
+          </view>
+        </view>
+      </view>
+      
+      <view class="detail-section mt-24">
+        <view class="section-title">投放提示</view>
+        <view class="tips-list">
+          <view class="tip-item" wx:for="{{selectedCategory.tips}}" wx:key="index">
+            <text class="tip-icon">💡</text>
+            <text class="tip-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <button class="btn-primary mt-24" bindtap="closeCategoryDetail">知道了</button>
+  </view>
+</view>
+
+<!-- 预约表单弹窗 -->
+<view class="modal-mask {{showOrderModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content order-form-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title">预约上门回收</text>
+      <text class="close-btn" bindtap="closeOrderModal">×</text>
+    </view>
+    
+    <view class="form-content mt-16">
+      <view class="form-item">
+        <view class="form-label">联系人</view>
+        <input 
+          class="form-input" 
+          placeholder="请输入联系人姓名" 
+          value="{{orderForm.name}}"
+          bindinput="inputOrderForm"
+          data-field="name"
+        />
+      </view>
+      
+      <view class="form-item mt-16">
+        <view class="form-label">联系电话</view>
+        <input 
+          class="form-input" 
+          type="number" 
+          placeholder="请输入联系电话" 
+          value="{{orderForm.phone}}"
+          bindinput="inputOrderForm"
+          data-field="phone"
+        />
+      </view>
+      
+      <view class="form-item mt-16">
+        <view class="form-label">上门地址</view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请输入详细地址" 
+          value="{{orderForm.address}}"
+          bindinput="inputOrderForm"
+          data-field="address"
+        />
+      </view>
+      
+      <view class="form-item mt-16">
+        <view class="form-label">备注（选填）</view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="其他说明" 
+          value="{{orderForm.remark}}"
+          bindinput="inputOrderForm"
+          data-field="remark"
+        />
+      </view>
+      
+      <view class="form-summary mt-24 p-16 bg-light">
+        <view class="summary-row flex flex-between">
+          <text class="text-secondary">物品</text>
+          <text>{{orderForm.items.length}} 项</text>
+        </view>
+        <view class="summary-row flex flex-between mt-8">
+          <text class="text-secondary">预计积分</text>
+          <text class="text-primary text-bold">+{{orderForm.estimatedPoints}} 积分</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="form-actions flex mt-24">
+      <button class="btn-secondary flex-1" bindtap="closeOrderModal">取消</button>
+      <button class="btn-primary flex-1" bindtap="submitOrder">确认预约</button>
+    </view>
+  </view>
+</view>

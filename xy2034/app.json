@@ -1,0 +1,61 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/treeHole/treeHole",
+    "pages/treeHole/createPost/createPost",
+    "pages/treeHole/postDetail/postDetail",
+    "pages/anxietyTest/anxietyTest",
+    "pages/aiChat/aiChat",
+    "pages/complaint/complaint",
+    "pages/complaint/createComplaint/createComplaint",
+    "pages/complaint/complaintDetail/complaintDetail",
+    "pages/clickGame/clickGame",
+    "pages/profile/profile",
+    "pages/doodle/doodle",
+    "pages/moment/moment",
+    "pages/moment/createMoment/createMoment",
+    "pages/moment/momentDetail/momentDetail",
+    "pages/moment/userProfile/userProfile",
+    "pages/push/push"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#6B8DD6",
+    "navigationBarTitleText": "高考失利帮",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#6B8DD6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/images/home.png",
+        "selectedIconPath": "assets/images/home-active.png"
+      },
+      {
+        "pagePath": "pages/treeHole/treeHole",
+        "text": "情绪树洞",
+        "iconPath": "assets/images/treehole.png",
+        "selectedIconPath": "assets/images/treehole-active.png"
+      },
+      {
+        "pagePath": "pages/moment/moment",
+        "text": "分享圈",
+        "iconPath": "assets/images/moment.png",
+        "selectedIconPath": "assets/images/moment-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "个人中心",
+        "iconPath": "assets/images/profile.png",
+        "selectedIconPath": "assets/images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,199 @@
+<view class="container">
+  <!-- 月份导航 -->
+  <view class="card calendar-header">
+    <view class="month-nav flex flex-between flex-center">
+      <view class="nav-btn" bindtap="prevMonth">
+        <text class="nav-icon">◀</text>
+      </view>
+      <view class="month-title flex flex-center">
+        <text class="month-text">{{currentYear}}年{{currentMonth}}月</text>
+        <view class="today-btn" bindtap="goToToday">今天</view>
+      </view>
+      <view class="nav-btn" bindtap="nextMonth">
+        <text class="nav-icon">▶</text>
+      </view>
+    </view>
+    
+    <!-- 星期标题 -->
+    <view class="week-header flex flex-around mt-16">
+      <view wx:for="{{weekDays}}" wx:key="index" class="week-day text-secondary">
+        {{item}}
+      </view>
+    </view>
+    
+    <!-- 日历格子 -->
+    <view class="calendar-grid mt-8">
+      <view 
+        wx:for="{{calendarDays}}" 
+        wx:key="dateStr"
+        class="calendar-day {{!item.isCurrentMonth ? 'other-month' : ''}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}}"
+        bindtap="selectDate"
+        data-date="{{item.dateStr}}"
+        data-current-month="{{item.isCurrentMonth}}"
+      >
+        <view class="day-number">{{item.day}}</view>
+        <view class="day-marks" wx:if="{{item.isCurrentMonth}}">
+          <view class="mark-task" wx:if="{{item.hasTasks}}">●</view>
+          <view class="mark-complete" wx:if="{{item.completedAll}}">✓</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 月度统计 -->
+  <view class="card stats-card" wx:if="{{monthlyStats.totalDays}}">
+    <view class="card-title">本月环保统计</view>
+    <view class="stats-grid grid-3">
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{monthlyStats.activeDays}}</view>
+        <view class="stat-label text-secondary">活跃天数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{monthlyStats.totalCompleted}}</view>
+        <view class="stat-label text-secondary">完成任务</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{monthlyStats.totalDays}}</view>
+        <view class="stat-label text-secondary">本月天数</view>
+      </view>
+    </view>
+    
+    <!-- 进度条 -->
+    <view class="progress-section mt-16">
+      <view class="progress-header flex flex-between mb-8">
+        <text class="text-secondary">本月活跃度</text>
+        <text class="text-primary">{{(monthlyStats.activeDays / monthlyStats.totalDays * 100).toFixed(0)}}%</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{monthlyStats.activeDays / monthlyStats.totalDays * 100}}%"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选中日期的任务列表 -->
+  <view class="card tasks-card">
+    <view class="task-header flex flex-between">
+      <view class="card-title">
+        {{selectedDate.year}}年{{selectedDate.month}}月{{selectedDate.day}}日任务
+      </view>
+      <view class="task-progress">
+        <text class="text-primary text-bold">{{completedCount}}</text>
+        <text class="text-secondary">/{{totalCount}}</text>
+      </view>
+    </view>
+    
+    <view class="tasks-list" wx:if="{{dailyTasks.length > 0}}">
+      <view 
+        wx:for="{{dailyTasks}}" 
+        wx:key="id" 
+        class="task-item {{item.completed ? 'completed' : ''}}"
+        bindtap="showTaskDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="task-icon">{{item.icon}}</view>
+        <view class="task-content flex-1">
+          <view class="task-title">{{item.title}}</view>
+          <view class="task-desc text-secondary text-small">{{item.description}}</view>
+        </view>
+        <view class="task-right">
+          <view class="task-points text-primary">+{{item.points}}</view>
+          <view class="task-action" wx:if="{{!item.completed}}">
+            <button class="mini-btn" catchtap="onCompleteTask" data-id="{{item.id}}">完成</button>
+          </view>
+          <view class="task-done" wx:else>
+            <text class="text-success">✓ 已完成</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">📋</view>
+      <view class="empty-text text-secondary">该日期暂无任务</view>
+    </view>
+  </view>
+
+  <!-- 任务分类说明 -->
+  <view class="card category-card">
+    <view class="card-title">任务分类说明</view>
+    <view class="category-list">
+      <view class="category-item">
+        <view class="category-icon">🛍️</view>
+        <view class="category-info">
+          <view class="category-name">购物类</view>
+          <view class="category-desc text-secondary">自带购物袋、拒绝过度包装</view>
+        </view>
+      </view>
+      <view class="category-item">
+        <view class="category-icon">🚲</view>
+        <view class="category-info">
+          <view class="category-name">出行类</view>
+          <view class="category-desc text-secondary">步行、骑车、公共交通</view>
+        </view>
+      </view>
+      <view class="category-item">
+        <view class="category-icon">💡</view>
+        <view class="category-info">
+          <view class="category-name">节能类</view>
+          <view class="category-desc text-secondary">关灯节电、节约用水</view>
+        </view>
+      </view>
+      <view class="category-item">
+        <view class="category-icon">♻️</view>
+        <view class="category-info">
+          <view class="category-name">回收类</view>
+          <view class="category-desc text-secondary">垃圾分类、旧物利用</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 任务详情弹窗 -->
+<view class="modal-mask {{showTaskDetail ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content task-detail-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title">任务详情</text>
+      <text class="close-btn" bindtap="closeTaskDetail">×</text>
+    </view>
+    
+    <view class="task-detail-content" wx:if="{{selectedTask}}">
+      <view class="detail-icon">{{selectedTask.icon}}</view>
+      <view class="detail-title">{{selectedTask.title}}</view>
+      <view class="detail-desc text-secondary mt-16">{{selectedTask.description}}</view>
+      
+      <view class="detail-info mt-24">
+        <view class="info-item flex flex-between">
+          <text class="text-secondary">积分奖励</text>
+          <text class="text-primary text-bold">+{{selectedTask.points}} 积分</text>
+        </view>
+        <view class="info-item flex flex-between">
+          <text class="text-secondary">任务分类</text>
+          <text>{{selectedTask.category}}</text>
+        </view>
+        <view class="info-item flex flex-between">
+          <text class="text-secondary">完成状态</text>
+          <text class="{{selectedTask.completed ? 'text-success' : 'text-warning'}}">
+            {{selectedTask.completed ? '已完成' : '未完成'}}
+          </text>
+        </view>
+      </view>
+      
+      <view class="detail-tips mt-24">
+        <view class="tips-title">小贴士</view>
+        <view class="tips-content text-secondary">
+          每天完成5个低碳任务，可以获得额外的连续完成奖励。坚持下去，为地球做出更多贡献！
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-actions mt-24" wx:if="{{selectedTask}}">
+      <button class="btn-secondary" wx:if="{{!selectedTask.completed}}" catchtap="onCompleteTask" data-id="{{selectedTask.id}}">
+        完成任务
+      </button>
+      <button class="btn-primary" bindtap="closeTaskDetail">
+        关闭
+      </button>
+    </view>
+  </view>
+</view>

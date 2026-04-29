@@ -1,0 +1,91 @@
+<view class="container">
+  <view class="post-card card" wx:if="{{postData}}">
+    <view class="post-header">
+      <view class="post-author">
+        <view class="author-avatar">{{postData.author.avatar}}</view>
+        <view class="author-info">
+          <view class="author-name">{{postData.author.name}}</view>
+          <view class="author-meta">
+            <text class="tier-badge tier-{{postData.tier}}">{{postData.tier}}档</text>
+            <text class="post-time">{{postData.createTime}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="follow-btn {{isFollowed ? 'followed' : ''}}" bindtap="toggleFollow">
+        {{isFollowed ? '已关注' : '+ 关注'}}
+      </view>
+    </view>
+    
+    <view class="post-content">{{postData.content}}</view>
+    
+    <view class="post-images" wx:if="{{postData.images && postData.images.length > 0}}">
+      <view class="image-item" wx:for="{{postData.images}}" wx:key="index">
+        <view class="image-placeholder">{{item}}</view>
+      </view>
+    </view>
+    
+    <view class="post-tags" wx:if="{{postData.tags && postData.tags.length > 0}}">
+      <text class="post-tag" wx:for="{{postData.tags}}" wx:for-item="tag" wx:key="index">
+        #{{tag}}
+      </text>
+    </view>
+    
+    <view class="post-stats">
+      <view class="stat-item {{isLiked ? 'liked' : ''}}" bindtap="toggleLike">
+        <text class="stat-icon">{{isLiked ? '❤️' : '🤍'}}</text>
+        <text class="stat-num">{{postData.likes}}</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-icon">💬</text>
+        <text class="stat-num">{{postData.comments}}</text>
+      </view>
+      <view class="stat-item" bindtap="sharePost">
+        <text class="stat-icon">📤</text>
+        <text class="stat-num">{{postData.shares}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="comments-section">
+    <view class="section-header">
+      <view class="section-title">全部评论 ({{comments.length}})</view>
+    </view>
+    
+    <view class="comments-list">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <view class="comment-avatar">{{item.avatar}}</view>
+        <view class="comment-content">
+          <view class="comment-user">
+            <text class="comment-name">{{item.name}}</text>
+            <text class="comment-time">{{item.time}}</text>
+          </view>
+          <view class="comment-text">{{item.content}}</view>
+          <view class="comment-actions">
+            <view class="comment-action" bindtap="likeComment" data-id="{{item.id}}">
+              {{item.isLiked ? '❤️' : '🤍'}} {{item.likes}}
+            </view>
+            <view class="comment-action" bindtap="replyComment" data-id="{{item.id}}">
+              回复
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="empty-comments" wx:if="{{comments.length === 0}}">
+      <view class="empty-icon">💬</view>
+      <view class="empty-text">暂无评论，快来抢沙发吧</view>
+    </view>
+  </view>
+
+  <view class="comment-input-area">
+    <view class="input-wrapper">
+      <input class="comment-input" 
+             type="text" 
+             placeholder="{{replyTo ? '回复 @' + replyTo.name : '说点什么...'}}"
+             value="{{commentText}}"
+             bindinput="onCommentInput" />
+    </view>
+    <view class="send-btn" bindtap="sendComment">发送</view>
+  </view>
+</view>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>身体小电量 - 健康管理助手</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="logo" onclick="showPage('home')">
+                    <span class="battery-icon">🔋</span>
+                    <span class="app-name">身体小电量</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#" onclick="showPage('home')" class="nav-link active" data-page="home">首页</a>
+                    <a href="#" onclick="showPage('diary')" class="nav-link" data-page="diary">身体日记</a>
+                    <a href="#" onclick="showPage('health')" class="nav-link" data-page="health">健康指南</a>
+                    <a href="#" onclick="showPage('profile')" class="nav-link" data-page="profile">身体数据</a>
+                    <a href="#" onclick="showPage('social')" class="nav-link" data-page="social">社交圈</a>
+                </div>
+                <div class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="mobile-menu hidden">
+            <a href="#" onclick="showPage('home')" class="mobile-nav-link active" data-page="home">首页</a>
+            <a href="#" onclick="showPage('diary')" class="mobile-nav-link" data-page="diary">身体日记</a>
+            <a href="#" onclick="showPage('health')" class="mobile-nav-link" data-page="health">健康指南</a>
+            <a href="#" onclick="showPage('profile')" class="mobile-nav-link" data-page="profile">身体数据</a>
+            <a href="#" onclick="showPage('social')" class="mobile-nav-link" data-page="social">社交圈</a>
+        </div>
+
+        <!-- 页面容器 -->
+        <main id="main-content">
+            <!-- 首页 -->
+            <div id="home-page" class="page active">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">你的身体电量</h1>
+                        <div class="battery-display" id="main-battery">
+                            <div class="battery-level" style="width: 85%;"></div>
+                            <div class="battery-percentage">85%</div>
+                        </div>
+                        <p class="hero-subtitle">点击身体部位，开始健康自查</p>
+                    </div>
+                </div>
+
+                <div class="body-map-section">
+                    <h2 class="section-title">选择不舒服的部位</h2>
+                    <div class="body-grid" id="body-grid">
+                        <!-- 身体部位按钮将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 治愈小语录 -->
+                <div class="quote-section">
+                    <div class="quote-card">
+                        <p class="quote-text" id="daily-quote">"身体是革命的本钱，好好照顾自己哦！"</p>
+                        <p class="quote-author">— 身体小电量</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 症状选择页面 -->
+            <div id="symptoms-page" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="showPage('home')">← 返回</button>
+                    <h1 class="page-title" id="symptom-page-title">症状选择</h1>
+                </div>
+
+                <div class="symptoms-container">
+                    <div class="symptom-section">
+                        <h3 class="section-subtitle">选择你的症状</h3>
+                        <div class="symptoms-list" id="symptoms-list">
+                            <!-- 症状列表将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="symptom-section">
+                        <h3 class="section-subtitle">疼痛程度</h3>
+                        <div class="pain-scale" id="pain-scale">
+                            <div class="pain-level" data-level="1" onclick="selectPainLevel(1)">
+                                <span class="pain-emoji">😊</span>
+                                <span class="pain-label">轻微</span>
+                            </div>
+                            <div class="pain-level" data-level="2" onclick="selectPainLevel(2)">
+                                <span class="pain-emoji">😐</span>
+                                <span class="pain-label">轻度</span>
+                            </div>
+                            <div class="pain-level active" data-level="3" onclick="selectPainLevel(3)">
+                                <span class="pain-emoji">😣</span>
+                                <span class="pain-label">中度</span>
+                            </div>
+                            <div class="pain-level" data-level="4" onclick="selectPainLevel(4)">
+                                <span class="pain-emoji">😫</span>
+                                <span class="pain-label">重度</span>
+                            </div>
+                            <div class="pain-level" data-level="5" onclick="selectPainLevel(5)">
+                                <span class="pain-emoji">😰</span>
+                                <span class="pain-label">剧烈</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="symptom-section">
+                        <h3 class="section-subtitle">持续天数</h3>
+                        <div class="duration-selector">
+                            <input type="number" id="duration-days" min="1" max="365" value="1" class="duration-input">
+                            <span class="duration-unit">天</span>
+                        </div>
+                    </div>
+
+                    <div class="symptom-section">
+                        <h3 class="section-subtitle">详细描述（可选）</h3>
+                        <textarea id="symptom-description" class="description-textarea" placeholder="请详细描述你的症状，例如：疼痛的具体位置、发作时间、是否有其他伴随症状等..."></textarea>
+                    </div>
+
+                    <button class="submit-btn" onclick="submitSymptoms()">提交分析</button>
+                </div>
+            </div>
+
+            <!-- 分析结果页面 -->
+            <div id="result-page" class="page">
+                <div class="page-header">
+                    <button class="back-btn" onclick="showPage('home')">← 返回首页</button>
+                    <h1 class="page-title">健康分析结果</h1>
+                </div>
+
+                <!-- 病痛退退贴纸 -->
+                <div class="sticker-container" id="sticker-container">
+                    <div class="sticker">
+                        <span class="sticker-text">病痛退退退！</span>
+                    </div>
+                </div>
+
+                <!-- 身体电量 -->
+                <div class="result-battery-section">
+                    <h3 class="section-subtitle">你的身体电量</h3>
+                    <div class="battery-display large" id="result-battery">
+                        <div class="battery-level" style="width: 70%;"></div>
+                        <div class="battery-percentage">70%</div>
+                    </div>
+                    <p class="battery-status" id="battery-status">电量充足，但需要注意休息</p>
+                </div>
+
+                <div class="results-container">
+                    <!-- 身体状况分析 -->
+                    <div class="result-card">
+                        <div class="card-header">
+                            <span class="card-icon">📋</span>
+                            <h3 class="card-title">身体状况分析</h3>
+                        </div>
+                        <div class="card-content" id="analysis-content">
+                            <!-- 分析内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 轻重判断 -->
+                    <div class="result-card">
+                        <div class="card-header">
+                            <span class="card-icon">⚖️</span>
+                            <h3 class="card-title">轻重判断</h3>
+                        </div>
+                        <div class="card-content" id="severity-content">
+                            <!-- 轻重判断内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 居家缓解办法 -->
+                    <div class="result-card">
+                        <div class="card-header">
+                            <span class="card-icon">🏠</span>
+                            <h3 class="card-title">居家缓解办法</h3>
+                        </div>
+                        <div class="card-content" id="relief-content">
+                            <!-- 缓解办法内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 饮食禁忌 -->
+                    <div class="result-card">
+                        <div class="card-header">
+                            <span class="card-icon">🍽️</span>
+                            <h3 class="card-title">饮食禁忌与建议</h3>
+                        </div>
+                        <div class="card-content" id="diet-content">
+                            <!-- 饮食建议内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 是否需要就医 -->
+                    <div class="result-card medical-card" id="medical-card">
+                        <div class="card-header">
+                            <span class="card-icon">🏥</span>
+                            <h3 class="card-title">就医建议</h3>
+                        </div>
+                        <div class="card-content" id="medical-content">
+                            <!-- 就医建议内容将通过JavaScript动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 治愈小语录 -->
+                <div class="quote-section result-quote">
+                    <div class="quote-card">
+                        <p class="quote-text" id="result-quote">"今天也要好好照顾自己哦！你的身体正在努力恢复中 💪"</p>
+                        <p class="quote-author">— 身体小电量</p>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button class="action-btn" onclick="saveToDiary()">保存到身体日记</button>
+                    <button class="action-btn secondary" onclick="showPage('home')">返回首页</button>
+                </div>
+            </div>
+
+            <!-- 身体日记页面 -->
+            <div id="diary-page" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">身体日记</h1>
+                </div>
+
+                <!-- 疼痛打卡 -->
+                <div class="diary-section">
+                    <h2 class="section-title">疼痛打卡</h2>
+                    <div class="checkin-card">
+                        <div class="checkin-header">
+                            <h3>今日疼痛记录</h3>
+                            <span class="checkin-date" id="today-date">2026年4月29日</span>
+                        </div>
+                        <div class="checkin-form">
+                            <div class="form-group">
+                                <label class="form-label">疼痛部位</label>
+                                <select id="checkin-body-part" class="form-select">
+                                    <option value="">请选择部位</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">疼痛程度</label>
+                                <div class="pain-scale small" id="checkin-pain-scale">
+                                    <div class="pain-level" data-level="1" onclick="selectCheckinPain(1)">
+                                        <span class="pain-emoji">😊</span>
+                                        <span class="pain-label">轻微</span>
+                                    </div>
+                                    <div class="pain-level" data-level="2" onclick="selectCheckinPain(2)">
+                                        <span class="pain-emoji">😐</span>
+                                        <span class="pain-label">轻度</span>
+                                    </div>
+                                    <div class="pain-level active" data-level="3" onclick="selectCheckinPain(3)">
+                                        <span class="pain-emoji">😣</span>
+                                        <span class="pain-label">中度</span>
+                                    </div>
+                                    <div class="pain-level" data-level="4" onclick="selectCheckinPain(4)">
+                                        <span class="pain-emoji">😫</span>
+                                        <span class="pain-label">重度</span>
+                                    </div>
+                                    <div class="pain-level" data-level="5" onclick="selectCheckinPain(5)">
+                                        <span class="pain-emoji">😰</span>
+                                        <span class="pain-label">剧烈</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">持续天数</label>
+                                <input type="number" id="checkin-duration" min="1" max="365" value="1" class="form-input">
+                            </div>
+                            <button class="checkin-btn" onclick="submitPainCheckin()">打卡记录</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div class="diary-section">
+                    <h2 class="section-title">历史记录</h2>
+                    <div class="diary-list" id="diary-list">
+                        <!-- 日记列表将通过JavaScript动态生成 -->
+                        <div class="empty-state">
+                            <div class="empty-icon">📝</div>
+                            <p class="empty-text">还没有身体日记记录</p>
+                            <p class="empty-hint">开始健康自查，记录你的身体状况吧！</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 打卡记录列表 -->
+                <div class="diary-section">
+                    <h2 class="section-title">疼痛打卡记录</h2>
+                    <div class="checkin-list" id="checkin-list">
+                        <!-- 打卡列表将通过JavaScript动态生成 -->
+                        <div class="empty-state">
+                            <div class="empty-icon">📅</div>
+                            <p class="empty-text">还没有疼痛打卡记录</p>
+                            <p class="empty-hint">开始记录你的疼痛情况吧！</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 健康指南页面 -->
+            <div id="health-page" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">健康指南</h1>
+                </div>
+
+                <!-- 小病自愈指南 -->
+                <div class="health-section">
+                    <h2 class="section-title">小病自愈指南</h2>
+                    <div class="guide-tabs">
+                        <button class="guide-tab active" onclick="switchGuideTab('head')">头部</button>
+                        <button class="guide-tab" onclick="switchGuideTab('eye')">眼部</button>
+                        <button class="guide-tab" onclick="switchGuideTab('stomach')">肠胃</button>
+                        <button class="guide-tab" onclick="switchGuideTab('muscle')">肌肉</button>
+                    </div>
+                    <div class="guide-content" id="guide-content">
+                        <!-- 指南内容将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 饮食避雷 -->
+                <div class="health-section">
+                    <h2 class="section-title">饮食避雷指南</h2>
+                    <div class="diet-guide-container">
+                        <div class="diet-card avoid">
+                            <div class="diet-card-header">
+                                <span class="diet-icon">🚫</span>
+                                <h3>忌口食物</h3>
+                            </div>
+                            <div class="diet-list" id="avoid-foods">
+                                <!-- 忌口食物将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                        <div class="diet-card recommend">
+                            <div class="diet-card-header">
+                                <span class="diet-icon">✅</span>
+                                <h3>推荐食物</h3>
+                            </div>
+                            <div class="diet-list" id="recommend-foods">
+                                <!-- 推荐食物将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 作息提醒 -->
+                <div class="health-section">
+                    <h2 class="section-title">作息提醒</h2>
+                    <div class="reminders-container">
+                        <div class="reminder-card">
+                            <div class="reminder-icon">🌙</div>
+                            <div class="reminder-content">
+                                <h4>熬夜提醒</h4>
+                                <p>建议在23:00前入睡</p>
+                            </div>
+                            <div class="reminder-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="sleep-reminder" checked onchange="toggleReminder('sleep')">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="reminder-card">
+                            <div class="reminder-icon">💧</div>
+                            <div class="reminder-content">
+                                <h4>喝水提醒</h4>
+                                <p>每2小时提醒喝水一次</p>
+                            </div>
+                            <div class="reminder-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="water-reminder" checked onchange="toggleReminder('water')">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="reminder-card">
+                            <div class="reminder-icon">🔥</div>
+                            <div class="reminder-content">
+                                <h4>热敷提醒</h4>
+                                <p>每天提醒热敷缓解疲劳</p>
+                            </div>
+                            <div class="reminder-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="heat-reminder" onchange="toggleReminder('heat')">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="reminder-card">
+                            <div class="reminder-icon">🧘</div>
+                            <div class="reminder-content">
+                                <h4>拉伸提醒</h4>
+                                <p>每1小时提醒拉伸一次</p>
+                            </div>
+                            <div class="reminder-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="stretch-reminder" onchange="toggleReminder('stretch')">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 身体数据页面 -->
+            <div id="profile-page" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">身体数据</h1>
+                </div>
+
+                <!-- 基础档案 -->
+                <div class="profile-section">
+                    <h2 class="section-title">基础档案</h2>
+                    <div class="profile-card">
+                        <form id="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">身高 (cm)</label>
+                                    <input type="number" id="height" min="100" max="250" value="170" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">体重 (kg)</label>
+                                    <input type="number" id="weight" min="30" max="300" value="65" class="form-input">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">BMI指数</label>
+                                <div class="bmi-display" id="bmi-display">22.5 (正常)</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">体质归类</label>
+                                <select id="constitution" class="form-select">
+                                    <option value="balanced">平和体质 (健康)</option>
+                                    <option value="cold">虚寒体质 (怕冷)</option>
+                                    <option value="heat">上火体质 (怕热)</option>
+                                    <option value="wet">湿热体质 (易长痘)</option>
+                                    <option value="dry">阴虚体质 (口干舌燥)</option>
+                                    <option value="qi">气虚体质 (易疲劳)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">性别</label>
+                                <div class="gender-options">
+                                    <label class="gender-option">
+                                        <input type="radio" name="gender" value="male">
+                                        <span class="gender-label">男</span>
+                                    </label>
+                                    <label class="gender-option">
+                                        <input type="radio" name="gender" value="female" checked>
+                                        <span class="gender-label">女</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 经期记录（仅女性显示） -->
+                            <div class="form-group" id="menstrual-section">
+                                <label class="form-label">经期记录</label>
+                                <div class="menstrual-inputs">
+                                    <div class="form-group">
+                                        <label class="form-small-label">上次经期开始日期</label>
+                                        <input type="date" id="last-period" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-small-label">经期周期 (天)</label>
+                                        <input type="number" id="period-cycle" min="21" max="45" value="28" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-small-label">经期持续天数</label>
+                                        <input type="number" id="period-duration" min="3" max="10" value="5" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="period-info" id="period-info">
+                                    <p>下次经期预计：<span id="next-period">计算中...</span></p>
+                                    <p>当前状态：<span id="period-status">计算中...</span></p>
+                                </div>
+                            </div>
+
+                            <button type="button" class="save-btn" onclick="saveProfile()">保存档案</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 健康统计 -->
+                <div class="profile-section">
+                    <h2 class="section-title">健康统计</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🔋</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="avg-battery">85%</div>
+                                <div class="stat-label">平均身体电量</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="check-count">0</div>
+                                <div class="stat-label">健康自查次数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="checkin-days">0</div>
+                                <div class="stat-label">疼痛打卡天数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💪</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="healthy-days">0</div>
+                                <div class="stat-label">健康天数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 社交圈页面 -->
+            <div id="social-page" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">养生社交圈</h1>
+                    <button class="new-post-btn" onclick="showNewPostModal()">+ 发布帖子</button>
+                </div>
+
+                <!-- 帖子分类标签 -->
+                <div class="post-tabs">
+                    <button class="post-tab active" onclick="switchPostTab('all')">全部</button>
+                    <button class="post-tab" onclick="switchPostTab('experience')">养生经验</button>
+                    <button class="post-tab" onclick="switchPostTab('thought')">想法分享</button>
+                    <button class="post-tab" onclick="switchPostTab('question')">健康问答</button>
+                </div>
+
+                <!-- 帖子列表 -->
+                <div class="posts-container" id="posts-container">
+                    <!-- 帖子将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- 发布帖子弹窗 -->
+        <div id="post-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">发布新帖子</h2>
+                    <button class="modal-close" onclick="closePostModal()">×</button>
+                </div>
+                <form id="post-form">
+                    <div class="form-group">
+                        <label class="form-label">帖子类型</label>
+                        <select id="post-type" class="form-select">
+                            <option value="experience">养生经验</option>
+                            <option value="thought">想法分享</option>
+                            <option value="question">健康问答</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">帖子标题</label>
+                        <input type="text" id="post-title" class="form-input" placeholder="请输入帖子标题">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">帖子内容</label>
+                        <textarea id="post-content" class="form-textarea" placeholder="分享你的养生经验或想法..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">相关标签</label>
+                        <div class="tag-input">
+                            <input type="text" id="post-tags" class="form-input" placeholder="输入标签，用逗号分隔">
+                        </div>
+                    </div>
+                    <button type="button" class="submit-btn" onclick="submitPost()">发布帖子</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 评论弹窗 -->
+        <div id="comment-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">评论</h2>
+                    <button class="modal-close" onclick="closeCommentModal()">×</button>
+                </div>
+                <div class="comment-post-preview" id="comment-post-preview">
+                    <!-- 帖子预览将通过JavaScript动态生成 -->
+                </div>
+                <div class="comment-input-section">
+                    <div class="form-group">
+                        <label class="form-label">发表评论</label>
+                        <textarea id="comment-input" class="form-textarea" placeholder="写下你的评论..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitComment()">发表评论</button>
+                </div>
+                <div class="comments-list-section">
+                    <h3 class="section-subtitle">全部评论</h3>
+                    <div class="comments-list" id="comments-list">
+                        <!-- 评论列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享弹窗 -->
+        <div id="share-modal" class="modal hidden">
+            <div class="modal-content share-modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">分享</h2>
+                    <button class="modal-close" onclick="closeShareModal()">×</button>
+                </div>
+                <div class="share-options">
+                    <div class="share-option" onclick="shareToWeChat()">
+                        <span class="share-icon">💬</span>
+                        <span class="share-label">微信</span>
+                    </div>
+                    <div class="share-option" onclick="shareToWeibo()">
+                        <span class="share-icon">📢</span>
+                        <span class="share-label">微博</span>
+                    </div>
+                    <div class="share-option" onclick="shareToQQ()">
+                        <span class="share-icon">🐧</span>
+                        <span class="share-label">QQ</span>
+                    </div>
+                    <div class="share-option" onclick="copyLink()">
+                        <span class="share-icon">🔗</span>
+                        <span class="share-label">复制链接</span>
+                    </div>
+                </div>
+                <div class="share-link-section">
+                    <p class="share-link-label">分享链接</p>
+                    <div class="share-link-container">
+                        <input type="text" id="share-link-input" class="share-link-input" readonly>
+                        <button class="copy-link-btn" onclick="copyLink()">复制</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 动画容器 -->
+        <div id="animation-container" class="animation-container hidden">
+            <div class="cute-animation">
+                <div class="animation-emoji">🌟</div>
+                <div class="animation-text" id="animation-text">病痛退散！</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

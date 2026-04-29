@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="category-scroll">
+    <scroll-view class="category-bar" scroll-x>
+      <view class="category-list">
+        <view 
+          class="category-item {{currentCategory === item.id ? 'active' : ''}}" 
+          wx:for="{{categories}}" 
+          wx:key="id"
+          bindtap="selectCategory"
+          data-category="{{item.id}}"
+        >
+          {{item.name}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item {{filterType === 'all' ? 'active' : ''}" bindtap="switchFilter" data-type="all">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{filterType === 'sameTier' ? 'active' : ''}}" bindtap="switchFilter" data-type="sameTier">
+      <text>同档位</text>
+    </view>
+    <view class="filter-item {{filterType === 'friends' ? 'active' : ''}}" bindtap="switchFilter" data-type="friends">
+      <text>好友</text>
+    </view>
+  </view>
+
+  <view class="posts-list">
+    <view 
+      class="post-item card" 
+      wx:for="{{posts}}" 
+      wx:key="id"
+      bindtap="goToPostDetail"
+      data-post="{{item}}"
+    >
+      <view class="post-header">
+        <view class="post-user" bindtap="goToUserProfile" catchtap="goToUserProfile" data-user="{{item.user}}">
+          <view class="post-avatar">{{item.user.avatar}}</view>
+          <view class="post-user-info">
+            <view class="post-nickname">
+              {{item.user.nickname}}
+              <text class="friend-tag" wx:if="{{item.user.isFriend}}">互关</text>
+            </view>
+            <view class="post-meta">
+              <text class="post-tier tag tag-info">{{item.user.tier}}档</text>
+              <text class="post-city">{{item.user.city}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="post-time">{{item.createdAt}}</view>
+      </view>
+      
+      <view class="post-content">{{item.content}}</view>
+      
+      <view class="post-category tag tag-primary">{{item.category}}</view>
+      
+      <view class="post-footer">
+        <view class="post-action" bindtap="toggleLike" catchtap="toggleLike" data-index="{{index}}">
+          <text class="action-icon">{{item.isLiked ? '❤️' : '🤍'}</text>
+          <text class="action-count">{{item.likes}}</text>
+        </view>
+        <view class="post-action">
+          <text class="action-icon">💬</text>
+          <text class="action-count">{{item.comments.length}}</text>
+        </view>
+        <view class="post-action" bindtap="sharePost" catchtap="sharePost" data-index="{{index}}">
+          <text class="action-icon">🔗</text>
+          <text class="action-count">{{item.shares}}</text>
+        </view>
+        <view class="post-action" bindtap="addFriend" catchtap="addFriend" wx:if="{{!item.user.isFriend && item.user.id !== currentUserId}}">
+          <text class="action-icon">➕</text>
+          <text class="action-text">关注</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="load-more" wx:if="{{posts.length > 0}}">
+      <text class="load-text">上拉加载更多</text>
+    </view>
+
+    <view class="empty-section" wx:if="{{posts.length === 0}}">
+      <view class="empty-icon">🌐</view>
+      <view class="empty-text">暂无动态</view>
+      <view class="empty-tip">快来发布第一条动态吧</view>
+    </view>
+  </view>
+
+  <view class="create-post-btn" bindtap="goToCreatePost">
+    <view class="create-icon">✏️</view>
+    <view class="create-text">发布动态</view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

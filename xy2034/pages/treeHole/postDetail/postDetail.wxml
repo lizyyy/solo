@@ -1,0 +1,84 @@
+<view class="container">
+  <!-- 帖子内容 -->
+  <view class="post-section card" wx:if="{{post}}">
+    <view class="post-header">
+      <view class="post-author">
+        <image class="author-avatar" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=anonymous%20avatar%20simple&image_size=square" mode="aspectFill" />
+        <view class="author-info">
+          <view class="author-name">匿名用户</view>
+          <view class="post-time text-secondary">{{post.createTime}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="post-content">
+      {{post.content}}
+    </view>
+    <view class="post-stats">
+      <view class="stat-item">
+        <text class="stat-icon">💬</text>
+        <text class="stat-text">{{post.commentCount}} 评论</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评论区域 -->
+  <view class="comments-section">
+    <view class="section-header">
+      <view class="section-title">共情感知</view>
+      <view class="comment-hint text-secondary">
+        禁止说教，只允许共情和理解
+      </view>
+    </view>
+
+    <view class="comments-list" wx:if="{{comments.length > 0}}">
+      <view class="comment-item card" wx:for="{{comments}}" wx:key="id">
+        <view class="comment-header">
+          <image class="commenter-avatar" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=anonymous%20avatar%20simple&image_size=square" mode="aspectFill" />
+          <view class="commenter-info">
+            <view class="commenter-name">匿名用户</view>
+            <view class="comment-time text-secondary">{{item.createTime}}</view>
+          </view>
+        </view>
+        <view class="comment-content">
+          {{item.content}}
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-comments" wx:else>
+      <view class="empty-icon">💭</view>
+      <view class="empty-text text-secondary">
+        还没有评论，来成为第一个共情的人吧！
+      </view>
+    </view>
+  </view>
+
+  <!-- 评论输入区域 -->
+  <view class="comment-input-section" wx:if="{{showCommentInput}}">
+    <view class="input-wrapper">
+      <textarea 
+        class="comment-textarea" 
+        placeholder="写下你的共情感知... 禁止说教，只允许理解和支持"
+        value="{{commentContent}}"
+        bindinput="onCommentInput"
+        maxlength="200"
+        auto-height
+      />
+      <view class="input-actions">
+        <view class="cancel-btn" bindtap="toggleCommentInput">取消</view>
+        <view 
+          class="submit-btn {{!commentContent.trim() ? 'disabled' : ''}}" 
+          bindtap="submitComment"
+        >
+          发布
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部评论按钮 -->
+  <view class="footer-btn" bindtap="toggleCommentInput" wx:if="{{!showCommentInput}}">
+    <text class="btn-icon">💬</text>
+    <text class="btn-text">写下你的共情</text>
+  </view>
+</view>

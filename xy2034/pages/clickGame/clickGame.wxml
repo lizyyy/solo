@@ -1,0 +1,105 @@
+<view class="container">
+  <!-- 开始界面 -->
+  <view class="start-screen" wx:if="{{!isPlaying && !showResult}}">
+    <view class="game-title">解压点击</view>
+    <view class="game-desc text-secondary">
+      快速点击出现的目标，释放你的压力！
+    </view>
+    
+    <view class="stats-section">
+      <view class="stat-item">
+        <view class="stat-label">最高分</view>
+        <view class="stat-value text-primary">{{highScore}}</view>
+      </view>
+    </view>
+    
+    <view class="rules-section">
+      <view class="rules-title">游戏规则</view>
+      <view class="rules-list">
+        <view class="rule-item">• 点击出现的目标获得分数</view>
+        <view class="rule-item">• 目标越小，分数越高</view>
+        <view class="rule-item">• 连续快速点击获得连击加成</view>
+        <view class="rule-item">• 游戏时间30秒</view>
+      </view>
+    </view>
+    
+    <view class="start-btn" bindtap="startGame">
+      开始游戏
+    </view>
+  </view>
+
+  <!-- 游戏界面 -->
+  <view class="game-screen" wx:if="{{isPlaying}}" bindtap="onMissClick">
+    <!-- 顶部信息栏 -->
+    <view class="game-header">
+      <view class="header-item">
+        <view class="header-label">分数</view>
+        <view class="header-value">{{score}}</view>
+      </view>
+      <view class="header-item center">
+        <view class="header-label">时间</view>
+        <view class="header-value {{timeLeft <= 5 ? 'warning' : ''}}">{{timeLeft}}s</view>
+      </view>
+      <view class="header-item">
+        <view class="header-label">连击</view>
+        <view class="header-value {{combo > 0 ? 'combo' : ''}}">{{combo}}x</view>
+      </view>
+    </view>
+
+    <!-- 游戏区域 -->
+    <view class="game-area">
+      <!-- 目标 -->
+      <view 
+        class="target" 
+        style="left: {{targetPosition.x}}px; top: {{targetPosition.y}}px; width: {{targetSize}}px; height: {{targetSize}}px; border-radius: {{targetSize/2}}px;"
+        catchtap="onTargetClick"
+      >
+        <view class="target-inner" style="width: {{targetSize * 0.6}}px; height: {{targetSize * 0.6}}px; border-radius: {{targetSize * 0.3}}px;"></view>
+      </view>
+
+      <!-- 粒子效果 -->
+      <view 
+        class="particle" 
+        wx:for="{{particles}}" 
+        wx:key="id"
+        style="left: {{item.x}}px; top: {{item.y}}px; width: {{item.size}}px; height: {{item.size}}px; transform: translate({{Math.cos(item.angle) * item.speed * 10}}px, {{Math.sin(item.angle) * item.speed * 10}}px); opacity: {{item.opacity}};"
+      >
+      </view>
+    </view>
+
+    <!-- 连击提示 -->
+    <view class="combo-prompt" wx:if="{{combo >= 3}}">
+      {{combo}}连击！
+    </view>
+  </view>
+
+  <!-- 结果界面 -->
+  <view class="result-screen" wx:if="{{showResult}}">
+    <view class="result-title">游戏结束</view>
+    
+    <view class="result-stats">
+      <view class="result-item">
+        <view class="result-label">本次得分</view>
+        <view class="result-value score">{{score}}</view>
+      </view>
+      
+      <view class="result-item">
+        <view class="result-label">最高连击</view>
+        <view class="result-value combo">{{maxCombo}}x</view>
+      </view>
+      
+      <view class="result-item" wx:if="{{score >= highScore && score > 0}}">
+        <view class="new-record">🎉 新纪录！</view>
+      </view>
+    </view>
+    
+    <view class="result-actions">
+      <view class="action-btn secondary" bindtap="restartGame">
+        再玩一次
+      </view>
+      <view class="action-btn primary" bindtap="goBack">
+        返回
+      </view>
+    </view>
+  </view>
+</view>

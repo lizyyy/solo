@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太阳人际关系治愈小程序</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">☀️ 太阳人际关系治愈</h1>
+                <div class="header-actions">
+                    <button id="socialBatteryBtn" class="btn-icon">
+                        <span class="battery-icon">🔋</span>
+                        <span id="batteryValue">100%</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-content" id="mainContent">
+            <!-- 主页 -->
+            <section id="homePage" class="page active">
+                <div class="dashboard">
+                    <div class="welcome-card">
+                        <h2>你好，朋友 👋</h2>
+                        <p>让太阳治愈你的人际关系烦恼</p>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <h3>快速入口</h3>
+                        <div class="action-grid">
+                            <div class="action-card" data-page="relationships">
+                                <div class="action-icon">👥</div>
+                                <span>关系管理</span>
+                            </div>
+                            <div class="action-card" data-page="templates">
+                                <div class="action-icon">💬</div>
+                                <span>回复模板</span>
+                            </div>
+                            <div class="action-card" data-page="avoid">
+                                <div class="action-icon">⚠️</div>
+                                <span>避雷记录</span>
+                            </div>
+                            <div class="action-card" data-page="favors">
+                                <div class="action-icon">💰</div>
+                                <span>人情账本</span>
+                            </div>
+                            <div class="action-card" data-page="reminders">
+                                <div class="action-icon">🔔</div>
+                                <span>问候提醒</span>
+                            </div>
+                            <div class="action-card" data-page="assessment">
+                                <div class="action-icon">🧐</div>
+                                <span>关系判定</span>
+                            </div>
+                            <div class="action-card" data-page="battery">
+                                <div class="action-icon">🔋</div>
+                                <span>社交电量</span>
+                            </div>
+                            <div class="action-card" data-page="community">
+                                <div class="action-icon">🌍</div>
+                                <span>情绪分享</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="today-overview">
+                        <h3>今日概览</h3>
+                        <div id="todayOverview">
+                            <p class="empty-state">暂无今日提醒</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 关系管理页面 -->
+            <section id="relationshipsPage" class="page">
+                <div class="page-header">
+                    <h2>关系管理</h2>
+                    <button id="addRelationshipBtn" class="btn-primary">+ 添加关系</button>
+                </div>
+                
+                <!-- 分类标签 -->
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">全部</button>
+                    <button class="category-tab" data-category="friend">朋友</button>
+                    <button class="category-tab" data-category="colleague">同事</button>
+                    <button class="category-tab" data-category="family">家人</button>
+                    <button class="category-tab" data-category="romance">暧昧</button>
+                    <button class="category-tab" data-category="elder">长辈</button>
+                    <button class="category-tab" data-category="enemy">讨厌的人</button>
+                </div>
+
+                <!-- 关系列表 -->
+                <div id="relationshipsList" class="relationships-list">
+                    <!-- 动态填充 -->
+                </div>
+            </section>
+
+            <!-- 回复模板页面 -->
+            <section id="templatesPage" class="page">
+                <div class="page-header">
+                    <h2>聊天回复万能模版</h2>
+                </div>
+                
+                <!-- 场景分类 -->
+                <div class="scenario-tabs">
+                    <button class="scenario-tab active" data-scenario="perfunctory">敷衍回复</button>
+                    <button class="scenario-tab" data-scenario="refuse">拒绝别人</button>
+                    <button class="scenario-tab" data-scenario="excuse">委婉推脱</button>
+                    <button class="scenario-tab" data-scenario="colleague">同事客套</button>
+                    <button class="scenario-tab" data-scenario="favor">人情往来</button>
+                    <button class="scenario-tab" data-scenario="icebreaker">尴尬破冰</button>
+                    <button class="scenario-tab" data-scenario="gift">送礼话术</button>
+                    <button class="scenario-tab" data-scenario="quarrel">吵架缓和</button>
+                    <button class="scenario-tab" data-scenario="apology">高情商道歉</button>
+                    <button class="scenario-tab" data-scenario="confession">婉拒表白</button>
+                    <button class="scenario-tab" data-scenario="remind">催别人办事</button>
+                </div>
+
+                <!-- 模板列表 -->
+                <div id="templatesList" class="templates-list">
+                    <!-- 动态填充 -->
+                </div>
+            </section>
+
+            <!-- 避雷记录页面 -->
+            <section id="avoidPage" class="page">
+                <div class="page-header">
+                    <h2>社交避雷备忘录</h2>
+                </div>
+                
+                <div class="avoid-filter">
+                    <select id="avoidPersonFilter" class="select-input">
+                        <option value="all">全部人员</option>
+                    </select>
+                </div>
+
+                <div id="avoidList" class="avoid-list">
+                    <!-- 动态填充 -->
+                </div>
+            </section>
+
+            <!-- 人情账本页面 -->
+            <section id="favorsPage" class="page">
+                <div class="page-header">
+                    <h2>人情账本</h2>
+                    <button id="addFavorBtn" class="btn-primary">+ 记录人情</button>
+                </div>
+                
+                <!-- 统计卡片 -->
+                <div class="favor-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalGiven">¥0</div>
+                        <div class="stat-label">送出金额</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalReceived">¥0</div>
+                        <div class="stat-label">收到金额</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="netBalance">¥0</div>
+                        <div class="stat-label">净额</div>
+                    </div>
+                </div>
+
+                <!-- 人情列表 -->
+                <div id="favorsList" class="favors-list">
+                    <!-- 动态填充 -->
+                </div>
+            </section>
+
+            <!-- 问候提醒页面 -->
+            <section id="remindersPage" class="page">
+                <div class="page-header">
+                    <h2>问候提醒</h2>
+                    <button id="addReminderBtn" class="btn-primary">+ 添加提醒</button>
+                </div>
+                
+                <!-- 即将到来 -->
+                <div class="upcoming-section">
+                    <h3>即将到来</h3>
+                    <div id="upcomingReminders" class="reminders-list">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+
+                <!-- 所有提醒 -->
+                <div class="all-reminders-section">
+                    <h3>所有提醒</h3>
+                    <div id="allReminders" class="reminders-list">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 关系判定页面 -->
+            <section id="assessmentPage" class="page">
+                <div class="page-header">
+                    <h2>断舍离关系判定</h2>
+                </div>
+                
+                <div class="assessment-container">
+                    <div class="assessment-form">
+                        <h3>输入关系状态</h3>
+                        
+                        <div class="form-group">
+                            <label>关系类型</label>
+                            <select id="relationType" class="select-input">
+                                <option value="friend">朋友</option>
+                                <option value="colleague">同事</option>
+                                <option value="family">家人</option>
+                                <option value="partner">伴侣</option>
+                                <option value="acquaintance">熟人</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>相处频率</label>
+                            <select id="meetFrequency" class="select-input">
+                                <option value="daily">每天</option>
+                                <option value="weekly">每周几次</option>
+                                <option value="monthly">每月几次</option>
+                                <option value="rarely">很少</option>
+                                <option value="never">几乎不</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>每次相处后的感受</label>
+                            <select id="afterFeeling" class="select-input">
+                                <option value="energetic">充满能量，心情愉悦</option>
+                                <option value="neutral">平淡，没什么特别感觉</option>
+                                <option value="tired">有些疲惫，需要独处恢复</option>
+                                <option value="negative">心情变差，感到焦虑/压抑</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>对方是否会主动联系你</label>
+                            <select id="initiative" class="select-input">
+                                <option value="always">经常主动</option>
+                                <option value="sometimes">偶尔</option>
+                                <option value="rarely">很少</option>
+                                <option value="never">从不</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>是否有利益往来</label>
+                            <select id="hasInterest" class="select-input">
+                                <option value="no">没有</option>
+                                <option value="minor">有一些</option>
+                                <option value="major">利益关系重要</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>是否有过矛盾或不满</label>
+                            <select id="hasConflict" class="select-input">
+                                <option value="no">没有</option>
+                                <option value="minor">有小矛盾，已解决</option>
+                                <option value="major">有重大矛盾，未解决</option>
+                            </select>
+                        </div>
+
+                        <button id="assessBtn" class="btn-primary btn-large">开始判定</button>
+                    </div>
+
+                    <div id="assessmentResult" class="assessment-result hidden">
+                        <!-- 动态填充结果 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 社交电量页面 -->
+            <section id="batteryPage" class="page">
+                <div class="page-header">
+                    <h2>社交电量</h2>
+                </div>
+                
+                <div class="battery-container">
+                    <div class="battery-display">
+                        <div class="battery-icon-large">🔋</div>
+                        <div class="battery-level" id="batteryLevel">
+                            <div class="battery-fill" id="batteryFill" style="width: 100%"></div>
+                        </div>
+                        <div class="battery-text">
+                            <span id="batteryPercentage">100%</span>
+                            <span id="batteryStatus">电量充足</span>
+                        </div>
+                    </div>
+
+                    <div class="battery-controls">
+                        <div class="form-group">
+                            <label>消耗社交活动</label>
+                            <div class="battery-actions">
+                                <button class="btn-battery" data-action="consume" data-amount="10">小型聚会 -10%</button>
+                                <button class="btn-battery" data-action="consume" data-amount="25">工作会议 -25%</button>
+                                <button class="btn-battery" data-action="consume" data-amount="40">大型聚会 -40%</button>
+                                <button class="btn-battery" data-action="consume" data-amount="60">相亲/尴尬场面 -60%</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>恢复社交电量</label>
+                            <div class="battery-actions">
+                                <button class="btn-battery" data-action="recharge" data-amount="20">独处休息 +20%</button>
+                                <button class="btn-battery" data-action="recharge" data-amount="40">与好友相处 +40%</button>
+                                <button class="btn-battery" data-action="recharge" data-amount="60">充足睡眠 +60%</button>
+                                <button class="btn-battery" data-action="recharge" data-amount="100">完全重置 +100%</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="battery-log">
+                        <h3>电量记录</h3>
+                        <div id="batteryLog" class="log-list">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 黑名单树洞入口 -->
+                <div class="blackhole-section">
+                    <h3>🔒 黑名单心理树洞</h3>
+                    <p class="section-desc">吐槽讨厌的人，仅自己可见，需密码访问</p>
+                    
+                    <div id="blackholeLock" class="lock-form">
+                        <div class="form-group">
+                            <label>请输入密码</label>
+                            <input type="password" id="blackholePassword" class="text-input" placeholder="输入密码访问树洞">
+                        </div>
+                        <div class="lock-actions">
+                            <button id="unlockBlackholeBtn" class="btn-primary">解锁</button>
+                            <button id="setPasswordBtn" class="btn-secondary">设置密码</button>
+                        </div>
+                    </div>
+
+                    <div id="blackholeContent" class="hidden">
+                        <div class="blackhole-header">
+                            <span class="unlocked-badge">🔓 已解锁</span>
+                            <button id="lockBlackholeBtn" class="btn-small">锁定</button>
+                        </div>
+                        
+                        <div class="add-blackhole-section">
+                            <button id="addBlackholePostBtn" class="btn-primary">+ 写吐槽</button>
+                        </div>
+
+                        <div id="blackholePosts" class="blackhole-posts">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 情绪分享社区页面 -->
+            <section id="communityPage" class="page">
+                <div class="page-header">
+                    <h2>陌生人情绪帖子分享圈</h2>
+                    <button id="addCommunityPostBtn" class="btn-primary">+ 发布帖子</button>
+                </div>
+                
+                <div class="community-tabs">
+                    <button class="community-tab active" data-sort="latest">最新</button>
+                    <button class="community-tab" data-sort="hot">热门</button>
+                </div>
+
+                <div id="communityPosts" class="community-posts">
+                    <!-- 动态填充 -->
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">首页</span>
+            </button>
+            <button class="nav-item" data-page="relationships">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">关系</span>
+            </button>
+            <button class="nav-item" data-page="templates">
+                <span class="nav-icon">💬</span>
+                <span class="nav-label">模板</span>
+            </button>
+            <button class="nav-item" data-page="battery">
+                <span class="nav-icon">🔋</span>
+                <span class="nav-label">电量</span>
+            </button>
+            <button class="nav-item" data-page="community">
+                <span class="nav-icon">🌍</span>
+                <span class="nav-label">社区</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 模态框容器 -->
+    <div id="modalContainer"></div>
+
+    <!-- Toast 通知 -->
+    <div id="toastContainer"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/init-data.js"></script>
+    <script src="js/components/modal.js"></script>
+    <script src="js/components/toast.js"></script>
+    <script src="js/pages/home.js"></script>
+    <script src="js/pages/relationships.js"></script>
+    <script src="js/pages/templates.js"></script>
+    <script src="js/pages/avoid.js"></script>
+    <script src="js/pages/favors.js"></script>
+    <script src="js/pages/reminders.js"></script>
+    <script src="js/pages/assessment.js"></script>
+    <script src="js/pages/battery.js"></script>
+    <script src="js/pages/blackhole.js"></script>
+    <script src="js/pages/community.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
