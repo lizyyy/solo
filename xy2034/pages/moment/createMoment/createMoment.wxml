@@ -1,0 +1,73 @@
+<view class="container">
+  <!-- 用户信息 -->
+  <view class="user-section card" wx:if="{{userInfo}}">
+    <view class="user-info">
+      <image class="user-avatar" src="{{userInfo.avatar}}" mode="aspectFill" />
+      <view class="user-name">{{userInfo.userName}}</view>
+    </view>
+    
+    <!-- 隐私设置 -->
+    <view class="privacy-section">
+      <view class="privacy-label">可见范围：</view>
+      <view class="privacy-options">
+        <view 
+          class="privacy-option {{isPublic ? 'selected' : ''}}" 
+          bindtap="togglePrivacy"
+          data-public="true"
+        >
+          <text class="option-icon">🌍</text>
+          <text class="option-text">公开</text>
+        </view>
+        <view 
+          class="privacy-option {{!isPublic ? 'selected' : ''}}" 
+          bindtap="togglePrivacy"
+          data-public="false"
+        >
+          <text class="option-icon">🔒</text>
+          <text class="option-text">私密</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容输入 -->
+  <view class="content-section card">
+    <view class="section-title">分享你的心情</view>
+    <textarea 
+      class="content-textarea" 
+      placeholder="在这里写下你的心情... 可以是开心、难过、迷茫，或者任何你想表达的情绪。"
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="{{maxWords}}"
+      auto-height
+    />
+    <view class="word-count">
+      <text class="count-text text-secondary">{{wordCount}}</text>
+      <text class="max-text text-secondary">/{{maxWords}}</text>
+    </view>
+  </view>
+
+  <!-- 提示 -->
+  <view class="tips-section card">
+    <view class="tips-icon">💡</view>
+    <view class="tips-content">
+      <view class="tips-title">温馨提示</view>
+      <view class="tips-desc text-secondary">
+        <view class="tip-item">• 公开：所有人都可以看到你的心情</view>
+        <view class="tip-item">• 私密：只有你自己可以看到</view>
+        <view class="tip-item">• 请遵守社区规范，发布积极健康的内容</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer-section">
+    <view class="btn-secondary" bindtap="goBack">取消</view>
+    <view 
+      class="btn-primary {{isSubmitting ? 'disabled' : ''}}" 
+      bindtap="submitMoment"
+    >
+      {{isSubmitting ? '发布中...' : '发布'}}
+    </view>
+  </view>
+</view>

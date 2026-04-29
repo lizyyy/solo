@@ -1,0 +1,164 @@
+<view class="container">
+  <!-- 测试说明 -->
+  <view class="intro-section card" wx:if="{{!isCompleted && currentQuestionIndex === 0}}">
+    <view class="intro-icon">📋</view>
+    <view class="intro-content">
+      <view class="intro-title">GAD-7 焦虑自测量表</view>
+      <view class="intro-desc text-secondary">
+        以下问题询问的是你在过去两周内，受到以下问题困扰的程度。请根据你的实际情况选择最符合的选项。
+      </view>
+    </view>
+  </view>
+
+  <!-- 进度条 -->
+  <view class="progress-section" wx:if="{{!isCompleted}}">
+    <view class="progress-header">
+      <view class="progress-text">第 {{currentQuestionIndex + 1}} / {{totalQuestions}} 题</view>
+      <view class="progress-percent text-primary">{{Math.floor((currentQuestionIndex + 1) / totalQuestions * 100)}}%</view>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{(currentQuestionIndex + 1) / totalQuestions * 100}}%"></view>
+    </view>
+  </view>
+
+  <!-- 题目导航 -->
+  <view class="question-nav" wx:if="{{!isCompleted}}">
+    <view 
+      class="nav-item {{answers[index] !== null ? 'answered' : ''}} {{index === currentQuestionIndex ? 'current' : ''}}"
+      wx:for="{{questions}}" 
+      wx:key="id"
+      bindtap="goToQuestion"
+      data-index="{{index}}"
+    >
+      {{index + 1}}
+    </view>
+  </view>
+
+  <!-- 题目内容 -->
+  <view class="question-section card" wx:if="{{!isCompleted && questions.length > 0}}">
+    <view class="question-number">问题 {{currentQuestionIndex + 1}}</view>
+    <view class="question-text">
+      {{questions[currentQuestionIndex].question}}
+    </view>
+    <view class="options-list">
+      <view 
+        class="option-item {{answers[currentQuestionIndex] === option.value ? 'selected' : ''}}"
+        wx:for="{{questions[currentQuestionIndex].options}}" 
+        wx:key="value"
+        bindtap="selectOption"
+        data-index="{{currentQuestionIndex}}"
+        data-value="{{option.value}}"
+      >
+        <view class="option-radio">
+          <view class="radio-inner" wx:if="{{answers[currentQuestionIndex] === option.value}}"></view>
+        </view>
+        <view class="option-label">{{option.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 导航按钮 -->
+  <view class="nav-buttons" wx:if="{{!isCompleted}}">
+    <view 
+      class="btn-secondary {{currentQuestionIndex === 0 ? 'disabled' : ''}}" 
+      bindtap="prevQuestion"
+      wx:if="{{currentQuestionIndex > 0}}"
+    >
+      上一题
+    </view>
+    <view 
+      class="btn-primary" 
+      bindtap="calculateResult"
+      wx:if="{{currentQuestionIndex === totalQuestions - 1}}"
+    >
+      查看结果
+    </view>
+    <view 
+      class="btn-primary" 
+      bindtap="nextQuestion"
+      wx:else
+    >
+      下一题
+    </view>
+  </view>
+
+  <!-- 结果页面 -->
+  <view class="result-section" wx:if="{{isCompleted}}">
+    <!-- 结果概览 -->
+    <view class="result-overview card">
+      <view class="result-icon">🧠</view>
+      <view class="result-title">测试完成</view>
+      <view class="result-score">
+        <text class="score-label">总得分：</text>
+        <text class="score-value" style="color: {{levelColor}}">{{totalScore}}</text>
+        <text class="score-max">/21</text>
+      </view>
+      <view class="result-level" style="background-color: {{levelColor}}20; color: {{levelColor}}">
+        {{anxietyLevel}}
+      </view>
+    </view>
+
+    <!-- 等级说明 -->
+    <view class="level-info card">
+      <view class="info-title">焦虑等级说明</view>
+      <view class="level-list">
+        <view class="level-item">
+          <view class="level-dot" style="background-color: #51cf66"></view>
+          <view class="level-info">
+            <view class="level-name">0-4分：轻度焦虑</view>
+            <view class="level-desc text-secondary">正常的情绪反应，建议保持良好作息</view>
+          </view>
+        </view>
+        <view class="level-item">
+          <view class="level-dot" style="background-color: #fcc419"></view>
+          <view class="level-info">
+            <view class="level-name">5-9分：中度焦虑</view>
+            <view class="level-desc text-secondary">需要关注情绪变化，可尝试放松技巧</view>
+          </view>
+        </view>
+        <view class="level-item">
+          <view class="level-dot" style="background-color: #ff922b"></view>
+          <view class="level-info">
+            <view class="level-name">10-14分：中重度焦虑</view>
+            <view class="level-desc text-secondary">建议寻求专业心理咨询师的帮助</view>
+          </view>
+        </view>
+        <view class="level-item">
+          <view class="level-dot" style="background-color: #ff6b6b"></view>
+          <view class="level-info">
+            <view class="level-name">15-21分：重度焦虑</view>
+            <view class="level-desc text-secondary">需要立即关注，建议尽快就医</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 建议 -->
+    <view class="suggestions-section card">
+      <view class="suggestions-title">💡 建议与疏导</view>
+      <view class="suggestions-list">
+        <view class="suggestion-item" wx:for="{{suggestions}}" wx:key="index">
+          <view class="suggestion-icon">•</view>
+          <view class="suggestion-text">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 温馨提示 -->
+    <view class="warning-section card">
+      <view class="warning-icon">⚠️</view>
+      <view class="warning-content">
+        <view class="warning-title">重要提示</view>
+        <view class="warning-desc text-secondary">
+          本测试仅供参考，不能替代专业诊断。如果你持续感到焦虑、抑郁或有自杀念头，请立即寻求专业心理医生的帮助。
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <view class="btn-secondary" bindtap="restartTest">重新测试</view>
+      <view class="btn-primary" bindtap="goBack">返回首页</view>
+    </view>
+  </view>
+</view>

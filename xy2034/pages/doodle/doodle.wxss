@@ -1,0 +1,195 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0;
+  background-color: #f5f7fa;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  margin: 20rpx;
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.doodle-canvas {
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.canvas-tip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.tip-icon {
+  font-size: 60rpx;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.tools-section {
+  background-color: #fff;
+  border-radius: 24rpx 24rpx 0 0;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.tools-expanded {
+  padding: 20rpx 20rpx 40rpx;
+}
+
+.tools-collapsed {
+  padding: 10rpx 20rpx;
+}
+
+.section-label {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.color-section {
+  margin-bottom: 24rpx;
+}
+
+.colors-row {
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+
+.color-item {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.color-item:active {
+  transform: scale(0.95);
+}
+
+.color-active {
+  border: 4rpx solid #333;
+}
+
+.color-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28rpx;
+  color: #fff;
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.3);
+}
+
+.size-section {
+  margin-bottom: 24rpx;
+}
+
+.sizes-row {
+  align-items: center;
+  gap: 40rpx;
+}
+
+.size-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: #f5f7fa;
+  transition: all 0.2s ease;
+}
+
+.size-item:active {
+  background-color: #e8e8e8;
+}
+
+.size-active {
+  background-color: #6B8DD6;
+}
+
+.size-dot {
+  border-radius: 50%;
+  background-color: #333;
+}
+
+.size-active .size-dot {
+  background-color: #fff;
+}
+
+.actions-row {
+  align-items: center;
+}
+
+.actions-left,
+.actions-right {
+  gap: 16rpx;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 16rpx;
+  border-radius: 12rpx;
+  background-color: #f5f7fa;
+  min-width: 100rpx;
+  transition: all 0.2s ease;
+}
+
+.action-btn:active {
+  background-color: #e8e8e8;
+}
+
+.action-active {
+  background-color: #6B8DD6;
+}
+
+.action-icon {
+  font-size: 32rpx;
+  margin-bottom: 4rpx;
+}
+
+.action-text {
+  font-size: 22rpx;
+  color: #666;
+}
+
+.action-active .action-text {
+  color: #fff;
+}
+
+.toggle-btn {
+  background-color: #e8f0ff;
+}
+
+.toggle-btn .action-text {
+  color: #6B8DD6;
+}
+
+.bottom-tip {
+  padding: 20rpx;
+  font-size: 24rpx;
+  color: #999;
+}

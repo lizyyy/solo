@@ -1,0 +1,73 @@
+<view class="container">
+  <!-- 登录提示 -->
+  <view class="login-section card" wx:if="{{!isLoggedIn}}">
+    <view class="login-content">
+      <view class="login-icon">👤</view>
+      <view class="login-text">
+        <view class="login-title">登录后体验更多功能</view>
+        <view class="login-desc text-secondary">发布心情、点赞评论、添加好友</view>
+      </view>
+    </view>
+    <view class="login-btn" bindtap="handleLogin">
+      立即登录
+    </view>
+  </view>
+
+  <!-- 分享圈列表 -->
+  <view class="moments-section">
+    <view class="section-header">
+      <view class="section-title">分享圈</view>
+      <view class="moment-count text-secondary">共 {{moments.length}} 条动态</view>
+    </view>
+
+    <view class="moments-list" wx:if="{{moments.length > 0}}">
+      <view class="moment-item card" wx:for="{{moments}}" wx:key="id">
+        <!-- 用户信息 -->
+        <view class="moment-header" bindtap="goToUserProfile" data-userid="{{item.userId}}">
+          <image class="user-avatar" src="{{item.avatar}}" mode="aspectFill" />
+          <view class="user-info">
+            <view class="user-name">{{item.userName}}</view>
+            <view class="post-time text-secondary">{{item.createTime}}</view>
+          </view>
+          <view class="privacy-tag" wx:if="{{!item.isPublic}}">
+            私密
+          </view>
+        </view>
+
+        <!-- 内容 -->
+        <view class="moment-content" bindtap="goToMomentDetail" data-id="{{item.id}}">
+          {{item.content}}
+        </view>
+
+        <!-- 操作栏 -->
+        <view class="moment-actions">
+          <view class="action-item" bindtap="toggleLike" data-id="{{item.id}}">
+            <text class="action-icon {{item.likeCount > 0 ? 'liked' : ''}}">❤️</text>
+            <text class="action-text">{{item.likeCount > 0 ? item.likeCount : '点赞'}}</text>
+          </view>
+          <view class="action-item" bindtap="goToMomentDetail" data-id="{{item.id}}">
+            <text class="action-icon">💬</text>
+            <text class="action-text">{{item.commentCount > 0 ? item.commentCount : '评论'}}</text>
+          </view>
+          <view class="action-item">
+            <text class="action-icon">🔗</text>
+            <text class="action-text">分享</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">💭</view>
+      <view class="empty-text text-secondary">
+        还没有动态，快来发布第一条心情吧！
+      </view>
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="create-moment-btn" bindtap="goToCreateMoment">
+    <text class="btn-icon">+</text>
+    <text class="btn-text">发布心情</text>
+  </view>
+</view>

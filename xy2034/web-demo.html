@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高考失利帮 - 网页演示版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; overflow: hidden; }
+        .app-container { max-width: 430px; margin: 0 auto; height: 100vh; background: #f5f7fa; position: relative; display: flex; flex-direction: column; box-shadow: 0 0 30px rgba(0,0,0,0.2); }
+        .page { display: none; flex: 1; overflow-y: auto; padding-bottom: 70px; }
+        .page.active { display: flex; flex-direction: column; }
+        .tabbar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; height: 65px; background: white; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); transition: transform 0.3s; }
+        .tabbar.hidden { transform: translateX(-50%) translateY(100%); }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; height: 100%; cursor: pointer; transition: all 0.3s; }
+        .tab-item.active { color: #667eea; }
+        .tab-item .icon { font-size: 24px; margin-bottom: 2px; }
+        .tab-item .label { font-size: 11px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; padding-top: calc(15px + env(safe-area-inset-top)); position: sticky; top: 0; z-index: 100; }
+        .header-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .header-desc { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+        .back-btn { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .content { padding: 15px; flex: 1; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .feature-card { background: white; border-radius: 16px; padding: 20px 10px; text-align: center; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .feature-card:active { transform: scale(0.95); }
+        .feature-card .icon { font-size: 32px; margin-bottom: 8px; }
+        .feature-card .title { font-size: 13px; color: #333; font-weight: 500; }
+        .feature-card .desc { font-size: 11px; color: #999; margin-top: 4px; }
+        .toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; z-index: 9999; animation: fadeInOut 2s ease-in-out; }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
+        .post-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); cursor: pointer; }
+        .post-card:active { transform: scale(0.98); }
+        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .post-user { display: flex; align-items: center; gap: 8px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600; }
+        .anonymous-avatar { background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); }
+        .user-name { font-size: 14px; color: #333; font-weight: 500; }
+        .anonymous-tag { background: #f0f0f0; color: #999; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+        .post-time { font-size: 12px; color: #999; }
+        .post-content { font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 12px; }
+        .post-stats { display: flex; gap: 20px; color: #999; font-size: 12px; }
+        .stat-item { display: flex; align-items: center; gap: 4px; }
+        .add-btn { position: fixed; bottom: 85px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .input-group { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .input-label { font-size: 14px; color: #666; margin-bottom: 10px; font-weight: 500; }
+        .textarea { width: 100%; min-height: 150px; border: 1px solid #eee; border-radius: 12px; padding: 12px; font-size: 14px; resize: vertical; font-family: inherit; line-height: 1.6; }
+        .textarea:focus { outline: none; border-color: #667eea; }
+        .word-count { text-align: right; font-size: 12px; color: #999; margin-top: 8px; }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .detail-content { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .comments-section { margin-top: 20px; }
+        .section-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .comment-card { background: #f8f9fa; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .comment-user { display: flex; align-items: center; gap: 6px; }
+        .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; }
+        .comment-name { font-size: 13px; color: #666; }
+        .comment-time { font-size: 11px; color: #999; }
+        .comment-text { font-size: 13px; color: #333; line-height: 1.6; }
+        .comment-input-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: white; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .comment-input { flex: 1; border: 1px solid #eee; border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; }
+        .comment-input:focus { border-color: #667eea; }
+        .send-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; font-weight: 500; }
+        .test-container { padding: 20px; }
+        .test-progress { margin-bottom: 24px; }
+        .progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 4px; transition: width 0.3s; }
+        .progress-text { text-align: right; font-size: 12px; color: #999; }
+        .question-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .question-number { font-size: 12px; color: #667eea; font-weight: 600; margin-bottom: 8px; }
+        .question-text { font-size: 16px; color: #333; line-height: 1.6; font-weight: 500; }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-item { background: #f8f9fa; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; }
+        .option-item:active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .option-item.selected { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .option-score { width: 28px; height: 28px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #667eea; flex-shrink: 0; }
+        .option-text { font-size: 14px; }
+        .next-btn { width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px; }
+        .next-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-card { background: white; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .result-level { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .result-score { font-size: 48px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+        .result-desc { font-size: 14px; color: #666; line-height: 1.6; }
+        .advice-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .advice-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .advice-list { list-style: none; }
+        .advice-list li { font-size: 14px; color: #666; padding: 8px 0; padding-left: 24px; position: relative; line-height: 1.6; }
+        .advice-list li:before { content: '✓'; position: absolute; left: 0; color: #667eea; font-weight: bold; }
+        .level-normal { color: #52c41a; }
+        .level-mild { color: #1890ff; }
+        .level-moderate { color: #faad14; }
+        .level-severe { color: #ff4d4f; }
+        .game-container { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .game-status { display: flex; justify-content: space-between; align-items: center; background: white; border-radius: 16px; padding: 16px 24px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .status-item { text-align: center; }
+        .status-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .status-value { font-size: 24px; font-weight: 700; color: #333; }
+        .game-area { flex: 1; background: white; border-radius: 20px; position: relative; overflow: hidden; min-height: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .target { position: absolute; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4); animation: pulse 1s infinite; user-select: none; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .target:active { transform: scale(0.9); }
+        .start-screen, .end-screen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; z-index: 10; }
+        .game-icon { font-size: 80px; margin-bottom: 20px; }
+        .game-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 12px; }
+        .game-subtitle { font-size: 14px; color: #999; margin-bottom: 30px; text-align: center; line-height: 1.6; }
+        .game-start-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 16px 48px; border-radius: 30px; font-size: 18px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+        .final-score { font-size: 64px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 8px; }
+        .final-label { font-size: 16px; color: #999; margin-bottom: 20px; }
+        .high-score-badge { background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%); color: #856404; padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+        .combo-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: 700; color: #ff6b6b; animation: comboAnim 0.8s ease-out forwards; pointer-events: none; z-index: 20; }
+        @keyframes comboAnim { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -80%) scale(1.5); } }
+        .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 16px; }
+        .message { margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
+        .message.user { flex-direction: row-reverse; }
+        .message-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .message-avatar.ai { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .message-avatar.user { background: linear-gradient(135deg, #52c41a 0%, #237804 100%); }
+        .message-bubble { max-width: 75%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.6; word-break: break-word; }
+        .message-bubble.ai { background: white; border-bottom-left-radius: 6px; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .message-bubble.user { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 6px; }
+        .chat-input-bar { background: white; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .chat-input { flex: 1; border: 1px solid #eee; border-radius: 20px; padding: 12px 20px; font-size: 14px; outline: none; }
+        .chat-input:focus { border-color: #667eea; }
+        .chat-send-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .quick-replies { display: flex; gap: 8px; padding: 8px 16px; overflow-x: auto; background: #f8f9fa; flex-wrap: wrap; }
+        .quick-reply-btn { background: white; border: 1px solid #e8e8e8; padding: 8px 16px; border-radius: 20px; font-size: 13px; color: #666; cursor: pointer; white-space: nowrap; transition: all 0.3s; }
+        .quick-reply-btn:active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: transparent; }
+        .moment-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .moment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .moment-user { display: flex; align-items: center; gap: 10px; }
+        .moment-content { font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 12px; }
+        .moment-actions { display: flex; gap: 24px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+        .action-btn { display: flex; align-items: center; gap: 6px; color: #999; font-size: 13px; cursor: pointer; transition: all 0.3s; }
+        .action-btn:active { transform: scale(0.95); }
+        .action-btn.liked { color: #ff6b6b; }
+        .privacy-tag { background: #e6f7ff; color: #1890ff; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+        .profile-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px 20px; padding-top: calc(30px + env(safe-area-inset-top)); text-align: center; color: white; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px; border: 3px solid rgba(255,255,255,0.5); }
+        .profile-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .profile-desc { font-size: 13px; opacity: 0.9; }
+        .profile-stats { display: flex; justify-content: space-around; background: white; margin: -20px 16px 16px; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); position: relative; z-index: 10; }
+        .stat-card { text-align: center; }
+        .stat-card .number { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 4px; }
+        .stat-card .label { font-size: 12px; color: #999; }
+        .menu-list { background: white; margin: 0 16px; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; transition: background 0.3s; border-bottom: 1px solid #f0f0f0; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:active { background: #f5f5f5; }
+        .menu-left { display: flex; align-items: center; gap: 12px; }
+        .menu-icon { font-size: 22px; }
+        .menu-title { font-size: 15px; color: #333; }
+        .menu-arrow { color: #ccc; font-size: 18px; }
+        .logout-btn { margin: 20px 16px; background: white; color: #ff4d4f; border: 1px solid #ff4d4f; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 320px; text-align: center; }
+        .modal-icon { font-size: 48px; margin-bottom: 16px; }
+        .modal-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .modal-desc { font-size: 14px; color: #666; margin-bottom: 24px; }
+        .modal-buttons { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; border: none; }
+        .modal-btn.cancel { background: #f5f5f5; color: #666; }
+        .modal-btn.confirm { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .hidden { display: none !important; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .empty-state .icon { font-size: 64px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state .text { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 首页 -->
+        <div id="page-home" class="page active">
+            <div class="header">
+                <div class="header-title">🌙 高考失利帮</div>
+                <div class="header-desc">你不是一个人在战斗</div>
+            </div>
+            <div class="content">
+                <div class="features-grid">
+                    <div class="feature-card" onclick="App.navigate('treeHole')">
+                        <div class="icon">🌳</div>
+                        <div class="title">情绪树洞</div>
+                        <div class="desc">匿名倾诉</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('anxietyTest')">
+                        <div class="icon">📝</div>
+                        <div class="title">焦虑自测</div>
+                        <div class="desc">GAD-7量表</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('aiChat')">
+                        <div class="icon">🤖</div>
+                        <div class="title">AI陪伴</div>
+                        <div class="desc">情绪聊天</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('complaint')">
+                        <div class="icon">⚡</div>
+                        <div class="title">避雷吐槽</div>
+                        <div class="desc">释放情绪</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('clickGame')">
+                        <div class="icon">🎮</div>
+                        <div class="title">解压游戏</div>
+                        <div class="desc">点击减压</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('doodle')">
+                        <div class="icon">🎨</div>
+                        <div class="title">涂鸦板</div>
+                        <div class="desc">随手画画</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('push')">
+                        <div class="icon">🌙</div>
+                        <div class="title">治愈推送</div>
+                        <div class="desc">暖心内容</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('moment')">
+                        <div class="icon">💫</div>
+                        <div class="title">分享圈</div>
+                        <div class="desc">心情分享</div>
+                    </div>
+                    <div class="feature-card" onclick="App.navigate('profile')">
+                        <div class="icon">👤</div>
+                        <div class="title">个人中心</div>
+                        <div class="desc">我的信息</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 情绪树洞列表页 -->
+        <div id="page-treeHole" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">🌳 情绪树洞</div>
+                <div class="header-desc">匿名倾诉，温暖陪伴</div>
+            </div>
+            <div class="content" id="treeHole-list"></div>
+            <button class="add-btn" onclick="App.navigate('createPost')">+</button>
+        </div>
+
+        <!-- 发帖页 -->
+        <div id="page-createPost" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">✏️ 发布帖子</div>
+            </div>
+            <div class="content">
+                <div class="input-group">
+                    <div class="input-label">说点什么吧...</div>
+                    <textarea class="textarea" id="post-content" placeholder="这里没有人知道你是谁，放心倾诉吧...（至少5个字）" oninput="App.checkPostLength()"></textarea>
+                    <div class="word-count"><span id="post-word-count">0</span>/500</div>
+                </div>
+                <button class="submit-btn" id="post-submit-btn" disabled onclick="App.submitPost()">发布</button>
+            </div>
+        </div>
+
+        <!-- 帖子详情页 -->
+        <div id="page-postDetail" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">📖 帖子详情</div>
+            </div>
+            <div class="content" id="post-detail-content" style="padding-bottom: 80px;"></div>
+            <div class="comment-input-bar">
+                <input type="text" class="comment-input" id="comment-input" placeholder="写下你的共情...">
+                <button class="send-btn" onclick="App.submitComment()">发送</button>
+            </div>
+        </div>
+
+        <!-- 焦虑测试页 -->
+        <div id="page-anxietyTest" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">📝 焦虑自测量表</div>
+                <div class="header-desc">GAD-7 专业量表</div>
+            </div>
+            <div class="test-container" id="test-container"></div>
+        </div>
+
+        <!-- 解压游戏页 -->
+        <div id="page-clickGame" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">🎮 解压点击游戏</div>
+                <div class="header-desc">30秒限时挑战</div>
+            </div>
+            <div class="game-container">
+                <div class="game-status">
+                    <div class="status-item">
+                        <div class="status-label">时间</div>
+                        <div class="status-value" id="game-time">30</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">得分</div>
+                        <div class="status-value" id="game-score">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">连击</div>
+                        <div class="status-value" id="game-combo">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-label">最高</div>
+                        <div class="status-value" id="game-highscore">0</div>
+                    </div>
+                </div>
+                <div class="game-area" id="game-area">
+                    <div class="start-screen" id="game-start">
+                        <div class="game-icon">🎯</div>
+                        <div class="game-title">解压点击</div>
+                        <div class="game-subtitle">30秒内点击出现的目标<br>目标越小，分数越高！</div>
+                        <button class="game-start-btn" onclick="App.startGame()">开始游戏</button>
+                    </div>
+                    <div class="end-screen hidden" id="game-end">
+                        <div class="game-icon">🎉</div>
+                        <div class="final-score" id="game-final-score">0</div>
+                        <div class="final-label">本次得分</div>
+                        <div class="high-score-badge hidden" id="game-new-record">🏆 新纪录！</div>
+                        <button class="game-start-btn" onclick="App.startGame()">再玩一次</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI聊天页 -->
+        <div id="page-aiChat" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">🤖 AI情绪陪伴</div>
+                <div class="header-desc">随时倾听你的心声</div>
+            </div>
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages"></div>
+                <div class="quick-replies">
+                    <button class="quick-reply-btn" onclick="App.sendQuickReply('我觉得自己很没用')">我觉得自己很没用</button>
+                    <button class="quick-reply-btn" onclick="App.sendQuickReply('我愧对父母')">我愧对父母</button>
+                    <button class="quick-reply-btn" onclick="App.sendQuickReply('我害怕被嘲笑')">我害怕被嘲笑</button>
+                    <button class="quick-reply-btn" onclick="App.sendQuickReply('我对未来很迷茫')">我对未来很迷茫</button>
+                </div>
+                <div class="chat-input-bar">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="输入你想说的话..." onkeypress="App.handleChatEnter(event)">
+                    <button class="chat-send-btn" onclick="App.sendChatMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分享圈列表页 -->
+        <div id="page-moment" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">💫 分享圈</div>
+                <div class="header-desc">与同路人交流</div>
+            </div>
+            <div class="content" id="moment-list"></div>
+            <button class="add-btn" onclick="App.navigate('createMoment')">+</button>
+        </div>
+
+        <!-- 发动态页 -->
+        <div id="page-createMoment" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">✏️ 发布动态</div>
+            </div>
+            <div class="content">
+                <div class="input-group">
+                    <div class="input-label">分享你的心情</div>
+                    <textarea class="textarea" id="moment-content" placeholder="此刻的心情是...（至少5个字）" oninput="App.checkMomentLength()"></textarea>
+                    <div class="word-count"><span id="moment-word-count">0</span>/300</div>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">可见范围</div>
+                    <div class="options-list" style="flex-direction: row; gap: 12px;">
+                        <div class="option-item" style="flex: 1; background: white; border: 1px solid #667eea; color: #667eea;" id="privacy-public" onclick="App.selectPrivacy('public')">
+                            <span class="option-score">🌍</span>
+                            <span class="option-text">公开</span>
+                        </div>
+                        <div class="option-item" style="flex: 1; background: #f8f9fa;" id="privacy-private" onclick="App.selectPrivacy('private')">
+                            <span class="option-score">🔒</span>
+                            <span class="option-text">私密</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="submit-btn" id="moment-submit-btn" disabled onclick="App.submitMoment()">发布</button>
+            </div>
+        </div>
+
+        <!-- 动态详情页 -->
+        <div id="page-momentDetail" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">📖 动态详情</div>
+            </div>
+            <div class="content" id="moment-detail-content" style="padding-bottom: 80px;"></div>
+            <div class="comment-input-bar">
+                <input type="text" class="comment-input" id="moment-comment-input" placeholder="写下你的评论...">
+                <button class="send-btn" onclick="App.submitMomentComment()">发送</button>
+            </div>
+        </div>
+
+        <!-- 我的动态页 -->
+        <div id="page-myMoments" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">📋 我的动态</div>
+                <div class="header-desc">查看自己发布的所有动态</div>
+            </div>
+            <div class="content" id="my-moments-list"></div>
+        </div>
+
+        <!-- 用户资料页 -->
+        <div id="page-userProfile" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">👤 用户资料</div>
+            </div>
+            <div class="profile-header">
+                <div class="profile-avatar" id="user-profile-avatar">😊</div>
+                <div class="profile-name" id="user-profile-name">用户</div>
+                <div class="profile-desc" id="user-profile-desc">这个人很神秘，什么都没留下</div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="number" id="user-stat-moments">0</div>
+                    <div class="label">动态</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="user-stat-following">0</div>
+                    <div class="label">关注</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="user-stat-followers">0</div>
+                    <div class="label">粉丝</div>
+                </div>
+            </div>
+            <div style="padding: 16px;">
+                <button class="submit-btn" id="follow-btn" onclick="App.toggleFollow()">关注</button>
+            </div>
+            <div class="content" style="padding-top: 0;">
+                <div class="section-title">📝 TA的动态</div>
+                <div id="user-moments-list"></div>
+            </div>
+        </div>
+
+        <!-- 测试记录页 -->
+        <div id="page-testRecords" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">📊 测试记录</div>
+                <div class="header-desc">查看你的焦虑测试历史</div>
+            </div>
+            <div class="content" id="test-records-list"></div>
+        </div>
+
+        <!-- 个人中心页 -->
+        <div id="page-profile" class="page">
+            <div class="profile-header">
+                <div class="profile-avatar">😊</div>
+                <div class="profile-name">失落的考生</div>
+                <div class="profile-desc">高考只是人生的一站</div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <div class="number" id="stat-moments">2</div>
+                    <div class="label">动态</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="stat-following">1</div>
+                    <div class="label">关注</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="stat-followers">3</div>
+                    <div class="label">粉丝</div>
+                </div>
+            </div>
+            <div class="menu-list">
+                <div class="menu-item" onclick="App.navigate('myMoments')">
+                    <div class="menu-left">
+                        <span class="menu-icon">📋</span>
+                        <span class="menu-title">我的动态</span>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="App.navigate('testRecords')">
+                    <div class="menu-left">
+                        <span class="menu-icon">📊</span>
+                        <span class="menu-title">测试记录</span>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item" onclick="App.showToast('功能开发中...')">
+                    <div class="menu-left">
+                        <span class="menu-icon">⚙️</span>
+                        <span class="menu-title">设置</span>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="App.showLogoutModal()">🚪 退出登录</button>
+        </div>
+
+        <!-- 涂鸦板页面 -->
+        <div id="page-doodle" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">🎨 解压涂鸦板</div>
+                <div class="header-desc">随手画画，释放情绪</div>
+            </div>
+            <div class="content" style="display: flex; flex-direction: column; padding-bottom: 80px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#667eea')" style="width: 32px; height: 32px; border-radius: 50%; background: #667eea; border: 3px solid #667eea; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#ff6b6b')" style="width: 32px; height: 32px; border-radius: 50%; background: #ff6b6b; border: 2px solid #ddd; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#ffd93d')" style="width: 32px; height: 32px; border-radius: 50%; background: #ffd93d; border: 2px solid #ddd; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#6bcb77')" style="width: 32px; height: 32px; border-radius: 50%; background: #6bcb77; border: 2px solid #ddd; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#4d96ff')" style="width: 32px; height: 32px; border-radius: 50%; background: #4d96ff; border: 2px solid #ddd; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#333333')" style="width: 32px; height: 32px; border-radius: 50%; background: #333333; border: 2px solid #ddd; cursor: pointer;"></button>
+                        <button class="doodle-color-btn" onclick="App.setDoodleColor('#ffffff')" style="width: 32px; height: 32px; border-radius: 50%; background: #ffffff; border: 2px solid #ddd; cursor: pointer; font-size: 12px;">🧹</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span style="font-size: 13px; color: #666;">粗细:</span>
+                        <button class="doodle-size-btn" onclick="App.setDoodleSize(3)" style="width: 20px; height: 20px; border-radius: 50%; background: #667eea; border: none; cursor: pointer;"></button>
+                        <button class="doodle-size-btn" onclick="App.setDoodleSize(6)" style="width: 26px; height: 26px; border-radius: 50%; background: #667eea; border: none; cursor: pointer;"></button>
+                        <button class="doodle-size-btn" onclick="App.setDoodleSize(10)" style="width: 32px; height: 32px; border-radius: 50%; background: #667eea; border: none; cursor: pointer;"></button>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-left: auto;">
+                        <button onclick="App.undoDoodle()" style="padding: 8px 16px; border-radius: 18px; border: 1px solid #ddd; background: white; font-size: 13px; cursor: pointer;">↩️ 撤销</button>
+                        <button onclick="App.clearDoodle()" style="padding: 8px 16px; border-radius: 18px; border: 1px solid #ff6b6b; background: white; color: #ff6b6b; font-size: 13px; cursor: pointer;">🗑️ 清空</button>
+                    </div>
+                </div>
+                <div style="background: white; border-radius: 16px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex: 1; min-height: 300px;">
+                    <canvas id="doodle-canvas" style="width: 100%; height: 100%; min-height: 300px; border-radius: 8px; background: #fafafa; touch-action: none; cursor: crosshair;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 吐槽区页面 -->
+        <div id="page-complaint" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">⚡ 避雷吐槽</div>
+                <div class="header-desc">一吐为快，释放情绪</div>
+            </div>
+            <div class="content" id="complaint-list"></div>
+            <button class="add-btn" onclick="App.navigate('createComplaint')">+</button>
+        </div>
+
+        <!-- 发布吐槽页 -->
+        <div id="page-createComplaint" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">✏️ 发布吐槽</div>
+            </div>
+            <div class="content">
+                <div class="input-group">
+                    <div class="input-label">选择吐槽类型</div>
+                    <div class="options-list" style="flex-direction: row; gap: 8px; flex-wrap: wrap;">
+                        <div class="complaint-tag-btn" onclick="App.selectComplaintTag('亲戚')" data-tag="亲戚" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">👨‍👩‍👧‍👦 亲戚</div>
+                        <div class="complaint-tag-btn" onclick="App.selectComplaintTag('偏见')" data-tag="偏见" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">😤 偏见</div>
+                        <div class="complaint-tag-btn" onclick="App.selectComplaintTag('学历焦虑')" data-tag="学历焦虑" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">📚 学历焦虑</div>
+                        <div class="complaint-tag-btn" onclick="App.selectComplaintTag('其他')" data-tag="其他" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">💬 其他</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">吐槽内容</div>
+                    <textarea class="textarea" id="complaint-content" placeholder="把想说的都吐出来吧...（至少5个字）" oninput="App.checkComplaintLength()"></textarea>
+                    <div class="word-count"><span id="complaint-word-count">0</span>/500</div>
+                </div>
+                <button class="submit-btn" id="complaint-submit-btn" disabled onclick="App.submitComplaint()">发布</button>
+            </div>
+        </div>
+
+        <!-- 治愈推送页面 -->
+        <div id="page-push" class="page">
+            <div class="header" style="position: relative;">
+                <button class="back-btn" onclick="App.goBack()">←</button>
+                <div class="header-title" style="margin-left: 50px;">🌙 深夜治愈</div>
+                <div class="header-desc">暖心内容，陪伴入眠</div>
+            </div>
+            <div class="content">
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <button class="push-category-btn active" onclick="App.filterPush('全部')" style="padding: 8px 16px; border-radius: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; font-size: 13px; cursor: pointer;">全部</button>
+                    <button class="push-category-btn" onclick="App.filterPush('同龄人经历')" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">同龄人经历</button>
+                    <button class="push-category-btn" onclick="App.filterPush('清醒文案')" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">清醒文案</button>
+                    <button class="push-category-btn" onclick="App.filterPush('解压短句')" style="padding: 8px 16px; border-radius: 20px; background: #f8f9fa; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">解压短句</button>
+                </div>
+                <div id="push-list"></div>
+            </div>
+        </div>
+
+        <!-- TabBar -->
+        <div class="tabbar">
+            <div class="tab-item active" onclick="App.switchTab('home')" data-tab="home">
+                <span class="icon">🏠</span>
+                <span class="label">首页</span>
+            </div>
+            <div class="tab-item" onclick="App.switchTab('treeHole')" data-tab="treeHole">
+                <span class="icon">🌳</span>
+                <span class="label">树洞</span>
+            </div>
+            <div class="tab-item" onclick="App.switchTab('moment')" data-tab="moment">
+                <span class="icon">💫</span>
+                <span class="label">分享圈</span>
+            </div>
+            <div class="tab-item" onclick="App.switchTab('profile')" data-tab="profile">
+                <span class="icon">👤</span>
+                <span class="label">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 退出确认弹窗 -->
+    <div id="logout-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-icon">🚪</div>
+            <div class="modal-title">确认退出？</div>
+            <div class="modal-desc">退出后您的数据仍会保存在本地</div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="App.hideLogoutModal()">取消</button>
+                <button class="modal-btn confirm" onclick="App.confirmLogout()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const App = {
+            pageHistory: ['home'],
+            currentPage: 'home',
+            treeHolePosts: [],
+            moments: [],
+            currentPostId: null,
+            testAnswers: [],
+            currentQuestion: 0,
+            privacy: 'public',
+            selectedOption: null,
+            gameState: {
+                score: 0,
+                combo: 0,
+                timeLeft: 30,
+                highScore: 0,
+                isPlaying: false,
+                timer: null,
+                targetTimer: null
+            },
+            
+            questions: [
+                { text: "感到紧张、焦虑或急切" },
+                { text: "不能停止或控制担忧" },
+                { text: "对各种各样的事情担忧过多" },
+                { text: "很难放松下来" },
+                { text: "由于不安而无法静坐" },
+                { text: "变得容易烦恼或急躁" },
+                { text: "感到似乎将有可怕的事情发生而害怕" }
+            ],
+
+            aiReplies: {
+                '没用': "我理解你现在的感受，高考失利确实会让人产生自我怀疑。但请记住，一次考试的结果并不代表你的全部价值。每个人的人生节奏不同，有的人早成，有的人晚达。你现在的失落只是暂时的，真正决定你未来的是你面对挫折的态度和持续的努力。",
+                '父母': "我知道你觉得愧对父母，但请相信，在父母心中，你的健康和快乐永远比成绩重要。他们可能一时难以接受，但他们对你的爱不会因为一次考试而改变。试着和他们坦诚地聊聊你的感受，你会发现他们一直在你身后支持着你。",
+                '嘲笑': "害怕被嘲笑是很正常的心理，但真正的朋友和善良的人不会因为一次考试失利就看不起你。那些会嘲笑你的人，往往是在用别人的失意来掩饰自己的不安。你不需要为别人的无知和恶意买单，你的价值不需要通过他人的认可来证明。",
+                '迷茫': "对未来感到迷茫是很正常的，尤其是在这样一个转折点。但迷茫往往意味着改变的开始。高考只是人生众多选择中的一条路，不是唯一的路。你可以选择复读、选择其他学校、选择学习技能...重要的是找到你真正热爱和擅长的事情。",
+                '复读': "复读是一个需要勇气的选择。它意味着你愿意再给自己一次机会，这本身就是一种勇敢。复读的一年会很辛苦，但如果你确定这是你想要的，那就去做吧。记住，不管结果如何，这段经历都会让你变得更强大。",
+                '难过': "难过是很正常的，想哭就哭出来，不要压抑自己的情绪。接受自己现在的感受，这是走出困境的第一步。时间是最好的良药，慢慢的，你会发现事情并没有想象中那么糟糕。记住，你不是一个人在面对这一切。",
+                '未来': "高考的确很重要，但它远没有重要到决定你整个人生的程度。历史上有很多成功人士，他们的人生轨迹也不是由一次考试决定的。你的未来充满无限可能，现在的失意只是暂时的。重要的是保持希望，继续前行。"
+            },
+
+            init: function() {
+                this.loadData();
+                this.renderTreeHoleList();
+                this.renderMomentList();
+                this.loadGameHighScore();
+                this.initChat();
+            },
+
+            loadData: function() {
+                const savedFollowing = localStorage.getItem('followingList');
+                if (savedFollowing) {
+                    this.followingList = JSON.parse(savedFollowing);
+                }
+                
+                const savedTestRecords = localStorage.getItem('testRecords');
+                if (savedTestRecords) {
+                    this.testRecords = JSON.parse(savedTestRecords);
+                }
+                
+                const savedPosts = localStorage.getItem('treeHolePosts');
+                if (savedPosts) {
+                    this.treeHolePosts = JSON.parse(savedPosts);
+                } else {
+                    this.treeHolePosts = [
+                        {
+                            id: 'post_1',
+                            content: '高考成绩出来了，比预期低了60分。看着父母失望的眼神，我真的不知道该怎么办。复读还是将就？感觉人生一片灰暗...',
+                            anonymous: true,
+                            createTime: Date.now() - 86400000,
+                            comments: [
+                                { id: 'c1', content: '我也是，差了50分，已经决定复读了。一起加油！', anonymous: true, createTime: Date.now() - 43200000 },
+                                { id: 'c2', content: '我去年差了80分，复读一年涨了120分。只要肯努力，一切都有可能！', anonymous: true, createTime: Date.now() - 21600000 }
+                            ]
+                        },
+                        {
+                            id: 'post_2',
+                            content: '不敢告诉亲戚朋友我的成绩，害怕他们的目光。明明平时成绩还不错，为什么关键时候掉链子？我是不是真的很没用...',
+                            anonymous: true,
+                            createTime: Date.now() - 172800000,
+                            comments: [
+                                { id: 'c3', content: '一次考试代表不了什么，人生是场马拉松，不是百米跑。', anonymous: true, createTime: Date.now() - 86400000 }
+                            ]
+                        },
+                        {
+                            id: 'post_3',
+                            content: '晚上睡不着，闭上眼睛就是成绩单。父母嘴上说没事，但我知道他们心里也很难过。感觉自己让所有人失望了...',
+                            anonymous: true,
+                            createTime: Date.now() - 259200000,
+                            comments: []
+                        }
+                    ];
+                }
+
+                const savedMoments = localStorage.getItem('moments');
+                if (savedMoments) {
+                    this.moments = JSON.parse(savedMoments);
+                    this.moments.forEach(function(m) {
+                        if (m.comments && m.comments.length !== m.commentCount) {
+                            m.commentCount = m.comments.length;
+                        }
+                    });
+                    localStorage.setItem('moments', JSON.stringify(this.moments));
+                } else {
+                    this.moments = [
+                        {
+                            id: 'moment_1',
+                            content: '今天去书店买了复读的资料，决定给自己再一次机会。虽然前路漫漫，但至少我还有选择的权利。加油💪',
+                            userName: '追光者',
+                            userAvatar: '🌅',
+                            isPrivate: false,
+                            liked: false,
+                            likeCount: 12,
+                            commentCount: 3,
+                            createTime: Date.now() - 86400000,
+                            comments: [
+                                { id: 'mc1', userName: '路人甲', userAvatar: '😊', content: '一起加油！', createTime: Date.now() - 43200000 },
+                                { id: 'mc2', userName: '迷茫的考生', userAvatar: '😔', content: '我也在考虑复读，你有什么建议吗？', createTime: Date.now() - 21600000 },
+                                { id: 'mc3', userName: '向阳生长', userAvatar: '🌻', content: '加油！复读一年可以改变很多！', createTime: Date.now() - 10800000 }
+                            ]
+                        },
+                        {
+                            id: 'moment_2',
+                            content: '和父母深谈了一次，他们说无论我做什么决定都支持我。突然觉得，有家人在身后，什么困难都不怕了。',
+                            userName: '向阳生长',
+                            userAvatar: '🌻',
+                            isPrivate: false,
+                            liked: false,
+                            likeCount: 8,
+                            commentCount: 2,
+                            createTime: Date.now() - 172800000,
+                            comments: [
+                                { id: 'mc4', userName: '追光者', userAvatar: '🌅', content: '有家人的支持真好！', createTime: Date.now() - 86400000 },
+                                { id: 'mc5', userName: '失落的考生', userAvatar: '😊', content: '我也想和父母好好谈谈...', createTime: Date.now() - 43200000 }
+                            ]
+                        }
+                    ];
+                }
+            },
+
+            saveData: function() {
+                localStorage.setItem('treeHolePosts', JSON.stringify(this.treeHolePosts));
+                localStorage.setItem('moments', JSON.stringify(this.moments));
+            },
+
+            showToast: function(message) {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(function() { toast.remove(); }, 2000);
+            },
+
+            formatTime: function(timestamp) {
+                const now = Date.now();
+                const diff = now - timestamp;
+                if (diff < 60000) return '刚刚';
+                if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+                if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+                if (diff < 604800000) return Math.floor(diff / 86400000) + '天前';
+                const date = new Date(timestamp);
+                return (date.getMonth() + 1) + '-' + date.getDate();
+            },
+
+            switchTab: function(tab) {
+                this.pageHistory = [tab];
+                this.showPage(tab);
+                document.querySelectorAll('.tab-item').forEach(function(item) {
+                    item.classList.toggle('active', item.dataset.tab === tab);
+                });
+            },
+
+            navigate: function(page) {
+                if (this.currentPage !== page) {
+                    this.pageHistory.push(page);
+                    this.showPage(page);
+                }
+            },
+
+            goBack: function() {
+                if (this.pageHistory.length > 1) {
+                    this.pageHistory.pop();
+                    const prevPage = this.pageHistory[this.pageHistory.length - 1];
+                    this.showPage(prevPage);
+                }
+            },
+
+            showPage: function(page) {
+                document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+                const targetPage = document.getElementById('page-' + page);
+                if (targetPage) targetPage.classList.add('active');
+                this.currentPage = page;
+
+                if (page === 'anxietyTest') {
+                    this.resetTest();
+                    this.renderQuestion();
+                }
+                if (page === 'createPost') {
+                    document.getElementById('post-content').value = '';
+                    document.getElementById('post-word-count').textContent = '0';
+                    document.getElementById('post-submit-btn').disabled = true;
+                }
+                if (page === 'createMoment') {
+                    document.getElementById('moment-content').value = '';
+                    document.getElementById('moment-word-count').textContent = '0';
+                    document.getElementById('moment-submit-btn').disabled = true;
+                    this.privacy = 'public';
+                    this.updatePrivacyUI();
+                }
+            },
+
+            renderTreeHoleList: function() {
+                const container = document.getElementById('treeHole-list');
+                if (!this.treeHolePosts.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">🌳</div><div class="text">还没有人发帖，来当第一个吧！</div></div>';
+                    return;
+                }
+                const self = this;
+                container.innerHTML = this.treeHolePosts.map(function(post) {
+                    return '<div class="post-card" onclick="App.openPostDetail(\'' + post.id + '\')"><div class="post-header"><div class="post-user"><div class="avatar anonymous-avatar">匿</div><div><div class="user-name">匿名用户</div></div></div><div class="post-time">' + self.formatTime(post.createTime) + '</div></div><div class="post-content">' + post.content + '</div><div class="post-stats"><div class="stat-item">💬 ' + post.comments.length + ' 评论</div></div></div>';
+                }).join('');
+            },
+
+            openPostDetail: function(postId) {
+                this.currentPostId = postId;
+                this.renderPostDetail();
+                this.navigate('postDetail');
+            },
+
+            renderPostDetail: function() {
+                const post = this.treeHolePosts.find(function(p) { return p.id === App.currentPostId; });
+                if (!post) return;
+                const container = document.getElementById('post-detail-content');
+                const self = this;
+                let commentsHtml = '';
+                if (post.comments.length > 0) {
+                    commentsHtml = post.comments.map(function(comment) {
+                        return '<div class="comment-card"><div class="comment-header"><div class="comment-user"><div class="comment-avatar">匿</div><span class="comment-name">匿名用户</span></div><span class="comment-time">' + self.formatTime(comment.createTime) + '</span></div><div class="comment-text">' + comment.content + '</div></div>';
+                    }).join('');
+                } else {
+                    commentsHtml = '<div style="text-align: center; padding: 20px; color: #999;">暂无评论，快来第一个共情吧~</div>';
+                }
+                container.innerHTML = '<div class="detail-content"><div class="post-header"><div class="post-user"><div class="avatar anonymous-avatar">匿</div><div><div class="user-name">匿名用户</div></div></div><div class="post-time">' + this.formatTime(post.createTime) + '</div></div><div class="post-content">' + post.content + '</div></div><div class="comments-section"><div class="section-title">💬 共情评论</div>' + commentsHtml + '</div>';
+            },
+
+            checkPostLength: function() {
+                const content = document.getElementById('post-content').value;
+                document.getElementById('post-word-count').textContent = content.length;
+                document.getElementById('post-submit-btn').disabled = content.length < 5;
+            },
+
+            submitPost: function() {
+                const content = document.getElementById('post-content').value.trim();
+                if (content.length < 5) { this.showToast('内容至少5个字'); return; }
+                const newPost = {
+                    id: 'post_' + Date.now(),
+                    content: content,
+                    anonymous: true,
+                    createTime: Date.now(),
+                    comments: []
+                };
+                this.treeHolePosts.unshift(newPost);
+                this.saveData();
+                this.renderTreeHoleList();
+                this.showToast('发布成功！');
+                this.goBack();
+            },
+
+            submitComment: function() {
+                const input = document.getElementById('comment-input');
+                const content = input.value.trim();
+                if (!content) { this.showToast('请输入内容'); return; }
+                const post = this.treeHolePosts.find(function(p) { return p.id === App.currentPostId; });
+                if (!post) return;
+                post.comments.push({
+                    id: 'c_' + Date.now(),
+                    content: content,
+                    anonymous: true,
+                    createTime: Date.now()
+                });
+                this.saveData();
+                this.renderPostDetail();
+                this.renderTreeHoleList();
+                input.value = '';
+                this.showToast('评论成功！');
+            },
+
+            resetTest: function() {
+                this.testAnswers = [];
+                this.currentQuestion = 0;
+                this.selectedOption = null;
+            },
+
+            renderQuestion: function() {
+                const container = document.getElementById('test-container');
+                if (this.currentQuestion >= this.questions.length) {
+                    this.showTestResult();
+                    return;
+                }
+                const q = this.questions[this.currentQuestion];
+                const progress = ((this.currentQuestion + 1) / this.questions.length) * 100;
+                const options = [
+                    { score: 0, text: '完全不会' },
+                    { score: 1, text: '有几天' },
+                    { score: 2, text: '一半以上的天数' },
+                    { score: 3, text: '几乎每天' }
+                ];
+                const self = this;
+                container.innerHTML = '<div class="test-progress"><div class="progress-bar"><div class="progress-fill" style="width: ' + progress + '%;"></div></div><div class="progress-text">' + (this.currentQuestion + 1) + ' / ' + this.questions.length + '</div></div><div class="question-card"><div class="question-number">问题 ' + (this.currentQuestion + 1) + '</div><div class="question-text">' + q.text + '</div></div><div class="options-list">' + options.map(function(opt) {
+                    return '<div class="option-item" onclick="App.selectOption(' + opt.score + ')" data-score="' + opt.score + '"><span class="option-score">' + opt.score + '</span><span class="option-text">' + opt.text + '</span></div>';
+                }).join('') + '</div><button class="next-btn" id="next-btn" disabled onclick="App.nextQuestion()">' + (this.currentQuestion === this.questions.length - 1 ? '查看结果' : '下一题') + '</button>';
+            },
+
+            selectOption: function(score) {
+                this.selectedOption = score;
+                document.querySelectorAll('.option-item').forEach(function(item) {
+                    item.classList.toggle('selected', parseInt(item.dataset.score) === score);
+                });
+                document.getElementById('next-btn').disabled = false;
+            },
+
+            nextQuestion: function() {
+                if (this.selectedOption === null) return;
+                this.testAnswers.push(this.selectedOption);
+                this.selectedOption = null;
+                this.currentQuestion++;
+                this.renderQuestion();
+            },
+
+            testRecords: [],
+
+            showTestResult: function() {
+                const totalScore = this.testAnswers.reduce(function(a, b) { return a + b; }, 0);
+                let level, levelClass, desc, advice;
+                if (totalScore <= 4) {
+                    level = '正常状态';
+                    levelClass = 'level-normal';
+                    desc = '你的焦虑水平较低，整体状态良好。继续保持积极的心态！';
+                    advice = ['保持规律作息，适当运动', '多和朋友家人交流', '做一些自己喜欢的事情放松'];
+                } else if (totalScore <= 9) {
+                    level = '轻度焦虑';
+                    levelClass = 'level-mild';
+                    desc = '你有一些轻微的焦虑症状，这是很正常的反应。试着调整一下自己的状态。';
+                    advice = ['每天花10分钟做深呼吸或冥想', '写日记记录自己的情绪', '避免过度思考负面结果', '适当进行体育锻炼'];
+                } else if (totalScore <= 14) {
+                    level = '中度焦虑';
+                    levelClass = 'level-moderate';
+                    desc = '你正在经历中度的焦虑，这可能会影响你的日常生活。建议采取一些措施来缓解。';
+                    advice = ['建议和信任的人倾诉你的感受', '考虑寻求专业心理咨询师的帮助', '尝试渐进式肌肉放松训练', '减少咖啡因摄入，保证充足睡眠'];
+                } else {
+                    level = '重度焦虑';
+                    levelClass = 'level-severe';
+                    desc = '你的焦虑症状较为明显，建议及时寻求专业帮助。记住，寻求帮助是勇敢的表现。';
+                    advice = ['强烈建议寻求专业心理咨询或治疗', '告诉你的家人你的感受，获得他们的支持', '避免独自承受压力', '可以考虑去医院心理科进行评估'];
+                }
+                
+                const record = {
+                    id: 'tr_' + Date.now(),
+                    score: totalScore,
+                    level: level,
+                    levelClass: levelClass,
+                    createTime: Date.now()
+                };
+                this.testRecords.unshift(record);
+                localStorage.setItem('testRecords', JSON.stringify(this.testRecords));
+                
+                const container = document.getElementById('test-container');
+                container.innerHTML = '<div class="result-card"><div class="result-level ' + levelClass + '">' + level + '</div><div class="result-score">' + totalScore + '</div><div class="result-desc">GAD-7 焦虑量表总分：0-21分</div><div class="result-desc" style="margin-top: 12px;">' + desc + '</div></div><div class="advice-card"><div class="advice-title">💡 建议</div><ul class="advice-list">' + advice.map(function(a) { return '<li>' + a + '</li>'; }).join('') + '</ul></div><button class="next-btn" onclick="App.resetTest(); App.renderQuestion();">重新测试</button>';
+            },
+
+            loadGameHighScore: function() {
+                const saved = localStorage.getItem('gameHighScore');
+                if (saved) {
+                    this.gameState.highScore = parseInt(saved);
+                    document.getElementById('game-highscore').textContent = this.gameState.highScore;
+                }
+            },
+
+            startGame: function() {
+                const self = this;
+                this.gameState.score = 0;
+                this.gameState.combo = 0;
+                this.gameState.timeLeft = 30;
+                this.gameState.isPlaying = true;
+                this.updateGameUI();
+                document.getElementById('game-start').classList.add('hidden');
+                document.getElementById('game-end').classList.add('hidden');
+                this.gameState.timer = setInterval(function() {
+                    self.gameState.timeLeft--;
+                    document.getElementById('game-time').textContent = self.gameState.timeLeft;
+                    if (self.gameState.timeLeft <= 0) {
+                        self.endGame();
+                    }
+                }, 1000);
+                this.spawnTarget();
+            },
+
+            spawnTarget: function() {
+                if (!this.gameState.isPlaying) return;
+                const gameArea = document.getElementById('game-area');
+                const areaRect = gameArea.getBoundingClientRect();
+                const minSize = 30;
+                const maxSize = 80;
+                const size = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
+                const maxX = areaRect.width - size - 20;
+                const maxY = areaRect.height - size - 20;
+                const x = Math.floor(Math.random() * maxX) + 10;
+                const y = Math.floor(Math.random() * maxY) + 10;
+                const points = Math.floor((maxSize - size) / 10) + 1;
+                const target = document.createElement('div');
+                target.className = 'target';
+                target.style.width = size + 'px';
+                target.style.height = size + 'px';
+                target.style.left = x + 'px';
+                target.style.top = y + 'px';
+                target.style.fontSize = Math.max(12, size / 3) + 'px';
+                target.textContent = '+' + points;
+                target.dataset.points = points;
+                target.onclick = function(e) {
+                    e.stopPropagation();
+                    App.hitTarget(this);
+                };
+                gameArea.appendChild(target);
+                const self = this;
+                const disappearTime = Math.max(1000, 2000 - size * 10);
+                setTimeout(function() {
+                    if (target.parentNode && self.gameState.isPlaying) {
+                        target.remove();
+                        self.gameState.combo = 0;
+                        self.updateGameUI();
+                    }
+                }, disappearTime);
+            },
+
+            hitTarget: function(target) {
+                const points = parseInt(target.dataset.points);
+                this.gameState.combo++;
+                const comboBonus = Math.floor(this.gameState.combo / 3);
+                const totalPoints = points + comboBonus;
+                this.gameState.score += totalPoints;
+                
+                if (this.gameState.combo >= 3) {
+                    this.showComboPopup(this.gameState.combo);
+                }
+                
+                target.remove();
+                this.updateGameUI();
+                
+                const self = this;
+                setTimeout(function() {
+                    if (self.gameState.isPlaying) {
+                        self.spawnTarget();
+                    }
+                }, 100);
+            },
+
+            showComboPopup: function(combo) {
+                const gameArea = document.getElementById('game-area');
+                const popup = document.createElement('div');
+                popup.className = 'combo-popup';
+                popup.textContent = combo + '连击!';
+                gameArea.appendChild(popup);
+                setTimeout(function() { popup.remove(); }, 800);
+            },
+
+            updateGameUI: function() {
+                document.getElementById('game-score').textContent = this.gameState.score;
+                document.getElementById('game-combo').textContent = this.gameState.combo;
+            },
+
+            endGame: function() {
+                this.gameState.isPlaying = false;
+                clearInterval(this.gameState.timer);
+                
+                const gameArea = document.getElementById('game-area');
+                const targets = gameArea.querySelectorAll('.target');
+                targets.forEach(function(t) { t.remove(); });
+                
+                const isNewRecord = this.gameState.score > this.gameState.highScore;
+                if (isNewRecord) {
+                    this.gameState.highScore = this.gameState.score;
+                    localStorage.setItem('gameHighScore', this.gameState.highScore);
+                    document.getElementById('game-highscore').textContent = this.gameState.highScore;
+                }
+                
+                document.getElementById('game-final-score').textContent = this.gameState.score;
+                document.getElementById('game-new-record').classList.toggle('hidden', !isNewRecord);
+                document.getElementById('game-end').classList.remove('hidden');
+            },
+
+            currentMomentId: null,
+
+            currentViewingUser: null,
+            followingList: [],
+            users: {},
+
+            renderMomentList: function() {
+                const container = document.getElementById('moment-list');
+                const publicMoments = this.moments.filter(function(m) { return !m.isPrivate; });
+                
+                if (!publicMoments.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">💫</div><div class="text">还没有人分享，来当第一个吧！</div></div>';
+                    return;
+                }
+                
+                const self = this;
+                container.innerHTML = publicMoments.map(function(m) {
+                    const likedClass = m.liked ? 'liked' : '';
+                    const isCurrentUser = m.userName === '失落的考生';
+                    return '<div class="moment-card" onclick="App.openMomentDetail(\'' + m.id + '\')"><div class="moment-header"><div class="moment-user" onclick="event.stopPropagation(); App.openUserProfile(\'' + m.userName + '\', \'' + m.userAvatar + '\')"><div class="avatar" style="cursor: pointer;">' + m.userAvatar + '</div><div><div class="user-name" style="cursor: pointer;">' + m.userName + '</div></div></div><div class="post-time">' + self.formatTime(m.createTime) + '</div></div><div class="moment-content">' + m.content + '</div><div class="moment-actions"><div class="action-btn ' + likedClass + '" onclick="event.stopPropagation(); App.toggleMomentLike(\'' + m.id + '\', \'list\')"><span>' + (m.liked ? '❤️' : '🤍') + '</span><span>' + m.likeCount + '</span></div><div class="action-btn" onclick="event.stopPropagation(); App.openMomentDetail(\'' + m.id + '\')"><span>💬</span><span>' + m.commentCount + '</span></div><div class="action-btn" onclick="event.stopPropagation(); App.shareMoment(\'' + m.id + '\')"><span>🔗</span><span>分享</span></div></div></div>';
+                }).join('');
+            },
+
+            toggleLike: function(momentId) {
+                const m = this.moments.find(function(item) { return item.id === momentId; });
+                if (!m) return;
+                
+                if (m.liked) {
+                    m.liked = false;
+                    m.likeCount = Math.max(0, m.likeCount - 1);
+                } else {
+                    m.liked = true;
+                    m.likeCount++;
+                }
+                
+                this.saveData();
+                this.renderMomentList();
+            },
+
+            checkMomentLength: function() {
+                const content = document.getElementById('moment-content').value;
+                document.getElementById('moment-word-count').textContent = content.length;
+                document.getElementById('moment-submit-btn').disabled = content.length < 5;
+            },
+
+            selectPrivacy: function(privacy) {
+                this.privacy = privacy;
+                this.updatePrivacyUI();
+            },
+
+            updatePrivacyUI: function() {
+                const publicEl = document.getElementById('privacy-public');
+                const privateEl = document.getElementById('privacy-private');
+                
+                if (this.privacy === 'public') {
+                    publicEl.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    publicEl.style.color = 'white';
+                    publicEl.style.border = 'none';
+                    privateEl.style.background = '#f8f9fa';
+                    privateEl.style.color = '#333';
+                    privateEl.style.border = 'none';
+                } else {
+                    privateEl.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    privateEl.style.color = 'white';
+                    privateEl.style.border = 'none';
+                    publicEl.style.background = 'white';
+                    publicEl.style.color = '#667eea';
+                    publicEl.style.border = '1px solid #667eea';
+                }
+            },
+
+            submitMoment: function() {
+                const content = document.getElementById('moment-content').value.trim();
+                if (content.length < 5) { this.showToast('内容至少5个字'); return; }
+                
+                const newMoment = {
+                    id: 'moment_' + Date.now(),
+                    content: content,
+                    userName: '失落的考生',
+                    userAvatar: '😊',
+                    isPrivate: this.privacy === 'private',
+                    liked: false,
+                    likeCount: 0,
+                    commentCount: 0,
+                    createTime: Date.now(),
+                    comments: []
+                };
+                
+                this.moments.unshift(newMoment);
+                this.saveData();
+                this.renderMomentList();
+                this.showToast('发布成功！');
+                this.goBack();
+            },
+
+            toggleMomentLike: function(momentId, source) {
+                const m = this.moments.find(function(item) { return item.id === momentId; });
+                if (!m) return;
+                
+                if (m.liked) {
+                    m.liked = false;
+                    m.likeCount = Math.max(0, m.likeCount - 1);
+                } else {
+                    m.liked = true;
+                    m.likeCount++;
+                }
+                
+                this.saveData();
+                
+                if (source === 'list') {
+                    this.renderMomentList();
+                } else if (source === 'my') {
+                    this.renderMyMoments();
+                } else if (source === 'detail') {
+                    this.renderMomentDetail();
+                }
+            },
+
+            openMomentDetail: function(momentId) {
+                this.currentMomentId = momentId;
+                this.renderMomentDetail();
+                this.navigate('momentDetail');
+            },
+
+            renderMomentDetail: function() {
+                const m = this.moments.find(function(item) { return item.id === App.currentMomentId; });
+                if (!m) return;
+                
+                const container = document.getElementById('moment-detail-content');
+                const self = this;
+                const likedClass = m.liked ? 'liked' : '';
+                
+                let commentsHtml = '';
+                if (m.comments.length > 0) {
+                    commentsHtml = m.comments.map(function(c) {
+                        return '<div class="comment-card"><div class="comment-header"><div class="comment-user"><div class="comment-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">' + (c.userAvatar ? c.userAvatar.charAt(0) : '😊') + '</div><span class="comment-name">' + c.userName + '</span></div><span class="comment-time">' + self.formatTime(c.createTime) + '</span></div><div class="comment-text">' + c.content + '</div></div>';
+                    }).join('');
+                } else {
+                    commentsHtml = '<div style="text-align: center; padding: 20px; color: #999;">暂无评论，快来第一个评论吧~</div>';
+                }
+                
+                container.innerHTML = '<div class="detail-content"><div class="moment-header"><div class="moment-user" onclick="App.openUserProfile(\'' + m.userName + '\', \'' + m.userAvatar + '\')"><div class="avatar" style="cursor: pointer;">' + m.userAvatar + '</div><div><div class="user-name" style="cursor: pointer;">' + m.userName + '</div>' + (m.isPrivate ? '<span class="privacy-tag">🔒 私密</span>' : '') + '</div></div><div class="post-time">' + self.formatTime(m.createTime) + '</div></div><div class="moment-content">' + m.content + '</div><div class="moment-actions"><div class="action-btn ' + likedClass + '" onclick="event.stopPropagation(); App.toggleMomentLike(\'' + m.id + '\', \'detail\')"><span>' + (m.liked ? '❤️' : '🤍') + '</span><span>' + m.likeCount + '</span></div><div class="action-btn"><span>💬</span><span>' + m.commentCount + '</span></div></div></div><div class="comments-section"><div class="section-title">💬 评论</div>' + commentsHtml + '</div>';
+            },
+
+            submitMomentComment: function() {
+                const input = document.getElementById('moment-comment-input');
+                const content = input.value.trim();
+                if (!content) { this.showToast('请输入评论内容'); return; }
+                
+                const m = this.moments.find(function(item) { return item.id === App.currentMomentId; });
+                if (!m) return;
+                
+                m.comments.push({
+                    id: 'mc_' + Date.now(),
+                    userName: '失落的考生',
+                    userAvatar: '😊',
+                    content: content,
+                    createTime: Date.now()
+                });
+                m.commentCount++;
+                
+                this.saveData();
+                this.renderMomentDetail();
+                this.renderMomentList();
+                input.value = '';
+                this.showToast('评论成功！');
+            },
+
+            openUserProfile: function(userName, userAvatar) {
+                if (userName === '失落的考生') {
+                    this.showToast('这是你自己哦~');
+                    return;
+                }
+                this.currentViewingUser = { name: userName, avatar: userAvatar };
+                this.renderUserProfile();
+                this.navigate('userProfile');
+            },
+
+            renderUserProfile: function() {
+                if (!this.currentViewingUser) return;
+                
+                const user = this.currentViewingUser;
+                document.getElementById('user-profile-avatar').textContent = user.avatar;
+                document.getElementById('user-profile-name').textContent = user.name;
+                document.getElementById('user-profile-desc').textContent = '这个人很神秘，什么都没留下';
+                
+                const userMoments = this.moments.filter(function(m) {
+                    return m.userName === user.name && !m.isPrivate;
+                });
+                
+                document.getElementById('user-stat-moments').textContent = userMoments.length;
+                
+                const isFollowing = this.followingList.includes(user.name);
+                const followBtn = document.getElementById('follow-btn');
+                if (isFollowing) {
+                    followBtn.textContent = '已关注';
+                    followBtn.style.background = '#52c41a';
+                } else {
+                    followBtn.textContent = '关注';
+                    followBtn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+                
+                const container = document.getElementById('user-moments-list');
+                const self = this;
+                
+                if (!userMoments.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">📝</div><div class="text">TA还没有发布过动态</div></div>';
+                    return;
+                }
+                
+                container.innerHTML = userMoments.map(function(m) {
+                    const likedClass = m.liked ? 'liked' : '';
+                    return '<div class="moment-card" onclick="App.openMomentDetail(\'' + m.id + '\')"><div class="moment-content">' + m.content + '</div><div class="moment-actions"><div class="action-btn ' + likedClass + '" onclick="event.stopPropagation(); App.toggleMomentLike(\'' + m.id + '\', \'user\')"><span>' + (m.liked ? '❤️' : '🤍') + '</span><span>' + m.likeCount + '</span></div><div class="action-btn" onclick="event.stopPropagation(); App.openMomentDetail(\'' + m.id + '\')"><span>💬</span><span>' + m.commentCount + '</span></div></div></div>';
+                }).join('');
+            },
+
+            toggleFollow: function() {
+                if (!this.currentViewingUser) return;
+                
+                const userName = this.currentViewingUser.name;
+                const index = this.followingList.indexOf(userName);
+                
+                if (index > -1) {
+                    this.followingList.splice(index, 1);
+                    this.showToast('已取消关注');
+                } else {
+                    this.followingList.push(userName);
+                    this.showToast('关注成功！');
+                }
+                
+                localStorage.setItem('followingList', JSON.stringify(this.followingList));
+                this.renderUserProfile();
+            },
+
+            shareMoment: function(momentId) {
+                const m = this.moments.find(function(item) { return item.id === momentId; });
+                if (!m) return;
+                
+                const shareText = '【高考失利帮】来自 ' + m.userName + ' 的分享：\n' + m.content;
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(shareText).then(function() {
+                        App.showToast('已复制到剪贴板！');
+                    }).catch(function() {
+                        App.showToast('分享内容：' + m.content.substring(0, 20) + '...');
+                    });
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = shareText;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        this.showToast('已复制到剪贴板！');
+                    } catch (err) {
+                        this.showToast('分享内容：' + m.content.substring(0, 20) + '...');
+                    }
+                    document.body.removeChild(textarea);
+                }
+            },
+
+            renderMyMoments: function() {
+                const container = document.getElementById('my-moments-list');
+                const myMoments = this.moments.filter(function(m) {
+                    return m.userName === '失落的考生';
+                });
+                
+                if (!myMoments.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">还没有发布过动态</div></div>';
+                    return;
+                }
+                
+                const self = this;
+                container.innerHTML = myMoments.map(function(m) {
+                    const likedClass = m.liked ? 'liked' : '';
+                    const privacyLabel = m.isPrivate ? '🔒 私密' : '🌍 公开';
+                    return '<div class="moment-card" onclick="App.openMomentDetail(\'' + m.id + '\')"><div class="moment-header"><div class="moment-user"><div class="avatar">' + m.userAvatar + '</div><div><div class="user-name">' + m.userName + '</div><span class="privacy-tag">' + privacyLabel + '</span></div></div><div class="post-time">' + self.formatTime(m.createTime) + '</div></div><div class="moment-content">' + m.content + '</div><div class="moment-actions"><div class="action-btn ' + likedClass + '" onclick="event.stopPropagation(); App.toggleMomentLike(\'' + m.id + '\', \'my\')"><span>' + (m.liked ? '❤️' : '🤍') + '</span><span>' + m.likeCount + '</span></div><div class="action-btn" onclick="event.stopPropagation(); App.openMomentDetail(\'' + m.id + '\')"><span>💬</span><span>' + m.commentCount + '</span></div></div></div>';
+                }).join('');
+            },
+
+            renderTestRecords: function() {
+                const container = document.getElementById('test-records-list');
+                const self = this;
+                
+                if (!this.testRecords.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">📊</div><div class="text">还没有测试记录</div><div class="text" style="margin-top: 8px; font-size: 12px;">去做一次焦虑自测吧</div></div>';
+                    return;
+                }
+                
+                container.innerHTML = this.testRecords.map(function(r) {
+                    const levelColorClass = r.levelClass;
+                    return '<div class="post-card"><div class="post-header"><div style="display: flex; align-items: center; gap: 10px;"><div style="font-size: 28px;">📊</div><div><div style="font-size: 16px; font-weight: 600;" class="' + levelColorClass + '">' + r.level + '</div><div style="font-size: 12px; color: #999; margin-top: 4px;">' + self.formatTime(r.createTime) + '</div></div></div><div style="text-align: right;"><div style="font-size: 28px; font-weight: 700;" class="' + levelColorClass + '">' + r.score + '</div><div style="font-size: 11px; color: #999;">总分</div></div></div></div>';
+                }).join('');
+            },
+
+            initChat: function() {
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '<div class="message"><div class="message-avatar ai">🤖</div><div class="message-bubble ai">你好！我是AI情绪陪伴者。有什么想聊的吗？关于高考失利的情绪、感受，或者只是想倾诉，都可以告诉我。我会认真倾听，不会评判你。</div></div>';
+            },
+
+            sendQuickReply: function(text) {
+                document.getElementById('chat-input').value = text;
+                this.sendChatMessage();
+            },
+
+            handleChatEnter: function(event) {
+                if (event.key === 'Enter') {
+                    this.sendChatMessage();
+                }
+            },
+
+            sendChatMessage: function() {
+                const input = document.getElementById('chat-input');
+                const text = input.value.trim();
+                if (!text) return;
+                
+                this.addChatMessage(text, 'user');
+                input.value = '';
+                
+                const self = this;
+                setTimeout(function() {
+                    const reply = self.getAIReply(text);
+                    self.addChatMessage(reply, 'ai');
+                }, 800 + Math.random() * 500);
+            },
+
+            getAIReply: function(message) {
+                const lowerMsg = message.toLowerCase();
+                for (const key in this.aiReplies) {
+                    if (lowerMsg.includes(key)) {
+                        return this.aiReplies[key];
+                    }
+                }
+                const defaultReplies = [
+                    "我理解你现在的心情，高考失利确实是一件让人很难过的事情。但请相信，这只是人生中的一个阶段，不是终点。你愿意和我多聊聊你的感受吗？",
+                    "谢谢你愿意和我分享。很多人在高考失利后都会有类似的感受，你不是一个人。有时候把感受说出来，会让自己轻松一些。",
+                    "我在认真听你说。高考的确很重要，但它远不能决定你的全部价值。你有很多闪光点，一次考试并不能定义你是谁。",
+                    "你的感受是真实的，难过、自责、迷茫都是很正常的反应。给自己一些时间去接受这个结果，你不需要立刻好起来。"
+                ];
+                return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+            },
+
+            addChatMessage: function(text, type) {
+                const container = document.getElementById('chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ' + type;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar ' + type;
+                avatar.textContent = type === 'ai' ? '🤖' : '😊';
+                
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble ' + type;
+                bubble.textContent = text;
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(bubble);
+                container.appendChild(messageDiv);
+                
+                container.scrollTop = container.scrollHeight;
+            },
+
+            showLogoutModal: function() {
+                document.getElementById('logout-modal').classList.remove('hidden');
+            },
+
+            hideLogoutModal: function() {
+                document.getElementById('logout-modal').classList.add('hidden');
+            },
+
+            confirmLogout: function() {
+                this.hideLogoutModal();
+                this.showToast('已退出登录');
+            },
+
+            doodleState: {
+                color: '#667eea',
+                size: 6,
+                isDrawing: false,
+                lastX: 0,
+                lastY: 0,
+                history: [],
+                historyIndex: -1
+            },
+
+            complaints: [],
+            currentComplaintTag: null,
+            pushes: [],
+            currentPushCategory: '全部',
+
+            initDoodle: function() {
+                const canvas = document.getElementById('doodle-canvas');
+                if (!canvas) return;
+                
+                const container = canvas.parentElement;
+                const rect = container.getBoundingClientRect();
+                
+                canvas.width = rect.width - 20;
+                canvas.height = Math.max(300, rect.height - 20);
+                
+                const ctx = canvas.getContext('2d');
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.fillStyle = '#fafafa';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                this.canvasCtx = ctx;
+                this.doodleState.history = [];
+                this.doodleState.historyIndex = -1;
+                this.saveDoodleState();
+                
+                const self = this;
+                
+                canvas.addEventListener('mousedown', function(e) {
+                    self.startDrawing(e.clientX, e.clientY);
+                });
+                canvas.addEventListener('mousemove', function(e) {
+                    self.draw(e.clientX, e.clientY);
+                });
+                canvas.addEventListener('mouseup', function() {
+                    self.stopDrawing();
+                });
+                canvas.addEventListener('mouseleave', function() {
+                    self.stopDrawing();
+                });
+                
+                canvas.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    self.startDrawing(touch.clientX, touch.clientY);
+                });
+                canvas.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    self.draw(touch.clientX, touch.clientY);
+                });
+                canvas.addEventListener('touchend', function() {
+                    self.stopDrawing();
+                });
+            },
+
+            startDrawing: function(x, y) {
+                const canvas = document.getElementById('doodle-canvas');
+                if (!canvas || !this.canvasCtx) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                this.doodleState.isDrawing = true;
+                this.doodleState.lastX = x - rect.left;
+                this.doodleState.lastY = y - rect.top;
+            },
+
+            draw: function(x, y) {
+                if (!this.doodleState.isDrawing || !this.canvasCtx) return;
+                
+                const canvas = document.getElementById('doodle-canvas');
+                const rect = canvas.getBoundingClientRect();
+                const currentX = x - rect.left;
+                const currentY = y - rect.top;
+                
+                this.canvasCtx.beginPath();
+                this.canvasCtx.strokeStyle = this.doodleState.color;
+                this.canvasCtx.lineWidth = this.doodleState.size;
+                this.canvasCtx.moveTo(this.doodleState.lastX, this.doodleState.lastY);
+                this.canvasCtx.lineTo(currentX, currentY);
+                this.canvasCtx.stroke();
+                
+                this.doodleState.lastX = currentX;
+                this.doodleState.lastY = currentY;
+            },
+
+            stopDrawing: function() {
+                if (this.doodleState.isDrawing) {
+                    this.doodleState.isDrawing = false;
+                    this.saveDoodleState();
+                }
+            },
+
+            saveDoodleState: function() {
+                const canvas = document.getElementById('doodle-canvas');
+                if (!canvas) return;
+                
+                this.doodleState.history = this.doodleState.history.slice(0, this.doodleState.historyIndex + 1);
+                this.doodleState.history.push(canvas.toDataURL());
+                this.doodleState.historyIndex++;
+            },
+
+            setDoodleColor: function(color) {
+                this.doodleState.color = color;
+                
+                document.querySelectorAll('.doodle-color-btn').forEach(function(btn) {
+                    btn.style.border = '2px solid #ddd';
+                });
+                
+                const buttons = document.querySelectorAll('.doodle-color-btn');
+                const colors = ['#667eea', '#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#333333', '#ffffff'];
+                
+                for (let i = 0; i < buttons.length; i++) {
+                    if (colors[i] === color) {
+                        buttons[i].style.border = '3px solid ' + color;
+                        if (color === '#ffffff') {
+                            buttons[i].style.border = '3px solid #667eea';
+                        }
+                    }
+                }
+            },
+
+            setDoodleSize: function(size) {
+                this.doodleState.size = size;
+                
+                document.querySelectorAll('.doodle-size-btn').forEach(function(btn) {
+                    btn.style.opacity = '0.5';
+                });
+                
+                const sizes = [3, 6, 10];
+                const buttons = document.querySelectorAll('.doodle-size-btn');
+                
+                for (let i = 0; i < buttons.length; i++) {
+                    if (sizes[i] === size) {
+                        buttons[i].style.opacity = '1';
+                    }
+                }
+            },
+
+            undoDoodle: function() {
+                if (this.doodleState.historyIndex <= 0) {
+                    this.showToast('没有可撤销的操作');
+                    return;
+                }
+                
+                this.doodleState.historyIndex--;
+                const canvas = document.getElementById('doodle-canvas');
+                const ctx = this.canvasCtx;
+                const img = new Image();
+                
+                const self = this;
+                img.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = this.doodleState.history[this.doodleState.historyIndex];
+            },
+
+            clearDoodle: function() {
+                const canvas = document.getElementById('doodle-canvas');
+                if (!canvas || !this.canvasCtx) return;
+                
+                this.canvasCtx.fillStyle = '#fafafa';
+                this.canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                this.saveDoodleState();
+                this.showToast('已清空画布');
+            },
+
+            loadComplaints: function() {
+                const saved = localStorage.getItem('complaints');
+                if (saved) {
+                    this.complaints = JSON.parse(saved);
+                } else {
+                    this.complaints = [
+                        {
+                            id: 'c_1',
+                            content: '今天亲戚来我家串门，一进门就问考了多少分，还说「考不上好大学以后没出路。真的烦透了，考得好不好关你什么事啊！',
+                            tag: '亲戚',
+                            createTime: Date.now() - 86400000
+                        },
+                        {
+                            id: 'c_2',
+                            content: '为什么大家都觉得学历低人一等？难道只有上大学才是唯一出路？我就是想读专科不行吗？',
+                            tag: '偏见',
+                            createTime: Date.now() - 172800000
+                        },
+                        {
+                            id: 'c_3',
+                            content: '父母一直在说"早知道让你去报那个学校就好了，现在分数够了就不会这么多话真的比我还焦虑。他们不知道怎么办，唉。',
+                            tag: '学历焦虑',
+                            createTime: Date.now() - 259200000
+                        }
+                    ];
+                }
+            },
+
+            saveComplaints: function() {
+                localStorage.setItem('complaints', JSON.stringify(this.complaints));
+            },
+
+            renderComplaintList: function() {
+                const container = document.getElementById('complaint-list');
+                if (!this.complaints.length) {
+                    container.innerHTML = '<div class="empty-state"><div class="icon">⚡</div><div class="text">还没有人吐槽，来当第一个吧！</div></div>';
+                    return;
+                }
+                
+                const self = this;
+                const tagIcons = {
+                    '亲戚': '👨‍👩‍👧‍👦',
+                    '偏见': '😤',
+                    '学历焦虑': '📚',
+                    '其他': '💬'
+                };
+                
+                container.innerHTML = this.complaints.map(function(c) {
+                    return '<div class="post-card"><div class="post-header"><div><span style="background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #666;">' + (tagIcons[c.tag] || '💬') + ' ' + c.tag + '</span></div><div class="post-time">' + self.formatTime(c.createTime) + '</div></div><div class="post-content">' + c.content + '</div></div>';
+                }).join('');
+            },
+
+            selectComplaintTag: function(tag) {
+                this.currentComplaintTag = tag;
+                
+                document.querySelectorAll('.complaint-tag-btn').forEach(function(btn) {
+                    btn.style.background = '#f8f9fa';
+                    btn.style.color = '#333';
+                    btn.style.border = '1px solid #ddd';
+                });
+                
+                const buttons = document.querySelectorAll('.complaint-tag-btn');
+                buttons.forEach(function(btn) {
+                    if (btn.dataset.tag === tag) {
+                        btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        btn.style.color = 'white';
+                        btn.style.border = 'none';
+                    }
+                });
+            },
+
+            checkComplaintLength: function() {
+                const content = document.getElementById('complaint-content').value;
+                document.getElementById('complaint-word-count').textContent = content.length;
+                document.getElementById('complaint-submit-btn').disabled = content.length < 5;
+            },
+
+            submitComplaint: function() {
+                const content = document.getElementById('complaint-content').value.trim();
+                if (content.length < 5) { this.showToast('内容至少5个字'); return; }
+                
+                if (!this.currentComplaintTag) {
+                    this.showToast('请选择吐槽类型');
+                    return;
+                }
+                
+                const newComplaint = {
+                    id: 'c_' + Date.now(),
+                    content: content,
+                    tag: this.currentComplaintTag,
+                    createTime: Date.now()
+                };
+                
+                this.complaints.unshift(newComplaint);
+                this.saveComplaints();
+                this.renderComplaintList();
+                this.showToast('发布成功！一吐为快！');
+                this.goBack();
+            },
+
+            loadPushes: function() {
+                this.pushes = [
+                    {
+                        id: 'p_1',
+                        title: '我是如何从高考失利的阴影中走出来的',
+                        category: '同龄人经历',
+                        content: '去年的这个时候，我也和你一样，把自己关在房间里，不敢见人。分数出来的那天，我感觉天都塌下来了。\n\n但现在回头看，那只是我人生的一个转折点。我选择了复读，虽然过程很辛苦，但第二年我考上了理想的学校。\n\n想告诉现在的你：\n1. 允许自己难过，但不要沉溺其中\n2. 和家人坦诚沟通，他们比你想象的更支持你\n3. 无论选择什么路，努力就有未来\n\n你比你想象的更强大。',
+                        icon: '📖'
+                    },
+                    {
+                        id: 'p_2',
+                        title: '高考不是终点，是新的起点',
+                        category: '清醒文案',
+                        content: '马云参加了三次高考，第一次数学只考了1分。\n\n俞敏洪也参加了三次高考，第一次英语33分。\n\n他们都没有在一次成功，但他们没有放弃。\n\n高考的确很重要，但它远不能决定你的一生。它只是人生众多考试中的一场。\n\n真正决定你未来的，是你面对挫折的态度，是你持续学习的能力，是你永不放弃的精神。\n\n一次考试的失利，不等于人生的失败。',
+                        icon: '💪'
+                    },
+                    {
+                        id: 'p_3',
+                        title: '10句让你瞬间清醒的话',
+                        category: '解压短句',
+                        content: '1. 高考只是人生的一站，不是终点站。\n\n2. 你远比一张试卷，比你考的人生。\n\n3. 那些杀不死你的，终将使你更强大。\n\n4. 人生不是百米跑，是马拉松。\n\n5. 昨天的太阳，晒不干今天的衣裳。\n\n6. 摔倒了，没关系，重要的是站起来继续走。\n\n7. 每一个优秀的人，都有一段沉默的时光。\n\n8. 别让别人的眼光，定义你的人生。\n\n9. 你还有很多机会，不要急于下结论。\n\n10. 晚安，明天又是新的一天。',
+                        icon: '🌙'
+                    },
+                    {
+                        id: 'p_4',
+                        title: '复读一年，我明白了这些道理',
+                        category: '同龄人经历',
+                        content: '作为一个过来人，想给正在考虑复读的你一些建议：\n\n1. 复读不是为了逃避，而是为了更好地面对。\n\n2. 心态比分数更重要。保持平常心，不要给自己太大压力。\n\n3. 找到适合自己的学习方法，不要盲目跟风。\n\n4. 和家人保持良好沟通，他们是你最坚强的后盾。\n\n5. 注意身体，劳逸结合。\n\n复读的一年会很辛苦，但只要你坚持下来，你会发现自己成长了很多。无论结果如何，这段经历都是宝贵的财富。\n\n加油！',
+                        icon: '📚'
+                    },
+                    {
+                        id: 'p_5',
+                        title: '致正在迷茫的你',
+                        category: '清醒文案',
+                        content: '亲爱的朋友：\n\n我知道你现在很迷茫，不知道未来的路该怎么走。\n\n但请相信，迷茫往往意味着你在思考，在成长。\n\n高考失利不是人生的失败，它只是告诉你：这条路暂时走不通，换一条试试。\n\n你可以选择复读，也可以选择其他学校，可以选择学习技能，可以选择创业...\n\n人生的路有千万条，不是只有高考这一座独木桥。\n\n给自己一些时间，给自己一些空间，你会找到属于自己的路。\n\n记住，你永远有选择的权利，你永远有改变的可能。',
+                        icon: '✨'
+                    }
+                ];
+            },
+
+            filterPush: function(category) {
+                this.currentPushCategory = category;
+                
+                document.querySelectorAll('.push-category-btn').forEach(function(btn) {
+                    btn.style.background = '#f8f9fa';
+                    btn.style.color = '#333';
+                    btn.style.border = '1px solid #ddd';
+                });
+                
+                event.target.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                event.target.style.color = 'white';
+                event.target.style.border = 'none';
+                
+                this.renderPushList();
+            },
+
+            renderPushList: function() {
+                const container = document.getElementById('push-list');
+                let filtered = this.pushes;
+                
+                if (this.currentPushCategory !== '全部') {
+                    filtered = this.pushes.filter(function(p) {
+                        return p.category === App.currentPushCategory;
+                    });
+                }
+                
+                container.innerHTML = filtered.map(function(p) {
+                    return '<div class="post-card"><div class="post-header"><div style="display: flex; align-items: center; gap: 10px;"><span style="font-size: 24px;">' + p.icon + '</span><div><div class="user-name" style="font-weight: 600; margin-bottom: 4px;">' + p.title + '</div><span style="font-size: 11px; color: #999;">' + p.category + '</span></div></div></div><div class="post-content" style="white-space: pre-line; font-size: 13px; line-height: 1.8; color: #555;">' + p.content + '</div></div>';
+                }).join('');
+            },
+
+            init: function() {
+                this.loadData();
+                this.renderTreeHoleList();
+                this.renderMomentList();
+                this.loadGameHighScore();
+                this.initChat();
+                this.loadComplaints();
+                this.renderComplaintList();
+                this.loadPushes();
+                this.renderPushList();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            App.init();
+        });
+
+        const originalShowPage = App.showPage.bind(App);
+        App.showPage = function(page) {
+            originalShowPage(page);
+            
+            const tabbar = document.querySelector('.tabbar');
+            const detailPages = ['postDetail', 'momentDetail', 'createPost', 'createMoment', 'createComplaint', 'userProfile', 'testRecords'];
+            const mainPages = ['home', 'treeHole', 'moment', 'profile', 'complaint', 'push', 'doodle', 'clickGame', 'anxietyTest', 'aiChat', 'myMoments'];
+            
+            if (detailPages.includes(page)) {
+                tabbar.classList.add('hidden');
+            } else if (mainPages.includes(page)) {
+                tabbar.classList.remove('hidden');
+            }
+            
+            if (page === 'doodle') {
+                setTimeout(function() {
+                    App.initDoodle();
+                }, 100);
+            }
+            if (page === 'complaint') {
+                this.renderComplaintList();
+            }
+            if (page === 'push') {
+                this.renderPushList();
+            }
+            if (page === 'myMoments') {
+                this.renderMyMoments();
+            }
+            if (page === 'testRecords') {
+                this.renderTestRecords();
+            }
+        };
+    </script>
+</body>
+</html>
