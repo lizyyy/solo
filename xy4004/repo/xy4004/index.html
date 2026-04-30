@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>换景节拍板 - 剧场排练工具</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>换景节拍板</h1>
+            <div class="header-actions">
+                <button id="btn-import" class="btn btn-secondary">导入 JSON</button>
+                <button id="btn-export" class="btn btn-secondary">导出 JSON</button>
+                <button id="btn-reset" class="btn btn-danger">清空数据</button>
+            </div>
+        </header>
+
+        <main class="main">
+            <div id="mode-switch">
+                <button id="btn-edit-mode" class="btn btn-mode active">编辑模式</button>
+                <button id="btn-rehearsal-mode" class="btn btn-mode">排练模式</button>
+            </div>
+
+            <div id="edit-mode" class="mode-container">
+                <div class="toolbar">
+                    <button id="btn-add-cue" class="btn btn-primary">+ 新增 Cue</button>
+                    <span class="toolbar-info">提示：拖拽排序或使用上下按钮调整顺序</span>
+                </div>
+
+                <div id="cue-list" class="cue-list">
+                </div>
+
+                <div id="cue-editor" class="modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="editor-title">编辑 Cue</h2>
+                            <button id="btn-close-editor" class="btn-close">&times;</button>
+                        </div>
+                        <form id="cue-form">
+                            <input type="hidden" id="cue-id">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="cue-number">Cue 编号</label>
+                                    <input type="text" id="cue-number" placeholder="例如：Q1, Q1.1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cue-duration">持续时间（秒）</label>
+                                    <input type="number" id="cue-duration" min="0" step="1" placeholder="例如：15">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cue-group">负责组别</label>
+                                    <select id="cue-group">
+                                        <option value="灯光">灯光</option>
+                                        <option value="音响">音响</option>
+                                        <option value="道具">道具</option>
+                                        <option value="服装">服装</option>
+                                        <option value="舞台">舞台</option>
+                                        <option value="其他">其他</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cue-risk">风险等级</label>
+                                    <select id="cue-risk">
+                                        <option value="low">低风险</option>
+                                        <option value="medium">中风险</option>
+                                        <option value="high">高风险</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cue-depends">依赖上一个 Cue</label>
+                                    <select id="cue-depends">
+                                        <option value="">无（并行）</option>
+                                    </select>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="cue-description">换景说明</label>
+                                    <textarea id="cue-description" rows="3" placeholder="详细描述换景内容..."></textarea>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="cue-notes">备注</label>
+                                    <textarea id="cue-notes" rows="2" placeholder="排练注意事项..."></textarea>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="btn-cancel-edit" class="btn btn-secondary">取消</button>
+                                <button type="submit" class="btn btn-primary">保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rehearsal-mode" class="mode-container hidden">
+                <div class="rehearsal-header">
+                    <div class="rehearsal-timer">
+                        <span class="timer-label">排练计时</span>
+                        <span id="rehearsal-time" class="timer-value">00:00:00</span>
+                    </div>
+                    <div class="rehearsal-controls">
+                        <button id="btn-prev-cue" class="btn btn-control">◀ 上一个</button>
+                        <button id="btn-play-pause" class="btn btn-primary btn-large">▶ 开始</button>
+                        <button id="btn-next-cue" class="btn btn-control">下一个 ▶</button>
+                        <button id="btn-stop-rehearsal" class="btn btn-danger">结束排练</button>
+                    </div>
+                </div>
+
+                <div id="current-cue-display" class="current-cue hidden">
+                    <div class="current-cue-header">
+                        <span id="current-cue-number" class="cue-number-display">Q1</span>
+                        <span id="current-cue-group" class="cue-group-badge">灯光</span>
+                    </div>
+                    <div id="current-cue-description" class="current-cue-description">换景说明内容</div>
+                    <div class="current-cue-timing">
+                        <div class="timing-item">
+                            <span class="timing-label">预计开始</span>
+                            <span id="expected-start" class="timing-value">00:00:00</span>
+                        </div>
+                        <div class="timing-item">
+                            <span class="timing-label">预计持续</span>
+                            <span id="expected-duration" class="timing-value">00:15</span>
+                        </div>
+                        <div class="timing-item">
+                            <span class="timing-label">实际开始</span>
+                            <span id="actual-start" class="timing-value">--:--:--</span>
+                        </div>
+                        <div class="timing-item">
+                            <span class="timing-label">已进行</span>
+                            <span id="elapsed-time" class="timing-value">00:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rehearsal-cue-list" class="cue-list rehearsal-list">
+                </div>
+
+                <div id="rehearsal-summary" class="summary-container hidden">
+                    <h2>排练总结</h2>
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Cue</th>
+                                <th>组别</th>
+                                <th>预计开始</th>
+                                <th>实际开始</th>
+                                <th>开始偏差</th>
+                                <th>预计持续</th>
+                                <th>实际持续</th>
+                                <th>持续偏差</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-body">
+                        </tbody>
+                    </table>
+                    <div class="summary-actions">
+                        <button id="btn-close-summary" class="btn btn-secondary">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/state.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/persistence.js"></script>
+    <script src="js/importExport.js"></script>
+    <script src="js/rehearsal.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
