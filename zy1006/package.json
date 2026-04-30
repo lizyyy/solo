@@ -1,0 +1,29 @@
+{
+  "name": "sample-borrowing-system",
+  "version": "1.0.0",
+  "description": "样品借用台账系统 - 全栈小应用",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "prisma:init": "cd backend && npx prisma migrate dev --name init",
+    "prisma:generate": "cd backend && npx prisma generate",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm start"
+  },
+  "keywords": [
+    "样品借用",
+    "台账管理",
+    "全栈应用",
+    "Node.js",
+    "React",
+    "SQLite"
+  ],
+  "author": "",
+  "license": "MIT"
+}
