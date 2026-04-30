@@ -1,0 +1,30 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+}
+
+.ant-layout {
+  background: #f0f2f5;
+}
+
+.timeline-content {
+  padding-bottom: 16px;
+}
+
+.timeline-content h4 {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.timeline-content p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 12px;
+}
