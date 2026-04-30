@@ -1,0 +1,20 @@
+{
+  "name": "property-storage-manager",
+  "version": "1.0.0",
+  "description": "物业寄存管理系统 - 钥匙和临时放行条登记",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": ["property", "storage", "management", "sql"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1"
+  }
+}
