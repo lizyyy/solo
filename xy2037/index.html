@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>失物招领与证件找回系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.css" />
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        .app-container { min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .page { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); overflow: hidden; }
+        .card-header { padding: 20px; border-bottom: 1px solid #f0f0f0; }
+        .card-body { padding: 20px; }
+        .btn { padding: 12px 24px; border-radius: 12px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #f8f9fa; color: #495057; }
+        .btn-secondary:hover { background: #e9ecef; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 16px; transition: border-color 0.2s; }
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { outline: none; border-color: #667eea; }
+        .tag { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 500; margin-right: 8px; margin-bottom: 8px; }
+        .tag-lost { background: #fff3f3; color: #dc3545; }
+        .tag-found { background: #f0fff4; color: #28a745; }
+        .tag-category { background: #f3e8ff; color: #7c3aed; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-pending { background: #fff9e6; color: #f59e0b; }
+        .status-matched { background: #dbeafe; color: #3b82f6; }
+        .status-claimed { background: #dcfce7; color: #16a34a; }
+        .status-completed { background: #f3f4f6; color: #6b7280; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1); z-index: 1000; }
+        .bottom-nav-items { display: flex; justify-content: space-around; padding: 8px 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; cursor: pointer; transition: all 0.2s; border-radius: 12px; }
+        .nav-item:hover { background: #f8f9fa; }
+        .nav-item.active { color: #667eea; }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
+        .nav-item span { font-size: 12px; font-weight: 500; }
+        .header { position: sticky; top: 0; background: white; z-index: 100; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .header-content { max-width: 1200px; margin: 0 auto; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .search-box { flex: 1; max-width: 400px; margin: 0 20px; }
+        .search-box input { width: 100%; padding: 10px 16px; border: 2px solid #e9ecef; border-radius: 20px; font-size: 14px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; cursor: pointer; }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 20px; padding-bottom: 80px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .list-item { padding: 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: background 0.2s; }
+        .list-item:hover { background: #f8f9fa; }
+        .list-item:last-child { border-bottom: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 20px; font-weight: 700; }
+        .modal-close { width: 36px; height: 36px; border-radius: 50%; border: none; background: #f8f9fa; cursor: pointer; font-size: 20px; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 16px 24px; border-radius: 12px; font-weight: 500; z-index: 3000; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .toast-success { background: #dcfce7; color: #16a34a; }
+        .toast-error { background: #fee2e2; color: #dc2626; }
+        .toast-info { background: #dbeafe; color: #2563eb; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state svg { width: 80px; height: 80px; margin-bottom: 16px; color: #cbd5e1; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: #64748b; margin-bottom: 8px; }
+        .empty-state p { color: #94a3b8; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 16px; text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .stat-value { font-size: 32px; font-weight: 700; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 14px; color: #64748b; margin-top: 4px; }
+        .image-upload { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .image-upload:hover { border-color: #667eea; background: #f8f9fa; }
+        .image-upload svg { width: 48px; height: 48px; color: #94a3b8; margin-bottom: 12px; }
+        .image-upload p { color: #64748b; }
+        .image-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-top: 12px; }
+        .image-preview-item { position: relative; border-radius: 12px; overflow: hidden; height: 100px; }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-item .remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0, 0, 0, 0.5); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .masked-text { font-family: 'Courier New', monospace; letter-spacing: 2px; }
+        .masked-text .visible { color: #1f2937; }
+        .masked-text .hidden { color: #94a3b8; }
+        .heatmap-container { height: 400px; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+        .post-card { background: white; border-radius: 16px; margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .post-header { padding: 16px; display: flex; align-items: center; gap: 12px; }
+        .post-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .post-user-info { flex: 1; }
+        .post-username { font-weight: 600; color: #1f2937; }
+        .post-time { font-size: 12px; color: #94a3b8; }
+        .post-content { padding: 0 16px 16px; }
+        .post-text { color: #374151; line-height: 1.6; margin-bottom: 12px; }
+        .post-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+        .post-images img { width: 100%; border-radius: 8px; aspect-ratio: 1; object-fit: cover; }
+        .post-actions { padding: 12px 16px; border-top: 1px solid #f0f0f0; display: flex; gap: 24px; }
+        .post-action { display: flex; align-items: center; gap: 6px; cursor: pointer; transition: color 0.2s; }
+        .post-action:hover { color: #667eea; }
+        .post-action svg { width: 20px; height: 20px; }
+        .post-action span { font-size: 14px; color: #64748b; }
+        .comments-section { padding: 16px; background: #f8f9fa; }
+        .comment { padding: 12px; background: white; border-radius: 12px; margin-bottom: 8px; }
+        .comment-user { font-weight: 600; color: #667eea; font-size: 14px; }
+        .comment-text { color: #374151; font-size: 14px; margin-top: 4px; }
+        .comment-input { display: flex; gap: 8px; margin-top: 12px; }
+        .comment-input input { flex: 1; padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 20px; font-size: 14px; }
+        .comment-input button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; }
+        .match-score { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; }
+        .verification-question { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-bottom: 16px; border-radius: 0 8px 8px 0; }
+        .verification-question h4 { color: #d97706; font-weight: 600; margin-bottom: 8px; }
+        .floating-action-btn { position: fixed; bottom: 80px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 999; transition: transform 0.2s; }
+        .floating-action-btn:hover { transform: scale(1.1); }
+        .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
+        .filter-tab { padding: 8px 20px; border-radius: 20px; border: none; font-size: 14px; font-weight: 500; cursor: pointer; background: #f1f5f9; color: #64748b; white-space: nowrap; }
+        .filter-tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .handover-map { height: 300px; border-radius: 12px; overflow: hidden; margin: 16px 0; }
+        .handover-info { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 16px; }
+        .handover-info h4 { color: #0369a1; font-weight: 600; margin-bottom: 8px; }
+        .handover-info p { color: #374151; margin-bottom: 4px; }
+        .map-screenshot-hint { font-size: 12px; color: #64748b; margin-top: 8px; }
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 12px; }
+            .search-box { width: 100%; max-width: none; margin: 0; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">🔍 失物招领</h1>
+                <div style="display: flex; gap: 12px; align-items: center; flex: 1; max-width: 500px; margin: 0 20px;">
+                    <select id="citySelector" style="padding: 10px 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 14px; min-width: 100px; cursor: pointer;">
+                        <!-- 动态填充城市选项 -->
+                    </select>
+                    <div class="search-box" style="margin: 0;">
+                        <input type="text" id="globalSearch" placeholder="搜索失物/拾物...">
+                    </div>
+                </div>
+                <div class="user-avatar" id="userAvatar">张</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Page -->
+            <div id="page-home" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-lost">0</div>
+                        <div class="stat-label">失物发布</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-found">0</div>
+                        <div class="stat-label">拾物发布</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-matched">0</div>
+                        <div class="stat-label">成功匹配</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">完成交接</div>
+                    </div>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card" onclick="navigateTo('publish-lost')">
+                        <div class="card-body" style="text-align: center; cursor: pointer;">
+                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; color: #dc3545;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                            </svg>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">发布失物</h3>
+                            <p style="color: #64748b; font-size: 14px;">登记丢失的物品信息</p>
+                        </div>
+                    </div>
+                    <div class="card" onclick="navigateTo('publish-found')">
+                        <div class="card-body" style="text-align: center; cursor: pointer;">
+                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; color: #28a745;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">发布拾物</h3>
+                            <p style="color: #64748b; font-size: 14px;">登记捡到的物品信息</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-weight: 600;">最新发布</h3>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 14px;" onclick="navigateTo('list')">查看全部</button>
+                    </div>
+                    <div class="card-body" id="latest-items">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- List Page -->
+            <div id="page-list" class="page">
+                <div class="filter-tabs" id="filterTabs">
+                    <button class="filter-tab active" data-filter="all">全部</button>
+                    <button class="filter-tab" data-filter="lost">失物</button>
+                    <button class="filter-tab" data-filter="found">拾物</button>
+                    <button class="filter-tab" data-filter="matched">已匹配</button>
+                    <button class="filter-tab" data-filter="completed">已完成</button>
+                </div>
+                <div id="item-list">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+
+            <!-- Match Page -->
+            <div id="page-match" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="font-weight: 600;">🔮 智能匹配</h3>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 4px;">系统根据地点、时间、类别自动匹配失物与拾物</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label>选择要匹配的物品</label>
+                            <select id="matchSelect">
+                                <option value="">请选择...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="runMatch()">开始匹配</button>
+                    </div>
+                </div>
+                <div id="match-results" style="margin-top: 24px;">
+                    <!-- 匹配结果 -->
+                </div>
+            </div>
+
+            <!-- Heatmap Page -->
+            <div id="page-heatmap" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="font-weight: 600;">🌆 城市热力图</h3>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 4px;">显示高频丢失区域，提醒大家注意保管物品</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="heatmap-container" id="heatmap-container"></div>
+                        <div class="map-screenshot-hint">💡 提示：可以使用截图工具分享该热力图到社交平台</div>
+                        <div class="stats-grid" style="margin-top: 20px;">
+                            <div class="stat-card">
+                                <div class="stat-value">🏪</div>
+                                <div class="stat-label">商场/超市</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">🚇</div>
+                                <div class="stat-label">地铁站</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">🍽️</div>
+                                <div class="stat-label">餐厅</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">🏫</div>
+                                <div class="stat-label">学校</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Page -->
+            <div id="page-social" class="page">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-body">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="user-avatar" style="width: 48px; height: 48px; margin: 0;">张</div>
+                            <input type="text" placeholder="分享你的故事..." style="flex: 1; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 24px; cursor: pointer;" onclick="openPostModal()">
+                            <button class="btn btn-primary" onclick="openPostModal()">发帖</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="posts-container">
+                    <!-- 动态加载帖子 -->
+                </div>
+            </div>
+
+            <!-- Publish Lost Page -->
+            <div id="page-publish-lost" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="font-weight: 600;">📝 发布失物信息</h3>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 4px;">请详细填写物品信息，帮助快速找回</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="lostItemForm">
+                            <div class="input-group">
+                                <label>物品名称 *</label>
+                                <input type="text" id="lost-title" placeholder="如：黑色钱包、iPhone 14、身份证等" required>
+                            </div>
+                            <div class="grid-2">
+                                <div class="input-group">
+                                    <label>丢失时间 *</label>
+                                    <input type="datetime-local" id="lost-time" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>物品类别 *</label>
+                                    <select id="lost-category" required>
+                                        <option value="">请选择类别</option>
+                                        <option value="electronics">电子产品</option>
+                                        <option value="wallet">钱包/证件</option>
+                                        <option value="bag">箱包</option>
+                                        <option value="clothing">衣物</option>
+                                        <option value="jewelry">首饰</option>
+                                        <option value="keys">钥匙</option>
+                                        <option value="documents">文件资料</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>丢失地点 *</label>
+                                <input type="text" id="lost-location" placeholder="如：北京市朝阳区国贸购物中心B1层" required>
+                                <input type="hidden" id="lost-location-lat">
+                                <input type="hidden" id="lost-location-lng">
+                            </div>
+                            <div class="input-group">
+                                <label>物品特征描述 *</label>
+                                <textarea id="lost-description" rows="4" placeholder="请详细描述物品特征，如颜色、品牌、型号、特殊标记等" required></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>认领验证问题（用于防止冒领）</label>
+                                <input type="text" id="lost-question" placeholder="如：钱包内有多少现金？">
+                            </div>
+                            <div class="input-group">
+                                <label>验证问题答案</label>
+                                <input type="text" id="lost-answer" placeholder="请输入正确答案">
+                            </div>
+                            <div class="input-group">
+                                <label>物品照片（可选）</label>
+                                <div class="image-upload" id="lost-image-upload" onclick="document.getElementById('lost-images').click()">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    <p>点击上传照片</p>
+                                </div>
+                                <input type="file" id="lost-images" accept="image/*" multiple style="display: none;">
+                                <div class="image-preview" id="lost-image-preview"></div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">发布失物信息</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publish Found Page -->
+            <div id="page-publish-found" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 style="font-weight: 600;">📝 发布拾物信息</h3>
+                        <p style="color: #64748b; font-size: 14px; margin-top: 4px;">系统会自动隐藏关键信息，防止冒领</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="foundItemForm">
+                            <div class="input-group">
+                                <label>物品名称 *</label>
+                                <input type="text" id="found-title" placeholder="如：黑色钱包、iPhone 14、身份证等" required>
+                            </div>
+                            <div class="grid-2">
+                                <div class="input-group">
+                                    <label>捡到时间 *</label>
+                                    <input type="datetime-local" id="found-time" required>
+                                </div>
+                                <div class="input-group">
+                                    <label>物品类别 *</label>
+                                    <select id="found-category" required>
+                                        <option value="">请选择类别</option>
+                                        <option value="electronics">电子产品</option>
+                                        <option value="wallet">钱包/证件</option>
+                                        <option value="bag">箱包</option>
+                                        <option value="clothing">衣物</option>
+                                        <option value="jewelry">首饰</option>
+                                        <option value="keys">钥匙</option>
+                                        <option value="documents">文件资料</option>
+                                        <option value="other">其他</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>捡到地点 *</label>
+                                <input type="text" id="found-location" placeholder="如：北京市朝阳区国贸购物中心B1层" required>
+                                <input type="hidden" id="found-location-lat">
+                                <input type="hidden" id="found-location-lng">
+                            </div>
+                            <div class="input-group">
+                                <label>物品特征描述（将部分隐藏）*</label>
+                                <textarea id="found-description" rows="4" placeholder="请详细描述物品特征，系统会自动隐藏敏感信息" required></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>设置认领验证问题</label>
+                                <input type="text" id="found-question" placeholder="如：钱包内有什么特殊物品？">
+                            </div>
+                            <div class="input-group">
+                                <label>验证问题答案</label>
+                                <input type="text" id="found-answer" placeholder="请输入正确答案">
+                            </div>
+                            <div class="input-group">
+                                <label>证件类型（如为证件类物品）</label>
+                                <select id="found-document-type">
+                                    <option value="">非证件类</option>
+                                    <option value="id_card">身份证</option>
+                                    <option value="student_card">学生证</option>
+                                    <option value="bank_card">银行卡</option>
+                                    <option value="driver_license">驾驶证</option>
+                                    <option value="passport">护照</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>证件号码（系统将自动打码）</label>
+                                <input type="text" id="found-document-number" placeholder="如：110101199001011234">
+                            </div>
+                            <div class="input-group">
+                                <label>物品照片（可选，系统将智能打码敏感信息）</label>
+                                <div class="image-upload" id="found-image-upload" onclick="document.getElementById('found-images').click()">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    <p>点击上传照片</p>
+                                </div>
+                                <input type="file" id="found-images" accept="image/*" multiple style="display: none;">
+                                <div class="image-preview" id="found-image-preview"></div>
+                            </div>
+                            <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+                                <h4 style="color: #0369a1; font-weight: 600; margin-bottom: 8px;">🔒 隐私保护说明</h4>
+                                <p style="color: #374151; font-size: 14px; line-height: 1.6;">
+                                    发布拾物信息时，系统会自动：<br>
+                                    • 隐藏证件号码中间8位数字<br>
+                                    • 对照片中的人脸和证件信息进行智能打码<br>
+                                    • 只显示物品的大致特征，隐藏具体细节<br>
+                                    • 只有通过验证的失主才能查看完整信息
+                                </p>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">发布拾物信息</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail Page -->
+            <div id="page-detail" class="page">
+                <div id="detail-content">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="bottom-nav-items">
+                <div class="nav-item active" data-page="home">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span>首页</span>
+                </div>
+                <div class="nav-item" data-page="list">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    <span>列表</span>
+                </div>
+                <div class="nav-item" data-page="match">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    <span>匹配</span>
+                </div>
+                <div class="nav-item" data-page="heatmap">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>热力图</span>
+                </div>
+                <div class="nav-item" data-page="social">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span>分享圈</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Floating Action Button -->
+        <button class="floating-action-btn" onclick="showPublishOptions()">+</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="publish-options-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">选择发布类型</h3>
+                <button class="modal-close" onclick="closeModal('publish-options-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="grid-2">
+                    <div class="card" style="cursor: pointer;" onclick="closeModal('publish-options-modal'); navigateTo('publish-lost')">
+                        <div class="card-body" style="text-align: center;">
+                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; color: #dc3545;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                            </svg>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">我丢失了物品</h3>
+                            <p style="color: #64748b; font-size: 14px;">发布失物信息</p>
+                        </div>
+                    </div>
+                    <div class="card" style="cursor: pointer;" onclick="closeModal('publish-options-modal'); navigateTo('publish-found')">
+                        <div class="card-body" style="text-align: center;">
+                            <svg style="width: 48px; height: 48px; margin: 0 auto 12px; color: #28a745;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 style="font-weight: 600; margin-bottom: 4px;">我捡到了物品</h3>
+                            <p style="color: #64748b; font-size: 14px;">发布拾物信息</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="post-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">发布帖子</h3>
+                <button class="modal-close" onclick="closeModal('post-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="postForm">
+                    <div class="input-group">
+                        <label>帖子类型</label>
+                        <select id="post-type">
+                            <option value="lost_story">失物故事</option>
+                            <option value="found_story">拾物故事</option>
+                            <option value="thanks">感谢拾主</option>
+                            <option value="tip">防丢提示</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>标题</label>
+                        <input type="text" id="post-title" placeholder="写一个吸引人的标题">
+                    </div>
+                    <div class="input-group">
+                        <label>内容 *</label>
+                        <textarea id="post-content" rows="5" placeholder="分享你的故事..." required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>关联物品（可选）</label>
+                        <select id="post-related-item">
+                            <option value="">不关联</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>添加图片</label>
+                        <div class="image-upload" id="post-image-upload" onclick="document.getElementById('post-images').click()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <p>点击上传照片</p>
+                        </div>
+                        <input type="file" id="post-images" accept="image/*" multiple style="display: none;">
+                        <div class="image-preview" id="post-image-preview"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('post-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitPost()">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="claim-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🔐 认领验证</h3>
+                <button class="modal-close" onclick="closeModal('claim-modal')">×</button>
+            </div>
+            <div class="modal-body" id="claim-verify-content">
+                <!-- 动态加载验证问题 -->
+            </div>
+        </div>
+    </div>
+
+    <div id="handover-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📍 线下交接</h3>
+                <button class="modal-close" onclick="closeModal('handover-modal')">×</button>
+            </div>
+            <div class="modal-body" id="handover-content">
+                <!-- 动态加载交接信息 -->
+            </div>
+        </div>
+    </div>
+
+    <div id="poster-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">📱 生成海报</h3>
+                <button class="modal-close" onclick="closeModal('poster-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="poster-preview" style="text-align: center;">
+                    <canvas id="poster-canvas" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);"></canvas>
+                </div>
+                <p style="text-align: center; color: #64748b; font-size: 14px; margin-top: 16px;">长按图片保存或截图分享</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('poster-modal')">关闭</button>
+                <button class="btn btn-primary" onclick="downloadPoster()">下载海报</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/matching.js"></script>
+    <script src="js/privacy.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
