@@ -1,18 +1,19 @@
 {
-  "name": "booking-deposit-manager",
+  "name": "repair-order-manager",
   "version": "1.0.0",
-  "description": "小型摄影工作室预约押金核销台系统",
+  "description": "小型手机维修店工单管理系统",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node server/index.js",
-    "test": "node server/test-api.js"
+    "test": "node server/test-api.js",
+    "test-db": "node server/test-api.js --db-only"
   },
   "keywords": [
-    "booking",
-    "deposit",
-    "photography",
-    "studio"
+    "repair",
+    "workorder",
+    "phone",
+    "management"
   ],
   "author": "",
   "license": "MIT",

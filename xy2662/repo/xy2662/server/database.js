@@ -7,28 +7,24 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const dbPath = path.join(dataDir, 'repair.db');
+const dbPath = path.join(dataDir, 'booking.db');
 
 let db;
 let isInitialized = false;
 let initPromise;
 
 const STATUS_FLOW = {
-  'pending': ['quoting', 'cancelled'],
-  'quoting': ['repairing', 'cancelled'],
-  'repairing': ['ready', 'cancelled'],
-  'ready': ['completed', 'cancelled'],
-  'completed': [],
-  'cancelled': []
+  'pending': ['deposited', 'refunded'],
+  'deposited': ['verified', 'refunded'],
+  'verified': [],
+  'refunded': []
 };
 
 const STATUS_NAMES = {
-  'pending': '待检测',
-  'quoting': '报价中',
-  'repairing': '维修中',
-  'ready': '待取机',
-  'completed': '已完成',
-  'cancelled': '已取消'
+  'pending': '待收押金',
+  'deposited': '已收押金',
+  'verified': '已核销',
+  'refunded': '已退款'
 };
 
 function getStatusName(status) {
@@ -45,14 +41,25 @@ function getAvailableTransitions(status) {
 }
 
 function getTransitionReason(fromStatus, toStatus) {
-  if (!canTransition(fromStatus, toStatus)) {
-    const nextStatus = getAvailableTransitions(fromStatus);
-    if (nextStatus.length === 0) {
-      return `当前状态「${getStatusName(fromStatus)}」无法进行状态变更`;
-    }
-    return `当前状态「${getStatusName(fromStatus)}」只能变更为：${nextStatus.map(s => getStatusName(s)).join('、')}`;
+  const nextStatus = getAvailableTransitions(fromStatus);
+  if (nextStatus.length === 0) {
+    return `当前状态「${getStatusName(fromStatus)}」无法进行状态变更`;
   }
-  return null;
+  return `当前状态「${getStatusName(fromStatus)}」只能变更为：${nextStatus.map(s => getStatusName(s)).join('、')}`;
+}
+
+function isTimeOverlap(start1, end1, start2, end2) {
+  const toMinutes = (time) => {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
+  };
+  
+  const s1 = toMinutes(start1);
+  const e1 = toMinutes(end1);
+  const s2 = toMinutes(start2);
+  const e2 = toMinutes(end2);
+  
+  return s1 < e2 && s2 < e1;
 }
 
 function initializeDatabase() {
@@ -67,17 +74,17 @@ function initializeDatabase() {
       
       db.serialize(() => {
         db.run(`
-          CREATE TABLE IF NOT EXISTS repair_orders (
+          CREATE TABLE IF NOT EXISTS bookings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             customer_name TEXT NOT NULL,
             phone TEXT NOT NULL,
-            device_model TEXT NOT NULL,
-            fault_description TEXT NOT NULL,
-            quote_amount REAL,
-            repair_parts TEXT,
-            expected_pickup_time TEXT,
-            notes TEXT,
+            studio TEXT NOT NULL,
+            booking_date TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT NOT NULL,
+            deposit_amount REAL NOT NULL DEFAULT 0,
             status TEXT NOT NULL DEFAULT 'pending',
+            note TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
           )
@@ -86,20 +93,20 @@ function initializeDatabase() {
         db.run(`
           CREATE TABLE IF NOT EXISTS audit_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            repair_order_id INTEGER NOT NULL,
+            booking_id INTEGER NOT NULL,
             action TEXT NOT NULL,
             from_status TEXT,
             to_status TEXT,
             note TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (repair_order_id) REFERENCES repair_orders (id)
+            FOREIGN KEY (booking_id) REFERENCES bookings (id)
           )
         `);
 
-        db.run(`CREATE INDEX IF NOT EXISTS idx_repair_orders_status ON repair_orders(status)`);
-        db.run(`CREATE INDEX IF NOT EXISTS idx_repair_orders_phone ON repair_orders(phone)`);
-        db.run(`CREATE INDEX IF NOT EXISTS idx_repair_orders_name ON repair_orders(customer_name)`);
-        db.run(`CREATE INDEX IF NOT EXISTS idx_audit_repair_order ON audit_logs(repair_order_id)`, (err) => {
+        db.run(`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_bookings_studio ON bookings(studio)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status)`);
+        db.run(`CREATE INDEX IF NOT EXISTS idx_audit_booking ON audit_logs(booking_id)`, (err) => {
           if (err) {
             console.error('创建索引失败:', err);
             reject(err);
@@ -163,75 +170,124 @@ async function all(sql, params = []) {
   });
 }
 
-async function createRepairOrder(data) {
+async function checkTimeConflict(studio, bookingDate, startTime, endTime, excludeId = null) {
   await waitForInitialization();
+  
+  let sql = `
+    SELECT * FROM bookings 
+    WHERE studio = ? 
+      AND booking_date = ? 
+      AND status != 'refunded'
+  `;
+  let params = [studio, bookingDate];
+
+  if (excludeId) {
+    sql += ` AND id != ?`;
+    params.push(excludeId);
+  }
+
+  const existingBookings = await all(sql, params);
+
+  for (const booking of existingBookings) {
+    if (isTimeOverlap(startTime, endTime, booking.start_time, booking.end_time)) {
+      return {
+        conflict: true,
+        message: `棚位 ${studio} 在 ${bookingDate} ${booking.start_time}-${booking.end_time} 已被预约`,
+        existingBooking: booking
+      };
+    }
+  }
+
+  return { conflict: false };
+}
+
+async function addAuditLog(bookingId, action, fromStatus, toStatus, note) {
+  await run(`
+    INSERT INTO audit_logs (booking_id, action, from_status, to_status, note)
+    VALUES (?, ?, ?, ?, ?)
+  `, [bookingId, action, fromStatus, toStatus, note]);
+}
+
+async function createBooking(data) {
+  await waitForInitialization();
+  
   const {
-    customer_name, phone, device_model, fault_description,
-    quote_amount, repair_parts, expected_pickup_time, notes
+    customer_name, phone, studio, booking_date,
+    start_time, end_time, deposit_amount, note
   } = data;
 
-  const result = await run(`
-    INSERT INTO repair_orders 
-    (customer_name, phone, device_model, fault_description, quote_amount, repair_parts, expected_pickup_time, notes)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `, [
-    customer_name, phone, device_model, fault_description,
-    quote_amount, repair_parts, expected_pickup_time, notes
-  ]);
+  const conflict = await checkTimeConflict(studio, booking_date, start_time, end_time);
+  if (conflict.conflict) {
+    throw new Error(conflict.message);
+  }
 
-  await run(`
-    INSERT INTO audit_logs (repair_order_id, action, note)
-    VALUES (?, 'create', '创建工单')
-  `, [result.lastID]);
+  const result = await run(`
+    INSERT INTO bookings 
+    (customer_name, phone, studio, booking_date, start_time, end_time, deposit_amount, status, note)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+  `, [customer_name, phone, studio, booking_date, start_time, end_time, deposit_amount, note]);
+
+  await addAuditLog(
+    result.lastID,
+    'create',
+    null,
+    'pending',
+    `创建预约 - 客户: ${customer_name}, 棚位: ${studio}, 日期: ${booking_date}, 时间: ${start_time}-${end_time}`
+  );
 
   return result.lastID;
 }
 
-async function updateRepairOrder(id, data) {
+async function updateBooking(id, data) {
   await waitForInitialization();
+  
+  const existingBooking = await get(`SELECT * FROM bookings WHERE id = ?`, [id]);
+  if (!existingBooking) {
+    throw new Error('预约不存在');
+  }
+
+  if (existingBooking.status === 'verified' || existingBooking.status === 'refunded') {
+    throw new Error('已核销或已退款的预约无法修改');
+  }
+
   const {
-    customer_name, phone, device_model, fault_description,
-    quote_amount, repair_parts, expected_pickup_time, notes
+    customer_name, phone, studio, booking_date,
+    start_time, end_time, deposit_amount, note
   } = data;
 
-  const existingOrder = await get(`
-    SELECT * FROM repair_orders WHERE id = ?
-  `, [id]);
-
-  if (!existingOrder) {
-    throw new Error('工单不存在');
+  const conflict = await checkTimeConflict(studio, booking_date, start_time, end_time, id);
+  if (conflict.conflict) {
+    throw new Error(conflict.message);
   }
 
   await run(`
-    UPDATE repair_orders SET
-      customer_name = ?, phone = ?, device_model = ?,
-      fault_description = ?, quote_amount = ?, repair_parts = ?,
-      expected_pickup_time = ?, notes = ?, updated_at = CURRENT_TIMESTAMP
+    UPDATE bookings SET
+      customer_name = ?, phone = ?, studio = ?,
+      booking_date = ?, start_time = ?, end_time = ?,
+      deposit_amount = ?, note = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
-  `, [
-    customer_name, phone, device_model, fault_description,
-    quote_amount, repair_parts, expected_pickup_time, notes, id
-  ]);
+  `, [customer_name, phone, studio, booking_date, start_time, end_time, deposit_amount, note, id]);
 
-  await run(`
-    INSERT INTO audit_logs (repair_order_id, action, note)
-    VALUES (?, 'update', '更新工单信息')
-  `, [id]);
+  await addAuditLog(
+    id,
+    'update',
+    existingBooking.status,
+    existingBooking.status,
+    `更新预约信息`
+  );
 
   return true;
 }
 
 async function updateStatus(id, newStatus, note = '') {
   await waitForInitialization();
-  const existingOrder = await get(`
-    SELECT * FROM repair_orders WHERE id = ?
-  `, [id]);
-
-  if (!existingOrder) {
-    throw new Error('工单不存在');
+  
+  const existingBooking = await get(`SELECT * FROM bookings WHERE id = ?`, [id]);
+  if (!existingBooking) {
+    throw new Error('预约不存在');
   }
 
-  const oldStatus = existingOrder.status;
+  const oldStatus = existingBooking.status;
 
   if (!canTransition(oldStatus, newStatus)) {
     const reason = getTransitionReason(oldStatus, newStatus);
@@ -239,30 +295,50 @@ async function updateStatus(id, newStatus, note = '') {
   }
 
   await run(`
-    UPDATE repair_orders SET status = ?, updated_at = CURRENT_TIMESTAMP
+    UPDATE bookings SET status = ?, updated_at = CURRENT_TIMESTAMP
     WHERE id = ?
   `, [newStatus, id]);
 
-  const actionNote = note || `从「${getStatusName(oldStatus)}」变更为「${getStatusName(newStatus)}」`;
-  await run(`
-    INSERT INTO audit_logs (repair_order_id, action, from_status, to_status, note)
-    VALUES (?, 'status_change', ?, ?, ?)
-  `, [id, oldStatus, newStatus, actionNote]);
+  let action = '';
+  let actionNote = note;
+
+  if (newStatus === 'deposited') {
+    action = 'deposit';
+    actionNote = note || `收取押金 ¥${existingBooking.deposit_amount}`;
+  } else if (newStatus === 'verified') {
+    action = 'verify';
+    actionNote = note || `核销预约，押金 ¥${existingBooking.deposit_amount} 已确认`;
+  } else if (newStatus === 'refunded') {
+    action = 'refund';
+    actionNote = note || `退回押金 ¥${existingBooking.deposit_amount}`;
+  }
+
+  await addAuditLog(
+    id,
+    action,
+    oldStatus,
+    newStatus,
+    actionNote
+  );
 
   return true;
 }
 
-async function getRepairOrderById(id) {
+async function getBookingById(id) {
   await waitForInitialization();
-  return await get(`
-    SELECT * FROM repair_orders WHERE id = ?
-  `, [id]);
+  return await get(`SELECT * FROM bookings WHERE id = ?`, [id]);
 }
 
-async function getRepairOrders(filters = {}) {
+async function getBookings(filters = {}) {
   await waitForInitialization();
-  let sql = `SELECT * FROM repair_orders WHERE 1=1`;
+  
+  let sql = `SELECT * FROM bookings WHERE 1=1`;
   const params = [];
+
+  if (filters.booking_date) {
+    sql += ` AND booking_date = ?`;
+    params.push(filters.booking_date);
+  }
 
   if (filters.status) {
     sql += ` AND status = ?`;
@@ -271,20 +347,26 @@ async function getRepairOrders(filters = {}) {
 
   if (filters.search) {
     const searchTerm = `%${filters.search}%`;
-    sql += ` AND (customer_name LIKE ? OR phone LIKE ? OR device_model LIKE ?)`;
+    sql += ` AND (customer_name LIKE ? OR phone LIKE ? OR studio LIKE ?)`;
     params.push(searchTerm, searchTerm, searchTerm);
   }
 
-  sql += ` ORDER BY created_at DESC`;
+  sql += ` ORDER BY booking_date DESC, start_time ASC`;
 
   return await all(sql, params);
 }
 
-async function getAuditLogs(repairOrderId) {
+async function getAuditLogs(bookingId) {
   await waitForInitialization();
   return await all(`
-    SELECT * FROM audit_logs WHERE repair_order_id = ? ORDER BY created_at DESC
-  `, [repairOrderId]);
+    SELECT * FROM audit_logs WHERE booking_id = ? ORDER BY created_at DESC
+  `, [bookingId]);
+}
+
+function isOverdue(booking) {
+  const today = new Date().toISOString().split('T')[0];
+  return booking.booking_date < today && 
+         (booking.status === 'pending' || booking.status === 'deposited');
 }
 
 async function init() {
@@ -296,12 +378,16 @@ module.exports = {
   run,
   get,
   all,
-  createRepairOrder,
-  updateRepairOrder,
+  createBooking,
+  updateBooking,
   updateStatus,
-  getRepairOrderById,
-  getRepairOrders,
+  getBookingById,
+  getBookings,
   getAuditLogs,
+  checkTimeConflict,
+  addAuditLog,
+  isTimeOverlap,
+  isOverdue,
   getStatusName,
   canTransition,
   getAvailableTransitions,

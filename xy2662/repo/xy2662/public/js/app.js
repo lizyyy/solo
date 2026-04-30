@@ -1,562 +1,574 @@
-class RepairOrderApp {
-    constructor() {
-        this.orders = [];
-        this.statusInfo = null;
-        this.currentEditOrder = null;
-        this.init();
+const API_BASE = '';
+
+let bookings = [];
+let currentBookingId = null;
+let isEditMode = false;
+
+const STATUS_NAMES = {
+  'pending': '待收押金',
+  'deposited': '已收押金',
+  'verified': '已核销',
+  'refunded': '已退款'
+};
+
+const ACTION_NAMES = {
+  'create': '创建预约',
+  'deposit': '收取押金',
+  'verify': '核销预约',
+  'refund': '退回押金',
+  'update': '更新信息'
+};
+
+function getStatusName(status) {
+  return STATUS_NAMES[status] || status;
+}
+
+function getActionName(action) {
+  return ACTION_NAMES[action] || action;
+}
+
+function getStatusClass(status) {
+  return `status-${status}`;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatDateTime(dateTimeStr) {
+  if (!dateTimeStr) return '';
+  const date = new Date(dateTimeStr);
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function formatCurrency(amount) {
+  return `¥${parseFloat(amount || 0).toFixed(2)}`;
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
+}
+
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.classList.remove('hidden');
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  modal.classList.add('hidden');
+}
+
+async function fetchBookings() {
+  try {
+    const dateFilter = document.getElementById('filterDate').value;
+    const searchTerm = document.getElementById('searchInput').value;
+
+    let url = `${API_BASE}/api/bookings?`;
+    const params = [];
+
+    if (dateFilter) params.push(`booking_date=${encodeURIComponent(dateFilter)}`);
+    if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
+
+    if (params.length > 0) url += params.join('&');
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.success) {
+      bookings = data.data;
+      renderBookings();
+      updateStats();
+    } else {
+      showToast('加载预约列表失败', 'error');
+    }
+  } catch (error) {
+    console.error('获取预约列表失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
+}
+
+function renderBookings() {
+  const container = document.getElementById('bookingList');
+
+  if (bookings.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>暂无预约记录</p>
+      </div>
+    `;
+    return;
+  }
+
+  const sortedBookings = [...bookings].sort((a, b) => {
+    if (a.is_overdue && !b.is_overdue) return -1;
+    if (!a.is_overdue && b.is_overdue) return 1;
+    if (a.booking_date !== b.booking_date) {
+      return a.booking_date.localeCompare(b.booking_date);
+    }
+    return a.start_time.localeCompare(b.start_time);
+  });
+
+  container.innerHTML = sortedBookings.map(booking => `
+    <div class="booking-card ${booking.is_overdue ? 'overdue' : ''}" 
+         onclick="viewBookingDetail(${booking.id})"
+         data-id="${booking.id}">
+      <div class="booking-info">
+        <div class="booking-header">
+          <span class="booking-studio">棚位 ${booking.studio}</span>
+          <span class="booking-customer">${booking.customer_name}</span>
+          <span class="booking-phone">${booking.phone}</span>
+        </div>
+        <div class="booking-meta">
+          <span>📅 ${formatDate(booking.booking_date)}</span>
+          <span>⏰ ${booking.start_time} - ${booking.end_time}</span>
+          ${booking.is_overdue ? '<span style="color: #ef4444; font-weight: 600;">⚠️ 已逾期</span>' : ''}
+        </div>
+      </div>
+      <div class="booking-right">
+        <span class="booking-status ${getStatusClass(booking.status)}">
+          ${getStatusName(booking.status)}
+        </span>
+        <span class="booking-deposit">
+          押金: <strong>${formatCurrency(booking.deposit_amount)}</strong>
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateStats() {
+  const today = new Date().toISOString().split('T')[0];
+  
+  const todayCount = bookings.filter(b => b.booking_date === today).length;
+  const pendingCount = bookings.filter(b => b.status === 'pending').length;
+  const depositedCount = bookings.filter(b => b.status === 'deposited').length;
+  const verifiedCount = bookings.filter(b => b.status === 'verified').length;
+  const refundedCount = bookings.filter(b => b.status === 'refunded').length;
+  const overdueCount = bookings.filter(b => b.is_overdue).length;
+
+  document.getElementById('todayCount').textContent = todayCount;
+  document.getElementById('pendingCount').textContent = pendingCount;
+  document.getElementById('depositedCount').textContent = depositedCount;
+  document.getElementById('verifiedCount').textContent = verifiedCount;
+  document.getElementById('refundedCount').textContent = refundedCount;
+  document.getElementById('overdueCount').textContent = overdueCount;
+}
+
+async function viewBookingDetail(id) {
+  try {
+    const response = await fetch(`${API_BASE}/api/bookings/${id}`);
+    const data = await response.json();
+
+    if (data.success) {
+      currentBookingId = id;
+      renderBookingDetail(data.data);
+      openModal('detailModal');
+    } else {
+      showToast('获取预约详情失败', 'error');
+    }
+  } catch (error) {
+    console.error('获取预约详情失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
+}
+
+function renderBookingDetail(booking) {
+  const basicContainer = document.getElementById('detailBasic');
+  
+  basicContainer.innerHTML = `
+    <div class="detail-item">
+      <span class="detail-label">客户姓名</span>
+      <span class="detail-value">${booking.customer_name}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">联系电话</span>
+      <span class="detail-value">${booking.phone}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">棚位</span>
+      <span class="detail-value">棚位 ${booking.studio}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">预约日期</span>
+      <span class="detail-value">${formatDate(booking.booking_date)} ${booking.is_overdue ? '<span style="color: #ef4444;">(逾期)</span>' : ''}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">时间段</span>
+      <span class="detail-value">${booking.start_time} - ${booking.end_time}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">当前状态</span>
+      <span class="detail-value">
+        <span class="booking-status ${getStatusClass(booking.status)}" style="display: inline-block;">
+          ${getStatusName(booking.status)}
+        </span>
+      </span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">押金金额</span>
+      <span class="detail-value">${formatCurrency(booking.deposit_amount)}</span>
+    </div>
+    ${booking.note ? `
+    <div class="detail-item" style="grid-column: 1 / -1;">
+      <span class="detail-label">备注</span>
+      <span class="detail-value">${booking.note}</span>
+    </div>
+    ` : ''}
+  `;
+
+  renderStatusActions(booking);
+  renderAuditLogs(booking.audit_logs);
+}
+
+function renderStatusActions(booking) {
+  const container = document.getElementById('statusActions');
+  const status = booking.status;
+
+  const actions = [];
+
+  if (status === 'pending') {
+    actions.push({
+      id: 'deposit',
+      label: '💰 收取押金',
+      class: 'btn-success',
+      targetStatus: 'deposited',
+      disabled: false,
+      reason: ''
+    });
+    actions.push({
+      id: 'refund',
+      label: '❌ 取消预约',
+      class: 'btn-danger',
+      targetStatus: 'refunded',
+      disabled: false,
+      reason: ''
+    });
+  } else if (status === 'deposited') {
+    actions.push({
+      id: 'verify',
+      label: '✅ 核销预约',
+      class: 'btn-success',
+      targetStatus: 'verified',
+      disabled: false,
+      reason: ''
+    });
+    actions.push({
+      id: 'refund',
+      label: '↩️ 退回押金',
+      class: 'btn-danger',
+      targetStatus: 'refunded',
+      disabled: false,
+      reason: ''
+    });
+  } else if (status === 'verified') {
+    actions.push({
+      id: 'noaction1',
+      label: '已完成',
+      class: 'btn-secondary',
+      targetStatus: null,
+      disabled: true,
+      reason: '已核销的预约无法进行状态变更'
+    });
+  } else if (status === 'refunded') {
+    actions.push({
+      id: 'noaction2',
+      label: '已退款',
+      class: 'btn-secondary',
+      targetStatus: null,
+      disabled: true,
+      reason: '已退款的预约无法进行状态变更'
+    });
+  }
+
+  container.innerHTML = actions.map(action => `
+    <button class="btn ${action.class}" 
+            ${action.disabled ? 'disabled' : ''}
+            title="${action.reason}"
+            onclick="${action.targetStatus ? `updateStatus('${action.targetStatus}')` : ''}">
+      ${action.label}
+    </button>
+  `).join('');
+}
+
+function renderAuditLogs(logs) {
+  const container = document.getElementById('auditList');
+
+  if (!logs || logs.length === 0) {
+    container.innerHTML = '<p style="color: #6b7280; font-size: 0.875rem;">暂无操作记录</p>';
+    return;
+  }
+
+  container.innerHTML = logs.map(log => `
+    <div class="audit-item ${log.action}">
+      <div class="audit-header">
+        <span class="audit-action">${getActionName(log.action)}</span>
+        <span class="audit-time">${formatDateTime(log.created_at)}</span>
+      </div>
+      ${log.note ? `<div class="audit-note">${log.note}</div>` : ''}
+      ${log.from_status || log.to_status ? `
+        <div class="audit-status">
+          ${log.from_status ? `状态: ${getStatusName(log.from_status)}` : ''}
+          ${log.from_status && log.to_status ? ' → ' : ''}
+          ${log.to_status ? getStatusName(log.to_status) : ''}
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+async function updateStatus(newStatus) {
+  try {
+    let note = '';
+    if (newStatus === 'deposited') {
+      note = '前台收取押金';
+    } else if (newStatus === 'verified') {
+      note = '拍摄完成，核销预约';
+    } else if (newStatus === 'refunded') {
+      note = '客户取消预约，退回押金';
     }
 
-    async init() {
-        await this.loadStatusInfo();
-        await this.loadOrders();
-        this.bindEvents();
+    const response = await fetch(`${API_BASE}/api/bookings/${currentBookingId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: newStatus, note })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      showToast('状态更新成功', 'success');
+      closeModal('detailModal');
+      fetchBookings();
+    } else {
+      showToast(data.error || '状态更新失败', 'error');
+    }
+  } catch (error) {
+    console.error('更新状态失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
+}
+
+function openNewBookingModal() {
+  isEditMode = false;
+  currentBookingId = null;
+  document.getElementById('modalTitle').textContent = '新建预约';
+  
+  document.getElementById('bookingId').value = '';
+  document.getElementById('customerName').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('studio').value = '';
+  document.getElementById('bookingDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('startTime').value = '09:00';
+  document.getElementById('endTime').value = '12:00';
+  document.getElementById('depositAmount').value = '0';
+  document.getElementById('note').value = '';
+
+  openModal('bookingModal');
+}
+
+async function editBooking() {
+  if (!currentBookingId) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/api/bookings/${currentBookingId}`);
+    const data = await response.json();
+
+    if (data.success) {
+      const booking = data.data;
+      
+      if (booking.status === 'verified' || booking.status === 'refunded') {
+        showToast('已核销或已退款的预约无法修改', 'error');
+        return;
+      }
+
+      isEditMode = true;
+      document.getElementById('modalTitle').textContent = '编辑预约';
+      
+      document.getElementById('bookingId').value = booking.id;
+      document.getElementById('customerName').value = booking.customer_name;
+      document.getElementById('phone').value = booking.phone;
+      document.getElementById('studio').value = booking.studio;
+      document.getElementById('bookingDate').value = booking.booking_date;
+      document.getElementById('startTime').value = booking.start_time;
+      document.getElementById('endTime').value = booking.end_time;
+      document.getElementById('depositAmount').value = booking.deposit_amount;
+      document.getElementById('note').value = booking.note || '';
+
+      closeModal('detailModal');
+      openModal('bookingModal');
+    } else {
+      showToast('获取预约详情失败', 'error');
+    }
+  } catch (error) {
+    console.error('获取预约详情失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
+}
+
+async function saveBooking(e) {
+  e.preventDefault();
+
+  const bookingData = {
+    customer_name: document.getElementById('customerName').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    studio: document.getElementById('studio').value,
+    booking_date: document.getElementById('bookingDate').value,
+    start_time: document.getElementById('startTime').value,
+    end_time: document.getElementById('endTime').value,
+    deposit_amount: parseFloat(document.getElementById('depositAmount').value) || 0,
+    note: document.getElementById('note').value.trim()
+  };
+
+  if (!bookingData.customer_name || !bookingData.phone || !bookingData.studio ||
+      !bookingData.booking_date || !bookingData.start_time || !bookingData.end_time) {
+    showToast('请填写所有必填项', 'error');
+    return;
+  }
+
+  const phoneRegex = /^1[3-9]\d{9}$/;
+  if (!phoneRegex.test(bookingData.phone)) {
+    showToast('请输入有效的手机号码', 'error');
+    return;
+  }
+
+  if (bookingData.start_time >= bookingData.end_time) {
+    showToast('结束时间必须晚于开始时间', 'error');
+    return;
+  }
+
+  try {
+    let url = `${API_BASE}/api/bookings`;
+    let method = 'POST';
+
+    if (isEditMode && currentBookingId) {
+      url += `/${currentBookingId}`;
+      method = 'PUT';
     }
 
-    async loadStatusInfo() {
-        try {
-            const response = await fetch('/api/status-info');
-            const result = await response.json();
-            if (result.success) {
-                this.statusInfo = result.data;
-            }
-        } catch (error) {
-            console.error('加载状态信息失败:', error);
-        }
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookingData)
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      showToast(isEditMode ? '预约更新成功' : '预约创建成功', 'success');
+      closeModal('bookingModal');
+      fetchBookings();
+    } else {
+      showToast(data.error || '操作失败', 'error');
     }
+  } catch (error) {
+    console.error('保存预约失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
+}
 
-    async loadOrders(filters = {}) {
-        try {
-            let url = '/api/orders';
-            const params = new URLSearchParams();
-            if (filters.status) params.append('status', filters.status);
-            if (filters.search) params.append('search', filters.search);
-            if (params.toString()) url += '?' + params.toString();
+async function exportTodayCsv() {
+  const date = document.getElementById('filterDate').value || new Date().toISOString().split('T')[0];
+  window.location.href = `${API_BASE}/api/csv/export?date=${encodeURIComponent(date)}`;
+}
 
-            const response = await fetch(url);
-            const result = await response.json();
-            if (result.success) {
-                this.orders = result.data;
-                this.renderKanban();
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('加载工单失败:', error);
-            this.showToast('加载工单失败', 'error');
-        }
+async function exportAllCsv() {
+  window.location.href = `${API_BASE}/api/csv/all`;
+}
+
+async function importCsv(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(`${API_BASE}/api/csv/import`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      showToast(`导入成功: ${data.data.imported} 条记录${data.data.errors > 0 ? `，${data.data.errors} 条失败` : ''}`, 
+        data.data.errors > 0 ? 'info' : 'success');
+      fetchBookings();
+    } else {
+      showToast(data.error || '导入失败', 'error');
     }
+  } catch (error) {
+    console.error('导入 CSV 失败:', error);
+    showToast('网络错误，请稍后重试', 'error');
+  }
 
-    renderKanban() {
-        const statusGroups = {
-            pending: [],
-            quoting: [],
-            repairing: [],
-            ready: [],
-            completed: [],
-            cancelled: []
-        };
+  e.target.value = '';
+}
 
-        this.orders.forEach(order => {
-            if (statusGroups[order.status]) {
-                statusGroups[order.status].push(order);
-            }
-        });
+function initEventListeners() {
+  document.getElementById('newBookingBtn').addEventListener('click', openNewBookingModal);
+  document.getElementById('exportTodayCsv').addEventListener('click', exportTodayCsv);
+  document.getElementById('exportAllCsv').addEventListener('click', exportAllCsv);
+  document.getElementById('importCsv').addEventListener('change', importCsv);
 
-        Object.keys(statusGroups).forEach(status => {
-            const countElement = document.getElementById(`${status}-count`);
-            const cardsElement = document.getElementById(`${status}-cards`);
-            
-            if (countElement) {
-                countElement.textContent = statusGroups[status].length;
-            }
-            
-            if (cardsElement) {
-                cardsElement.innerHTML = statusGroups[status]
-                    .map(order => this.renderCard(order))
-                    .join('');
-            }
-        });
+  document.getElementById('filterDate').addEventListener('change', fetchBookings);
+  document.getElementById('clearDate').addEventListener('click', () => {
+    document.getElementById('filterDate').value = '';
+    fetchBookings();
+  });
+
+  let searchTimer;
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      fetchBookings();
+    }, 300);
+  });
+
+  document.getElementById('bookingForm').addEventListener('submit', saveBooking);
+  document.getElementById('cancelModal').addEventListener('click', () => closeModal('bookingModal'));
+  document.getElementById('closeModal').addEventListener('click', () => closeModal('bookingModal'));
+
+  document.getElementById('editBookingBtn').addEventListener('click', editBooking);
+  document.getElementById('closeDetailBtn').addEventListener('click', () => closeModal('detailModal'));
+  document.getElementById('closeDetailModal').addEventListener('click', () => closeModal('detailModal'));
+
+  document.getElementById('bookingModal').addEventListener('click', (e) => {
+    if (e.target.id === 'bookingModal') closeModal('bookingModal');
+  });
+  document.getElementById('detailModal').addEventListener('click', (e) => {
+    if (e.target.id === 'detailModal') closeModal('detailModal');
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal('bookingModal');
+      closeModal('detailModal');
     }
-
-    renderCard(order) {
-        const statusColor = this.getStatusColor(order.status);
-        const priceText = order.quote_amount ? `¥${order.quote_amount}` : '待报价';
-        
-        return `
-            <div class="card" data-status="${order.status}" data-id="${order.id}">
-                <div class="card-header">
-                    <span class="card-id">#${order.id}</span>
-                </div>
-                <div class="card-customer">${order.customer_name}</div>
-                <div class="card-device">${order.device_model}</div>
-                <div class="card-fault">${this.escapeHtml(order.fault_description)}</div>
-                <div class="card-footer">
-                    <span class="card-price">${priceText}</span>
-                    <span>${this.formatDate(order.created_at)}</span>
-                </div>
-            </div>
-        `;
-    }
-
-    getStatusColor(status) {
-        const colors = {
-            pending: 'f59e0b',
-            quoting: '6366f1',
-            repairing: '3b82f6',
-            ready: '10b981',
-            completed: '64748b',
-            cancelled: 'ef4444'
-        };
-        return colors[status] || '64748b';
-    }
-
-    getStatusName(status) {
-        const names = {
-            pending: '待检测',
-            quoting: '报价中',
-            repairing: '维修中',
-            ready: '待取机',
-            completed: '已完成',
-            cancelled: '已取消'
-        };
-        return names[status] || status;
-    }
-
-    getNextStatuses(status) {
-        const flow = {
-            pending: ['quoting', 'cancelled'],
-            quoting: ['repairing', 'cancelled'],
-            repairing: ['ready', 'cancelled'],
-            ready: ['completed', 'cancelled'],
-            completed: [],
-            cancelled: []
-        };
-        return flow[status] || [];
-    }
-
-    getStatusButtonClass(status) {
-        const classes = {
-            quoting: 'btn-warning',
-            repairing: 'btn-secondary',
-            ready: 'btn-warning',
-            completed: 'btn-success',
-            cancelled: 'btn-danger'
-        };
-        return classes[status] || 'btn-secondary';
-    }
-
-    getStatusTransitionReason(fromStatus, toStatus) {
-        const nextStatus = this.getNextStatuses(fromStatus);
-        if (nextStatus.length === 0) {
-            return `当前状态「${this.getStatusName(fromStatus)}」无法进行状态变更`;
-        }
-        return `当前状态「${this.getStatusName(fromStatus)}」只能变更为：${nextStatus.map(s => this.getStatusName(s)).join('、')}`;
-    }
-
-    canTransition(fromStatus, toStatus) {
-        const nextStatus = this.getNextStatuses(fromStatus);
-        return nextStatus.includes(toStatus);
-    }
-
-    bindEvents() {
-        document.getElementById('newOrderBtn').addEventListener('click', () => {
-            this.openOrderModal();
-        });
-
-        document.getElementById('closeModal').addEventListener('click', () => {
-            this.closeOrderModal();
-        });
-
-        document.getElementById('cancelBtn').addEventListener('click', () => {
-            this.closeOrderModal();
-        });
-
-        document.getElementById('orderForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.saveOrder();
-        });
-
-        document.getElementById('searchBtn').addEventListener('click', () => {
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            this.loadOrders({ search: searchTerm });
-        });
-
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const searchTerm = document.getElementById('searchInput').value.trim();
-                this.loadOrders({ search: searchTerm });
-            }
-        });
-
-        document.getElementById('exportBtn').addEventListener('click', () => {
-            window.location.href = '/api/csv/export';
-        });
-
-        document.getElementById('importFile').addEventListener('change', async (e) => {
-            await this.importCSV(e.target.files[0]);
-            e.target.value = '';
-        });
-
-        document.getElementById('closeDetailModal').addEventListener('click', () => {
-            this.closeDetailModal();
-        });
-
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    if (overlay.id === 'orderModal') {
-                        this.closeOrderModal();
-                    } else if (overlay.id === 'detailModal') {
-                        this.closeDetailModal();
-                    }
-                }
-            });
-        });
-
-        document.addEventListener('click', async (e) => {
-            const card = e.target.closest('.card');
-            if (card) {
-                const orderId = card.dataset.id;
-                await this.showOrderDetail(orderId);
-            }
-
-            if (e.target.classList.contains('status-action-btn')) {
-                const orderId = e.target.dataset.orderId;
-                const newStatus = e.target.dataset.status;
-                await this.updateStatus(orderId, newStatus);
-            }
-
-            if (e.target.classList.contains('edit-order-btn')) {
-                const orderId = e.target.dataset.orderId;
-                await this.editOrder(orderId);
-            }
-        });
-    }
-
-    openOrderModal(order = null) {
-        this.currentEditOrder = order;
-        const modal = document.getElementById('orderModal');
-        const title = document.getElementById('modalTitle');
-        const form = document.getElementById('orderForm');
-
-        if (order) {
-            title.textContent = '编辑工单';
-            this.fillForm(order);
-        } else {
-            title.textContent = '新建工单';
-            form.reset();
-        }
-
-        modal.classList.add('active');
-    }
-
-    closeOrderModal() {
-        const modal = document.getElementById('orderModal');
-        modal.classList.remove('active');
-        this.currentEditOrder = null;
-    }
-
-    fillForm(order) {
-        const form = document.getElementById('orderForm');
-        form.customer_name.value = order.customer_name || '';
-        form.phone.value = order.phone || '';
-        form.device_model.value = order.device_model || '';
-        form.fault_description.value = order.fault_description || '';
-        form.quote_amount.value = order.quote_amount || '';
-        form.repair_parts.value = order.repair_parts || '';
-        form.notes.value = order.notes || '';
-        
-        if (order.expected_pickup_time) {
-            const date = new Date(order.expected_pickup_time);
-            const isoString = date.toISOString().slice(0, 16);
-            form.expected_pickup_time.value = isoString;
-        } else {
-            form.expected_pickup_time.value = '';
-        }
-    }
-
-    async saveOrder() {
-        const form = document.getElementById('orderForm');
-        const formData = {
-            customer_name: form.customer_name.value.trim(),
-            phone: form.phone.value.trim(),
-            device_model: form.device_model.value.trim(),
-            fault_description: form.fault_description.value.trim(),
-            quote_amount: form.quote_amount.value ? parseFloat(form.quote_amount.value) : null,
-            repair_parts: form.repair_parts.value.trim() || null,
-            expected_pickup_time: form.expected_pickup_time.value || null,
-            notes: form.notes.value.trim() || null
-        };
-
-        try {
-            let url = '/api/orders';
-            let method = 'POST';
-
-            if (this.currentEditOrder) {
-                url = `/api/orders/${this.currentEditOrder.id}`;
-                method = 'PUT';
-            }
-
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                this.showToast(result.message, 'success');
-                this.closeOrderModal();
-                await this.loadOrders();
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('保存工单失败:', error);
-            this.showToast('保存工单失败', 'error');
-        }
-    }
-
-    async editOrder(orderId) {
-        try {
-            const response = await fetch(`/api/orders/${orderId}`);
-            const result = await response.json();
-
-            if (result.success) {
-                this.openOrderModal(result.data);
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('获取工单详情失败:', error);
-            this.showToast('获取工单详情失败', 'error');
-        }
-    }
-
-    async showOrderDetail(orderId) {
-        try {
-            const response = await fetch(`/api/orders/${orderId}`);
-            const result = await response.json();
-
-            if (result.success) {
-                this.renderDetailModal(result.data);
-                document.getElementById('detailModal').classList.add('active');
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('获取工单详情失败:', error);
-            this.showToast('获取工单详情失败', 'error');
-        }
-    }
-
-    renderDetailModal(order) {
-        const title = document.getElementById('detailModalTitle');
-        const content = document.getElementById('detailContent');
-
-        title.textContent = `工单 #${order.id} - ${order.customer_name}`;
-
-        const nextStatuses = this.getNextStatuses(order.status);
-        const statusActionsHtml = nextStatuses.map(status => {
-            const isAllowed = this.canTransition(order.status, status);
-            const buttonClass = this.getStatusButtonClass(status);
-            const tooltip = isAllowed ? '' : this.getStatusTransitionReason(order.status, status);
-
-            return `
-                <div class="status-action-tooltip">
-                    <button class="btn ${buttonClass} status-action-btn" 
-                            data-order-id="${order.id}" 
-                            data-status="${status}"
-                            ${isAllowed ? '' : 'disabled'}>
-                        转为${this.getStatusName(status)}
-                    </button>
-                    ${tooltip ? `<div class="tooltip">${tooltip}</div>` : ''}
-                </div>
-            `;
-        }).join('');
-
-        const auditLogsHtml = order.auditLogs && order.auditLogs.length > 0
-            ? order.auditLogs.map(log => `
-                <div class="audit-log-item">
-                    <div class="audit-log-time">${this.formatDateTime(log.created_at)}</div>
-                    <div class="audit-log-action">
-                        ${log.action === 'create' ? '创建工单' : 
-                          log.action === 'update' ? '更新工单' : 
-                          log.action === 'status_change' ? '状态变更' : log.action}
-                    </div>
-                    <div class="audit-log-note">${this.escapeHtml(log.note || '')}</div>
-                </div>
-            `).join('')
-            : '<p style="color: #94a3b8; font-size: 0.85rem;">暂无操作记录</p>';
-
-        content.innerHTML = `
-            <div>
-                <div class="detail-section">
-                    <h3>基本信息</h3>
-                    <div class="detail-row">
-                        <span class="detail-label">工单编号</span>
-                        <span class="detail-value">#${order.id}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">客户姓名</span>
-                        <span class="detail-value">${order.customer_name}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">联系电话</span>
-                        <span class="detail-value">${order.phone}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">设备型号</span>
-                        <span class="detail-value">${order.device_model}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">当前状态</span>
-                        <span class="detail-value status status-${order.status}">${this.getStatusName(order.status)}</span>
-                    </div>
-                    <div class="status-actions">
-                        ${statusActionsHtml}
-                        <button class="btn btn-secondary edit-order-btn" data-order-id="${order.id}">编辑信息</button>
-                    </div>
-                </div>
-
-                <div class="detail-section">
-                    <h3>维修详情</h3>
-                    <div class="detail-row">
-                        <span class="detail-label">故障描述</span>
-                        <span class="detail-value">${this.escapeHtml(order.fault_description)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">报价金额</span>
-                        <span class="detail-value">${order.quote_amount ? `¥${order.quote_amount}` : '待报价'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">维修配件</span>
-                        <span class="detail-value">${order.repair_parts || '无'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">预计取机</span>
-                        <span class="detail-value">${order.expected_pickup_time ? this.formatDateTime(order.expected_pickup_time) : '未设置'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">备注</span>
-                        <span class="detail-value">${order.notes || '无'}</span>
-                    </div>
-                </div>
-
-                <div class="detail-section">
-                    <h3>时间信息</h3>
-                    <div class="detail-row">
-                        <span class="detail-label">创建时间</span>
-                        <span class="detail-value">${this.formatDateTime(order.created_at)}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">更新时间</span>
-                        <span class="detail-value">${this.formatDateTime(order.updated_at)}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="detail-section">
-                    <h3>操作记录</h3>
-                    ${auditLogsHtml}
-                </div>
-            </div>
-        `;
-    }
-
-    closeDetailModal() {
-        document.getElementById('detailModal').classList.remove('active');
-    }
-
-    async updateStatus(orderId, newStatus) {
-        try {
-            const response = await fetch(`/api/orders/${orderId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                this.showToast(`状态已更新为「${this.getStatusName(newStatus)}」`, 'success');
-                this.closeDetailModal();
-                await this.loadOrders();
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('更新状态失败:', error);
-            this.showToast('更新状态失败', 'error');
-        }
-    }
-
-    async importCSV(file) {
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            const response = await fetch('/api/csv/import', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                let message = result.message;
-                if (result.data.errorDetails && result.data.errorDetails.length > 0) {
-                    message += '\n\n错误详情：\n' + result.data.errorDetails.join('\n');
-                }
-                this.showToast(message, result.data.errors > 0 ? 'warning' : 'success');
-                await this.loadOrders();
-            } else {
-                this.showToast(result.message, 'error');
-            }
-        } catch (error) {
-            console.error('导入 CSV 失败:', error);
-            this.showToast('导入 CSV 失败', 'error');
-        }
-    }
-
-    showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = `toast show ${type}`;
-
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-    }
-
-    formatDateTime(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-    }
-
-    escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new RepairOrderApp();
+  initEventListeners();
+  fetchBookings();
 });
