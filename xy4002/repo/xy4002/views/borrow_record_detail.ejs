@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借还记录详情 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records" class="active">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>借还记录详情</h1>
+            <a href="/borrow-records" class="btn btn-secondary">返回列表</a>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>记录 #<%= record.id %></h2>
+                <span class="status status-<%= record.status %>">
+                    <%= getStatusText(record.status) %>
+                </span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>物资名称</label>
+                    <p><%= record.material_name %></p>
+                </div>
+                <div class="form-group">
+                    <label>借出数量</label>
+                    <p><%= record.borrow_quantity %> <%= record.material_unit %></p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>居民姓名</label>
+                    <p><%= record.resident_name %></p>
+                </div>
+                <div class="form-group">
+                    <label>联系电话</label>
+                    <p><%= record.resident_phone || '-' %></p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>借出时间</label>
+                    <p><%= formatDate(record.created_at) %></p>
+                </div>
+                <div class="form-group">
+                    <label>预计归还日期</label>
+                    <p style="color: <%= record.status === 'overdue' ? '#e74c3c' : '' %>; font-weight: <%= record.status === 'overdue' ? 'bold' : 'normal' %>;">
+                        <%= record.expected_return_date || '-' %>
+                        <% if (record.status === 'overdue') { %>
+                            <span class="status status-overdue">已逾期</span>
+                        <% } %>
+                    </p>
+                </div>
+            </div>
+
+            <% if (record.status === 'returned') { %>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>实际归还时间</label>
+                        <p><%= record.actual_return_date ? formatDate(record.actual_return_date) : '-' %></p>
+                    </div>
+                    <div class="form-group">
+                        <label>归还备注</label>
+                        <p><%= record.return_remark || '无' %></p>
+                    </div>
+                </div>
+            <% } %>
+
+            <% if (record.status !== 'returned') { %>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <h3 style="margin-bottom: 15px;">办理归还</h3>
+                    <form method="POST" action="/return/<%= record.id %>">
+                        <div class="form-group">
+                            <label for="return_remark">归还备注</label>
+                            <textarea id="return_remark" name="return_remark" placeholder="请输入归还备注（可选）"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success" onclick="return confirm('确认归还该物资？')">确认归还</button>
+                    </form>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
+
+<% function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function getStatusText(status) {
+    const map = {
+        'borrowed': '借出中',
+        'overdue': '已逾期',
+        'returned': '已归还'
+    };
+    return map[status] || status;
+}
+%>

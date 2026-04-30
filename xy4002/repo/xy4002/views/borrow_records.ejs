@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借还记录 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records" class="active">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>借还记录管理</h1>
+            <div>
+                <a href="/borrow/new" class="btn btn-primary">办理借出</a>
+                <a href="/export/borrows" class="btn btn-success">导出记录</a>
+            </div>
+        </header>
+
+        <div class="filters">
+            <form method="GET" action="/borrow-records">
+                <div class="search-box">
+                    <input type="text" name="keyword" placeholder="搜索物资名称、居民姓名、电话..." value="<%= keyword || '' %>">
+                </div>
+                <div class="filter-group">
+                    <label for="status">状态：</label>
+                    <select name="status" id="status">
+                        <option value="">全部</option>
+                        <option value="borrowed" <%= status === 'borrowed' ? 'selected' : '' %>>借出中</option>
+                        <option value="overdue" <%= status === 'overdue' ? 'selected' : '' %>>已逾期</option>
+                        <option value="returned" <%= status === 'returned' ? 'selected' : '' %>>已归还</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">筛选</button>
+                <a href="/borrow-records" class="btn btn-link">清除筛选</a>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <% if (records.length === 0) { %>
+                <div class="no-data">
+                    <p>暂无借还记录</p>
+                    <a href="/borrow/new" class="btn btn-primary">办理第一笔借出</a>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>记录ID</th>
+                            <th>物资名称</th>
+                            <th>居民姓名</th>
+                            <th>联系电话</th>
+                            <th>借出数量</th>
+                            <th>预计归还</th>
+                            <th>实际归还</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% records.forEach(record => { %>
+                            <tr>
+                                <td><%= record.id %></td>
+                                <td><%= record.material_name %></td>
+                                <td><%= record.resident_name %></td>
+                                <td><%= record.resident_phone || '-' %></td>
+                                <td><%= record.borrow_quantity %> <%= record.material_unit %></td>
+                                <td style="color: <%= record.status === 'overdue' ? '#e74c3c' : '' %>">
+                                    <%= record.expected_return_date || '-' %>
+                                </td>
+                                <td><%= record.actual_return_date ? formatDate(record.actual_return_date) : '-' %></td>
+                                <td>
+                                    <span class="status status-<%= record.status %>">
+                                        <%= getStatusText(record.status) %>
+                                    </span>
+                                </td>
+                                <td class="actions">
+                                    <a href="/borrow-records/<%= record.id %>" class="btn btn-sm btn-info">详情</a>
+                                    <% if (record.status !== 'returned') { %>
+                                        <form method="POST" action="/return/<%= record.id %>" class="inline-form">
+                                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('确认归还？')">归还</button>
+                                        </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
+
+<% function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function getStatusText(status) {
+    const map = {
+        'borrowed': '借出中',
+        'overdue': '已逾期',
+        'returned': '已归还'
+    };
+    return map[status] || status;
+}
+%>

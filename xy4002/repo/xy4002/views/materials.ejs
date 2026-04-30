@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物资列表 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials" class="active">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>物资库存管理</h1>
+            <div>
+                <a href="/materials/new" class="btn btn-primary">登记新物资</a>
+                <a href="/export/inventory" class="btn btn-success">导出库存</a>
+            </div>
+        </header>
+
+        <div class="filters">
+            <form method="GET" action="/materials">
+                <div class="search-box">
+                    <input type="text" name="keyword" placeholder="搜索物资名称、分类、描述..." value="<%= keyword || '' %>">
+                </div>
+                <div class="filter-group">
+                    <label for="status">状态：</label>
+                    <select name="status" id="status">
+                        <option value="">全部</option>
+                        <option value="active" <%= status === 'active' ? 'selected' : '' %>>正常</option>
+                        <option value="scrapped" <%= status === 'scrapped' ? 'selected' : '' %>>已报废</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="category">分类：</label>
+                    <select name="category" id="category">
+                        <option value="">全部分类</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat %>" <%= category === cat ? 'selected' : '' %>><%= cat %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">筛选</button>
+                <a href="/materials" class="btn btn-link">清除筛选</a>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <% if (materials.length === 0) { %>
+                <div class="no-data">
+                    <p>暂无物资数据</p>
+                    <a href="/materials/new" class="btn btn-primary">登记第一个物资</a>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>物资名称</th>
+                            <th>分类</th>
+                            <th>总数量</th>
+                            <th>可用数量</th>
+                            <th>借出/逾期</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% materials.forEach(material => { %>
+                            <tr>
+                                <td><%= material.id %></td>
+                                <td><a href="/materials/<%= material.id %>"><%= material.name %></a></td>
+                                <td><%= material.category || '-' %></td>
+                                <td><%= material.total_quantity %> <%= material.unit %></td>
+                                <td>
+                                    <span style="color: <%= material.available_quantity > 0 ? '#2ecc71' : '#e74c3c' %>">
+                                        <%= material.available_quantity %> <%= material.unit %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status status-borrowed"><%= material.borrowed_count %></span>
+                                    <% if (material.overdue_count > 0) { %>
+                                        <span class="status status-overdue"><%= material.overdue_count %></span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <span class="status status-<%= material.status %>">
+                                        <%= material.status === 'active' ? '正常' : '已报废' %>
+                                    </span>
+                                </td>
+                                <td class="actions">
+                                    <a href="/materials/<%= material.id %>" class="btn btn-sm btn-info">详情</a>
+                                    <a href="/materials/<%= material.id %>/edit" class="btn btn-sm btn-warning">编辑</a>
+                                    <% if (material.status === 'active' && material.available_quantity > 0) { %>
+                                        <a href="/borrow/new?material_id=<%= material.id %>" class="btn btn-sm btn-primary">借出</a>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

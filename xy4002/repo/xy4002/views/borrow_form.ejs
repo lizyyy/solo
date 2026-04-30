@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>办理借出 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new" class="active">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>办理物资借出</h1>
+            <a href="/borrow-records" class="btn btn-secondary">查看借还记录</a>
+        </header>
+
+        <% if (materials.length === 0) { %>
+            <div class="card">
+                <div class="no-data">
+                    <p>暂无可借出的物资</p>
+                    <a href="/materials/new" class="btn btn-primary">登记新物资</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="card">
+                <form method="POST" action="/borrow">
+                    <div class="form-group">
+                        <label for="material_id">选择物资 <span class="required">*</span></label>
+                        <select id="material_id" name="material_id" required onchange="updateQuantityInfo()">
+                            <option value="">请选择物资</option>
+                            <% materials.forEach(m => { %>
+                                <option value="<%= m.id %>" 
+                                        <%= selectedMaterialId == m.id ? 'selected' : '' %>
+                                        data-available="<%= m.available_quantity %>"
+                                        data-unit="<%= m.unit %>">
+                                    <%= m.name %>（可用：<%= m.available_quantity %> <%= m.unit %>）
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="borrow_quantity">借出数量 <span class="required">*</span></label>
+                            <input type="number" id="borrow_quantity" name="borrow_quantity" required min="1" value="1" placeholder="请输入借出数量">
+                            <small id="quantity_info" style="color: #7f8c8d;">请先选择物资</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="expected_return_date">预计归还日期 <span class="required">*</span></label>
+                            <input type="date" id="expected_return_date" name="expected_return_date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="resident_name">居民姓名 <span class="required">*</span></label>
+                            <input type="text" id="resident_name" name="resident_name" required placeholder="请输入居民姓名">
+                        </div>
+                        <div class="form-group">
+                            <label for="resident_phone">联系电话</label>
+                            <input type="tel" id="resident_phone" name="resident_phone" placeholder="请输入联系电话（可选）">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary">确认借出</button>
+                        <a href="/materials" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        function updateQuantityInfo() {
+            const select = document.getElementById('material_id');
+            const quantityInput = document.getElementById('borrow_quantity');
+            const info = document.getElementById('quantity_info');
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption && selectedOption.value) {
+                const available = parseInt(selectedOption.dataset.available);
+                const unit = selectedOption.dataset.unit;
+                info.textContent = `可用数量：${available} ${unit}`;
+                quantityInput.max = available;
+                if (parseInt(quantityInput.value) > available) {
+                    quantityInput.value = available;
+                }
+            } else {
+                info.textContent = '请先选择物资';
+                quantityInput.max = '';
+            }
+        }
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('expected_return_date').min = today;
+
+        updateQuantityInfo();
+    </script>
+</body>
+</html>
