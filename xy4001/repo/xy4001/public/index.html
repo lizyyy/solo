@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>咖啡店预订单排班工作台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .header { text-align: center; color: white; margin-bottom: 40px; }
+    .header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    .header p { font-size: 1.1rem; opacity: 0.9; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: white; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+    .card-icon { font-size: 3rem; margin-bottom: 15px; }
+    .card-title { font-size: 1.3rem; color: #333; margin-bottom: 10px; font-weight: 600; }
+    .card-desc { color: #666; font-size: 0.9rem; line-height: 1.5; }
+    .card:nth-child(1) .card-icon { color: #3b82f6; }
+    .card:nth-child(2) .card-icon { color: #10b981; }
+    .card:nth-child(3) .card-icon { color: #f59e0b; }
+    .card:nth-child(4) .card-icon { color: #8b5cf6; }
+    .seed-btn { position: fixed; bottom: 30px; right: 30px; background: #ef4444; color: white; border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(239,68,68,0.3); transition: all 0.3s; }
+    .seed-btn:hover { background: #dc2626; transform: scale(1.05); }
+    .toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 15px 25px; border-radius: 8px; opacity: 0; transform: translateX(100px); transition: all 0.3s; }
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>☕ 咖啡店预订单排班工作台</h1>
+      <p>管理微信群预订单，再也不会漏单</p>
+    </div>
+    <div class="cards">
+      <div class="card" onclick="window.location.href='order-form.html'">
+        <div class="card-icon">📝</div>
+        <div class="card-title">订单录入</div>
+        <div class="card-desc">录入微信收到的预订单，自动校验手机号和取杯时间</div>
+      </div>
+      <div class="card" onclick="window.location.href='queue.html'">
+        <div class="card-icon">📋</div>
+        <div class="card-title">制作队列</div>
+        <div class="card-desc">按时间段查看制作队列，快速切换订单状态</div>
+      </div>
+      <div class="card" onclick="window.location.href='exceptions.html'">
+        <div class="card-icon">⚠️</div>
+        <div class="card-title">异常处理</div>
+        <div class="card-desc">处理取消订单、修改订单等异常情况</div>
+      </div>
+      <div class="card" onclick="window.location.href='stats.html'">
+        <div class="card-icon">📊</div>
+        <div class="card-title">出杯统计</div>
+        <div class="card-desc">查看当天总杯数、已完成数、热门饮品排行</div>
+      </div>
+    </div>
+  </div>
+  <button class="seed-btn" onclick="seedData()">🧪 生成种子数据</button>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_BASE = '';
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000);
+    }
+
+    async function seedData() {
+      try {
+        const res = await fetch(`${API_BASE}/api/seed`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast(data.message, 'success');
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (e) {
+        showToast('网络错误', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
