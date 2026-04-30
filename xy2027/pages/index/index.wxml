@@ -1,0 +1,136 @@
+<view class="index-page">
+  <view class="header">
+    <view class="header-content">
+      <view class="greeting">
+        <view class="greeting-text">{{greeting}}</view>
+        <view class="sub-text">今天也要享受缝纫时光</view>
+      </view>
+      <view class="sewing-machine-icon">
+        <text class="icon-text">🧵</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="stats-section">
+    <view class="stats-card">
+      <view class="stats-item">
+        <view class="stats-value">{{todaySewingTime}}</view>
+        <view class="stats-label">今日缝纫</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-value">{{totalSewingTime}}</view>
+        <view class="stats-label">累计时长</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-value">¥{{totalInvestment}}</view>
+        <view class="stats-label">总投资</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-actions-section">
+    <view class="section-header">
+      <text class="section-title">快捷入口</text>
+    </view>
+    <view class="quick-actions-grid">
+      <view 
+        wx:for="{{quickActions}}" 
+        wx:key="name" 
+        class="action-item"
+        bindtap="goToPage"
+        data-path="{{item.path}}"
+      >
+        <view class="action-icon" style="background-color: {{item.color}}20;">
+          <view class="icon-placeholder" style="color: {{item.color}};">
+            <text wx:if="{{item.name === '成衣柜'}}">🧶</text>
+            <text wx:elif="{{item.name === '纸样库'}}">📐</text>
+            <text wx:elif="{{item.name === '辅料'}}">🔗</text>
+            <text wx:elif="{{item.name === '工具箱'}}">🔧</text>
+            <text wx:elif="{{item.name === '开始计时'}}">⏱️</text>
+            <text wx:elif="{{item.name === '数据汇总'}}">📊</text>
+          </view>
+        </view>
+        <text class="action-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="inventory-overview">
+    <view class="section-header">
+      <text class="section-title">库存概览</text>
+    </view>
+    <view class="inventory-grid">
+      <view class="inventory-item" bindtap="goToPage" data-path="/pages/fabric/fabric">
+        <view class="inventory-count text-primary">{{fabricsCount}}</view>
+        <view class="inventory-label">成衣柜</view>
+      </view>
+      <view class="inventory-item" bindtap="goToPage" data-path="/pages/pattern/pattern">
+        <view class="inventory-count text-secondary">{{patternsCount}}</view>
+        <view class="inventory-label">纸样库</view>
+      </view>
+      <view class="inventory-item" bindtap="goToPage" data-path="/pages/materials/materials">
+        <view class="inventory-count" style="color: #4ECDC4;">{{materialsCount}}</view>
+        <view class="inventory-label">辅料</view>
+      </view>
+      <view class="inventory-item" bindtap="goToPage" data-path="/pages/tools/tools">
+        <view class="inventory-count" style="color: #9B59B6;">{{toolsCount}}</view>
+        <view class="inventory-label">工具箱</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="recent-purchases">
+    <view class="section-header flex-between">
+      <text class="section-title">最近购买</text>
+      <text class="section-more" bindtap="viewAllPurchases">查看全部 ></text>
+    </view>
+    <view class="purchases-list" wx:if="{{recentPurchases.length > 0}}">
+      <view class="purchase-item" wx:for="{{recentPurchases}}" wx:key="id">
+        <view class="purchase-info">
+          <view class="purchase-name">{{item.name}}</view>
+          <view class="purchase-meta">
+            <text class="purchase-quantity">{{item.quantity}}{{item.unit}}</text>
+            <text class="purchase-date">{{item.purchaseDate}}</text>
+          </view>
+        </view>
+        <view class="purchase-amount">¥{{item.totalAmount}}</view>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无购买记录</text>
+    </view>
+  </view>
+
+  <view class="recent-sessions">
+    <view class="section-header flex-between">
+      <text class="section-title">最近缝纫</text>
+      <text class="section-more" bindtap="viewAllSessions">查看全部 ></text>
+    </view>
+    <view class="sessions-list" wx:if="{{recentSessions.length > 0}}">
+      <view class="session-item" wx:for="{{recentSessions}}" wx:key="id">
+        <view class="session-info">
+          <view class="session-name">{{item.projectName}}</view>
+          <view class="session-meta">
+            <text class="session-type">{{item.type === 'countdown' ? '倒计时' : '正计时'}}</text>
+          </view>
+        </view>
+        <view class="session-duration">{{item.actualDuration ? (item.actualDuration / 60).toFixed(0) + '分钟' : '--'}}</view>
+      </view>
+    </view>
+    <view class="empty-state" wx:else>
+      <text class="empty-text">暂无缝纫记录</text>
+    </view>
+  </view>
+
+  <view class="quick-timer-section">
+    <view class="section-header">
+      <text class="section-title">快速开始</text>
+    </view>
+    <view class="quick-timer-btn btn btn-primary" bindtap="startQuickTimer">
+      <text class="btn-icon">⏱️</text>
+      <text class="btn-text">开始计时缝纫</text>
+    </view>
+  </view>
+</view>

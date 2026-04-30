@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>地理天气小灵通</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-title">地理天气小灵通</div>
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="搜索全国城市...">
+        <div class="search-results"></div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section id="page-home" class="page active">
+        <div class="weather-card">
+          <div class="weather-header">
+            <div class="city-info">
+              <div class="city-name" id="home-city-name">北京</div>
+              <div class="city-province" id="home-city-province">北京市</div>
+            </div>
+          </div>
+          <div class="weather-main">
+            <div>
+              <div class="temp-display" id="home-temp">25</div>
+            </div>
+            <div class="weather-info">
+              <div class="weather-icon" id="home-weather-icon">☀️</div>
+              <div class="weather-text" id="home-weather">晴</div>
+              <div class="temp-range" id="home-high-low">30°/20°</div>
+            </div>
+          </div>
+          <div class="weather-details">
+            <div class="detail-item">
+              <div class="detail-icon">💧</div>
+              <div class="detail-label">湿度</div>
+              <div class="detail-value" id="home-humidity">65%</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">💨</div>
+              <div class="detail-label">风力</div>
+              <div class="detail-value" id="home-wind">3级</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">👁️</div>
+              <div class="detail-label">能见度</div>
+              <div class="detail-value" id="home-visibility">10km</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-icon">☀️</div>
+              <div class="detail-label">紫外线</div>
+              <div class="detail-value" id="home-uv">5</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="aqi-section">
+          <div class="aqi-header">
+            <div class="aqi-title">空气质量</div>
+            <div>
+              <span class="aqi-value bg-green-500" id="home-aqi">58</span>
+              <span class="aqi-level" id="home-aqi-level">良</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="solar-term-section"></div>
+
+        <div class="action-buttons">
+          <button id="favorite-btn" class="action-btn" onclick="toggleCurrentFavorite()">🤍 收藏</button>
+          <button id="check-in-btn" class="action-btn" onclick="doCheckIn()">打卡</button>
+        </div>
+
+        <section id="warning-section" class="warning-section">
+          <div class="section-title">灾害预警</div>
+          <div id="warning-container" class="warning-container"></div>
+        </section>
+
+        <div class="hourly-section">
+          <div class="section-title">24小时预报</div>
+          <div id="hourly-forecast" class="hourly-forecast"></div>
+        </div>
+
+        <div class="daily-section">
+          <div class="section-title">7日预报</div>
+          <div id="daily-forecast" class="daily-forecast"></div>
+        </div>
+
+        <div class="outfit-section-wrapper">
+          <div class="section-title">出行穿搭建议</div>
+          <div id="outfit-container" class="outfit-container"></div>
+        </div>
+      </section>
+
+      <section id="page-city" class="page">
+        <div class="city-detail-header">
+          <div class="city-detail-terrain-icon" id="city-terrain-icon">🌳</div>
+          <div class="city-detail-info">
+            <div class="city-detail-name" id="city-name">北京</div>
+            <div class="city-detail-province" id="city-province">北京市</div>
+            <div class="city-detail-terrain" id="city-terrain">平原</div>
+          </div>
+        </div>
+
+        <button id="city-favorite-btn" class="action-btn" onclick="toggleCurrentFavorite()">🤍 收藏城市</button>
+
+        <div class="geo-info-section">
+          <div class="section-title">地理信息</div>
+          <div class="geo-info-grid">
+            <div class="geo-info-item">
+              <div class="geo-info-label">纬度</div>
+              <div class="geo-info-value" id="city-lat">39.9042°N</div>
+            </div>
+            <div class="geo-info-item">
+              <div class="geo-info-label">经度</div>
+              <div class="geo-info-value" id="city-lng">116.4074°E</div>
+            </div>
+            <div class="geo-info-item">
+              <div class="geo-info-label">海拔</div>
+              <div class="geo-info-value" id="city-elevation">43.5米</div>
+            </div>
+            <div class="geo-info-item">
+              <div class="geo-info-label">气候类型</div>
+              <div class="geo-info-value" id="city-climate">温带季风气候</div>
+            </div>
+          </div>
+          <div class="geo-info-desc">
+            <h4>地形描述</h4>
+            <p id="city-terrain-desc">华北平原西北边缘，背靠燕山山脉</p>
+          </div>
+          <div class="geo-info-desc">
+            <h4>气候特征</h4>
+            <p id="city-climate-desc">夏季高温多雨，冬季寒冷干燥，春秋短促</p>
+          </div>
+          <div class="geo-info-desc">
+            <h4>城市特色</h4>
+            <p id="city-features">首都，历史文化名城，多风沙天气</p>
+          </div>
+        </div>
+
+        <div class="terrain-analysis-section">
+          <div class="section-title">地形解析天气成因</div>
+          <div id="terrain-analysis" class="analysis-container"></div>
+        </div>
+
+        <div class="city-card-section">
+          <div class="section-title">城市地图小卡片</div>
+          <div id="city-card-container" class="city-card-container"></div>
+        </div>
+
+        <div class="disaster-section">
+          <div class="section-title">地理灾害预警</div>
+          <div id="disaster-info" class="disaster-container"></div>
+        </div>
+      </section>
+
+      <section id="page-compare" class="page">
+        <div class="compare-select-section">
+          <div class="section-title">双城市地理天气对比</div>
+          <div class="compare-selectors">
+            <div class="compare-select-wrapper">
+              <label>城市1</label>
+              <select id="compare-city-1"></select>
+            </div>
+            <div class="compare-select-wrapper">
+              <label>城市2</label>
+              <select id="compare-city-2"></select>
+            </div>
+          </div>
+        </div>
+
+        <div id="compare-empty" class="compare-empty">
+          <div class="compare-empty-icon">🔄</div>
+          <div class="compare-empty-text">请选择两个城市进行对比</div>
+        </div>
+
+        <div id="compare-results" class="compare-results">
+          <div class="compare-weather-row">
+            <div class="compare-city-header">
+              <div class="compare-city-name" id="compare-name-1">北京</div>
+              <div id="compare-weather-1" class="compare-weather-display"></div>
+            </div>
+            <div class="compare-vs">VS</div>
+            <div class="compare-city-header">
+              <div class="compare-city-name" id="compare-name-2">上海</div>
+              <div id="compare-weather-2" class="compare-weather-display"></div>
+            </div>
+          </div>
+
+          <div class="compare-weather-detail-section">
+            <div class="section-title">天气详情对比</div>
+            <div id="compare-weather-detail" class="compare-weather-detail"></div>
+          </div>
+
+          <div class="compare-table-section">
+            <div class="section-title">详细对比</div>
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>对比项</th>
+                  <th>城市1</th>
+                  <th>城市2</th>
+                </tr>
+              </thead>
+              <tbody id="compare-table"></tbody>
+            </table>
+          </div>
+
+          <div class="compare-hourly-section">
+            <div class="section-title">24小时预报对比</div>
+            <div id="compare-hourly" class="compare-hourly-container"></div>
+          </div>
+
+          <div class="compare-daily-section">
+            <div class="section-title">7日预报对比</div>
+            <div id="compare-daily" class="compare-daily-container"></div>
+          </div>
+
+          <div class="compare-analysis-section">
+            <div class="section-title">对比分析</div>
+            <div id="compare-analysis" class="compare-analysis-content"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-favorites" class="page">
+        <div class="favorites-tabs">
+          <button class="favorites-tab active" onclick="switchFavoritesTab('favorites')">我的收藏</button>
+          <button class="favorites-tab" onclick="switchFavoritesTab('checkin')">打卡记录</button>
+        </div>
+
+        <div id="favorites-list-container">
+          <div id="favorites-empty" class="favorites-empty">
+            <div class="favorites-empty-icon">💝</div>
+            <div class="favorites-empty-text">暂无收藏的城市</div>
+          </div>
+          <div id="favorites-list" class="favorites-list"></div>
+        </div>
+
+        <div id="checkin-list-container" style="display: none;">
+          <div id="checkin-empty" class="checkin-empty">
+            <div class="checkin-empty-icon">📝</div>
+            <div class="checkin-empty-text">暂无打卡记录</div>
+          </div>
+          <div id="checkin-history" class="checkin-history"></div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">首页</span>
+      </div>
+      <div class="nav-item" data-page="city">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-label">城市</span>
+      </div>
+      <div class="nav-item" data-page="compare">
+        <span class="nav-icon">🔄</span>
+        <span class="nav-label">对比</span>
+      </div>
+      <div class="nav-item" data-page="favorites">
+        <span class="nav-icon">💝</span>
+        <span class="nav-label">收藏</span>
+      </div>
+    </nav>
+  </div>
+
+  <div id="poster-modal" class="poster-modal" onclick="closePosterModal()">
+    <div class="poster-modal-content" onclick="event.stopPropagation()">
+      <button class="poster-modal-close" onclick="closePosterModal()">✕</button>
+      <div id="poster-content" class="poster-content"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function switchFavoritesTab(tab) {
+      const tabs = document.querySelectorAll('.favorites-tab');
+      const favoritesContainer = document.getElementById('favorites-list-container');
+      const checkinContainer = document.getElementById('checkin-list-container');
+
+      tabs.forEach(t => t.classList.remove('active'));
+      
+      if (tab === 'favorites') {
+        tabs[0].classList.add('active');
+        favoritesContainer.style.display = 'block';
+        checkinContainer.style.display = 'none';
+        renderFavoritesList();
+      } else {
+        tabs[1].classList.add('active');
+        favoritesContainer.style.display = 'none';
+        checkinContainer.style.display = 'block';
+        renderCheckInHistory();
+      }
+    }
+  </script>
+</body>
+</html>

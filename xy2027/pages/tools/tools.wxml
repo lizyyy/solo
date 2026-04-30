@@ -1,0 +1,218 @@
+<view class="tools-page">
+  <view class="header-card">
+    <view class="header-icon">🔧</view>
+    <view class="header-title">工具箱</view>
+    <view class="header-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{filteredTools.length}}</view>
+        <view class="stat-label">工具总数</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{tools.filter(t => t.status === '正常').length}}</view>
+        <view class="stat-label">正常使用</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-section">
+    <view class="search-bar">
+      <text class="search-icon">🔍</text>
+      <input class="search-input" placeholder="搜索工具..." value="{{searchKeyword}}" bindinput="onSearchInput" />
+    </view>
+    <picker class="filter-picker" mode="selector" range="{{toolTypes}}" bindchange="onTypeFilter">
+      <view class="filter-text">{{filterType === 'all' ? '全部类型' : filterType}}</view>
+    </picker>
+  </view>
+
+  <view class="tools-list">
+    <view wx:for="{{filteredTools}}" wx:key="id" class="tool-card" bindtap="viewDetail" data-id="{{item.id}}">
+      <view class="tool-header">
+        <view class="tool-icon">
+          <text wx:if="{{item.type === '缝纫机'}}">🧵</text>
+          <text wx:elif="{{item.type === '剪刀'}}">✂️</text>
+          <text wx:elif="{{item.type === '测量工具'}}">📏</text>
+          <text wx:elif="{{item.type === '定位工具'}}">📍</text>
+          <text wx:else>🔧</text>
+        </view>
+        <view class="tool-info">
+          <view class="tool-name">{{item.name}}</view>
+          <view class="tool-meta">
+            <text wx:if="{{item.brand}}">{{item.brand}}</text>
+            <text wx:if="{{item.model}}"> {{item.model}}</text>
+          </view>
+        </view>
+        <view class="tool-status badge-{{item.status === '正常' ? 'success' : item.status === '维修中' ? 'warning' : 'danger'}}">{{item.status}}</view>
+      </view>
+      <view class="tool-footer">
+        <text wx:if="{{item.price}}" class="tool-price">¥{{item.price}}</text>
+        <text wx:if="{{item.purchaseDate}}" class="tool-date">购入: {{item.purchaseDate}}</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredTools.length === 0}}">
+      <text class="empty-icon">🔧</text>
+      <text class="empty-text">暂无工具记录</text>
+    </view>
+  </view>
+
+  <view class="add-btn" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加工具</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">添加工具</text>
+        <text class="modal-close" bindtap="hideAddModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="form-item">
+          <text class="form-label">工具名称 *</text>
+          <input class="form-input" placeholder="请输入工具名称" value="{{formData.name}}" data-field="name" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">类型</text>
+            <picker class="form-picker" mode="selector" range="{{['缝纫机', '剪刀', '测量工具', '定位工具', '其他']}}" data-field="type" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.type}}</view>
+            </picker>
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">状态</text>
+            <picker class="form-picker" mode="selector" range="{{['正常', '维修中', '待维护', '损坏']}}" data-field="status" bindchange="onPickerChange">
+              <view class="picker-text">{{formData.status}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">品牌</text>
+            <input class="form-input" placeholder="品牌" value="{{formData.brand}}" data-field="brand" bindinput="onFormInput" />
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">型号</text>
+            <input class="form-input" placeholder="型号" value="{{formData.model}}" data-field="model" bindinput="onFormInput" />
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">价格(元)</text>
+          <input class="form-input" type="digit" placeholder="价格" value="{{formData.price}}" data-field="price" bindinput="onFormInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">购买日期</text>
+          <picker class="form-picker" mode="date" value="{{formData.purchaseDate}}" data-field="purchaseDate" bindchange="onDateChange">
+            <view class="picker-text">{{formData.purchaseDate}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">供应商</text>
+          <input class="form-input" placeholder="供应商" value="{{formData.supplier}}" data-field="supplier" bindinput="onFormInput" />
+        </view>
+        <view class="form-row">
+          <view class="form-item flex-1">
+            <text class="form-label">上次维护</text>
+            <picker class="form-picker" mode="date" value="{{formData.lastMaintenance}}" data-field="lastMaintenance" bindchange="onDateChange">
+              <view class="picker-text">{{formData.lastMaintenance || '选择日期'}}</view>
+            </picker>
+          </view>
+          <view class="form-item flex-1">
+            <text class="form-label">下次维护</text>
+            <picker class="form-picker" mode="date" value="{{formData.nextMaintenance}}" data-field="nextMaintenance" bindchange="onDateChange">
+              <view class="picker-text">{{formData.nextMaintenance || '选择日期'}}</view>
+            </picker>
+          </view>
+        </view>
+        <view class="form-item">
+          <text class="form-label">保修到期</text>
+          <picker class="form-picker" mode="date" value="{{formData.warrantyExpiry}}" data-field="warrantyExpiry" bindchange="onDateChange">
+            <view class="picker-text">{{formData.warrantyExpiry || '选择日期'}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" placeholder="备注" value="{{formData.notes}}" data-field="notes" bindinput="onFormInput"></textarea>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="btn btn-outline" bindtap="hideAddModal">取消</view>
+        <view class="btn btn-primary" bindtap="submitAddForm">确认添加</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showDetailModal}}" bindtap="hideDetailModal">
+    <view class="modal-content detail-modal" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">工具详情</text>
+        <text class="modal-close" bindtap="hideDetailModal">✕</text>
+      </view>
+      <scroll-view class="modal-body" scroll-y wx:if="{{currentTool}}">
+        <view class="detail-section">
+          <view class="detail-title">基本信息</view>
+          <view class="detail-grid">
+            <view class="detail-item">
+              <text class="detail-label">名称</text>
+              <text class="detail-value">{{currentTool.name}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">类型</text>
+              <text class="detail-value">{{currentTool.type}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.brand}}">
+              <text class="detail-label">品牌</text>
+              <text class="detail-value">{{currentTool.brand}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.model}}">
+              <text class="detail-label">型号</text>
+              <text class="detail-value">{{currentTool.model}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">状态</text>
+              <text class="detail-value badge-{{currentTool.status === '正常' ? 'success' : currentTool.status === '维修中' ? 'warning' : 'danger'}}">{{currentTool.status}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.price}}">
+              <text class="detail-label">价格</text>
+              <text class="detail-value">¥{{currentTool.price}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentTool.purchaseDate || currentTool.supplier}}">
+          <view class="detail-title">采购信息</view>
+          <view class="detail-grid">
+            <view class="detail-item" wx:if="{{currentTool.purchaseDate}}">
+              <text class="detail-label">购买日期</text>
+              <text class="detail-value">{{currentTool.purchaseDate}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.supplier}}">
+              <text class="detail-label">供应商</text>
+              <text class="detail-value">{{currentTool.supplier}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="detail-section" wx:if="{{currentTool.lastMaintenance || currentTool.nextMaintenance || currentTool.warrantyExpiry}}">
+          <view class="detail-title">维护信息</view>
+          <view class="detail-grid">
+            <view class="detail-item" wx:if="{{currentTool.lastMaintenance}}">
+              <text class="detail-label">上次维护</text>
+              <text class="detail-value">{{currentTool.lastMaintenance}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.nextMaintenance}}">
+              <text class="detail-label">下次维护</text>
+              <text class="detail-value">{{currentTool.nextMaintenance}}</text>
+            </view>
+            <view class="detail-item" wx:if="{{currentTool.warrantyExpiry}}">
+              <text class="detail-label">保修到期</text>
+              <text class="detail-value">{{currentTool.warrantyExpiry}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="modal-footer detail-footer">
+        <view class="btn btn-secondary" wx:if="{{currentTool.status !== '正常'}}" bindtap="changeStatus" data-id="{{currentTool.id}}" data-status="正常">恢复正常</view>
+        <view class="btn btn-warning" wx:if="{{currentTool.status !== '维修中'}}" bindtap="changeStatus" data-id="{{currentTool.id}}" data-status="维修中">送修</view>
+        <view class="btn btn-danger" bindtap="deleteTool" data-id="{{currentTool.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+</view>

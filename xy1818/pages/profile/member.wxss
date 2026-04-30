@@ -1,0 +1,362 @@
+.page {
+  min-height: 100vh;
+  background-color: #FFF5F5;
+  padding-bottom: 40rpx;
+}
+
+.member-header {
+  position: relative;
+  padding: 30rpx;
+  padding-bottom: 60rpx;
+}
+
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 400rpx;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 50%, #FFB3B3 100%);
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.member-card {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+}
+
+.member-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-placeholder {
+  font-size: 48rpx;
+}
+
+.member-info {
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.member-level-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  margin-top: 8rpx;
+  align-self: flex-start;
+}
+
+.level-icon {
+  font-size: 20rpx;
+  margin-right: 6rpx;
+}
+
+.level-name {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.recharge-btn {
+  background-color: #FFFFFF;
+  padding: 16rpx 32rpx;
+  border-radius: 30rpx;
+}
+
+.btn-text {
+  font-size: 26rpx;
+  color: #D32F2F;
+  font-weight: bold;
+}
+
+.stats-section {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  background-color: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 30rpx 0;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #D32F2F;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.stat-divider {
+  width: 2rpx;
+  height: 60rpx;
+  background-color: #F0F0F0;
+  align-self: center;
+}
+
+.progress-section {
+  margin: 20rpx 30rpx;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.progress-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.progress-info {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.progress-bar-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 16rpx;
+  background-color: #F5F5F5;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-percent {
+  font-size: 24rpx;
+  color: #D32F2F;
+  font-weight: bold;
+  margin-left: 16rpx;
+}
+
+.level-tips {
+  margin-top: 16rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.levels-section {
+  margin: 0 30rpx 20rpx;
+}
+
+.section-header {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.levels-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.level-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #F5F5F5;
+  position: relative;
+}
+
+.level-item:last-child {
+  border-bottom: none;
+}
+
+.level-item.active {
+  background-color: #FFF5F5;
+  margin: 0 -24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+}
+
+.level-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid;
+}
+
+.level-icon-main {
+  font-size: 36rpx;
+}
+
+.level-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.level-name-main {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.level-discount {
+  font-size: 22rpx;
+  color: #D32F2F;
+  margin-top: 4rpx;
+}
+
+.level-condition {
+  font-size: 22rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.level-status {
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+}
+
+.level-status.passed {
+  background-color: #4CAF50;
+}
+
+.status-text {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.benefits-section {
+  margin: 0 30rpx 20rpx;
+}
+
+.benefits-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -10rpx;
+}
+
+.benefit-item {
+  width: 50%;
+  padding: 10rpx;
+  box-sizing: border-box;
+}
+
+.benefit-item-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background-color: #FFF9F9;
+  border-radius: 16rpx;
+}
+
+.benefit-icon-wrap {
+  width: 64rpx;
+  height: 64rpx;
+  background: linear-gradient(135deg, #D32F2F 0%, #FF6B6B 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.benefit-icon {
+  font-size: 32rpx;
+}
+
+.benefit-name {
+  font-size: 24rpx;
+  color: #333333;
+  text-align: center;
+}
+
+.tips-section {
+  margin: 0 30rpx;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12rpx 0;
+}
+
+.tip-dot {
+  font-size: 24rpx;
+  color: #D32F2F;
+  margin-right: 12rpx;
+  line-height: 1.4;
+}
+
+.tip-content {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.6;
+  flex: 1;
+}
