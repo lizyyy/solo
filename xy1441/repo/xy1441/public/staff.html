@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>值班员控制台 - 共享冷藏柜取餐登记系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .nav-back {
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+        .card-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(238, 90, 90, 0.4);
+        }
+        .message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .batch-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .batch-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .batch-item:hover {
+            border-color: #4facfe;
+            background: white;
+        }
+        .batch-item.selected {
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+        }
+        .batch-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .batch-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .batch-stats {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .stat-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .stat-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .stat-picked {
+            background: #d4edda;
+            color: #155724;
+        }
+        .stat-contacted {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .slot-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 2px solid #e1e5eb;
+            transition: all 0.3s;
+        }
+        .slot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .slot-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .slot-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-picked {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-contacted {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-empty {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        .slot-food {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .slot-phone {
+            font-size: 12px;
+            color: #888;
+        }
+        .slot-code {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4facfe;
+            margin-top: 5px;
+        }
+        .section-empty {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 15px;
+        }
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .form-row {
+                flex-direction: column;
+            }
+            .form-group {
+                min-width: 100%;
+            }
+            .batch-list {
+                grid-template-columns: 1fr;
+            }
+            .slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="nav-back">← 返回首页</a>
+        <h1>👨‍💼 值班员控制台</h1>
+        <p class="subtitle">管理批次、录入餐品、查看格口状态</p>
+    </div>
+    
+    <div class="main-content">
+        <div id="messageArea"></div>
+        
+        <div class="card">
+            <div class="card-title">📦 创建新批次</div>
+            <form id="createBatchForm" class="form-row">
+                <div class="form-group">
+                    <label for="batchName">批次名称</label>
+                    <input type="text" id="batchName" placeholder="例如：2026年5月1日午餐" required>
+                </div>
+                <div class="form-group">
+                    <label for="slotCount">格口数量</label>
+                    <input type="number" id="slotCount" placeholder="1-100" min="1" max="100" value="20" required>
+                </div>
+                <button type="submit" class="btn btn-primary">创建批次</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">📋 批次列表</div>
+            <div id="batchList" class="batch-list">
+                <div class="section-empty">暂无批次，请先创建批次</div>
+            </div>
+        </div>
+        
+        <div class="card" id="slotEntryCard" style="display: none;">
+            <div class="card-title">📝 录入格口餐品</div>
+            <form id="addSlotForm" class="form-row">
+                <div class="form-group">
+                    <label for="slotNumber">格口号</label>
+                    <input type="number" id="slotNumber" placeholder="格口号" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="foodName">餐品名称</label>
+                    <input type="text" id="foodName" placeholder="例如：宫保鸡丁套餐" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneLastFour">手机号后四位</label>
+                    <input type="text" id="phoneLastFour" placeholder="4位数字" maxlength="4" pattern="\d{4}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">录入</button>
+            </form>
+        </div>
+        
+        <div class="card" id="slotsCard" style="display: none;">
+            <div class="card-title">🔢 格口状态</div>
+            <div id="slotsGrid" class="slots-grid">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        let selectedBatchId = null;
+        let currentBatch = null;
+        let batches = [];
+        let slots = [];
+        
+        function showMessage(message, type = 'success') {
+            const area = document.getElementById('messageArea');
+            const className = type === 'success' ? 'message-success' : 'message-error';
+            area.innerHTML = `<div class="message ${className}">${message}</div>`;
+            setTimeout(() => {
+                area.innerHTML = '';
+            }, 5000);
+        }
+        
+        async function loadBatches() {
+            try {
+                const response = await fetch(`${API_BASE}/api/batches`);
+                const data = await response.json();
+                if (data.success) {
+                    batches = data.data;
+                    renderBatchList();
+                }
+            } catch (err) {
+                console.error('加载批次失败:', err);
+            }
+        }
+        
+        function renderBatchList() {
+            const container = document.getElementById('batchList');
+            
+            if (batches.length === 0) {
+                container.innerHTML = '<div class="section-empty">暂无批次，请先创建批次</div>';
+                return;
+            }
+            
+            let html = '';
+            batches.forEach(batch => {
+                const batchSlots = slots.filter(s => s.batchId === batch.id);
+                const pending = batchSlots.filter(s => s.status === 'pending').length;
+                const picked = batchSlots.filter(s => s.status === 'picked').length;
+                const contacted = batchSlots.filter(s => s.status === 'contacted').length;
+                const isSelected = selectedBatchId === batch.id;
+                
+                html += `
+                    <div class="batch-item ${isSelected ? 'selected' : ''}" data-id="${batch.id}" onclick="selectBatch('${batch.id}')">
+                        <div class="batch-name">${batch.name}</div>
+                        <div class="batch-info">📅 日期: ${batch.date}</div>
+                        <div class="batch-info">🔢 格口数量: ${batch.slotCount}</div>
+                        <div class="batch-stats">
+                            <span class="stat-badge stat-pending">待取: ${pending}</span>
+                            <span class="stat-badge stat-picked">已取: ${picked}</span>
+                            ${contacted > 0 ? `<span class="stat-badge stat-contacted">待联系: ${contacted}</span>` : ''}
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-danger" onclick="event.stopPropagation(); deleteBatch('${batch.id}')">删除批次</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        async function selectBatch(batchId) {
+            selectedBatchId = batchId;
+            currentBatch = batches.find(b => b.id === batchId);
+            
+            document.getElementById('slotEntryCard').style.display = 'block';
+            document.getElementById('slotsCard').style.display = 'block';
+            
+            document.getElementById('slotNumber').max = currentBatch.slotCount;
+            document.getElementById('slotNumber').placeholder = `1-${currentBatch.slotCount}`;
+            
+            await loadSlots(batchId);
+            renderBatchList();
+        }
+        
+        async function loadSlots(batchId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/batches/${batchId}/slots`);
+                const data = await response.json();
+                if (data.success) {
+                    slots = data.data;
+                    renderSlots();
+                    renderBatchList();
+                }
+            } catch (err) {
+                console.error('加载格口失败:', err);
+            }
+        }
+        
+        function renderSlots() {
+            const container = document.getElementById('slotsGrid');
+            
+            if (!currentBatch) return;
+            
+            let html = '';
+            
+            for (let i = 1; i <= currentBatch.slotCount; i++) {
+                const slot = slots.find(s => s.slotNumber === i);
+                
+                if (slot) {
+                    let statusClass = '';
+                    let statusText = '';
+                    
+                    switch (slot.status) {
+                        case 'pending':
+                            statusClass = 'status-pending';
+                            statusText = '待取餐';
+                            break;
+                        case 'picked':
+                            statusClass = 'status-picked';
+                            statusText = '已取餐';
+                            break;
+                        case 'contacted':
+                            statusClass = 'status-contacted';
+                            statusText = '待联系';
+                            break;
+                    }
+                    
+                    html += `
+                        <div class="slot-card">
+                            <div class="slot-number">${slot.slotNumber}</div>
+                            <span class="slot-status ${statusClass}">${statusText}</span>
+                            <div class="slot-food">${slot.foodName}</div>
+                            <div class="slot-phone">手机: ****${slot.phoneLastFour}</div>
+                            <div class="slot-code">取餐码: ${slot.pickupCode}</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="slot-card">
+                            <div class="slot-number">${i}</div>
+                            <span class="slot-status status-empty">空</span>
+                            <div style="color: #aaa; font-size: 12px; margin-top: 10px;">未录入</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        document.getElementById('createBatchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const batchName = document.getElementById('batchName').value;
+            const slotCount = document.getElementById('slotCount').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/batches`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ batchName, slotCount })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    document.getElementById('createBatchForm').reset();
+                    document.getElementById('slotCount').value = 20;
+                    await loadBatches();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (err) {
+                showMessage('创建批次失败，请重试', 'error');
+                console.error(err);
+            }
+        });
+        
+        document.getElementById('addSlotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedBatchId) {
+                showMessage('请先选择一个批次', 'error');
+                return;
+            }
+            
+            const slotNumber = document.getElementById('slotNumber').value;
+            const foodName = document.getElementById('foodName').value;
+            const phoneLastFour = document.getElementById('phoneLastFour').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/slots`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        batchId: selectedBatchId, 
+                        slotNumber, 
+                        foodName, 
+                        phoneLastFour 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    document.getElementById('addSlotForm').reset();
+                    const nextSlot = parseInt(slotNumber) + 1;
+                    if (nextSlot <= currentBatch.slotCount) {
+                        document.getElementById('slotNumber').value = nextSlot;
+                    }
+                    await loadSlots(selectedBatchId);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (err) {
+                showMessage('录入失败，请重试', 'error');
+                console.error(err);
+            }
+        });
+        
+        async function deleteBatch(batchId) {
+            if (!confirm('确定要删除此批次吗？相关格口和记录也会被删除。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/batches/${batchId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    if (selectedBatchId === batchId) {
+                        selectedBatchId = null;
+                        currentBatch = null;
+                        document.getElementById('slotEntryCard').style.display = 'none';
+                        document.getElementById('slotsCard').style.display = 'none';
+                    }
+                    await loadBatches();
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (err) {
+                showMessage('删除失败，请重试', 'error');
+                console.error(err);
+            }
+        }
+        
+        loadBatches();
+    </script>
+</body>
+</html>

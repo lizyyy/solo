@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy1441",
+  "idea_short_title": "我最近在帮小区做“共享冷藏柜取餐”登记，想要一个能本地跑起来的全栈小工具：前端可以给值班员创建当天批次、录入每个格口的餐",
+  "folder_name": "xy1441",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy1441",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "Bug修复",
+    "业务领域": "AI/ML应用",
+    "修改范围": "模块内多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy1441/base",
+    "round_branch": "idea/xy1441/r1",
+    "pr_title": "[xy1441][第一轮] 我最近在帮小区做“共享冷藏柜取餐”登记，想要一个能本地跑起来的全栈小工具：前端可以给值班员创建当天批",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy1441/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy1441/base...idea/xy1441/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy1441/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy1441/xy1441.xlsx",
+    "uid": "xy1441",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy1441/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy1441/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy1441/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy1441/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy1441/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T03:16:57.995293+08:00"
+}
