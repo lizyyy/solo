@@ -1,0 +1,7 @@
+allowed_permissions:
+  - storage
+  - activeTab
+
+allowed_hosts:
+  - https://example.com/*
+  - https://api.example.org/*
