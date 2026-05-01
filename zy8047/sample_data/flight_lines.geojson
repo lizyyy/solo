@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "route_id": "route_A",
+        "name": "Survey Line A"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [121.4737, 31.2304],
+          [121.4737, 31.2308],
+          [121.4737, 31.2312],
+          [121.4737, 31.2316],
+          [121.4737, 31.2320],
+          [121.4737, 31.2324]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "route_id": "route_B",
+        "name": "Survey Line B"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [121.4739, 31.2304],
+          [121.4739, 31.2308],
+          [121.4739, 31.2312],
+          [121.4739, 31.2316],
+          [121.4739, 31.2320],
+          [121.4739, 31.2324]
+        ]
+      }
+    }
+  ]
+}
