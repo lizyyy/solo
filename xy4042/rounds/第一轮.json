@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4042",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4042/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给假肢矫形门诊和制作间一起用的本地桌面 GUI 应用，叫“矫形取模适配台”。门诊每天会给患者量尺寸、拍取模照片、登记石膏模或 3D 扫描文件，制作间再排版裁片、记录试穿调整；现在靠纸单和网盘文件夹，很容易把左右侧、版本和复诊时间弄混。请从 0 到 1 做一个能直接运行的桌面应用：用户可以创建患者档案，登记诊断部位、左右侧、尺寸表、取模日期、负责技师、复诊预约和附件文件；附件导入时要复制到项目数据目录，计算 SHA256，识别同名不同内容、缺失扫描文件、照片和尺寸记录不匹配这些问题。应用要有左侧患者/订单列表，中间是订单阶段看板（待取模、待设计、制作中、待试穿、需返修、已交付），右侧详情区能维护尺寸版本、附件清单、试穿反馈和返修原因。状态流转要有规则：没有尺寸版本不能进入设计，没有扫描或照片不能进入制作，返修必须关联一次试穿记录，交付前必须生成最终清单；每次状态变化和尺寸修改都要写入本地 SQLite 或文件数据库，重启后能继续。还要支持从门诊 CSV 导入预约和尺寸初稿，导入时逐行校验手机号、左右侧枚举、日期格式和重复订单；支持导出 Markdown 交付单、CSV 订单列表和一个包含附件哈希的 JSON 审计包。请把 GUI 入口、数据模型、附件归档、校验规则、状态机、持久化、导入导出、报告生成、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、启动命令，以及如何用临时目录验证创建患者、导入附件、推进状态、记录试穿返修、导入 CSV 和导出交付包这些核心流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4042/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n项目编号：xy4042\n本轮：第一轮\n模型要求：必须使用 Seed-Code-DogFooding\n智能体要求：必须使用 SOLO Coder\n代码目录要求：在仓库根目录创建并只修改 `xy4042/`\n\n原始想法：\n我想做一个给假肢矫形门诊和制作间一起用的本地桌面 GUI 应用，叫“矫形取模适配台”。门诊每天会给患者量尺寸、拍取模照片、登记石膏模或 3D 扫描文件，制作间再排版裁片、记录试穿调整；现在靠纸单和网盘文件夹，很容易把左右侧、版本和复诊时间弄混。请从 0 到 1 做一个能直接运行的桌面应用：用户可以创建患者档案，登记诊断部位、左右侧、尺寸表、取模日期、负责技师、复诊预约和附件文件；附件导入时要复制到项目数据目录，计算 SHA256，识别同名不同内容、缺失扫描文件、照片和尺寸记录不匹配这些问题。应用要有左侧患者/订单列表，中间是订单阶段看板（待取模、待设计、制作中、待试穿、需返修、已交付），右侧详情区能维护尺寸版本、附件清单、试穿反馈和返修原因。状态流转要有规则：没有尺寸版本不能进入设计，没有扫描或照片不能进入制作，返修必须关联一次试穿记录，交付前必须生成最终清单；每次状态变化和尺寸修改都要写入本地 SQLite 或文件数据库，重启后能继续。还要支持从门诊 CSV 导入预约和尺寸初稿，导入时逐行校验手机号、左右侧枚举、日期格式和重复订单；支持导出 Markdown 交付单、CSV 订单列表和一个包含附件哈希的 JSON 审计包。请把 GUI 入口、数据模型、附件归档、校验规则、状态机、持久化、导入导出、报告生成、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、启动命令，以及如何用临时目录验证创建患者、导入附件、推进状态、记录试穿返修、导入 CSV 和导出交付包这些核心流程。\n\n开发目标：\n- 将上面的想法落成一个不简单、可运行、可演示的项目原型\n- 所有代码集中在 `xy4042/`\n- 如果仓库当前为空，请自行初始化最小但完整的项目结构\n- 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n工作方式要求：\n- 先快速审视当前仓库是否为空、已有文件结构和运行方式\n- 再给出极简执行计划，然后立即开始写代码\n- 不要把大量时间花在空泛分析或模板化总结上\n- 不要偏离需求去做无关的大重构\n- 如需新增依赖，只增加必要依赖，并说明原因\n\n交付要求：\n- 必须给出完整代码\n- 必须给出运行步骤\n- 必须说明关键文件和实现点\n- 如有未完成项，明确列出\n\n验收标准：\n- 项目可以启动或运行\n- 页面或功能不是纯占位\n- 至少包含 3 个以上互相关联的功能点或模块\n- 代码结构清晰，文件划分合理\n- 不要只生成单文件 demo\n\n输出方式：\n- 先简短说明你将创建什么\n- 然后直接开始改文件\n- 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4042/r1",
+  "base_branch_name": "idea/xy4042/base",
+  "parent_branch_name": "idea/xy4042/base",
+  "pr_title": "[xy4042][第一轮] 我想做一个给假肢矫形门诊和制作间一起用的本地桌面 GUI 应用，叫“矫形取模适配台”。门诊每天会给患",
+  "session_id": "69f47ad0e644eb6dd6d4c194",
+  "message_id": "69f47ad8e2c0475c9dd18e25",
+  "trace_id": null,
+  "task_type": "代码测试",
+  "business_domain": "AI/ML应用",
+  "modification_scope": "单文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4042/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4042/repo/xy4042",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4042/base...idea/xy4042/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T18:04:48.617200+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4042/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4042/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4042"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4042/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4042/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4042/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4042/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给假肢矫形门诊和制作间一起用的本地桌面 GUI 应用，叫“矫形取模适配台”。门诊每天会给患者量尺寸、拍取模照片、登记石膏模或 3D 扫描文件，制作间再排版裁片、记录试穿调整；现在靠纸单和网盘文件夹，很容易把左右侧、版本和复诊时间弄混。请从 0 到 1 做一个能直接运行的桌面应用：用户可以创建患者档案，登记诊断部位、左右侧、尺寸表、取模日期、负责技师、复诊预约和附件文件；附件导入时要复制到项目数据目录，计算 SHA256，识别同名不同内容、缺失扫描文件、照片和尺寸记录不匹配这些问题。应用要有左侧患者/订单列表，中间是订单阶段看板（待取模、待设计、制作中、待试穿、需返修、已交付），右侧详情区能维护尺寸版本、附件清单、试穿反馈和返修原因。状态流转要有规则：没有尺寸版本不能进入设计，没有扫描或照片不能进入制作，返修必须关联一次试穿记录，交付前必须生成最终清单；每次状态变化和尺寸修改都要写入本地 SQLite 或文件数据库，重启后能继续。还要支持从门诊 CSV 导入预约和尺寸初稿，导入时逐行校验手机号、左右侧枚举、日期格式和重复订单；支持导出 Markdown 交付单、CSV 订单列表和一个包含附件哈希的 JSON 审计包。请把 GUI 入口、数据模型、附件归档、校验规则、状态机、持久化、导入导出、报告生成、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、启动命令，以及如何用临时目录验证创建患者、导入附件、推进状态、记录试穿返修、导入 CSV 和导出交付包这些核心流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T18:05:13.547073+08:00"
+}
