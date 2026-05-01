@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>吊点载荷排练台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+    
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    #toolbar {
+      height: 50px;
+      background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      border-bottom: 1px solid #34495e;
+    }
+    
+    #toolbar button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    
+    #toolbar button:hover {
+      background: #2980b9;
+    }
+    
+    #toolbar button:disabled {
+      background: #7f8c8d;
+      cursor: not-allowed;
+    }
+    
+    #toolbar .separator {
+      width: 1px;
+      height: 30px;
+      background: #34495e;
+      margin: 0 10px;
+    }
+    
+    #main-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    #sidebar {
+      width: 320px;
+      background: #f5f6fa;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #dcdde1;
+    }
+    
+    #canvas-container {
+      flex: 1;
+      position: relative;
+      background: #1e272e;
+    }
+    
+    #canvas-container canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    #right-panel {
+      width: 350px;
+      background: #f5f6fa;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #dcdde1;
+    }
+    
+    .panel-header {
+      background: #2c3e50;
+      color: white;
+      padding: 12px 15px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid #34495e;
+    }
+    
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    
+    .device-item {
+      background: white;
+      border: 1px solid #dcdde1;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: grab;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    
+    .device-item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    
+    .device-item.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    
+    .device-name {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 4px;
+    }
+    
+    .device-info {
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+    
+    .problem-item {
+      background: white;
+      border-left: 4px solid #e74c3c;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .problem-item:hover {
+      background: #fef5f5;
+    }
+    
+    .problem-item.warning {
+      border-left-color: #f39c12;
+    }
+    
+    .problem-title {
+      font-weight: 600;
+      color: #e74c3c;
+      margin-bottom: 4px;
+    }
+    
+    .problem-item.warning .problem-title {
+      color: #f39c12;
+    }
+    
+    .problem-details {
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+    
+    #properties-panel {
+      padding: 15px;
+      background: white;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    
+    .property-row {
+      margin-bottom: 10px;
+    }
+    
+    .property-label {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-bottom: 4px;
+    }
+    
+    .property-value {
+      font-size: 14px;
+      color: #2c3e50;
+    }
+    
+    .property-input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #dcdde1;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    
+    .button-group button {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #dcdde1;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    
+    .button-group button:hover {
+      background: #f5f6fa;
+    }
+    
+    .button-group button.primary {
+      background: #3498db;
+      color: white;
+      border-color: #3498db;
+    }
+    
+    .button-group button.primary:hover {
+      background: #2980b9;
+    }
+    
+    .status-bar {
+      height: 30px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 12px;
+      gap: 20px;
+    }
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ecc71;
+    }
+    
+    .status-indicator.warning {
+      background: #f39c12;
+    }
+    
+    .status-indicator.error {
+      background: #e74c3c;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    #logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      margin-right: 20px;
+    }
+    
+    .tool-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .tab-container {
+      display: flex;
+      background: #2c3e50;
+      border-bottom: 1px solid #34495e;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      color: #bdc3c7;
+      cursor: pointer;
+      font-size: 13px;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    
+    .tab:hover {
+      color: white;
+    }
+    
+    .tab.active {
+      color: white;
+      border-bottom-color: #3498db;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .settings-group {
+      background: white;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .settings-group-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+    
+    .settings-row {
+      margin-bottom: 12px;
+    }
+    
+    .settings-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .settings-label {
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-bottom: 4px;
+    }
+    
+    .settings-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #dcdde1;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
+    .settings-input:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+    
+    .load-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    
+    .load-bar {
+      flex: 1;
+      height: 8px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .load-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+    }
+    
+    .load-bar-fill.safe {
+      background: #2ecc71;
+    }
+    
+    .load-bar-fill.warning {
+      background: #f39c12;
+    }
+    
+    .load-bar-fill.danger {
+      background: #e74c3c;
+    }
+    
+    .load-text {
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: right;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .modal-header {
+      padding: 15px 20px;
+      background: #2c3e50;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .modal-footer {
+      padding: 15px 20px;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .modal-footer button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .modal-footer button.cancel {
+      background: #bdc3c7;
+      color: #2c3e50;
+    }
+    
+    .modal-footer button.confirm {
+      background: #3498db;
+      color: white;
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .file-input-label {
+      display: block;
+      padding: 40px 20px;
+      border: 2px dashed #dcdde1;
+      border-radius: 6px;
+      text-align: center;
+      color: #7f8c8d;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    
+    .file-input-label:hover {
+      border-color: #3498db;
+      color: #3498db;
+    }
+    
+    .validation-error {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 8px;
+      padding: 10px;
+      background: #fef5f5;
+      border-radius: 4px;
+    }
+    
+    .validation-success {
+      color: #27ae60;
+      font-size: 12px;
+      margin-top: 8px;
+      padding: 10px;
+      background: #f0fff4;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="toolbar">
+      <div id="logo">吊点载荷排练台</div>
+      
+      <button id="btn-new" class="tool-button">
+        <span>新建</span>
+      </button>
+      
+      <button id="btn-save" class="tool-button">
+        <span>保存</span>
+      </button>
+      
+      <button id="btn-load" class="tool-button">
+        <span>加载</span>
+      </button>
+      
+      <div class="separator"></div>
+      
+      <button id="btn-import" class="tool-button">
+        <span>导入</span>
+      </button>
+      
+      <button id="btn-export" class="tool-button">
+        <span>导出</span>
+      </button>
+      
+      <div class="separator"></div>
+      
+      <button id="btn-export-report" class="tool-button">
+        <span>生成报告</span>
+      </button>
+      
+      <button id="btn-export-csv" class="tool-button">
+        <span>设备清单</span>
+      </button>
+      
+      <div class="separator"></div>
+      
+      <button id="btn-undo" class="tool-button" disabled>
+        <span>撤销</span>
+      </button>
+      
+      <button id="btn-redo" class="tool-button" disabled>
+        <span>重做</span>
+      </button>
+      
+      <div class="separator"></div>
+      
+      <button id="btn-clear-selection" class="tool-button">
+        <span>取消选择</span>
+      </button>
+      
+      <button id="btn-delete" class="tool-button">
+        <span>删除</span>
+      </button>
+    </div>
+    
+    <div id="main-content">
+      <div id="sidebar">
+        <div class="tab-container">
+          <div class="tab active" data-tab="devices">设备库</div>
+          <div class="tab" data-tab="settings">设置</div>
+          <div class="tab" data-tab="loads">载荷</div>
+        </div>
+        
+        <div id="tab-devices" class="tab-content active panel-content">
+          <div id="devices-list"></div>
+        </div>
+        
+        <div id="tab-settings" class="tab-content panel-content">
+          <div class="settings-group">
+            <div class="settings-group-title">舞台尺寸 (米)</div>
+            <div class="settings-row">
+              <div class="settings-label">宽度 (X轴)</div>
+              <input type="number" class="settings-input" id="stage-width" value="16" step="0.1">
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">深度 (Z轴)</div>
+              <input type="number" class="settings-input" id="stage-depth" value="10" step="0.1">
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">高度 (Y轴)</div>
+              <input type="number" class="settings-input" id="stage-height" value="8" step="0.1">
+            </div>
+          </div>
+          
+          <div class="settings-group">
+            <div class="settings-group-title">吊点网格</div>
+            <div class="settings-row">
+              <div class="settings-label">X方向间距 (米)</div>
+              <input type="number" class="settings-input" id="grid-x-spacing" value="2" step="0.1">
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">Z方向间距 (米)</div>
+              <input type="number" class="settings-input" id="grid-z-spacing" value="2" step="0.1">
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">安全载荷/吊点 (kg)</div>
+              <input type="number" class="settings-input" id="hoist-max-load" value="500" step="1">
+            </div>
+          </div>
+          
+          <div class="settings-group">
+            <div class="settings-group-title">横杆设置</div>
+            <div class="settings-row">
+              <div class="settings-label">默认直径 (米)</div>
+              <input type="number" class="settings-input" id="bar-default-diameter" value="0.05" step="0.01">
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">单位长度重量 (kg/m)</div>
+              <input type="number" class="settings-input" id="bar-weight-per-meter" value="5" step="0.1">
+            </div>
+          </div>
+        </div>
+        
+        <div id="tab-loads" class="tab-content panel-content">
+          <div id="loads-list"></div>
+        </div>
+      </div>
+      
+      <div id="canvas-container">
+        <canvas id="main-canvas"></canvas>
+      </div>
+      
+      <div id="right-panel">
+        <div class="tab-container">
+          <div class="tab active" data-tab="properties">属性</div>
+          <div class="tab" data-tab="problems">问题</div>
+        </div>
+        
+        <div id="tab-properties" class="tab-content panel-content">
+          <div id="properties-panel">
+            <div class="empty-state">
+              <div class="empty-state-icon">🎯</div>
+              <div>选择对象查看属性</div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="tab-problems" class="tab-content panel-content">
+          <div id="problems-list"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-indicator" id="status-indicator"></div>
+        <span id="status-text">就绪</span>
+      </div>
+      <div class="status-item">
+        <span>设备: <span id="device-count">0</span></span>
+      </div>
+      <div class="status-item">
+        <span>问题: <span id="problem-count">0</span></span>
+      </div>
+      <div class="status-item">
+        <span>最后保存: <span id="last-save">从未</span></span>
+      </div>
+    </div>
+  </div>
+  
+  <div id="modal-container"></div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

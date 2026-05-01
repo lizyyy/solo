@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4038",
+  "idea_short_title": "我想做一个给小剧场技术总监用的本地 3D 交互预演工具，叫“吊点载荷排练台”。我们搭演出前会在舞台上方挂灯具、音箱、幕布",
+  "folder_name": "xy4038",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4038",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "3D/交互可视化",
+    "修改范围": "跨模块多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4038/base",
+    "round_branch": "idea/xy4038/r1",
+    "pr_title": "[xy4038][第一轮] 我想做一个给小剧场技术总监用的本地 3D 交互预演工具，叫“吊点载荷排练台”。我们搭演出前会在舞台上",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4038/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4038/base...idea/xy4038/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4038/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4038/xy4038.xlsx",
+    "uid": "xy4038",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4038/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4038/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4038/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4038/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4038/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T16:58:29.655982+08:00"
+}
