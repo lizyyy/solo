@@ -1,0 +1,32 @@
+[project]
+name = "track-cleaner"
+version = "0.1.0"
+description = "轨迹净化和行程报告器 - 一个给徒步领队用的本地命令行工具"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "gpxpy>=1.5.0",
+    "pandas>=2.0.0",
+    "geopy>=2.3.0",
+    "shapely>=2.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+]
+
+[project.scripts]
+track-cleaner = "track_cleaner.cli.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["track_cleaner*"]
