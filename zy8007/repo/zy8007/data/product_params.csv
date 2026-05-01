@@ -1,0 +1,16 @@
+product_name,param_name,param_value,version,source
+企业版ERP,最大并发用户数,1000,V3.0,产品参数表V3
+企业版ERP,最大并发用户数,500,V2.0,产品参数表V2
+企业版ERP,数据库支持,MySQL 8.0+, PostgreSQL 12+, Oracle 19c+, SQL Server 2019+,V3.0,产品参数表V3
+企业版ERP,数据库支持,MySQL 5.7+, PostgreSQL 10+, Oracle 12c+,V2.0,产品参数表V2
+企业版ERP,单租户存储上限,10TB,V3.0,产品参数表V3
+企业版ERP,单租户存储上限,5TB,V2.0,产品参数表V2
+企业版ERP,API调用频率限制,1000次/分钟,V3.0,产品参数表V3
+企业版ERP,API调用频率限制,500次/分钟,V2.0,产品参数表V2
+企业版ERP,支持单点登录,SAML 2.0, OAuth 2.0,V3.0,产品参数表V3
+企业版ERP,支持单点登录,SAML 2.0,V2.0,产品参数表V2
+企业版ERP,报表导出格式,Excel, PDF, CSV,V3.0,产品参数表V3
+企业版ERP,移动端支持,iOS, Android, 微信小程序,V3.0,产品参数表V3
+企业版CRM,最大并发用户数,500,V2.5,CRM参数表
+企业版CRM,单租户存储上限,2TB,V2.5,CRM参数表
+企业版CRM,API调用频率限制,2000次/分钟,V2.5,CRM参数表
