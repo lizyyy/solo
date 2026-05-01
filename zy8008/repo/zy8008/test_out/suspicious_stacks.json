@@ -1,0 +1,67 @@
+[
+  {
+    "rank": 1,
+    "confidence": 0.5,
+    "signature": "ArrayIndexOutOfBoundsException|java.util.ArrayList::get|com.example.myapp.ui.DetailActivity::loadItem|com.example.myapp.ui.DetailActivity::onCreate",
+    "exception_type": "ArrayIndexOutOfBoundsException",
+    "key_frames": [],
+    "occurrence_count": 1,
+    "sample_stack": ""
+  },
+  {
+    "rank": 2,
+    "confidence": 0.5,
+    "signature": "java.net.SocketTimeoutException|okhttp3.internal.http2.Http2Stream$StreamTimeout.newTimeoutException|okhttp3.internal.http2.Http2Stream$StreamTimeout.exitAndThrowIfTimedOut|okhttp3.internal.http2.Http2Stream.takeResponseHeaders|com.example.myapp.network.ApiClient.makeRequest",
+    "exception_type": "java.net.SocketTimeoutException",
+    "key_frames": [
+      {
+        "index": 0,
+        "frame": "at okhttp3.internal.http2.Http2Stream$StreamTimeout.newTimeoutException(Http2Stream.java:678)"
+      },
+      {
+        "index": 1,
+        "frame": "at okhttp3.internal.http2.Http2Stream$StreamTimeout.exitAndThrowIfTimedOut(Http2Stream.java:686)"
+      },
+      {
+        "index": 2,
+        "frame": "at okhttp3.internal.http2.Http2Stream.takeResponseHeaders(Http2Stream.java:203)"
+      },
+      {
+        "index": 3,
+        "frame": "at com.example.myapp.network.ApiClient.makeRequest(ApiClient.java:123)"
+      }
+    ],
+    "occurrence_count": 1,
+    "sample_stack": "    at okhttp3.internal.http2.Http2Stream$StreamTimeout.newTimeoutException(Http2Stream.java:678)\n    at okhttp3.internal.http2.Http2Stream$StreamTimeout.exitAndThrowIfTimedOut(Http2Stream.java:686)\n    at okhttp3.internal.http2.Http2Stream.takeResponseHeaders(Http2Stream.java:203)\n    at com.example.myapp.network.ApiClient.makeRequest(ApiClient.java:123)"
+  },
+  {
+    "rank": 3,
+    "confidence": 0.3,
+    "signature": "java.lang.NullPointerException",
+    "exception_type": "java.lang.NullPointerException",
+    "key_frames": [
+      {
+        "index": 0,
+        "frame": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference"
+      },
+      {
+        "index": 1,
+        "frame": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat com.example.myapp.ui.MainActivity$3.onBindViewHolder(MainActivity.java:156)"
+      },
+      {
+        "index": 2,
+        "frame": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Adapter.onBindViewHolder(RecyclerView.java:7065)"
+      },
+      {
+        "index": 3,
+        "frame": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Adapter.bindViewHolder(RecyclerView.java:7107)"
+      },
+      {
+        "index": 4,
+        "frame": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Recycler.tryGetViewHolderForPositionByDeadline(RecyclerView.java:6366)"
+      }
+    ],
+    "occurrence_count": 1,
+    "sample_stack": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat com.example.myapp.ui.MainActivity$3.onBindViewHolder(MainActivity.java:156)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Adapter.onBindViewHolder(RecyclerView.java:7065)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Adapter.bindViewHolder(RecyclerView.java:7107)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Recycler.tryGetViewHolderForPositionByDeadline(RecyclerView.java:6366)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Recycler.getViewForPosition(RecyclerView.java:6219)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1035)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat android.os.Handler.handleCallback(Handler.java:883)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat android.os.Looper.loop(Looper.java:214)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat android.app.ActivityThread.main(ActivityThread.java:7356)"
+  }
+]

@@ -1,0 +1,39 @@
+2024-01-15 14:32:30.000 INFO: 这是最早的日志
+{"timestamp": "2024-01-15T14:32:40.123Z", "level": "INFO", "tag": "AppStart", "message": "Application started", "user": {"id": "user_12345", "name": "**", "phone": "***********", "email": "********************"}}
+{"timestamp": "2024-01-15T14:32:41.456Z", "level": "DEBUG", "tag": "Network", "message": "Making API request", "request": {"url": "https://api.example.com/data", "headers": {"Authorization": "**********************************************************************************************************", "X-API-Key": "sk_live_abcdefghijklmnop"}}}
+{"timestamp": "2024-01-15T14:32:42.789Z", "level": "INFO", "tag": "Database", "message": "Query executed", "query": "SELECT * FROM users WHERE id = ?", "params": ["user_67890"]}
+{"timestamp": "2024-01-15T14:32:43.000Z", "level": "ERROR", "tag": "Crash", "message": "Application crashed", "exception": {"type": "ArrayIndexOutOfBoundsException", "message": "length=5; index=5", "stackTrace": [{"className": "*******************", "methodName": "***", "fileName": "**************", "lineNumber": 157}, {"className": "***********************************", "methodName": "********", "fileName": "*******************", "lineNumber": 234}, {"className": "***********************************", "methodName": "********", "fileName": "*******************", "lineNumber": 89}]}}
+{"timestamp": "2024-01-15T14:32:44.123Z", "level": "WARN", "tag": "Memory", "message": "Low memory warning", "memory": {"available": "50MB", "total": "256MB"}}
+2024-01-15 14:32:45.000 DEBUG: 初始化数据库连接
+2024-01-15 14:32:45.123 1234 5678 D MyApp: 应用启动完成
+2024-01-15 14:32:46.456 1234 5678 I Network: 发起网络请求, 用户: user_001, 电话: 138****5678
+2024-01-15 14:32:47.789 1234 5678 D Auth: 登录成功, [REDACTED_TOKEN]
+2024-01-15 14:32:48.000 1234 5678 I UI: 加载首页数据
+2024-01-15 14:32:49.234 1234 5678 W RecyclerView: 绑定数据时发现空引用
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: FATAL EXCEPTION: main
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: Process: com.example.myapp, PID: 1234
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at com.example.myapp.ui.MainActivity$3.onBindViewHolder(MainActivity.java:156)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Adapter.onBindViewHolder(RecyclerView.java:7065)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Adapter.bindViewHolder(RecyclerView.java:7107)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Recycler.tryGetViewHolderForPositionByDeadline(RecyclerView.java:6366)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Recycler.getViewForPosition(RecyclerView.java:6219)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1035)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:214)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:7356)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: Caused by: java.lang.IllegalStateException: Data is null
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at com.example.myapp.data.Repository.getData(Repository.java:89)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	... 15 more
+2024-01-15 14:32:51.000 1234 5678 I Process: 进程正在终止
+2024-01-15 14:33:15.000 INFO: 应用进入后台
+2024-01-15 14:34:00.000 WARN: 内存不足警告
+2024-01-15 14:34:45.000 ERROR: 网络请求失败
+java.net.SocketTimeoutException: timeout
+    at okhttp3.internal.http2.Http2Stream$StreamTimeout.newTimeoutException(Http2Stream.java:678)
+    at okhttp3.internal.http2.Http2Stream$StreamTimeout.exitAndThrowIfTimedOut(Http2Stream.java:686)
+    at okhttp3.internal.http2.Http2Stream.takeResponseHeaders(Http2Stream.java:203)
+    at com.example.myapp.network.ApiClient.makeRequest(ApiClient.java:123)
+2024-01-15 14:35:00.000 INFO: 用户操作: 点击按钮
+2024-01-15 14:35:30.000 DEBUG: 中间日志条目
+2024-01-15 14:36:00.000 INFO: 这是最后一条日志

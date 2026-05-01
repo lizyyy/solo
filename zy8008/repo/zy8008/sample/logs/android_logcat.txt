@@ -1,0 +1,21 @@
+2024-01-15 14:32:45.123 1234 5678 D MyApp: 应用启动完成
+2024-01-15 14:32:46.456 1234 5678 I Network: 发起网络请求, 用户: user_001, 电话: 13812345678
+2024-01-15 14:32:47.789 1234 5678 D Auth: 登录成功, token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+2024-01-15 14:32:48.000 1234 5678 I UI: 加载首页数据
+2024-01-15 14:32:49.234 1234 5678 W RecyclerView: 绑定数据时发现空引用
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: FATAL EXCEPTION: main
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: Process: com.example.myapp, PID: 1234
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at com.example.myapp.ui.MainActivity$3.onBindViewHolder(MainActivity.java:156)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Adapter.onBindViewHolder(RecyclerView.java:7065)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Adapter.bindViewHolder(RecyclerView.java:7107)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Recycler.tryGetViewHolderForPositionByDeadline(RecyclerView.java:6366)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at androidx.recyclerview.widget.RecyclerView$Recycler.getViewForPosition(RecyclerView.java:6219)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:1035)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:214)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at android.app.ActivityThread.main(ActivityThread.java:7356)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: Caused by: java.lang.IllegalStateException: Data is null
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	at com.example.myapp.data.Repository.getData(Repository.java:89)
+2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: 	... 15 more
+2024-01-15 14:32:51.000 1234 5678 I Process: 进程正在终止

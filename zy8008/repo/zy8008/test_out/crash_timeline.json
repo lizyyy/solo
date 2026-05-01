@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": null,
+    "exception_type": "ArrayIndexOutOfBoundsException",
+    "message": "length=5; index=5",
+    "source": "/Users/lzy/pro/solocoder/pro/zy8008/repo/zy8008/sample/logs/json_logs.log",
+    "crash_id": "",
+    "stack_preview": ""
+  },
+  {
+    "timestamp": "2024-01-15T14:32:50.567000",
+    "exception_type": "java.lang.NullPointerException",
+    "message": "Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference",
+    "source": "/Users/lzy/pro/solocoder/pro/zy8008/repo/zy8008/sample/logs/android_logcat.txt",
+    "crash_id": "",
+    "stack_preview": "2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: java.lang.NullPointerException: Attempt to invoke virtual method 'java.lang.String java.lang.Object.toString()' on a null object reference\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat com.example.myapp.ui.MainActivity$3.onBindViewHolder(MainActivity.java:156)\n2024-01-15 14:32:50.567 1234 9012 E AndroidRuntime: \tat androidx.recyclerview.widget.RecyclerView$Adapter.onBindViewHolder(RecyclerView.java:7065)"
+  },
+  {
+    "timestamp": "2024-01-15T14:34:45",
+    "exception_type": "java.net.SocketTimeoutException",
+    "message": "timeout",
+    "source": "/Users/lzy/pro/solocoder/pro/zy8008/repo/zy8008/sample/logs/unsorted_logs.txt",
+    "crash_id": "",
+    "stack_preview": "    at okhttp3.internal.http2.Http2Stream$StreamTimeout.newTimeoutException(Http2Stream.java:678)\n    at okhttp3.internal.http2.Http2Stream$StreamTimeout.exitAndThrowIfTimedOut(Http2Stream.java:686)\n    at okhttp3.internal.http2.Http2Stream.takeResponseHeaders(Http2Stream.java:203)"
+  }
+]

@@ -1,0 +1,67 @@
+Incident Identifier: E1234567-89AB-CDEF-0123-456789ABCDEF
+CrashReporter Key: FEDCBA98-7654-3210-FEDC-BA0987654321
+Hardware Model: iPhone14,3
+Process: MyApp [12345]
+Path: /private/var/containers/Bundle/Application/ABCDEF12-3456-7890-ABCD-EF1234567890/MyApp.app/MyApp
+Identifier: com.example.MyApp
+Version: 2.3.1 (20301)
+Code Type: ARM-64 (Native)
+Role: Foreground
+Parent Process: launchd [1]
+Coalition: com.example.MyApp [12345]
+
+Date/Time: 2024-01-15 14:35:20.123 +0800
+Launch Time: 2024-01-15 14:30:15.456 +0800
+OS Version: iPhone OS 17.2.1 (21C66)
+Release Type: User
+Report Version: 104
+
+Exception Type: EXC_BAD_ACCESS (SIGSEGV)
+Exception Subtype: KERN_INVALID_ADDRESS at 0x0000000000000000
+Exception Codes: 0x0000000000000001, 0x0000000000000000
+VM Region Info: 0 is not in any region.  Bytes before following region: 4363526144
+      REGION TYPE                    START - END         [ VSIZE] PRT/MAX SHRMOD  REGION DETAIL
+      UNUSED SPACE AT START
+--->  
+      MALLOC_NANO (reserved)   0000000108800000-0000000108880000 [  512K] rw-/rwx SM=NUL  ...(unallocated)
+Termination Reason: SIGNAL 11 Segmentation fault: 11
+Terminating Process: exc handler [12345]
+
+Triggered by Thread:  0
+
+Thread 0 name:
+Thread 0 Crashed:
+0   libobjc.A.dylib               	0x00000001b82a4184 objc_msgSend + 36
+1   UIKitCore                     	0x00000001bb92c344 -[UIViewController view] + 28
+2   MyApp                         	0x0000000104a2b3c0 -[DetailViewController configureView] + 64 (DetailViewController.m:156)
+3   MyApp                         	0x0000000104a2b1e8 -[DetailViewController viewDidLoad] + 128 (DetailViewController.m:89)
+4   UIKitCore                     	0x00000001bb92c5f0 -[UIViewController _sendViewDidLoadWithAppearanceProxyObjectTaggingEnabled] + 104
+5   UIKitCore                     	0x00000001bb9313f8 -[UIViewController loadViewIfRequired] + 912
+6   UIKitCore                     	0x00000001bb931760 -[UIViewController view] + 28
+7   UIKitCore                     	0x00000001bbd55758 -[UINavigationController _startCustomTransition:] + 1092
+8   UIKitCore                     	0x00000001bbd65554 -[UINavigationController _startDeferredTransitionIfNeeded:] + 716
+9   UIKitCore                     	0x00000001bbd65ecc -[UINavigationController __viewWillLayoutSubviews] + 164
+10  UIKitCore                     	0x00000001bbd492c8 -[UILayoutContainerView layoutSubviews] + 228
+11  UIKitCore                     	0x00000001bc412988 -[UIView(CALayerDelegate) layoutSublayersOfLayer:] + 1992
+12  QuartzCore                    	0x00000001c206f964 CA::Layer::layout_if_needed(CA::Transaction*) + 532
+13  QuartzCore                    	0x00000001c207bd98 CA::Layer::layout_and_display_if_needed(CA::Transaction*) + 148
+14  QuartzCore                    	0x00000001c2070134 CA::Context::commit_transaction(CA::Transaction*) + 348
+15  QuartzCore                    	0x00000001c2074e58 CA::Transaction::commit() + 648
+16  UIKitCore                     	0x00000001bbf62f28 _UIApplicationFlushRunLoopCATransactionIfTooLate + 172
+17  UIKitCore                     	0x00000001bbf681f4 __handleEventQueueInternal + 5596
+18  UIKitCore                     	0x00000001bbf5b5d4 __handleHIDEventFetcherDrain + 112
+19  CoreFoundation                	0x00000001b725c808 __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__ + 28
+20  CoreFoundation                	0x00000001b726b704 __CFRunLoopDoSource0 + 208
+21  CoreFoundation                	0x00000001b71aa58c __CFRunLoopDoSources0 + 268
+22  CoreFoundation                	0x00000001b71b0254 __CFRunLoopRun + 828
+23  CoreFoundation                	0x00000001b71c3eb0 CFRunLoopRunSpecific + 612
+24  GraphicsServices              	0x00000001f51e3368 GSEventRunModal + 164
+25  UIKitCore                     	0x00000001bbf48668 -[UIApplication _run] + 888
+26  UIKitCore                     	0x00000001bbf482cc UIApplicationMain + 340
+27  MyApp                         	0x0000000104a23f04 main + 80 (main.m:16)
+28  dyld                          	0x00000001d93cc960 start + 2528
+
+Thread 1:
+0   libsystem_kernel.dylib        	0x00000001f015bfa8 __workq_kernreturn + 8
+1   libsystem_pthread.dylib       	0x0000000219f15d5c _pthread_wqthread + 364
+2   libsystem_pthread.dylib       	0x0000000219f15a04 start_wqthread + 8
