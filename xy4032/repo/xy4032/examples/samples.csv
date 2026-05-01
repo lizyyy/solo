@@ -1,0 +1,8 @@
+sample_id,batch,initial_concentration,concentration_unit,available_volume,target_concentration,target_concentration_unit,replicate_count,remark,molecular_weight
+S001,BATCH001,100,ng/ul,100,10,ng/ul,3,标准样品1,
+S002,BATCH001,200,ng/ul,50,5,ng/ul,2,标准样品2,
+S003,BATCH001,500,pg/ul,80,50,pg/ul,3,低浓度样品,
+S004,BATCH002,10,uM,200,1,uM,2,引物A,6000
+S005,BATCH002,50,uM,150,5,uM,3,引物B,8000
+S006,BATCH002,200,nM,100,20,nM,2,cDNA样品,
+S007,BATCH001,50,ng/ul,30,50,ng/ul,1,高浓度目标,
