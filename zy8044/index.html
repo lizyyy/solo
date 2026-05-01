@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>刀模拼版预检工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🛠️ 刀模拼版预检工具</h1>
+            <div class="header-actions">
+                <button id="loadSampleBtn" class="btn btn-sample">📦 加载示例数据</button>
+                <button id="exportIssuesBtn" class="btn btn-export" disabled>📊 导出 Issues CSV</button>
+                <button id="exportPreviewBtn" class="btn btn-export" disabled>📄 导出 Preview JSON</button>
+            </div>
+        </header>
+
+        <main>
+            <aside class="panel-left">
+                <section class="upload-section">
+                    <h2>📁 文件导入</h2>
+
+                    <div class="upload-group">
+                        <label>刀模 JSON</label>
+                        <input type="file" id="dieCutFile" accept=".json">
+                        <div id="dieCutPreview" class="file-preview"></div>
+                    </div>
+
+                    <div class="upload-group">
+                        <label>图文元素 CSV</label>
+                        <input type="file" id="graphicsFile" accept=".csv">
+                        <div id="graphicsPreview" class="file-preview"></div>
+                    </div>
+
+                    <div class="upload-group">
+                        <label>规则配置 YAML</label>
+                        <input type="file" id="rulesFile" accept=".yaml,.yml">
+                        <div id="rulesPreview" class="file-preview"></div>
+                    </div>
+                </section>
+
+                <section class="rules-display">
+                    <h2>📋 当前规则</h2>
+                    <div id="rulesDisplay" class="rules-content">
+                        <p class="placeholder">请导入规则文件或加载示例</p>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="canvas-section">
+                <div class="canvas-toolbar">
+                    <label>缩放: <input type="range" id="zoomSlider" min="25" max="400" value="100"> <span id="zoomValue">100%</span></label>
+                    <button id="resetViewBtn" class="btn btn-sm">重置视图</button>
+                    <button id="toggleGridBtn" class="btn btn-sm">显示/隐藏网格</button>
+                    <button id="toggleIssueHighlightBtn" class="btn btn-sm">显示/隐藏问题高亮</button>
+                </div>
+                <div class="canvas-wrapper">
+                    <canvas id="previewCanvas"></canvas>
+                    <div id="canvasInfo" class="canvas-info"></div>
+                </div>
+                <div id="legend" class="legend">
+                    <span class="legend-item"><span class="legend-color" style="background:#ff4444"></span> 出血不足</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ff8800"></span> 文字压线</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#9900ff"></span> 色版缺失</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#ff0066"></span> 重叠区域</span>
+                    <span class="legend-item"><span class="legend-color" style="background:#00ff88"></span> 安全线</span>
+                </div>
+            </section>
+
+            <aside class="panel-right">
+                <section class="issues-section">
+                    <h2>⚠️ 检测到的问题 <span id="issueCount" class="badge">0</span></h2>
+                    <div id="issuesList" class="issues-list">
+                        <p class="placeholder">暂无问题，请导入文件开始检测</p>
+                    </div>
+                </section>
+
+                <section class="stats-section">
+                    <h2>📐 拼版统计</h2>
+                    <div id="statsDisplay" class="stats-content">
+                        <div class="stat-item">
+                            <span class="stat-label">页面尺寸</span>
+                            <span id="statPageSize" class="stat-value">--</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">刀模数量</span>
+                            <span id="statDieCount" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">图文元素</span>
+                            <span id="statGraphicCount" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">出血宽度</span>
+                            <span id="statBleed" class="stat-value">--</span>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

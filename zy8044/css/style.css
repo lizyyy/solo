@@ -1,0 +1,379 @@
+:root {
+    --primary: #2c5aa0;
+    --primary-dark: #1e3d6e;
+    --success: #28a745;
+    --warning: #ffc107;
+    --danger: #dc3545;
+    --purple: #6f42c1;
+    --teal: #20c997;
+    --dark: #343a40;
+    --light: #f8f9fa;
+    --border: #dee2e6;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    line-height: 1.5;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-sample {
+    background: var(--teal);
+    color: white;
+}
+
+.btn-sample:hover {
+    background: #1ba87c;
+}
+
+.btn-export {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.btn-export:hover:not(:disabled) {
+    background: rgba(255,255,255,0.3);
+}
+
+.btn-export:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-sm {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: var(--light);
+    border: 1px solid var(--border);
+}
+
+.btn-sm:hover {
+    background: #e9ecef;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.panel-left, .panel-right {
+    background: white;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.panel-right {
+    border-right: none;
+    border-left: 1px solid var(--border);
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary);
+}
+
+.upload-group {
+    margin-bottom: 16px;
+}
+
+.upload-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #555;
+}
+
+.upload-group input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.upload-group input[type="file"]:hover {
+    border-color: var(--primary);
+}
+
+.file-preview {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: #e9ecef;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #666;
+    min-height: 24px;
+}
+
+.file-preview.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.file-preview.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.rules-content, .stats-content {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 12px;
+}
+
+.placeholder {
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.rules-content .rule-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.rules-content .rule-item:last-child {
+    border-bottom: none;
+}
+
+.rules-content .rule-label {
+    color: #666;
+}
+
+.rules-content .rule-value {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.canvas-section {
+    display: flex;
+    flex-direction: column;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.canvas-toolbar {
+    background: white;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.canvas-toolbar label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.canvas-toolbar input[type="range"] {
+    width: 120px;
+}
+
+.canvas-wrapper {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#previewCanvas {
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    cursor: crosshair;
+}
+
+.canvas-info {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.legend {
+    background: white;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.issues-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge {
+    background: var(--danger);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.issues-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.issue-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    border-left: 4px solid;
+}
+
+.issue-item.bleed {
+    background: #ffe6e6;
+    border-color: #ff4444;
+}
+
+.issue-item.text-on-line {
+    background: #fff3e6;
+    border-color: #ff8800;
+}
+
+.issue-item.missing-color {
+    background: #f3e6ff;
+    border-color: #9900ff;
+}
+
+.issue-item.overlap {
+    background: #ffe6f0;
+    border-color: #ff0066;
+}
+
+.issue-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.issue-detail {
+    color: #666;
+    font-size: 11px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: #666;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
