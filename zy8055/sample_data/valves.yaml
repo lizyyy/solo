@@ -1,0 +1,31 @@
+valves:
+  V1:
+    node: N2
+    pipe: P1
+    status: open
+    type: gate
+  V2:
+    node: N3
+    pipe: P2
+    status: open
+    type: gate
+  V3:
+    node: N4
+    pipe: P3
+    status: open
+    type: gate
+  V4:
+    node: N6
+    pipe: P5
+    status: open
+    type: gate
+  V5:
+    node: N7
+    pipe: P6
+    status: open
+    type: gate
+  V6:
+    node: N9
+    pipe: P8
+    status: open
+    type: gate
