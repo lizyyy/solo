@@ -1,0 +1,16 @@
+{
+  "devices": [
+    {
+      "device_id": "GW-001",
+      "name": "Lab Gateway A",
+      "description": "Primary temperature/humidity gateway",
+      "location": "Lab Room 101"
+    },
+    {
+      "device_id": "GW-002",
+      "name": "Lab Gateway B",
+      "description": "Secondary sensor gateway",
+      "location": "Lab Room 102"
+    }
+  ]
+}
