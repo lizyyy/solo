@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4044",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4044/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给远程乐队排练和小型直播团队用的本地浏览器工具，叫“多路音视频延迟校准台”。我们经常同时接入手机、声卡、摄像头和远程 WebRTC 画面，排练时总觉得鼓声、主唱口型和伴奏轨不对齐，但现在只能靠耳朵拖滑块，换一台设备又得重来。请从 0 到 1 做一个可运行的前端项目：打开后直接进入校准工作区，不要做营销首页；左侧能维护输入源清单，包括设备名、类型（麦克风/摄像头/远程流/本地文件）、采样率、帧率、当前延迟偏移和是否参与混音；中间是多轨时间线和波形/帧标记视图，支持导入几份示例 JSON/CSV 日志来模拟 WebRTC getStats、音频拍手峰值、视频闪光帧和人工标记点；右侧是校准结果和问题列表。系统要能根据拍手峰值、闪光帧、RTP 时间戳、人工锚点这些证据计算每路源相对主时钟的延迟偏移和置信度，识别时钟漂移、丢帧、采样率不一致、同一路源重复导入、锚点冲突、远程流抖动过大这些问题，并且允许用户手动确认或覆盖某条校准结果。需要有“回放预演”模式：按校准后的时间轴播放/暂停/拖动进度，显示每路源应该提前或延后多少毫秒，并在事件日志里标出仍然不同步的片段。项目数据要保存在浏览器本地，刷新后不丢；支持导入/导出一个完整 session JSON，导入时校验版本、源编号、时间戳单位和缺失字段，坏数据不能覆盖当前 session；还要能导出 Markdown 校准报告和 CSV 偏移表。希望代码拆成数据模型、导入解析与校验、延迟/漂移计算算法、时间线状态、回放控制、本地持久化、报告导出、界面组件和示例数据，不要写成一个大组件或静态演示。README 里写清楚安装、启动、示例数据格式，以及如何验证导入示例、自动校准、手动覆盖、回放预演、刷新恢复、导入导出和生成报告这些核心流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4044/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n项目编号：xy4044\n本轮：第一轮\n模型要求：必须使用 Seed-Code-DogFooding\n智能体要求：必须使用 SOLO Coder\n代码目录要求：在仓库根目录创建并只修改 `xy4044/`\n\n原始想法：\n我想做一个给远程乐队排练和小型直播团队用的本地浏览器工具，叫“多路音视频延迟校准台”。我们经常同时接入手机、声卡、摄像头和远程 WebRTC 画面，排练时总觉得鼓声、主唱口型和伴奏轨不对齐，但现在只能靠耳朵拖滑块，换一台设备又得重来。请从 0 到 1 做一个可运行的前端项目：打开后直接进入校准工作区，不要做营销首页；左侧能维护输入源清单，包括设备名、类型（麦克风/摄像头/远程流/本地文件）、采样率、帧率、当前延迟偏移和是否参与混音；中间是多轨时间线和波形/帧标记视图，支持导入几份示例 JSON/CSV 日志来模拟 WebRTC getStats、音频拍手峰值、视频闪光帧和人工标记点；右侧是校准结果和问题列表。系统要能根据拍手峰值、闪光帧、RTP 时间戳、人工锚点这些证据计算每路源相对主时钟的延迟偏移和置信度，识别时钟漂移、丢帧、采样率不一致、同一路源重复导入、锚点冲突、远程流抖动过大这些问题，并且允许用户手动确认或覆盖某条校准结果。需要有“回放预演”模式：按校准后的时间轴播放/暂停/拖动进度，显示每路源应该提前或延后多少毫秒，并在事件日志里标出仍然不同步的片段。项目数据要保存在浏览器本地，刷新后不丢；支持导入/导出一个完整 session JSON，导入时校验版本、源编号、时间戳单位和缺失字段，坏数据不能覆盖当前 session；还要能导出 Markdown 校准报告和 CSV 偏移表。希望代码拆成数据模型、导入解析与校验、延迟/漂移计算算法、时间线状态、回放控制、本地持久化、报告导出、界面组件和示例数据，不要写成一个大组件或静态演示。README 里写清楚安装、启动、示例数据格式，以及如何验证导入示例、自动校准、手动覆盖、回放预演、刷新恢复、导入导出和生成报告这些核心流程。\n\n开发目标：\n- 将上面的想法落成一个不简单、可运行、可演示的项目原型\n- 所有代码集中在 `xy4044/`\n- 如果仓库当前为空，请自行初始化最小但完整的项目结构\n- 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n工作方式要求：\n- 先快速审视当前仓库是否为空、已有文件结构和运行方式\n- 再给出极简执行计划，然后立即开始写代码\n- 不要把大量时间花在空泛分析或模板化总结上\n- 不要偏离需求去做无关的大重构\n- 如需新增依赖，只增加必要依赖，并说明原因\n\n交付要求：\n- 必须给出完整代码\n- 必须给出运行步骤\n- 必须说明关键文件和实现点\n- 如有未完成项，明确列出\n\n验收标准：\n- 项目可以启动或运行\n- 页面或功能不是纯占位\n- 至少包含 3 个以上互相关联的功能点或模块\n- 代码结构清晰，文件划分合理\n- 不要只生成单文件 demo\n\n输出方式：\n- 先简短说明你将创建什么\n- 然后直接开始改文件\n- 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4044/r1",
+  "base_branch_name": "idea/xy4044/base",
+  "parent_branch_name": "idea/xy4044/base",
+  "pr_title": "[xy4044][第一轮] 我想做一个给远程乐队排练和小型直播团队用的本地浏览器工具，叫“多路音视频延迟校准台”。我们经常同时接",
+  "session_id": "69f47d1fe644eb6dd6d4c2e3",
+  "message_id": "69f47d289c3abc5d765ba08d",
+  "trace_id": null,
+  "task_type": "0-1代码生成",
+  "business_domain": "AI/ML应用",
+  "modification_scope": "跨模块多文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4044/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4044/repo/xy4044",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4044/base...idea/xy4044/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T18:14:42.683015+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4044/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4044/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4044"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4044/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4044/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4044/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4044/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给远程乐队排练和小型直播团队用的本地浏览器工具，叫“多路音视频延迟校准台”。我们经常同时接入手机、声卡、摄像头和远程 WebRTC 画面，排练时总觉得鼓声、主唱口型和伴奏轨不对齐，但现在只能靠耳朵拖滑块，换一台设备又得重来。请从 0 到 1 做一个可运行的前端项目：打开后直接进入校准工作区，不要做营销首页；左侧能维护输入源清单，包括设备名、类型（麦克风/摄像头/远程流/本地文件）、采样率、帧率、当前延迟偏移和是否参与混音；中间是多轨时间线和波形/帧标记视图，支持导入几份示例 JSON/CSV 日志来模拟 WebRTC getStats、音频拍手峰值、视频闪光帧和人工标记点；右侧是校准结果和问题列表。系统要能根据拍手峰值、闪光帧、RTP 时间戳、人工锚点这些证据计算每路源相对主时钟的延迟偏移和置信度，识别时钟漂移、丢帧、采样率不一致、同一路源重复导入、锚点冲突、远程流抖动过大这些问题，并且允许用户手动确认或覆盖某条校准结果。需要有“回放预演”模式：按校准后的时间轴播放/暂停/拖动进度，显示每路源应该提前或延后多少毫秒，并在事件日志里标出仍然不同步的片段。项目数据要保存在浏览器本地，刷新后不丢；支持导入/导出一个完整 session JSON，导入时校验版本、源编号、时间戳单位和缺失字段，坏数据不能覆盖当前 session；还要能导出 Markdown 校准报告和 CSV 偏移表。希望代码拆成数据模型、导入解析与校验、延迟/漂移计算算法、时间线状态、回放控制、本地持久化、报告导出、界面组件和示例数据，不要写成一个大组件或静态演示。README 里写清楚安装、启动、示例数据格式，以及如何验证导入示例、自动校准、手动覆盖、回放预演、刷新恢复、导入导出和生成报告这些核心流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T18:15:06.461174+08:00"
+}
