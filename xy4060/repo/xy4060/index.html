@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线路巡检机器人训练场</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>🤖 线路巡检机器人训练场</h1>
+            <div class="header-controls">
+                <button id="btn-mode-switch" class="btn btn-secondary">切换模式</button>
+                <button id="btn-import" class="btn btn-secondary">导入关卡</button>
+                <button id="btn-export" class="btn btn-secondary">导出关卡</button>
+                <button id="btn-help" class="btn btn-secondary">帮助</button>
+            </div>
+        </header>
+
+        <main class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>关卡选择</h3>
+                    <select id="level-selector" class="form-control">
+                        <option value="">-- 选择关卡 --</option>
+                    </select>
+                    <button id="btn-new-level" class="btn btn-primary btn-full mt-10">新建关卡</button>
+                    <button id="btn-delete-level" class="btn btn-danger btn-full mt-5">删除当前关卡</button>
+                </div>
+
+                <div class="sidebar-section" id="editor-tools" style="display: none;">
+                    <h3>编辑器工具</h3>
+                    <div class="tool-box" id="tool-start">
+                        <div class="tool-icon start-icon">🚀</div>
+                        <span>起点</span>
+                    </div>
+                    <div class="tool-box" id="tool-obstacle">
+                        <div class="tool-icon obstacle-icon">🧱</div>
+                        <span>障碍</span>
+                    </div>
+                    <div class="tool-box" id="tool-charge">
+                        <div class="tool-icon charge-icon">🔋</div>
+                        <span>充电点</span>
+                    </div>
+                    <div class="tool-box" id="tool-checkpoint">
+                        <div class="tool-icon checkpoint-icon">✅</div>
+                        <span>检查点</span>
+                    </div>
+                    <div class="tool-box" id="tool-danger">
+                        <div class="tool-icon danger-icon">⚠️</div>
+                        <span>危险格</span>
+                    </div>
+                    <div class="tool-box" id="tool-sample">
+                        <div class="tool-icon sample-icon">📦</div>
+                        <span>取样点</span>
+                    </div>
+                    <div class="tool-box" id="tool-erase">
+                        <div class="tool-icon erase-icon">🗑️</div>
+                        <span>擦除</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section" id="level-settings" style="display: none;">
+                    <h3>关卡设置</h3>
+                    <div class="form-group">
+                        <label>关卡名称</label>
+                        <input type="text" id="level-name" class="form-control" placeholder="输入关卡名称">
+                    </div>
+                    <div class="form-group">
+                        <label>地图大小</label>
+                        <div class="size-inputs">
+                            <input type="number" id="map-width" class="form-control size-input" value="10" min="5" max="20">
+                            <span>×</span>
+                            <input type="number" id="map-height" class="form-control size-input" value="10" min="5" max="20">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>初始能量</label>
+                        <input type="number" id="initial-energy" class="form-control" value="50" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea id="level-description" class="form-control" rows="3" placeholder="关卡描述..."></textarea>
+                    </div>
+                    <button id="btn-save-level" class="btn btn-success btn-full">保存关卡</button>
+                </div>
+            </aside>
+
+            <section class="game-area">
+                <div class="game-info">
+                    <div class="info-item">
+                        <span class="info-label">模式：</span>
+                        <span id="current-mode" class="info-value">训练模式</span>
+                    </div>
+                    <div class="info-item" id="level-info-display">
+                        <span class="info-label">关卡：</span>
+                        <span id="current-level-name" class="info-value">未选择</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">状态：</span>
+                        <span id="game-status" class="info-value">准备就绪</span>
+                    </div>
+                </div>
+
+                <div class="canvas-container">
+                    <canvas id="game-canvas" width="600" height="600"></canvas>
+                </div>
+
+                <div class="robot-info">
+                    <div class="info-group">
+                        <div class="info-item">
+                            <span class="info-label">位置：</span>
+                            <span id="robot-position" class="info-value">(0, 0)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">方向：</span>
+                            <span id="robot-direction" class="info-value">↑ 上</span>
+                        </div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-item">
+                            <span class="info-label">能量：</span>
+                            <div class="energy-bar">
+                                <div id="energy-fill" class="energy-fill" style="width: 100%;"></div>
+                            </div>
+                            <span id="energy-value" class="info-value">50/50</span>
+                        </div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-item">
+                            <span class="info-label">已检：</span>
+                            <span id="checked-count" class="info-value">0/0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">已取：</span>
+                            <span id="sampled-count" class="info-value">0/0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="command-panel">
+                <div class="sidebar-section">
+                    <h3>指令系统</h3>
+                    <div class="command-tools">
+                        <div class="command-drag" draggable="true" data-command="forward">
+                            <span class="cmd-icon">➡️</span>
+                            <span>前进</span>
+                        </div>
+                        <div class="command-drag" draggable="true" data-command="turnLeft">
+                            <span class="cmd-icon">⬅️</span>
+                            <span>左转</span>
+                        </div>
+                        <div class="command-drag" draggable="true" data-command="turnRight">
+                            <span class="cmd-icon">➡️</span>
+                            <span>右转</span>
+                        </div>
+                        <div class="command-drag" draggable="true" data-command="sample">
+                            <span class="cmd-icon">📦</span>
+                            <span>取样</span>
+                        </div>
+                        <div class="command-drag" draggable="true" data-command="charge">
+                            <span class="cmd-icon">🔋</span>
+                            <span>充电</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>指令队列</h3>
+                    <div id="command-queue" class="command-queue">
+                        <div class="empty-hint">拖拽指令到此处，或使用文本编辑</div>
+                    </div>
+                    <div class="command-controls">
+                        <button id="btn-clear-commands" class="btn btn-secondary btn-small">清空</button>
+                        <button id="btn-text-edit" class="btn btn-secondary btn-small">文本编辑</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section" id="text-editor-section" style="display: none;">
+                    <h3>文本指令</h3>
+                    <textarea id="text-commands" class="form-control" rows="6" placeholder="每行一个指令：
+forward - 前进
+turnLeft - 左转
+turnRight - 右转
+sample - 取样
+charge - 充电"></textarea>
+                    <button id="btn-apply-text" class="btn btn-primary btn-full mt-10">应用指令</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>运行控制</h3>
+                    <div class="run-controls">
+                        <button id="btn-run" class="btn btn-success">▶ 运行</button>
+                        <button id="btn-step" class="btn btn-primary">⏭ 单步</button>
+                        <button id="btn-pause" class="btn btn-warning" disabled>⏸ 暂停</button>
+                        <button id="btn-reset" class="btn btn-secondary">🔄 重置</button>
+                    </div>
+                    <div class="form-group mt-10">
+                        <label>运行速度</label>
+                        <input type="range" id="speed-slider" class="form-control" min="1" max="10" value="5">
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>运行结果</h3>
+                    <div id="result-area" class="result-area">
+                        <div class="empty-hint">运行后查看结果</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>最佳记录</h3>
+                    <div id="best-records" class="best-records">
+                        <div class="empty-hint">暂无记录</div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <div id="help-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>帮助指南</h2>
+                <button id="btn-close-help" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>🎯 游戏目标</h3>
+                <p>编写指令控制机器人完成巡检任务：通过所有检查点，在取样点采集样本，避开危险格，到达终点。</p>
+                
+                <h3>📋 指令说明</h3>
+                <ul>
+                    <li><strong>前进</strong>：机器人向当前方向前进一格（消耗1能量）</li>
+                    <li><strong>左转</strong>：机器人原地左转90度（消耗0.5能量）</li>
+                    <li><strong>右转</strong>：机器人原地右转90度（消耗0.5能量）</li>
+                    <li><strong>取样</strong>：在当前位置采集样本（需在取样点，消耗2能量）</li>
+                    <li><strong>充电</strong>：在充电点补充能量（恢复20能量）</li>
+                </ul>
+                
+                <h3>⭐ 评分规则</h3>
+                <ul>
+                    <li><strong>3星</strong>：完美完成，无错误，指令数最少</li>
+                    <li><strong>2星</strong>：完成任务，但有可优化空间</li>
+                    <li><strong>1星</strong>：基本完成，存在小问题</li>
+                    <li><strong>0星</strong>：任务失败</li>
+                </ul>
+                
+                <h3>⚠️ 错误类型</h3>
+                <ul>
+                    <li><strong>撞墙</strong>：移动到障碍物或地图外</li>
+                    <li><strong>漏检</strong>：未经过所有检查点</li>
+                    <li><strong>能量耗尽</strong>：能量不足无法继续</li>
+                    <li><strong>重复取样</strong>：同一取样点多次取样</li>
+                    <li><strong>危险区域</strong>：进入危险格</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".json" style="display: none;">
+
+    <script src="js/utils/constants.js"></script>
+    <script src="js/models/Level.js"></script>
+    <script src="js/models/Command.js"></script>
+    <script src="js/models/RobotState.js"></script>
+    <script src="js/models/Replay.js"></script>
+    <script src="js/core/CommandInterpreter.js"></script>
+    <script src="js/core/Validator.js"></script>
+    <script src="js/core/Scorer.js"></script>
+    <script src="js/storage/Storage.js"></script>
+    <script src="js/storage/ImportExport.js"></script>
+    <script src="js/render/GameRenderer.js"></script>
+    <script src="js/ui/LevelEditor.js"></script>
+    <script src="js/ui/CommandEditor.js"></script>
+    <script src="js/ui/GameController.js"></script>
+    <script src="js/test/TestRunner.js"></script>
+    <script src="js/data/SampleLevels.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
