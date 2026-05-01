@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Listing Desk - 二手闲置照片管理工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="header-left">
+        <h1>📦 Photo Listing Desk</h1>
+        <span class="subtitle">二手闲置照片整理与上架管理工具</span>
+      </div>
+      <div class="header-right">
+        <button id="btn-new-project" class="btn btn-secondary">
+          新建项目
+        </button>
+        <button id="btn-open-project" class="btn btn-secondary">
+          打开项目
+        </button>
+        <button id="btn-save-project" class="btn btn-primary">
+          保存项目
+        </button>
+        <button id="btn-export" class="btn btn-success">
+          导出
+        </button>
+      </div>
+    </header>
+
+    <div class="welcome-screen" id="welcome-screen">
+      <div class="welcome-content">
+        <div class="welcome-icon">📷</div>
+        <h2>欢迎使用 Photo Listing Desk</h2>
+        <p>轻松整理您的二手闲置照片，为每件商品创建精美的上架清单</p>
+        <div class="welcome-actions">
+          <button id="btn-select-folder" class="btn btn-primary btn-large">
+            选择照片文件夹
+          </button>
+          <button id="btn-load-sample" class="btn btn-secondary btn-large">
+            加载示例数据
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content" id="main-content" style="display: none;">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <h3>📊 统计概览</h3>
+          <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total-photos">0</div>
+              <div class="stat-label">总照片数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-grouped-photos">0</div>
+              <div class="stat-label">已分组</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-ungrouped-photos">0</div>
+              <div class="stat-label">未分组</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total-products">0</div>
+              <div class="stat-label">商品数</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3>⚠️ 待处理问题</h3>
+            <span class="badge" id="issues-count">0</span>
+          </div>
+          <div class="issues-list" id="issues-list">
+            <div class="empty-message">暂无问题</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h3>🔄 重复检测</h3>
+            <span class="badge" id="duplicates-count">0</span>
+          </div>
+          <div class="duplicates-list" id="duplicates-list">
+            <div class="empty-message">暂无检测到的重复图片</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="ungrouped">
+            未分组照片
+            <span class="tab-count" id="tab-count-ungrouped">0</span>
+          </button>
+          <button class="tab-btn" data-tab="products">
+            商品列表
+            <span class="tab-count" id="tab-count-products">0</span>
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <div class="tab-panel active" id="panel-ungrouped">
+            <div class="panel-toolbar">
+              <div class="toolbar-left">
+                <button id="btn-create-product" class="btn btn-primary">
+                  + 创建新商品
+                </button>
+              </div>
+              <div class="toolbar-right">
+                <input type="text" id="search-ungrouped" placeholder="搜索照片文件名..." class="search-input">
+                <select id="sort-ungrouped" class="select-input">
+                  <option value="name">按名称排序</option>
+                  <option value="size">按大小排序</option>
+                  <option value="date">按日期排序</option>
+                </select>
+              </div>
+            </div>
+            <div class="photo-grid" id="ungrouped-photos">
+              <div class="empty-message">暂无未分组照片</div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="panel-products">
+            <div class="panel-toolbar">
+              <div class="toolbar-left">
+                <button id="btn-create-product-2" class="btn btn-primary">
+                  + 创建新商品
+                </button>
+              </div>
+              <div class="toolbar-right">
+                <select id="filter-status" class="select-input">
+                  <option value="all">全部状态</option>
+                  <option value="draft">草稿</option>
+                  <option value="published">已上架</option>
+                </select>
+              </div>
+            </div>
+            <div class="products-grid" id="products-grid">
+              <div class="empty-message">暂无商品，点击"创建新商品"开始</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay"></div>
+    
+    <div class="modal" id="photo-modal">
+      <div class="modal-header">
+        <h3 id="modal-photo-title">照片详情</h3>
+        <button class="modal-close" id="modal-photo-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="photo-detail-view">
+          <div class="photo-preview">
+            <img id="modal-photo-image" src="" alt="照片预览">
+          </div>
+          <div class="photo-info">
+            <div class="info-row">
+              <span class="info-label">文件名：</span>
+              <span class="info-value" id="modal-photo-filename">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">文件大小：</span>
+              <span class="info-value" id="modal-photo-size">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">尺寸：</span>
+              <span class="info-value" id="modal-photo-dimensions">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">格式：</span>
+              <span class="info-value" id="modal-photo-format">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">所属商品：</span>
+              <span class="info-value" id="modal-photo-product">-</span>
+            </div>
+          </div>
+        </div>
+        <div class="photo-actions">
+          <div class="action-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="modal-photo-main"> 设为主图
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="modal-photo-defect"> 标记为瑕疵图
+            </label>
+          </div>
+          <div class="action-group" id="defect-description-group" style="display: none;">
+            <label class="text-label">瑕疵说明：</label>
+            <textarea id="modal-defect-description" placeholder="描述此照片中的瑕疵..." rows="2"></textarea>
+          </div>
+          <div class="action-group">
+            <label class="select-label">分配到商品：</label>
+            <select id="modal-assign-product" class="select-input">
+              <option value="">-- 选择商品 --</option>
+            </select>
+            <button id="btn-new-product-from-photo" class="btn btn-small btn-secondary">新建商品</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-photo-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-photo-save">保存</button>
+      </div>
+    </div>
+
+    <div class="modal" id="product-modal">
+      <div class="modal-header">
+        <h3 id="modal-product-title">商品详情</h3>
+        <button class="modal-close" id="modal-product-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="product-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">商品标题 *</label>
+              <input type="text" id="product-title" class="form-input" placeholder="例如：iPhone 13 Pro 256G 远峰蓝">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">价格 (¥) *</label>
+              <input type="number" id="product-price" class="form-input" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">成色</label>
+              <select id="product-condition" class="form-select">
+                <option value="">-- 请选择 --</option>
+                <option value="excellent">全新</option>
+                <option value="good">良好</option>
+                <option value="fair">一般</option>
+                <option value="poor">较差</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">上架状态</label>
+              <select id="product-status" class="form-select">
+                <option value="draft">草稿</option>
+                <option value="published">已上架</option>
+                <option value="sold">已售出</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label class="form-label">瑕疵说明</label>
+              <textarea id="product-defects" class="form-textarea" placeholder="描述商品的整体瑕疵情况..." rows="2"></textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full-width">
+              <label class="form-label">备注</label>
+              <textarea id="product-notes" class="form-textarea" placeholder="其他备注信息..." rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="product-photos-section">
+          <div class="section-header">
+            <h4>商品照片</h4>
+            <button id="btn-add-photos" class="btn btn-small btn-secondary">+ 添加照片</button>
+          </div>
+          <div class="product-photos-grid" id="product-photos-grid">
+            <div class="empty-message">暂无照片</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="modal-product-delete" style="margin-right: auto;">删除商品</button>
+        <button class="btn btn-secondary" id="modal-product-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-product-save">保存</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
