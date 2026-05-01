@@ -1,0 +1,14 @@
+deprecated_fields:
+  - oldDeprecatedField
+  - ingress.annotations.kubernetes.io/ingress.class
+risk_thresholds:
+  resource_limits:
+    cpu: "2"
+    memory: "2Gi"
+required_manual_confirm:
+  - replicaCount
+  - service.type
+  - resources.limits
+allowed_changes:
+  - image.tag
+conflict_resolution: manual
