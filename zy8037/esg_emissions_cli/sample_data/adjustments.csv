@@ -1,0 +1,6 @@
+site,month,energy_type,adjustment_type,amount,reason,related_bill_id
+Shanghai Factory,2024-01,electricity,correction,-15,kWh读表误差修正,ELEC_2024_001
+Guangzhou Site,2024-02,diesel,reversal,-0.5,负数冲回测试,DIESEL_GZ_001
+Shanghai Factory,2024-02,electricity,correction,5,跨月调整补计,ELEC_2024_001
+Shanghai Factory,2024-03,electricity,reversal,-20,负数冲回,ELEC_SH_003
+北京办公室,2024-01,electricity,correction,3,跨月调整,ELEC_BJ_001

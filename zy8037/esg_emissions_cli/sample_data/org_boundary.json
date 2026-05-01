@@ -1,0 +1,45 @@
+{
+  "sites": {
+    "Shanghai Factory": {
+      "name_cn": "上海工厂",
+      "name_en": "Shanghai Factory",
+      "scope": "Scope 2",
+      "region": "East China",
+      "category": "manufacturing"
+    },
+    "北京办公室": {
+      "name_cn": "北京办公室",
+      "name_en": "Beijing Office",
+      "scope": "Scope 2",
+      "region": "North China",
+      "category": "office"
+    },
+    "Guangzhou Site": {
+      "name_cn": "广州站点",
+      "name_en": "Guangzhou Site",
+      "scope": "Scope 1",
+      "region": "South China",
+      "category": "mixed"
+    },
+    "Shenzhen Factory": {
+      "name_cn": "深圳工厂",
+      "name_en": "Shenzhen Factory",
+      "scope": "Scope 1",
+      "region": "South China",
+      "category": "manufacturing"
+    },
+    "上海工厂": {
+      "name_cn": "上海工厂",
+      "name_en": "Shanghai Factory",
+      "scope": "Scope 2",
+      "region": "East China",
+      "category": "manufacturing"
+    }
+  },
+  "site_aliases": {
+    "Shanghai Factory": ["上海工厂", "shanghai factory", "SHANGHAI"],
+    "北京办公室": ["Beijing Office", "beijing office", "北京办公室"],
+    "Guangzhou Site": ["广州站点", "guangzhou site", "GZ"],
+    "Shenzhen Factory": ["深圳工厂", "shenzhen factory", "SZ"]
+  }
+}
