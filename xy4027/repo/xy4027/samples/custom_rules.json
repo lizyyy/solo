@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "created_at": "2024-01-01",
+  "rules": [
+    {
+      "name": "客户姓名",
+      "rule_type": "custom",
+      "pattern": "张三|李四|王五|赵六",
+      "is_regex": true,
+      "risk_level": "medium",
+      "is_active": true,
+      "description": "常见的客户姓名关键词"
+    },
+    {
+      "name": "合同编号",
+      "rule_type": "custom",
+      "pattern": "HT\\d{4,}",
+      "is_regex": true,
+      "risk_level": "high",
+      "is_active": true,
+      "description": "合同编号格式：HT前缀+数字"
+    },
+    {
+      "name": "内部员工",
+      "rule_type": "custom",
+      "pattern": "经理|总监|总裁|老板",
+      "is_regex": false,
+      "risk_level": "low",
+      "is_active": true,
+      "description": "内部职位称谓"
+    },
+    {
+      "name": "项目代号",
+      "rule_type": "custom",
+      "pattern": "PROJ[-_]?\\d+",
+      "is_regex": true,
+      "risk_level": "medium",
+      "is_active": true,
+      "description": "项目代号格式"
+    },
+    {
+      "name": "测试手机号",
+      "rule_type": "phone",
+      "pattern": "13800138000",
+      "is_regex": false,
+      "risk_level": "high",
+      "is_active": true,
+      "description": "测试用手机号"
+    }
+  ]
+}
