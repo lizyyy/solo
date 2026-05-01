@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4043",
+  "idea_short_title": "我想做一个给小型发酵实验室用的本地科学计算 CLI 工具，叫“发酵曲线校准器”。我们做酵母和乳酸菌小试时，摇瓶和小罐会不",
+  "folder_name": "xy4043",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4043",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "Bug修复",
+    "业务领域": "AI/ML应用",
+    "修改范围": "模块内多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4043/base",
+    "round_branch": "idea/xy4043/r1",
+    "pr_title": "[xy4043][第一轮] 我想做一个给小型发酵实验室用的本地科学计算 CLI 工具，叫“发酵曲线校准器”。我们做酵母和乳酸菌小",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4043/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4043/base...idea/xy4043/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4043/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4043/xy4043.xlsx",
+    "uid": "xy4043",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4043/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4043/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4043/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4043/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4043/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T18:09:54.824711+08:00"
+}
