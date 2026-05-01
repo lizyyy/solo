@@ -1,0 +1,4 @@
+plan_id,plan_name,vehicle_id,ambient_temp,total_precool_time,door_open_duration,batch_id,product_id,product_name,volume,mass,initial_temp,target_temp,arrival_time,deadline_time,notes
+PLAN_RISKY_001,高风险示例(预冷不足),REF_001,35.0,60,40,B001,APPLE_FUJI,红富士苹果,4.0,2000,18.0,0.0,0,50,初温高，预冷时间短
+PLAN_RISKY_001,高风险示例(预冷不足),REF_001,35.0,60,40,B002,ORANGE_NAVEL,脐橙,3.0,1650,20.0,5.0,0,55,开门时间过长
+PLAN_RISKY_001,高风险示例(预冷不足),REF_001,35.0,60,40,B003,GRAPE_RED,红提葡萄,2.5,1300,15.0,0.0,10,40,需要快速预冷但时间不够

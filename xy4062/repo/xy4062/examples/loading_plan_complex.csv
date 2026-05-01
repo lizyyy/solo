@@ -1,0 +1,6 @@
+plan_id,plan_name,vehicle_id,ambient_temp,total_precool_time,door_open_duration,batch_id,product_id,product_name,volume,mass,initial_temp,target_temp,arrival_time,deadline_time,notes
+PLAN_COMPLEX_001,复杂多批次示例,REF_003,32.0,180,60,B001,APPLE_FUJI,红富士苹果,3.0,1500,15.0,0.0,0,120,第一批，预冷时间充裕
+PLAN_COMPLEX_001,复杂多批次示例,REF_003,32.0,180,60,B002,GRAPE_RED,红提葡萄,2.0,1040,12.0,0.0,0,90,需要快速预冷
+PLAN_COMPLEX_001,复杂多批次示例,REF_003,32.0,180,60,B003,STRAWBERRY,草莓,1.5,600,8.0,2.0,30,60,晚到批次，截止时间紧
+PLAN_COMPLEX_001,复杂多批次示例,REF_003,32.0,180,60,B004,BROCCOLI,西兰花,2.0,900,10.0,0.0,60,150,最晚到达批次
+PLAN_COMPLEX_001,复杂多批次示例,REF_003,32.0,180,60,B005,PORK_FRESH,冷鲜猪肉,2.5,2625,4.0,0.0,90,160,肉类产品

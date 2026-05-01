@@ -1,0 +1,4 @@
+plan_id,plan_name,vehicle_id,ambient_temp,total_precool_time,door_open_duration,batch_id,product_id,product_name,volume,mass,initial_temp,target_temp,arrival_time,deadline_time,notes
+PLAN_MIXED_001,混装示例(温度冲突),REF_002,30.0,120,25,B001,APPLE_FUJI,红富士苹果,2.0,1000,10.0,0.0,0,100,需要0°C
+PLAN_MIXED_001,混装示例(温度冲突),REF_002,30.0,120,25,B002,ORANGE_NAVEL,脐橙,1.5,825,12.0,5.0,5,110,需要5°C
+PLAN_MIXED_001,混装示例(温度冲突),REF_002,30.0,120,25,B003,CHICKEN_FROZEN,冻鸡肉,3.0,2700,-5.0,-18.0,0,90,需要-18°C，温差大
