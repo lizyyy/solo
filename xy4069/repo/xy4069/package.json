@@ -1,0 +1,24 @@
+{
+  "name": "offline-collab-conflict-replayer",
+  "version": "1.0.0",
+  "description": "离线协作冲突回放器 - 用于复盘多人弱网编辑问题",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test tests/",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "collaboration",
+    "crdt",
+    "operational-transformation",
+    "conflict-resolution",
+    "log-replay"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

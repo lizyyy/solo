@@ -1,0 +1,150 @@
+[
+  {
+    "operationId": "op-001",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.100Z",
+    "version": 0,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Hello"
+    }
+  },
+  {
+    "operationId": "op-002",
+    "userId": "bob",
+    "timestamp": "2024-05-01T10:00:00.200Z",
+    "version": 0,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Hi "
+    }
+  },
+  {
+    "operationId": "op-003",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.300Z",
+    "version": 1,
+    "type": "CURSOR_MOVE",
+    "payload": {
+      "position": 5
+    }
+  },
+  {
+    "operationId": "op-004",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.400Z",
+    "version": 2,
+    "type": "INSERT",
+    "payload": {
+      "position": 5,
+      "text": " World"
+    }
+  },
+  {
+    "operationId": "op-005",
+    "userId": "charlie",
+    "timestamp": "2024-05-01T10:00:00.500Z",
+    "version": 0,
+    "type": "INSERT",
+    "payload": {
+      "position": 100,
+      "text": "Invalid position test"
+    }
+  },
+  {
+    "operationId": "op-001",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.600Z",
+    "version": 3,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Duplicate ID test"
+    }
+  },
+  {
+    "operationId": "op-006",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.700Z",
+    "version": 10,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Version jump test"
+    }
+  },
+  {
+    "operationId": "op-007",
+    "userId": "bob",
+    "timestamp": "2024-05-01T10:00:00.800Z",
+    "version": 1,
+    "type": "RECONNECT",
+    "payload": {
+      "lastKnownVersion": 0,
+      "pendingOperations": []
+    }
+  },
+  {
+    "operationId": "op-008",
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:00.900Z",
+    "version": 11,
+    "type": "UNDO",
+    "payload": {}
+  },
+  {
+    "operationId": "op-009",
+    "userId": "bob",
+    "timestamp": "2024-05-01T10:00:01.000Z",
+    "version": 2,
+    "type": "DELETE",
+    "payload": {
+      "position": 0,
+      "length": 3,
+      "direction": "forward"
+    }
+  },
+  {
+    "userId": "alice",
+    "timestamp": "2024-05-01T10:00:01.100Z",
+    "version": 12,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Missing operationId field"
+    }
+  },
+  {
+    "operationId": "op-010",
+    "userId": "charlie",
+    "timestamp": "2024-05-01T10:00:01.200Z",
+    "version": 1,
+    "type": "MERGE",
+    "payload": {
+      "baseVersion": 0,
+      "remoteOperations": [
+        {
+          "operationId": "remote-001",
+          "type": "INSERT",
+          "payload": {
+            "position": 0,
+            "text": "Merged "
+          }
+        }
+      ]
+    }
+  },
+  {
+    "operationId": "op-011",
+    "userId": "bob",
+    "timestamp": "2024-05-01T10:00:00.150Z",
+    "version": 3,
+    "type": "INSERT",
+    "payload": {
+      "position": 0,
+      "text": "Out of order test"
+    }
+  }
+]
