@@ -1,0 +1,9 @@
+rules:
+  - name: standard
+    hourly_rate: 2.0
+    daily_cap: 20.0
+    free_minutes: 5
+  - name: weekend
+    hourly_rate: 2.5
+    daily_cap: 25.0
+    free_minutes: 10
