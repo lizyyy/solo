@@ -1,0 +1,10 @@
+{"id": "op1", "clientId": "user1", "timestamp": 1000, "type": "insert", "position": 0, "char": "H"}
+{"id": "op2", "clientId": "user2", "timestamp": 1050, "type": "insert", "position": 0, "char": "W"}
+{"id": "op3", "clientId": "user1", "timestamp": 1100, "type": "insert", "position": 1, "char": "e"}
+{"id": "op4", "clientId": "user2", "timestamp": 1150, "type": "insert", "position": 2, "char": "o"}
+{"id": "op5", "clientId": "user3", "timestamp": 1200, "type": "insert", "position": 3, "char": "r"}
+{"id": "op6", "clientId": "user1", "timestamp": 1250, "type": "delete", "position": 1}
+{"id": "op7", "clientId": "user2", "timestamp": 1300, "type": "insert", "position": 2, "char": "l"}
+{"id": "op8", "clientId": "user3", "timestamp": 1350, "type": "delete", "position": 5}
+{"id": "op9", "clientId": "user1", "timestamp": 1400, "type": "insert", "position": 3, "char": "l"}
+{"id": "op10", "clientId": "user2", "timestamp": 1450, "type": "undo", "position": 0, "targetOpId": "op4"}
