@@ -1,0 +1,65 @@
+rules:
+  - id: amount_increase_20pct
+    name: 金额上浮超过20%
+    description: 检测合同金额是否上浮超过20%
+    enabled: true
+    level: high
+    check_type: amount_increase
+    threshold: 0.2
+    suggestion: 合同金额上浮超过20%，建议重新评估预算和项目范围
+
+  - id: payment_period_30_to_60
+    name: 付款周期从30天延长至60天
+    description: 检测付款周期是否从30天改为60天
+    enabled: true
+    level: high
+    check_type: payment_period_change
+    from_days: [30]
+    to_days: [60, 90]
+    suggestion: 付款周期从30天延长至60天，对甲方现金流有利，但需确认是否接受
+
+  - id: auto_renewal_no_notice
+    name: 自动续约无提前通知条款
+    description: 检测是否新增自动续约条款且未约定提前通知天数
+    enabled: true
+    level: high
+    check_type: auto_renewal
+    keywords:
+      - 自动续约
+      - 自动续期
+      - 自动顺延
+    notice_days_pattern: 提前\s*(\d+)\s*天
+    suggestion: 新增自动续约条款但未约定提前通知天数，可能导致被动续约风险
+
+  - id: jurisdiction_change
+    name: 管辖地变更为外地法院
+    description: 检测管辖法院是否从本地变更为外地
+    enabled: true
+    level: high
+    check_type: jurisdiction_change
+    local_patterns:
+      - 甲方住所地
+      - 北京
+      - 本合同签订地
+      - 本市
+    suggestion: 管辖地变更为外地法院，将增加诉讼成本和时间
+
+  - id: penalty_increase
+    name: 违约金比例提高
+    description: 检测违约金比例是否提高
+    enabled: true
+    level: medium
+    check_type: penalty_change
+    suggestion: 违约金比例提高，建议评估违约风险承受能力
+
+  - id: keyword_force_majeure
+    name: 新增不可抗力条款
+    description: 检测是否新增不可抗力相关关键词
+    enabled: true
+    level: low
+    check_type: keyword_match
+    keywords:
+      - 不可抗力
+      - 免责
+      - 无法预见
+    suggestion: 新增不可抗力相关条款，建议确认责任范围

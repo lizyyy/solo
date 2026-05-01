@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}开始巡检 - 合同改稿巡检器{% endblock %}
+
+{% block content %}
+    <h2 style="margin-bottom: 30px; color: #1a1a2e;">📄 新建合同巡检</h2>
+    
+    <form method="POST" enctype="multipart/form-data" id="inspectForm">
+        <div class="two-col" style="margin-bottom: 30px;">
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">👥 客户名称 <span style="color: #dc2626;">*</span></label>
+                    <input type="text" name="client" class="form-input" 
+                           placeholder="例如：北京XX科技有限公司" required>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">📋 合同名称 <span style="color: #dc2626;">*</span></label>
+                    <input type="text" name="contract_name" class="form-input" 
+                           placeholder="例如：软件开发服务合同" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="two-col" style="margin-bottom: 30px;">
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">📄 旧版合同（V1） <span style="color: #dc2626;">*</span></label>
+                    <label class="form-file" id="oldFileLabel">
+                        <input type="file" name="old_file" id="oldFile" 
+                               accept=".txt,.md" required>
+                        <div class="form-file-icon">📤</div>
+                        <div class="form-file-text">点击或拖拽上传旧版合同</div>
+                        <div class="form-file-text" style="font-size: 12px; margin-top: 8px;">
+                            支持格式：.txt, .md
+                        </div>
+                        <div class="file-name" id="oldFileName"></div>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="form-group">
+                    <label class="form-label">📄 新版合同（V2） <span style="color: #dc2626;">*</span></label>
+                    <label class="form-file" id="newFileLabel">
+                        <input type="file" name="new_file" id="newFile" 
+                               accept=".txt,.md" required>
+                        <div class="form-file-icon">📤</div>
+                        <div class="form-file-text">点击或拖拽上传新版合同</div>
+                        <div class="form-file-text" style="font-size: 12px; margin-top: 8px;">
+                            支持格式：.txt, .md
+                        </div>
+                        <div class="file-name" id="newFileName"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="form-group">
+                <label class="form-label">📋 风险规则文件（可选）</label>
+                <label class="form-file" id="rulesFileLabel">
+                    <input type="file" name="rules_file" id="rulesFile" 
+                           accept=".yaml,.yml,.json">
+                    <div class="form-file-icon">⚙️</div>
+                    <div class="form-file-text">点击或拖拽上传规则文件（可选）</div>
+                    <div class="form-file-text" style="font-size: 12px; margin-top: 8px;">
+                        支持格式：.yaml, .yml, .json | 如不上传则仅进行差异对比
+                    </div>
+                    <div class="file-name" id="rulesFileName"></div>
+                </label>
+            </div>
+            
+            <div style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #667eea;">
+                    💡 提示：规则文件示例
+                </div>
+                <pre style="background: white; padding: 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0;">
+rules:
+  - id: amount_increase
+    name: 金额上浮超过20%
+    level: high
+    check_type: amount_increase
+    threshold: 0.2
+    suggestion: 建议复核金额上浮幅度</pre>
+                <p style="margin-top: 10px; font-size: 13px; color: #666;">
+                    更多规则示例请查看 demo/rules.yaml 文件
+                </p>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <button type="submit" class="btn btn-primary" id="submitBtn" 
+                    style="font-size: 18px; padding: 16px 60px;">
+                🔍 开始巡检
+            </button>
+        </div>
+        
+        <div id="submitLoading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p style="font-size: 16px;">正在解析合同并检测差异...</p>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                这可能需要几秒钟，请耐心等待
+            </p>
+        </div>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setupFileUpload(inputId, labelId, nameId) {
+    const input = document.getElementById(inputId);
+    const label = document.getElementById(labelId);
+    const nameDisplay = document.getElementById(nameId);
+    
+    input.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            nameDisplay.textContent = '已选择: ' + file.name;
+            nameDisplay.style.display = 'block';
+        } else {
+            nameDisplay.style.display = 'none';
+        }
+    });
+    
+    label.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#667eea';
+        this.style.background = '#f8f9ff';
+    });
+    
+    label.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e0e0e0';
+        this.style.background = 'transparent';
+    });
+    
+    label.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#e0e0e0';
+        this.style.background = 'transparent';
+        
+        if (e.dataTransfer.files.length > 0) {
+            input.files = e.dataTransfer.files;
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        }
+    });
+}
+
+setupFileUpload('oldFile', 'oldFileLabel', 'oldFileName');
+setupFileUpload('newFile', 'newFileLabel', 'newFileName');
+setupFileUpload('rulesFile', 'rulesFileLabel', 'rulesFileName');
+
+document.getElementById('inspectForm').addEventListener('submit', function(e) {
+    const oldFile = document.getElementById('oldFile').files.length;
+    const newFile = document.getElementById('newFile').files.length;
+    
+    if (oldFile === 0 || newFile === 0) {
+        alert('请上传旧版和新版合同文件');
+        e.preventDefault();
+        return false;
+    }
+    
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('submitLoading').style.display = 'block';
+});
+</script>
+{% endblock %}

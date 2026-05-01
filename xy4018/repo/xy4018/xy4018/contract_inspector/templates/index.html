@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 合同改稿巡检器{% endblock %}
+
+{% block content %}
+    {% if has_demo %}
+    <div class="demo-section">
+        <h2>🚀 快速体验</h2>
+        <p>点击下方按钮，立即体验完整的合同巡检功能（使用预设样例合同）</p>
+        <button id="runDemo" class="btn btn-primary" style="font-size: 18px; padding: 16px 40px;">
+            ✨ 一键运行演示
+        </button>
+        <div id="demoLoading" class="loading" style="margin-top: 20px;">
+            <div class="spinner"></div>
+            <p>正在分析合同差异和风险条款...</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="two-col" style="margin-bottom: 30px;">
+        <div class="card">
+            <div class="card-title">📄 开始新巡检</div>
+            <p style="color: #666; margin-bottom: 20px;">上传两版合同文本，自动检测差异和风险条款</p>
+            <a href="{{ url_for('inspect') }}" class="btn btn-primary">
+                开始巡检 →
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">📋 查看历史记录</div>
+            <p style="color: #666; margin-bottom: 20px;">查看所有巡检任务记录，按客户或合同筛选</p>
+            <a href="{{ url_for('tasks') }}" class="btn btn-secondary">
+                查看历史 →
+            </a>
+        </div>
+    </div>
+
+    {% if recent_tasks %}
+    <div class="card">
+        <div class="card-title">🕐 最近巡检任务</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>客户名称</th>
+                    <th>合同名称</th>
+                    <th>巡检时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in recent_tasks %}
+                <tr>
+                    <td>{{ task.client }}</td>
+                    <td>{{ task.contract_name }}</td>
+                    <td>{{ task.created_at|datetime_format }}</td>
+                    <td>
+                        <a href="{{ url_for('result', task_id=task.id) }}" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;">
+                            查看详情
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3>暂无巡检记录</h3>
+        <p>上传两版合同开始第一次巡检，或点击上方"一键运行演示"体验功能</p>
+    </div>
+    {% endif %}
+
+    <div class="card" style="margin-top: 30px;">
+        <div class="card-title">🔍 支持的风险检测类型</div>
+        <div class="two-col">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">💰</span>
+                <div>
+                    <div style="font-weight: 600;">金额上浮检测</div>
+                    <div style="font-size: 14px; color: #666;">检测合同金额是否超过阈值（如20%）</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">📅</span>
+                <div>
+                    <div style="font-weight: 600;">付款周期变化</div>
+                    <div style="font-size: 14px; color: #666;">检测付款周期是否延长（如30天变60天）</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">🔄</span>
+                <div>
+                    <div style="font-weight: 600;">自动续约风险</div>
+                    <div style="font-size: 14px; color: #666;">检测自动续约条款是否缺少提前通知天数</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">⚖️</span>
+                <div>
+                    <div style="font-weight: 600;">管辖地变更</div>
+                    <div style="font-size: 14px; color: #666;">检测管辖法院是否从本地变更为外地</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">⚠️</span>
+                <div>
+                    <div style="font-weight: 600;">违约金比例</div>
+                    <div style="font-size: 14px; color: #666;">检测违约金比例是否提高</div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+                <span style="font-size: 24px;">🔍</span>
+                <div>
+                    <div style="font-weight: 600;">自定义关键词</div>
+                    <div style="font-size: 14px; color: #666;">支持自定义关键词和正则表达式规则</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('runDemo').addEventListener('click', function() {
+    var btn = this;
+    var loading = document.getElementById('demoLoading');
+    
+    btn.style.display = 'none';
+    loading.style.display = 'block';
+    
+    fetch('{{ url_for("quick_demo") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            alert('演示运行失败: ' + (data.error || '未知错误'));
+            btn.style.display = 'inline-block';
+            loading.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        alert('请求失败: ' + error.message);
+        btn.style.display = 'inline-block';
+        loading.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}
