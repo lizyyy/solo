@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4051",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4051/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传感器网关和手持采集器升级时，常常拿着 U 盘到现场拷固件、校准参数和回滚包；现在靠人工看文件名和 Excel 记录，很容易把设备型号、区域批次、校准日期或固件版本弄错，等设备上线才发现没法追溯。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护设备型号、区域、允许的固件版本、校准包有效期、签名公钥、投递目录和审计输出目录；import-device 能导入设备清单 CSV，字段包括设备号、型号、区域、当前固件、当前校准版本、最后上线时间和负责人；import-package 能导入一个升级包目录，读取 manifest.json，校验固件文件、校准参数、回滚包、版本依赖、SHA256 和签名信息，发现缺文件、同名不同内容、manifest 版本不兼容、校准包过期、设备型号不匹配时要进入 quarantine.json 并说明原因。plan 命令要按设备清单和包清单生成 dry-run 投递计划，支持按区域灰度，识别跨版本跳升、缺少回滚包、设备当前版本未知、同一设备被多个包命中、负责人未确认这些阻断项；apply 命令只能执行无阻断计划，把文件复制到每台设备的投递目录，写入 journal，并在复制后重新计算哈希校验；rollback 命令能根据最近一次 journal 生成安全回滚计划，遇到目标目录被人工改过时要停止并提示；report 命令导出 Markdown 投递报告、CSV 设备结果和 JSON 审计包，history 命令能按设备号、区域、版本和执行日期查询历史投递记录。请把 CLI 入口、配置模型、CSV 解析、manifest/签名校验、投递计划、执行器、回滚 journal、隔离区、持久化、报告导出、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、示例命令，以及如何用临时目录验证 init、导入设备、导入升级包、生成计划、执行投递、校验哈希、回滚和导出审计包这些核心流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4051/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n项目编号：xy4051\n本轮：第一轮\n模型要求：必须使用 Seed-Code-DogFooding\n智能体要求：必须使用 SOLO Coder\n代码目录要求：在仓库根目录创建并只修改 `xy4051/`\n\n原始想法：\n我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传感器网关和手持采集器升级时，常常拿着 U 盘到现场拷固件、校准参数和回滚包；现在靠人工看文件名和 Excel 记录，很容易把设备型号、区域批次、校准日期或固件版本弄错，等设备上线才发现没法追溯。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护设备型号、区域、允许的固件版本、校准包有效期、签名公钥、投递目录和审计输出目录；import-device 能导入设备清单 CSV，字段包括设备号、型号、区域、当前固件、当前校准版本、最后上线时间和负责人；import-package 能导入一个升级包目录，读取 manifest.json，校验固件文件、校准参数、回滚包、版本依赖、SHA256 和签名信息，发现缺文件、同名不同内容、manifest 版本不兼容、校准包过期、设备型号不匹配时要进入 quarantine.json 并说明原因。plan 命令要按设备清单和包清单生成 dry-run 投递计划，支持按区域灰度，识别跨版本跳升、缺少回滚包、设备当前版本未知、同一设备被多个包命中、负责人未确认这些阻断项；apply 命令只能执行无阻断计划，把文件复制到每台设备的投递目录，写入 journal，并在复制后重新计算哈希校验；rollback 命令能根据最近一次 journal 生成安全回滚计划，遇到目标目录被人工改过时要停止并提示；report 命令导出 Markdown 投递报告、CSV 设备结果和 JSON 审计包，history 命令能按设备号、区域、版本和执行日期查询历史投递记录。请把 CLI 入口、配置模型、CSV 解析、manifest/签名校验、投递计划、执行器、回滚 journal、隔离区、持久化、报告导出、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、示例命令，以及如何用临时目录验证 init、导入设备、导入升级包、生成计划、执行投递、校验哈希、回滚和导出审计包这些核心流程。\n\n开发目标：\n- 将上面的想法落成一个不简单、可运行、可演示的项目原型\n- 所有代码集中在 `xy4051/`\n- 如果仓库当前为空，请自行初始化最小但完整的项目结构\n- 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n工作方式要求：\n- 先快速审视当前仓库是否为空、已有文件结构和运行方式\n- 再给出极简执行计划，然后立即开始写代码\n- 不要把大量时间花在空泛分析或模板化总结上\n- 不要偏离需求去做无关的大重构\n- 如需新增依赖，只增加必要依赖，并说明原因\n\n交付要求：\n- 必须给出完整代码\n- 必须给出运行步骤\n- 必须说明关键文件和实现点\n- 如有未完成项，明确列出\n\n验收标准：\n- 项目可以启动或运行\n- 页面或功能不是纯占位\n- 至少包含 3 个以上互相关联的功能点或模块\n- 代码结构清晰，文件划分合理\n- 不要只生成单文件 demo\n\n输出方式：\n- 先简短说明你将创建什么\n- 然后直接开始改文件\n- 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4051/r1",
+  "base_branch_name": "idea/xy4051/base",
+  "parent_branch_name": "idea/xy4051/base",
+  "pr_title": "[xy4051][第一轮] 我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传",
+  "session_id": "69f49442e644eb6dd6d4c8d4",
+  "message_id": "69f4946ac3fe1a24159d6129",
+  "trace_id": null,
+  "task_type": "0-1代码生成",
+  "business_domain": "端侧与基础工具",
+  "modification_scope": "跨模块多文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4051/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4051/repo/xy4051",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4051/base...idea/xy4051/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T19:52:49.856120+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4051/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4051/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4051"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4051/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4051/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4051/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4051/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传感器网关和手持采集器升级时，常常拿着 U 盘到现场拷固件、校准参数和回滚包；现在靠人工看文件名和 Excel 记录，很容易把设备型号、区域批次、校准日期或固件版本弄错，等设备上线才发现没法追溯。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护设备型号、区域、允许的固件版本、校准包有效期、签名公钥、投递目录和审计输出目录；import-device 能导入设备清单 CSV，字段包括设备号、型号、区域、当前固件、当前校准版本、最后上线时间和负责人；import-package 能导入一个升级包目录，读取 manifest.json，校验固件文件、校准参数、回滚包、版本依赖、SHA256 和签名信息，发现缺文件、同名不同内容、manifest 版本不兼容、校准包过期、设备型号不匹配时要进入 quarantine.json 并说明原因。plan 命令要按设备清单和包清单生成 dry-run 投递计划，支持按区域灰度，识别跨版本跳升、缺少回滚包、设备当前版本未知、同一设备被多个包命中、负责人未确认这些阻断项；apply 命令只能执行无阻断计划，把文件复制到每台设备的投递目录，写入 journal，并在复制后重新计算哈希校验；rollback 命令能根据最近一次 journal 生成安全回滚计划，遇到目标目录被人工改过时要停止并提示；report 命令导出 Markdown 投递报告、CSV 设备结果和 JSON 审计包，history 命令能按设备号、区域、版本和执行日期查询历史投递记录。请把 CLI 入口、配置模型、CSV 解析、manifest/签名校验、投递计划、执行器、回滚 journal、隔离区、持久化、报告导出、示例数据和测试拆成多个文件，不要写成一个大脚本。README 里写清楚安装方式、示例命令，以及如何用临时目录验证 init、导入设备、导入升级包、生成计划、执行投递、校验哈希、回滚和导出审计包这些核心流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T19:54:19.807680+08:00"
+}

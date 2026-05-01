@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4051",
+  "idea_short_title": "我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传感器网关和手持采集器",
+  "folder_name": "xy4051",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4051",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "端侧与基础工具",
+    "修改范围": "跨模块多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4051/base",
+    "round_branch": "idea/xy4051/r1",
+    "pr_title": "[xy4051][第一轮] 我想做一个给现场设备维护工程师用的本地命令行工具，叫“固件校准包投递员”。我们给一批离线巡检终端、传",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4051/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4051/base...idea/xy4051/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4051/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4051/xy4051.xlsx",
+    "uid": "xy4051",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4051/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4051/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4051/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4051/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4051/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T19:52:48.157199+08:00"
+}
