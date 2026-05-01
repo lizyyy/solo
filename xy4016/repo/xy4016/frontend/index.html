@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>轮班交接风险看板</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>轮班交接风险看板</h1>
+      <div class="header-actions">
+        <button id="refreshBtn" class="btn btn-secondary">
+          <span>🔄</span> 刷新数据
+        </button>
+        <div class="csv-actions">
+          <label for="importFile" class="btn btn-secondary">
+            <span>📥</span> 导入CSV
+          </label>
+          <input type="file" id="importFile" accept=".csv" hidden>
+          <button id="exportBtn" class="btn btn-primary">
+            <span>📤</span> 导出CSV
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="risk-summary" id="riskSummary">
+    </div>
+
+    <div class="main-container">
+      <aside class="sidebar">
+        <div class="form-section">
+          <h2>📝 新增交接事项</h2>
+          <form id="issueForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shift">班次 *</label>
+                <select id="shift" required>
+                  <option value="白班">白班</option>
+                  <option value="晚班">晚班</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="assignee">负责人 *</label>
+                <input type="text" id="assignee" placeholder="请输入负责人姓名" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="customer">客户</label>
+                <input type="text" id="customer" placeholder="客户名称">
+              </div>
+              <div class="form-group">
+                <label for="ticketNo">工单号</label>
+                <input type="text" id="ticketNo" placeholder="工单编号">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="riskLevel">风险等级 *</label>
+                <select id="riskLevel" required>
+                  <option value="低">低</option>
+                  <option value="中" selected>中</option>
+                  <option value="高">高</option>
+                  <option value="紧急">紧急</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="deadline">截止时间 *</label>
+                <input type="datetime-local" id="deadline" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tags">标签</label>
+              <input type="text" id="tags" placeholder="多个标签用逗号分隔，如：紧急,新用户,退款">
+              <small class="form-hint">标签将显示在看板上，用于快速识别</small>
+            </div>
+
+            <div class="form-group">
+              <label for="status">初始状态</label>
+              <select id="status">
+                <option value="待处理" selected>待处理</option>
+                <option value="处理中">处理中</option>
+                <option value="待复盘">待复盘</option>
+                <option value="已关闭">已关闭</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="description">问题描述 *</label>
+              <textarea id="description" rows="4" placeholder="详细描述交接的问题和要求..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+              ➕ 添加交接事项
+            </button>
+          </form>
+        </div>
+
+        <div class="filter-section">
+          <h3>🔍 筛选条件</h3>
+          <div class="form-group">
+            <label for="filterShift">班次</label>
+            <select id="filterShift">
+              <option value="">全部班次</option>
+              <option value="白班">白班</option>
+              <option value="晚班">晚班</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filterAssignee">负责人</label>
+            <input type="text" id="filterAssignee" placeholder="输入负责人筛选">
+          </div>
+          <div class="form-group">
+            <label for="filterRiskLevel">风险等级</label>
+            <select id="filterRiskLevel">
+              <option value="">全部等级</option>
+              <option value="低">低</option>
+              <option value="中">中</option>
+              <option value="高">高</option>
+              <option value="紧急">紧急</option>
+            </select>
+          </div>
+          <button id="applyFilterBtn" class="btn btn-secondary btn-full">
+            应用筛选
+          </button>
+          <button id="clearFilterBtn" class="btn btn-secondary btn-full" style="margin-top: 8px;">
+            清除筛选
+          </button>
+        </div>
+
+        <div class="batch-actions" id="batchActions" style="display: none;">
+          <h3>⚡ 批量操作</h3>
+          <div class="form-group">
+            <label>已选择 <span id="selectedCount">0</span> 个事项</label>
+            <select id="batchStatus">
+              <option value="">选择新状态...</option>
+              <option value="处理中">处理中</option>
+              <option value="待复盘">待复盘</option>
+              <option value="已关闭">已关闭</option>
+            </select>
+          </div>
+          <button id="applyBatchBtn" class="btn btn-warning btn-full">
+            批量更新状态
+          </button>
+          <button id="cancelBatchBtn" class="btn btn-secondary btn-full" style="margin-top: 8px;">
+            取消选择
+          </button>
+        </div>
+      </aside>
+
+      <main class="board">
+        <div class="board-columns">
+          <div class="column column-overdue" data-group="overdueSoon">
+            <div class="column-header">
+              <span class="column-icon">⏰</span>
+              <span class="column-title">即将超时</span>
+              <span class="column-count" id="count-overdueSoon">0</span>
+            </div>
+            <div class="column-body" id="column-overdueSoon">
+            </div>
+          </div>
+
+          <div class="column column-high-risk" data-group="highRiskUnresolved">
+            <div class="column-header">
+              <span class="column-icon">🔥</span>
+              <span class="column-title">高风险未处理</span>
+              <span class="column-count" id="count-highRiskUnresolved">0</span>
+            </div>
+            <div class="column-body" id="column-highRiskUnresolved">
+            </div>
+          </div>
+
+          <div class="column column-review" data-group="pendingReview">
+            <div class="column-header">
+              <span class="column-icon">📋</span>
+              <span class="column-title">待复盘</span>
+              <span class="column-count" id="count-pendingReview">0</span>
+            </div>
+            <div class="column-body" id="column-pendingReview">
+            </div>
+          </div>
+
+          <div class="column column-closed" data-group="closed">
+            <div class="column-header">
+              <span class="column-icon">✅</span>
+              <span class="column-title">已关闭</span>
+              <span class="column-count" id="count-closed">0</span>
+            </div>
+            <div class="column-body" id="column-closed">
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal" id="issueModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>事项详情</h3>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="modalCloseBtn">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
