@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自习室预约管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>自习室预约管理系统</h1>
+            <p>营业时间：08:00 - 22:00</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="board">今日座位板</button>
+            <button class="tab-btn" data-tab="balances">学员余额</button>
+            <button class="tab-btn" data-tab="records">请假补签流水</button>
+            <button class="tab-btn" data-tab="reservation">预约管理</button>
+            <button class="tab-btn" data-tab="students">学员管理</button>
+            <button class="tab-btn" data-tab="seats">座位管理</button>
+        </nav>
+
+        <main>
+            <!-- 今日座位板 -->
+            <section id="board" class="tab-content active">
+                <div class="section-header">
+                    <h2>今日座位板</h2>
+                    <div class="date-filter">
+                        <label>选择日期：</label>
+                        <input type="date" id="board-date" value="">
+                        <button onclick="loadBoard()">查询</button>
+                    </div>
+                    <button class="btn-export" onclick="exportReservations()">导出CSV</button>
+                </div>
+                <div id="board-container" class="board-container">
+                    <!-- 座位板内容将通过JS动态生成 -->
+                </div>
+            </section>
+
+            <!-- 学员余额 -->
+            <section id="balances" class="tab-content">
+                <div class="section-header">
+                    <h2>学员余额列表</h2>
+                    <button class="btn-export" onclick="exportBalances()">导出CSV</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>学员ID</th>
+                            <th>姓名</th>
+                            <th>电话</th>
+                            <th>总小时数</th>
+                            <th>已使用</th>
+                            <th>剩余余额</th>
+                            <th>补签额度</th>
+                            <th>更新时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="balances-body">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 请假补签流水 -->
+            <section id="records" class="tab-content">
+                <div class="section-header">
+                    <h2>请假补签流水</h2>
+                    <div class="date-filter">
+                        <label>选择日期：</label>
+                        <input type="date" id="records-date">
+                        <button onclick="loadRecords()">查询</button>
+                        <button onclick="loadRecords('')">全部</button>
+                    </div>
+                    <button class="btn-export" onclick="exportLeaveRecords()">导出CSV</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>记录ID</th>
+                            <th>学员</th>
+                            <th>类型</th>
+                            <th>小时数</th>
+                            <th>日期</th>
+                            <th>状态</th>
+                            <th>描述</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-body">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 预约管理 -->
+            <section id="reservation" class="tab-content">
+                <div class="section-header">
+                    <h2>预约管理</h2>
+                    <button class="btn-primary" onclick="showReservationModal()">新建预约</button>
+                    <button class="btn-primary" onclick="showMakeupModal()">补签预约</button>
+                </div>
+                <div class="filter-bar">
+                    <label>日期筛选：</label>
+                    <input type="date" id="reservation-date">
+                    <button onclick="loadReservations()">查询</button>
+                    <button onclick="loadReservations('')">全部</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>预约ID</th>
+                            <th>学员</th>
+                            <th>座位</th>
+                            <th>日期</th>
+                            <th>时间段</th>
+                            <th>时长</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservation-body">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 学员管理 -->
+            <section id="students" class="tab-content">
+                <div class="section-header">
+                    <h2>学员管理</h2>
+                    <button class="btn-primary" onclick="showStudentModal()">新增学员</button>
+                    <button class="btn-primary" onclick="showPackageModal()">购买套餐</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>学员ID</th>
+                            <th>姓名</th>
+                            <th>电话</th>
+                            <th>邮箱</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-body">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 座位管理 -->
+            <section id="seats" class="tab-content">
+                <div class="section-header">
+                    <h2>座位管理</h2>
+                    <button class="btn-primary" onclick="showSeatModal()">新增座位</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>座位ID</th>
+                            <th>座位名称</th>
+                            <th>位置</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seats-body">
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框：新建预约 -->
+    <div id="reservation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建预约</h3>
+                <span class="close" onclick="closeModal('reservation-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="reservation-form">
+                    <div class="form-group">
+                        <label>学员 *</label>
+                        <select id="reservation-student" required>
+                            <option value="">请选择学员</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>座位 *</label>
+                        <select id="reservation-seat" required>
+                            <option value="">请选择座位</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>日期 *</label>
+                        <input type="date" id="reservation-date-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间 *</label>
+                        <input type="time" id="reservation-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label>结束时间 *</label>
+                        <input type="time" id="reservation-end" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">确认预约</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('reservation-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：补签预约 -->
+    <div id="makeup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>补签预约（使用补签额度）</h3>
+                <span class="close" onclick="closeModal('makeup-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="makeup-form">
+                    <div class="form-group">
+                        <label>学员 *</label>
+                        <select id="makeup-student" required>
+                            <option value="">请选择学员（仅显示有补签额度的学员）</option>
+                        </select>
+                        <small id="makeup-balance-info"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>座位 *</label>
+                        <select id="makeup-seat" required>
+                            <option value="">请选择座位</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>日期 *</label>
+                        <input type="date" id="makeup-date-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间 *</label>
+                        <input type="time" id="makeup-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label>结束时间 *</label>
+                        <input type="time" id="makeup-end" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">确认补签</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('makeup-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：新增学员 -->
+    <div id="student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增学员</h3>
+                <span class="close" onclick="closeModal('student-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="student-form">
+                    <div class="form-group">
+                        <label>姓名 *</label>
+                        <input type="text" id="student-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>电话</label>
+                        <input type="tel" id="student-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="student-email">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('student-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：购买套餐 -->
+    <div id="package-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>购买套餐</h3>
+                <span class="close" onclick="closeModal('package-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="package-form">
+                    <div class="form-group">
+                        <label>学员 *</label>
+                        <select id="package-student" required>
+                            <option value="">请选择学员</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>购买小时数 *</label>
+                        <input type="number" id="package-hours" min="1" step="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>价格</label>
+                        <input type="number" id="package-price" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>购买日期</label>
+                        <input type="date" id="package-date">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">确认购买</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('package-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：新增座位 -->
+    <div id="seat-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增座位</h3>
+                <span class="close" onclick="closeModal('seat-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="seat-form">
+                    <div class="form-group">
+                        <label>座位名称 *</label>
+                        <input type="text" id="seat-name" required placeholder="如：A1、B2">
+                    </div>
+                    <div class="form-group">
+                        <label>位置</label>
+                        <input type="text" id="seat-location" placeholder="如：靠窗区、中心区">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" class="btn-secondary" onclick="closeModal('seat-modal')">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
