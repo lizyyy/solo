@@ -1,0 +1,33 @@
+{
+  "events": [
+    {
+      "event_id": "E20250501001",
+      "origin_time": "2025-05-01T10:30:00",
+      "latitude": 31.8,
+      "longitude": 113.5,
+      "depth": 10.0,
+      "magnitude": 3.2,
+      "arrivals": [
+        {"station": "QISH", "phase": "P", "time": "2025-05-01T10:30:05.2"},
+        {"station": "QISH", "phase": "S", "time": "2025-05-01T10:30:08.5"},
+        {"station": "WUHAN", "phase": "P", "time": "2025-05-01T10:30:12.1"},
+        {"station": "WUHAN", "phase": "S", "time": "2025-05-01T10:30:18.3"},
+        {"station": "XIAN", "phase": "P", "time": "2025-05-01T10:30:20.5"},
+        {"station": "XIAN", "phase": "S", "time": "2025-05-01T10:30:28.2"}
+      ]
+    },
+    {
+      "event_id": "E20250501002",
+      "origin_time": "2025-05-01T14:15:00",
+      "latitude": 32.1,
+      "longitude": 112.8,
+      "depth": 15.0,
+      "magnitude": 2.8,
+      "arrivals": [
+        {"station": "QISH", "phase": "P", "time": "2025-05-01T14:15:04.8"},
+        {"station": "WUHAN", "phase": "P", "time": "2025-05-01T14:15:10.2"},
+        {"station": "XIANGL", "phase": "P", "time": "2025-05-01T14:15:15.6"}
+      ]
+    }
+  ]
+}
