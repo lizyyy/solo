@@ -1,0 +1,20 @@
+[project]
+name = "customs-inspector"
+version = "0.1.0"
+description = "跨境报关资料预检与补证清单生成器"
+requires-python = ">=3.9"
+dependencies = [
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+customs-inspector = "customs_inspector.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

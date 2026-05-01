@@ -1,0 +1,21 @@
+{
+  "ticket_no": "TKT002",
+  "packing_date": "2024-05-09",
+  "total_weight": 350,
+  "total_volume": 10.5,
+  "items": [
+    {
+      "ticket_no": "TKT002",
+      "container_no": "MSKU1234567",
+      "description": "纺织布料 Textile Fabric",
+      "hs_code": "",
+      "weight": 350,
+      "weight_unit": "KG",
+      "volume": 10.5,
+      "volume_unit": "CBM",
+      "quantity": 200,
+      "package_type": "ROLL",
+      "marks": "TEXTILE GOODS"
+    }
+  ]
+}
