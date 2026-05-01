@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>同步节拍工坊</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>同步节拍工坊</h1>
+        </header>
+        
+        <main>
+            <div id="game-container">
+                <canvas id="game-canvas"></canvas>
+                
+                <div id="game-ui" class="hidden">
+                    <div class="score-display">
+                        <div class="score-item">
+                            <span class="label">分数</span>
+                            <span id="score" class="value">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">连击</span>
+                            <span id="combo" class="value">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="label">最高连击</span>
+                            <span id="max-combo" class="value">0</span>
+                        </div>
+                    </div>
+                    
+                    <div id="judgement" class="hidden"></div>
+                </div>
+                
+                <div id="start-screen" class="screen">
+                    <h2>选择谱面</h2>
+                    <div id="chart-list" class="chart-list"></div>
+                    <div class="controls-info">
+                        <p>操作说明：</p>
+                        <p>← → ↑ ↓ 方向键击打音符</p>
+                        <p>ESC 暂停游戏</p>
+                    </div>
+                    <button id="editor-btn" class="btn">谱面编辑器</button>
+                </div>
+                
+                <div id="pause-screen" class="screen hidden">
+                    <h2>游戏暂停</h2>
+                    <div class="button-group">
+                        <button id="resume-btn" class="btn">继续游戏</button>
+                        <button id="restart-btn" class="btn">重新开始</button>
+                        <button id="quit-btn" class="btn">返回主菜单</button>
+                    </div>
+                </div>
+                
+                <div id="result-screen" class="screen hidden">
+                    <h2>游戏结束</h2>
+                    <div class="result-info">
+                        <div class="result-item">
+                            <span class="label">最终分数</span>
+                            <span id="final-score" class="value">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">最高连击</span>
+                            <span id="final-max-combo" class="value">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">Perfect</span>
+                            <span id="perfect-count" class="value">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">Good</span>
+                            <span id="good-count" class="value">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">Miss</span>
+                            <span id="miss-count" class="value">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">历史最高</span>
+                            <span id="high-score" class="value">0</span>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button id="retry-btn" class="btn">再来一次</button>
+                        <button id="back-btn" class="btn">返回主菜单</button>
+                    </div>
+                </div>
+                
+                <div id="editor-screen" class="screen hidden">
+                    <h2>谱面编辑器</h2>
+                    <div class="editor-controls">
+                        <div class="control-group">
+                            <label>谱面名称:</label>
+                            <input type="text" id="chart-name" placeholder="输入谱面名称">
+                        </div>
+                        <div class="control-group">
+                            <label>BPM:</label>
+                            <input type="number" id="chart-bpm" value="120" min="30" max="300">
+                        </div>
+                        <div class="control-group">
+                            <label>节拍间隔 (秒):</label>
+                            <input type="number" id="chart-interval" value="0.5" min="0.1" max="2" step="0.1">
+                        </div>
+                    </div>
+                    
+                    <div class="editor-grid">
+                        <canvas id="editor-canvas"></canvas>
+                    </div>
+                    
+                    <div class="editor-buttons">
+                        <button id="place-left" class="btn direction-btn left">←</button>
+                        <button id="place-down" class="btn direction-btn down">↓</button>
+                        <button id="place-up" class="btn direction-btn up">↑</button>
+                        <button id="place-right" class="btn direction-btn right">→</button>
+                        <button id="clear-note" class="btn">清除当前</button>
+                    </div>
+                    
+                    <div class="editor-buttons">
+                        <button id="preview-chart" class="btn">预览谱面</button>
+                        <button id="save-chart" class="btn">保存谱面</button>
+                        <button id="load-chart" class="btn">加载谱面</button>
+                        <button id="editor-back" class="btn">返回</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/gameState.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/editor.js"></script>
+    <script src="js/main.js"></script>
+    <script src="tests/tests.js"></script>
+</body>
+</html>
