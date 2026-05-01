@@ -1,0 +1,130 @@
+name: gateway_firmware_test_scene
+description: 网关固件测试场景脚本 - 设备初始化与状态监控
+version: "1.0"
+author: "Embedded Test Team"
+created_at: "2026-05-02"
+
+scenarios:
+  - id: S001
+    name: 设备上电初始化
+    description: 验证设备上电后的初始化流程
+    expected_frames:
+      - direction: request
+        function_code: "03"
+        register_address: 0
+        description: 读取设备ID
+      
+      - direction: response
+        function_code: "03"
+        register_address: 0
+        expected_data: [0x00, 0x01]
+        description: 设备ID应为1
+      
+      - direction: request
+        function_code: "03"
+        register_address: 1
+        register_count: 2
+        description: 读取固件版本
+    
+    expected_states:
+      - from: IDLE
+        to: REQUEST_SENT
+        trigger: send_request
+      
+      - from: REQUEST_SENT
+        to: RESPONSE_RECEIVED
+        trigger: valid_response
+      
+      - from: RESPONSE_RECEIVED
+        to: IDLE
+        trigger: reset
+
+  - id: S002
+    name: 传感器数据轮询
+    description: 验证传感器数据读取流程
+    timeout_ms: 1000
+    expected_frames:
+      - direction: request
+        slave_address: 2
+        function_code: "03"
+        register_address: 100
+        register_count: 2
+        description: 读取温湿度传感器
+      
+      - direction: response
+        slave_address: 2
+        function_code: "03"
+        min_data_length: 4
+        description: 温湿度数据响应
+
+  - id: S003
+    name: 控制输出测试
+    description: 验证线圈控制功能
+    expected_frames:
+      - direction: request
+        function_code: "05"
+        register_address: 200
+        description: 写入输出使能线圈
+      
+      - direction: response
+        function_code: "05"
+        register_address: 200
+        description: 写入确认响应
+
+  - id: S004
+    name: 故障注入测试
+    description: 用于测试故障注入功能的场景
+    fault_injections:
+      - type: corrupt_crc
+        trigger: frame
+        trigger_value: 5
+        description: 在第5帧注入CRC错误
+      
+      - type: timeout
+        trigger: frame
+        trigger_value: 10
+        parameters:
+          timeout_duration: 5000
+        description: 在第10帧注入超时
+
+breakpoints:
+  - type: error_frame
+    enabled: true
+    name: "错误帧断点"
+    description: "遇到错误帧时暂停"
+  
+  - type: function_code
+    value: "05"
+    enabled: true
+    name: "写线圈断点"
+    description: "写线圈操作时暂停"
+
+validation_rules:
+  - name: "响应时间检查"
+    rule: "response_time < 500ms"
+    severity: "high"
+  
+  - name: "CRC完整性"
+    rule: "crc_valid == true"
+    severity: "critical"
+  
+  - name: "从机地址范围"
+    rule: "slave_address between 1 and 10"
+    severity: "high"
+
+test_cases:
+  - id: TC001
+    name: "正常通信测试"
+    scenario: S001
+    expected_anomalies: 0
+  
+  - id: TC002
+    name: "超时模拟测试"
+    scenario: S002
+    fault_injections:
+      - type: timeout
+        trigger: frame
+        trigger_value: 3
+    expected_anomalies:
+      - type: timeout
+        count: 1

@@ -1,0 +1,82 @@
+name: modbus_gateway_config
+protocol_type: modbus_rtu
+baud_rate: 19200
+data_bits: 8
+stop_bits: 1.0
+parity: N
+slave_address_range:
+  - 1
+  - 10
+register_range:
+  - 0
+  - 1000
+timeout_ms: 500
+max_retry_count: 3
+
+frame_formats:
+  - name: modbus_rtu_timestamped
+    pattern: ^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+)\s+([RTX])\s+([0-9A-Fa-f\s]+)$
+    description: 带时间戳的Modbus RTU帧格式
+  - name: simple_hex
+    pattern: ^([0-9A-Fa-f\s]+)$
+    description: 简单十六进制格式
+
+registers:
+  - address: 0
+    name: Device_ID
+    type: holding_register
+    description: 设备ID寄存器
+    min_value: 1
+    max_value: 255
+    unit: ""
+  
+  - address: 1
+    name: Firmware_Version_Major
+    type: holding_register
+    description: 固件版本主版本号
+  
+  - address: 2
+    name: Firmware_Version_Minor
+    type: holding_register
+    description: 固件版本次版本号
+  
+  - address: 10
+    name: Status_Word
+    type: holding_register
+    description: 设备状态字
+    min_value: 0
+    max_value: 65535
+  
+  - address: 100
+    name: Sensor_Temperature
+    type: input_register
+    description: 温度传感器读数
+    scale: 0.1
+    unit: "°C"
+  
+  - address: 101
+    name: Sensor_Humidity
+    type: input_register
+    description: 湿度传感器读数
+    scale: 0.1
+    unit: "%"
+  
+  - address: 200
+    name: Control_Output_Enable
+    type: coil
+    description: 输出使能线圈
+  
+  - address: 201
+    name: Alarm_Trigger
+    type: coil
+    description: 报警触发线圈
+  
+  - address: 300
+    name: Fault_Status_1
+    type: discrete_input
+    description: 故障状态输入1
+  
+  - address: 301
+    name: Fault_Status_2
+    type: discrete_input
+    description: 故障状态输入2
