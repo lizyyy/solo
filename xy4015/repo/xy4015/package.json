@@ -1,0 +1,26 @@
+{
+  "name": "gym-booking-system",
+  "version": "1.0.0",
+  "description": "健身工作室会员预约和爽约扣课系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-db": "node database/init.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "path": "^0.12.7"
+  },
+  "keywords": [
+    "gym",
+    "booking",
+    "fitness",
+    "会员预约"
+  ],
+  "author": "",
+  "license": "MIT"
+}

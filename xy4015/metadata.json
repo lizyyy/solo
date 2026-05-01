@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4015",
+  "idea_short_title": "我想从零做一个给小型健身工作室用的会员预约和爽约扣课小系统：有一个浏览器页面给前台录入会员、课程、教练排班和预约，数据要",
+  "folder_name": "xy4015",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4015",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "全栈Web应用",
+    "修改范围": "跨系统多模块"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4015/base",
+    "round_branch": "idea/xy4015/r1",
+    "pr_title": "[xy4015][第一轮] 我想从零做一个给小型健身工作室用的会员预约和爽约扣课小系统：有一个浏览器页面给前台录入会员、课程、教",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4015/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4015/base...idea/xy4015/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4015/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4015/xy4015.xlsx",
+    "uid": "xy4015",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4015/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4015/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4015/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4015/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4015/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T13:36:51.207785+08:00"
+}
