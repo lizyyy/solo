@@ -1,0 +1,24 @@
+{
+  "name": "video-quality-check",
+  "version": "1.0.0",
+  "description": "短视频素材质检 CLI 工具",
+  "main": "src/cli.js",
+  "bin": {
+    "vqc": "./bin/vqc"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parse": "^5.5.0",
+    "js-yaml": "^4.1.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  },
+  "type": "module"
+}
