@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民宿房态交接和异常追踪系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card.overdue {
+            border-left-color: #e74c3c;
+            background: #fef2f2;
+        }
+        
+        .stat-card.pending {
+            border-left-color: #f39c12;
+            background: #fff9e6;
+        }
+        
+        .stat-card.in-progress {
+            border-left-color: #3498db;
+            background: #e8f4fd;
+        }
+        
+        .stat-card.completed {
+            border-left-color: #27ae60;
+            background: #e8f8ef;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e68900;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d63727;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tasks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .room-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .room-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+        
+        .room-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .room-info p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .room-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-available { background: #e8f8ef; color: #27ae60; }
+        .status-occupied { background: #e8f4fd; color: #3498db; }
+        .status-maintenance { background: #fff9e6; color: #f39c12; }
+        
+        .room-tasks {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .task-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-item:hover {
+            background: #f9f9f9;
+        }
+        
+        .task-item.overdue {
+            background: #fef2f2;
+            border-left: 3px solid #e74c3c;
+        }
+        
+        .task-item.overdue:hover {
+            background: #fee2e2;
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 5px;
+        }
+        
+        .task-title {
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .task-type {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .type-checkin { background: #e8f4fd; color: #3498db; }
+        .type-checkout { background: #e8f8ef; color: #27ae60; }
+        .type-cleaning { background: #fff9e6; color: #f39c12; }
+        .type-maintenance { background: #f3e5f5; color: #9b59b6; }
+        .type-complaint { background: #fef2f2; color: #e74c3c; }
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .task-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .status-pending { background: #fff9e6; color: #f39c12; }
+        .status-in_progress { background: #e8f4fd; color: #3498db; }
+        .status-pending_review { background: #f3e5f5; color: #9b59b6; }
+        .status-completed { background: #e8f8ef; color: #27ae60; }
+        .status-overdue { background: #fef2f2; color: #e74c3c; }
+        
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafbfc;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            line-height: 1;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .task-actions .btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .logs-container {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .log-item {
+            padding: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 12px;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            color: #999;
+            margin-left: 8px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .alert.active {
+            display: block;
+        }
+        
+        .alert-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        
+        .alert-success {
+            background: #e8f8ef;
+            border: 1px solid #bbf7d0;
+            color: #16a34a;
+        }
+        
+        .alert-warning {
+            background: #fff9e6;
+            border: 1px solid #fde68a;
+            color: #ca8a04;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .import-export {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .room-management {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .room-management h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .room-manage-card {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .room-manage-info h4 {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .room-manage-info p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-row {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .import-export {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 民宿房态交接和异常追踪系统</h1>
+        </header>
+        
+        <div class="stats-bar" id="statsBar">
+        </div>
+        
+        <div class="import-export">
+            <div class="file-input-wrapper">
+                <button class="btn btn-warning" id="importBtn">📥 导入CSV</button>
+                <input type="file" id="csvFileInput" accept=".csv">
+            </div>
+            <button class="btn btn-success" id="exportBtn">📤 导出筛选结果</button>
+            <button class="btn btn-secondary" id="toggleRoomsBtn">🏨 房间管理</button>
+        </div>
+        
+        <div class="room-management" id="roomManagement" style="display: none;">
+            <h3>房间管理</h3>
+            <div class="rooms-grid" id="roomsGrid">
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" id="addRoomBtn">+ 添加房间</button>
+            </div>
+        </div>
+        
+        <div class="alert alert-danger" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
+        
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>任务类型</label>
+                    <select id="filterType">
+                        <option value="">全部类型</option>
+                        <option value="checkin">入住</option>
+                        <option value="checkout">退房</option>
+                        <option value="cleaning">保洁</option>
+                        <option value="maintenance">维修</option>
+                        <option value="complaint">客诉</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>任务状态</label>
+                    <select id="filterStatus">
+                        <option value="">全部状态</option>
+                        <option value="pending">待接单</option>
+                        <option value="in_progress">处理中</option>
+                        <option value="pending_review">待复核</option>
+                        <option value="completed">已完成</option>
+                        <option value="overdue">已逾期</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>日期</label>
+                    <input type="date" id="filterDate">
+                </div>
+                
+                <div class="filter-group">
+                    <label>负责人</label>
+                    <select id="filterAssignee">
+                        <option value="">全部负责人</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <button class="btn btn-primary" id="createTaskBtn">+ 新建任务</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tasks-container" id="tasksContainer">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="9" y1="9" x2="15" y2="9"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                <p>暂无任务数据</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="taskModalTitle">新建任务</h2>
+                <button class="modal-close" id="closeTaskModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" id="taskFormError"></div>
+                
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>房间 *</label>
+                            <select id="taskRoomId" required>
+                                <option value="">选择房间</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>任务类型 *</label>
+                            <select id="taskType" required>
+                                <option value="checkin">入住</option>
+                                <option value="checkout">退房</option>
+                                <option value="cleaning">保洁</option>
+                                <option value="maintenance">维修</option>
+                                <option value="complaint">客诉</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>任务标题 *</label>
+                        <input type="text" id="taskTitle" placeholder="输入任务标题" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>任务描述</label>
+                        <textarea id="taskDescription" placeholder="输入任务描述"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>负责人</label>
+                            <input type="text" id="taskAssignee" placeholder="输入负责人姓名">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>优先级</label>
+                            <select id="taskPriority">
+                                <option value="low">低</option>
+                                <option value="normal" selected>普通</option>
+                                <option value="high">高</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>开始时间 *</label>
+                            <input type="datetime-local" id="taskStartTime" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>结束时间 *</label>
+                            <input type="datetime-local" id="taskEndTime" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="statusEditGroup" style="display: none;">
+                        <label>任务状态</label>
+                        <select id="taskStatus">
+                            <option value="pending">待接单</option>
+                            <option value="in_progress">处理中</option>
+                            <option value="pending_review">待复核</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelTaskBtn">取消</button>
+                <button class="btn btn-primary" id="saveTaskBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="taskDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="detailTaskTitle">任务详情</h2>
+                <button class="modal-close" id="closeDetailModal">&times;</button>
+            </div>
+            <div class="modal-body" id="taskDetailContent">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+                <button class="btn btn-primary" id="editDetailBtn">编辑</button>
+                <button class="btn btn-danger" id="deleteDetailBtn">删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="roomModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="roomModalTitle">添加房间</h2>
+                <button class="modal-close" id="closeRoomModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" id="roomFormError"></div>
+                
+                <form id="roomForm">
+                    <input type="hidden" id="roomId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>房间号 *</label>
+                            <input type="text" id="roomNumber" placeholder="例如：101" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>楼层</label>
+                            <input type="number" id="roomFloor" placeholder="例如：1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>房间类型</label>
+                            <input type="text" id="roomType" placeholder="例如：大床房、标间">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>容纳人数</label>
+                            <input type="number" id="roomCapacity" placeholder="例如：2">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>房间状态</label>
+                        <select id="roomStatus">
+                            <option value="available">空闲</option>
+                            <option value="occupied">占用</option>
+                            <option value="maintenance">维修中</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelRoomBtn">取消</button>
+                <button class="btn btn-primary" id="saveRoomBtn">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        
+        const TASK_TYPE_NAMES = {
+            checkin: '入住',
+            checkout: '退房',
+            cleaning: '保洁',
+            maintenance: '维修',
+            complaint: '客诉'
+        };
+        
+        const STATUS_NAMES = {
+            pending: '待接单',
+            in_progress: '处理中',
+            pending_review: '待复核',
+            completed: '已完成',
+            overdue: '已逾期'
+        };
+        
+        let currentTasks = [];
+        let currentRooms = [];
+        let currentFilterParams = {};
+        let selectedTaskId = null;
+        let selectedRoomId = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initDateInputs();
+            loadAllData();
+            setupEventListeners();
+        });
+        
+        function initDateInputs() {
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            document.getElementById('filterDate').value = dateStr;
+            
+            const startInput = document.getElementById('taskStartTime');
+            const endInput = document.getElementById('taskEndTime');
+            const nowStr = today.toISOString().slice(0, 16);
+            startInput.value = nowStr;
+            
+            const twoHoursLater = new Date(today.getTime() + 2 * 60 * 60 * 1000);
+            endInput.value = twoHoursLater.toISOString().slice(0, 16);
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('filterType').addEventListener('change', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('filterDate').addEventListener('change', applyFilters);
+            document.getElementById('filterAssignee').addEventListener('change', applyFilters);
+            
+            document.getElementById('createTaskBtn').addEventListener('click', openCreateTaskModal);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('csvFileInput').click());
+            document.getElementById('exportBtn').addEventListener('click', exportCSV);
+            document.getElementById('toggleRoomsBtn').addEventListener('click', toggleRoomManagement);
+            document.getElementById('csvFileInput').addEventListener('change', handleCSVImport);
+            
+            document.getElementById('closeTaskModal').addEventListener('click', closeTaskModal);
+            document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
+            document.getElementById('saveTaskBtn').addEventListener('click', saveTask);
+            
+            document.getElementById('closeDetailModal').addEventListener('click', closeTaskDetailModal);
+            document.getElementById('closeDetailBtn').addEventListener('click', closeTaskDetailModal);
+            document.getElementById('editDetailBtn').addEventListener('click', editTaskFromDetail);
+            document.getElementById('deleteDetailBtn').addEventListener('click', deleteTask);
+            
+            document.getElementById('closeRoomModal').addEventListener('click', closeRoomModal);
+            document.getElementById('cancelRoomBtn').addEventListener('click', closeRoomModal);
+            document.getElementById('saveRoomBtn').addEventListener('click', saveRoom);
+            document.getElementById('addRoomBtn').addEventListener('click', openCreateRoomModal);
+            
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+        
+        async function loadAllData() {
+            await Promise.all([
+                loadStats(),
+                loadRooms(),
+                loadTasks()
+            ]);
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/stats`);
+                const stats = await response.json();
+                renderStats(stats);
+                updateAssigneeFilter(stats.assignees);
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+        
+        function renderStats(stats) {
+            const statsBar = document.getElementById('statsBar');
+            statsBar.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${stats.total_rooms}</div>
+                    <div class="stat-label">总房间数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.today_tasks}</div>
+                    <div class="stat-label">今日任务</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-number">${stats.pending_tasks}</div>
+                    <div class="stat-label">待接单</div>
+                </div>
+                <div class="stat-card in-progress">
+                    <div class="stat-number">${stats.in_progress_tasks}</div>
+                    <div class="stat-label">处理中</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${stats.pending_review_tasks}</div>
+                    <div class="stat-label">待复核</div>
+                </div>
+                <div class="stat-card completed">
+                    <div class="stat-number">${stats.completed_tasks}</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+                <div class="stat-card overdue">
+                    <div class="stat-number">${stats.overdue_tasks}</div>
+                    <div class="stat-label">已逾期</div>
+                </div>
+            `;
+        }
+        
+        function updateAssigneeFilter(assignees) {
+            const select = document.getElementById('filterAssignee');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="">全部负责人</option>';
+            assignees.forEach(a => {
+                select.innerHTML += `<option value="${a.assignee}">${a.assignee} (${a.count})</option>`;
+            });
+            
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        }
+        
+        async function loadRooms() {
+            try {
+                const response = await fetch(`${API_BASE}/api/rooms`);
+                currentRooms = await response.json();
+                renderRoomManagement();
+                updateRoomSelects();
+            } catch (error) {
+                console.error('加载房间失败:', error);
+                showError('加载房间数据失败');
+            }
+        }
+        
+        function renderRoomManagement() {
+            const grid = document.getElementById('roomsGrid');
+            
+            if (currentRooms.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <p>暂无房间，请添加</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = currentRooms.map(room => `
+                <div class="room-manage-card">
+                    <div class="room-manage-info">
+                        <h4>${room.room_number}</h4>
+                        <p>${room.type || '未设置类型'} | ${room.capacity ? room.capacity + '人' : ''}</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" 
+                                onclick="openEditRoomModal(${room.id})">编辑</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateRoomSelects() {
+            const taskRoomSelect = document.getElementById('taskRoomId');
+            const currentValue = taskRoomSelect.value;
+            
+            taskRoomSelect.innerHTML = '<option value="">选择房间</option>';
+            currentRooms.forEach(room => {
+                taskRoomSelect.innerHTML += `<option value="${room.id}">${room.room_number}</option>`;
+            });
+            
+            if (currentValue) {
+                taskRoomSelect.value = currentValue;
+            }
+        }
+        
+        async function loadTasks() {
+            try {
+                const params = getFilterParams();
+                const queryString = new URLSearchParams(params).toString();
+                const url = queryString ? `${API_BASE}/api/tasks?${queryString}` : `${API_BASE}/api/tasks/today`;
+                
+                const response = await fetch(url);
+                currentTasks = await response.json();
+                renderTasks();
+            } catch (error) {
+                console.error('加载任务失败:', error);
+                showError('加载任务数据失败');
+            }
+        }
+        
+        function getFilterParams() {
+            const params = {};
+            
+            const type = document.getElementById('filterType').value;
+            const status = document.getElementById('filterStatus').value;
+            const date = document.getElementById('filterDate').value;
+            const assignee = document.getElementById('filterAssignee').value;
+            
+            if (type) params.task_type = type;
+            if (status) params.status = status;
+            if (date) params.date = date;
+            if (assignee) params.assignee = assignee;
+            
+            currentFilterParams = params;
+            return params;
+        }
+        
+        function applyFilters() {
+            loadTasks();
+        }
+        
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            
+            const tasksByRoom = {};
+            currentTasks.forEach(task => {
+                if (!tasksByRoom[task.room_id]) {
+                    tasksByRoom[task.room_id] = {
+                        room: {
+                            id: task.room_id,
+                            room_number: task.room_number,
+                            floor: task.floor,
+                            room_type: task.room_type,
+                            status: 'available'
+                        },
+                        tasks: []
+                    };
+                }
+                tasksByRoom[task.room_id].tasks.push(task);
+            });
+            
+            currentRooms.forEach(room => {
+                if (!tasksByRoom[room.id]) {
+                    tasksByRoom[room.id] = {
+                        room: room,
+                        tasks: []
+                    };
+                }
+            });
+            
+            const roomEntries = Object.values(tasksByRoom).sort((a, b) => 
+                a.room.room_number.localeCompare(b.room.room_number)
+            );
+            
+            if (roomEntries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="9" y1="9" x2="15" y2="9"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                        <p>暂无任务数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = roomEntries.map(entry => `
+                <div class="room-card">
+                    <div class="room-header">
+                        <div class="room-info">
+                            <h3>${entry.room.room_number}</h3>
+                            <p>${entry.room.floor ? '楼层: ' + entry.room.floor : ''} ${entry.room.room_type || ''}</p>
+                        </div>
+                        <span class="room-status status-${entry.room.status}">${getRoomStatusName(entry.room.status)}</span>
+                    </div>
+                    <div class="room-tasks">
+                        ${entry.tasks.length === 0 ? `
+                            <div class="empty-state" style="padding: 20px;">
+                                <p style="font-size: 12px;">暂无任务</p>
+                            </div>
+                        ` : entry.tasks.map(task => renderTaskItem(task)).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getRoomStatusName(status) {
+            const names = {
+                available: '空闲',
+                occupied: '占用',
+                maintenance: '维修中'
+            };
+            return names[status] || status;
+        }
+        
+        function renderTaskItem(task) {
+            const isOverdue = task.status === 'overdue';
+            const startTime = new Date(task.start_time).toLocaleString('zh-CN');
+            const endTime = new Date(task.end_time).toLocaleString('zh-CN');
+            
+            return `
+                <div class="task-item ${isOverdue ? 'overdue' : ''}" onclick="openTaskDetail(${task.id})">
+                    <div class="task-header">
+                        <span class="task-title">${task.title}</span>
+                        <span class="task-type type-${task.task_type}">${TASK_TYPE_NAMES[task.task_type]}</span>
+                    </div>
+                    <div class="task-meta">
+                        <span class="task-status status-${task.status}">${STATUS_NAMES[task.status]}</span>
+                        <span class="task-assignee">
+                            👤 ${task.assignee || '未分配'}
+                        </span>
+                    </div>
+                    <div style="font-size: 11px; color: #999; margin-top: 5px;">
+                        ${startTime} - ${endTime.split(' ')[1]}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function openCreateTaskModal() {
+            document.getElementById('taskModalTitle').textContent = '新建任务';
+            document.getElementById('taskId').value = '';
+            document.getElementById('statusEditGroup').style.display = 'none';
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskFormError').classList.remove('active');
+            initDateInputs();
+            updateRoomSelects();
+            document.getElementById('taskModal').classList.add('active');
+        }
+        
+        async function openEditTaskModal(taskId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${taskId}`);
+                const task = await response.json();
+                
+                document.getElementById('taskModalTitle').textContent = '编辑任务';
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('statusEditGroup').style.display = 'block';
+                document.getElementById('taskFormError').classList.remove('active');
+                
+                document.getElementById('taskRoomId').value = task.room_id;
+                document.getElementById('taskType').value = task.task_type;
+                document.getElementById('taskTitle').value = task.title;
+                document.getElementById('taskDescription').value = task.description || '';
+                document.getElementById('taskAssignee').value = task.assignee || '';
+                document.getElementById('taskPriority').value = task.priority;
+                document.getElementById('taskStatus').value = task.status === 'overdue' ? 'pending' : task.status;
+                
+                document.getElementById('taskStartTime').value = new Date(task.start_time).toISOString().slice(0, 16);
+                document.getElementById('taskEndTime').value = new Date(task.end_time).toISOString().slice(0, 16);
+                
+                closeTaskDetailModal();
+                document.getElementById('taskModal').classList.add('active');
+            } catch (error) {
+                showError('加载任务详情失败');
+            }
+        }
+        
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+        
+        async function saveTask() {
+            const taskId = document.getElementById('taskId').value;
+            const roomId = document.getElementById('taskRoomId').value;
+            const taskType = document.getElementById('taskType').value;
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const priority = document.getElementById('taskPriority').value;
+            const startTime = document.getElementById('taskStartTime').value;
+            const endTime = document.getElementById('taskEndTime').value;
+            const status = document.getElementById('statusEditGroup').style.display !== 'none' 
+                ? document.getElementById('taskStatus').value 
+                : 'pending';
+            
+            if (!roomId || !title || !startTime || !endTime) {
+                showTaskFormError('请填写必填字段');
+                return;
+            }
+            
+            const taskData = {
+                room_id: parseInt(roomId),
+                task_type: taskType,
+                title: title,
+                description: description || null,
+                assignee: assignee || null,
+                priority: priority,
+                start_time: new Date(startTime).toISOString(),
+                end_time: new Date(endTime).toISOString()
+            };
+            
+            if (taskId) {
+                taskData.status = status;
+            }
+            
+            try {
+                let response;
+                if (taskId) {
+                    response = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(taskData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE}/api/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(taskData)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    if (result.error === '时间冲突') {
+                        showTaskFormError(`时间冲突：该房间在此时间段已有任务`);
+                    } else {
+                        showTaskFormError(result.error || '保存失败');
+                    }
+                    return;
+                }
+                
+                closeTaskModal();
+                showSuccess(taskId ? '任务更新成功' : '任务创建成功');
+                loadAllData();
+            } catch (error) {
+                showTaskFormError('保存失败，请重试');
+            }
+        }
+        
+        async function openTaskDetail(taskId) {
+            selectedTaskId = taskId;
+            
+            try {
+                const [taskResponse, logsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/api/tasks/${taskId}`),
+                    fetch(`${API_BASE}/api/tasks/${taskId}/logs`)
+                ]);
+                
+                const task = await taskResponse.json();
+                const logs = await logsResponse.json();
+                
+                document.getElementById('detailTaskTitle').textContent = `${task.room_number} - ${task.title}`;
+                
+                const content = document.getElementById('taskDetailContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <span class="task-type type-${task.task_type}">${TASK_TYPE_NAMES[task.task_type]}</span>
+                            <span class="task-status status-${task.status}">${STATUS_NAMES[task.status]}</span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 3px;">房间</p>
+                                <p style="font-weight: 500;">${task.room_number}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 3px;">负责人</p>
+                                <p style="font-weight: 500;">${task.assignee || '未分配'}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 3px;">开始时间</p>
+                                <p style="font-weight: 500;">${new Date(task.start_time).toLocaleString('zh-CN')}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 3px;">结束时间</p>
+                                <p style="font-weight: 500;">${new Date(task.end_time).toLocaleString('zh-CN')}</p>
+                            </div>
+                        </div>
+                        
+                        ${task.description ? `
+                            <div>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 3px;">描述</p>
+                                <p>${task.description}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="task-actions">
+                        ${task.status !== 'completed' && task.status !== 'overdue' ? `
+                            ${task.status === 'pending' ? `
+                                <button class="btn btn-primary" onclick="changeTaskStatus(${task.id}, 'in_progress')">开始处理</button>
+                            ` : ''}
+                            ${task.status === 'in_progress' ? `
+                                <button class="btn btn-warning" onclick="changeTaskStatus(${task.id}, 'pending_review')">提交复核</button>
+                            ` : ''}
+                            ${task.status === 'pending_review' ? `
+                                <button class="btn btn-success" onclick="changeTaskStatus(${task.id}, 'completed')">通过完成</button>
+                            ` : ''}
+                        ` : ''}
+                    </div>
+                    
+                    ${logs.length > 0 ? `
+                        <div style="margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px; font-size: 14px;">操作日志</h4>
+                            <div class="logs-container">
+                                ${logs.map(log => `
+                                    <div class="log-item">
+                                        <span>${log.action === 'created' ? '创建任务' : `状态变更: ${STATUS_NAMES[log.previous_status] || '-'} → ${STATUS_NAMES[log.new_status]}`}</span>
+                                        <span class="log-time">${new Date(log.created_at).toLocaleString('zh-CN')}</span>
+                                        ${log.assignee ? `<span style="color: #666;">by ${log.assignee}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                document.getElementById('taskDetailModal').classList.add('active');
+            } catch (error) {
+                showError('加载任务详情失败');
+            }
+        }
+        
+        function closeTaskDetailModal() {
+            document.getElementById('taskDetailModal').classList.remove('active');
+        }
+        
+        function editTaskFromDetail() {
+            if (selectedTaskId) {
+                openEditTaskModal(selectedTaskId);
+            }
+        }
+        
+        async function changeTaskStatus(taskId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                
+                if (response.ok) {
+                    closeTaskDetailModal();
+                    showSuccess('状态更新成功');
+                    loadAllData();
+                } else {
+                    showError('状态更新失败');
+                }
+            } catch (error) {
+                showError('状态更新失败');
+            }
+        }
+        
+        async function deleteTask() {
+            if (!selectedTaskId) return;
+            
+            if (!confirm('确定要删除这个任务吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/tasks/${selectedTaskId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    closeTaskDetailModal();
+                    showSuccess('任务删除成功');
+                    loadAllData();
+                } else {
+                    showError('删除失败');
+                }
+            } catch (error) {
+                showError('删除失败');
+            }
+        }
+        
+        function toggleRoomManagement() {
+            const management = document.getElementById('roomManagement');
+            management.style.display = management.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function openCreateRoomModal() {
+            document.getElementById('roomModalTitle').textContent = '添加房间';
+            document.getElementById('roomId').value = '';
+            document.getElementById('roomForm').reset();
+            document.getElementById('roomFormError').classList.remove('active');
+            document.getElementById('roomModal').classList.add('active');
+        }
+        
+        async function openEditRoomModal(roomId) {
+            const room = currentRooms.find(r => r.id === roomId);
+            if (!room) return;
+            
+            document.getElementById('roomModalTitle').textContent = '编辑房间';
+            document.getElementById('roomId').value = room.id;
+            document.getElementById('roomFormError').classList.remove('active');
+            
+            document.getElementById('roomNumber').value = room.room_number;
+            document.getElementById('roomFloor').value = room.floor || '';
+            document.getElementById('roomType').value = room.type || '';
+            document.getElementById('roomCapacity').value = room.capacity || '';
+            document.getElementById('roomStatus').value = room.status;
+            
+            document.getElementById('roomModal').classList.add('active');
+        }
+        
+        function closeRoomModal() {
+            document.getElementById('roomModal').classList.remove('active');
+        }
+        
+        async function saveRoom() {
+            const roomId = document.getElementById('roomId').value;
+            const roomNumber = document.getElementById('roomNumber').value;
+            const floor = document.getElementById('roomFloor').value;
+            const type = document.getElementById('roomType').value;
+            const capacity = document.getElementById('roomCapacity').value;
+            const status = document.getElementById('roomStatus').value;
+            
+            if (!roomNumber) {
+                showRoomFormError('请输入房间号');
+                return;
+            }
+            
+            const roomData = {
+                room_number: roomNumber,
+                floor: floor ? parseInt(floor) : null,
+                type: type || null,
+                capacity: capacity ? parseInt(capacity) : null,
+                status: status
+            };
+            
+            try {
+                let response;
+                if (roomId) {
+                    response = await fetch(`${API_BASE}/api/rooms/${roomId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(roomData)
+                    });
+                } else {
+                    response = await fetch(`${API_BASE}/api/rooms`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(roomData)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    showRoomFormError(result.error || '保存失败');
+                    return;
+                }
+                
+                closeRoomModal();
+                showSuccess(roomId ? '房间更新成功' : '房间添加成功');
+                loadRooms();
+            } catch (error) {
+                showRoomFormError('保存失败，请重试');
+            }
+        }
+        
+        async function handleCSVImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const csvContent = e.target.result;
+                    
+                    const response = await fetch(`${API_BASE}/api/import/csv`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ csv_content: csvContent })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showSuccess(`导入成功：${result.rooms_imported} 个房间，${result.tasks_imported} 个任务`);
+                        loadAllData();
+                    } else {
+                        showError(result.error || '导入失败');
+                    }
+                } catch (error) {
+                    showError('导入失败，请检查CSV格式');
+                }
+            };
+            reader.readAsText(file);
+            
+            event.target.value = '';
+        }
+        
+        function exportCSV() {
+            const params = getFilterParams();
+            const queryString = new URLSearchParams(params).toString();
+            const url = queryString ? `${API_BASE}/api/export/csv?${queryString}` : `${API_BASE}/api/export/csv`;
+            
+            window.open(url, '_blank');
+        }
+        
+        function showError(message) {
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = message;
+            alert.classList.add('active');
+            
+            setTimeout(() => {
+                alert.classList.remove('active');
+            }, 3000);
+        }
+        
+        function showSuccess(message) {
+            const alert = document.getElementById('successAlert');
+            alert.textContent = message;
+            alert.classList.add('active');
+            
+            setTimeout(() => {
+                alert.classList.remove('active');
+            }, 3000);
+        }
+        
+        function showTaskFormError(message) {
+            const alert = document.getElementById('taskFormError');
+            alert.textContent = message;
+            alert.classList.add('active');
+        }
+        
+        function showRoomFormError(message) {
+            const alert = document.getElementById('roomFormError');
+            alert.textContent = message;
+            alert.classList.add('active');
+        }
+    </script>
+</body>
+</html>
