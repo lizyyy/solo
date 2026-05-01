@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜谱结构化抽取对比报告</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .summary { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .summary-item { background: #f8f9fa; padding: 15px; border-radius: 4px; }
+        .summary-item .label { color: #666; font-size: 14px; }
+        .summary-item .value { color: #333; font-size: 24px; font-weight: bold; margin-top: 5px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #ddd; border-radius: 4px; cursor: pointer; }
+        .tab.active { background: #007bff; color: white; }
+        .recipe-card { background: white; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        .recipe-header { background: #007bff; color: white; padding: 15px; cursor: pointer; }
+        .recipe-header:hover { background: #0056b3; }
+        .recipe-body { padding: 20px; display: none; }
+        .recipe-body.open { display: block; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: #f8f9fa; border-radius: 4px; padding: 15px; }
+        .panel h3 { margin-bottom: 10px; color: #333; }
+        .panel.golden { border-left: 4px solid #28a745; }
+        .panel.model { border-left: 4px solid #dc3545; }
+        .error-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 10px; margin-top: 10px; }
+        .error-item { background: #f8d7da; border-radius: 4px; padding: 8px; margin-bottom: 5px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin: 2px; }
+        .tag-error { background: #f8d7da; color: #721c24; }
+        .tag-warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥗 菜谱结构化抽取对比报告</h1>
+        <div class="summary">
+            <h2>总体统计</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="label">评估菜谱数</div>
+                    <div class="value">{{total_recipes}}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">字段准确率</div>
+                    <div class="value">{{field_accuracy}}%</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">总错误数</div>
+                    <div class="value">{{total_errors}}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">总警告数</div>
+                    <div class="value">{{total_warnings}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showAll()">全部</div>
+            <div class="tab" onclick="showOnly('errors')">仅错误</div>
+            <div class="tab" onclick="showOnly('warnings')">仅警告</div>
+        </div>
+
+        {{recipes_html}}
+    </div>
+
+    <script>
+        function toggleRecipe(id) {
+            const body = document.getElementById('recipe-' + id);
+            body.classList.toggle('open');
+        }
+
+        function showAll() {
+            document.querySelectorAll('.recipe-card').forEach(c => c.style.display = 'block');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.tab').classList.add('active');
+        }
+
+        function showOnly(type) {
+            document.querySelectorAll('.recipe-card').forEach(c => {
+                const hasErrors = c.dataset.hasErrors === 'true';
+                const hasWarnings = c.dataset.hasWarnings === 'true';
+                if (type === 'errors' && hasErrors) c.style.display = 'block';
+                else if (type === 'warnings' && !hasErrors && hasWarnings) c.style.display = 'block';
+                else if (type === 'all') c.style.display = 'block';
+                else c.style.display = 'none';
+            });
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
