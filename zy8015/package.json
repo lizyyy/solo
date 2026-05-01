@@ -1,0 +1,25 @@
+{
+  "name": "mcp-replay-debugger",
+  "version": "1.0.0",
+  "description": "本地 MCP 工具调用录制与重放调试器",
+  "main": "src/index.js",
+  "bin": {
+    "mcp-replay": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/*.js"
+  },
+  "keywords": ["mcp", "debugger", "replay", "record", "tool-call"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "yaml": "^2.4.0",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "node": ">=18.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

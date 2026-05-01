@@ -1,0 +1,170 @@
+{
+  "version": "2.0.0",
+  "tools": [
+    {
+      "name": "get_user",
+      "description": "获取用户信息",
+      "idempotent": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "用户ID"
+          }
+        },
+        "required": ["user_id"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "inactive", "pending"] }
+        }
+      }
+    },
+    {
+      "name": "create_user",
+      "description": "创建新用户",
+      "idempotent": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱地址"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          }
+        },
+        "required": ["name", "email", "password"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "string" },
+          "success": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "name": "update_user",
+      "description": "更新用户信息",
+      "idempotent": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "用户ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "新用户名"
+          },
+          "email": {
+            "type": "string",
+            "description": "新邮箱地址"
+          }
+        },
+        "required": ["user_id"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "updated_at": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "delete_user",
+      "description": "删除用户",
+      "idempotent": false,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "用户ID"
+          }
+        },
+        "required": ["user_id"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" }
+        }
+      }
+    },
+    {
+      "name": "list_users",
+      "description": "列出所有用户",
+      "idempotent": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "页码",
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "每页数量",
+            "default": 10
+          },
+          "status": {
+            "type": "string",
+            "description": "用户状态过滤",
+            "enum": ["active", "inactive", "pending"]
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "users": { "type": "array" },
+          "total": { "type": "integer" },
+          "page": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "name": "search_files",
+      "description": "搜索文件",
+      "idempotent": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "搜索关键词"
+          },
+          "directory": {
+            "type": "string",
+            "description": "搜索目录"
+          }
+        },
+        "required": ["query"]
+      },
+      "returns": {
+        "type": "object",
+        "properties": {
+          "files": { "type": "array" },
+          "count": { "type": "integer" }
+        }
+      }
+    }
+  ]
+}
