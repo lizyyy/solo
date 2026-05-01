@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}AlkCalc - 历史记录{% endblock %}
+
+{% block content %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5><i class="fa fa-history"></i> 计算历史记录</h5>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('calculate') }}" class="btn btn-primary">
+                <i class="fa fa-plus"></i> 新建计算
+            </a>
+        </div>
+    </div>
+
+    {% if batches %}
+        <!-- 统计卡片 -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number text-primary">{{ batches|length }}</div>
+                    <div class="stats-label">总计批次</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number text-success">{{ stats.pass_count if stats else 0 }}</div>
+                    <div class="stats-label">质控通过</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number text-warning">{{ stats.warning_count if stats else 0 }}</div>
+                    <div class="stats-label">质控警告</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div class="stats-number text-danger">{{ stats.fail_count if stats else 0 }}</div>
+                    <div class="stats-label">质控失败</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批次列表 -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fa fa-list"></i> 计算批次列表</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 8%;">批次ID</th>
+                                <th style="width: 25%;">批次名称</th>
+                                <th style="width: 18%;">创建时间</th>
+                                <th style="width: 12%;">标准液浓度</th>
+                                <th style="width: 8%;">样品数</th>
+                                <th style="width: 10%;">质控状态</th>
+                                <th style="width: 19%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in batches %}
+                                <tr>
+                                    <td><strong>#{{ batch.batch_id }}</strong></td>
+                                    <td>{{ batch.batch_name }}</td>
+                                    <td>{{ batch.created_at|datetime_format('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ "%.4f"|format(batch.standard_concentration_mol_l) }} mol/L</td>
+                                    <td>
+                                        <span class="badge bg-info">
+                                            {{ batch.sample_count if batch.sample_count is defined else '-' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ batch.overall_qc_status|status_badge|safe }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('view_result', batch_id=batch.batch_id) }}" 
+                                               class="btn btn-outline-info" title="查看结果">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('download_file', batch_id=batch.batch_id, file_type='report') }}" 
+                                               class="btn btn-outline-primary" title="下载报告">
+                                                <i class="fa fa-file-text-o"></i>
+                                            </a>
+                                            <a href="{{ url_for('download_file', batch_id=batch.batch_id, file_type='csv') }}" 
+                                               class="btn btn-outline-success" title="下载CSV">
+                                                <i class="fa fa-table"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- 空状态 -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fa fa-inbox fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted mb-2">暂无计算历史记录</h4>
+                <p class="text-muted mb-4">上传您的第一个样品清单和滴定数据开始计算</p>
+                <a href="{{ url_for('calculate') }}" class="btn btn-primary">
+                    <i class="fa fa-calculator"></i> 开始计算
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 使用说明 -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fa fa-lightbulb-o"></i> 使用提示</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3">
+                            <div class="feature-icon primary" style="width: 40px; height: 40px; font-size: 1rem;">
+                                <i class="fa fa-upload"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>1. 准备数据</h6>
+                            <p class="text-muted small mb-0">准备样品清单CSV和滴定读数CSV文件</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3">
+                            <div class="feature-icon success" style="width: 40px; height: 40px; font-size: 1rem;">
+                                <i class="fa fa-calculator"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>2. 执行计算</h6>
+                            <p class="text-muted small mb-0">在计算页面上传文件，系统自动执行Gran法计算</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3">
+                            <div class="feature-icon warning" style="width: 40px; height: 40px; font-size: 1rem;">
+                                <i class="fa fa-download"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6>3. 下载报告</h6>
+                            <p class="text-muted small mb-0">查看计算结果和质控状态，下载Markdown或CSV报告</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

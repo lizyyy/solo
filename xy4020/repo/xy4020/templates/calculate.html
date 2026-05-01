@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}AlkCalc - 碱度计算{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fa fa-calculator"></i> 碱度滴定计算</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <!-- 批次信息 -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="text-muted mb-3"><i class="fa fa-info-circle"></i> 批次信息</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">批次名称 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="batch_name" 
+                                       value="计算批次 {{ now }}" required>
+                                <small class="text-muted">为本次计算批次命名</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">标准液浓度 (mol/L) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="standard_concentration" 
+                                       step="0.00001" value="{{ "%.5f"|format(default_standard) }}" required>
+                                <small class="text-muted">盐酸标准溶液的浓度，单位 mol/L</small>
+                            </div>
+                        </div>
+
+                        <!-- 样品体积和空白样 -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="text-muted mb-3"><i class="fa fa-flask"></i> 分析参数</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">样品体积 (ml) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="sample_volume" 
+                                       step="0.1" value="50.0" required>
+                                <small class="text-muted">用于滴定的水样体积，通常为 50 ml</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">空白样品ID</label>
+                                <input type="text" class="form-control" name="blank_sample" 
+                                       placeholder="例如: BLK001">
+                                <small class="text-muted">指定空白样品ID用于空白扣除（可选）</small>
+                            </div>
+                        </div>
+
+                        <!-- 文件上传区域 -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <h6 class="text-muted mb-3"><i class="fa fa-upload"></i> 数据文件上传</h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">样品清单 CSV <span class="text-danger">*</span></label>
+                                <div class="upload-area" onclick="document.getElementById('samples_file').click()">
+                                    <input type="file" id="samples_file" name="samples_file" 
+                                           accept=".csv,.txt" style="display:none" required
+                                           onchange="updateFileInfo(this, 'samples_file_info')">
+                                    <i class="fa fa-file-text-o"></i>
+                                    <h6>点击选择或拖拽文件到此处</h6>
+                                    <p class="text-muted small mb-0">支持 .csv 或 .txt 格式</p>
+                                </div>
+                                <div id="samples_file_info" class="file-info" style="display:none;">
+                                    <i class="fa fa-check-circle"></i>
+                                    <span id="samples_file_name"></span>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>必填列:</strong> sample_id, sampling_point, bottle_number, 
+                                        temperature_c, dilution_factor, is_blank, is_duplicate
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">滴定读数 CSV <span class="text-danger">*</span></label>
+                                <div class="upload-area" onclick="document.getElementById('titration_file').click()">
+                                    <input type="file" id="titration_file" name="titration_file" 
+                                           accept=".csv,.txt" style="display:none" required
+                                           onchange="updateFileInfo(this, 'titration_file_info')">
+                                    <i class="fa fa-line-chart"></i>
+                                    <h6>点击选择或拖拽文件到此处</h6>
+                                    <p class="text-muted small mb-0">支持 .csv 或 .txt 格式</p>
+                                </div>
+                                <div id="titration_file_info" class="file-info" style="display:none;">
+                                    <i class="fa fa-check-circle"></i>
+                                    <span id="titration_file_name"></span>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>必填列:</strong> sample_id, volume_ml, ph
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 质控阈值（高级） -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2" type="button" 
+                                         data-bs-toggle="collapse" data-bs-target="#advancedSettings">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0"><i class="fa fa-sliders"></i> 高级设置（质控阈值）</h6>
+                                            <i class="fa fa-chevron-down text-muted"></i>
+                                        </div>
+                                    </div>
+                                    <div class="collapse" id="advancedSettings">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">平行样 RPD 限值 (%)</label>
+                                                    <input type="number" class="form-control" 
+                                                           name="duplicate_rpd_limit" 
+                                                           value="{{ config.qc_thresholds.duplicate_rpd_limit if config else 10.0 }}">
+                                                    <small class="text-muted">相对偏差超过此值标记为异常</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">最小读数点数</label>
+                                                    <input type="number" class="form-control" 
+                                                           name="min_readings" 
+                                                           value="{{ config.qc_thresholds.min_readings if config else 5 }}">
+                                                    <small class="text-muted">少于此数量无法计算</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">pH 单调性容差</label>
+                                                    <input type="number" class="form-control" step="0.01"
+                                                           name="ph_monotonic_tolerance" 
+                                                           value="{{ config.qc_thresholds.ph_monotonic_tolerance if config else 0.05 }}">
+                                                    <small class="text-muted">pH 上升超过此值标记警告</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fa fa-play"></i> 开始计算
+                                </button>
+                                <button type="reset" class="btn btn-outline-secondary btn-lg px-4 ms-2">
+                                    <i class="fa fa-refresh"></i> 重置
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 示例数据格式说明 -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fa fa-table"></i> 样品清单 CSV 格式示例</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>sample_id</th>
+                                    <th>sampling_point</th>
+                                    <th>bottle_number</th>
+                                    <th>temperature_c</th>
+                                    <th>dilution_factor</th>
+                                    <th>is_blank</th>
+                                    <th>is_duplicate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>S001</td>
+                                    <td>河流上游</td>
+                                    <td>A-001</td>
+                                    <td>24.5</td>
+                                    <td>1.0</td>
+                                    <td>no</td>
+                                    <td>no</td>
+                                </tr>
+                                <tr>
+                                    <td>S002</td>
+                                    <td>河流上游</td>
+                                    <td>A-002</td>
+                                    <td>24.5</td>
+                                    <td>1.0</td>
+                                    <td>no</td>
+                                    <td>yes</td>
+                                </tr>
+                                <tr>
+                                    <td>BLK001</td>
+                                    <td>实验室空白</td>
+                                    <td>BLK-001</td>
+                                    <td>25.0</td>
+                                    <td>1.0</td>
+                                    <td>yes</td>
+                                    <td>no</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fa fa-area-chart"></i> 滴定读数 CSV 格式示例</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>sample_id</th>
+                                    <th>volume_ml</th>
+                                    <th>ph</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>S001</td>
+                                    <td>0.00</td>
+                                    <td>8.12</td>
+                                </tr>
+                                <tr>
+                                    <td>S001</td>
+                                    <td>1.00</td>
+                                    <td>7.85</td>
+                                </tr>
+                                <tr>
+                                    <td>S001</td>
+                                    <td>2.00</td>
+                                    <td>7.42</td>
+                                </tr>
+                                <tr>
+                                    <td>S001</td>
+                                    <td>...</td>
+                                    <td>...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gran 法计算说明 -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-info bg-opacity-10">
+                <div class="card-body">
+                    <h6><i class="fa fa-info-circle"></i> 关于 Gran 法计算</h6>
+                    <p class="text-muted small mb-0">
+                        本工具使用 Gran 图法进行滴定端点估计，通过计算 F1 = (V0 + V) × 10^(-pH) 进行线性拟合，
+                        外推到 F1=0 得到端点体积。碱度计算公式：总碱度 = [(V_sample - V_blank) × N × 50045] / V_sample_used × 稀释倍数
+                        (单位: mg/L as CaCO3)
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateFileInfo(input, infoId) {
+        const infoDiv = document.getElementById(infoId);
+        const nameSpan = document.getElementById(input.id + '_name');
+        
+        if (input.files.length > 0) {
+            nameSpan.textContent = input.files[0].name + ' (' + formatFileSize(input.files[0].size) + ')';
+            infoDiv.style.display = 'block';
+        } else {
+            infoDiv.style.display = 'none';
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    
+    // 拖拽上传支持
+    document.querySelectorAll('.upload-area').forEach(area => {
+        area.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#2563eb';
+            this.style.backgroundColor = '#f1f5f9';
+        });
+        
+        area.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e1';
+            this.style.backgroundColor = 'transparent';
+        });
+        
+        area.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e1';
+            this.style.backgroundColor = 'transparent';
+            
+            const input = this.querySelector('input[type="file"]');
+            if (e.dataTransfer.files.length > 0) {
+                input.files = e.dataTransfer.files;
+                updateFileInfo(input, input.id + '_info');
+            }
+        });
+    });
+</script>
+{% endblock %}

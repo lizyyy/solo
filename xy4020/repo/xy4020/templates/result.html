@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}AlkCalc - 计算结果{% endblock %}
+
+{% block content %}
+    <!-- 批次信息头部 -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fa fa-check-circle text-success"></i> 
+                        计算结果 - 批次 #{{ batch.batch_id }}
+                    </h5>
+                    <small class="text-muted">{{ batch.batch_name }}</small>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <a href="{{ url_for('download_file', batch_id=batch.batch_id, file_type='report') }}" 
+                           class="btn btn-outline-primary">
+                            <i class="fa fa-file-text-o"></i> 下载 Markdown
+                        </a>
+                        <a href="{{ url_for('download_file', batch_id=batch.batch_id, file_type='csv') }}" 
+                           class="btn btn-outline-success">
+                            <i class="fa fa-table"></i> 下载 CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number text-primary">{{ samples|length }}</div>
+                        <div class="stats-label">总样品数</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number text-success">{{ pass_count }}</div>
+                        <div class="stats-label">质控通过</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number text-warning">{{ warning_count }}</div>
+                        <div class="stats-label">质控警告</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number text-danger">{{ fail_count + error_count }}</div>
+                        <div class="stats-label">质控失败</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted" style="width: 35%;"><i class="fa fa-calendar"></i> 创建时间:</td>
+                            <td><strong>{{ batch.created_at|datetime_format }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fa fa-flask"></i> 标准液浓度:</td>
+                            <td><strong>{{ "%.5f"|format(batch.standard_concentration_mol_l) }} mol/L</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fa fa-tint"></i> 样品体积:</td>
+                            <td><strong>{{ batch.sample_volume_used_ml }} ml</strong></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted" style="width: 35%;"><i class="fa fa-trophy"></i> 整体质控:</td>
+                            <td>
+                                {{ batch.overall_qc_status|status_badge|safe }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fa fa-bar-chart"></i> 碱度范围:</td>
+                            <td><strong>{{ "%.2f"|format(min_alk) }} - {{ "%.2f"|format(max_alk) }} mg/L</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted"><i class="fa fa-calculator"></i> 平均碱度:</td>
+                            <td><strong>{{ "%.2f"|format(avg_alk) }} mg/L</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            {% if batch.notes %}
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fa fa-info-circle"></i> {{ batch.notes }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 质控状态分布 -->
+    {% if warning_count > 0 or fail_count > 0 or error_count > 0 %}
+        <div class="card mb-4">
+            <div class="card-header bg-warning bg-opacity-10">
+                <h6 class="mb-0"><i class="fa fa-exclamation-triangle text-warning"></i> 质控问题摘要</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>样品ID</th>
+                                <th>采样点</th>
+                                <th>质控状态</th>
+                                <th>问题数量</th>
+                                <th>问题详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sample in samples if sample.qc_status != 'PASS' %}
+                                <tr>
+                                    <td><strong>{{ sample.sample_id }}</strong></td>
+                                    <td>{{ sample.sampling_point }}</td>
+                                    <td>{{ sample.qc_status|status_badge|safe }}</td>
+                                    <td>{{ sample.qc_issue_count }}</td>
+                                    <td>
+                                        {% if sample.qc_issue_messages %}
+                                            <small class="text-muted">{{ sample.qc_issue_messages }}</small>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 详细结果表格 -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="fa fa-table"></i> 详细结果</h6>
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-secondary" onclick="filterSamples('all')">全部</button>
+                <button type="button" class="btn btn-outline-success" onclick="filterSamples('PASS')">PASS</button>
+                <button type="button" class="btn btn-outline-warning" onclick="filterSamples('WARNING')">WARNING</button>
+                <button type="button" class="btn btn-outline-danger" onclick="filterSamples('FAIL')">FAIL</button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="resultsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 10%;">状态</th>
+                            <th style="width: 10%;">样品ID</th>
+                            <th style="width: 15%;">采样点</th>
+                            <th style="width: 10%;">瓶号</th>
+                            <th style="width: 12%;">碱度 (mg/L)</th>
+                            <th style="width: 12%;">端点体积 (ml)</th>
+                            <th style="width: 8%;">温度 (°C)</th>
+                            <th style="width: 8%;">稀释倍数</th>
+                            <th style="width: 15%;">类型</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sample in samples %}
+                            <tr class="sample-row" data-status="{{ sample.qc_status }}">
+                                <td>
+                                    {{ sample.qc_status|status_badge|safe }}
+                                </td>
+                                <td>
+                                    <strong>{{ sample.sample_id }}</strong>
+                                </td>
+                                <td>{{ sample.sampling_point }}</td>
+                                <td>{{ sample.bottle_number }}</td>
+                                <td>
+                                    <strong class="text-primary">
+                                        {{ "%.2f"|format(sample.total_alkalinity_mg_l_caco3) }}
+                                    </strong>
+                                </td>
+                                <td>{{ "%.4f"|format(sample.endpoint_volume_ml) }}</td>
+                                <td>{{ "%.1f"|format(sample.temperature_c) }}</td>
+                                <td>{{ "%.2f"|format(sample.dilution_factor) }}</td>
+                                <td>
+                                    {% if sample.is_blank %}
+                                        <span class="badge bg-secondary">空白样</span>
+                                    {% elif sample.is_duplicate %}
+                                        <span class="badge bg-info">平行样</span>
+                                        {% if sample.parent_sample_id %}
+                                            <small class="text-muted">({{ sample.parent_sample_id }})</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-success">常规</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            
+                            {% if sample.qc_issue_count > 0 %}
+                                <tr class="sample-row-details" style="display: none;" data-status="{{ sample.qc_status }}">
+                                    <td colspan="9" class="bg-light">
+                                        <div class="p-3">
+                                            <h6 class="text-warning mb-2">
+                                                <i class="fa fa-exclamation-triangle"></i> 质控问题详情
+                                            </h6>
+                                            {% if sample.qc_issue_codes %}
+                                                {% set codes = sample.qc_issue_codes.split(',') %}
+                                                {% set messages = sample.qc_issue_messages.split('; ') %}
+                                                <ul class="list-unstyled mb-0">
+                                                    {% for i in range(codes|length) %}
+                                                        <li class="mb-1">
+                                                            <span class="badge bg-warning text-dark">{{ codes[i] }}</span>
+                                                            {{ messages[i] }}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <p class="text-muted mb-0">{{ sample.qc_issue_messages }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('history') }}" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left"></i> 返回历史记录
+            </a>
+            <a href="{{ url_for('calculate') }}" class="btn btn-primary ms-2">
+                <i class="fa fa-plus"></i> 新建计算
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterSamples(status) {
+        const rows = document.querySelectorAll('.sample-row');
+        const details = document.querySelectorAll('.sample-row-details');
+        
+        rows.forEach(row => {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        details.forEach(detail => {
+            detail.style.display = 'none';
+        });
+    }
+    
+    // 点击样品行显示详情
+    document.querySelectorAll('.sample-row').forEach(row => {
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', function() {
+            const nextRow = this.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('sample-row-details')) {
+                if (nextRow.style.display === 'none') {
+                    nextRow.style.display = '';
+                } else {
+                    nextRow.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
