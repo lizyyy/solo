@@ -1,0 +1,45 @@
+default:
+  base_amount: 100
+  feed_times:
+    - hour: 6
+      amount: 80
+    - hour: 10
+      amount: 120
+    - hour: 14
+      amount: 100
+    - hour: 18
+      amount: 80
+
+Pond_A:
+  base_amount: 120
+  feed_times:
+    - hour: 6
+      amount: 100
+    - hour: 10
+      amount: 140
+    - hour: 14
+      amount: 120
+    - hour: 18
+      amount: 100
+
+Pond_B:
+  base_amount: 90
+  feed_times:
+    - hour: 7
+      amount: 70
+    - hour: 11
+      amount: 100
+    - hour: 15
+      amount: 90
+    - hour: 19
+      amount: 70
+
+Pond_C:
+  base_amount: 150
+  feed_times:
+    - hour: 6
+      amount: 120
+    - hour: 12
+      amount: 180
+    - hour: 18
+      amount: 120
