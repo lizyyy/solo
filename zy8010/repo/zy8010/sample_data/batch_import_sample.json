@@ -1,0 +1,159 @@
+{
+  "batch_no": "SAMPLE_BATCH_20260501",
+  "prescriptions": [
+    {
+      "prescription_no": "RX20260501001",
+      "patient_name": "张三",
+      "patient_id": "PAT001",
+      "prescription_date": "2026-04-30T10:00:00",
+      "doctor_name": "李医生",
+      "department": "心内科",
+      "diagnosis": "原发性高血压",
+      "items": [
+        {
+          "drug_name": "硝苯地平缓释片(Ⅱ)",
+          "drug_code": "DRUG001",
+          "specification": "20mg*30片",
+          "quantity": 2.0,
+          "unit": "盒",
+          "dosage": "每日2次，每次1片",
+          "batch_no": "BATCH20260101"
+        },
+        {
+          "drug_name": "阿司匹林肠溶片",
+          "drug_code": "DRUG002",
+          "specification": "100mg*30片",
+          "quantity": 1.0,
+          "unit": "盒",
+          "dosage": "每日1次，每次1片",
+          "batch_no": "BATCH20260102"
+        }
+      ]
+    },
+    {
+      "prescription_no": "RX20260501002",
+      "patient_name": "李四",
+      "patient_id": "PAT002",
+      "prescription_date": "2026-05-02T14:00:00",
+      "doctor_name": "王医生",
+      "department": "内分泌科",
+      "diagnosis": "2型糖尿病",
+      "items": [
+        {
+          "drug_name": "盐酸二甲双胍缓释片",
+          "drug_code": "DRUG003",
+          "specification": "500mg*30片",
+          "quantity": 3.0,
+          "unit": "盒",
+          "dosage": "每日2次，每次1片",
+          "batch_no": "BATCH20260103"
+        },
+        {
+          "drug_name": "格列美脲片",
+          "drug_code": "DRUG004",
+          "specification": "2mg*30片",
+          "quantity": 1.0,
+          "unit": "盒",
+          "dosage": "每日1次，每次1片",
+          "batch_no": "BATCH20269999"
+        }
+      ]
+    },
+    {
+      "prescription_no": "RX20260501003",
+      "patient_name": "王五",
+      "patient_id": "PAT003",
+      "prescription_date": "2026-04-29T09:00:00",
+      "doctor_name": "赵医生",
+      "department": "呼吸内科",
+      "diagnosis": "急性上呼吸道感染",
+      "items": [
+        {
+          "drug_name": "布洛芬缓释胶囊",
+          "drug_code": "DRUG005",
+          "specification": "300mg*20粒",
+          "quantity": 2.0,
+          "unit": "盒",
+          "dosage": "每日2次，每次1粒",
+          "batch_no": "BATCH20260105"
+        }
+      ]
+    }
+  ],
+  "settlements": [
+    {
+      "settlement_no": "STL20260501001",
+      "prescription_no": "RX20260501001",
+      "settlement_date": "2026-05-01T10:30:00",
+      "total_amount": 156.50,
+      "insurance_payment": 125.20,
+      "personal_payment": 31.30
+    },
+    {
+      "settlement_no": "STL20260501002",
+      "prescription_no": "RX20260501002",
+      "settlement_date": "2026-04-30T15:00:00",
+      "total_amount": 289.00,
+      "insurance_payment": 231.20,
+      "personal_payment": 57.80
+    },
+    {
+      "settlement_no": "STL20260501003",
+      "prescription_no": "RX20260501003",
+      "settlement_date": "2026-04-29T10:00:00",
+      "total_amount": 68.00,
+      "insurance_payment": 54.40,
+      "personal_payment": 13.60
+    }
+  ],
+  "inventories": [
+    {
+      "drug_code": "DRUG001",
+      "drug_name": "硝苯地平缓释片(Ⅱ)",
+      "batch_no": "BATCH20260101",
+      "quantity": 100.0,
+      "unit": "盒",
+      "expiry_date": "2027-12-31T23:59:59",
+      "manufacturer": "某制药股份有限公司"
+    },
+    {
+      "drug_code": "DRUG002",
+      "drug_name": "阿司匹林肠溶片",
+      "batch_no": "BATCH20260102",
+      "quantity": 50.0,
+      "unit": "盒",
+      "expiry_date": "2027-06-30T23:59:59",
+      "manufacturer": "某制药股份有限公司"
+    },
+    {
+      "drug_code": "DRUG003",
+      "drug_name": "盐酸二甲双胍缓释片",
+      "batch_no": "BATCH20260103",
+      "quantity": 80.0,
+      "unit": "盒",
+      "expiry_date": "2027-09-30T23:59:59",
+      "manufacturer": "某制药股份有限公司"
+    },
+    {
+      "drug_code": "DRUG005",
+      "drug_name": "布洛芬缓释胶囊",
+      "batch_no": "BATCH20260105",
+      "quantity": 1.0,
+      "unit": "盒",
+      "expiry_date": "2025-12-31T23:59:59",
+      "manufacturer": "某制药股份有限公司"
+    }
+  ],
+  "returns": [
+    {
+      "return_no": "RET20260501001",
+      "prescription_no": "RX20260501003",
+      "drug_name": "布洛芬缓释胶囊",
+      "batch_no": "BATCH20260105",
+      "return_quantity": 3.0,
+      "return_date": "2026-04-30T14:00:00",
+      "return_reason": "患者出现过敏反应",
+      "operator": "李护士"
+    }
+  ]
+}
