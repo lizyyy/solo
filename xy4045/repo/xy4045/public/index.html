@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>无密码登录训练场 - Passkey/WebAuthn 演练沙盒</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <h1>🔐 无密码登录训练场</h1>
+        <span class="subtitle">Passkey/WebAuthn 演练沙盒</span>
+      </div>
+      <div class="header-right">
+        <select id="mode-select" class="mode-select">
+          <option value="webauthn">真实 WebAuthn 模式</option>
+          <option value="simulator">教学模拟器模式</option>
+        </select>
+        <button id="export-json" class="btn btn-secondary">导出 JSON</button>
+        <button id="export-markdown" class="btn btn-secondary">导出报告</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <aside class="left-panel">
+        <div class="panel-section">
+          <h2>👥 演练用户</h2>
+          <div class="user-create-form">
+            <input type="text" id="new-username" placeholder="用户名" class="input-field">
+            <input type="text" id="new-displayname" placeholder="显示名 (可选)" class="input-field">
+            <button id="create-user" class="btn btn-primary">创建用户</button>
+          </div>
+          <div class="user-list" id="user-list">
+            <div class="empty-state">暂无用户，请先创建</div>
+          </div>
+        </div>
+
+        <div class="panel-section" id="credentials-section" style="display: none;">
+          <h2>📱 已注册设备</h2>
+          <div class="credential-list" id="credential-list">
+            <div class="empty-state">该用户尚未注册 Passkey</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="center-panel">
+        <div class="operation-tabs">
+          <button class="tab-btn active" data-tab="register">注册 Passkey</button>
+          <button class="tab-btn" data-tab="login">登录验证</button>
+          <button class="tab-btn" data-tab="revoke">撤销与模拟</button>
+          <button class="tab-btn" data-tab="attacks">攻击演示</button>
+        </div>
+
+        <div class="tab-content" id="tab-register">
+          <div class="step-guide">
+            <div class="step active" data-step="1">1. 选择用户</div>
+            <div class="step" data-step="2">2. 获取挑战值</div>
+            <div class="step" data-step="3">3. 完成注册</div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-group">
+              <label>当前选中用户</label>
+              <div class="selected-user" id="selected-user-register">
+                <span class="placeholder">请先从左侧选择用户</span>
+              </div>
+            </div>
+
+            <div class="form-group" id="simulator-key-section" style="display: none;">
+              <label>模拟器密钥对</label>
+              <div class="simulator-key-info" id="simulator-key-info">
+                <div class="empty-state">尚未生成密钥</div>
+              </div>
+              <button id="generate-sim-key" class="btn btn-secondary">生成新密钥对</button>
+            </div>
+
+            <div class="form-group">
+              <label>设备备注</label>
+              <input type="text" id="register-device-remark" placeholder="例如：公司笔记本、个人手机" class="input-field" value="新注册设备">
+            </div>
+
+            <div class="action-buttons">
+              <button id="start-register" class="btn btn-primary btn-large">开始注册</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-login" style="display: none;">
+          <div class="step-guide">
+            <div class="step active" data-step="1">1. 选择凭据</div>
+            <div class="step" data-step="2">2. 获取挑战值</div>
+            <div class="step" data-step="3">3. 完成验证</div>
+          </div>
+
+          <div class="form-section">
+            <div class="form-group">
+              <label>选择登录凭据</label>
+              <div class="credential-select" id="login-credential-select">
+                <div class="empty-state">请先选择用户并注册 Passkey</div>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button id="start-login" class="btn btn-primary btn-large">开始登录</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-revoke" style="display: none;">
+          <div class="form-section">
+            <h3>撤销凭据</h3>
+            <p class="description">撤销设备后，该凭据将无法再用于登录，但保留审计记录。这模拟了"设备丢失"场景。</p>
+            
+            <div class="form-group">
+              <label>选择要撤销的凭据</label>
+              <div class="credential-select" id="revoke-credential-select">
+                <div class="empty-state">请先选择用户并注册 Passkey</div>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button id="revoke-credential" class="btn btn-danger">撤销凭据</button>
+              <button id="unrevoke-credential" class="btn btn-secondary">恢复凭据</button>
+            </div>
+
+            <div class="info-box mt-20">
+              <strong>💡 提示：</strong>
+              <ul>
+                <li>撤销凭据后，尝试使用该凭据登录会被拒绝</li>
+                <li>可以通过"恢复凭据"来模拟"找回设备"场景</li>
+                <li>所有操作都会被记录到审计日志</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-attacks" style="display: none;">
+          <div class="form-section">
+            <h3>攻击演示</h3>
+            <p class="description">使用教学模拟器模式，可以演示各种攻击场景，观察后端如何检测和阻止这些攻击。</p>
+
+            <div class="attack-card">
+              <h4>🎭 重放攻击</h4>
+              <p>攻击者截获并重复使用之前的认证响应。后端通过标记挑战值为"已使用"来检测。</p>
+              <div class="form-group">
+                <label>选择凭据</label>
+                <div class="credential-select" id="attack-credential-select">
+                  <div class="empty-state">请先选择用户并注册 Passkey</div>
+                </div>
+              </div>
+              <button id="demo-replay" class="btn btn-warning">演示重放攻击</button>
+              <div class="hint">步骤：先正常登录一次，然后再次使用相同的挑战值尝试登录</div>
+            </div>
+
+            <div class="attack-card">
+              <h4>🔄 签名计数器倒退攻击</h4>
+              <p>攻击者克隆了设备但使用旧的签名计数器值。后端通过检测计数器不递增来识别。</p>
+              <button id="demo-rollback" class="btn btn-warning">演示计数器倒退</button>
+              <div class="hint">需要先使用模拟器模式完成至少一次正常登录</div>
+            </div>
+
+            <div class="info-box mt-20">
+              <strong>⚠️ 注意：</strong>
+              <p>这些攻击演示仅在"教学模拟器模式"下可用，用于教学目的。在真实 WebAuthn 模式下，浏览器会安全地处理这些细节。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-panel">
+        <div class="panel-section">
+          <h2>📊 当前操作详情</h2>
+          <div class="detail-view" id="detail-view">
+            <div class="empty-state">执行操作后，这里会显示详细信息</div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2>📝 审计日志</h2>
+          <div class="audit-log-list" id="audit-log-list">
+            <div class="empty-state">暂无操作记录</div>
+          </div>
+          <button id="refresh-logs" class="btn btn-secondary btn-small mt-10">刷新日志</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/webauthn-adapter.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
