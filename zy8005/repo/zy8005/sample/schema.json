@@ -1,0 +1,168 @@
+{
+  "tables": {
+    "accounts": {
+      "columns": {
+        "id": {
+          "type": "string",
+          "max_length": 50,
+          "required": true,
+          "description": "客户唯一标识"
+        },
+        "name": {
+          "type": "string",
+          "max_length": 200,
+          "required": true,
+          "description": "公司名称"
+        },
+        "website": {
+          "type": "string",
+          "max_length": 255,
+          "format": "url",
+          "description": "公司网站"
+        },
+        "industry": {
+          "type": "string",
+          "max_length": 50,
+          "enum": ["technology", "energy", "retail", "finance", "healthcare", "education"],
+          "description": "行业类型"
+        },
+        "status": {
+          "type": "string",
+          "max_length": 20,
+          "enum": ["active", "inactive", "prospect"],
+          "required": true,
+          "default": "prospect",
+          "description": "客户状态"
+        },
+        "created_at": {
+          "type": "date",
+          "required": true,
+          "description": "创建日期"
+        },
+        "description": {
+          "type": "string",
+          "max_length": 1000,
+          "description": "客户描述"
+        }
+      }
+    },
+    "contacts": {
+      "columns": {
+        "id": {
+          "type": "string",
+          "max_length": 50,
+          "required": true,
+          "description": "联系人唯一标识"
+        },
+        "account_id": {
+          "type": "string",
+          "max_length": 50,
+          "required": true,
+          "description": "关联客户ID"
+        },
+        "first_name": {
+          "type": "string",
+          "max_length": 100,
+          "description": "名"
+        },
+        "last_name": {
+          "type": "string",
+          "max_length": 100,
+          "required": true,
+          "description": "姓"
+        },
+        "email": {
+          "type": "string",
+          "max_length": 255,
+          "format": "email",
+          "description": "邮箱地址"
+        },
+        "phone": {
+          "type": "string",
+          "max_length": 50,
+          "format": "phone",
+          "description": "联系电话"
+        },
+        "position": {
+          "type": "string",
+          "max_length": 100,
+          "description": "职位"
+        },
+        "is_primary": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否主要联系人"
+        }
+      },
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "referenced_table": "accounts",
+          "referenced_column": "id"
+        }
+      ]
+    },
+    "activities": {
+      "columns": {
+        "id": {
+          "type": "string",
+          "max_length": 50,
+          "required": true,
+          "description": "活动唯一标识"
+        },
+        "account_id": {
+          "type": "string",
+          "max_length": 50,
+          "required": true,
+          "description": "关联客户ID"
+        },
+        "contact_id": {
+          "type": "string",
+          "max_length": 50,
+          "description": "关联联系人ID"
+        },
+        "activity_type": {
+          "type": "string",
+          "max_length": 50,
+          "enum": ["meeting", "call", "email", "task", "note"],
+          "required": true,
+          "description": "活动类型"
+        },
+        "activity_date": {
+          "type": "datetime",
+          "required": true,
+          "description": "活动日期时间"
+        },
+        "subject": {
+          "type": "string",
+          "max_length": 500,
+          "required": true,
+          "description": "活动主题"
+        },
+        "duration_minutes": {
+          "type": "integer",
+          "description": "持续时间（分钟）"
+        },
+        "status": {
+          "type": "string",
+          "max_length": 20,
+          "enum": ["planned", "in_progress", "completed", "cancelled"],
+          "default": "planned",
+          "description": "活动状态"
+        }
+      },
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "referenced_table": "accounts",
+          "referenced_column": "id"
+        },
+        {
+          "column": "contact_id",
+          "referenced_table": "contacts",
+          "referenced_column": "id"
+        }
+      ]
+    }
+  }
+}
