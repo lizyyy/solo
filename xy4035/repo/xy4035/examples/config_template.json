@@ -1,0 +1,122 @@
+{
+  "project_name": "桥梁模型加载试验",
+  "project_id": "bridge_test_2024",
+  "description": "钢梁四点弯曲加载试验，测试应变分布和中性轴位置",
+  "sensors": [
+    {
+      "sensor_id": "SG1",
+      "type": "strain_gauge",
+      "name": "上缘应变片1",
+      "unit": "microstrain",
+      "location_y": 0.25,
+      "temperature_compensation_sensor": "T1",
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "SG2",
+      "type": "strain_gauge",
+      "name": "上缘应变片2",
+      "unit": "microstrain",
+      "location_y": 0.20,
+      "temperature_compensation_sensor": "T1",
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "SG3",
+      "type": "strain_gauge",
+      "name": "下缘应变片3",
+      "unit": "microstrain",
+      "location_y": 0.05,
+      "temperature_compensation_sensor": "T1",
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "SG4",
+      "type": "strain_gauge",
+      "name": "中部应变片4",
+      "unit": "microstrain",
+      "location_y": 0.15,
+      "temperature_compensation_sensor": "T2",
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "SG5",
+      "type": "strain_gauge",
+      "name": "底部应变片5",
+      "unit": "microstrain",
+      "location_y": 0.0,
+      "temperature_compensation_sensor": "T2",
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "T1",
+      "type": "temperature_sensor",
+      "name": "温度传感器1",
+      "unit": "celsius",
+      "location_y": null,
+      "temperature_compensation_sensor": null,
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "T2",
+      "type": "temperature_sensor",
+      "name": "温度传感器2",
+      "unit": "celsius",
+      "location_y": null,
+      "temperature_compensation_sensor": null,
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "D1",
+      "type": "displacement_meter",
+      "name": "位移计1",
+      "unit": "mm",
+      "location_y": 0.25,
+      "temperature_compensation_sensor": null,
+      "gain": 1.0,
+      "offset": 0.0
+    },
+    {
+      "sensor_id": "D2",
+      "type": "displacement_meter",
+      "name": "位移计2",
+      "unit": "mm",
+      "location_y": 0.25,
+      "temperature_compensation_sensor": null,
+      "gain": 1.0,
+      "offset": 0.0
+    }
+  ],
+  "cross_section": {
+    "width": 0.15,
+    "height": 0.3,
+    "neutral_axis_y": 0.15,
+    "area": 0.045,
+    "moment_of_inertia": 3.375e-05
+  },
+  "material": {
+    "name": "Q235钢",
+    "elastic_modulus": 2.06e11,
+    "poisson_ratio": 0.3,
+    "thermal_expansion_coefficient": 1.2e-05
+  },
+  "default_sampling_rate": 10.0,
+  "max_time_offset": 0.1,
+  "zero_load_duration": 30.0,
+  "output_directory": "output",
+  "data_directory": "data",
+  "quarantine_directory": "quarantine",
+  "thresholds": {
+    "max_strain": 2000.0,
+    "max_displacement": 100.0,
+    "residual_strain_ratio": 0.1,
+    "strain_jump_threshold": 100.0
+  }
+}
