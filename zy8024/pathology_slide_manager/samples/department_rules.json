@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "department": "病理科",
+      "max_borrow_days": 7,
+      "max_concurrent_borrows": 5,
+      "allow_extend": true,
+      "requires_approval": false,
+      "notes": "本科室借阅流程简化"
+    },
+    {
+      "department": "肿瘤科",
+      "max_borrow_days": 14,
+      "max_concurrent_borrows": 3,
+      "allow_extend": true,
+      "requires_approval": true,
+      "notes": "需填写借阅申请表"
+    },
+    {
+      "department": "外科",
+      "max_borrow_days": 10,
+      "max_concurrent_borrows": 3,
+      "allow_extend": false,
+      "requires_approval": true,
+      "notes": "手术相关优先处理"
+    },
+    {
+      "department": "研究所",
+      "max_borrow_days": 30,
+      "max_concurrent_borrows": 10,
+      "allow_extend": true,
+      "requires_approval": true,
+      "notes": "科研项目专用配额"
+    },
+    {
+      "department": "其他",
+      "max_borrow_days": 7,
+      "max_concurrent_borrows": 2,
+      "allow_extend": false,
+      "requires_approval": true,
+      "notes": "临时借阅需审批"
+    }
+  ]
+}
