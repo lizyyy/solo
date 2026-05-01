@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}新建锅次 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('cycles') }}">锅次管理</a></li>
+                <li class="breadcrumb-item active">新建锅次</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>🔥 新建锅次</h4>
+            <form method="POST" action="{{ url_for('add_cycle') }}">
+                <div class="mb-3">
+                    <label class="form-label">锅次编号 <span class="text-danger">*</span></label>
+                    <input type="text" name="cycle_number" class="form-control" required
+                           value="{{ default_number }}">
+                    <div class="form-text">系统自动生成，可手动修改</div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">灭菌锅号 <span class="text-danger">*</span></label>
+                        <select name="autoclave_id" class="form-select" required>
+                            <option value="">请选择</option>
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="A3">A3</option>
+                            <option value="B1">B1</option>
+                            <option value="B2">B2</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">操作人 <span class="text-danger">*</span></label>
+                        <input type="text" name="operator" class="form-control" required
+                               placeholder="请输入操作人姓名">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">温度 (℃)</label>
+                        <input type="number" name="temperature" class="form-control" 
+                               placeholder="例如: 121" step="0.1">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">压力 (kPa)</label>
+                        <input type="number" name="pressure" class="form-control" 
+                               placeholder="例如: 103" step="0.1">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">备注</label>
+                    <textarea name="notes" class="form-control" rows="3"
+                              placeholder="可选，输入备注信息..."></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        💾 创建锅次
+                    </button>
+                    <a href="{{ url_for('cycles') }}" class="btn btn-outline-secondary">
+                        取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>📋 锅次流程</h4>
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">1</div>
+                    <div class="ms-3">
+                        <strong>创建锅次</strong>
+                        <div class="text-muted small">填写基本信息</div>
+                    </div>
+                </div>
+                <div class="ms-4 border-start" style="height: 20px;"></div>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">2</div>
+                    <div class="ms-3">
+                        <strong>添加器械包</strong>
+                        <div class="text-muted small">将待灭菌的器械包加入锅次</div>
+                    </div>
+                </div>
+                <div class="ms-4 border-start" style="height: 20px;"></div>
+                
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">3</div>
+                    <div class="ms-3">
+                        <strong>完成锅次</strong>
+                        <div class="text-muted small">填写生物/化学指示结果</div>
+                    </div>
+                </div>
+                <div class="ms-4 border-start" style="height: 20px;"></div>
+                
+                <div class="d-flex align-items-center">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">4</div>
+                    <div class="ms-3">
+                        <strong>放行/失败</strong>
+                        <div class="text-muted small">指示通过则放行，失败则隔离所有包</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4>⚠️ 注意事项</h4>
+            <ul class="mb-0">
+                <li class="mb-2">锅次创建后状态为"进行中"</li>
+                <li class="mb-2">只有进行中的锅次可以添加器械包</li>
+                <li class="mb-2">完成锅次时必须填写生物/化学指示结果</li>
+                <li class="mb-2">指示结果未通过或缺失时不能放行</li>
+                <li>锅次标记失败后，所有未领用的器械包会自动隔离</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

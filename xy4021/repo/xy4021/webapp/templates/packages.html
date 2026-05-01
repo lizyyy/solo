@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}器械包管理 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">器械包管理</h2>
+        <p class="text-muted">管理所有器械包的状态和生命周期</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('add_package') }}" class="btn btn-primary">
+            ➕ 新增器械包
+        </a>
+    </div>
+</div>
+
+<div class="card card-stat mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('packages') }}" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">状态筛选</label>
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="全部" {% if current_filter == '全部' %}selected{% endif %}>全部状态</option>
+                    {% for status in statuses %}
+                    <option value="{{ status }}" {% if current_filter == status %}selected{% endif %}>{{ status }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">搜索</label>
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="搜索编号或模板..." value="{{ search }}">
+                    <button class="btn btn-outline-secondary" type="submit">🔍</button>
+                </div>
+            </div>
+            <div class="col-md-auto">
+                <a href="{{ url_for('packages') }}" class="btn btn-outline-secondary">重置</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>模板类型</th>
+                <th>状态</th>
+                <th>当前锅次</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pkg in packages %}
+            <tr>
+                <td><strong>{{ pkg.package_number }}</strong></td>
+                <td>{{ pkg.template_name }}</td>
+                <td>
+                    <span class="status-badge status-{{ pkg.status }}">{{ pkg.status }}</span>
+                </td>
+                <td>
+                    {% if pkg.current_cycle_id %}
+                    <span class="badge bg-info">#{{ pkg.current_cycle_id }}</span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted small">{{ pkg.created_at }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('package_history', package_id=pkg.id) }}" 
+                           class="btn btn-sm btn-outline-info" title="查看历史">
+                            📋
+                        </a>
+                        
+                        {% if pkg.status == '已放行' %}
+                        <form method="POST" action="{{ url_for('use_package', package_id=pkg.id) }}" style="display:inline;"
+                              onsubmit="return confirmAction('确定要领用这个器械包吗？')">
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="领用">
+                                ✅
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if pkg.status != '已领用' and pkg.status != '已报废' %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" title="报废"
+                                onclick="showDiscardModal({{ pkg.id }}, '{{ pkg.package_number }}')">
+                            🗑️
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                    <div class="mb-2">📦</div>
+                    <p>暂无器械包数据</p>
+                    <a href="{{ url_for('add_package') }}" class="btn btn-sm btn-primary">新增第一个</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <div class="text-muted">
+        共 {{ packages|length }} 条记录
+    </div>
+    <div>
+        <a href="{{ url_for('export_inventory') }}" class="btn btn-outline-secondary btn-sm">
+            📥 导出CSV
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="discardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">报废器械包</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="discardForm" method="POST">
+                <div class="modal-body">
+                    <p>确定要报废器械包 <strong id="discardPackageNumber"></strong> 吗？</p>
+                    <div class="mb-3">
+                        <label class="form-label">报废原因</label>
+                        <input type="text" name="reason" class="form-control" placeholder="请输入报废原因" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">确认报废</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showDiscardModal(packageId, packageNumber) {
+    document.getElementById('discardPackageNumber').textContent = packageNumber;
+    document.getElementById('discardForm').action = '/packages/' + packageId + '/discard';
+    new bootstrap.Modal(document.getElementById('discardModal')).show();
+}
+</script>
+{% endblock %}

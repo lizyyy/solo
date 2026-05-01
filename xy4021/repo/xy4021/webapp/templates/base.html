@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}器械包追踪台{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --status-pending: #ffc107;
+            --status-sterilizing: #0d6efd;
+            --status-pending-release: #fd7e14;
+            --status-released: #198754;
+            --status-used: #6c757d;
+            --status-isolated: #dc3545;
+            --status-discarded: #495057;
+        }
+        
+        .status-badge {
+            padding: 0.35em 0.65em;
+            font-size: 0.85em;
+            border-radius: 0.25rem;
+        }
+        
+        .status-待灭菌 { background-color: var(--status-pending); color: #000; }
+        .status-灭菌中 { background-color: var(--status-sterilizing); color: #fff; }
+        .status-待放行 { background-color: var(--status-pending-release); color: #fff; }
+        .status-已放行 { background-color: var(--status-released); color: #fff; }
+        .status-已领用 { background-color: var(--status-used); color: #fff; }
+        .status-已隔离 { background-color: var(--status-isolated); color: #fff; }
+        .status-已报废 { background-color: var(--status-discarded); color: #fff; }
+        
+        .cycle-status-进行中 { background-color: var(--status-sterilizing); color: #fff; }
+        .cycle-status-已完成 { background-color: var(--status-released); color: #fff; }
+        .cycle-status-失败 { background-color: var(--status-isolated); color: #fff; }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e3a5f 0%, #2c5282 100%);
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.2s;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .card-stat {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .card-stat .card-body {
+            padding: 24px;
+        }
+        
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .table-container .table {
+            margin-bottom: 0;
+        }
+        
+        .table-container .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            padding: 16px;
+        }
+        
+        .table-container .table td {
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+        
+        .btn-action {
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            margin: 0 2px;
+        }
+        
+        .flash-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        
+        .form-section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .form-section h4 {
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-card .detail-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        
+        .detail-card .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            padding-bottom: 20px;
+            border-left: 2px solid #dee2e6;
+            margin-left: 10px;
+        }
+        
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #0d6efd;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+        
+        .timeline-content {
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'warning' if category == 'warning' else 'success' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 sidebar">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-4 min-vh-100">
+                    <div class="text-white mb-4 text-center text-sm-start w-100 px-2">
+                        <h5 class="mb-1">🔬 器械包追踪台</h5>
+                        <small class="text-white-50">口腔诊所消毒管理系统</small>
+                    </div>
+                    
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 w-100">
+                        <li class="nav-item">
+                            <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                                <span>📊</span> 仪表盘
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('packages') }}" class="nav-link {% if 'packages' in request.endpoint %}active{% endif %}">
+                                <span>📦</span> 器械包管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('cycles') }}" class="nav-link {% if 'cycles' in request.endpoint %}active{% endif %}">
+                                <span>🔥</span> 锅次管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('trace') }}" class="nav-link {% if request.endpoint == 'trace' %}active{% endif %}">
+                                <span>🔍</span> 追溯查询
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('reports') }}" class="nav-link {% if 'report' in request.endpoint %}active{% endif %}">
+                                <span>📈</span> 报表中心
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('import_packages') }}" class="nav-link {% if request.endpoint == 'import_packages' %}active{% endif %}">
+                                <span>📥</span> 导入数据
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="text-white-50 w-100">
+                    
+                    <div class="text-white-50 small mb-4 px-2">
+                        <div>📁 数据存储: SQLite</div>
+                        <div>📅 今天: {{ now }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col py-4 px-4" style="background-color: #f5f7fa;">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        function confirmAction(message) {
+            return confirm(message);
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}报表中心 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">报表中心</h2>
+        <p class="text-muted">查看和导出各类统计报表</p>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">📊</span>
+                </div>
+                <h5 class="card-title">库存报告</h5>
+                <p class="card-text text-muted small">
+                    查看当前库存状态分布，包括各状态器械包数量、模板分布等统计信息。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('report_inventory') }}" class="btn btn-primary btn-sm">
+                        查看报告
+                    </a>
+                    <a href="{{ url_for('export_inventory') }}" class="btn btn-outline-secondary btn-sm">
+                        导出CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">❌</span>
+                </div>
+                <h5 class="card-title">失败锅次报告</h5>
+                <p class="card-text text-muted small">
+                    查看所有失败的锅次记录，包括失败原因、隔离的器械包数量等信息。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('report_failed_cycles') }}" class="btn btn-danger btn-sm">
+                        查看报告
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">📅</span>
+                </div>
+                <h5 class="card-title">每日汇总报告</h5>
+                <p class="card-text text-muted small">
+                    查看今日的业务汇总，包括新建锅次数、新建器械包数、当前库存状态等。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('report_daily') }}" class="btn btn-info btn-sm">
+                        查看报告
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">🔗</span>
+                </div>
+                <h5 class="card-title">锅次追溯报告</h5>
+                <p class="card-text text-muted small">
+                    导出所有锅次及其关联器械包的完整追溯信息，适用于审计和合规检查。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('export_cycles') }}" class="btn btn-outline-primary btn-sm">
+                        导出CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">🔍</span>
+                </div>
+                <h5 class="card-title">单个器械包追溯</h5>
+                <p class="card-text text-muted small">
+                    查询特定器械包的完整生命周期历史，包括所有状态变更和关联锅次。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('trace') }}" class="btn btn-outline-primary btn-sm">
+                        前往查询
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col">
+        <div class="card card-stat h-100">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="display-4">📥</span>
+                </div>
+                <h5 class="card-title">导入导出</h5>
+                <p class="card-text text-muted small">
+                    从CSV文件批量导入器械包，或导出当前库存数据进行备份。
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('import_packages') }}" class="btn btn-outline-success btn-sm">
+                        导入数据
+                    </a>
+                    <a href="{{ url_for('export_inventory') }}" class="btn btn-outline-secondary btn-sm">
+                        导出库存
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
