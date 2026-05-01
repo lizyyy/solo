@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 器械包灭菌装载预检工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+        #app {
+            display: flex;
+            height: 100vh;
+        }
+        #sidebar {
+            width: 380px;
+            background: #f5f5f5;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+        }
+        #viewer {
+            flex: 1;
+            position: relative;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+        #warnings {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+        }
+        .warning-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            border-left: 4px solid #ffc107;
+        }
+        .warning-item.error {
+            border-left-color: #dc3545;
+        }
+        h2 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        h3 {
+            margin: 15px 0 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        #selected-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar">
+            <h2>3D 器械包灭菌装载预检</h2>
+            
+            <h3>数据输入</h3>
+            <div class="input-group">
+                <label>托盘规格 (JSON)</label>
+                <input type="file" id="tray-file" accept=".json">
+                <button class="btn btn-secondary" id="load-tray-sample">加载示例托盘</button>
+            </div>
+            <div class="input-group">
+                <label>器械清单 (CSV)</label>
+                <input type="file" id="instruments-file" accept=".csv">
+                <button class="btn btn-secondary" id="load-instruments-sample">加载示例器械</button>
+            </div>
+            <div class="input-group">
+                <label>灭菌规则 (YAML)</label>
+                <input type="file" id="rules-file" accept=".yaml,.yml">
+                <button class="btn btn-secondary" id="load-rules-sample">加载示例规则</button>
+            </div>
+            
+            <button class="btn" id="load-all">加载全部示例</button>
+            
+            <h3>操作</h3>
+            <button class="btn" id="reset-view">重置视角</button>
+            <button class="btn btn-success" id="validate">校验规则</button>
+            <button class="btn" id="export-plan">导出 Load Plan</button>
+            <button class="btn" id="export-report">导出 Risk Report</button>
+            
+            <div id="selected-info" style="display: none;">
+                <h3>选中器械</h3>
+                <div id="selected-details"></div>
+            </div>
+            
+            <div id="warnings" style="display: none;">
+                <h3>校验结果</h3>
+                <div id="warnings-list"></div>
+            </div>
+        </div>
+        <div id="viewer">
+            <div id="canvas-container"></div>
+        </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
