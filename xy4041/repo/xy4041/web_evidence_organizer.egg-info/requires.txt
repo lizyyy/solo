@@ -1,0 +1,12 @@
+click>=8.0.0
+pydantic>=2.0.0
+beautifulsoup4>=4.9.0
+lxml>=4.9.0
+python-dateutil>=2.8.0
+pytz>=2023.3
+Pillow>=10.0.0
+python-magic>=0.4.27
+
+[dev]
+pytest>=7.0.0
+pytest-cov>=4.0.0
