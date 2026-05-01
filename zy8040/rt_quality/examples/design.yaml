@@ -1,0 +1,10 @@
+conditions:
+  - congruent
+  - incongruent
+
+condition_typo_map:
+  " congruent": congruent
+
+cleaning:
+  min_rt: 100
+  sd_threshold: 3.0
