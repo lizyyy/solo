@@ -89,7 +89,9 @@ async function executeCheck(options) {
 }
 
 async function generateReports(issues, outputDir) {
-  if (!await fs.exists(outputDir)) {
+  try {
+    await fs.access(outputDir);
+  } catch {
     await fs.mkdir(outputDir, { recursive: true });
   }
 

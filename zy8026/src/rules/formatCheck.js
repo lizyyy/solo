@@ -77,15 +77,17 @@ function findMetadata(metadata, filename) {
   const baseName = filename.toLowerCase().replace(/\.[^.]+$/, '');
   
   if (metadata.streams) {
+    let firstVideoStream = null;
     for (const stream of metadata.streams) {
       if (stream.codec_type === 'video') {
+        if (!firstVideoStream) firstVideoStream = stream;
         if (stream.tags?.filename) {
           const metaName = stream.tags.filename.toLowerCase().replace(/\.[^.]+$/, '');
           if (metaName === baseName) return stream;
         }
-        return stream;
       }
     }
+    return firstVideoStream;
   }
   
   return null;
