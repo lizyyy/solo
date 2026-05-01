@@ -1,0 +1,15 @@
+interventions:
+  - date: "2026-05-01"
+    flight_num: "MU505"
+    time: "07:40"
+    type: "carousel_reassign"
+    from_carousel: "T2-1"
+    to_carousel: "T2-2"
+    reason: "T2-1 拥堵"
+  - date: "2026-05-01"
+    flight_num: "CA404"
+    time: "07:50"
+    type: "staff_deployment"
+    carousel: "C2"
+    staff_added: 2
+    reason: "加快处理速度"
