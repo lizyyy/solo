@@ -1,0 +1,56 @@
+plan_id: PLAN-2024-001
+description: 2024年第一批次变更计划 - 包含上架、迁移、下架场景
+
+steps:
+  - step_id: STEP-001
+    change_type: add
+    device_id: srv-008
+    target_rack_id: RACK-A01
+    target_u_start: 7
+    target_u_end: 8
+    target_switch_port: port-004
+    target_vlan: vlan100
+    notes: 新增Web服务器
+
+  - step_id: STEP-002
+    change_type: move
+    device_id: srv-007
+    target_rack_id: RACK-B01
+    target_u_start: 22
+    target_u_end: 23
+    target_switch_port: port-009
+    target_vlan: vlan300
+    notes: 迁移Cache服务器到新位置（测试端口未释放场景）
+
+  - step_id: STEP-003
+    change_type: remove
+    device_id: srv-006
+    notes: 下架存储节点
+
+  - step_id: STEP-004
+    change_type: add
+    device_id: srv-009
+    target_rack_id: RACK-A02
+    target_u_start: 5
+    target_u_end: 6
+    target_switch_port: port-007
+    target_vlan: vlan100
+    notes: 上架迁移服务器
+
+  - step_id: STEP-005
+    change_type: move
+    device_id: srv-003
+    target_rack_id: RACK-A02
+    target_u_start: 7
+    target_u_end: 8
+    target_switch_port: port-008
+    target_vlan: vlan200
+    notes: 迁移DB服务器到RACK-A02
+
+  - step_id: STEP-006
+    change_type: add
+    device_id: non-existent-device
+    target_rack_id: RACK-A01
+    target_u_start: 25
+    target_u_end: 26
+    notes: 测试引用不存在设备
