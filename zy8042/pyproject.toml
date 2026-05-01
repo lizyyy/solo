@@ -1,0 +1,13 @@
+[project]
+name = "empty-yard-sim"
+version = "0.1.0"
+description = "空箱调箱策略模拟工具"
+requires-python = ">=3.9"
+dependencies = ["pyyaml>=6.0"]
+
+[project.scripts]
+empty-yard-sim = "empty_yard_sim.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
