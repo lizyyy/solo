@@ -1,0 +1,82 @@
+{
+  "id": "demo-room-1",
+  "name": "演示房间 1",
+  "cards": [
+    {
+      "id": "demo-card-001",
+      "title": "设计数据库架构",
+      "status": "todo",
+      "assignee": null,
+      "createdAt": 1777634443200,
+      "updatedAt": 1777634443200
+    },
+    {
+      "id": "demo-card-002",
+      "title": "实现用户认证",
+      "status": "in_progress",
+      "assignee": "Alice",
+      "createdAt": 1777636243200,
+      "updatedAt": 1777636243200
+    },
+    {
+      "id": "demo-card-003",
+      "title": "编写API文档",
+      "status": "done",
+      "assignee": "Bob",
+      "createdAt": 1777637983200,
+      "updatedAt": 1777637983200
+    }
+  ],
+  "eventLog": [],
+  "members": [
+    "2475021d-e5d4-48aa-bafb-b1a84b15b78e"
+  ],
+  "createdAt": 1777638043200,
+  "lastEventAt": 1777638043201,
+  "events": [
+    {
+      "id": "demo-evt-001",
+      "type": "card_created",
+      "roomId": "demo-room-1",
+      "payload": {
+        "cardId": "demo-card-001",
+        "title": "设计数据库架构",
+        "status": "todo"
+      },
+      "clientId": "demo-client",
+      "timestamp": 1777634443200,
+      "sequence": 1,
+      "receivedAt": 1777638043201
+    },
+    {
+      "id": "demo-evt-002",
+      "type": "card_created",
+      "roomId": "demo-room-1",
+      "payload": {
+        "cardId": "demo-card-002",
+        "title": "实现用户认证",
+        "status": "in_progress",
+        "assignee": "Alice"
+      },
+      "clientId": "demo-client",
+      "timestamp": 1777636243200,
+      "sequence": 2,
+      "receivedAt": 1777638043201
+    },
+    {
+      "id": "demo-evt-003",
+      "type": "card_created",
+      "roomId": "demo-room-1",
+      "payload": {
+        "cardId": "demo-card-003",
+        "title": "编写API文档",
+        "status": "done",
+        "assignee": "Bob"
+      },
+      "clientId": "demo-client",
+      "timestamp": 1777637983200,
+      "sequence": 3,
+      "receivedAt": 1777638043201
+    }
+  ]
+}

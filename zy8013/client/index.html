@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>多人排班墙 - 事件回放调试台</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>多人排班墙 - 事件回放调试台</h1>
+      <div class="header-info">
+        <span id="clientIdDisplay">Client ID: --</span>
+        <span id="connectionStatus" class="status-disconnected">未连接</span>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>房间管理</h3>
+          <div class="input-group">
+            <input type="text" id="roomIdInput" placeholder="输入房间ID" value="demo-room-1">
+            <button id="joinRoomBtn">加入房间</button>
+          </div>
+          <div class="input-group">
+            <button id="createRoomBtn">创建新房间</button>
+            <button id="leaveRoomBtn" disabled>离开房间</button>
+          </div>
+          <div class="input-group">
+            <button id="resetRoomBtn" disabled>重置房间</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>房间列表</h3>
+          <div id="roomsList" class="list-container">
+            <p class="empty-text">加载中...</p>
+          </div>
+          <button id="refreshRoomsBtn">刷新列表</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>事件回放脚本</h3>
+          <div id="scriptsList" class="list-container">
+            <p class="empty-text">加载中...</p>
+          </div>
+          <div class="input-group">
+            <button id="startReplayBtn" disabled>开始回放</button>
+            <button id="stopReplayBtn" disabled>停止回放</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>同步与差异</h3>
+          <div class="input-group">
+            <button id="syncNowBtn" disabled>立即同步</button>
+            <button id="showDiffBtn" disabled>显示差异</button>
+          </div>
+          <div id="diffDisplay" class="diff-container hidden">
+            <h4>差异对比</h4>
+            <div id="diffContent"></div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>在线成员</h3>
+          <div id="membersList" class="list-container">
+            <p class="empty-text">未加入房间</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div class="room-header" id="roomHeader">
+          <div id="roomInfo">
+            <h2 id="roomName">未加入房间</h2>
+            <p id="roomStats">事件: 0 | 卡片: 0</p>
+          </div>
+          <div class="event-log-toggle">
+            <button id="toggleEventLog">显示事件日志</button>
+          </div>
+        </div>
+
+        <div class="kanban-board" id="kanbanBoard">
+          <div class="column" data-status="todo">
+            <div class="column-header">
+              <h3>待办</h3>
+              <span class="card-count" id="todoCount">0</span>
+            </div>
+            <div class="cards-container" id="todoColumn">
+              <p class="empty-text">暂无卡片</p>
+            </div>
+          </div>
+
+          <div class="column" data-status="in_progress">
+            <div class="column-header">
+              <h3>进行中</h3>
+              <span class="card-count" id="inProgressCount">0</span>
+            </div>
+            <div class="cards-container" id="inProgressColumn">
+              <p class="empty-text">暂无卡片</p>
+            </div>
+          </div>
+
+          <div class="column" data-status="review">
+            <div class="column-header">
+              <h3>审核中</h3>
+              <span class="card-count" id="reviewCount">0</span>
+            </div>
+            <div class="cards-container" id="reviewColumn">
+              <p class="empty-text">暂无卡片</p>
+            </div>
+          </div>
+
+          <div class="column" data-status="done">
+            <div class="column-header">
+              <h3>已完成</h3>
+              <span class="card-count" id="doneCount">0</span>
+            </div>
+            <div class="cards-container" id="doneColumn">
+              <p class="empty-text">暂无卡片</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="add-card-section">
+          <input type="text" id="newCardTitle" placeholder="输入新卡片标题..." disabled>
+          <button id="addCardBtn" disabled>添加卡片</button>
+        </div>
+      </main>
+
+      <aside class="event-log-panel" id="eventLogPanel">
+        <div class="event-log-header">
+          <h3>事件日志</h3>
+          <button id="closeEventLog">×</button>
+        </div>
+        <div id="eventLogContent" class="event-log-content">
+          <p class="empty-text">暂无事件</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="notifications" id="notifications"></div>
+
+    <div id="cardEditModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>编辑卡片</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>标题</label>
+            <input type="text" id="editCardTitle">
+          </div>
+          <div class="form-group">
+            <label>负责人</label>
+            <input type="text" id="editCardAssignee" placeholder="可选">
+          </div>
+          <div class="form-group">
+            <label>状态</label>
+            <select id="editCardStatus">
+              <option value="todo">待办</option>
+              <option value="in_progress">进行中</option>
+              <option value="review">审核中</option>
+              <option value="done">已完成</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancelEditCard">取消</button>
+          <button class="btn-primary" id="saveEditCard">保存</button>
+          <button class="btn-danger" id="deleteCardBtn">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
