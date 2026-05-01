@@ -1,0 +1,117 @@
+{
+  "tools": [
+    {
+      "name": "search_code",
+      "description": "在代码库中搜索代码片段或符号。幂等操作，可安全重试。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "搜索查询字符串"
+          },
+          "language": {
+            "type": "string",
+            "enum": ["python", "javascript", "typescript", "go", "rust", "java"],
+            "description": "编程语言过滤"
+          },
+          "max_results": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10
+          }
+        },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "read_file",
+      "description": "读取文件内容。幂等操作，可安全重试。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "要读取的文件路径"
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "读取偏移量（行号）"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "最大读取行数"
+          }
+        },
+        "required": ["file_path"]
+      }
+    },
+    {
+      "name": "write_file",
+      "description": "写入文件内容。非幂等操作，多次调用可能覆盖或修改文件。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "要写入的文件路径"
+          },
+          "content": {
+            "type": "string",
+            "description": "文件内容"
+          },
+          "append": {
+            "type": "boolean",
+            "default": false,
+            "description": "是否追加模式"
+          }
+        },
+        "required": ["file_path", "content"]
+      }
+    },
+    {
+      "name": "create_user",
+      "description": "创建新用户。非幂等操作，多次调用会创建多个用户。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "用户邮箱"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "user", "guest"],
+            "default": "user"
+          }
+        },
+        "required": ["username", "email"]
+      }
+    },
+    {
+      "name": "list_users",
+      "description": "列出所有用户。幂等操作。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "description": "过滤条件"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50
+          }
+        }
+      }
+    }
+  ]
+}
