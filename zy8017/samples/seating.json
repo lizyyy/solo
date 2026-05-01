@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "theatre_name": "星光大剧院",
+    "show_name": "《剧院魅影》2026巡演",
+    "accessible_sections": ["无障碍区"],
+    "total_seats": 120,
+    "last_updated": "2026-05-01"
+  },
+  "sections": {
+    "A区": {
+      "name": "VIP 区",
+      "description": "中央观演最佳区域",
+      "rows": {
+        "1": {
+          "name": "第1排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": false, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        },
+        "2": {
+          "name": "第2排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": false, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        },
+        "3": {
+          "name": "第3排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": false, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        },
+        "4": {
+          "name": "第4排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": false, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "9": {"number": "9", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "10": {"number": "10", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        },
+        "5": {
+          "name": "第5排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "9": {"number": "9", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "10": {"number": "10", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "11": {"number": "11", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "12": {"number": "12", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "13": {"number": "13", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "14": {"number": "14", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "15": {"number": "15", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        },
+        "6": {
+          "name": "第6排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "3": {"number": "3", "is_available": false, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "9": {"number": "9", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0},
+            "10": {"number": "10", "is_available": true, "is_accessible": false, "category": "VIP", "price": 280.0}
+          }
+        }
+      }
+    },
+    "B区": {
+      "name": "标准区",
+      "description": "侧区标准座位",
+      "rows": {
+        "2": {
+          "name": "第2排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0}
+          }
+        },
+        "3": {
+          "name": "第3排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "3": {"number": "3", "is_available": false, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0}
+          }
+        },
+        "5": {
+          "name": "第5排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "Standard", "price": 180.0}
+          }
+        }
+      }
+    },
+    "C区": {
+      "name": "经济区",
+      "description": "后区经济座位",
+      "rows": {
+        "2": {
+          "name": "第2排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0}
+          }
+        },
+        "3": {
+          "name": "第3排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "4": {"number": "4", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "5": {"number": "5", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "6": {"number": "6", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "7": {"number": "7", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0},
+            "8": {"number": "8", "is_available": true, "is_accessible": false, "category": "Economy", "price": 120.0}
+          }
+        }
+      }
+    },
+    "无障碍区": {
+      "name": "无障碍座位区",
+      "description": "为行动不便人士设置的专用区域",
+      "rows": {
+        "1": {
+          "name": "第1排",
+          "seats": {
+            "1": {"number": "1", "is_available": true, "is_accessible": true, "category": "Accessible", "price": 180.0},
+            "2": {"number": "2", "is_available": true, "is_accessible": true, "category": "Accessible", "price": 180.0},
+            "3": {"number": "3", "is_available": true, "is_accessible": true, "category": "Accessible", "price": 180.0}
+          }
+        }
+      }
+    }
+  }
+}
