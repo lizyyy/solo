@@ -1,0 +1,63 @@
+{
+  "page": "首页性能预算",
+  "thresholds": {
+    "totalRequests": 50,
+    "totalSize": 5242880,
+    "resourceTypes": {
+      "script": {
+        "count": 15,
+        "size": 2097152
+      },
+      "image": {
+        "count": 20,
+        "size": 2097152
+      },
+      "stylesheet": {
+        "count": 8,
+        "size": 524288
+      },
+      "font": {
+        "count": 5,
+        "size": 262144
+      }
+    },
+    "timing": {
+      "domContentLoaded": 2000,
+      "onLoad": 3000,
+      "firstContentfulPaint": 1500,
+      "timeToInteractive": 3500
+    },
+    "thirdParty": {
+      "count": 10,
+      "size": 1048576,
+      "domains": ["google-analytics.com", "doubleclick.net", "facebook.net"]
+    },
+    "cache": {
+      "missRate": 20
+    }
+  },
+  "comments": {
+    "totalRequests": "最大请求数：50个",
+    "totalSize": "最大总大小：5MB (5242880字节)",
+    "resourceTypes": {
+      "script": "脚本：最多15个，最大2MB",
+      "image": "图片：最多20个，最大2MB",
+      "stylesheet": "样式表：最多8个，最大512KB",
+      "font": "字体：最多5个，最大256KB"
+    },
+    "timing": {
+      "domContentLoaded": "DOMContentLoaded：2秒内",
+      "onLoad": "onLoad：3秒内",
+      "firstContentfulPaint": "首次内容绘制：1.5秒内",
+      "timeToInteractive": "可交互时间：3.5秒内"
+    },
+    "thirdParty": {
+      "count": "第三方请求数：最多10个",
+      "size": "第三方总大小：最大1MB",
+      "domains": "允许的第三方域名列表"
+    },
+    "cache": {
+      "missRate": "缓存未命中率：最多20%"
+    }
+  }
+}
