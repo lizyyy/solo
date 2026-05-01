@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Building {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  location    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  devices     Device[]
+}
+
+model Worker {
+  id          Int       @id @default(autoincrement())
+  name        String
+  phone       String?
+  skills      String    @default("[]")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  repairOrders RepairOrder[]
+}
+
+model Device {
+  id           Int         @id @default(autoincrement())
+  name         String
+  type         String
+  buildingId   Int
+  building     Building    @relation(fields: [buildingId], references: [id])
+  location     String?
+  status       String      @default("active")
+  lastPatrolAt DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  patrolTasks  PatrolTask[]
+  inspectionTemplates InspectionTemplate[]
+  repairOrders RepairOrder[]
+}
+
+model InspectionTemplate {
+  id          Int       @id @default(autoincrement())
+  name        String
+  deviceId    Int
+  device      Device    @relation(fields: [deviceId], references: [id])
+  checkItems  CheckItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model CheckItem {
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  templateId          Int
+  template            InspectionTemplate  @relation(fields: [templateId], references: [id])
+  description         String?
+  sortOrder           Int                 @default(0)
+  patrolTaskItems     PatrolTaskItem[]
+}
+
+model PatrolTask {
+  id          Int       @id @default(autoincrement())
+  name        String
+  deviceId    Int
+  device      Device    @relation(fields: [deviceId], references: [id])
+  status      String    @default("pending")
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  items       PatrolTaskItem[]
+  repairOrders RepairOrder[]
+}
+
+model PatrolTaskItem {
+  id            Int         @id @default(autoincrement())
+  patrolTaskId  Int
+  patrolTask    PatrolTask  @relation(fields: [patrolTaskId], references: [id])
+  checkItemId   Int
+  checkItem     CheckItem   @relation(fields: [checkItemId], references: [id])
+  result        String?
+  photoUrls     String      @default("[]")
+  notes         String?
+  isAbnormal    Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model RepairOrder {
+  id            Int         @id @default(autoincrement())
+  title         String
+  description   String?
+  status        String      @default("pending_assignment")
+  patrolTaskId  Int?
+  patrolTask    PatrolTask? @relation(fields: [patrolTaskId], references: [id])
+  deviceId      Int
+  device        Device      @relation(fields: [deviceId], references: [id])
+  workerId      Int?
+  worker        Worker?     @relation(fields: [workerId], references: [id])
+  skillRequired String?
+  estimatedMinutes Int?
+  dueDate       DateTime?
+  processingNotes String?
+  completedAt   DateTime?
+  reviewedBy    String?
+  reviewNotes   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}

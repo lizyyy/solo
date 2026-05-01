@@ -1,0 +1,47 @@
+{
+  "idea_id": "zy1010",
+  "idea_short_title": "请从零做一个给小型物业维修队用的全栈 Web 应用，叫“巡修排班台”。我们平时有一批楼栋设备要定期巡检，巡检发现问题后会",
+  "folder_name": "zy1010",
+  "idea_dir": "/Users/lzy/pro/solocoder/pro/zy1010",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "Bug修复",
+    "业务领域": "纯后端API服务",
+    "修改范围": "模块内多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/zy1010/base",
+    "round_branch": "idea/zy1010/r1",
+    "pr_title": "[zy1010][第一轮] 请从零做一个给小型物业维修队用的全栈 Web 应用，叫“巡修排班台”。我们平时有一批楼栋设备要定期巡",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": "uid/x01",
+      "repo_probe_inconclusive": false,
+      "ls_remote_returncode": 0,
+      "ls_remote_stderr": "",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/zy1010/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/zy1010/base...idea/zy1010/r1?expand=1",
+    "repo_dir": "/Users/lzy/pro/solocoder/pro/zy1010/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/lzy/pro/solocoder/pro/zy1010/zy1010.xlsx",
+    "uid": "zy1010",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/lzy/pro/solocoder/pro/zy1010/idea.md",
+    "prompt_raw": "/Users/lzy/pro/solocoder/pro/zy1010/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/lzy/pro/solocoder/pro/zy1010/prompts/第一轮-优化建议.md",
+    "pr": "/Users/lzy/pro/solocoder/pro/zy1010/pr/第一轮.md",
+    "round_json": "/Users/lzy/pro/solocoder/pro/zy1010/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T13:40:35.108096+08:00"
+}
