@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>按压节奏训练器 - CPR 胸外按压训练</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>按压节奏训练器</h1>
+      <p class="subtitle">CPR 胸外按压节奏训练</p>
+    </header>
+
+    <main class="main">
+      <div id="main-screen" class="screen">
+        <section id="setup-section" class="setup-section">
+          <div class="setup-card">
+            <h2>选择训练时长</h2>
+            <div class="duration-options">
+              <select id="duration-select" class="form-select">
+                <option value="30">30 秒</option>
+                <option value="60" selected>60 秒</option>
+                <option value="120">120 秒 (2分钟)</option>
+                <option value="custom">自定义时长</option>
+              </select>
+              <div id="custom-duration-group" class="custom-duration hidden">
+                <input type="number" id="custom-duration" 
+                       class="form-input" 
+                       min="10" max="600" 
+                       placeholder="输入秒数 (10-600)">
+                <span class="unit">秒</span>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button id="start-button" class="btn btn-primary btn-large">
+                开始训练
+              </button>
+            </div>
+
+            <div class="secondary-actions">
+              <button id="coach-button" class="btn btn-secondary">
+                教练模式
+              </button>
+              <button id="history-button" class="btn btn-secondary">
+                历史记录
+              </button>
+            </div>
+          </div>
+
+          <div class="instructions-card">
+            <h3>使用说明</h3>
+            <ul class="instructions">
+              <li>按 <strong>空格键</strong> 或 <strong>点击屏幕</strong> 模拟一次按压</li>
+              <li>目标节奏：<strong>100-120 次/分钟</strong></li>
+              <li>保持稳定的节奏，避免过快或过慢</li>
+              <li>训练结束后可查看评分和导出记录</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="countdown-section" class="countdown-section hidden">
+          <div class="countdown-display">
+            <div id="countdown-display" class="countdown-number">3</div>
+            <p class="countdown-text">准备开始...</p>
+          </div>
+        </section>
+
+        <section id="training-section" class="training-section hidden">
+          <div class="stats-bar">
+            <div class="stat-item">
+              <span class="stat-label">剩余时间</span>
+              <span id="timer-display" class="stat-value">01:00</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">当前 BPM</span>
+              <span id="bpm-display" class="stat-value">--</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">连续合格</span>
+              <span id="streak-display" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <div class="progress-container">
+            <div class="progress-bar-bg">
+              <div id="progress-bar" class="progress-bar-fill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="rhythm-display">
+            <div id="beat-ring" class="beat-ring">
+              <div class="beat-ring-outer"></div>
+              <div id="beat-ring-inner" class="beat-ring-inner"></div>
+              <div class="beat-ring-center">
+                <div class="instruction-text">按空格键</div>
+                <div class="instruction-sub">或点击屏幕</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feedback-container">
+            <div id="feedback-text" class="feedback-text">准备开始</div>
+          </div>
+
+          <div class="scatter-container">
+            <h4>最近 10 次按压偏差</h4>
+            <svg id="scatter-plot" class="scatter-plot" viewBox="0 0 300 80"></svg>
+            <div class="scatter-legend">
+              <span class="legend-item">
+                <span class="legend-dot" style="background: #4ade80"></span>完美
+              </span>
+              <span class="legend-item">
+                <span class="legend-dot" style="background: #60a5fa"></span>合格
+              </span>
+              <span class="legend-item">
+                <span class="legend-dot" style="background: #f87171"></span>过快
+              </span>
+              <span class="legend-item">
+                <span class="legend-dot" style="background: #fbbf24"></span>过慢
+              </span>
+            </div>
+          </div>
+
+          <div id="training-controls" class="control-buttons">
+            <button id="pause-button" class="btn btn-warning">
+              暂停
+            </button>
+            <button id="reset-button" class="btn btn-danger">
+              重开
+            </button>
+          </div>
+
+          <div id="pause-controls" class="control-buttons hidden">
+            <div class="pause-notice">
+              <strong>训练已暂停</strong>
+              <p>窗口失焦或点击暂停按钮</p>
+            </div>
+            <button id="resume-button" class="btn btn-success">
+              继续训练
+            </button>
+            <button id="reset-button" class="btn btn-danger">
+              重开
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div id="result-screen" class="screen hidden">
+        <div class="result-container">
+          <h2>训练结果</h2>
+          
+          <div class="result-overall">
+            <div class="score-circle">
+              <div id="result-overall" class="score-value">0</div>
+              <div class="score-label">综合评分</div>
+            </div>
+          </div>
+
+          <div class="result-stats">
+            <div class="result-row">
+              <div class="result-item">
+                <span class="result-label">平均 BPM</span>
+                <span id="result-bpm" class="result-number">--</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">准确率</span>
+                <span id="result-accuracy" class="result-number">0%</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">稳定度</span>
+                <span id="result-stability" class="result-number">0%</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">最长连续</span>
+                <span id="result-streak" class="result-number">0</span>
+              </div>
+            </div>
+
+            <div class="result-detail">
+              <h3>详细统计</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="detail-label">总按压次数</span>
+                  <span id="result-total-presses" class="detail-value">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">有效按压</span>
+                  <span id="result-valid-presses" class="detail-value">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">完美按压</span>
+                  <span id="result-perfect" class="detail-value good">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">过快</span>
+                  <span id="result-too-fast" class="detail-value bad">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">过慢</span>
+                  <span id="result-too-slow" class="detail-value bad">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">漏拍</span>
+                  <span id="result-missed" class="detail-value bad">0</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">连击误触</span>
+                  <span id="result-double-tap" class="detail-value bad">0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-suggestions">
+              <h3>建议练习点</h3>
+              <ul id="result-suggestions" class="suggestions-list">
+                <li>加载中...</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="result-actions">
+            <button id="export-json" class="btn btn-secondary">
+              导出 JSON
+            </button>
+            <button id="export-csv" class="btn btn-secondary">
+              导出 CSV
+            </button>
+            <button id="train-again" class="btn btn-primary">
+              再练一次
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="coach-screen" class="screen hidden">
+        <div class="coach-container">
+          <h2>教练模式 - 高级设置</h2>
+          
+          <form id="config-form" class="config-form">
+            <div id="config-error" class="config-error hidden"></div>
+
+            <div class="form-group">
+              <label for="config-bpm-low">目标 BPM 范围 (下限)</label>
+              <input type="number" id="config-bpm-low" 
+                     class="form-input" min="60" max="200" value="100">
+              <span class="form-hint">建议: 100</span>
+            </div>
+
+            <div class="form-group">
+              <label for="config-bpm-high">目标 BPM 范围 (上限)</label>
+              <input type="number" id="config-bpm-high" 
+                     class="form-input" min="60" max="200" value="120">
+              <span class="form-hint">建议: 120</span>
+            </div>
+
+            <div class="form-group">
+              <label for="config-tolerance">误差容忍 (毫秒)</label>
+              <input type="number" id="config-tolerance" 
+                     class="form-input" min="50" max="500" value="100">
+              <span class="form-hint">数值越大越宽松，建议: 100</span>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="config-metronome" checked>
+                <span>开启节拍提示音</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="config-mouse" checked>
+                <span>允许鼠标点击输入</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="config-volume">提示音音量</label>
+              <input type="range" id="config-volume" 
+                     class="form-range" min="0" max="1" step="0.1" value="0.7">
+              <span class="range-value">0.7</span>
+            </div>
+
+            <div class="form-group">
+              <label for="config-history-limit">历史记录保存数量</label>
+              <input type="number" id="config-history-limit" 
+                     class="form-input" min="1" max="100" value="20">
+              <span class="form-hint">最多保存 100 条</span>
+            </div>
+
+            <div class="config-actions">
+              <button type="button" id="save-config" class="btn btn-primary">
+                保存配置
+              </button>
+              <button type="button" id="reset-config" class="btn btn-secondary">
+                恢复默认
+              </button>
+              <button type="button" id="back-from-coach" class="btn btn-secondary">
+                返回
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="history-screen" class="screen hidden">
+        <div class="history-container">
+          <h2>训练历史记录</h2>
+          
+          <div id="history-stats" class="history-stats"></div>
+
+          <div class="history-actions-top">
+            <button id="export-history-json" class="btn btn-secondary btn-small">
+              全部导出 JSON
+            </button>
+            <button id="export-history-csv" class="btn btn-secondary btn-small">
+              全部导出 CSV
+            </button>
+            <button id="clear-history" class="btn btn-danger btn-small">
+              清除全部
+            </button>
+          </div>
+
+          <div id="history-list" class="history-list"></div>
+
+          <div class="history-footer">
+            <button id="back-from-history" class="btn btn-secondary">
+              返回
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>按压节奏训练器 - 帮助急救培训学员掌握正确的 CPR 胸外按压节奏</p>
+    </footer>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
