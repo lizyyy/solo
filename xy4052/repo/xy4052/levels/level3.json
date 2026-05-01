@@ -1,0 +1,180 @@
+{
+  "id": "level3",
+  "name": "急救夜班",
+  "description": "高难度急救夜班，包含多个急危重症患者，考验快速决策和资源调配能力",
+  "duration": 660,
+  "resources": {
+    "nurse": { "count": 2 },
+    "ecg_machine": { "count": 1 },
+    "lab": { "count": 1 },
+    "doctor": { "count": 1 },
+    "isolation_room": { "count": 1 }
+  },
+  "patients": [
+    {
+      "id": "p1",
+      "arrivalTime": 0,
+      "chiefComplaint": "心脏骤停",
+      "vitalSigns": {
+        "heartRate": 0,
+        "bloodPressure": "无法测量",
+        "temperature": 35.5,
+        "spo2": "无法测量",
+        "respiratoryRate": 0,
+        "gcs": 3
+      },
+      "riskFactors": ["冠心病史", "高血压", "糖尿病"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "ecg", "call_doctor", "blood_test"],
+      "deteriorationTime": 30,
+      "needsIsolation": false,
+      "description": "68岁男性，在家中突发意识丧失，家属呼叫120。急救人员到达时已无心跳呼吸，正在进行心肺复苏。"
+    },
+    {
+      "id": "p2",
+      "arrivalTime": 90,
+      "chiefComplaint": "严重创伤",
+      "vitalSigns": {
+        "heartRate": 140,
+        "bloodPressure": "75/40",
+        "temperature": 35.8,
+        "spo2": 88,
+        "respiratoryRate": 35,
+        "gcs": 10
+      },
+      "riskFactors": ["多发伤", "失血性休克"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "blood_test", "call_doctor", "fluids"],
+      "deteriorationTime": 60,
+      "needsIsolation": false,
+      "description": "35岁男性，高处坠落伤约20米，意识模糊，烦躁不安。全身多处伤口出血，左下肢畸形。"
+    },
+    {
+      "id": "p3",
+      "arrivalTime": 180,
+      "chiefComplaint": "急性脑卒中",
+      "vitalSigns": {
+        "heartRate": 95,
+        "bloodPressure": "185/105",
+        "temperature": 36.8,
+        "spo2": 94,
+        "respiratoryRate": 18,
+        "gcs": 13
+      },
+      "riskFactors": ["高血压史", "房颤", "吸烟"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "ecg", "blood_test", "call_doctor"],
+      "deteriorationTime": 120,
+      "needsIsolation": false,
+      "description": "72岁女性，突发右侧肢体无力2小时，伴言语不清。有高血压和房颤病史。"
+    },
+    {
+      "id": "p4",
+      "arrivalTime": 270,
+      "chiefComplaint": "药物中毒",
+      "vitalSigns": {
+        "heartRate": 55,
+        "bloodPressure": "90/55",
+        "temperature": 35.2,
+        "spo2": 90,
+        "respiratoryRate": 10,
+        "gcs": 11
+      },
+      "riskFactors": ["抑郁症", "药物过量"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "blood_test", "call_doctor"],
+      "deteriorationTime": 90,
+      "needsIsolation": false,
+      "description": "28岁女性，家人发现其意识不清，床边有空的安眠药瓶。呼吸浅慢，瞳孔缩小。"
+    },
+    {
+      "id": "p5",
+      "arrivalTime": 360,
+      "chiefComplaint": "急腹症",
+      "vitalSigns": {
+        "heartRate": 125,
+        "bloodPressure": "95/60",
+        "temperature": 38.8,
+        "spo2": 96,
+        "respiratoryRate": 22
+      },
+      "riskFactors": ["胃溃疡史"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "blood_test"],
+      "deteriorationTime": 180,
+      "needsIsolation": false,
+      "description": "50岁男性，突发剧烈腹痛6小时，伴呕血。有胃溃疡病史，近期有黑便。"
+    },
+    {
+      "id": "p6",
+      "arrivalTime": 420,
+      "chiefComplaint": "呼吸困难",
+      "vitalSigns": {
+        "heartRate": 110,
+        "bloodPressure": "160/90",
+        "temperature": 38.5,
+        "spo2": 82,
+        "respiratoryRate": 32
+      },
+      "riskFactors": ["COPD", "吸烟史"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "ecg", "blood_test", "isolation"],
+      "deteriorationTime": 150,
+      "needsIsolation": true,
+      "description": "65岁男性，COPD急性加重，呼吸困难，咳黄脓痰3天。今天出现意识模糊。"
+    },
+    {
+      "id": "p7",
+      "arrivalTime": 480,
+      "chiefComplaint": "眼外伤",
+      "vitalSigns": {
+        "heartRate": 88,
+        "bloodPressure": "135/85",
+        "temperature": 36.7,
+        "spo2": 98,
+        "respiratoryRate": 16
+      },
+      "riskFactors": [],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals"],
+      "deteriorationTime": 240,
+      "needsIsolation": false,
+      "description": "40岁男性，工作时被异物击中左眼，视力下降，眼痛明显。"
+    },
+    {
+      "id": "p8",
+      "arrivalTime": 540,
+      "chiefComplaint": "家属强烈催问",
+      "vitalSigns": {
+        "heartRate": 85,
+        "bloodPressure": "130/85",
+        "temperature": 36.6,
+        "spo2": 97
+      },
+      "riskFactors": [],
+      "correctTriage": "green",
+      "requiredActions": ["calm_family"],
+      "deteriorationTime": 660,
+      "needsIsolation": false,
+      "description": "p1患者的儿子，情绪非常激动，大声质问为什么医生还不来，说要投诉医院。"
+    },
+    {
+      "id": "p9",
+      "arrivalTime": 570,
+      "chiefComplaint": "过敏反应",
+      "vitalSigns": {
+        "heartRate": 130,
+        "bloodPressure": "85/50",
+        "temperature": 36.9,
+        "spo2": 88,
+        "respiratoryRate": 28
+      },
+      "riskFactors": ["药物过敏史"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "call_doctor", "blood_test"],
+      "deteriorationTime": 45,
+      "needsIsolation": false,
+      "description": "30岁女性，在诊所注射抗生素后出现全身皮疹、呼吸困难。有青霉素过敏史。"
+    }
+  ]
+}

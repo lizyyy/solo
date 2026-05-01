@@ -1,0 +1,1010 @@
+/**
+ * 急诊分诊夜班游戏样式表
+ */
+
+:root {
+  --primary-color: #1976d2;
+  --secondary-color: #424242;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+  --info-color: #2196f3;
+  
+  --triage-red: #f44336;
+  --triage-yellow: #ff9800;
+  --triage-green: #4caf50;
+  --triage-observation: #9e9e9e;
+  
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --border-color: #e0e0e0;
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  --shadow-md: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  
+  --border-radius: 8px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Header */
+.game-header {
+  background: linear-gradient(135deg, var(--primary-color), #1565c0);
+  color: white;
+  padding: 16px 0;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.game-title {
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-title::before {
+  content: '🏥';
+  font-size: 28px;
+}
+
+.game-info {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.info-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#time-display {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+}
+
+#score-display {
+  color: #ffd700;
+}
+
+.game-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: #388e3c;
+}
+
+.btn-warning {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background-color: #f57c00;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #d32f2f;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #616161;
+}
+
+/* Main Game Area */
+.game-main {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  padding: 24px 0;
+  min-height: calc(100vh - 120px);
+}
+
+@media (max-width: 1024px) {
+  .game-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Triage Zones */
+.triage-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pending-zone {
+  background-color: #fff3e0;
+  border: 2px dashed var(--warning-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  min-height: 150px;
+}
+
+.zone-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.triage-zones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .triage-zones {
+    grid-template-columns: 1fr;
+  }
+}
+
+.triage-zone {
+  border-radius: var(--border-radius);
+  padding: 16px;
+  min-height: 200px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.triage-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.red-zone {
+  background-color: #ffebee;
+  border: 2px solid var(--triage-red);
+}
+
+.red-zone::before {
+  background-color: var(--triage-red);
+}
+
+.red-zone.drag-over,
+.red-zone.highlight {
+  background-color: #ffcdd2;
+  border-color: #d32f2f;
+}
+
+.yellow-zone {
+  background-color: #fff8e1;
+  border: 2px solid var(--triage-yellow);
+}
+
+.yellow-zone::before {
+  background-color: var(--triage-yellow);
+}
+
+.yellow-zone.drag-over,
+.yellow-zone.highlight {
+  background-color: #ffecb3;
+  border-color: #f57c00;
+}
+
+.green-zone {
+  background-color: #e8f5e9;
+  border: 2px solid var(--triage-green);
+}
+
+.green-zone::before {
+  background-color: var(--triage-green);
+}
+
+.green-zone.drag-over,
+.green-zone.highlight {
+  background-color: #c8e6c9;
+  border-color: #388e3c;
+}
+
+.observation-zone {
+  background-color: #fafafa;
+  border: 2px solid var(--triage-observation);
+}
+
+.observation-zone::before {
+  background-color: var(--triage-observation);
+}
+
+.observation-zone.drag-over,
+.observation-zone.highlight {
+  background-color: #f5f5f5;
+  border-color: #757575;
+}
+
+.zone-patients {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100px;
+}
+
+/* Patient Cards */
+.patient-card {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+  transition: var(--transition);
+  border-left: 4px solid transparent;
+  position: relative;
+}
+
+.patient-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.patient-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.patient-card.selected {
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--primary-color);
+}
+
+.patient-card.red-zone {
+  border-left-color: var(--triage-red);
+}
+
+.patient-card.yellow-zone {
+  border-left-color: var(--triage-yellow);
+}
+
+.patient-card.green-zone {
+  border-left-color: var(--triage-green);
+}
+
+.patient-card.observation-zone {
+  border-left-color: var(--triage-observation);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.patient-id {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.triage-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.triage-badge.red-zone {
+  background-color: var(--triage-red);
+}
+
+.triage-badge.yellow-zone {
+  background-color: var(--triage-yellow);
+}
+
+.triage-badge.green-zone {
+  background-color: var(--triage-green);
+}
+
+.triage-badge.observation-zone {
+  background-color: var(--triage-observation);
+}
+
+.state-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--triage-observation);
+}
+
+.state-indicator.state-pending {
+  background-color: var(--warning-color);
+  animation: pulse 1.5s infinite;
+}
+
+.state-indicator.state-treating {
+  background-color: var(--info-color);
+  animation: pulse 1s infinite;
+}
+
+.state-indicator.state-deteriorated {
+  background-color: var(--danger-color);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.card-body {
+  margin-bottom: 8px;
+}
+
+.chief-complaint {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.card-description {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.card-vitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.vital {
+  font-size: 11px;
+  color: var(--text-secondary);
+  background-color: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.wait-time,
+.family-stress {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.wait-time .label,
+.family-stress .label {
+  color: var(--text-secondary);
+}
+
+.stress-bar {
+  width: 60px;
+  height: 4px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stress-fill {
+  height: 100%;
+  background-color: var(--danger-color);
+  transition: width 0.3s ease;
+}
+
+.isolation-badge,
+.deterioration-badge {
+  font-size: 16px;
+}
+
+/* Right Panel */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-section {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Resource Status */
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resource-name {
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.resource-count {
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.resource-bar {
+  flex: 1;
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.resource-fill {
+  height: 100%;
+  background-color: var(--success-color);
+  transition: width 0.3s ease;
+}
+
+.resource-item.resource-low .resource-fill {
+  background-color: var(--danger-color);
+}
+
+/* Action Panel */
+#action-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 10px 8px;
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.action-btn:disabled,
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#selected-patient-info {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.patient-detail {
+  font-size: 13px;
+}
+
+.patient-detail h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.patient-description {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.detail-section {
+  margin-bottom: 12px;
+}
+
+.detail-section h5 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.vital-signs-list,
+.risk-factors-list,
+.required-actions {
+  list-style: none;
+  padding-left: 8px;
+}
+
+.vital-signs-list li,
+.risk-factors-list li,
+.required-actions li {
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.risk-factor {
+  color: var(--warning-color);
+  font-weight: 500;
+}
+
+.required-actions li.completed {
+  color: var(--success-color);
+  text-decoration: line-through;
+}
+
+.required-actions li.pending {
+  color: var(--text-secondary);
+}
+
+.isolation-warning {
+  background-color: #fff3e0;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid var(--warning-color);
+}
+
+.warning {
+  color: var(--danger-color);
+  font-weight: 500;
+}
+
+.success {
+  color: var(--success-color);
+  font-weight: 500;
+}
+
+/* Score History */
+#score-history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.score-item.positive {
+  background-color: #e8f5e9;
+  color: var(--success-color);
+}
+
+.score-item.negative {
+  background-color: #ffebee;
+  color: var(--danger-color);
+}
+
+.score-reason {
+  flex: 1;
+  margin-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-value {
+  font-weight: 600;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.close-modal:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Game Over Modal */
+.final-result {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.final-score {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.final-rating {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.result-details {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 12px;
+}
+
+.error-item {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.error-item:last-child {
+  border-bottom: none;
+}
+
+.error-time {
+  font-family: 'Courier New', monospace;
+  color: var(--text-secondary);
+  min-width: 50px;
+}
+
+.error-type {
+  color: var(--danger-color);
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.error-desc {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+/* Validation Errors */
+#validation-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.validation-error {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffebee;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.error-index {
+  font-weight: 600;
+  color: var(--danger-color);
+}
+
+.error-field {
+  font-family: 'Courier New', monospace;
+  color: var(--text-secondary);
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  animation: slideIn 0.3s ease;
+  max-width: 300px;
+}
+
+.notification.info {
+  background-color: var(--info-color);
+  color: white;
+}
+
+.notification.success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.notification.warning {
+  background-color: var(--warning-color);
+  color: white;
+}
+
+.notification.error {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.notification.fade-out {
+  animation: slideOut 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Level Select */
+#level-select {
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+#level-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Import Modal */
+#import-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#import-file {
+  padding: 12px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+#import-file:hover {
+  border-color: var(--primary-color);
+  background-color: #e3f2fd;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .game-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .game-controls {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .patient-count {
+    display: none;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .game-header,
+  .game-controls,
+  .right-panel,
+  .notification {
+    display: none;
+  }
+
+  .game-main {
+    grid-template-columns: 1fr;
+  }
+
+  .triage-zone {
+    break-inside: avoid;
+  }
+}

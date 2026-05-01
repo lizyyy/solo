@@ -1,0 +1,159 @@
+{
+  "id": "level2",
+  "name": "高峰夜班",
+  "description": "患者密集到达的高峰夜班，考验时间管理和优先级判断能力",
+  "duration": 600,
+  "resources": {
+    "nurse": { "count": 2 },
+    "ecg_machine": { "count": 1 },
+    "lab": { "count": 2 },
+    "doctor": { "count": 1 },
+    "isolation_room": { "count": 1 }
+  },
+  "patients": [
+    {
+      "id": "p1",
+      "arrivalTime": 0,
+      "chiefComplaint": "严重胸痛",
+      "vitalSigns": {
+        "heartRate": 130,
+        "bloodPressure": "100/60",
+        "temperature": 36.7,
+        "spo2": 90,
+        "respiratoryRate": 26
+      },
+      "riskFactors": ["冠心病史", "高血压", "高血脂"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "ecg", "blood_test", "call_doctor"],
+      "deteriorationTime": 90,
+      "needsIsolation": false,
+      "description": "62岁男性，突发剧烈胸痛20分钟，面色苍白，大汗淋漓。心电图提示心肌缺血可能。"
+    },
+    {
+      "id": "p2",
+      "arrivalTime": 30,
+      "chiefComplaint": "高热伴抽搐",
+      "vitalSigns": {
+        "heartRate": 140,
+        "bloodPressure": "85/50",
+        "temperature": 40.2,
+        "spo2": 88,
+        "respiratoryRate": 32
+      },
+      "riskFactors": ["热性惊厥史"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "blood_test", "call_doctor", "isolation"],
+      "deteriorationTime": 60,
+      "needsIsolation": true,
+      "description": "2岁男童，高热3天，今天出现抽搐1次。家长说孩子现在精神很差。"
+    },
+    {
+      "id": "p3",
+      "arrivalTime": 60,
+      "chiefComplaint": "车祸后意识不清",
+      "vitalSigns": {
+        "heartRate": 120,
+        "bloodPressure": "90/55",
+        "temperature": 36.4,
+        "spo2": 92,
+        "respiratoryRate": 20,
+        "gcs": 12
+      },
+      "riskFactors": ["头部外伤"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "blood_test", "call_doctor"],
+      "deteriorationTime": 120,
+      "needsIsolation": false,
+      "description": "28岁男性，车祸伤，头部着地，当时有短暂昏迷。现在意识模糊，对答不切题。"
+    },
+    {
+      "id": "p4",
+      "arrivalTime": 120,
+      "chiefComplaint": "呼吸困难",
+      "vitalSigns": {
+        "heartRate": 115,
+        "bloodPressure": "155/95",
+        "temperature": 37.8,
+        "spo2": 85,
+        "respiratoryRate": 30
+      },
+      "riskFactors": ["哮喘史", "吸烟"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "ecg", "blood_test"],
+      "deteriorationTime": 150,
+      "needsIsolation": false,
+      "description": "45岁女性，哮喘急性发作，呼吸困难，说话断断续续，不能平卧。"
+    },
+    {
+      "id": "p5",
+      "arrivalTime": 180,
+      "chiefComplaint": "呕血",
+      "vitalSigns": {
+        "heartRate": 135,
+        "bloodPressure": "80/45",
+        "temperature": 36.3,
+        "spo2": 94,
+        "respiratoryRate": 22
+      },
+      "riskFactors": ["肝硬化史", "饮酒史"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "blood_test", "call_doctor", "fluids"],
+      "deteriorationTime": 100,
+      "needsIsolation": false,
+      "description": "55岁男性，呕血3次，量约500ml，伴头晕、心慌。有肝硬化病史。"
+    },
+    {
+      "id": "p6",
+      "arrivalTime": 240,
+      "chiefComplaint": "发热伴皮疹",
+      "vitalSigns": {
+        "heartRate": 100,
+        "bloodPressure": "110/70",
+        "temperature": 38.9,
+        "spo2": 96,
+        "respiratoryRate": 18
+      },
+      "riskFactors": ["近期旅行史"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "blood_test", "isolation"],
+      "deteriorationTime": 200,
+      "needsIsolation": true,
+      "description": "25岁女性，发热5天，今天出现皮疹。上周刚从东南亚旅游回来。"
+    },
+    {
+      "id": "p7",
+      "arrivalTime": 300,
+      "chiefComplaint": "急性腹痛",
+      "vitalSigns": {
+        "heartRate": 95,
+        "bloodPressure": "135/85",
+        "temperature": 37.5,
+        "spo2": 97,
+        "respiratoryRate": 16
+      },
+      "riskFactors": [],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "blood_test"],
+      "deteriorationTime": 240,
+      "needsIsolation": false,
+      "description": "40岁男性，右下腹痛8小时，伴恶心、呕吐。麦氏点压痛明显。"
+    },
+    {
+      "id": "p8",
+      "arrivalTime": 360,
+      "chiefComplaint": "家属催问",
+      "vitalSigns": {
+        "heartRate": 75,
+        "bloodPressure": "120/80",
+        "temperature": 36.6,
+        "spo2": 98
+      },
+      "riskFactors": [],
+      "correctTriage": "green",
+      "requiredActions": ["calm_family"],
+      "deteriorationTime": 600,
+      "needsIsolation": false,
+      "description": "p2患者的母亲，情绪非常激动，一直追问孩子的病情。"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "emergency-triage-night-shift",
+  "version": "1.0.0",
+  "description": "急诊分诊夜班 - 急诊科新护士培训闯关游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/test-runner.js"
+  },
+  "keywords": [
+    "emergency",
+    "triage",
+    "training",
+    "game",
+    "nurse"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>急诊分诊夜班 - 急诊科新护士培训游戏</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏥%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <!-- Game Header -->
+  <header class="game-header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="game-title">急诊分诊夜班</h1>
+        
+        <div class="game-info">
+          <div class="info-item">
+            <span class="info-label">时间</span>
+            <span class="info-value" id="time-display">10:00</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">分数</span>
+            <span class="info-value" id="score-display">0</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label" id="patient-count">待分诊: 0 | 处理中: 0 | 已完成: 0</span>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <select id="level-select">
+            <option value="">选择关卡</option>
+            <option value="level1">普通夜班</option>
+            <option value="level2">高峰夜班</option>
+            <option value="level3">急救夜班</option>
+          </select>
+          <button id="start-btn" class="btn btn-primary">开始游戏</button>
+          <button id="pause-btn" class="btn btn-warning" style="display: none;">暂停</button>
+          <button id="resume-btn" class="btn btn-success" style="display: none;">继续</button>
+          <button id="import-level-btn" class="btn btn-secondary">导入关卡</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Area -->
+  <main class="game-main container">
+    <!-- Triage Area -->
+    <section class="triage-area">
+      <!-- Pending Zone -->
+      <div class="pending-zone" id="pending-zone">
+        <h3 class="zone-title">⏳ 待分诊患者</h3>
+        <div class="zone-patients" id="pending-queue">
+          <!-- Patient cards will be rendered here -->
+        </div>
+      </div>
+
+      <!-- Triage Zones -->
+      <div class="triage-zones">
+        <!-- Red Zone -->
+        <div class="triage-zone red-zone" data-triage-level="red">
+          <h3 class="zone-title">🔴 红色 - 急危重症</h3>
+          <p class="zone-description">需要立即处理的患者（如胸痛、呼吸困难、意识障碍）</p>
+          <div class="zone-patients" id="red-queue">
+            <!-- Patient cards will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Yellow Zone -->
+        <div class="triage-zone yellow-zone" data-triage-level="yellow">
+          <h3 class="zone-title">🟡 黄色 - 急症</h3>
+          <p class="zone-description">需要优先处理的患者（如外伤、发热、腹痛）</p>
+          <div class="zone-patients" id="yellow-queue">
+            <!-- Patient cards will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Green Zone -->
+        <div class="triage-zone green-zone" data-triage-level="green">
+          <h3 class="zone-title">🟢 绿色 - 轻症</h3>
+          <p class="zone-description">可以稍后处理的轻症患者</p>
+          <div class="zone-patients" id="green-queue">
+            <!-- Patient cards will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Observation Zone -->
+        <div class="triage-zone observation-zone" data-triage-level="observation">
+          <h3 class="zone-title">⚪ 留观</h3>
+          <p class="zone-description">需要观察但不紧急的患者</p>
+          <div class="zone-patients" id="observation-queue">
+            <!-- Patient cards will be rendered here -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Panel -->
+    <aside class="right-panel">
+      <!-- Resource Status -->
+      <section class="panel-section">
+        <h3 class="panel-title">📊 资源状态</h3>
+        <div class="resource-list" id="resource-status">
+          <div class="resource-item">
+            <span class="resource-name">护士</span>
+            <span class="resource-count">2/2</span>
+            <div class="resource-bar">
+              <div class="resource-fill" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <span class="resource-name">心电图机</span>
+            <span class="resource-count">1/1</span>
+            <div class="resource-bar">
+              <div class="resource-fill" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <span class="resource-name">检验室</span>
+            <span class="resource-count">2/2</span>
+            <div class="resource-bar">
+              <div class="resource-fill" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <span class="resource-name">医生</span>
+            <span class="resource-count">1/1</span>
+            <div class="resource-bar">
+              <div class="resource-fill" style="width: 100%"></div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <span class="resource-name">隔离室</span>
+            <span class="resource-count">1/1</span>
+            <div class="resource-bar">
+              <div class="resource-fill" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Panel -->
+      <section class="panel-section">
+        <h3 class="panel-title">⚡ 操作面板</h3>
+        <div id="action-panel">
+          <p style="color: var(--text-secondary); font-size: 13px;">点击患者卡片查看详情和可执行操作</p>
+          
+          <div class="action-buttons" style="margin-top: 12px;">
+            <button class="action-btn btn btn-primary" data-action-type="measure_vitals" disabled>
+              📋 测量生命体征
+            </button>
+            <button class="action-btn btn btn-primary" data-action-type="ecg" disabled>
+              💓 心电图检查
+            </button>
+            <button class="action-btn btn btn-primary" data-action-type="blood_test" disabled>
+              🩸 抽血检验
+            </button>
+            <button class="action-btn btn btn-primary" data-action-type="fluids" disabled>
+              💧 补液治疗
+            </button>
+            <button class="action-btn btn btn-warning" data-action-type="call_doctor" disabled>
+              👨‍⚕️ 呼叫医生
+            </button>
+            <button class="action-btn btn btn-danger" data-action-type="isolation" disabled>
+              🦠 隔离措施
+            </button>
+            <button class="action-btn btn btn-success" data-action-type="calm_family" disabled>
+              💬 安抚家属
+            </button>
+            <button class="action-btn btn btn-secondary" data-action-type="discharge" disabled>
+              🚪 办理出院
+            </button>
+          </div>
+
+          <div id="selected-patient-info"></div>
+        </div>
+      </section>
+
+      <!-- Score History -->
+      <section class="panel-section">
+        <h3 class="panel-title">📈 评分记录</h3>
+        <div id="score-history">
+          <p style="color: var(--text-secondary); font-size: 13px;">开始游戏后显示评分变动</p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Continue Game Modal -->
+  <div id="continue-game-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">检测到未完成的游戏</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>系统检测到您有一个未完成的游戏，是否继续？</p>
+      </div>
+      <div class="modal-footer">
+        <button id="new-game-btn" class="btn btn-secondary">开始新游戏</button>
+        <button id="continue-game-btn" class="btn btn-primary">继续游戏</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div id="game-over-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">游戏结束</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="final-result">
+          <div class="final-score" id="final-score">0</div>
+          <div class="final-rating" id="final-rating">未评级</div>
+        </div>
+
+        <h3 style="margin-bottom: 12px;">错误分析</h3>
+        <div class="result-details" id="result-details">
+          <!-- Error items will be rendered here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="restart-btn" class="btn btn-warning">重新开始</button>
+        <button id="export-report-btn" class="btn btn-primary">导出培训报告</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Level Modal -->
+  <div id="import-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">导入自定义关卡</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="import-form">
+          <p style="margin-bottom: 16px;">选择一个JSON格式的关卡文件进行导入。</p>
+          <input type="file" id="import-file" accept=".json" style="display: none;">
+          <label for="import-file" class="btn btn-secondary" style="display: inline-block; cursor: pointer;">
+            📁 选择文件
+          </label>
+          <p id="file-name" style="margin-top: 12px; color: var(--text-secondary);"></p>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="close-modal btn btn-secondary">取消</button>
+        <button id="confirm-import-btn" class="btn btn-primary" disabled>导入关卡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation Error Modal -->
+  <div id="validation-error-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">关卡验证失败</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: var(--danger-color);">关卡数据存在以下错误，无法导入：</p>
+        <div id="validation-errors">
+          <!-- Validation errors will be rendered here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="close-modal btn btn-secondary">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { game } from '/js/game.js';
+    import { validateLevel } from '/js/validator.js';
+    import { storageManager } from '/js/storage.js';
+
+    function initGame() {
+      const startBtn = document.getElementById('start-btn');
+      const pauseBtn = document.getElementById('pause-btn');
+      const resumeBtn = document.getElementById('resume-btn');
+      const importLevelBtn = document.getElementById('import-level-btn');
+      const levelSelect = document.getElementById('level-select');
+
+      if (startBtn) {
+        startBtn.addEventListener('click', () => {
+          const selectedLevel = levelSelect.value;
+          if (selectedLevel) {
+            game.startGame(selectedLevel);
+          } else {
+            game.startGame();
+          }
+        });
+      }
+
+      if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => game.togglePause());
+      }
+
+      if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => game.togglePause());
+      }
+
+      if (importLevelBtn) {
+        importLevelBtn.addEventListener('click', () => game.ui.showImportDialog());
+      }
+
+      if (levelSelect) {
+        levelSelect.addEventListener('change', (e) => {
+          game.selectLevel(e.target.value);
+        });
+      }
+
+      document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => game.ui.closeAllModals());
+      });
+
+      document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            game.ui.closeAllModals();
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGame);
+    } else {
+      initGame();
+    }
+
+    // Initialize action buttons
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const actionType = btn.dataset.actionType;
+        const selectedPatient = game.ui.selectedPatient;
+        
+        if (selectedPatient && !btn.disabled) {
+          game.performAction(selectedPatient.id, actionType);
+        }
+      });
+    });
+
+    // Handle file import
+    const importFile = document.getElementById('import-file');
+    const fileName = document.getElementById('file-name');
+    const confirmImportBtn = document.getElementById('confirm-import-btn');
+    let selectedLevelData = null;
+
+    importFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      fileName.textContent = `已选择: ${file.name}`;
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          selectedLevelData = JSON.parse(event.target.result);
+          confirmImportBtn.disabled = false;
+        } catch (error) {
+          fileName.textContent = `错误: 文件格式不正确`;
+          fileName.style.color = 'var(--danger-color)';
+          confirmImportBtn.disabled = true;
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    confirmImportBtn.addEventListener('click', async () => {
+      if (!selectedLevelData) return;
+
+      const result = await game.importLevel(selectedLevelData);
+      
+      if (result.success) {
+        game.ui.closeAllModals();
+        game.ui.showNotification('关卡导入成功！', 'success');
+        
+        const levelSelect = document.getElementById('level-select');
+        const option = document.createElement('option');
+        option.value = selectedLevelData.id;
+        option.textContent = selectedLevelData.name + ' (自定义)';
+        levelSelect.appendChild(option);
+      }
+    });
+
+    // Handle continue game modal
+    const newGameBtn = document.getElementById('new-game-btn');
+    const continueGameBtn = document.getElementById('continue-game-btn');
+
+    newGameBtn?.addEventListener('click', () => {
+      storageManager.clearSavedGame();
+      game.ui.closeAllModals();
+    });
+
+    continueGameBtn?.addEventListener('click', () => {
+      const savedState = storageManager.loadGameState();
+      if (savedState) {
+        game.restoreGame(savedState);
+      }
+    });
+
+    // Handle restart button in game over modal
+    document.getElementById('restart-btn')?.addEventListener('click', () => {
+      game.restartGame();
+      game.ui.closeAllModals();
+    });
+
+    // Handle export report button
+    document.getElementById('export-report-btn')?.addEventListener('click', () => {
+      game.exportReport();
+    });
+
+    // Update level select based on available levels
+    function updateLevelSelect() {
+      const levelSelect = document.getElementById('level-select');
+      const levels = game.getAvailableLevels();
+      
+      // Clear existing options except the first one
+      while (levelSelect.options.length > 1) {
+        levelSelect.remove(1);
+      }
+
+      // Add available levels
+      levels.forEach(level => {
+        const option = document.createElement('option');
+        option.value = level.id;
+        option.textContent = level.name;
+        levelSelect.appendChild(option);
+      });
+    }
+
+    // Wait for game to initialize and then update level select
+    setTimeout(updateLevelSelect, 500);
+  </script>
+</body>
+</html>
