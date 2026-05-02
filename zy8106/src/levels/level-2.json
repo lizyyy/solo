@@ -1,0 +1,70 @@
+{
+  "id": "level-2",
+  "name": "复杂调度",
+  "description": "多任务协调，需要避免同频干扰",
+  "channels": 6,
+  "slots": 5,
+  "initialBattery": 85,
+  "tasks": [
+    {
+      "id": "task-1",
+      "type": "rescue",
+      "name": "消防救援队A",
+      "description": "东区火灾救援",
+      "priority": "high",
+      "powerConsumption": 15,
+      "coverageRadius": 3,
+      "position": { "x": 3, "y": 3 }
+    },
+    {
+      "id": "task-2",
+      "type": "rescue",
+      "name": "消防救援队B",
+      "description": "西区建筑坍塌救援",
+      "priority": "high",
+      "powerConsumption": 15,
+      "coverageRadius": 3,
+      "position": { "x": 15, "y": 12 }
+    },
+    {
+      "id": "task-3",
+      "type": "hospital",
+      "name": "第一医院",
+      "description": "主要医疗中心",
+      "priority": "high",
+      "powerConsumption": 10,
+      "coverageRadius": 5,
+      "position": { "x": 8, "y": 5 }
+    },
+    {
+      "id": "task-4",
+      "type": "hospital",
+      "name": "第二医院",
+      "description": "备用医疗点",
+      "priority": "medium",
+      "powerConsumption": 8,
+      "coverageRadius": 4,
+      "position": { "x": 12, "y": 10 }
+    },
+    {
+      "id": "task-5",
+      "type": "station",
+      "name": "临时基站1",
+      "description": "北区信号增强",
+      "priority": "medium",
+      "powerConsumption": 20,
+      "coverageRadius": 8,
+      "position": { "x": 5, "y": 15 }
+    },
+    {
+      "id": "task-6",
+      "type": "station",
+      "name": "临时基站2",
+      "description": "南区信号增强",
+      "priority": "low",
+      "powerConsumption": 18,
+      "coverageRadius": 7,
+      "position": { "x": 10, "y": 2 }
+    }
+  ]
+}

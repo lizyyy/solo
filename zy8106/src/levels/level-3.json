@@ -1,0 +1,90 @@
+{
+  "id": "level-3",
+  "name": "极限挑战",
+  "description": "资源紧张，需要精确规划每个时隙",
+  "channels": 8,
+  "slots": 6,
+  "initialBattery": 60,
+  "tasks": [
+    {
+      "id": "task-1",
+      "type": "rescue",
+      "name": "消防救援队A",
+      "description": "化工厂爆炸救援",
+      "priority": "high",
+      "powerConsumption": 18,
+      "coverageRadius": 2,
+      "position": { "x": 6, "y": 6 }
+    },
+    {
+      "id": "task-2",
+      "type": "rescue",
+      "name": "消防救援队B",
+      "description": "地铁事故救援",
+      "priority": "high",
+      "powerConsumption": 16,
+      "coverageRadius": 3,
+      "position": { "x": 12, "y": 8 }
+    },
+    {
+      "id": "task-3",
+      "type": "rescue",
+      "name": "医疗救援队",
+      "description": "野外伤员搜救",
+      "priority": "high",
+      "powerConsumption": 14,
+      "coverageRadius": 4,
+      "position": { "x": 3, "y": 12 }
+    },
+    {
+      "id": "task-4",
+      "type": "hospital",
+      "name": "中心医院",
+      "description": "主要救治中心",
+      "priority": "high",
+      "powerConsumption": 12,
+      "coverageRadius": 6,
+      "position": { "x": 9, "y": 5 }
+    },
+    {
+      "id": "task-5",
+      "type": "hospital",
+      "name": "野战医院",
+      "description": "临时医疗点",
+      "priority": "medium",
+      "powerConsumption": 10,
+      "coverageRadius": 4,
+      "position": { "x": 5, "y": 10 }
+    },
+    {
+      "id": "task-6",
+      "type": "station",
+      "name": "临时基站1",
+      "description": "主基站",
+      "priority": "medium",
+      "powerConsumption": 25,
+      "coverageRadius": 10,
+      "position": { "x": 8, "y": 8 }
+    },
+    {
+      "id": "task-7",
+      "type": "station",
+      "name": "临时基站2",
+      "description": "备用基站",
+      "priority": "low",
+      "powerConsumption": 20,
+      "coverageRadius": 8,
+      "position": { "x": 14, "y": 4 }
+    },
+    {
+      "id": "task-8",
+      "type": "station",
+      "name": "临时基站3",
+      "description": "边缘覆盖",
+      "priority": "low",
+      "powerConsumption": 15,
+      "coverageRadius": 6,
+      "position": { "x": 2, "y": 3 }
+    }
+  ]
+}

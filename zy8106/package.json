@@ -1,0 +1,21 @@
+{
+  "name": "emergency-frequency-scheduler",
+  "version": "1.0.0",
+  "description": "应急频段调度员 - 本地浏览器小游戏",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "game",
+    "scheduler",
+    "frequency"
+  ],
+  "author": "",
+  "license": "MIT"
+}

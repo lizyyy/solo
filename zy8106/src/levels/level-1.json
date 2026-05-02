@@ -1,0 +1,40 @@
+{
+  "id": "level-1",
+  "name": "新手训练场",
+  "description": "学习基础调度操作，熟悉拖拽机制",
+  "channels": 4,
+  "slots": 4,
+  "initialBattery": 100,
+  "tasks": [
+    {
+      "id": "task-1",
+      "type": "rescue",
+      "name": "消防救援队A",
+      "description": "城市中心火灾救援",
+      "priority": "high",
+      "powerConsumption": 12,
+      "coverageRadius": 3,
+      "position": { "x": 5, "y": 5 }
+    },
+    {
+      "id": "task-2",
+      "type": "hospital",
+      "name": "中心医院",
+      "description": "接收伤员救治",
+      "priority": "high",
+      "powerConsumption": 8,
+      "coverageRadius": 5,
+      "position": { "x": 10, "y": 8 }
+    },
+    {
+      "id": "task-3",
+      "type": "station",
+      "name": "临时基站1",
+      "description": "增强区域信号覆盖",
+      "priority": "medium",
+      "powerConsumption": 15,
+      "coverageRadius": 8,
+      "position": { "x": 7, "y": 6 }
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急频段调度员</title>
+    <link rel="stylesheet" href="/src/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="game-header">
+            <h1>应急频段调度员</h1>
+            <div class="game-stats">
+                <span id="current-level">关卡: 1</span>
+                <span id="current-score">分数: 0</span>
+                <span id="battery-status">电量: 100%</span>
+            </div>
+            <div class="game-controls">
+                <button id="undo-btn" title="撤销 (Ctrl+Z)">↩</button>
+                <button id="redo-btn" title="重做 (Ctrl+Y)">↪</button>
+                <button id="save-btn" title="保存游戏">💾</button>
+                <button id="load-btn" title="读取存档">📂</button>
+                <button id="restart-btn" title="重新开始">🔄</button>
+                <button id="levels-btn" title="选择关卡">📋</button>
+            </div>
+        </header>
+
+        <main class="game-container">
+            <aside class="task-panel">
+                <h2>待调度任务</h2>
+                <div id="task-list" class="task-list"></div>
+            </aside>
+
+            <section class="scheduler-panel">
+                <h2>频率调度台</h2>
+                <div class="channel-info">
+                    <span>频道: <span id="channel-count">8</span></span>
+                    <span>时隙: <span id="slot-count">6</span></span>
+                </div>
+                <div id="scheduler-grid" class="scheduler-grid"></div>
+            </section>
+
+            <aside class="info-panel">
+                <h2>实时状态</h2>
+                <div class="status-section">
+                    <h3>干扰检测</h3>
+                    <div id="interference-status" class="status-indicator">
+                        <span class="status-icon">✅</span>
+                        <span>无干扰</span>
+                    </div>
+                </div>
+                <div class="status-section">
+                    <h3>任务优先级</h3>
+                    <div id="priority-list" class="priority-list"></div>
+                </div>
+                <div class="status-section">
+                    <h3>信号覆盖</h3>
+                    <div id="coverage-status" class="coverage-status"></div>
+                </div>
+                <div class="status-section">
+                    <h3>设备电量</h3>
+                    <div id="battery-indicator" class="battery-indicator">
+                        <div class="battery-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="game-footer">
+            <button id="submit-btn" class="primary-btn">提交调度方案</button>
+            <button id="clear-btn" class="secondary-btn">清空调度</button>
+            <button id="leaderboard-btn" class="secondary-btn">排行榜</button>
+        </footer>
+
+        <div id="levels-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>选择关卡</h2>
+                <div id="levels-list" class="levels-list"></div>
+                <button id="close-levels-btn" class="close-btn">关闭</button>
+            </div>
+        </div>
+
+        <div id="leaderboard-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>排行榜</h2>
+                <div id="leaderboard-content" class="leaderboard-content"></div>
+                <button id="close-leaderboard-btn" class="close-btn">关闭</button>
+            </div>
+        </div>
+
+        <div id="report-modal" class="modal hidden">
+            <div class="modal-content report-modal">
+                <h2>调度复盘报告</h2>
+                <div id="report-content" class="report-content"></div>
+                <button id="close-report-btn" class="close-btn">关闭</button>
+                <button id="next-level-btn" class="primary-btn">下一关卡</button>
+            </div>
+        </div>
+
+        <div id="save-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>游戏已保存</h2>
+                <p>您的游戏进度已保存到本地存储。</p>
+                <button id="close-save-btn" class="close-btn">关闭</button>
+            </div>
+        </div>
+
+        <div id="load-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>读取存档</h2>
+                <div id="save-list" class="save-list"></div>
+                <button id="close-load-btn" class="close-btn">关闭</button>
+            </div>
+        </div>
+
+        <div id="welcome-modal" class="modal">
+            <div class="modal-content welcome-modal">
+                <h1>应急频段调度员</h1>
+                <p class="subtitle">在突发事件中，合理调度通信频率资源，确保救援队伍、医疗机构和应急基站能够高效通信。</p>
+                <div class="instructions">
+                    <h3>游戏规则：</h3>
+                    <ul>
+                        <li>将左侧任务卡片拖拽到右侧频率网格中</li>
+                        <li>同一频道的相同时隙只能放置一个任务</li>
+                        <li>注意避免同频干扰，优先处理高优先级任务</li>
+                        <li>考虑信号覆盖距离和设备电量消耗</li>
+                    </ul>
+                </div>
+                <div class="task-types">
+                    <h3>任务类型：</h3>
+                    <div class="task-type-item">
+                        <span class="type-icon rescue">🚒</span>
+                        <span>救援队 - 最高优先级</span>
+                    </div>
+                    <div class="task-type-item">
+                        <span class="type-icon hospital">🏥</span>
+                        <span>医院 - 高优先级</span>
+                    </div>
+                    <div class="task-type-item">
+                        <span class="type-icon station">📡</span>
+                        <span>临时基站 - 中优先级</span>
+                    </div>
+                </div>
+                <button id="start-game-btn" class="primary-btn large-btn">开始游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
