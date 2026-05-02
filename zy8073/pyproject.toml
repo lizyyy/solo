@@ -1,0 +1,19 @@
+[project]
+name = "race-arbiter"
+version = "0.1.0"
+description = "Race Timing Arbitration Tool for running and trail races"
+requires-python = ">=3.8"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+race-arbiter = "race_arbiter.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[tool.setuptools]
+packages = ["race_arbiter"]

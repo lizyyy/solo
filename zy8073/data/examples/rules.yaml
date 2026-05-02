@@ -1,0 +1,29 @@
+race_name: "City Marathon 2024"
+start_mat: "START"
+end_mat: "FINISH"
+cross_day: false
+mat_alias:
+  "HALF": "CP2"
+segments:
+  - id: "seg1"
+    name: "Start to CP1"
+    order: 1
+    from_mat: "START"
+    to_mat: "CP1"
+  - id: "seg2"
+    name: "CP1 to CP2"
+    order: 2
+    from_mat: "CP1"
+    to_mat: "CP2"
+  - id: "seg3"
+    name: "CP2 to Finish"
+    order: 3
+    from_mat: "CP2"
+    to_mat: "FINISH"
+cutoffs:
+  - segment_id: "seg1"
+    time_limit: "1:30:00"
+    mat: "CP1"
+  - segment_id: "seg2"
+    time_limit: "3:00:00"
+    mat: "CP2"
