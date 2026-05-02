@@ -1,0 +1,295 @@
+openapi: 3.0.0
+info:
+  title: 用户管理 API
+  description: 用于演示合约漂移检测的示例 OpenAPI 合约
+  version: 2.0.0
+tags:
+  - name: 用户管理
+    description: 用户相关操作
+  - name: 订单管理
+    description: 订单相关操作
+
+paths:
+  /v1/users:
+    get:
+      tags: [用户管理]
+      summary: 获取用户列表
+      description: 返回所有用户的列表
+      operationId: getUsersV1
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: 成功返回用户列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total, page, limit]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserV1'
+                  total:
+                    type: integer
+                    description: 总记录数
+                  page:
+                    type: integer
+                    description: 当前页码
+                  limit:
+                    type: integer
+                    description: 每页数量
+
+  /v2/users:
+    get:
+      tags: [用户管理]
+      summary: 获取用户列表 (V2)
+      description: V2 版本的用户列表接口，支持更多筛选条件
+      operationId: getUsersV2
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+      responses:
+        '200':
+          description: 成功返回用户列表
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, total]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserV2'
+                  total:
+                    type: integer
+
+  /v1/users/{id}:
+    get:
+      tags: [用户管理]
+      summary: 获取单个用户
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功返回用户信息
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserV1'
+        '404':
+          description: 用户不存在
+
+  /v1/users:
+    post:
+      tags: [用户管理]
+      summary: 创建用户
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: 用户创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserV1'
+
+  /v1/orders:
+    get:
+      tags: [订单管理]
+      summary: 获取订单列表
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, shipped, delivered, cancelled]
+            default: pending
+      responses:
+        '200':
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+
+  /v2/orders:
+    get:
+      tags: [订单管理]
+      summary: 获取订单列表 (V2)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, shipped, delivered, cancelled, refunded]
+            default: pending
+      responses:
+        '200':
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderV2'
+
+components:
+  schemas:
+    UserV1:
+      type: object
+      required: [id, name, email]
+      properties:
+        id:
+          type: integer
+          description: 用户ID
+        name:
+          type: string
+          description: 用户名
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 用户状态
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+
+    UserV2:
+      type: object
+      required: [id, name, email]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        phone:
+          type: string
+          description: 手机号码
+        address:
+          type: object
+          properties:
+            city:
+              type: string
+            street:
+              type: string
+            zipCode:
+              type: string
+
+    CreateUserRequest:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    Order:
+      type: object
+      required: [id, userId, amount, status]
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        amount:
+          type: number
+          format: float
+        status:
+          type: string
+          enum: [pending, paid, shipped, delivered, cancelled]
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    OrderV2:
+      type: object
+      required: [id, userId, totalAmount, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: integer
+        totalAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, shipped, delivered, cancelled, refunded]
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+              quantity:
+                type: integer
+              price:
+                type: number

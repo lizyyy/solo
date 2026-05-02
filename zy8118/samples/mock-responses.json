@@ -1,0 +1,68 @@
+[
+  {
+    "path": "/v1/users",
+    "method": "GET",
+    "status": 200,
+    "body": {
+      "data": [
+        {
+          "id": 1,
+          "name": "Mock User 1",
+          "email": "mock1@example.com",
+          "status": "active",
+          "createdAt": "2024-01-01T00:00:00Z"
+        },
+        {
+          "id": 2,
+          "name": "Mock User 2",
+          "email": "mock2@example.com",
+          "status": "inactive",
+          "createdAt": "2024-01-02T00:00:00Z"
+        }
+      ],
+      "total": 2,
+      "page": 1,
+      "limit": 10
+    }
+  },
+  {
+    "path": "/v1/users/{id}",
+    "method": "GET",
+    "status": 200,
+    "body": {
+      "id": 1,
+      "name": "Mock Single User",
+      "email": "mockuser@example.com",
+      "status": "active",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "path": "/v1/users",
+    "method": "POST",
+    "status": 201,
+    "body": {
+      "id": 999,
+      "name": "Created User",
+      "email": "created@example.com",
+      "status": "active",
+      "createdAt": "2024-01-15T10:06:00Z"
+    }
+  },
+  {
+    "path": "/v1/orders",
+    "method": "GET",
+    "status": 200,
+    "body": {
+      "orders": [
+        {
+          "id": 999,
+          "userId": 1,
+          "amount": 999.99,
+          "status": "pending",
+          "createdAt": "2024-01-15T10:00:00Z"
+        }
+      ]
+    }
+  }
+]
