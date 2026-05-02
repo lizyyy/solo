@@ -1,0 +1,8 @@
+actorId,time,posX,posY,posZ,rotation,note
+actor_a,0,-5,0,3,0,上场
+actor_a,10,-3,0,4,0,走向中央
+actor_a,20,0,0,6,0,定点
+actor_a,30,3,0,5,90,转身
+actor_b,0,5,0,3,180,上场
+actor_b,15,3,0,5,180,入场
+actor_b,25,0,0,5.5,180,定点
