@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晚高峰站台指挥员</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 主菜单 -->
+        <div v-if="gameState === 'menu'" class="menu-screen">
+            <h1 class="title">🚇 晚高峰站台指挥员</h1>
+            <div class="menu-buttons">
+                <button @click="startGame" class="btn primary">开始游戏</button>
+                <button @click="showLevelSelect = true" class="btn secondary">选择关卡</button>
+                <button @click="showLevelEditor = true" class="btn secondary">关卡编辑器</button>
+            </div>
+            <div class="instructions">
+                <h3>游戏说明</h3>
+                <ul>
+                    <li>🎯 目标：引导不同颜色的乘客到达对应颜色的出口</li>
+                    <li>🧱 围栏：临时放置围栏改变人流方向</li>
+                    <li>🚪 闸机：开关闸机控制通道</li>
+                    <li>👷 工作人员：放置在格子上疏导人流，提高通行速度</li>
+                    <li>⚠️ 避免拥堵！乘客耐心值降为0会扣分</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 关卡选择弹窗 -->
+        <div v-if="showLevelSelect" class="modal-overlay">
+            <div class="modal">
+                <h2>选择关卡</h2>
+                <div class="level-grid">
+                    <div 
+                        v-for="(level, index) in allLevels" 
+                        :key="index"
+                        class="level-card"
+                        :class="{ unlocked: isLevelUnlocked(index), completed: isLevelCompleted(index) }"
+                        @click="selectLevel(index)"
+                    >
+                        <div class="level-number">关卡 {{ index + 1 }}</div>
+                        <div class="level-name">{{ level.name }}</div>
+                        <div v-if="isLevelCompleted(index)" class="level-stars">
+                            ★★★
+                        </div>
+                        <div v-else-if="isLevelUnlocked(index)" class="level-status">
+                            未通关
+                        </div>
+                        <div v-else class="level-locked">
+                            🔒 锁定
+                        </div>
+                    </div>
+                </div>
+                <button @click="showLevelSelect = false" class="btn secondary">关闭</button>
+            </div>
+        </div>
+
+        <!-- 关卡编辑器弹窗 -->
+        <div v-if="showLevelEditor" class="modal-overlay large-modal">
+            <div class="modal">
+                <h2>关卡编辑器</h2>
+                <div class="editor-container">
+                    <div class="editor-json">
+                        <label>关卡 JSON:</label>
+                        <textarea 
+                            v-model="editorJson" 
+                            class="json-editor"
+                            spellcheck="false"
+                        ></textarea>
+                        <div class="editor-buttons">
+                            <button @click="validateLevelJson" class="btn secondary">验证</button>
+                            <button @click="importLevelJson" class="btn primary">导入并测试</button>
+                            <button @click="exportCurrentLevel" class="btn secondary">导出当前关卡</button>
+                        </div>
+                        <div v-if="editorError" class="error-message">{{ editorError }}</div>
+                        <div v-if="editorSuccess" class="success-message">{{ editorSuccess }}</div>
+                    </div>
+                    <div class="editor-preview">
+                        <label>预览:</label>
+                        <canvas 
+                            ref="editorCanvasRef"
+                            class="editor-canvas"
+                            @click="handleEditorCanvasClick"
+                        ></canvas>
+                    </div>
+                </div>
+                <button @click="closeLevelEditor" class="btn secondary">关闭</button>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div v-if="gameState === 'playing' || gameState === 'paused' || gameState === 'ended'" class="game-screen">
+            <!-- 顶部信息栏 -->
+            <div class="top-bar">
+                <div class="level-info">
+                    <span class="level-name-display">关卡 {{ currentLevelIndex + 1 }}: {{ currentLevel?.name }}</span>
+                    <span class="objective">目标: {{ currentLevel?.objective }}</span>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-label">得分</span>
+                        <span class="metric-value">{{ score }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">时间</span>
+                        <span class="metric-value">{{ formatTime(gameTime) }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">剩余人流</span>
+                        <span class="metric-value">{{ remainingPassengers }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">满意度</span>
+                        <div class="satisfaction-bar">
+                            <div 
+                                class="satisfaction-fill"
+                                :style="{ width: satisfaction + '%' }"
+                                :class="{ 'low': satisfaction < 30, 'medium': satisfaction < 60 }"
+                            ></div>
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">拥堵指数</span>
+                        <div class="congestion-bar">
+                            <div 
+                                class="congestion-fill"
+                                :style="{ width: congestionLevel + '%' }"
+                                :class="{ 'high': congestionLevel > 70, 'medium': congestionLevel > 40 }"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主游戏区域 -->
+            <div class="main-game-area">
+                <!-- 左侧工具栏 -->
+                <div class="toolbar">
+                    <h3>工具</h3>
+                    
+                    <div class="tool-category">
+                        <div class="category-label">导航控制</div>
+                        <div 
+                            class="tool-item"
+                            :class="{ active: selectedTool === 'fence' }"
+                            @click="selectTool('fence')"
+                        >
+                            <span class="tool-icon">🧱</span>
+                            <span class="tool-name">临时围栏</span>
+                            <span class="tool-count">剩余: {{ toolCounts.fence }}</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-category">
+                        <div class="category-label">通道控制</div>
+                        <div 
+                            class="tool-item"
+                            :class="{ active: selectedTool === 'gate' }"
+                            @click="selectTool('gate')"
+                        >
+                            <span class="tool-icon">🚪</span>
+                            <span class="tool-name">开关闸机</span>
+                            <span class="tool-desc">点击闸机切换</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-category">
+                        <div class="category-label">人员调度</div>
+                        <div 
+                            class="tool-item"
+                            :class="{ active: selectedTool === 'staff' }"
+                            @click="selectTool('staff')"
+                        >
+                            <span class="tool-icon">👷</span>
+                            <span class="tool-name">工作人员</span>
+                            <span class="tool-count">剩余: {{ toolCounts.staff }}</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-category">
+                        <div class="category-label">拆除工具</div>
+                        <div 
+                            class="tool-item"
+                            :class="{ active: selectedTool === 'remove' }"
+                            @click="selectTool('remove')"
+                        >
+                            <span class="tool-icon">🗑️</span>
+                            <span class="tool-name">拆除</span>
+                            <span class="tool-desc">拆除围栏/工作人员</span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="controls">
+                        <h3>游戏控制</h3>
+                        <div class="control-buttons">
+                            <button 
+                                @click="togglePause" 
+                                class="btn control-btn"
+                                :class="{ active: gameState === 'paused' }"
+                            >
+                                {{ gameState === 'paused' ? '▶ 继续' : '⏸ 暂停' }}
+                            </button>
+                            <button @click="restartLevel" class="btn control-btn secondary">🔄 重开</button>
+                            <button @click="backToMenu" class="btn control-btn secondary">🏠 菜单</button>
+                        </div>
+                        
+                        <div class="speed-control">
+                            <span>游戏速度:</span>
+                            <div class="speed-buttons">
+                                <button 
+                                    v-for="speed in [0.5, 1, 2, 3]" 
+                                    :key="speed"
+                                    @click="setGameSpeed(speed)"
+                                    class="speed-btn"
+                                    :class="{ active: gameSpeed === speed }"
+                                >
+                                    {{ speed }}x
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 游戏画布 -->
+                <div class="game-canvas-container">
+                    <canvas 
+                        ref="gameCanvasRef"
+                        class="game-canvas"
+                        @click="handleCanvasClick"
+                        @mousemove="handleCanvasMouseMove"
+                        @mouseleave="handleCanvasMouseLeave"
+                    ></canvas>
+                    
+                    <!-- 游戏结束弹窗 -->
+                    <div v-if="gameState === 'ended'" class="game-over-overlay">
+                        <div class="game-over-modal">
+                            <h2 v-if="isVictory" class="victory-title">🎉 关卡完成！</h2>
+                            <h2 v-else class="defeat-title">😢 挑战失败</h2>
+                            
+                            <div class="result-stats">
+                                <div class="stat-row">
+                                    <span>最终得分:</span>
+                                    <span class="highlight">{{ finalScore }}</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>用时:</span>
+                                    <span>{{ formatTime(gameTime) }}</span>
+                                </div>
+                                <div class="stat-row" v-if="isVictory">
+                                    <span>星级评价:</span>
+                                    <span class="stars">{{ finalStars }}★</span>
+                                </div>
+                            </div>
+
+                            <!-- 回放事件列表 -->
+                            <div class="replay-section" v-if="replayEvents.length > 0">
+                                <h3>本局关键事件</h3>
+                                <div class="event-list">
+                                    <div 
+                                        v-for="(event, index) in replayEvents" 
+                                        :key="index"
+                                        class="event-item"
+                                        :class="event.type"
+                                    >
+                                        <span class="event-time">[{{ formatTime(event.time) }}]</span>
+                                        <span class="event-icon">{{ getEventIcon(event.type) }}</span>
+                                        <span class="event-desc">{{ event.description }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="result-buttons">
+                                <button @click="restartLevel" class="btn primary">重玩本关</button>
+                                <button v-if="isVictory && hasNextLevel" @click="nextLevel" class="btn primary">下一关</button>
+                                <button @click="backToMenu" class="btn secondary">返回菜单</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧信息面板 -->
+                <div class="info-panel">
+                    <div class="panel-section">
+                        <h4>关卡目标</h4>
+                        <div class="objective-detail">
+                            <p>{{ currentLevel?.objective }}</p>
+                            <div class="objective-items">
+                                <div class="objective-item" v-for="(goal, idx) in currentLevel?.goals" :key="idx">
+                                    <span class="goal-icon" :style="{ backgroundColor: getColorByType(goal.color) }"></span>
+                                    <span>引导 {{ goal.count }} 名乘客到达 {{ getColorName(goal.color) }} 出口</span>
+                                    <span class="goal-progress">{{ getGoalProgress(idx) }}/{{ goal.count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h4>图例说明</h4>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #4CAF50;"></div>
+                                <span>绿色入口/出口</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #2196F3;"></div>
+                                <span>蓝色入口/出口</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #FF9800;"></div>
+                                <span>橙色入口/出口</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9C27B0;"></div>
+                                <span>紫色入口/出口</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-icon">🧱</div>
+                                <span>临时围栏</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-icon">🚪</div>
+                                <span>闸机（可开关）</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-icon">👷</div>
+                                <span>工作人员（提速）</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-icon">⬛</div>
+                                <span>墙壁/障碍</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h4>实时事件</h4>
+                        <div class="live-events">
+                            <div 
+                                v-for="(event, index) in recentEvents.slice(-5)" 
+                                :key="index"
+                                class="live-event"
+                                :class="event.type"
+                            >
+                                <span class="event-time">[{{ formatTime(event.time) }}]</span>
+                                <span class="event-icon">{{ getEventIcon(event.type) }}</span>
+                                <span class="event-short">{{ event.shortDesc || event.description }}</span>
+                            </div>
+                            <div v-if="recentEvents.length === 0" class="no-events">
+                                暂无事件
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils/constants.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/core/Pathfinding.js"></script>
+    <script src="js/core/Passenger.js"></script>
+    <script src="js/core/GridMap.js"></script>
+    <script src="js/core/ToolSystem.js"></script>
+    <script src="js/core/EventRecorder.js"></script>
+    <script src="js/core/GameEngine.js"></script>
+    <script src="js/data/levels.js"></script>
+    <script src="js/data/storage.js"></script>
+    <script src="js/renderer/CanvasRenderer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
