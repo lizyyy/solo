@@ -1,0 +1,7 @@
+"""
+梅雨季晾衣干燥预估器 - 命令行入口
+"""
+from .cli import main
+
+if __name__ == "__main__":
+    main()

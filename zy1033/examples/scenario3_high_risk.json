@@ -1,0 +1,80 @@
+{
+  "name": "高风险晾晒场景",
+  "description": "异常场景：夜间晾晒、湿度过高、衣架间距过小、位置不佳",
+  "start_time": "2024-06-16 20:00:00",
+  "clothing_items": [
+    {
+      "name": "厚牛仔裤",
+      "fabric_type": "denim",
+      "weight_kg": 1.2,
+      "moisture_content_pct": 85,
+      "drying_location": "卫生间",
+      "hanger_spacing_cm": 5
+    },
+    {
+      "name": "厚毛衣",
+      "fabric_type": "sweater",
+      "weight_kg": 0.9,
+      "moisture_content_pct": 75,
+      "drying_location": "卫生间",
+      "hanger_spacing_cm": 5
+    },
+    {
+      "name": "棉毛巾",
+      "fabric_type": "cotton",
+      "weight_kg": 0.5,
+      "moisture_content_pct": 90,
+      "drying_location": "卫生间",
+      "hanger_spacing_cm": 3
+    },
+    {
+      "name": "羊毛围巾",
+      "fabric_type": "wool",
+      "weight_kg": 0.3,
+      "moisture_content_pct": 70,
+      "drying_location": "卫生间",
+      "hanger_spacing_cm": 8
+    }
+  ],
+  "weather_periods": [
+    {
+      "start_hour": 20,
+      "duration_hours": 4,
+      "temperature_c": 15,
+      "humidity_pct": 95,
+      "wind_speed_kph": 1,
+      "is_sunny": false,
+      "uv_index": 0
+    },
+    {
+      "start_hour": 0,
+      "duration_hours": 8,
+      "temperature_c": 12,
+      "humidity_pct": 98,
+      "wind_speed_kph": 0,
+      "is_sunny": false,
+      "uv_index": 0
+    },
+    {
+      "start_hour": 8,
+      "duration_hours": 4,
+      "temperature_c": 14,
+      "humidity_pct": 92,
+      "wind_speed_kph": 2,
+      "is_sunny": false,
+      "uv_index": 1
+    },
+    {
+      "start_hour": 12,
+      "duration_hours": 4,
+      "temperature_c": 16,
+      "humidity_pct": 88,
+      "wind_speed_kph": 3,
+      "is_sunny": false,
+      "uv_index": 2
+    }
+  ],
+  "average_temp_c": 14.25,
+  "average_humidity_pct": 93.25,
+  "average_wind_kph": 1.5
+}

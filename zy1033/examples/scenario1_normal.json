@@ -1,0 +1,89 @@
+{
+  "name": "梅雨季正常晾晒场景",
+  "description": "典型梅雨季阳台晾晒场景：温度适中，湿度较高，少量衣物",
+  "start_time": "2024-06-15 08:00:00",
+  "clothing_items": [
+    {
+      "name": "白色T恤",
+      "fabric_type": "cotton",
+      "weight_kg": 0.3,
+      "moisture_content_pct": 55,
+      "drying_location": "阳台",
+      "hanger_spacing_cm": 15
+    },
+    {
+      "name": "牛仔裤",
+      "fabric_type": "denim",
+      "weight_kg": 0.8,
+      "moisture_content_pct": 65,
+      "drying_location": "阳台",
+      "hanger_spacing_cm": 18
+    },
+    {
+      "name": "羊毛毛衣",
+      "fabric_type": "wool",
+      "weight_kg": 0.6,
+      "moisture_content_pct": 45,
+      "drying_location": "阳台",
+      "hanger_spacing_cm": 20
+    },
+    {
+      "name": "真丝衬衫",
+      "fabric_type": "silk",
+      "weight_kg": 0.15,
+      "moisture_content_pct": 40,
+      "drying_location": "室内",
+      "hanger_spacing_cm": 15
+    }
+  ],
+  "weather_periods": [
+    {
+      "start_hour": 8,
+      "duration_hours": 4,
+      "temperature_c": 22,
+      "humidity_pct": 75,
+      "wind_speed_kph": 8,
+      "is_sunny": false,
+      "uv_index": 2
+    },
+    {
+      "start_hour": 12,
+      "duration_hours": 4,
+      "temperature_c": 25,
+      "humidity_pct": 70,
+      "wind_speed_kph": 12,
+      "is_sunny": true,
+      "uv_index": 5
+    },
+    {
+      "start_hour": 16,
+      "duration_hours": 4,
+      "temperature_c": 23,
+      "humidity_pct": 78,
+      "wind_speed_kph": 6,
+      "is_sunny": false,
+      "uv_index": 1
+    },
+    {
+      "start_hour": 20,
+      "duration_hours": 4,
+      "temperature_c": 20,
+      "humidity_pct": 85,
+      "wind_speed_kph": 3,
+      "is_sunny": false,
+      "uv_index": 0
+    },
+    {
+      "start_hour": 0,
+      "duration_hours": 8,
+      "temperature_c": 18,
+      "humidity_pct": 90,
+      "wind_speed_kph": 2,
+      "is_sunny": false,
+      "uv_index": 0
+    }
+  ],
+  "average_temp_c": 21.6,
+  "average_humidity_pct": 79.6,
+  "average_wind_kph": 6.2
+}
