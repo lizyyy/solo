@@ -1,0 +1,24 @@
+{
+  "name": "hanging-point-sandbox",
+  "version": "1.0.0",
+  "description": "吊点荷载沙盘 - 舞台技术3D交互预演工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve -l 5174",
+    "start": "npx serve -l 5174",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "stage",
+    "lighting",
+    "truss",
+    "3d",
+    "rigging",
+    "load-calculation"
+  ],
+  "author": "SOLO Coder",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

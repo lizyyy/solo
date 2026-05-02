@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>吊点荷载沙盘 - 舞台技术3D预演工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header id="header">
+      <div class="header-left">
+        <h1>🎪 吊点荷载沙盘</h1>
+        <span class="version">v1.0.0</span>
+      </div>
+      <div class="header-right">
+        <span id="scene-name">未命名场景</span>
+        <button id="btn-save-scene" class="btn-secondary">💾 保存</button>
+        <button id="btn-new-scene" class="btn-secondary">📄 新建</button>
+      </div>
+    </header>
+
+    <div id="main-container">
+      <aside id="left-sidebar">
+        <div class="sidebar-section">
+          <h3>🛠️ 工具箱</h3>
+          <div class="tool-buttons">
+            <button id="btn-select-mode" class="tool-btn active">
+              <span class="tool-icon">👆</span>
+              <span class="tool-label">选择</span>
+            </button>
+            <button id="btn-add-hanging-point" class="tool-btn">
+              <span class="tool-icon">🔗</span>
+              <span class="tool-label">吊点</span>
+            </button>
+            <button id="btn-add-truss" class="tool-btn">
+              <span class="tool-icon">🔩</span>
+              <span class="tool-label">桁架</span>
+            </button>
+            <button id="btn-add-device" class="tool-btn">
+              <span class="tool-icon">💡</span>
+              <span class="tool-label">设备</span>
+            </button>
+            <button id="btn-add-obstacle" class="tool-btn">
+              <span class="tool-icon">🚧</span>
+              <span class="tool-label">障碍物</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📋 示例场景</h3>
+          <div id="sample-scenes-list" class="sample-scenes-list">
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🎯 视角控制</h3>
+          <div class="view-buttons">
+            <button id="btn-view-top" class="view-btn">俯视图</button>
+            <button id="btn-view-front" class="view-btn">正视图</button>
+            <button id="btn-view-side" class="view-btn">侧视图</button>
+            <button id="btn-view-perspective" class="view-btn">透视图</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📤 导出</h3>
+          <div class="export-buttons">
+            <button id="btn-import-json" class="btn-secondary">📥 导入JSON</button>
+            <button id="btn-export-json" class="btn-secondary">📤 导出JSON</button>
+            <button id="btn-export-markdown" class="btn-primary">📄 导出安全交底</button>
+          </div>
+          <input type="file" id="file-import" accept=".json" style="display: none;">
+        </div>
+      </aside>
+
+      <main id="canvas-area">
+        <div id="canvas-container"></div>
+        <div id="canvas-overlay">
+          <div id="status-bar">
+            <div class="status-item">
+              <span class="status-label">总重量:</span>
+              <span id="total-weight" class="status-value">0 kg</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">吊点:</span>
+              <span id="hanging-points-count" class="status-value">0</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">桁架:</span>
+              <span id="trusses-count" class="status-value">0</span>
+            </div>
+            <div class="status-item">
+              <span class="status-label">设备:</span>
+              <span id="devices-count" class="status-value">0</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside id="right-sidebar">
+        <div class="sidebar-section">
+          <h3>⚖️ 载荷状态</h3>
+          <div class="load-summary">
+            <div class="summary-row">
+              <span class="summary-label">重心位置</span>
+              <span id="cog-position" class="summary-value">X: 0m, Z: 0m</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">平衡状态</span>
+              <span id="balance-status" class="status-ok">✅ 平衡</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">碰撞检测</span>
+              <span id="collision-status" class="status-ok">✅ 正常</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📊 吊点载荷</h3>
+          <div id="hanging-points-list" class="points-list">
+            <div class="no-items">暂无吊点</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>⚠️ 警告与建议</h3>
+          <div id="warnings-list" class="warnings-list">
+            <div class="no-warnings">✅ 无警告</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="properties-panel" style="display: none;">
+      <div class="panel-header">
+        <h3>🎛️ 属性编辑</h3>
+        <button id="close-properties" class="close-btn">&times;</button>
+      </div>
+      <div id="properties-content" class="panel-content">
+      </div>
+    </div>
+  </div>
+
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    function checkThreeJS() {
+      if (typeof THREE !== 'undefined') {
+        console.log('Three.js loaded from CDN');
+        loadOrbitControls();
+      } else {
+        console.log('Falling back to local Three.js');
+        const script = document.createElement('script');
+        script.src = 'libs/three.min.js';
+        script.onload = loadOrbitControls;
+        document.head.appendChild(script);
+      }
+    }
+
+    function loadOrbitControls() {
+      if (typeof THREE.OrbitControls === 'undefined') {
+        const controlsScript = document.createElement('script');
+        controlsScript.src = 'libs/OrbitControls.js';
+        controlsScript.onload = loadMainApp;
+        document.head.appendChild(controlsScript);
+      } else {
+        loadMainApp();
+      }
+    }
+
+    function loadMainApp() {
+      const mainScript = document.createElement('script');
+      mainScript.type = 'module';
+      mainScript.src = 'src/main.js';
+      document.head.appendChild(mainScript);
+    }
+
+    window.addEventListener('load', () => {
+      if (typeof THREE !== 'undefined') {
+        loadOrbitControls();
+      } else {
+        const checkInterval = setInterval(() => {
+          if (typeof THREE !== 'undefined') {
+            clearInterval(checkInterval);
+            loadOrbitControls();
+          }
+        }, 100);
+        
+        setTimeout(() => {
+          clearInterval(checkInterval);
+          checkThreeJS();
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>
