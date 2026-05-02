@@ -1,0 +1,42 @@
+[
+  {
+    "group_id": "SG-T01-L03-001",
+    "name": "T01探方L03层第一组红陶绳纹罐",
+    "description": "由 TP-T01-L03-001、002、004 三片残片组成的绳纹红陶罐",
+    "status": "draft",
+    "guess_evidence": "三片均出自 T01 探方 L03 层 A1 方，胎土同为夹砂红陶，纹饰均为绳纹，边缘尺寸匹配度高，初步判断为同一器物残片。",
+    "pottery_ids": ["TP-T01-L03-001", "TP-T01-L03-002", "TP-T01-L03-004"]
+  },
+  {
+    "group_id": "SG-T01-L03-002",
+    "name": "T01探方L03层蓝纹灰陶",
+    "description": "TP-T01-L03-003 单器组",
+    "status": "draft",
+    "guess_evidence": "独立陶片，暂未找到匹配残片。",
+    "pottery_ids": ["TP-T01-L03-003"]
+  },
+  {
+    "group_id": "SG-T01-L04-001",
+    "name": "T01探方L04层大型灰陶瓮",
+    "description": "TP-T01-L04-001 单器组，可能为贮藏用大型瓮罐",
+    "status": "draft",
+    "guess_evidence": "大型器口沿，有明显附加堆纹，可能为瓮罐类器物。",
+    "pottery_ids": ["TP-T01-L04-001"]
+  },
+  {
+    "group_id": "SG-TEST-LAYER-001",
+    "name": "测试层位冲突组",
+    "description": "用于测试层位不一致检测的测试组",
+    "status": "draft",
+    "guess_evidence": "该组包含不同层位陶片，用于测试规则引擎的层位冲突检测功能。",
+    "pottery_ids": ["TP-T01-L03-001", "TP-T01-L04-001"]
+  },
+  {
+    "group_id": "SG-TEST-TAG-001",
+    "name": "测试标签冲突组",
+    "description": "用于测试纹饰/胎土标签冲突检测的测试组",
+    "status": "draft",
+    "guess_evidence": "该组包含不同纹饰和胎土类型的陶片，用于测试规则引擎的标签冲突检测功能。",
+    "pottery_ids": ["TP-T01-L03-001", "TP-T01-L02-001"]
+  }
+]
