@@ -1,0 +1,7 @@
+zone_id,name,description,anti_passback,re_entry_grace_minutes
+main_gate,正门入口,园区主入口,true,5
+server_room,机房,核心服务器机房,true,3
+meeting_room,会议室,会议接待区,false,10
+finance_room,财务室,财务部门禁,true,5
+storage,库房,物资存储区,true,10
+parking,停车场,地下停车场,true,5

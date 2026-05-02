@@ -1,0 +1,77 @@
+{
+  "device_id": "device_a",
+  "device_name": "正门读卡器A",
+  "export_time": "2026-05-01 18:00:00",
+  "events": [
+    {
+      "card_id": "C001",
+      "timestamp": "2026-05-01 08:00:15",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C002",
+      "timestamp": "2026-05-01 08:15:30",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C003",
+      "timestamp": "2026-05-01 08:30:00",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C999",
+      "timestamp": "2026-05-01 09:00:00",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C001",
+      "timestamp": "2026-05-01 12:00:00",
+      "zone_id": "main_gate",
+      "direction": "out",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C001",
+      "timestamp": "2026-05-01 12:30:00",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C004",
+      "timestamp": "2026-05-01 14:00:00",
+      "zone_id": "main_gate",
+      "direction": "in",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C005",
+      "timestamp": "2026-05-01 17:00:00",
+      "zone_id": "main_gate",
+      "direction": "out",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C001",
+      "timestamp": "2026-05-01 17:50:00",
+      "zone_id": "main_gate",
+      "direction": "out",
+      "event_type": "swipe"
+    },
+    {
+      "card_id": "C002",
+      "timestamp": "2026-05-01 17:55:00",
+      "zone_id": "main_gate",
+      "direction": "out",
+      "event_type": "swipe"
+    }
+  ]
+}

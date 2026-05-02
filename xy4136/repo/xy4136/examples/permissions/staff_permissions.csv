@@ -1,0 +1,7 @@
+card_id,person_name,person_id,department,group,allowed_zones,valid_from,valid_until,is_active
+C001,张三,E001,技术部,管理员,"main_gate,server_room,storage",2026-01-01,2026-12-31,true
+C002,李四,E002,行政部,普通员工,"main_gate,meeting_room",2026-01-01,2026-12-31,true
+C003,王五,E003,IT部,技术人员,"main_gate,server_room",2026-01-01,2026-06-30,true
+C004,赵六,E004,财务部,普通员工,"main_gate,finance_room",2026-01-01,2026-04-30,false
+C005,孙七,E005,市场部,普通员工,main_gate,2026-01-01,2026-12-31,true
+C006,周八,E006,安保部,安保人员,"*",2026-01-01,2026-12-31,true

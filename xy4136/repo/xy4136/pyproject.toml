@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "access-arbiter"
+version = "0.1.0"
+authors = [
+  { name="园区门禁管理员" }
+]
+description = "门禁刷卡冲突仲裁器 - 离线同步多设备门禁事件的CLI工具"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "click>=8.0",
+  "pydantic>=2.0",
+  "python-dateutil>=2.8",
+  "rich>=13.0",
+  "pytest>=7.0",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[project.scripts]
+access-arbiter = "access_arbiter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["access_arbiter*"]
