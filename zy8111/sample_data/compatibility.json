@@ -1,0 +1,38 @@
+{
+  "normalization": {
+    "强酸": ["酸类", "强酸性物质", "腐蚀性酸"],
+    "强碱": ["碱类", "强碱性物质", "腐蚀性碱"],
+    "氧化剂": ["氧化性物质", "强氧化剂"],
+    "易燃液体": ["可燃液体", "有机溶剂"]
+  },
+  "incompatible_pairs": [
+    {"category1": "强酸", "category2": "强碱", "severity": "critical"},
+    {"category1": "强酸", "category2": "易燃液体", "severity": "high"},
+    {"category1": "强碱", "category2": "易燃液体", "severity": "medium"},
+    {"category1": "氧化剂", "category2": "易燃液体", "severity": "critical"},
+    {"category1": "氧化剂", "category2": "强酸", "severity": "medium"},
+    {"category1": "氧化剂", "category2": "强碱", "severity": "low"}
+  ],
+  "storage_rules": [
+    {
+      "category": "强酸",
+      "requirements": ["通风", "防腐蚀", "远离水源"],
+      "notes": "应单独存放，避免与碱类接触"
+    },
+    {
+      "category": "强碱",
+      "requirements": ["通风", "防腐蚀", "密封存储"],
+      "notes": "避免与酸类接触"
+    },
+    {
+      "category": "易燃液体",
+      "requirements": ["防爆", "通风", "远离火源", "防静电"],
+      "notes": "存储温度不应超过30℃"
+    },
+    {
+      "category": "氧化剂",
+      "requirements": ["通风", "远离热源", "避免与还原剂接触"],
+      "notes": "应单独存放"
+    }
+  ]
+}
