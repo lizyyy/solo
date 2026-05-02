@@ -1,0 +1,30 @@
+[
+    {
+        "name": "新闻联播时段禁播",
+        "description": "每晚19:00-19:30新闻联播时段禁播商业广告",
+        "day_of_week": null,
+        "start_time": "19:00:00",
+        "end_time": "19:30:00",
+        "restricted_categories": ["所有"],
+        "is_active": true
+    },
+    {
+        "name": "周一至周五午间时段",
+        "description": "工作日午间12:00-12:30时段限制医药类广告",
+        "start_date": "2024-01-01",
+        "end_date": "2024-12-31",
+        "day_of_week": null,
+        "start_time": "12:00:00",
+        "end_time": "12:30:00",
+        "restricted_categories": ["医药", "医疗"],
+        "is_active": true
+    },
+    {
+        "name": "重大节假日禁播烟酒",
+        "description": "春节、国庆等重大节假日期间禁播烟酒广告",
+        "start_date": "2024-10-01",
+        "end_date": "2024-10-07",
+        "restricted_categories": ["烟酒", "烟草"],
+        "is_active": true
+    }
+]

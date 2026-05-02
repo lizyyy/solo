@@ -1,0 +1,37 @@
+[
+    {
+        "category_a": "数码电子",
+        "category_b": "汽车",
+        "min_interval_seconds": 300,
+        "description": "数码电子与汽车广告之间需间隔至少5分钟",
+        "is_active": true
+    },
+    {
+        "category_a": "医药",
+        "category_b": "医疗",
+        "min_interval_seconds": 600,
+        "description": "医药与医疗广告之间需间隔至少10分钟",
+        "is_active": true
+    },
+    {
+        "category_a": "食品饮料",
+        "category_b": "餐饮",
+        "min_interval_seconds": 120,
+        "description": "食品饮料与餐饮广告之间需间隔至少2分钟",
+        "is_active": true
+    },
+    {
+        "category_a": "烟酒",
+        "category_b": "医药",
+        "min_interval_seconds": 900,
+        "description": "烟酒与医药广告之间需间隔至少15分钟",
+        "is_active": true
+    },
+    {
+        "category_a": "游戏",
+        "category_b": "教育",
+        "min_interval_seconds": 300,
+        "description": "游戏与教育广告之间需间隔至少5分钟",
+        "is_active": true
+    }
+]
