@@ -1,0 +1,27 @@
+{
+  "name": "blood-bag-matching-system",
+  "version": "1.0.0",
+  "description": "血袋样本配对验收台 - 血站流动采血车护士交接系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test": "node tests/test.js"
+  },
+  "keywords": ["blood-bank", "blood-donation", "matching-system"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

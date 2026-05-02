@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血袋样本配对验收台</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🩸 血袋样本配对验收台</h1>
+            <p class="subtitle">血站流动采血车护士交接系统</p>
+        </header>
+
+        <nav class="app-nav">
+            <button class="nav-btn active" data-tab="input">📝 批量录入/扫码</button>
+            <button class="nav-btn" data-tab="matching">🔗 配对管理</button>
+            <button class="nav-btn" data-tab="coldbox">🧊 冷箱监控</button>
+            <button class="nav-btn" data-tab="handover">📋 交接复核</button>
+            <button class="nav-btn" data-tab="import-export">📁 导入导出</button>
+            <button class="nav-btn" data-tab="audit">📊 审计日志</button>
+        </nav>
+
+        <main class="app-main">
+            <section id="input-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2>批量录入/扫码模拟</h2>
+                    <p>录入献血者、血袋、样本管信息</p>
+                </div>
+
+                <div class="card-container">
+                    <div class="card">
+                        <h3>献血者信息</h3>
+                        <form id="donor-form" class="form-group">
+                            <label>
+                                献血者条码 *
+                                <input type="text" name="donor_code" placeholder="例如: D001" required>
+                            </label>
+                            <label>
+                                姓名
+                                <input type="text" name="name" placeholder="姓名">
+                            </label>
+                            <label>
+                                血型
+                                <select name="blood_type">
+                                    <option value="">请选择</option>
+                                    <option value="A">A型</option>
+                                    <option value="B">B型</option>
+                                    <option value="AB">AB型</option>
+                                    <option value="O">O型</option>
+                                </select>
+                            </label>
+                            <button type="submit" class="btn btn-primary">添加献血者</button>
+                        </form>
+
+                        <div class="section-divider">
+                            <span>批量导入</span>
+                        </div>
+                        <form id="donor-import-form" class="import-form">
+                            <label class="file-label">
+                                选择 CSV 文件
+                                <input type="file" name="file" accept=".csv" required>
+                            </label>
+                            <button type="submit" class="btn btn-secondary">导入献血者</button>
+                            <p class="help-text">CSV格式: donor_code, name, blood_type</p>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>血袋信息</h3>
+                        <form id="bloodbag-form" class="form-group">
+                            <label>
+                                血袋编号 *
+                                <input type="text" name="bag_code" placeholder="例如: B001" required>
+                            </label>
+                            <label>
+                                关联献血者条码
+                                <input type="text" name="donor_code" placeholder="献血者条码">
+                            </label>
+                            <label>
+                                容量 (ml)
+                                <input type="number" name="volume" value="400" min="200" max="400">
+                            </label>
+                            <label>
+                                血型
+                                <select name="blood_type">
+                                    <option value="">请选择</option>
+                                    <option value="A">A型</option>
+                                    <option value="B">B型</option>
+                                    <option value="AB">AB型</option>
+                                    <option value="O">O型</option>
+                                </select>
+                            </label>
+                            <button type="submit" class="btn btn-primary">添加血袋</button>
+                        </form>
+
+                        <div class="section-divider">
+                            <span>批量导入</span>
+                        </div>
+                        <form id="bloodbag-import-form" class="import-form">
+                            <label class="file-label">
+                                选择 CSV 文件
+                                <input type="file" name="file" accept=".csv" required>
+                            </label>
+                            <button type="submit" class="btn btn-secondary">导入血袋</button>
+                            <p class="help-text">CSV格式: bag_code, donor_code, volume, blood_type</p>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>样本管信息</h3>
+                        <form id="sampletube-form" class="form-group">
+                            <label>
+                                样本管编号 *
+                                <input type="text" name="tube_code" placeholder="例如: T001" required>
+                            </label>
+                            <label>
+                                关联献血者条码
+                                <input type="text" name="donor_code" placeholder="献血者条码">
+                            </label>
+                            <label>
+                                样本类型
+                                <select name="tube_type">
+                                    <option value="standard">标准</option>
+                                    <option value="edta">EDTA抗凝</option>
+                                    <option value="heparin">肝素抗凝</option>
+                                </select>
+                            </label>
+                            <button type="submit" class="btn btn-primary">添加样本管</button>
+                        </form>
+
+                        <div class="section-divider">
+                            <span>批量导入</span>
+                        </div>
+                        <form id="sampletube-import-form" class="import-form">
+                            <label class="file-label">
+                                选择 CSV 文件
+                                <input type="file" name="file" accept=".csv" required>
+                            </label>
+                            <button type="submit" class="btn btn-secondary">导入样本管</button>
+                            <p class="help-text">CSV格式: tube_code, donor_code, tube_type</p>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>扫码模拟</h3>
+                    <p class="subtitle">模拟扫码枪批量录入</p>
+                    <div class="scan-simulator">
+                        <textarea id="scan-input" placeholder="输入条码（每行一个，支持格式：Dxxx|Txxx|Bxxx）&#10;例如：&#10;D001&#10;B001&#10;T001"></textarea>
+                        <div class="scan-actions">
+                            <button id="scan-analyze-btn" class="btn btn-primary">解析条码</button>
+                            <button id="scan-clear-btn" class="btn btn-secondary">清空</button>
+                        </div>
+                        <div id="scan-results" class="scan-results"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>数据列表</h3>
+                    <div class="data-tabs">
+                        <button class="data-tab-btn active" data-list="donors">献血者</button>
+                        <button class="data-tab-btn" data-list="bloodbags">血袋</button>
+                        <button class="data-tab-btn" data-list="sampletubes">样本管</button>
+                    </div>
+                    <div id="data-list-container" class="data-list-container">
+                    </div>
+                </div>
+            </section>
+
+            <section id="matching-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>配对管理</h2>
+                    <p>血袋与样本管配对验证</p>
+                </div>
+
+                <div class="card">
+                    <h3>新建配对</h3>
+                    <form id="matching-form" class="form-group inline-form">
+                        <label>
+                            血袋编号 *
+                            <input type="text" name="blood_bag_code" placeholder="血袋编号" required>
+                        </label>
+                        <label>
+                            样本管编号 *
+                            <input type="text" name="sample_tube_code" placeholder="样本管编号" required>
+                        </label>
+                        <button type="button" id="match-validate-btn" class="btn btn-secondary">验证</button>
+                        <button type="submit" class="btn btn-primary">确认配对</button>
+                    </form>
+                    <div id="match-validation-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>批量配对</h3>
+                    <form id="batch-match-form" class="form-group">
+                        <label>
+                            配对列表（每行一组：血袋,样本管）
+                            <textarea name="batch_items" rows="5" placeholder="每行一组，用逗号分隔&#10;例如：&#10;B001,T001&#10;B002,T002"></textarea>
+                        </label>
+                        <button type="submit" class="btn btn-primary">批量配对</button>
+                    </form>
+                    <div id="batch-match-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>检查样本管漏扫</h3>
+                    <form id="check-missing-form" class="form-group inline-form">
+                        <label>
+                            献血者条码 *
+                            <input type="text" name="donor_code" placeholder="献血者条码" required>
+                        </label>
+                        <button type="submit" class="btn btn-warning">检查漏扫</button>
+                    </form>
+                    <div id="missing-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>配对列表</h3>
+                    <div class="match-filter">
+                        <label>
+                            状态筛选:
+                            <select id="match-status-filter">
+                                <option value="">全部</option>
+                                <option value="matched">已配对</option>
+                                <option value="verified">已验证</option>
+                                <option value="rejected">已拒绝</option>
+                            </select>
+                        </label>
+                        <button id="refresh-matches-btn" class="btn btn-secondary btn-small">刷新</button>
+                    </div>
+                    <div id="matches-list"></div>
+                </div>
+            </section>
+
+            <section id="coldbox-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>冷箱监控</h2>
+                    <p>冷箱温度和时间线管理</p>
+                </div>
+
+                <div class="card">
+                    <h3>添加冷箱</h3>
+                    <form id="coldbox-form" class="form-group inline-form">
+                        <label>
+                            冷箱编号 *
+                            <input type="text" name="box_code" placeholder="例如: BOX001" required>
+                        </label>
+                        <label>
+                            描述
+                            <input type="text" name="description" placeholder="描述">
+                        </label>
+                        <label>
+                            最高允许温度 (°C)
+                            <input type="number" name="max_temp" value="10" min="-20" max="30">
+                        </label>
+                        <button type="submit" class="btn btn-primary">添加冷箱</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>冷箱列表</h3>
+                    <div id="coldboxes-list"></div>
+                </div>
+
+                <div class="card">
+                    <h3>记录冷箱事件</h3>
+                    <form id="timeline-form" class="form-group inline-form">
+                        <label>
+                            冷箱编号 *
+                            <input type="text" name="box_code" placeholder="冷箱编号" required>
+                        </label>
+                        <label>
+                            事件类型 *
+                            <select name="event_type" required>
+                                <option value="">请选择</option>
+                                <option value="temp_check">温度检查</option>
+                                <option value="bag_add">放入血袋</option>
+                                <option value="bag_remove">取出血袋</option>
+                                <option value="transport">运输开始</option>
+                                <option value="arrival">到达</option>
+                            </select>
+                        </label>
+                        <label>
+                            当前温度 (°C)
+                            <input type="number" name="temperature" step="0.1" placeholder="温度">
+                        </label>
+                        <label>
+                            血袋编号
+                            <input type="text" name="blood_bag_code" placeholder="血袋编号">
+                        </label>
+                        <label>
+                            备注
+                            <input type="text" name="notes" placeholder="备注">
+                        </label>
+                        <button type="submit" class="btn btn-primary">记录事件</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>温度检查</h3>
+                    <div class="inline-form">
+                        <label>
+                            选择冷箱:
+                            <select id="temp-check-box">
+                                <option value="">请选择冷箱</option>
+                            </select>
+                        </label>
+                        <button id="check-temp-btn" class="btn btn-warning">检查温度超时</button>
+                    </div>
+                    <div id="temp-check-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>跨箱检查</h3>
+                    <form id="cross-check-form" class="form-group inline-form">
+                        <label>
+                            目标冷箱编号 *
+                            <input type="text" name="box_code" placeholder="冷箱编号" required>
+                        </label>
+                        <label>
+                            血袋编号 *
+                            <input type="text" name="blood_bag_code" placeholder="血袋编号" required>
+                        </label>
+                        <button type="submit" class="btn btn-warning">检查跨箱</button>
+                    </form>
+                    <div id="cross-check-result"></div>
+                </div>
+
+                <div class="card">
+                    <h3>冷箱时间线</h3>
+                    <div class="inline-form">
+                        <label>
+                            选择冷箱:
+                            <select id="timeline-box-select">
+                                <option value="">请选择冷箱</option>
+                            </select>
+                        </label>
+                        <button id="load-timeline-btn" class="btn btn-secondary btn-small">加载</button>
+                    </div>
+                    <div id="coldbox-timeline"></div>
+                </div>
+            </section>
+
+            <section id="handover-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>交接复核</h2>
+                    <p>交接记录管理与复核</p>
+                </div>
+
+                <div class="card">
+                    <h3>新建交接</h3>
+                    <form id="handover-form" class="form-group">
+                        <label>
+                            移交人 *
+                            <input type="text" name="from_operator" placeholder="移交人姓名" required>
+                        </label>
+                        <label>
+                            接收人 *
+                            <input type="text" name="to_operator" placeholder="接收人姓名" required>
+                        </label>
+                        <label>
+                            备注
+                            <textarea name="notes" rows="2" placeholder="备注信息"></textarea>
+                        </label>
+                        <button type="submit" class="btn btn-primary">创建交接</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>交接列表</h3>
+                    <div class="match-filter">
+                        <label>
+                            状态筛选:
+                            <select id="handover-status-filter">
+                                <option value="">全部</option>
+                                <option value="pending">待处理</option>
+                                <option value="completed">已完成</option>
+                                <option value="rejected">已退回</option>
+                            </select>
+                        </label>
+                        <button id="refresh-handovers-btn" class="btn btn-secondary btn-small">刷新</button>
+                    </div>
+                    <div id="handovers-list"></div>
+                </div>
+
+                <div class="card" id="handover-detail-card" style="display: none;">
+                    <h3>交接详情</h3>
+                    <div id="handover-detail-info"></div>
+                    
+                    <div class="section-divider">
+                        <span>添加交接项</span>
+                    </div>
+                    <form id="handover-item-form" class="form-group inline-form">
+                        <label>
+                            献血者条码
+                            <input type="text" name="donor_code" placeholder="献血者条码">
+                        </label>
+                        <label>
+                            血袋编号
+                            <input type="text" name="blood_bag_code" placeholder="血袋编号">
+                        </label>
+                        <label>
+                            样本管编号
+                            <input type="text" name="sample_tube_code" placeholder="样本管编号">
+                        </label>
+                        <button type="button" id="add-handover-item-btn" class="btn btn-secondary">添加</button>
+                    </form>
+
+                    <div class="section-divider">
+                        <span>批量添加</span>
+                    </div>
+                    <form id="batch-item-form" class="form-group">
+                        <label>
+                            批量添加（每行一项，格式：献血者,血袋,样本管）
+                            <textarea name="batch_items" rows="5" placeholder="每行一项，逗号分隔&#10;D001,B001,T001&#10;D002,B002,T002"></textarea>
+                        </label>
+                        <button type="submit" class="btn btn-secondary">批量添加</button>
+                    </form>
+
+                    <div class="section-divider">
+                        <span>交接项列表</span>
+                    </div>
+                    <div id="handover-items-list"></div>
+
+                    <div class="handover-actions">
+                        <button id="validate-handover-btn" class="btn btn-secondary">验证交接</button>
+                        <button id="complete-handover-btn" class="btn btn-success">完成交接</button>
+                        <button id="reject-handover-btn" class="btn btn-danger">退回</button>
+                    </div>
+                    <div id="handover-validation-result"></div>
+                </div>
+            </section>
+
+            <section id="import-export-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>导入导出</h2>
+                    <p>数据导入与报告导出</p>
+                </div>
+
+                <div class="card-container">
+                    <div class="card">
+                        <h3>导出交接报告</h3>
+                        <p class="subtitle">导出 Markdown 格式的交接报告</p>
+                        <form id="export-handover-form" class="form-group">
+                            <label>
+                                交接编号 *
+                                <input type="text" name="handover_code" placeholder="交接编号" required>
+                            </label>
+                            <button type="submit" class="btn btn-primary">导出报告</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>导出审计日志</h3>
+                        <p class="subtitle">导出 JSON 格式的审计包</p>
+                        <form id="export-audit-form" class="form-group">
+                            <label>
+                                开始时间
+                                <input type="datetime-local" name="start_time">
+                            </label>
+                            <label>
+                                结束时间
+                                <input type="datetime-local" name="end_time">
+                            </label>
+                            <label>
+                                操作人筛选
+                                <input type="text" name="operator" placeholder="操作人姓名">
+                            </label>
+                            <button type="submit" class="btn btn-primary">导出审计包</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>导出冷箱时间线</h3>
+                        <p class="subtitle">导出冷箱温度时间线报告</p>
+                        <form id="export-timeline-form" class="form-group">
+                            <label>
+                                冷箱编号
+                                <input type="text" name="box_code" placeholder="冷箱编号（留空导出全部）">
+                            </label>
+                            <label>
+                                开始时间
+                                <input type="datetime-local" name="start_time">
+                            </label>
+                            <label>
+                                结束时间
+                                <input type="datetime-local" name="end_time">
+                            </label>
+                            <button type="submit" class="btn btn-primary">导出报告</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>下载示例 CSV 模板</h3>
+                    <div class="template-downloads">
+                        <button id="download-donor-template" class="btn btn-secondary">献血者模板</button>
+                        <button id="download-bloodbag-template" class="btn btn-secondary">血袋模板</button>
+                        <button id="download-sampletube-template" class="btn btn-secondary">样本管模板</button>
+                    </div>
+                    <div id="template-display"></div>
+                </div>
+            </section>
+
+            <section id="audit-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>审计日志</h2>
+                    <p>操作记录追踪</p>
+                </div>
+
+                <div class="card">
+                    <h3>日志筛选</h3>
+                    <form id="audit-filter-form" class="form-group inline-form">
+                        <label>
+                            操作人
+                            <input type="text" name="operator" placeholder="操作人姓名">
+                        </label>
+                        <label>
+                            数据表
+                            <select name="table_name">
+                                <option value="">全部</option>
+                                <option value="donors">献血者</option>
+                                <option value="blood_bags">血袋</option>
+                                <option value="sample_tubes">样本管</option>
+                                <option value="bag_tube_matches">配对</option>
+                                <option value="cold_boxes">冷箱</option>
+                                <option value="handovers">交接</option>
+                            </select>
+                        </label>
+                        <label>
+                            操作类型
+                            <select name="operation_type">
+                                <option value="">全部</option>
+                                <option value="CREATE">创建</option>
+                                <option value="UPDATE">更新</option>
+                                <option value="DELETE">删除</option>
+                                <option value="EXPORT">导出</option>
+                            </select>
+                        </label>
+                        <label>
+                            开始时间
+                            <input type="datetime-local" name="start_time">
+                        </label>
+                        <label>
+                            结束时间
+                            <input type="datetime-local" name="end_time">
+                        </label>
+                        <button type="submit" class="btn btn-primary">查询</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>日志列表</h3>
+                    <button id="refresh-audit-btn" class="btn btn-secondary btn-small">刷新日志</button>
+                    <div id="audit-logs-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>血袋样本配对验收台 v1.0.0 | 本地交接系统</p>
+        </footer>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
