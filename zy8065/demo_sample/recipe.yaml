@@ -1,0 +1,21 @@
+capacity_threshold:
+  max: 2.0
+  min: 0.5
+current_threshold:
+  max: 5.0
+sampling_interval: 10
+stages:
+- duration_min: 60
+  name: formation
+- duration_min: 30
+  name: rest
+- duration_min: 90
+  name: grading
+- duration_min: 30
+  name: final_rest
+temperature_threshold:
+  max_rate_C_per_min: 2.0
+  max_rise_per_step: 15.0
+voltage_threshold:
+  max: 4.3
+  min: 2.5
