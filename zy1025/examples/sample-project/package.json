@@ -1,0 +1,15 @@
+{
+  "name": "sample-project",
+  "version": "1.0.0",
+  "description": "示例项目用于测试 env-checker",
+  "scripts": {
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development PORT=3001 nodemon server.js",
+    "test": "NODE_ENV=test API_BASE_URL=http://localhost:8080 jest",
+    "build": "BUILD_ENV=${BUILD_ENV:-production} webpack --mode production",
+    "migrate": "DB_HOST=${DB_HOST} DB_PORT=${DB_PORT} npx prisma migrate dev",
+    "lint": "eslint src/"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,576 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generatedAt": "2026-05-02T15:56:46.558Z",
+    "projectDir": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project"
+  },
+  "summary": {
+    "totalFiles": 6,
+    "totalVariables": 21,
+    "totalIssues": 10,
+    "issuesBySeverity": {
+      "high": 2,
+      "medium": 4,
+      "low": 4
+    }
+  },
+  "variables": {
+    "all": [
+      {
+        "name": "DB_HOST",
+        "sources": [
+          ".env.example",
+          ".env.local",
+          "README.md",
+          "docker-compose.yml",
+          "package.json"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose",
+          "package_json"
+        ],
+        "values": [
+          {
+            "value": "localhost",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          },
+          {
+            "value": "db.example.internal",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "DB_PORT",
+        "sources": [
+          ".env.example",
+          ".env.local",
+          "README.md",
+          "docker-compose.yml",
+          "package.json"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose",
+          "package_json"
+        ],
+        "values": [
+          {
+            "value": "5432",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          },
+          {
+            "value": "5433",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "DB_NAME",
+        "sources": [
+          ".env.example",
+          "README.md",
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "values": [
+          {
+            "value": "myapp",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "DB_USER",
+        "sources": [
+          ".env.example",
+          "README.md",
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "values": [
+          {
+            "value": "postgres",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "API_BASE_URL",
+        "sources": [
+          ".env.example",
+          "README.md",
+          "docker-compose.yml",
+          "package.json"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose",
+          "package_json"
+        ],
+        "values": [
+          {
+            "value": "https://api.example.com",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "API_TIMEOUT",
+        "sources": [
+          ".env.example"
+        ],
+        "foundIn": [
+          "env_file"
+        ],
+        "values": [
+          {
+            "value": "30000",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "NODE_ENV",
+        "sources": [
+          ".env.example",
+          "README.md",
+          "docker-compose.yml",
+          "package.json"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose",
+          "package_json"
+        ],
+        "values": [
+          {
+            "value": "development",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "PORT",
+        "sources": [
+          ".env.example",
+          "README.md",
+          "package.json"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "package_json"
+        ],
+        "values": [
+          {
+            "value": "3000",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          }
+        ]
+      },
+      {
+        "name": "DB_PASSWORD",
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "values": [
+          {
+            "value": "[REDACTED]",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "API_KEY",
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "values": [
+          {
+            "value": "[REDACTED]",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "DEV_TOOLS",
+        "sources": [
+          ".env.local"
+        ],
+        "foundIn": [
+          "env_file"
+        ],
+        "values": [
+          {
+            "value": "true",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "HOT_RELOAD",
+        "sources": [
+          ".env.local"
+        ],
+        "foundIn": [
+          "env_file"
+        ],
+        "values": [
+          {
+            "value": "true",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "USER_EMAIL",
+        "sources": [
+          ".env.local"
+        ],
+        "foundIn": [
+          "env_file"
+        ],
+        "values": [
+          {
+            "value": "developer@example.com",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      },
+      {
+        "name": "API",
+        "sources": [
+          "README.md"
+        ],
+        "foundIn": [
+          "markdown"
+        ],
+        "values": []
+      },
+      {
+        "name": "DEBUG",
+        "sources": [
+          "README.md"
+        ],
+        "foundIn": [
+          "markdown"
+        ],
+        "values": []
+      },
+      {
+        "name": "LOG_LEVEL",
+        "sources": [
+          "README.md"
+        ],
+        "foundIn": [
+          "markdown"
+        ],
+        "values": []
+      },
+      {
+        "name": "REDIS_URL",
+        "sources": [
+          "README.md",
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "markdown",
+          "docker_compose"
+        ],
+        "values": []
+      },
+      {
+        "name": "BUILD_ENV",
+        "sources": [
+          "README.md",
+          "package.json"
+        ],
+        "foundIn": [
+          "markdown",
+          "package_json"
+        ],
+        "values": []
+      },
+      {
+        "name": "POSTGRES_DB",
+        "sources": [
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "docker_compose"
+        ],
+        "values": []
+      },
+      {
+        "name": "POSTGRES_USER",
+        "sources": [
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "docker_compose"
+        ],
+        "values": []
+      },
+      {
+        "name": "POSTGRES_PASSWORD",
+        "sources": [
+          "docker-compose.yml"
+        ],
+        "foundIn": [
+          "docker_compose"
+        ],
+        "values": []
+      }
+    ],
+    "bySource": {
+      "example": [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USER",
+        "API_BASE_URL",
+        "API_TIMEOUT",
+        "NODE_ENV",
+        "PORT"
+      ],
+      "local": [
+        "DB_PASSWORD",
+        "DB_HOST",
+        "DB_PORT",
+        "API_KEY",
+        "DEV_TOOLS",
+        "HOT_RELOAD",
+        "USER_EMAIL"
+      ],
+      "docker": [
+        "NODE_ENV",
+        "API_BASE_URL",
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USER",
+        "DB_PASSWORD",
+        "API_KEY",
+        "REDIS_URL",
+        "POSTGRES_DB",
+        "POSTGRES_USER",
+        "POSTGRES_PASSWORD"
+      ],
+      "packageJson": [
+        "NODE_ENV",
+        "PORT",
+        "API_BASE_URL",
+        "BUILD_ENV",
+        "DB_HOST",
+        "DB_PORT"
+      ],
+      "markdown": [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_NAME",
+        "DB_USER",
+        "DB_PASSWORD",
+        "API",
+        "API_BASE_URL",
+        "API_KEY",
+        "NODE_ENV",
+        "PORT",
+        "DEBUG",
+        "LOG_LEVEL",
+        "REDIS_URL",
+        "BUILD_ENV"
+      ]
+    }
+  },
+  "issues": [
+    {
+      "type": "value_conflict",
+      "variable": "DB_HOST",
+      "severity": "medium",
+      "message": "变量 DB_HOST 在不同文件中的默认值不一致",
+      "details": {
+        "values": [
+          {
+            "value": "localhost",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          },
+          {
+            "value": "db.example.internal",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      }
+    },
+    {
+      "type": "value_conflict",
+      "variable": "DB_PORT",
+      "severity": "medium",
+      "message": "变量 DB_PORT 在不同文件中的默认值不一致",
+      "details": {
+        "values": [
+          {
+            "value": "5432",
+            "source": ".env.example",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.example"
+          },
+          {
+            "value": "5433",
+            "source": ".env.local",
+            "filePath": "/Users/lzy/pro/solocoder/pro/zy1025/repo/zy1025/examples/sample-project/.env.local"
+          }
+        ]
+      }
+    },
+    {
+      "type": "potential_secret",
+      "variable": "API_BASE_URL",
+      "severity": "low",
+      "message": "变量 API_BASE_URL 看起来可能包含敏感信息",
+      "details": {
+        "sources": [
+          ".env.example",
+          "README.md",
+          "docker-compose.yml",
+          "package.json"
+        ]
+      }
+    },
+    {
+      "type": "missing_in_example",
+      "variable": "DB_PASSWORD",
+      "severity": "high",
+      "message": "变量 DB_PASSWORD 在代码/脚本中使用，但 .env.example 中缺失",
+      "details": {
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ]
+      }
+    },
+    {
+      "type": "extra_in_local",
+      "variable": "DB_PASSWORD",
+      "severity": "medium",
+      "message": "变量 DB_PASSWORD 在 .env.local 中存在，但 .env.example 中未声明",
+      "details": {
+        "localValue": "[REDACTED]"
+      }
+    },
+    {
+      "type": "potential_secret",
+      "variable": "DB_PASSWORD",
+      "severity": "low",
+      "message": "变量 DB_PASSWORD 看起来可能包含敏感信息",
+      "details": {
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ]
+      }
+    },
+    {
+      "type": "missing_in_example",
+      "variable": "API_KEY",
+      "severity": "high",
+      "message": "变量 API_KEY 在代码/脚本中使用，但 .env.example 中缺失",
+      "details": {
+        "foundIn": [
+          "env_file",
+          "markdown",
+          "docker_compose"
+        ],
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ]
+      }
+    },
+    {
+      "type": "extra_in_local",
+      "variable": "API_KEY",
+      "severity": "medium",
+      "message": "变量 API_KEY 在 .env.local 中存在，但 .env.example 中未声明",
+      "details": {
+        "localValue": "[REDACTED]"
+      }
+    },
+    {
+      "type": "potential_secret",
+      "variable": "API_KEY",
+      "severity": "low",
+      "message": "变量 API_KEY 看起来可能包含敏感信息",
+      "details": {
+        "sources": [
+          ".env.local",
+          "README.md",
+          "docker-compose.yml"
+        ]
+      }
+    },
+    {
+      "type": "potential_secret",
+      "variable": "USER_EMAIL",
+      "severity": "low",
+      "message": "变量 USER_EMAIL 看起来可能包含敏感信息",
+      "details": {
+        "sources": [
+          ".env.local"
+        ]
+      }
+    }
+  ],
+  "hasErrors": true
+}
