@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜市炒粉摊出餐小游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>夜市炒粉摊</h1>
+        </header>
+        
+        <main id="main-content">
+            <section id="menu-screen" class="screen active">
+                <div class="menu-container">
+                    <h2>欢迎来到夜市炒粉摊！</h2>
+                    <p>晚高峰来了，很多顾客在排队等待你的美味炒粉！</p>
+                    
+                    <div class="menu-buttons">
+                        <button id="btn-start-game" class="btn-primary">开始游戏</button>
+                        <button id="btn-select-level" class="btn-secondary">选择关卡</button>
+                        <button id="btn-manage-levels" class="btn-secondary">关卡管理</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="level-select-screen" class="screen">
+                <div class="level-select-container">
+                    <h2>选择关卡</h2>
+                    <div id="level-list" class="level-list">
+                    </div>
+                    <button id="btn-back-from-level-select" class="btn-secondary">返回</button>
+                </div>
+            </section>
+            
+            <section id="level-manage-screen" class="screen">
+                <div class="level-manage-container">
+                    <h2>关卡管理</h2>
+                    
+                    <div class="import-export-section">
+                        <div class="import-section">
+                            <h3>导入关卡</h3>
+                            <textarea id="import-textarea" placeholder="粘贴关卡JSON数据..."></textarea>
+                            <button id="btn-import-level" class="btn-primary">导入关卡</button>
+                            <div id="import-error" class="error-message"></div>
+                        </div>
+                        
+                        <div class="export-section">
+                            <h3>导出关卡</h3>
+                            <select id="export-level-select">
+                                <option value="">选择关卡导出</option>
+                            </select>
+                            <button id="btn-export-level" class="btn-secondary">导出关卡</button>
+                            <textarea id="export-textarea" readonly placeholder="导出的JSON数据将显示在这里..."></textarea>
+                            <button id="btn-copy-export" class="btn-secondary">复制到剪贴板</button>
+                        </div>
+                    </div>
+                    
+                    <div class="current-levels-section">
+                        <h3>当前关卡列表</h3>
+                        <div id="manage-level-list" class="level-list">
+                        </div>
+                        <button id="btn-reset-levels" class="btn-warning">重置为默认关卡</button>
+                    </div>
+                    
+                    <button id="btn-back-from-manage" class="btn-secondary">返回</button>
+                </div>
+            </section>
+            
+            <section id="game-screen" class="screen">
+                <div class="game-header">
+                    <div class="game-info">
+                        <div class="info-item">
+                            <span class="info-label">关卡：</span>
+                            <span id="current-level-name" class="info-value">第1关</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">时间：</span>
+                            <span id="game-time" class="info-value">00:00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">分数：</span>
+                            <span id="game-score" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">连击：</span>
+                            <span id="game-combo" class="info-value">0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">差评：</span>
+                            <span id="game-bad-reviews" class="info-value">0</span>
+                        </div>
+                    </div>
+                    <button id="btn-pause-game" class="btn-small">暂停</button>
+                </div>
+                
+                <div class="game-main">
+                    <div class="customers-section">
+                        <h3>顾客队列</h3>
+                        <div id="customers-queue" class="customers-queue">
+                        </div>
+                    </div>
+                    
+                    <div class="kitchen-section">
+                        <div class="ingredients-section">
+                            <h3>食材库存</h3>
+                            <div id="ingredients-stock" class="ingredients-stock">
+                            </div>
+                            <div class="restock-buttons">
+                                <button id="btn-restock-noodles" class="btn-small">补米粉</button>
+                                <button id="btn-restock-toppings" class="btn-small">补配菜</button>
+                            </div>
+                        </div>
+                        
+                        <div class="woks-section">
+                            <h3>炒锅</h3>
+                            <div id="woks-area" class="woks-area">
+                            </div>
+                        </div>
+                        
+                        <div class="packing-section">
+                            <h3>打包台</h3>
+                            <div id="packing-area" class="packing-area">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="game-message" class="game-message"></div>
+            </section>
+            
+            <section id="pause-screen" class="screen">
+                <div class="pause-container">
+                    <h2>游戏暂停</h2>
+                    <div class="pause-buttons">
+                        <button id="btn-resume-game" class="btn-primary">继续游戏</button>
+                        <button id="btn-restart-game" class="btn-secondary">重新开始</button>
+                        <button id="btn-quit-game" class="btn-secondary">退出游戏</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="result-screen" class="screen">
+                <div class="result-container">
+                    <h2 id="result-title">游戏结束</h2>
+                    
+                    <div class="result-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">最终得分：</span>
+                            <span id="result-score" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">完成订单：</span>
+                            <span id="result-completed" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">流失顾客：</span>
+                            <span id="result-lost" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">最高连击：</span>
+                            <span id="result-max-combo" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">库存浪费：</span>
+                            <span id="result-wasted" class="summary-value">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">差评数：</span>
+                            <span id="result-bad-reviews" class="summary-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-details">
+                        <h3>差评原因</h3>
+                        <div id="result-bad-reasons" class="bad-reasons">
+                        </div>
+                    </div>
+                    
+                    <div class="result-buttons">
+                        <button id="btn-play-again" class="btn-primary">再玩一次</button>
+                        <button id="btn-select-level-again" class="btn-secondary">选择关卡</button>
+                        <button id="btn-back-to-menu" class="btn-secondary">返回主菜单</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
