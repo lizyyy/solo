@@ -1,0 +1,65 @@
+[
+  {
+    "id": "BC-TOO-SMALL",
+    "type": "CODE128",
+    "value": "SMALL01",
+    "x": 50,
+    "y": 50,
+    "width": 10,
+    "height": 5
+  },
+  {
+    "id": "BC-TOO-LARGE",
+    "type": "CODE128",
+    "value": "LARGE01",
+    "x": 100,
+    "y": 50,
+    "width": 150,
+    "height": 80
+  },
+  {
+    "id": "BC-LEFT-EDGE",
+    "type": "EAN13",
+    "value": "6901234567892",
+    "x": 0,
+    "y": 100,
+    "width": 40,
+    "height": 25
+  },
+  {
+    "id": "BC-RIGHT-EDGE",
+    "type": "EAN13",
+    "value": "6909876543210",
+    "x": 270,
+    "y": 100,
+    "width": 40,
+    "height": 25
+  },
+  {
+    "id": "BC-OUTSIDE-SAFE",
+    "type": "QR",
+    "value": "OUTSIDE",
+    "x": 5,
+    "y": 5,
+    "width": 15,
+    "height": 15
+  },
+  {
+    "id": "BC-EMPTY-VALUE",
+    "type": "CODE128",
+    "value": "",
+    "x": 150,
+    "y": 150,
+    "width": 40,
+    "height": 25
+  },
+  {
+    "id": "BC-EAN13-WRONG-LENGTH",
+    "type": "EAN13",
+    "value": "1234567",
+    "x": 200,
+    "y": 150,
+    "width": 40,
+    "height": 25
+  }
+]

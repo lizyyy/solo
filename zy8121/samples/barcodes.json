@@ -1,0 +1,29 @@
+[
+  {
+    "id": "BC-001",
+    "type": "EAN13",
+    "value": "6901234567892",
+    "x": 50,
+    "y": 120,
+    "width": 40,
+    "height": 25
+  },
+  {
+    "id": "BC-002",
+    "type": "CODE128",
+    "value": "LOT-20240501",
+    "x": 150,
+    "y": 120,
+    "width": 60,
+    "height": 20
+  },
+  {
+    "id": "BC-003",
+    "type": "QR",
+    "value": "https://example.com/product-info",
+    "x": 250,
+    "y": 120,
+    "width": 30,
+    "height": 30
+  }
+]

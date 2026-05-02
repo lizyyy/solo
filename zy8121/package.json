@@ -1,0 +1,39 @@
+{
+  "name": "prepress-checker",
+  "version": "1.0.0",
+  "description": "包装印刷厂制版预检 CLI 工具",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "prepress-checker": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli/index.ts",
+    "dev": "ts-node src/cli/index.ts",
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "prepress",
+    "packaging",
+    "printing",
+    "cli",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "js-yaml": "^4.1.0",
+    "xmldom": "^0.6.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.19",
+    "@types/xmldom": "^0.1.34",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

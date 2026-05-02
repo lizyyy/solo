@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="300" 
+     height="200">
+  
+  <g id="dieline">
+    <path id="open-dieline" 
+          d="M 20 20 L 280 20 L 280 180 L 20 180" 
+          fill="none" 
+          stroke="#0000FF" 
+          stroke-width="1.0"/>
+  </g>
+  
+  <g id="bad-colors">
+    <rect x="50" y="50" width="100" height="50" 
+          fill="MySpotColor" stroke="MySpotColor"/>
+    <circle cx="200" cy="75" r="25" 
+            fill="Bad Color With Spaces" stroke="none"/>
+  </g>
+  
+  <g id="elements-outside">
+    <rect x="-10" y="50" width="30" height="30" fill="#CCCCCC"/>
+    <rect x="285" y="50" width="30" height="30" fill="#CCCCCC"/>
+    <rect x="50" y="-10" width="30" height="30" fill="#CCCCCC"/>
+    <rect x="50" y="185" width="30" height="30" fill="#CCCCCC"/>
+  </g>
+</svg>

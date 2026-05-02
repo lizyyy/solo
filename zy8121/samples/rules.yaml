@@ -1,0 +1,52 @@
+# 包装印刷工艺规则配置
+# 此文件定义了制版预检工具的检查规则
+
+# 出血边距设置
+bleed:
+  # 出血边距值
+  margin: 3
+  # 单位: mm, cm, pt, in
+  unit: "mm"
+
+# 专色命名规则
+spotColors:
+  # 允许的专色前缀列表
+  allowedPrefixes:
+    - "PANTONE"
+    - "Spot"
+    - "专色"
+  # 是否区分大小写
+  caseSensitive: false
+
+# 套准孔规则
+registrationMarks:
+  # 是否必须包含套准孔
+  required: true
+  # 套准孔尺寸范围
+  size:
+    min: 5
+    max: 15
+  # 位置容差
+  positionTolerance: 2
+
+# 条码规则
+barcode:
+  # 最小宽度
+  minWidth: 20
+  # 最大宽度
+  maxWidth: 100
+  # 最小高度
+  minHeight: 10
+  # 最大高度
+  maxHeight: 50
+  # 安静区大小
+  quietZone: 5
+
+# 刀线规则
+dieline:
+  # 刀线描边颜色
+  strokeColor: "#FF0000"
+  # 刀线线宽
+  strokeWidth: 0.5
+  # 刀线必须闭合
+  mustBeClosed: true
