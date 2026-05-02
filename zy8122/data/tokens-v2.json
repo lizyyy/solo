@@ -1,0 +1,289 @@
+{
+  "color": {
+    "primary": {
+      "$value": "#1677ff",
+      "$type": "color",
+      "$description": "品牌主色（新版本）"
+    },
+    "primaryHover": {
+      "$value": "#69b1ff",
+      "$type": "color",
+      "$description": "主色悬停状态（新版本）"
+    },
+    "primaryActive": {
+      "$value": "#0958d9",
+      "$type": "color",
+      "$description": "主色激活状态（新版本）"
+    },
+    "success": {
+      "$value": "#52c41a",
+      "$type": "color",
+      "$description": "成功状态色"
+    },
+    "warning": {
+      "$value": "#faad14",
+      "$type": "color",
+      "$description": "警告状态色"
+    },
+    "error": {
+      "$value": "#ff4d4f",
+      "$type": "color",
+      "$description": "错误状态色"
+    },
+    "text": {
+      "primary": {
+        "$value": "#ffffff",
+        "$type": "color",
+        "$description": "主要文本色（修改为白色，用于测试对比度风险）"
+      },
+      "secondary": {
+        "$value": "#00000073",
+        "$type": "color",
+        "$description": "次要文本色"
+      }
+    },
+    "background": {
+      "base": {
+        "$value": "#ffffff",
+        "$type": "color",
+        "$description": "基础背景色"
+      },
+      "elevated": {
+        "$value": "#fafafa",
+        "$type": "color",
+        "$description": "悬浮层背景色（新版本）"
+      }
+    },
+    "border": {
+      "base": {
+        "$value": "#f0f0f0",
+        "$type": "color",
+        "$description": "基础边框色（新版本，更浅）"
+      }
+    }
+  },
+  "spacing": {
+    "xs": {
+      "$value": "4px",
+      "$type": "dimension",
+      "$description": "超小间距"
+    },
+    "sm": {
+      "$value": "8px",
+      "$type": "dimension",
+      "$description": "小间距"
+    },
+    "md": {
+      "$value": "20px",
+      "$type": "dimension",
+      "$description": "中间距（从 16px 改为 20px）"
+    },
+    "lg": {
+      "$value": "32px",
+      "$type": "dimension",
+      "$description": "大间距（从 24px 改为 32px）"
+    },
+    "xl": {
+      "$value": "48px",
+      "$type": "dimension",
+      "$description": "超大间距（从 32px 改为 48px）"
+    }
+  },
+  "sizing": {
+    "xs": {
+      "$value": "16px",
+      "$type": "dimension",
+      "$description": "超小尺寸"
+    },
+    "sm": {
+      "$value": "24px",
+      "$type": "dimension",
+      "$description": "小尺寸"
+    },
+    "md": {
+      "$value": "36px",
+      "$type": "dimension",
+      "$description": "中尺寸（从 32px 改为 36px）"
+    },
+    "lg": {
+      "$value": "44px",
+      "$type": "dimension",
+      "$description": "大尺寸（从 40px 改为 44px）"
+    },
+    "xl": {
+      "$value": "52px",
+      "$type": "dimension",
+      "$description": "超大尺寸（从 48px 改为 52px）"
+    }
+  },
+  "radius": {
+    "sm": {
+      "$value": "4px",
+      "$type": "dimension",
+      "$description": "小圆角（从 2px 改为 4px）"
+    },
+    "md": {
+      "$value": "6px",
+      "$type": "dimension",
+      "$description": "中圆角（从 4px 改为 6px）"
+    },
+    "lg": {
+      "$value": "12px",
+      "$type": "dimension",
+      "$description": "大圆角（从 8px 改为 12px）"
+    }
+  },
+  "typography": {
+    "fontSize": {
+      "xs": {
+        "$value": "12px",
+        "$type": "dimension",
+        "$description": "超小字体"
+      },
+      "sm": {
+        "$value": "14px",
+        "$type": "dimension",
+        "$description": "小字体"
+      },
+      "md": {
+        "$value": "16px",
+        "$type": "dimension",
+        "$description": "中字体"
+      },
+      "lg": {
+        "$value": "18px",
+        "$type": "dimension",
+        "$description": "大字体"
+      },
+      "xl": {
+        "$value": "20px",
+        "$type": "dimension",
+        "$description": "超大字体"
+      }
+    },
+    "fontWeight": {
+      "normal": {
+        "$value": 400,
+        "$type": "number",
+        "$description": "常规字重"
+      },
+      "medium": {
+        "$value": 500,
+        "$type": "number",
+        "$description": "中等字重"
+      },
+      "bold": {
+        "$value": 600,
+        "$type": "number",
+        "$description": "粗体"
+      }
+    },
+    "lineHeight": {
+      "tight": {
+        "$value": 1.25,
+        "$type": "number",
+        "$description": "紧凑行高"
+      },
+      "normal": {
+        "$value": 1.5,
+        "$type": "number",
+        "$description": "常规行高"
+      },
+      "relaxed": {
+        "$value": 1.75,
+        "$type": "number",
+        "$description": "宽松行高"
+      }
+    }
+  },
+  "shadow": {
+    "sm": {
+      "$value": "0 1px 2px 0 rgba(0, 0, 0, 0.03)",
+      "$type": "string",
+      "$description": "小阴影（更淡）"
+    },
+    "md": {
+      "$value": "0 4px 12px rgba(0, 0, 0, 0.08)",
+      "$type": "string",
+      "$description": "中阴影（新版本）"
+    },
+    "lg": {
+      "$value": "0 8px 24px rgba(0, 0, 0, 0.12)",
+      "$type": "string",
+      "$description": "大阴影（新版本）"
+    }
+  },
+  "component": {
+    "button": {
+      "primaryBg": {
+        "$value": "{color.primary}",
+        "$type": "alias",
+        "$description": "主按钮背景色"
+      },
+      "primaryHoverBg": {
+        "$value": "{color.primaryHover}",
+        "$type": "alias",
+        "$description": "主按钮悬停背景色"
+      },
+      "height": {
+        "$value": "{sizing.md}",
+        "$type": "alias",
+        "$description": "按钮高度"
+      },
+      "paddingX": {
+        "$value": "{spacing.md}",
+        "$type": "alias",
+        "$description": "按钮水平内边距"
+      },
+      "borderRadius": {
+        "$value": "{radius.md}",
+        "$type": "alias",
+        "$description": "按钮圆角"
+      }
+    },
+    "input": {
+      "height": {
+        "$value": "{sizing.md}",
+        "$type": "alias",
+        "$description": "输入框高度"
+      },
+      "borderColor": {
+        "$value": "{color.border.base}",
+        "$type": "alias",
+        "$description": "输入框边框色"
+      },
+      "borderRadius": {
+        "$value": "{radius.md}",
+        "$type": "alias",
+        "$description": "输入框圆角"
+      },
+      "paddingX": {
+        "$value": "{spacing.sm}",
+        "$type": "alias",
+        "$description": "输入框水平内边距"
+      }
+    },
+    "card": {
+      "background": {
+        "$value": "{color.background.base}",
+        "$type": "alias",
+        "$description": "卡片背景色"
+      },
+      "borderRadius": {
+        "$value": "{radius.lg}",
+        "$type": "alias",
+        "$description": "卡片圆角"
+      },
+      "padding": {
+        "$value": "{spacing.lg}",
+        "$type": "alias",
+        "$description": "卡片内边距"
+      },
+      "shadow": {
+        "$value": "{shadow.md}",
+        "$type": "alias",
+        "$description": "卡片阴影"
+      }
+    }
+  }
+}

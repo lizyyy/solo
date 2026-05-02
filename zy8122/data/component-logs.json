@@ -1,0 +1,129 @@
+[
+  {
+    "component": "Button",
+    "componentName": "Button",
+    "tokens": [
+      "component.button.primaryBg",
+      "component.button.height",
+      "component.button.paddingX",
+      "component.button.borderRadius"
+    ],
+    "usage": "background: var(--component-button-primaryBg); height: var(--component-button-height);",
+    "count": 156,
+    "lastUsed": "2024-01-15T10:30:00Z"
+  },
+  {
+    "component": "Input",
+    "componentName": "Input",
+    "tokens": [
+      "component.input.height",
+      "component.input.borderColor",
+      "component.input.borderRadius",
+      "component.input.paddingX"
+    ],
+    "usage": "height: var(--component-input-height); border-color: var(--component-input-borderColor);",
+    "count": 89,
+    "lastUsed": "2024-01-15T09:45:00Z"
+  },
+  {
+    "component": "Card",
+    "componentName": "Card",
+    "tokens": [
+      "component.card.background",
+      "component.card.borderRadius",
+      "component.card.padding",
+      "component.card.shadow"
+    ],
+    "usage": "background: var(--component-card-background); border-radius: var(--component-card-borderRadius);",
+    "count": 234,
+    "lastUsed": "2024-01-15T11:20:00Z"
+  },
+  {
+    "component": "Button",
+    "componentName": "Button",
+    "tokenPath": "color.text.disabled",
+    "usage": "color: var(--color-text-disabled);",
+    "count": 45,
+    "lastUsed": "2024-01-14T16:00:00Z",
+    "note": "此 token 在 v2 中被删除，用于测试旧组件引用已删除 token 的边界情况"
+  },
+  {
+    "component": "Modal",
+    "componentName": "Modal",
+    "tokens": [
+      "color.background.elevated",
+      "shadow.lg",
+      "radius.lg"
+    ],
+    "usage": "background: var(--color-background-elevated); box-shadow: var(--shadow-lg);",
+    "count": 67,
+    "lastUsed": "2024-01-15T08:30:00Z"
+  },
+  {
+    "component": "Typography",
+    "componentName": "Typography",
+    "tokens": [
+      "color.text.primary",
+      "color.text.secondary",
+      "typography.fontSize.md",
+      "typography.lineHeight.normal"
+    ],
+    "usage": "color: var(--color-text-primary); font-size: var(--typography-fontSize-md);",
+    "count": 512,
+    "lastUsed": "2024-01-15T12:00:00Z"
+  },
+  {
+    "component": "Dropdown",
+    "componentName": "Dropdown",
+    "tokens": [
+      "spacing.sm",
+      "spacing.md",
+      "radius.md",
+      "shadow.md"
+    ],
+    "usage": "padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md);",
+    "count": 78,
+    "lastUsed": "2024-01-14T14:20:00Z"
+  },
+  {
+    "component": "Alert",
+    "componentName": "Alert",
+    "tokens": [
+      "color.success",
+      "color.warning",
+      "color.error",
+      "spacing.md",
+      "radius.md"
+    ],
+    "usage": "background: var(--color-success); padding: var(--spacing-md);",
+    "count": 34,
+    "lastUsed": "2024-01-13T10:15:00Z"
+  },
+  {
+    "component": "Tag",
+    "componentName": "Tag",
+    "tokens": [
+      "color.primary",
+      "color.primaryHover",
+      "spacing.xs",
+      "spacing.sm",
+      "radius.sm"
+    ],
+    "usage": "background: var(--color-primary); padding: var(--spacing-xs) var(--spacing-sm);",
+    "count": 123,
+    "lastUsed": "2024-01-15T07:45:00Z"
+  },
+  {
+    "component": "Tooltip",
+    "componentName": "Tooltip",
+    "tokens": [
+      "color.text.primary",
+      "spacing.sm",
+      "radius.sm",
+      "shadow.sm"
+    ],
+    "usage": "color: var(--color-text-primary); padding: var(--spacing-sm);",
+    "count": 56,
+    "lastUsed": "2024-01-14T18:30:00Z"
+  }
+]

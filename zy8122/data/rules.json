@@ -1,0 +1,56 @@
+{
+  "breakingChanges": {
+    "removedTokens": true,
+    "typeChanges": true,
+    "valueChanges": {
+      "color": true,
+      "dimension": true,
+      "number": true,
+      "string": false
+    },
+    "unitChanges": true
+  },
+  "contrast": {
+    "backgroundTokens": [
+      "color.background",
+      "color.surface",
+      "component.card.background"
+    ],
+    "textTokens": [
+      "color.text",
+      "color.primary"
+    ],
+    "minRatio": {
+      "normal": 4.5,
+      "large": 3
+    }
+  },
+  "severity": {
+    "critical": [
+      { "tokenRemoved": true },
+      { "typeChanged": true },
+      { "contrastRatioBelow3": true }
+    ],
+    "high": [
+      { "colorValueChanged": true },
+      { "dimensionValueChanged": true },
+      { "unitChanged": true }
+    ],
+    "medium": [
+      { "numberValueChanged": true }
+    ],
+    "low": [
+      { "stringValueChanged": true },
+      { "descriptionChanged": true }
+    ]
+  },
+  "validation": {
+    "checkCircularReferences": true,
+    "checkUnresolvedAliases": true,
+    "checkDeprecatedTokens": true
+  },
+  "rollback": {
+    "autoSuggest": true,
+    "priorityThreshold": "high"
+  }
+}

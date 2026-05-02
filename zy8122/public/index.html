@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Token 发布回放台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #1890ff;
+      --primary-hover: #40a9ff;
+      --success: #52c41a;
+      --warning: #faad14;
+      --error: #ff4d4f;
+      --text-primary: #000000d9;
+      --text-secondary: #00000073;
+      --border: #d9d9d9;
+      --background: #f5f5f5;
+      --card-bg: #ffffff;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: var(--card-bg);
+      padding: 24px 32px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .upload-section {
+      background: var(--card-bg);
+      padding: 24px 32px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .upload-section h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .upload-item {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .upload-item:hover {
+      border-color: var(--primary);
+      background: rgba(24, 144, 255, 0.02);
+    }
+
+    .upload-item.has-file {
+      border-style: solid;
+      border-color: var(--success);
+      background: rgba(82, 196, 26, 0.02);
+    }
+
+    .upload-item input[type="file"] {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .upload-label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .upload-hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .file-name {
+      font-size: 12px;
+      color: var(--success);
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(24, 144, 255, 0.02);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #73d13d;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #ffc53d;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .results {
+      display: none;
+    }
+
+    .results.active {
+      display: block;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .stat-card.breaking {
+      border-left: 4px solid var(--error);
+    }
+
+    .stat-card.added {
+      border-left: 4px solid var(--success);
+    }
+
+    .stat-card.removed {
+      border-left: 4px solid var(--warning);
+    }
+
+    .stat-card.modified {
+      border-left: 4px solid var(--primary);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .stat-value.breaking { color: var(--error); }
+    .stat-value.added { color: var(--success); }
+    .stat-value.removed { color: var(--warning); }
+    .stat-value.modified { color: var(--primary); }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--card-bg);
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-secondary);
+    }
+
+    .tab:hover {
+      background: var(--background);
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tab-badge {
+      display: inline-block;
+      background: var(--error);
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+    }
+
+    .tab-content {
+      display: none;
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .change-tree {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 13px;
+    }
+
+    .tree-node {
+      margin-left: 20px;
+    }
+
+    .tree-item {
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tree-item:hover {
+      background: var(--background);
+    }
+
+    .tree-item.added {
+      background: rgba(82, 196, 26, 0.1);
+      border-left: 3px solid var(--success);
+    }
+
+    .tree-item.removed {
+      background: rgba(255, 77, 79, 0.1);
+      border-left: 3px solid var(--error);
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+
+    .tree-item.modified {
+      background: rgba(24, 144, 255, 0.1);
+      border-left: 3px solid var(--primary);
+    }
+
+    .tree-item.breaking {
+      background: rgba(255, 77, 79, 0.15);
+    }
+
+    .tree-badge {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .tree-badge.added { background: rgba(82, 196, 26, 0.2); color: var(--success); }
+    .tree-badge.removed { background: rgba(255, 77, 79, 0.2); color: var(--error); }
+    .tree-badge.modified { background: rgba(24, 144, 255, 0.2); color: var(--primary); }
+    .tree-badge.breaking { background: var(--error); color: white; }
+
+    .tree-value {
+      color: var(--text-secondary);
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      right: -500px;
+      width: 500px;
+      height: 100vh;
+      background: var(--card-bg);
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .detail-panel.active {
+      right: 0;
+    }
+
+    .detail-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: var(--card-bg);
+      z-index: 1;
+    }
+
+    .detail-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .detail-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .detail-close:hover {
+      background: var(--background);
+      color: var(--text-primary);
+    }
+
+    .detail-content {
+      padding: 24px;
+    }
+
+    .detail-section {
+      margin-bottom: 24px;
+    }
+
+    .detail-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--background);
+    }
+
+    .detail-item-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .detail-item-value {
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .value-compare {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .value-compare-item {
+      flex: 1;
+      padding: 12px;
+      border-radius: 6px;
+      background: var(--background);
+    }
+
+    .value-compare-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .value-compare-value {
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'SF Mono', Monaco, monospace;
+      word-break: break-all;
+    }
+
+    .color-preview {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .component-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+
+    .component-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .component-card.high {
+      border-left: 4px solid var(--error);
+    }
+
+    .component-card.medium {
+      border-left: 4px solid var(--warning);
+    }
+
+    .component-card.low {
+      border-left: 4px solid var(--success);
+    }
+
+    .component-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .component-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .component-severity {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .component-severity.high { background: rgba(255, 77, 79, 0.1); color: var(--error); }
+    .component-severity.medium { background: rgba(250, 173, 20, 0.1); color: var(--warning); }
+    .component-severity.low { background: rgba(82, 196, 26, 0.1); color: var(--success); }
+
+    .component-tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .component-token {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: var(--background);
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .component-usage {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-family: 'SF Mono', Monaco, monospace;
+      background: var(--background);
+      padding: 8px 12px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    .suggestion-card {
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .suggestion-card.high {
+      background: rgba(255, 77, 79, 0.1);
+      border-left: 4px solid var(--error);
+    }
+
+    .suggestion-card.medium {
+      background: rgba(250, 173, 20, 0.1);
+      border-left: 4px solid var(--warning);
+    }
+
+    .suggestion-card.low {
+      background: rgba(24, 144, 255, 0.1);
+      border-left: 4px solid var(--primary);
+    }
+
+    .suggestion-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-token {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .suggestion-priority {
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .suggestion-priority.high { background: var(--error); color: white; }
+    .suggestion-priority.medium { background: var(--warning); color: white; }
+    .suggestion-priority.low { background: var(--primary); color: white; }
+
+    .suggestion-reason {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .suggestion-action {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+
+    .contrast-risk {
+      background: rgba(255, 77, 79, 0.1);
+      border-left: 4px solid var(--error);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .contrast-risk.medium {
+      background: rgba(250, 173, 20, 0.1);
+      border-left-color: var(--warning);
+    }
+
+    .contrast-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .contrast-token {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .contrast-ratio {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .contrast-ratio.high { color: var(--error); }
+    .contrast-ratio.medium { color: var(--warning); }
+
+    .contrast-colors {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .contrast-color {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .contrast-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .contrast-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .contrast-value {
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .export-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      display: none;
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .alert.error {
+      background: rgba(255, 77, 79, 0.1);
+      border: 1px solid rgba(255, 77, 79, 0.3);
+      color: var(--error);
+    }
+
+    .alert.warning {
+      background: rgba(250, 173, 20, 0.1);
+      border: 1px solid rgba(250, 173, 20, 0.3);
+      color: #ad6800;
+    }
+
+    .tree-group {
+      margin-bottom: 16px;
+    }
+
+    .tree-group-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      padding: 8px 12px;
+      background: var(--background);
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tree-group-content {
+      margin-left: 16px;
+    }
+
+    .tree-group-content.collapsed {
+      display: none;
+    }
+
+    .fold-icon {
+      transition: transform 0.2s;
+    }
+
+    .fold-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 16px 20px;
+      }
+
+      .upload-section {
+        padding: 16px 20px;
+      }
+
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .detail-panel {
+        width: 100%;
+        right: -100%;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🎨 Design Token 发布回放台</h1>
+      <p>分析 Design Token 变更、检测破坏性变更、评估组件影响、生成回滚建议</p>
+    </header>
+
+    <section class="upload-section">
+      <h2>📁 导入数据</h2>
+      
+      <div class="upload-grid">
+        <div class="upload-item" id="upload-tokens-v1">
+          <input type="file" id="file-tokens-v1" accept=".json">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label">tokens-v1.json</div>
+          <div class="upload-hint">旧版本 Design Token</div>
+          <div class="file-name" id="file-name-v1"></div>
+        </div>
+
+        <div class="upload-item" id="upload-tokens-v2">
+          <input type="file" id="file-tokens-v2" accept=".json">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label">tokens-v2.json</div>
+          <div class="upload-hint">新版本 Design Token</div>
+          <div class="file-name" id="file-name-v2"></div>
+        </div>
+
+        <div class="upload-item" id="upload-logs">
+          <input type="file" id="file-logs" accept=".json,.jsonl,.txt">
+          <div class="upload-icon">📊</div>
+          <div class="upload-label">组件使用日志</div>
+          <div class="upload-hint">JSONL 格式（可选）</div>
+          <div class="file-name" id="file-name-logs"></div>
+        </div>
+
+        <div class="upload-item" id="upload-rules">
+          <input type="file" id="file-rules" accept=".yaml,.yml,.json">
+          <div class="upload-icon">⚙️</div>
+          <div class="upload-label">对比规则</div>
+          <div class="upload-hint">YAML/JSON 格式（可选）</div>
+          <div class="file-name" id="file-name-rules"></div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="btn-analyze" disabled>
+          <span>🔍</span> 分析变更
+        </button>
+        <button class="btn btn-secondary" id="btn-load-sample">
+          <span>📋</span> 加载示例数据
+        </button>
+      </div>
+    </section>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <div>正在分析 Token 变更...</div>
+    </div>
+
+    <section class="results" id="results">
+      <div class="stats-grid">
+        <div class="stat-card breaking">
+          <div class="stat-value breaking" id="stat-breaking">0</div>
+          <div class="stat-label">破坏性变更</div>
+        </div>
+        <div class="stat-card added">
+          <div class="stat-value added" id="stat-added">0</div>
+          <div class="stat-label">新增 Token</div>
+        </div>
+        <div class="stat-card removed">
+          <div class="stat-value removed" id="stat-removed">0</div>
+          <div class="stat-label">删除 Token</div>
+        </div>
+        <div class="stat-card modified">
+          <div class="stat-value modified" id="stat-modified">0</div>
+          <div class="stat-label">修改 Token</div>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="changes">
+          📝 Token 变更
+          <span class="tab-badge" id="badge-changes">0</span>
+        </div>
+        <div class="tab" data-tab="components">
+          🧩 受影响组件
+          <span class="tab-badge" id="badge-components">0</span>
+        </div>
+        <div class="tab" data-tab="contrast">
+          👁️ 对比度风险
+          <span class="tab-badge" id="badge-contrast">0</span>
+        </div>
+        <div class="tab" data-tab="rollback">
+          ↩️ 回滚建议
+          <span class="tab-badge" id="badge-rollback">0</span>
+        </div>
+      </div>
+
+      <div class="tab-content active" id="tab-changes">
+        <div class="change-tree" id="change-tree"></div>
+      </div>
+
+      <div class="tab-content" id="tab-components">
+        <div id="components-list"></div>
+      </div>
+
+      <div class="tab-content" id="tab-contrast">
+        <div id="contrast-list"></div>
+      </div>
+
+      <div class="tab-content" id="tab-rollback">
+        <div id="rollback-list"></div>
+      </div>
+
+      <div class="export-section">
+        <button class="btn btn-secondary" id="btn-export-json">
+          <span>📄</span> 导出 JSON 报告
+        </button>
+        <button class="btn btn-success" id="btn-export-markdown">
+          <span>📑</span> 导出 Markdown 报告
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title">Token 详情</div>
+      <button class="detail-close" id="detail-close">×</button>
+    </div>
+    <div class="detail-content" id="detail-content"></div>
+  </div>
+
+  <script>
+    const state = {
+      files: {
+        tokensV1: null,
+        tokensV2: null,
+        componentLogs: null,
+        rules: null
+      },
+      analysisData: null
+    };
+
+    const elements = {
+      uploadTokensV1: document.getElementById('upload-tokens-v1'),
+      uploadTokensV2: document.getElementById('upload-tokens-v2'),
+      uploadLogs: document.getElementById('upload-logs'),
+      uploadRules: document.getElementById('upload-rules'),
+      fileTokensV1: document.getElementById('file-tokens-v1'),
+      fileTokensV2: document.getElementById('file-tokens-v2'),
+      fileLogs: document.getElementById('file-logs'),
+      fileRules: document.getElementById('file-rules'),
+      fileNameV1: document.getElementById('file-name-v1'),
+      fileNameV2: document.getElementById('file-name-v2'),
+      fileNameLogs: document.getElementById('file-name-logs'),
+      fileNameRules: document.getElementById('file-name-rules'),
+      btnAnalyze: document.getElementById('btn-analyze'),
+      btnLoadSample: document.getElementById('btn-load-sample'),
+      loading: document.getElementById('loading'),
+      results: document.getElementById('results'),
+      detailPanel: document.getElementById('detail-panel'),
+      overlay: document.getElementById('overlay'),
+      detailClose: document.getElementById('detail-close'),
+      detailTitle: document.getElementById('detail-title'),
+      detailContent: document.getElementById('detail-content'),
+      btnExportJson: document.getElementById('btn-export-json'),
+      btnExportMarkdown: document.getElementById('btn-export-markdown')
+    };
+
+    function setupFileUpload(uploadElement, fileInput, fileNameElement, fileKey) {
+      uploadElement.addEventListener('click', () => fileInput.click());
+      
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          state.files[fileKey] = file;
+          fileNameElement.textContent = file.name;
+          uploadElement.classList.add('has-file');
+          updateAnalyzeButton();
+        }
+      });
+    }
+
+    function updateAnalyzeButton() {
+      const canAnalyze = state.files.tokensV1 && state.files.tokensV2;
+      elements.btnAnalyze.disabled = !canAnalyze;
+    }
+
+    setupFileUpload(elements.uploadTokensV1, elements.fileTokensV1, elements.fileNameV1, 'tokensV1');
+    setupFileUpload(elements.uploadTokensV2, elements.fileTokensV2, elements.fileNameV2, 'tokensV2');
+    setupFileUpload(elements.uploadLogs, elements.fileLogs, elements.fileNameLogs, 'componentLogs');
+    setupFileUpload(elements.uploadRules, elements.fileRules, elements.fileNameRules, 'rules');
+
+    elements.btnLoadSample.addEventListener('click', async () => {
+      elements.loading.classList.add('active');
+      elements.results.classList.remove('active');
+
+      try {
+        const response = await fetch('/api/sample');
+        const result = await response.json();
+
+        if (result.success) {
+          state.analysisData = result.data;
+          renderResults(result.data);
+          elements.loading.classList.remove('active');
+          elements.results.classList.add('active');
+        } else {
+          alert('加载示例数据失败: ' + result.error);
+          elements.loading.classList.remove('active');
+        }
+      } catch (error) {
+        alert('加载示例数据失败: ' + error.message);
+        elements.loading.classList.remove('active');
+      }
+    });
+
+    elements.btnAnalyze.addEventListener('click', async () => {
+      elements.loading.classList.add('active');
+      elements.results.classList.remove('active');
+
+      const formData = new FormData();
+      if (state.files.tokensV1) formData.append('tokensV1', state.files.tokensV1);
+      if (state.files.tokensV2) formData.append('tokensV2', state.files.tokensV2);
+      if (state.files.componentLogs) formData.append('componentLogs', state.files.componentLogs);
+      if (state.files.rules) formData.append('rules', state.files.rules);
+
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          state.analysisData = result.data;
+          renderResults(result.data);
+          elements.loading.classList.remove('active');
+          elements.results.classList.add('active');
+        } else {
+          alert('分析失败: ' + result.error);
+          elements.loading.classList.remove('active');
+        }
+      } catch (error) {
+        alert('分析失败: ' + error.message);
+        elements.loading.classList.remove('active');
+      }
+    });
+
+    function renderResults(data) {
+      const { changes, componentImpacts, rollbackSuggestions } = data;
+
+      const breakingCount = changes.filter(c => c.isBreaking).length;
+      const addedCount = changes.filter(c => c.type === 'added').length;
+      const removedCount = changes.filter(c => c.type === 'removed').length;
+      const modifiedCount = changes.filter(c => c.type === 'modified').length;
+
+      document.getElementById('stat-breaking').textContent = breakingCount;
+      document.getElementById('stat-added').textContent = addedCount;
+      document.getElementById('stat-removed').textContent = removedCount;
+      document.getElementById('stat-modified').textContent = modifiedCount;
+
+      document.getElementById('badge-changes').textContent = changes.length;
+      document.getElementById('badge-components').textContent = componentImpacts?.length || 0;
+      document.getElementById('badge-contrast').textContent = changes.filter(c => c.contrastRisk).length;
+      document.getElementById('badge-rollback').textContent = rollbackSuggestions?.length || 0;
+
+      renderChangeTree(changes);
+      renderComponents(componentImpacts || []);
+      renderContrastRisks(changes);
+      renderRollbackSuggestions(rollbackSuggestions || []);
+    }
+
+    function renderChangeTree(changes) {
+      const container = document.getElementById('change-tree');
+      
+      if (changes.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div>没有检测到任何变更</div>
+          </div>
+        `;
+        return;
+      }
+
+      const grouped = {};
+      changes.forEach(change => {
+        const parts = change.tokenPath.split('.');
+        const category = parts[0];
+        if (!grouped[category]) {
+          grouped[category] = [];
+        }
+        grouped[category].push(change);
+      });
+
+      let html = '';
+      for (const [category, items] of Object.entries(grouped)) {
+        const breakingInGroup = items.filter(i => i.isBreaking).length;
+        html += `
+          <div class="tree-group">
+            <div class="tree-group-title" data-group="${category}">
+              <span>
+                <span class="fold-icon" id="fold-${category}">▼</span>
+                ${getCategoryIcon(category)} ${category}
+                ${breakingInGroup > 0 ? `<span class="tree-badge breaking">${breakingInGroup} 破坏性</span>` : ''}
+              </span>
+              <span style="color: var(--text-secondary); font-size: 12px;">${items.length} 项变更</span>
+            </div>
+            <div class="tree-group-content" id="group-${category}">
+              ${items.map(change => renderChangeItem(change)).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+
+      document.querySelectorAll('.tree-group-title').forEach(title => {
+        title.addEventListener('click', () => {
+          const category = title.dataset.group;
+          const content = document.getElementById(`group-${category}`);
+          const icon = document.getElementById(`fold-${category}`);
+          content.classList.toggle('collapsed');
+          icon.classList.toggle('collapsed');
+        });
+      });
+
+      document.querySelectorAll('.tree-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const index = item.dataset.index;
+          showChangeDetail(changes[index]);
+        });
+      });
+    }
+
+    function getCategoryIcon(category) {
+      const icons = {
+        color: '🎨',
+        spacing: '↔️',
+        sizing: '📐',
+        radius: '⭕',
+        typography: '🔤',
+        shadow: '🌑',
+        component: '🧩'
+      };
+      return icons[category] || '📄';
+    }
+
+    function renderChangeItem(change) {
+      const index = state.analysisData.changes.indexOf(change);
+      const classes = ['tree-item', change.type];
+      if (change.isBreaking) classes.push('breaking');
+
+      let badgeHtml = '';
+      if (change.isBreaking) {
+        badgeHtml = '<span class="tree-badge breaking">破坏性</span>';
+      } else {
+        badgeHtml = `<span class="tree-badge ${change.type}">${getChangeTypeLabel(change.type)}</span>`;
+      }
+
+      let valueHtml = '';
+      if (change.type === 'added') {
+        valueHtml = `<span class="tree-value">${formatValue(change.newValue)}</span>`;
+      } else if (change.type === 'removed') {
+        valueHtml = `<span class="tree-value">${formatValue(change.oldValue)}</span>`;
+      } else {
+        valueHtml = `<span class="tree-value">${formatValue(change.oldValue)} → ${formatValue(change.newValue)}</span>`;
+      }
+
+      return `
+        <div class="${classes.join(' ')}" data-index="${index}">
+          ${badgeHtml}
+          <span>${change.tokenPath}</span>
+          ${valueHtml}
+        </div>
+      `;
+    }
+
+    function getChangeTypeLabel(type) {
+      const labels = {
+        added: '新增',
+        removed: '删除',
+        modified: '修改',
+        cycle: '循环'
+      };
+      return labels[type] || type;
+    }
+
+    function formatValue(value) {
+      if (value === undefined || value === null) return '—';
+      if (typeof value === 'object') {
+        if (value.hex) return value.hex;
+        if (value.original) return value.original;
+        return JSON.stringify(value);
+      }
+      return String(value);
+    }
+
+    function renderComponents(components) {
+      const container = document.getElementById('components-list');
+
+      if (components.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🧩</div>
+            <div>没有检测到受影响的组件</div>
+            <div style="font-size: 12px; margin-top: 8px;">请提供组件使用日志以获取更详细的影响分析</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      components.forEach(comp => {
+        html += `
+          <div class="component-card ${comp.severity}">
+            <div class="component-header">
+              <div class="component-name">${comp.componentName}</div>
+              <div class="component-severity ${comp.severity}">${getSeverityLabel(comp.severity)}</div>
+            </div>
+            <div class="component-tokens">
+              ${comp.affectedTokens.map(t => `<span class="component-token">${t}</span>`).join('')}
+            </div>
+            ${comp.usageExamples && comp.usageExamples.length > 0 ? `
+              <div class="component-usage">${escapeHtml(comp.usageExamples[0])}</div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function getSeverityLabel(severity) {
+      const labels = {
+        high: '高影响',
+        medium: '中影响',
+        low: '低影响'
+      };
+      return labels[severity] || severity;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderContrastRisks(changes) {
+      const container = document.getElementById('contrast-list');
+      const risks = changes.filter(c => c.contrastRisk);
+
+      if (risks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <div>没有检测到对比度风险</div>
+            <div style="font-size: 12px; margin-top: 8px;">所有颜色组合符合 WCAG 可访问性标准</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      risks.forEach(risk => {
+        const ratio = risk.contrastRatio || 0;
+        const riskClass = risk.contrastRisk;
+
+        html += `
+          <div class="contrast-risk ${riskClass}">
+            <div class="contrast-header">
+              <div class="contrast-token">${risk.tokenPath}</div>
+              <div class="contrast-ratio ${riskClass}">${ratio.toFixed(2)}:1</div>
+            </div>
+            <div style="margin-bottom: 12px;">
+              <strong>对比度风险等级:</strong> ${getContrastRiskLabel(risk.contrastRisk)}
+            </div>
+            <div style="margin-bottom: 12px;">
+              <strong>对比对象:</strong> ${risk.contrastWith || '未知'}
+            </div>
+            ${renderColorPreview(risk)}
+            <div class="alert ${riskClass === 'high' ? 'error' : 'warning'}">
+              <strong>建议:</strong> 调整颜色值以满足 WCAG 2.1 AA 标准（普通文本 4.5:1，大文本 3:1）
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function getContrastRiskLabel(risk) {
+      const labels = {
+        high: '高风险 - 严重违反可访问性标准',
+        medium: '中风险 - 可能影响部分用户'
+      };
+      return labels[risk] || risk;
+    }
+
+    function renderColorPreview(risk) {
+      if (!risk.resolvedNewValue || !risk.resolvedNewValue.hex) return '';
+      
+      return `
+        <div class="contrast-colors">
+          <div class="contrast-color">
+            <div class="contrast-swatch" style="background: ${risk.resolvedNewValue.hex};"></div>
+            <div>
+              <div class="contrast-label">当前颜色</div>
+              <div class="contrast-value">${risk.resolvedNewValue.hex}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRollbackSuggestions(suggestions) {
+      const container = document.getElementById('rollback-list');
+
+      if (suggestions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">✨</div>
+            <div>没有需要回滚的变更</div>
+            <div style="font-size: 12px; margin-top: 8px;">所有变更都是安全的，可以放心发布</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      suggestions.forEach(sug => {
+        html += `
+          <div class="suggestion-card ${sug.priority}">
+            <div class="suggestion-header">
+              <div class="suggestion-token">${sug.tokenPath}</div>
+              <div class="suggestion-priority ${sug.priority}">${getPriorityLabel(sug.priority)}</div>
+            </div>
+            <div class="suggestion-reason">${escapeHtml(sug.reason)}</div>
+            <div class="suggestion-action">💡 ${escapeHtml(sug.action)}</div>
+            ${sug.affectedComponents && sug.affectedComponents.length > 0 ? `
+              <div style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);">
+                <strong>影响组件:</strong> ${sug.affectedComponents.join(', ')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function getPriorityLabel(priority) {
+      const labels = {
+        high: '高优先级',
+        medium: '中优先级',
+        low: '低优先级'
+      };
+      return labels[priority] || priority;
+    }
+
+    function showChangeDetail(change) {
+      elements.detailTitle.textContent = change.tokenPath;
+      
+      let html = `
+        <div class="detail-section">
+          <div class="detail-section-title">基本信息</div>
+          <div class="detail-item">
+            <span class="detail-item-label">变更类型</span>
+            <span class="detail-item-value">${getChangeTypeLabel(change.type)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-item-label">是否破坏性</span>
+            <span class="detail-item-value" style="color: ${change.isBreaking ? 'var(--error)' : 'var(--success)'};">
+              ${change.isBreaking ? '是' : '否'}
+            </span>
+          </div>
+          ${change.breakingReason ? `
+            <div class="detail-item">
+              <span class="detail-item-label">破坏性原因</span>
+              <span class="detail-item-value">${escapeHtml(change.breakingReason)}</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      if (change.oldValue !== undefined || change.newValue !== undefined) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-section-title">值变更</div>
+            <div class="value-compare">
+              <div class="value-compare-item">
+                <div class="value-compare-label">旧值 (v1)</div>
+                <div class="value-compare-value">
+                  ${renderValueWithPreview(change.oldValue, change.resolvedOldValue)}
+                </div>
+              </div>
+              <div class="value-compare-item">
+                <div class="value-compare-label">新值 (v2)</div>
+                <div class="value-compare-value">
+                  ${renderValueWithPreview(change.newValue, change.resolvedNewValue)}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (change.modifications && change.modifications.length > 0) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-section-title">详细变更</div>
+            ${change.modifications.map(mod => `
+              <div class="detail-item">
+                <span class="detail-item-label">${getModificationLabel(mod.field)}</span>
+                <span class="detail-item-value">
+                  ${formatValue(mod.oldValue)} → ${formatValue(mod.newValue)}
+                </span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (change.contrastRisk) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-section-title">对比度风险</div>
+            <div class="alert ${change.contrastRisk === 'high' ? 'error' : 'warning'}">
+              <strong>风险等级:</strong> ${getContrastRiskLabel(change.contrastRisk)}<br>
+              <strong>对比度:</strong> ${change.contrastRatio?.toFixed(2) || 'N/A'}:1<br>
+              <strong>对比对象:</strong> ${change.contrastWith || '未知'}
+            </div>
+          </div>
+        `;
+      }
+
+      if (change.hasCycle && change.cycleInfo) {
+        html += `
+          <div class="detail-section">
+            <div class="detail-section-title">循环引用</div>
+            <div class="alert error">
+              <strong>循环路径:</strong> ${change.cycleInfo.message}
+            </div>
+          </div>
+        `;
+      }
+
+      elements.detailContent.innerHTML = html;
+      elements.detailPanel.classList.add('active');
+      elements.overlay.classList.add('active');
+    }
+
+    function renderValueWithPreview(original, resolved) {
+      let html = '';
+      
+      if (resolved && resolved.hex) {
+        html += `<span class="color-preview" style="background: ${resolved.hex};"></span>`;
+      }
+      
+      if (resolved && resolved.original) {
+        html += escapeHtml(resolved.original);
+        if (resolved.hex) {
+          html += ` <span style="color: var(--text-secondary);">(${resolved.hex})</span>`;
+        }
+      } else if (original !== undefined) {
+        html += escapeHtml(formatValue(original));
+      } else {
+        html += '—';
+      }
+
+      return html;
+    }
+
+    function getModificationLabel(field) {
+      const labels = {
+        type: '类型',
+        value: '值',
+        dimension: '尺寸',
+        color: '颜色',
+        resolution: '解析路径',
+        unit: '单位'
+      };
+      return labels[field] || field;
+    }
+
+    function closeDetailPanel() {
+      elements.detailPanel.classList.remove('active');
+      elements.overlay.classList.remove('active');
+    }
+
+    elements.detailClose.addEventListener('click', closeDetailPanel);
+    elements.overlay.addEventListener('click', closeDetailPanel);
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabId = tab.dataset.tab;
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+      });
+    });
+
+    elements.btnExportJson.addEventListener('click', async () => {
+      if (!state.analysisData) return;
+
+      try {
+        const response = await fetch('/api/export/json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: state.analysisData })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'token-analysis-report.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } catch (error) {
+        alert('导出失败: ' + error.message);
+      }
+    });
+
+    elements.btnExportMarkdown.addEventListener('click', async () => {
+      if (!state.analysisData) return;
+
+      try {
+        const response = await fetch('/api/export/markdown', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: state.analysisData })
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'token-analysis-report.md';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      } catch (error) {
+        alert('导出失败: ' + error.message);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDetailPanel();
+      }
+    });
+  </script>
+</body>
+</html>
