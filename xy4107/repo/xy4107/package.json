@@ -1,0 +1,29 @@
+{
+  "name": "passkey-rehearsal-platform",
+  "version": "1.0.0",
+  "description": "无密码登录彩排台 - WebAuthn Passkey 演练服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "webauthn",
+    "passkey",
+    "fido2",
+    "authentication"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "@simplewebauthn/server": "^8.3.4",
+    "@simplewebauthn/types": "^8.3.4",
+    "uuid": "^9.0.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
