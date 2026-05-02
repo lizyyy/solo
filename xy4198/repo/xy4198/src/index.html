@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>浓烟疏散演练棋盘</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>浓烟疏散演练棋盘</h1>
+      <p class="subtitle">商场安保培训模拟器</p>
+    </header>
+    
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="panel">
+          <h2>工具</h2>
+          <div class="tool-buttons">
+            <button class="tool-btn active" data-tool="select">
+              <span class="icon">🖱️</span>
+              <span>选择</span>
+            </button>
+            <button class="tool-btn" data-tool="wall">
+              <span class="icon">🧱</span>
+              <span>墙体</span>
+            </button>
+            <button class="tool-btn" data-tool="exit">
+              <span class="icon">🚪</span>
+              <span>出口</span>
+            </button>
+            <button class="tool-btn" data-tool="smoke">
+              <span class="icon">🔥</span>
+              <span>烟源</span>
+            </button>
+            <button class="tool-btn" data-tool="customer">
+              <span class="icon">👤</span>
+              <span>顾客</span>
+            </button>
+            <button class="tool-btn" data-tool="sign">
+              <span class="icon">🟢</span>
+              <span>指示牌</span>
+            </button>
+            <button class="tool-btn" data-tool="eraser">
+              <span class="icon">🗑️</span>
+              <span>橡皮擦</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h2>关卡</h2>
+          <div class="level-controls">
+            <div class="input-group">
+              <label>宽度</label>
+              <input type="number" id="gridWidth" value="10" min="5" max="20">
+            </div>
+            <div class="input-group">
+              <label>高度</label>
+              <input type="number" id="gridHeight" value="8" min="5" max="20">
+            </div>
+            <button id="resizeGrid" class="btn">调整大小</button>
+          </div>
+          
+          <div class="level-buttons">
+            <button id="saveLevel" class="btn btn-secondary">保存关卡</button>
+            <button id="loadLevel" class="btn btn-secondary">载入关卡</button>
+            <button id="clearAll" class="btn btn-danger">清空全部</button>
+          </div>
+          
+          <div class="example-levels">
+            <h3>示例关卡</h3>
+            <div class="example-buttons">
+              <button class="example-btn" data-level="simple">简单</button>
+              <button class="example-btn" data-level="medium">中等</button>
+              <button class="example-btn" data-level="hard">困难</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h2>模拟控制</h2>
+          <div class="simulation-controls">
+            <button id="startSimulation" class="btn btn-primary">开始模拟</button>
+            <button id="pauseSimulation" class="btn" disabled>暂停</button>
+            <button id="resetSimulation" class="btn">重置</button>
+          </div>
+          
+          <div class="simulation-info">
+            <div class="info-item">
+              <label>时间步</label>
+              <span id="timeStep">0</span>
+            </div>
+            <div class="info-item">
+              <label>已疏散</label>
+              <span id="evacuated">0</span>
+            </div>
+            <div class="info-item">
+              <label>待疏散</label>
+              <span id="remaining">0</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+      
+      <main class="game-area">
+        <div class="canvas-container">
+          <canvas id="gameCanvas"></canvas>
+        </div>
+        
+        <div class="status-bar">
+          <div class="status-item" id="statusMessage">准备就绪</div>
+          <div class="status-item">
+            <span>当前工具: </span>
+            <span id="currentTool">选择</span>
+          </div>
+        </div>
+      </main>
+      
+      <aside class="results-panel">
+        <div class="panel">
+          <h2>评分结果</h2>
+          <div id="scoreBoard" class="score-board">
+            <div class="score-item">
+              <label>总分</label>
+              <span id="totalScore">0</span>
+            </div>
+            <div class="score-item">
+              <label>基础分</label>
+              <span id="baseScore">0</span>
+            </div>
+            <div class="score-item">
+              <label>拥堵扣分</label>
+              <span id="congestionPenalty">0</span>
+            </div>
+            <div class="score-item">
+              <label>逆行扣分</label>
+              <span id="reversePenalty">0</span>
+            </div>
+            <div class="score-item">
+              <label>死路扣分</label>
+              <span id="deadEndPenalty">0</span>
+            </div>
+            <div class="score-item">
+              <label>超时扣分</label>
+              <span id="timeoutPenalty">0</span>
+            </div>
+          </div>
+          
+          <div id="scoreReasons" class="score-reasons">
+            <h3>扣分原因</h3>
+            <ul id="reasonsList"></ul>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h2>导出</h2>
+          <div class="export-buttons">
+            <button id="exportMarkdown" class="btn btn-secondary" disabled>导出Markdown复盘</button>
+            <button id="exportJSON" class="btn btn-secondary" disabled>导出JSON回放</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+    
+    <footer class="footer">
+      <p>浓烟疏散演练棋盘 v1.0.0 | 商场安保培训专用</p>
+    </footer>
+  </div>
+  
+  <input type="file" id="fileInput" accept=".json" style="display: none;">
+</body>
+</html>

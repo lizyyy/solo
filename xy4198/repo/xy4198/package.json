@@ -1,0 +1,34 @@
+{
+  "name": "smoke-evacuation-game",
+  "version": "1.0.0",
+  "description": "浓烟疏散演练棋盘游戏 - 商场安保培训",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "webpack serve --mode development",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "test": "jest"
+  },
+  "keywords": [
+    "game",
+    "evacuation",
+    "training",
+    "security"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "css-loader": "^6.8.1",
+    "html-webpack-plugin": "^5.5.3",
+    "jest": "^29.5.0",
+    "style-loader": "^3.3.3",
+    "ts-jest": "^29.1.0",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
