@@ -1,0 +1,145 @@
+[
+  {
+    "name": "咖啡杯",
+    "type": "prop",
+    "sceneNumber": "1-01",
+    "actorName": "张三",
+    "status": "满",
+    "description": "咖啡杯里有半杯咖啡，有热气",
+    "photoReference": "scene_1_01_coffee_001.jpg",
+    "timestamp": "2024-03-15T09:30:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "咖啡杯",
+    "type": "prop",
+    "sceneNumber": "1-02",
+    "actorName": "张三",
+    "status": "空",
+    "description": "咖啡杯是空的，杯底有咖啡渍",
+    "photoReference": "scene_1_02_coffee_002.jpg",
+    "timestamp": "2024-03-15T15:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "蓝色西装",
+    "type": "costume",
+    "sceneNumber": "1-01",
+    "actorName": "张三",
+    "status": "整洁",
+    "description": "蓝色西装，无污渍，平整",
+    "photoReference": "scene_1_01_costume_001.jpg",
+    "timestamp": "2024-03-15T09:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "蓝色西装",
+    "type": "costume",
+    "sceneNumber": "1-02",
+    "actorName": "张三",
+    "status": "有皱纹",
+    "description": "蓝色西装，袖口有轻微褶皱",
+    "photoReference": "scene_1_02_costume_002.jpg",
+    "timestamp": "2024-03-15T14:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "额头伤口",
+    "type": "wound",
+    "sceneNumber": "1-01",
+    "actorName": "张三",
+    "status": "新伤",
+    "description": "额头左侧有新鲜伤口，有少量血迹，约2厘米长",
+    "photoReference": "scene_1_01_wound_001.jpg",
+    "timestamp": "2024-03-15T09:30:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "额头伤口",
+    "type": "wound",
+    "sceneNumber": "1-03",
+    "actorName": "张三",
+    "status": "结痂",
+    "description": "额头伤口已经结痂，颜色暗红",
+    "photoReference": "scene_1_03_wound_003.jpg",
+    "timestamp": "2024-03-16T10:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "警服",
+    "type": "costume",
+    "sceneNumber": "1-02",
+    "actorName": "李四",
+    "status": "整洁",
+    "description": "警用制服，编号12345，肩章完整",
+    "photoReference": "scene_1_02_costume_003.jpg",
+    "timestamp": "2024-03-15T14:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "黑色夹克",
+    "type": "costume",
+    "sceneNumber": "1-03",
+    "actorName": "张三",
+    "status": "整洁",
+    "description": "黑色皮夹克，拉链拉到胸口",
+    "photoReference": "scene_1_03_costume_004.jpg",
+    "timestamp": "2024-03-16T10:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "浓妆",
+    "type": "makeup",
+    "sceneNumber": "1-03",
+    "actorName": "李四",
+    "status": "完整",
+    "description": "红色口红，浓眼影，粉底较厚",
+    "photoReference": "scene_1_03_makeup_001.jpg",
+    "timestamp": "2024-03-16T10:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "白大褂",
+    "type": "costume",
+    "sceneNumber": "1-05",
+    "actorName": "王五",
+    "status": "整洁",
+    "description": "白色医生制服，左胸有口袋",
+    "photoReference": "scene_1_05_costume_005.jpg",
+    "timestamp": "2024-03-16T16:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "手机",
+    "type": "prop",
+    "sceneNumber": "1-01",
+    "actorName": "张三",
+    "status": "开",
+    "description": "黑色智能手机，屏幕亮着，显示通话界面",
+    "photoReference": "scene_1_01_phone_001.jpg",
+    "timestamp": "2024-03-15T09:30:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "手机",
+    "type": "prop",
+    "sceneNumber": "1-02",
+    "actorName": "张三",
+    "status": "关",
+    "description": "手机放在桌上，屏幕黑屏",
+    "photoReference": "scene_1_02_phone_002.jpg",
+    "timestamp": "2024-03-15T15:00:00Z",
+    "recordedBy": "场记小王"
+  },
+  {
+    "name": "手机",
+    "type": "prop",
+    "sceneNumber": "1-06",
+    "actorName": "张三",
+    "status": "开",
+    "description": "手机屏幕亮着，显示短信界面",
+    "photoReference": "scene_1_06_phone_003.jpg",
+    "timestamp": "2024-03-17T10:00:00Z",
+    "recordedBy": "场记小王"
+  }
+]

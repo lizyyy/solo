@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 时间线样式 */
+.timeline-container {
+  position: relative;
+  padding: 20px 0;
+}
+
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e8e8e8;
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+  margin-right: calc(50% + 30px);
+  text-align: right;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+  margin-left: calc(50% + 30px);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #1890ff;
+  background: white;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.timeline-dot.warning {
+  border-color: #faad14;
+}
+
+.timeline-dot.critical {
+  border-color: #ff4d4f;
+}
+
+.timeline-dot.info {
+  border-color: #1890ff;
+}
+
+.timeline-content {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 40%;
+}
+
+/* 问题卡片样式 */
+.issue-card {
+  margin-bottom: 16px;
+  border-left: 4px solid #1890ff;
+}
+
+.issue-card.critical {
+  border-left-color: #ff4d4f;
+}
+
+.issue-card.warning {
+  border-left-color: #faad14;
+}
+
+.issue-card.info {
+  border-left-color: #1890ff;
+}
+
+/* 导入区域样式 */
+.import-area {
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.import-area:hover {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
+
+.import-area.dragover {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
