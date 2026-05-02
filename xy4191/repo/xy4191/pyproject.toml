@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "release-validator"
+version = "0.1.0"
+authors = [
+  { name = "Release Manager" }
+]
+description = "发布证据包验收员 - 开源项目发布自动化验证工具"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "semantic-version>=2.10.0",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[project.scripts]
+rv = "release_validator.cli:main"
+release-validator = "release_validator.cli:main"
