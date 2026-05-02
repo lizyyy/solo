@@ -1,0 +1,201 @@
+cranes:
+  - crane_id: crane_001
+    name: 三一重工 SCC4000A
+    type: crawler
+    manufacturer: SANY
+    model: SCC4000A
+    max_capacity: 400
+    capacity_unit: tons
+    
+    dimensions:
+      track_width: 10.5
+      track_length: 14.5
+      total_width: 12.0
+      total_length: 16.0
+      total_height_transport: 3.5
+      units: meters
+    
+    boom:
+      type: lattice
+      min_length: 24
+      max_length: 108
+      max_jib_length: 84
+      units: meters
+      
+      load_chart:
+        - boom_length: 36
+          radius_data:
+            - radius: 8
+              capacity: 180
+            - radius: 10
+              capacity: 165
+            - radius: 12
+              capacity: 150
+            - radius: 14
+              capacity: 135
+            - radius: 16
+              capacity: 120
+            - radius: 18
+              capacity: 108
+            - radius: 20
+              capacity: 96
+            - radius: 22
+              capacity: 85
+            - radius: 24
+              capacity: 75
+            - radius: 26
+              capacity: 68
+            - radius: 28
+              capacity: 62
+            - radius: 30
+              capacity: 56
+              
+        - boom_length: 48
+          radius_data:
+            - radius: 10
+              capacity: 145
+            - radius: 12
+              capacity: 132
+            - radius: 14
+              capacity: 120
+            - radius: 16
+              capacity: 108
+            - radius: 18
+              capacity: 98
+            - radius: 20
+              capacity: 88
+            - radius: 22
+              capacity: 80
+            - radius: 24
+              capacity: 72
+            - radius: 26
+              capacity: 65
+            - radius: 28
+              capacity: 59
+            - radius: 30
+              capacity: 54
+              
+        - boom_length: 60
+          radius_data:
+            - radius: 12
+              capacity: 115
+            - radius: 14
+              capacity: 105
+            - radius: 16
+              capacity: 95
+            - radius: 18
+              capacity: 86
+            - radius: 20
+              capacity: 78
+            - radius: 22
+              capacity: 71
+            - radius: 24
+              capacity: 65
+            - radius: 26
+              capacity: 59
+            - radius: 28
+              capacity: 54
+            - radius: 30
+              capacity: 50
+    
+    outrigger:
+      type: crawler (no outriggers)
+      note: 履带吊无需支腿，靠履带接地面积分散载荷
+      
+    swing_radius:
+      min: 0
+      max: 360
+      units: degrees
+    
+    operating_limits:
+      max_wind_speed: 15
+      wind_speed_unit: m/s
+      max_operating_slope: 1
+      slope_unit: degrees
+      min_temperature: -20
+      max_temperature: 40
+      temp_unit: celsius
+    
+    visualization:
+      color: "#e94560"
+      track_color: "#333333"
+      boom_color: "#555555"
+      hook_color: "#ffc107"
+
+  - crane_id: crane_002
+    name: 徐工集团 QY100K
+    type: truck_mounted
+    manufacturer: XCMG
+    model: QY100K
+    max_capacity: 100
+    capacity_unit: tons
+    
+    dimensions:
+      total_width: 3.0
+      total_length: 15.0
+      total_height: 4.0
+      units: meters
+    
+    boom:
+      type: telescopic
+      min_length: 12
+      max_length: 50
+      units: meters
+      
+      load_chart:
+        - boom_length: 12
+          radius_data:
+            - radius: 3
+              capacity: 100
+            - radius: 5
+              capacity: 80
+            - radius: 8
+              capacity: 55
+            - radius: 10
+              capacity: 42
+    
+    outrigger:
+      type: hydraulic
+      positions:
+        - name: 前左
+          offset: { x: -2.5, z: 2.5 }
+        - name: 前右
+          offset: { x: 2.5, z: 2.5 }
+        - name: 后左
+          offset: { x: -2.5, z: -2.5 }
+        - name: 后右
+          offset: { x: 2.5, z: -2.5 }
+      max_spread: 8.0
+      min_ground_pressure: 150
+      pressure_unit: kPa
+    
+    swing_radius:
+      min: 0
+      max: 360
+      units: degrees
+    
+    operating_limits:
+      max_wind_speed: 12
+      wind_speed_unit: m/s
+      max_operating_slope: 1.5
+      slope_unit: degrees
+    
+    visualization:
+      color: "#0d6efd"
+      boom_color: "#444444"
+      hook_color: "#ffc107"
+
+missing_params:
+  - crane_id: crane_001
+    params:
+      - name: 实际作业时吊臂组合方式
+        severity: high
+        description: 需要根据实际作业工况确定主臂+副臂组合方案
+      - name: 配重配置
+        severity: high
+        description: 需要根据吊装重量确定配重块数量和配置
+
+notes:
+  - "本规格文件中的载荷表为示例数据，实际作业时必须使用设备出厂的官方载荷表"
+  - "风速限制为参考值，实际作业时应遵循设备操作手册和现场安全规定"
+  - "吊机支腿区地面承载力必须由专业工程师确认"

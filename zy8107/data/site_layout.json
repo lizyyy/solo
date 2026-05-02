@@ -1,0 +1,104 @@
+{
+  "site_name": "化工厂扩建项目-3号装置区",
+  "site_coordinates": {
+    "origin": { "x": 0, "y": 0, "z": 0 },
+    "units": "meters"
+  },
+  "obstacles": [
+    {
+      "id": "obs_001",
+      "name": "现有精馏塔A",
+      "type": "cylinder",
+      "position": { "x": 15, "y": 0, "z": 20 },
+      "dimensions": { "radius": 3, "height": 45 },
+      "material": "steel",
+      "critical": true
+    },
+    {
+      "id": "obs_002",
+      "name": "管廊架",
+      "type": "box",
+      "position": { "x": -10, "y": 0, "z": 15 },
+      "dimensions": { "width": 20, "depth": 6, "height": 12 },
+      "material": "steel",
+      "critical": true
+    },
+    {
+      "id": "obs_003",
+      "name": "临时办公区",
+      "type": "box",
+      "position": { "x": -25, "y": 0, "z": -15 },
+      "dimensions": { "width": 15, "depth": 10, "height": 3 },
+      "material": "container",
+      "critical": false
+    },
+    {
+      "id": "obs_004",
+      "name": "高压电缆架",
+      "type": "cylinder",
+      "position": { "x": 25, "y": 0, "z": -10 },
+      "dimensions": { "radius": 0.5, "height": 8 },
+      "material": "steel",
+      "critical": true
+    },
+    {
+      "id": "obs_005",
+      "name": "消防水池",
+      "type": "box",
+      "position": { "x": 10, "y": -0.5, "z": -20 },
+      "dimensions": { "width": 12, "depth": 10, "height": 0.5 },
+      "material": "concrete",
+      "critical": false,
+      "no_go_zone": true
+    }
+  ],
+  "outrigger_zones": [
+    {
+      "id": "outrigger_001",
+      "name": "吊机A支腿区",
+      "crane_id": "crane_001",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "size": { "front": 12, "back": 12, "left": 12, "right": 12 },
+      "load_capacity_per_m2": 200,
+      "ground_condition": "reinforced"
+    }
+  ],
+  "no_fly_zones": [
+    {
+      "id": "nfz_001",
+      "name": "化工装置区",
+      "shape": "rectangle",
+      "bounds": {
+        "x_min": 20, "x_max": 40,
+        "z_min": 10, "z_max": 35
+      },
+      "min_height": 0,
+      "max_height": 50
+    }
+  ],
+  "lift_paths": [
+    {
+      "id": "path_001",
+      "lift_id": "lift_001",
+      "waypoints": [
+        { "x": -20, "y": 0, "z": -20, "description": "堆场起吊点" },
+        { "x": -10, "y": 15, "z": -5, "description": "上升至安全高度" },
+        { "x": 0, "y": 20, "z": 10, "description": "转向目标区域" },
+        { "x": 10, "y": 18, "z": 20, "description": "接近安装位置" },
+        { "x": 12, "y": 10, "z": 25, "description": "下降就位" }
+      ]
+    }
+  ],
+  "missing_params_notes": [
+    {
+      "param": "管廊架精确高度",
+      "severity": "high",
+      "suggestion": "建议现场复测确认高度，当前按设计值12m计算"
+    },
+    {
+      "param": "吊机站位点地面承载力",
+      "severity": "medium",
+      "suggestion": "建议做地面承载力试验，当前按200kN/m²估算"
+    }
+  ]
+}

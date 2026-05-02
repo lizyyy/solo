@@ -1,0 +1,19 @@
+{
+  "name": "lift-path-simulator",
+  "version": "1.0.0",
+  "description": "3D吊装路径碰撞预演工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "js-yaml": "^4.1.0",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
