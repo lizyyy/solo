@@ -1,0 +1,33 @@
+services:
+  - name: api-gateway
+    type: gateway
+  - name: user-service
+    type: backend
+  - name: auth-service
+    type: backend
+  - name: database
+    type: storage
+  - name: order-service
+    type: backend
+  - name: inventory-service
+    type: backend
+  - name: payment-service
+    type: backend
+  - name: product-service
+    type: backend
+
+connections:
+  - from: api-gateway
+    to: user-service
+  - from: api-gateway
+    to: auth-service
+  - from: api-gateway
+    to: order-service
+  - from: api-gateway
+    to: payment-service
+  - from: api-gateway
+    to: product-service
+  - from: user-service
+    to: database
+  - from: order-service
+    to: inventory-service

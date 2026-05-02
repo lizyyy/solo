@@ -1,0 +1,35 @@
+rules:
+  - name: drop-errors
+    type: tail
+    conditions:
+      - attribute: status.code
+        operator: eq
+        value: 1
+    action: keep
+    errorsOnly: true
+
+  - name: slow-traces
+    type: tail
+    conditions:
+      - attribute: duration
+        operator: gt
+        value: 1000000
+    action: keep
+    latencyThreshold: 1
+
+  - name: sample-healthy
+    type: head
+    conditions:
+      - attribute: http.status_code
+        operator: eq
+        value: 200
+    action: keep
+    probability: 0.1
+
+  - name: drop-health-checks
+    type: head
+    conditions:
+      - attribute: http.url
+        operator: contains
+        value: /health
+    action: drop
