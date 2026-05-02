@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图书馆错架复原训练</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>📚 图书馆闭馆前的错架复原训练</h1>
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">关卡</span>
+          <span class="stat-value" id="levelName">-</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">步数</span>
+          <span class="stat-value"><span id="currentSteps">0</span>/<span id="maxSteps">-</span></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">得分</span>
+          <span class="stat-value" id="score">0</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="loadLevelBtn" class="btn">📂 加载关卡</button>
+        <button id="undoBtn" class="btn" disabled>↩️ 撤销</button>
+        <button id="saveBtn" class="btn">💾 保存</button>
+        <button id="finishBtn" class="btn btn-primary">✅ 完成结算</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="cart-section">
+        <h2>📦 归还车</h2>
+        <div id="cart" class="cart"></div>
+      </aside>
+
+      <section class="shelves-section">
+        <h2>🏢 书架区 (第 <span id="currentFloor">1</span> 层)</h2>
+        <div id="shelves" class="shelves"></div>
+      </section>
+    </div>
+
+    <div id="message" class="message hidden"></div>
+  </div>
+
+  <input type="file" id="fileInput" accept=".json" style="display: none;">
+  
+  <script src="app.js"></script>
+</body>
+</html>

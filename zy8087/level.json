@@ -1,0 +1,72 @@
+{
+  "levelId": "level-1",
+  "levelName": "初级训练",
+  "maxSteps": 10,
+  "floor": 1,
+  "books": [
+    {
+      "id": "book-001",
+      "title": "JavaScript高级程序设计",
+      "callNumber": "TP312/JA1",
+      "isReserved": false,
+      "reservePriority": 0
+    },
+    {
+      "id": "book-002",
+      "title": "深入理解计算机系统",
+      "callNumber": "TP3/CS1",
+      "isReserved": true,
+      "reservePriority": 2
+    },
+    {
+      "id": "book-003",
+      "title": "算法导论",
+      "callNumber": "TP301.6/AL1",
+      "isReserved": false,
+      "reservePriority": 0
+    },
+    {
+      "id": "book-004",
+      "title": "设计模式",
+      "callNumber": "TP311.5/DP1",
+      "isReserved": true,
+      "reservePriority": 1
+    },
+    {
+      "id": "book-005",
+      "title": "代码整洁之道",
+      "callNumber": "TP311.1/CL1",
+      "isReserved": false,
+      "reservePriority": 0
+    }
+  ],
+  "shelves": [
+    {
+      "id": "shelf-001",
+      "label": "A区01架",
+      "callNumberRange": {
+        "start": "TP3",
+        "end": "TP309"
+      },
+      "isReserveShelf": false,
+      "slots": [
+        { "id": "slot-001", "bookId": null },
+        { "id": "slot-002", "bookId": null }
+      ]
+    },
+    {
+      "id": "shelf-002",
+      "label": "A区02架",
+      "callNumberRange": {
+        "start": "TP310",
+        "end": "TP319"
+      },
+      "isReserveShelf": true,
+      "slots": [
+        { "id": "slot-003", "bookId": null },
+        { "id": "slot-004", "bookId": null },
+        { "id": "slot-005", "bookId": null }
+      ]
+    }
+  ]
+}

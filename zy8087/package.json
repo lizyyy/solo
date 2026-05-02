@@ -1,0 +1,14 @@
+{
+  "name": "library-restoration-game",
+  "version": "1.0.0",
+  "description": "图书馆闭馆前的错架复原训练小游戏",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000",
+    "test": "node test.js"
+  },
+  "keywords": ["game", "library", "training"],
+  "author": "",
+  "license": "MIT"
+}
