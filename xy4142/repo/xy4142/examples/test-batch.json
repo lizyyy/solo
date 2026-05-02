@@ -1,0 +1,314 @@
+{
+  "id": "batch-quality-inspection-2024-001",
+  "name": "产品质检测试批次 - 2024年第一季度",
+  "description": "用于验证供应商A提供的产品质检规则插件的测试批次，包含正常产品、有缺陷产品和边界条件测试用例",
+  "pluginId": "quality-inspection-v1",
+  "pluginVersion": "1.0.0",
+  "createdAt": 1705804800000,
+  "testCases": [
+    {
+      "id": "test-case-001",
+      "name": "正常产品 - 无缺陷",
+      "description": "标准合格产品，无任何缺陷，尺寸在公差范围内",
+      "input": {
+        "format": "json",
+        "data": {
+          "productId": "PROD-2024-00001",
+          "timestamp": "2024-01-20T08:30:00Z",
+          "lineId": "line-A",
+          "images": [
+            {
+              "id": "img-front-001",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-image-data-here"
+            }
+          ],
+          "sensors": [
+            {
+              "type": "temperature",
+              "value": 22.5,
+              "unit": "celsius"
+            },
+            {
+              "type": "humidity",
+              "value": 45,
+              "unit": "percent"
+            }
+          ],
+          "metadata": {
+            "operator": "张三",
+            "shift": "morning"
+          }
+        }
+      },
+      "expected": {
+        "result": "pass",
+        "score": 95,
+        "details": {
+          "defects": [],
+          "measurements": [
+            {
+              "name": "length",
+              "value": 100.0,
+              "expected": 100.0,
+              "tolerance": 0.5,
+              "unit": "mm",
+              "status": "ok"
+            }
+          ]
+        }
+      },
+      "tags": ["normal", "pass"],
+      "metadata": {
+        "priority": "high"
+      }
+    },
+    {
+      "id": "test-case-002",
+      "name": "轻微缺陷产品",
+      "description": "产品有表面划痕，但不影响功能，应标记为警告",
+      "input": {
+        "format": "json",
+        "data": {
+          "productId": "PROD-2024-00002",
+          "timestamp": "2024-01-20T08:35:00Z",
+          "lineId": "line-A",
+          "images": [
+            {
+              "id": "img-front-002",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-image-data-with-scratch"
+            }
+          ],
+          "sensors": [
+            {
+              "type": "temperature",
+              "value": 22.8,
+              "unit": "celsius"
+            }
+          ],
+          "metadata": {}
+        }
+      },
+      "expected": {
+        "result": "warning",
+        "score": 75,
+        "details": {
+          "defects": [
+            {
+              "id": "defect-scratch-001",
+              "type": "surface_scratch",
+              "location": {
+                "x": 100,
+                "y": 150,
+                "width": 50,
+                "height": 5
+              },
+              "severity": "low",
+              "confidence": 0.85
+            }
+          ],
+          "measurements": []
+        }
+      },
+      "tags": ["warning", "minor-defect"],
+      "metadata": {}
+    },
+    {
+      "id": "test-case-003",
+      "name": "严重缺陷产品",
+      "description": "产品有裂纹和尺寸超差，应标记为不合格",
+      "input": {
+        "format": "json",
+        "data": {
+          "productId": "PROD-2024-00003",
+          "timestamp": "2024-01-20T08:40:00Z",
+          "lineId": "line-B",
+          "images": [
+            {
+              "id": "img-front-003",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-image-data-with-crack"
+            }
+          ],
+          "sensors": [
+            {
+              "type": "temperature",
+              "value": 23.0,
+              "unit": "celsius"
+            }
+          ],
+          "metadata": {}
+        }
+      },
+      "expected": {
+        "result": "fail",
+        "score": 40,
+        "details": {
+          "defects": [
+            {
+              "id": "defect-crack-001",
+              "type": "structural_crack",
+              "location": {
+                "x": 200,
+                "y": 300,
+                "width": 100,
+                "height": 2
+              },
+              "severity": "critical",
+              "confidence": 0.95
+            }
+          ],
+          "measurements": [
+            {
+              "name": "length",
+              "value": 101.5,
+              "expected": 100.0,
+              "tolerance": 0.5,
+              "unit": "mm",
+              "status": "fail"
+            }
+          ]
+        }
+      },
+      "tags": ["fail", "critical-defect"],
+      "metadata": {}
+    },
+    {
+      "id": "test-case-004",
+      "name": "边界条件 - 最大尺寸",
+      "description": "产品尺寸在上限边界，应判定为通过（在公差范围内）",
+      "input": {
+        "format": "json",
+        "data": {
+          "productId": "PROD-2024-00004",
+          "timestamp": "2024-01-20T09:00:00Z",
+          "lineId": "line-A",
+          "images": [
+            {
+              "id": "img-front-004",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-image-data"
+            }
+          ],
+          "sensors": [],
+          "metadata": {}
+        }
+      },
+      "expected": {
+        "result": "pass",
+        "score": 90,
+        "details": {
+          "defects": [],
+          "measurements": [
+            {
+              "name": "length",
+              "value": 100.49,
+              "expected": 100.0,
+              "tolerance": 0.5,
+              "unit": "mm",
+              "status": "ok"
+            }
+          ]
+        }
+      },
+      "tags": ["boundary", "edge-case"],
+      "metadata": {}
+    },
+    {
+      "id": "test-case-005",
+      "name": "多缺陷组合",
+      "description": "产品同时有多个不同严重程度的缺陷",
+      "input": {
+        "format": "json",
+        "data": {
+          "productId": "PROD-2024-00005",
+          "timestamp": "2024-01-20T09:30:00Z",
+          "lineId": "line-C",
+          "images": [
+            {
+              "id": "img-front-005",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-image-data-multiple-defects"
+            },
+            {
+              "id": "img-side-005",
+              "type": "rgb",
+              "width": 1920,
+              "height": 1080,
+              "data": "base64-encoded-side-image"
+            }
+          ],
+          "sensors": [
+            {
+              "type": "pressure",
+              "value": 1.5,
+              "unit": "bar"
+            },
+            {
+              "type": "temperature",
+              "value": 24.0,
+              "unit": "celsius"
+            }
+          ],
+          "metadata": {
+            "rework": true
+          }
+        }
+      },
+      "expected": {
+        "result": "fail",
+        "score": 25,
+        "details": {
+          "defects": [
+            {
+              "id": "defect-1",
+              "type": "dent",
+              "location": { "x": 50, "y": 50, "width": 20, "height": 20 },
+              "severity": "medium",
+              "confidence": 0.9
+            },
+            {
+              "id": "defect-2",
+              "type": "scratch",
+              "location": { "x": 100, "y": 100, "width": 30, "height": 2 },
+              "severity": "low",
+              "confidence": 0.75
+            }
+          ],
+          "measurements": [
+            {
+              "name": "width",
+              "value": 50.3,
+              "expected": 50.0,
+              "tolerance": 0.2,
+              "unit": "mm",
+              "status": "fail"
+            }
+          ]
+        }
+      },
+      "tags": ["multiple-defects", "complex"],
+      "metadata": {}
+    }
+  ],
+  "expectedResults": [],
+  "metadata": {
+    "testEnvironment": {
+      "os": "Linux",
+      "nodeVersion": "20.0.0",
+      "testRunId": "run-2024-01-20-001"
+    },
+    "tags": ["release-candidate", "v1.0.0"]
+  }
+}

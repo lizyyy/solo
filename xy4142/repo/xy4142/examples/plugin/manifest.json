@@ -1,0 +1,197 @@
+{
+  "id": "quality-inspection-v1",
+  "name": "产品质检规则插件",
+  "version": "1.0.0",
+  "description": "用于工厂生产线产品质量检测的WASM规则插件，支持缺陷检测、尺寸测量和质量评分",
+  "author": "供应商A - 技术团队",
+  "vendor": "供应商A",
+  "pluginType": "quality",
+  "wasm": {
+    "entrypoint": "plugin.wasm",
+    "memoryPages": 4,
+    "features": ["bulk-memory"]
+  },
+  "dependencies": [
+    {
+      "name": "quality-engine",
+      "version": ">=1.0.0",
+      "required": true,
+      "type": "runtime"
+    }
+  ],
+  "interfaces": {
+    "input": {
+      "schemaRef": "input-schema.json",
+      "format": "json",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "质检输入数据",
+        "type": "object",
+        "required": ["productId", "timestamp", "images", "sensors"],
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "产品唯一标识"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "检测时间戳"
+          },
+          "lineId": {
+            "type": "string",
+            "description": "生产线ID"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "type", "width", "height", "data"],
+              "properties": {
+                "id": { "type": "string" },
+                "type": { "type": "string", "enum": ["rgb", "depth", "infrared"] },
+                "width": { "type": "integer", "minimum": 1 },
+                "height": { "type": "integer", "minimum": 1 },
+                "data": { "type": "string" }
+              }
+            }
+          },
+          "sensors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "value", "unit"],
+              "properties": {
+                "type": { "type": "string" },
+                "value": { "type": "number" },
+                "unit": { "type": "string" }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "output": {
+      "schemaRef": "output-schema.json",
+      "format": "json",
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "质检输出结果",
+        "type": "object",
+        "required": ["result", "score", "details"],
+        "properties": {
+          "result": {
+            "type": "string",
+            "enum": ["pass", "fail", "warning", "error"],
+            "description": "质检结果"
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "质量评分"
+          },
+          "details": {
+            "type": "object",
+            "properties": {
+              "defects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "type", "location", "severity"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "type": { "type": "string" },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "x": { "type": "number" },
+                        "y": { "type": "number" },
+                        "width": { "type": "number" },
+                        "height": { "type": "number" }
+                      }
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": ["low", "medium", "high", "critical"]
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  }
+                }
+              },
+              "measurements": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "value", "unit", "status"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "value": { "type": "number" },
+                    "expected": { "type": "number" },
+                    "tolerance": { "type": "number" },
+                    "unit": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["ok", "warn", "fail"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["code", "message", "severity"],
+              "properties": {
+                "code": { "type": "string" },
+                "message": { "type": "string" },
+                "severity": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"]
+                }
+              }
+            }
+          },
+          "executionTime": {
+            "type": "number",
+            "description": "执行时间(毫秒)"
+          },
+          "modelVersion": {
+            "type": "string",
+            "description": "检测模型版本"
+          }
+        }
+      }
+    },
+    "lifecycle": {
+      "init": true,
+      "cleanup": false,
+      "reset": false
+    }
+  },
+  "capabilities": [],
+  "constraints": {
+    "timeoutMs": 5000,
+    "memoryPagesMax": 16,
+    "memoryBytesMax": 1048576,
+    "callStackDepth": 256,
+    "maxTableElements": 1024
+  },
+  "metadata": {
+    "createDate": "2024-01-15",
+    "lastUpdate": "2024-01-20",
+    "testCoverage": "95%",
+    "supportedLines": ["line-A", "line-B", "line-C"],
+    "products": ["product-X", "product-Y", "product-Z"]
+  }
+}
