@@ -1,0 +1,18 @@
+required_signatures:
+  - collector
+  - athlete
+  - chaperone
+  - receiver
+
+time_windows:
+  collection_to_sealing_minutes: 5
+  sealing_to_handover_minutes: 30
+  handover_to_storage_minutes: 60
+  storage_to_shipping_minutes: 480
+
+seal_pattern: "^[A-Z]{2,4}-[A-Z]-\d{3,6}$"
+
+lab_codes:
+  - WADA_LAB_A
+  - WADA_LAB_B
+  - WADA_LAB_C

@@ -1,0 +1,20 @@
+{"event_id": "EVT001", "timestamp": "2026-05-01T10:00:00+08:00", "event_type": "collection", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"venue": "主会场", "collector": "DR_WANG"}}
+{"event_id": "EVT002", "timestamp": "2026-05-01T10:05:00+08:00", "event_type": "sealing", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"bottle": "A", "seal_number": "SEAL-A-001"}}
+{"event_id": "EVT003", "timestamp": "2026-05-01T10:06:00+08:00", "event_type": "sealing", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"bottle": "B", "seal_number": "SEAL-B-001"}}
+{"event_id": "EVT004", "timestamp": "2026-05-01T10:30:00+08:00", "event_type": "handover", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"signatures": {"collector": "DR_WANG", "athlete": "张伟", "chaperone": "MR_LI"}}}
+{"event_id": "EVT005", "timestamp": "2026-05-01T11:00:00+08:00", "event_type": "storage", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"location": "冷藏库A", "operator": "MS_ZHANG"}}
+{"event_id": "EVT006", "timestamp": "2026-05-01T14:00:00+08:00", "event_type": "shipping", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"carrier": "DHL", "tracking": "123456789"}}
+{"event_id": "EVT007", "timestamp": "2026-05-01T22:00:00+00:00", "event_type": "lab_receipt", "athlete_id": "ATH001", "sample_id": "SMP001", "details": {"lab": "WADA_LAB_B", "received_by": "DR_JONES"}}
+{"event_id": "EVT008", "timestamp": "2026-05-01T10:00:00+08:00", "event_type": "collection", "athlete_id": "ATH002", "sample_id": "SMP002", "details": {"venue": "游泳馆", "collector": "DR_LIU"}}
+{"event_id": "EVT009", "timestamp": "2026-05-01T10:03:00+08:00", "event_type": "sealing", "athlete_id": "ATH002", "sample_id": "SMP002", "details": {"bottle": "A", "seal_number": "SEAL-A-002"}}
+{"event_id": "EVT010", "timestamp": "2026-05-01T10:04:00+08:00", "event_type": "sealing", "athlete_id": "ATH002", "sample_id": "SMP002", "details": {"bottle": "B", "seal_number": "SEAL-A-002"}}
+{"event_id": "EVT011", "timestamp": "2026-05-01T10:20:00+08:00", "event_type": "handover", "athlete_id": "ATH002", "sample_id": "SMP002", "details": {"signatures": {"collector": "DR_LIU", "chaperone": "MR_ZHOU"}}}
+{"event_id": "EVT012", "timestamp": "2026-05-01T09:50:00+08:00", "event_type": "collection", "athlete_id": "ATH003", "sample_id": "SMP003", "details": {"venue": "举重馆", "collector": "DR_CHEN"}}
+{"event_id": "EVT013", "timestamp": "2026-05-01T09:45:00+08:00", "event_type": "handover", "athlete_id": "ATH003", "sample_id": "SMP003", "details": {"signatures": {"collector": "DR_CHEN", "athlete": "王强", "chaperone": "MR_WU", "receiver": "MS_HUANG"}}}
+{"event_id": "EVT014", "timestamp": "2026-05-01T08:00:00+08:00", "event_type": "collection", "athlete_id": "ATH004", "sample_id": "SMP004", "details": {"venue": "田径场", "collector": "DR_SMITH"}}
+{"event_id": "EVT015", "timestamp": "2026-05-01T08:02:00+08:00", "event_type": "sealing", "athlete_id": "ATH004", "sample_id": "SMP004", "details": {"bottle": "A", "seal_number": "SEAL-A-004"}}
+{"event_id": "EVT016", "timestamp": "2026-05-01T08:30:00+08:00", "event_type": "handover", "athlete_id": "ATH004", "sample_id": "SMP004", "details": {"signatures": {"collector": "DR_SMITH", "athlete": "Tom Smith", "chaperone": "MR_BROWN", "receiver": "MS_GREEN"}}}
+{"event_id": "EVT017", "timestamp": "2026-05-01T08:01:00+08:00", "event_type": "sealing", "athlete_id": "ATH004", "sample_id": "SMP004", "details": {"bottle": "B", "seal_number": "SEAL-B-004"}}
+{"event_id": "EVT018", "timestamp": "2026-05-01T09:00:00+08:00", "event_type": "collection", "athlete_id": "ATH002", "sample_id": "SMP003", "details": {"venue": "游泳馆", "collector": "DR_LIU"}}
+{"event_id": "EVT019", "timestamp": "2026-05-01T09:02:00+08:00", "event_type": "sealing", "athlete_id": "ATH002", "sample_id": "SMP003", "details": {"bottle": "A", "seal_number": "SEAL-A-003"}}
+{"event_id": "EVT020", "timestamp": "2026-05-01T09:03:00+08:00", "event_type": "sealing", "athlete_id": "ATH002", "sample_id": "SMP003", "details": {"bottle": "B", "seal_number": "SEAL-B-003"}}

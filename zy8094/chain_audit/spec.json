@@ -1,0 +1,70 @@
+{
+  "project_name": "chain_audit",
+  "project_version": "1.0.0",
+  "project_description": "Anti-doping sample chain audit tool for post-competition medical staff",
+  "input_files": [
+    {
+      "name": "athletes.csv",
+      "description": "Athlete registry with ID, name, sport, nationality",
+      "fields": ["athlete_id", "name", "sport", "nationality"]
+    },
+    {
+      "name": "sample_events.jsonl",
+      "description": "All sample-related events: collection, sealing, handover, storage, lab receipt",
+      "fields": ["event_id", "timestamp", "event_type", "athlete_id", "sample_id", "details"]
+    },
+    {
+      "name": "handover_rules.yaml",
+      "description": "Validation rules for handover chains",
+      "fields": ["required_signatures", "time_windows", "seal_pattern"]
+    },
+    {
+      "name": "lab_receipts.csv",
+      "description": "Lab receipt confirmations",
+      "fields": ["receipt_id", "sample_id", "received_at", "lab_code", "condition"]
+    }
+  ],
+  "output_files": [
+    {
+      "name": "chain_audit.md",
+      "description": "Audit report in Markdown format"
+    },
+    {
+      "name": "issues.csv",
+      "description": "Issues found during audit in CSV format"
+    },
+    {
+      "name": "timeline.html",
+      "description": "Browsable timeline visualization"
+    }
+  ],
+  "validation_rules": [
+    {
+      "name": "seal_consistency",
+      "description": "A/B瓶封签号必须一致"
+    },
+    {
+      "name": "handoff_signature",
+      "description": "交接必须有完整签名"
+    },
+    {
+      "name": "time_order",
+      "description": "时间不能倒挂"
+    },
+    {
+      "name": "ab_split",
+      "description": "A/B瓶拆分异常检测"
+    }
+  ],
+  "boundary_conditions": [
+    "跨时区比赛",
+    "同一运动员多次采样"
+  ],
+  "modules": [
+    "parse",
+    "state_machine",
+    "rules",
+    "report",
+    "cli"
+  ]
+}
