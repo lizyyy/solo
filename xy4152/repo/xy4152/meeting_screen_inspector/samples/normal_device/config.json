@@ -1,0 +1,43 @@
+{
+  "version": "2.3.5",
+  "device_id": "MS-101",
+  "location": "3楼会议室A",
+  "network": {
+    "wifi": {
+      "ssid": "Office_WiFi",
+      "password": "********",
+      "dhcp": true
+    },
+    "ethernet": {
+      "enabled": false
+    },
+    "static_ip": {
+      "ip": "192.168.1.101",
+      "netmask": "255.255.255.0",
+      "gateway": "192.168.1.1",
+      "dns": ["8.8.8.8", "114.114.114.114"]
+    }
+  },
+  "bluetooth": {
+    "enabled": true,
+    "mac_address": "AA:BB:CC:DD:EE:01",
+    "name": "MeetingScreen-101",
+    "ble": {
+      "advertising": true,
+      "service_uuid": "00001800-0000-1000-8000-00805F9B34FB"
+    }
+  },
+  "display": {
+    "brightness": 80,
+    "resolution": "1920x1080",
+    "orientation": "landscape"
+  },
+  "audio": {
+    "volume": 70,
+    "mute": false
+  },
+  "rollback_config": {
+    "backup_version": "2.3.4",
+    "backup_date": "2024-04-20T10:00:00Z"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2024-05-01T08:00:10Z",
+  "devices": [
+    {
+      "address": "AA:BB:CC:DD:EE:01",
+      "name": "MeetingScreen-101",
+      "rssi": -45,
+      "service_data": "0x1234",
+      "manufacturer_data": "0xABCD"
+    },
+    {
+      "address": "11:22:33:44:55:66",
+      "name": "Phone-John",
+      "rssi": -65
+    }
+  ]
+}

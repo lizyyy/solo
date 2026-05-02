@@ -1,0 +1,19 @@
+{
+  "version": "2.3.5",
+  "device_id": "MS-103",
+  "location": "3楼会议室C",
+  "network": {
+    "wifi": {
+      "ssid": "Office_WiFi"
+    },
+    "static_ip": {
+      "ip": "192.168.1.103",
+      "netmask": "255.255.255.0",
+      "gateway": "192.168.1.1",
+      "dns": ["8.8.8.8"]
+    }
+  },
+  "bluetooth": {
+    "mac_address": "AA:BB:CC:DD:EE:03"
+  }
+}
