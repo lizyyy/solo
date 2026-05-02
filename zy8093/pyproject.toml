@@ -1,0 +1,25 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[project]
+name = "dataset-audit"
+version = "1.0.0"
+description = "Industrial vision dataset audit tool for defect classification model training"
+dependencies = [
+    "pandas>=2.0",
+    "pyyaml>=6.0",
+    "imagehash>=4.3",
+    "Pillow>=10.0",
+    "click>=8.0",
+    "scikit-learn>=1.3"
+]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
