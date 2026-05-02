@@ -1,0 +1,55 @@
+{
+  "rules": [
+    {
+      "rule_code": "RULE-TEM-001",
+      "name": "透射电镜标准费率",
+      "base_hourly_rate": 200.0,
+      "overtime_rate_multiplier": 1.5,
+      "overtime_start_hours": 4,
+      "night_rate_multiplier": 2.0,
+      "night_start_time": "22:00",
+      "night_end_time": "08:00",
+      "weekend_rate_multiplier": 1.5,
+      "discount_rate": 1.0,
+      "priority": 1,
+      "is_active": true
+    },
+    {
+      "rule_code": "RULE-SEM-001",
+      "name": "扫描电镜标准费率",
+      "base_hourly_rate": 150.0,
+      "overtime_rate_multiplier": 1.5,
+      "overtime_start_hours": 4,
+      "night_rate_multiplier": 2.0,
+      "night_start_time": "22:00",
+      "night_end_time": "08:00",
+      "weekend_rate_multiplier": 1.5,
+      "discount_rate": 1.0,
+      "priority": 1,
+      "is_active": true
+    },
+    {
+      "rule_code": "RULE-XPS-001",
+      "name": "XPS能谱仪标准费率",
+      "base_hourly_rate": 300.0,
+      "overtime_rate_multiplier": 1.5,
+      "overtime_start_hours": 4,
+      "night_rate_multiplier": 2.5,
+      "night_start_time": "22:00",
+      "night_end_time": "08:00",
+      "weekend_rate_multiplier": 2.0,
+      "discount_rate": 1.0,
+      "priority": 1,
+      "is_active": true
+    },
+    {
+      "rule_code": "RULE-GROUP-A-DISCOUNT",
+      "name": "A课题组优惠费率",
+      "base_hourly_rate": 0.0,
+      "discount_rate": 0.8,
+      "discount_reason": "长期合作客户折扣",
+      "priority": 10,
+      "is_active": true
+    }
+  ]
+}
