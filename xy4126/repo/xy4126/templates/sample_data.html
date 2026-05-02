@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}示例数据 - 借展装箱交接核对台{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">首页</a> / 示例数据
+</div>
+
+<div class="card">
+    <h2>示例数据文件</h2>
+    
+    {% if samples %}
+    <table>
+        <thead>
+            <tr>
+                <th>文件名</th>
+                <th>大小</th>
+                <th>修改时间</th>
+                <th>说明</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sample in samples %}
+            <tr>
+                <td><strong>{{ sample.filename }}</strong></td>
+                <td>{{ sample.size }} bytes</td>
+                <td>{{ sample.modified }}</td>
+                <td>
+                    {% if 'collection' in sample.filename %}
+                        藏品清单示例
+                    {% elif 'box_seal' in sample.filename %}
+                        箱号封签记录示例
+                    {% elif 'env' in sample.filename %}
+                        环境记录仪数据示例
+                    {% elif 'photo' in sample.filename %}
+                        照片清单示例
+                    {% elif 'sign' in sample.filename %}
+                        签收记录示例
+                    {% else %}
+                        示例数据
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无示例数据文件</p>
+        <p style="font-size: 14px; color: #6c757d;">
+            示例数据文件将在首次运行时自动生成在 <code>sample_data/</code> 目录下
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>文件格式说明</h2>
+    
+    <div style="line-height: 2;">
+        <h3 style="margin-bottom: 10px; color: #667eea;">藏品清单 CSV 格式</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 13px;">
+            item_id,name,category,description,dimensions,weight,condition,insurance_value,box_id<br>
+            CW001,清明上河图,绘画,北宋张择端作品,24.8x528.7cm,0.5kg,良好,10000000,B001<br>
+            CW002,千里江山图,绘画,北宋王希孟作品,51.5x1191.5cm,0.8kg,良好,8000000,B001
+        </div>
+        
+        <h3 style="margin-bottom: 10px; color: #f093fb;">箱号/封签记录 CSV 格式</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 13px;">
+            box_id,seal_id,box_description,applied_at,removed_at,applied_by,removed_by,previous_seal_id,next_seal_id,is_intact,item_id<br>
+            B001,S001,标准文物箱,2024-01-15 09:00:00,2024-01-16 14:30:00,张三,李四,,S002,true,CW001<br>
+            B001,S002,标准文物箱,2024-01-16 14:35:00,2024-01-17 10:00:00,李四,王五,S001,S003,true,CW001
+        </div>
+        
+        <h3 style="margin-bottom: 10px; color: #4facfe;">环境记录仪 JSON 格式</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 13px; overflow-x: auto;">
+            [<br>
+            &nbsp;&nbsp;{<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"logger_id": "LOG001",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"box_id": "B001",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"timestamp": "2024-01-15T09:00:00",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"temperature": 22.5,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"humidity": 52.0,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"temp_min": 18.0,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"temp_max": 24.0,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"humidity_min": 45.0,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"humidity_max": 65.0<br>
+            &nbsp;&nbsp;}<br>
+            ]
+        </div>
+        
+        <h3 style="margin-bottom: 10px; color: #43e97b;">照片清单 JSON 格式</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-family: monospace; font-size: 13px; overflow-x: auto;">
+            [<br>
+            &nbsp;&nbsp;{<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"photo_id": "P001",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"filename": "IMG_0001.jpg",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"description": "装箱前文物检查",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"category": "packing",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"box_id": "B001",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"item_id": "CW001",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"timestamp": "2024-01-15T08:30:00",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"photographer": "张三"<br>
+            &nbsp;&nbsp;}<br>
+            ]
+        </div>
+        
+        <h3 style="margin-bottom: 10px; color: #ffc107;">签收记录 CSV 格式</h3>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px;">
+            sign_id,person_name,role,action,box_id,item_id,seal_id,timestamp,location,notes,order<br>
+            SIGN001,张三,博物馆馆员,装箱确认,B001,CW001,S001,2024-01-15 09:00:00,故宫博物院文物库,,0<br>
+            SIGN002,李四,押运员,启运确认,B001,,S001,2024-01-15 10:00:00,故宫博物院正门,,1
+        </div>
+    </div>
+</div>
+{% endblock %}

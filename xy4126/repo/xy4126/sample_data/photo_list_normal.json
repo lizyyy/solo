@@ -1,0 +1,98 @@
+[
+    {
+        "photo_id": "P001",
+        "filename": "IMG_20240115_083001.jpg",
+        "description": "装箱前文物检查",
+        "category": "packing",
+        "box_id": "B001",
+        "item_id": "CW001",
+        "timestamp": "2024-01-15T08:30:00",
+        "photographer": "张三"
+    },
+    {
+        "photo_id": "P002",
+        "filename": "IMG_20240115_083502.jpg",
+        "description": "文物装箱过程",
+        "category": "packing",
+        "box_id": "B001",
+        "item_id": "CW002",
+        "timestamp": "2024-01-15T08:35:00",
+        "photographer": "张三"
+    },
+    {
+        "photo_id": "P003",
+        "filename": "IMG_20240115_084503.jpg",
+        "description": "封签加封",
+        "category": "sealing",
+        "box_id": "B001",
+        "seal_id": "S001",
+        "timestamp": "2024-01-15T08:45:00",
+        "photographer": "张三"
+    },
+    {
+        "photo_id": "P004",
+        "filename": "IMG_20240115_090004.jpg",
+        "description": "出库交接",
+        "category": "handover",
+        "box_id": "B001",
+        "timestamp": "2024-01-15T09:00:00",
+        "photographer": "李四"
+    },
+    {
+        "photo_id": "P005",
+        "filename": "IMG_20240116_143005.jpg",
+        "description": "中转站封签检查",
+        "category": "handover",
+        "box_id": "B001",
+        "seal_id": "S001",
+        "timestamp": "2024-01-16T14:30:00",
+        "photographer": "王五"
+    },
+    {
+        "photo_id": "P006",
+        "filename": "IMG_20240117_100006.jpg",
+        "description": "到达目的地拆封",
+        "category": "unpacking",
+        "box_id": "B001",
+        "timestamp": "2024-01-17T10:00:00",
+        "photographer": "赵六"
+    },
+    {
+        "photo_id": "P007",
+        "filename": "IMG_20240115_090507.jpg",
+        "description": "恒温箱文物检查",
+        "category": "packing",
+        "box_id": "B002",
+        "item_id": "CW003",
+        "timestamp": "2024-01-15T09:05:00",
+        "photographer": "钱七"
+    },
+    {
+        "photo_id": "P008",
+        "filename": "IMG_20240115_091508.jpg",
+        "description": "恒温箱封签",
+        "category": "sealing",
+        "box_id": "B002",
+        "seal_id": "S004",
+        "timestamp": "2024-01-15T09:15:00",
+        "photographer": "钱七"
+    },
+    {
+        "photo_id": "P009",
+        "filename": "IMG_20240115_092009.jpg",
+        "description": "恒温箱出库",
+        "category": "handover",
+        "box_id": "B002",
+        "timestamp": "2024-01-15T09:20:00",
+        "photographer": "孙八"
+    },
+    {
+        "photo_id": "P010",
+        "filename": "IMG_20240116_150010.jpg",
+        "description": "恒温箱到达",
+        "category": "unpacking",
+        "box_id": "B002",
+        "timestamp": "2024-01-16T15:00:00",
+        "photographer": "孙八"
+    }
+]

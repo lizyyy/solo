@@ -1,0 +1,68 @@
+[
+    {
+        "logger_id": "LOG001",
+        "box_id": "B001",
+        "timestamp": "2024-01-15T09:00:00",
+        "temperature": 22.0,
+        "humidity": 52.0,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    },
+    {
+        "logger_id": "LOG001",
+        "box_id": "B001",
+        "timestamp": "2024-01-15T09:30:00",
+        "temperature": 22.1,
+        "humidity": 52.5,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    },
+    {
+        "logger_id": "LOG001",
+        "box_id": "B001",
+        "timestamp": "2024-01-15T10:00:00",
+        "temperature": 21.9,
+        "humidity": 51.8,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    },
+    {
+        "logger_id": "LOG001",
+        "box_id": "B001",
+        "timestamp": "2024-01-15T10:30:00",
+        "temperature": 22.2,
+        "humidity": 53.0,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    },
+    {
+        "logger_id": "LOG002",
+        "box_id": "B002",
+        "timestamp": "2024-01-15T09:30:00",
+        "temperature": 20.5,
+        "humidity": 50.0,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    },
+    {
+        "logger_id": "LOG002",
+        "box_id": "B002",
+        "timestamp": "2024-01-15T10:00:00",
+        "temperature": 20.3,
+        "humidity": 50.2,
+        "temp_min": 18.0,
+        "temp_max": 24.0,
+        "humidity_min": 45.0,
+        "humidity_max": 65.0
+    }
+]

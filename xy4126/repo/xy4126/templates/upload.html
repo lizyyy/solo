@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}导入数据 - 借展装箱交接核对台{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">首页</a> / 
+    <a href="{{ url_for('session_detail', session_id=session.session_id) }}">{{ session.name }}</a> / 
+    导入数据
+</div>
+
+<div class="card">
+    <h2>导入数据文件</h2>
+    
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+        <p><strong>提示：</strong>请依次导入以下类型的数据文件。文件格式支持 UTF-8 或 GBK 编码的 CSV 和 JSON。</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="card" style="margin: 0; border: 2px solid #667eea; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-bottom: 15px;">1. 藏品清单 CSV</h3>
+            <form action="{{ url_for('upload_files', session_id=session.session_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="file_type" value="collection_list">
+                <div class="form-group">
+                    <label>选择藏品清单文件</label>
+                    <input type="file" name="file" accept=".csv" required>
+                </div>
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <strong>必需列：</strong>item_id, name<br>
+                    <strong>可选列：</strong>category, description, dimensions, weight, condition, insurance_value, box_id
+                </div>
+                <button type="submit" class="btn btn-primary">导入藏品清单</button>
+            </form>
+        </div>
+        
+        <div class="card" style="margin: 0; border: 2px solid #f093fb; border-radius: 8px;">
+            <h3 style="color: #f093fb; margin-bottom: 15px;">2. 箱号/封签记录 CSV</h3>
+            <form action="{{ url_for('upload_files', session_id=session.session_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="file_type" value="box_seal">
+                <div class="form-group">
+                    <label>选择箱号封签记录文件</label>
+                    <input type="file" name="file" accept=".csv" required>
+                </div>
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <strong>必需列：</strong>box_id, seal_id<br>
+                    <strong>可选列：</strong>box_description, box_type, applied_at, removed_at, previous_seal_id, next_seal_id, is_intact, item_id
+                </div>
+                <button type="submit" class="btn btn-primary">导入箱号封签</button>
+            </form>
+        </div>
+        
+        <div class="card" style="margin: 0; border: 2px solid #4facfe; border-radius: 8px;">
+            <h3 style="color: #4facfe; margin-bottom: 15px;">3. 环境记录仪 JSON</h3>
+            <form action="{{ url_for('upload_files', session_id=session.session_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="file_type" value="env_records">
+                <div class="form-group">
+                    <label>选择环境记录文件</label>
+                    <input type="file" name="file" accept=".json" required>
+                </div>
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <strong>必需字段：</strong>logger_id, temperature, humidity<br>
+                    <strong>可选字段：</strong>timestamp, box_id, temp_min, temp_max, humidity_min, humidity_max
+                </div>
+                <button type="submit" class="btn btn-primary">导入环境记录</button>
+            </form>
+        </div>
+        
+        <div class="card" style="margin: 0; border: 2px solid #43e97b; border-radius: 8px;">
+            <h3 style="color: #43e97b; margin-bottom: 15px;">4. 交接照片清单 JSON</h3>
+            <form action="{{ url_for('upload_files', session_id=session.session_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="file_type" value="photos">
+                <div class="form-group">
+                    <label>选择照片清单文件</label>
+                    <input type="file" name="file" accept=".json" required>
+                </div>
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <strong>必需字段：</strong>filename<br>
+                    <strong>可选字段：</strong>photo_id, description, category, box_id, item_id, seal_id, timestamp, photographer
+                </div>
+                <button type="submit" class="btn btn-primary">导入照片清单</button>
+            </form>
+        </div>
+        
+        <div class="card" style="margin: 0; border: 2px solid #ffc107; border-radius: 8px;">
+            <h3 style="color: #ffc107; margin-bottom: 15px;">5. 签收记录 CSV</h3>
+            <form action="{{ url_for('upload_files', session_id=session.session_id) }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="file_type" value="sign_records">
+                <div class="form-group">
+                    <label>选择签收记录文件</label>
+                    <input type="file" name="file" accept=".csv" required>
+                </div>
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 15px;">
+                    <strong>必需列：</strong>person_name, action<br>
+                    <strong>可选列：</strong>sign_id, role, box_id, item_id, seal_id, timestamp, location, notes, order
+                </div>
+                <button type="submit" class="btn btn-primary">导入签收记录</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>当前数据状态</h2>
+    <table style="max-width: 500px;">
+        <tr>
+            <th style="width: 150px;">数据类型</th>
+            <th style="width: 100px; text-align: center;">数量</th>
+            <th>状态</th>
+        </tr>
+        <tr>
+            <td>藏品清单</td>
+            <td style="text-align: center;">{{ session.items|length }}</td>
+            <td>
+                {% if session.items|length > 0 %}
+                    <span class="status-badge status-info">已导入</span>
+                {% else %}
+                    <span class="status-badge status-pending">待导入</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>箱号/封签</td>
+            <td style="text-align: center;">{{ session.boxes|length }} / {{ session.seals|length }}</td>
+            <td>
+                {% if session.boxes|length > 0 %}
+                    <span class="status-badge status-info">已导入</span>
+                {% else %}
+                    <span class="status-badge status-pending">待导入</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>环境记录</td>
+            <td style="text-align: center;">{{ session.env_records|length }}</td>
+            <td>
+                {% if session.env_records|length > 0 %}
+                    <span class="status-badge status-info">已导入</span>
+                {% else %}
+                    <span class="status-badge status-pending">待导入</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>照片清单</td>
+            <td style="text-align: center;">{{ session.photos|length }}</td>
+            <td>
+                {% if session.photos|length > 0 %}
+                    <span class="status-badge status-info">已导入</span>
+                {% else %}
+                    <span class="status-badge status-pending">待导入</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>签收记录</td>
+            <td style="text-align: center;">{{ session.sign_records|length }}</td>
+            <td>
+                {% if session.sign_records|length > 0 %}
+                    <span class="status-badge status-info">已导入</span>
+                {% else %}
+                    <span class="status-badge status-pending">待导入</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <div class="action-bar">
+        <a href="{{ url_for('session_detail', session_id=session.session_id) }}" class="btn btn-secondary">返回会话详情</a>
+    </div>
+</div>
+{% endblock %}
