@@ -1,0 +1,10 @@
+maxTotalWeight: 1000
+maxDeckWeight: 300
+maxCargoHoldWeight: 700
+balanceLimits:
+  maxPortStarboardDifference: 100
+  maxForeAftDifference: 80
+dangerousGoods:
+  isolationDistance: 5
+  Class3: Class8
+  Class8: Class3
