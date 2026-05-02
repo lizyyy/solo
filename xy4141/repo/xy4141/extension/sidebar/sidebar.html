@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>考场异常标记夹</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>考场异常标记夹</h1>
+      <div class="connection-status" id="connectionStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">连接中...</span>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="record">📝 记录异常</button>
+      <button class="tab-btn" data-tab="list">📋 异常列表</button>
+      <button class="tab-btn" data-tab="stats">📊 统计</button>
+    </nav>
+
+    <main class="content">
+      <section id="record-tab" class="tab-content active">
+        <form id="anomalyForm" class="form">
+          <div class="form-group">
+            <label for="examCode">考试代码 *</label>
+            <input type="text" id="examCode" placeholder="例如: MATH2024" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="studentId">学号 *</label>
+              <input type="text" id="studentId" placeholder="输入学号" required>
+            </div>
+            <div class="form-group">
+              <label for="studentName">姓名</label>
+              <input type="text" id="studentName" placeholder="输入姓名">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>异常类型 *</label>
+            <div class="anomaly-types" id="anomalyTypes">
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="suspicious_behavior" required>
+                <span>可疑行为</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="screen_sharing">
+                <span>屏幕共享</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="multiple_faces">
+                <span>多人出镜</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="no_face">
+                <span>无人出镜</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="look_away">
+                <span>视线偏离</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="phone_usage">
+                <span>使用手机</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="id_verification">
+                <span>身份验证异常</span>
+              </label>
+              <label class="type-btn">
+                <input type="radio" name="anomalyType" value="other">
+                <span>其他异常</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">异常描述</label>
+            <textarea id="description" rows="3" placeholder="详细描述异常情况..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>截图</label>
+            <div class="screenshot-area" id="screenshotArea">
+              <button type="button" class="btn-secondary" id="captureScreenshot">
+                📷 截取当前页面
+              </button>
+              <input type="file" id="screenshotInput" accept="image/*" style="display: none;">
+              <button type="button" class="btn-secondary" id="uploadScreenshot">
+                📁 上传图片
+              </button>
+              <div class="screenshot-preview" id="screenshotPreview" style="display: none;">
+                <img id="previewImg" alt="截图预览">
+                <button type="button" class="btn-danger" id="removeScreenshot">✕ 移除</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="submitBtn">
+              ⏰ 一键记录 (带时间戳)
+            </button>
+            <button type="button" class="btn-secondary" id="quickAdd">
+              ⚡ 快速录入 (仅标记)
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section id="list-tab" class="tab-content">
+        <div class="filters">
+          <div class="filter-group">
+            <label>考试代码</label>
+            <select id="filterExamCode">
+              <option value="">全部考试</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>状态</label>
+            <select id="filterStatus">
+              <option value="">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="reviewed">已复核</option>
+              <option value="confirmed">已确认违规</option>
+              <option value="dismissed">已驳回</option>
+            </select>
+          </div>
+          <button class="btn-secondary" id="refreshList">🔄 刷新</button>
+        </div>
+
+        <div class="list-actions">
+          <button class="btn-secondary" id="exportMarkdown">📄 导出 Markdown</button>
+          <button class="btn-secondary" id="exportCSV">📊 导出 CSV</button>
+        </div>
+
+        <div class="anomaly-list" id="anomalyList">
+          <div class="empty-state">
+            <p>暂无异常记录</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="stats-tab" class="tab-content">
+        <div class="stats-container" id="statsContainer">
+          <div class="empty-state">
+            <p>暂无统计数据</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="sidebar.js"></script>
+</body>
+</html>

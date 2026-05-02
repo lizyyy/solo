@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>考场异常标记夹</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h2>考场异常标记夹</h2>
+    </header>
+    
+    <div class="quick-actions">
+      <button class="action-btn" id="openSidebar">
+        <span class="icon">📋</span>
+        <span>打开侧边栏</span>
+      </button>
+      
+      <button class="action-btn" id="quickCapture">
+        <span class="icon">📷</span>
+        <span>快速截图</span>
+      </button>
+      
+      <button class="action-btn" id="viewPending">
+        <span class="icon">⏳</span>
+        <span class="count-badge" id="pendingCount">0</span>
+        <span>待处理</span>
+      </button>
+    </div>
+
+    <div class="recent-list" id="recentList">
+      <h3>最近记录</h3>
+      <div class="empty" id="recentEmpty">
+        <p>暂无最近记录</p>
+      </div>
+    </div>
+
+    <footer class="popup-footer">
+      <div class="status" id="status">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">连接中...</span>
+      </div>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+{
+  "name": "quality-inspection-rule",
+  "version": "1.0.0",
+  "vendor": "QualityTech Solutions",
+  "description": "Automated quality inspection rule for assembly line product verification",
+  "entrypoint": "process",
+  "permissions": [
+    "read:local"
+  ],
+  "dependencies": [],
+  "max_memory_mb": 64,
+  "max_timeout_ms": 5000,
+  "performance_threshold_ms": 1000,
+  "input_schema": {
+    "type": "object",
+    "required": [
+      "product_id",
+      "dimensions",
+      "inspection_time"
+    ],
+    "properties": {
+      "product_id": {
+        "type": "string",
+        "description": "Unique product identifier"
+      },
+      "dimensions": {
+        "type": "object",
+        "required": ["length", "width", "height"],
+        "properties": {
+          "length": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Length in millimeters"
+          },
+          "width": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Width in millimeters"
+          },
+          "height": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Height in millimeters"
+          }
+        }
+      },
+      "inspection_time": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Timestamp of inspection"
+      },
+      "sensor_readings": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "sensor_id": {
+              "type": "string"
+            },
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "required": [
+      "passed",
+      "quality_score",
+      "timestamp"
+    ],
+    "properties": {
+      "passed": {
+        "type": "boolean",
+        "description": "Whether the product passed inspection"
+      },
+      "quality_score": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100,
+        "description": "Overall quality score (0-100)"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "Processing timestamp"
+      },
+      "defects": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Defect code"
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"],
+              "description": "Defect severity"
+            },
+            "description": {
+              "type": "string",
+              "description": "Defect description"
+            },
+            "location": {
+              "type": "string",
+              "description": "Where the defect was found"
+            }
+          }
+        }
+      },
+      "recommendations": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["accept", "rework", "reject", "hold"],
+            "description": "Recommended action"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Additional notes"
+          }
+        }
+      },
+      "metrics": {
+        "type": "object",
+        "properties": {
+          "dimension_checks": {
+            "type": "object",
+            "properties": {
+              "passed": { "type": "number" },
+              "failed": { "type": "number" },
+              "total": { "type": "number" }
+            }
+          },
+          "sensor_checks": {
+            "type": "object",
+            "properties": {
+              "passed": { "type": "number" },
+              "failed": { "type": "number" },
+              "total": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "error_codes": [
+    {
+      "code": "Q001",
+      "description": "Dimension out of tolerance range",
+      "category": "dimension"
+    },
+    {
+      "code": "Q002",
+      "description": "Surface defect detected",
+      "category": "visual"
+    },
+    {
+      "code": "Q003",
+      "description": "Sensor reading out of specification",
+      "category": "sensor"
+    },
+    {
+      "code": "Q004",
+      "description": "Missing required inspection data",
+      "category": "input"
+    },
+    {
+      "code": "Q005",
+      "description": "Processing timeout exceeded",
+      "category": "system"
+    },
+    {
+      "code": "Q999",
+      "description": "Unknown inspection error",
+      "category": "system"
+    }
+  ]
+}

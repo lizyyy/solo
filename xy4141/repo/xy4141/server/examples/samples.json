@@ -1,0 +1,273 @@
+{
+  "samples": [
+    {
+      "input_data": {
+        "product_id": "PRD-2024-0001",
+        "dimensions": {
+          "length": 100.5,
+          "width": 50.0,
+          "height": 25.0
+        },
+        "inspection_time": "2024-05-15T10:30:00Z",
+        "sensor_readings": [
+          {
+            "sensor_id": "temp-001",
+            "value": 23.5,
+            "unit": "C"
+          },
+          {
+            "sensor_id": "pressure-002",
+            "value": 1.2,
+            "unit": "bar"
+          },
+          {
+            "sensor_id": "vibration-003",
+            "value": 0.02,
+            "unit": "mm/s"
+          }
+        ]
+      },
+      "expected_output": {
+        "passed": true,
+        "quality_score": 95.5,
+        "timestamp": "2024-05-15T10:30:01Z",
+        "defects": [],
+        "recommendations": {
+          "action": "accept",
+          "notes": "All quality checks passed within tolerance"
+        },
+        "metrics": {
+          "dimension_checks": {
+            "passed": 3,
+            "failed": 0,
+            "total": 3
+          },
+          "sensor_checks": {
+            "passed": 3,
+            "failed": 0,
+            "total": 3
+          }
+        }
+      }
+    },
+    {
+      "input_data": {
+        "product_id": "PRD-2024-0002",
+        "dimensions": {
+          "length": 100.5,
+          "width": 52.5,
+          "height": 25.0
+        },
+        "inspection_time": "2024-05-15T10:31:00Z",
+        "sensor_readings": [
+          {
+            "sensor_id": "temp-001",
+            "value": 24.1,
+            "unit": "C"
+          },
+          {
+            "sensor_id": "pressure-002",
+            "value": 1.18,
+            "unit": "bar"
+          }
+        ]
+      },
+      "expected_output": {
+        "passed": false,
+        "quality_score": 42.0,
+        "timestamp": "2024-05-15T10:31:02Z",
+        "defects": [
+          {
+            "code": "Q001",
+            "severity": "high",
+            "description": "Width dimension exceeds tolerance range",
+            "location": "main body"
+          }
+        ],
+        "recommendations": {
+          "action": "reject",
+          "notes": "Critical dimension out of specification"
+        },
+        "metrics": {
+          "dimension_checks": {
+            "passed": 2,
+            "failed": 1,
+            "total": 3
+          },
+          "sensor_checks": {
+            "passed": 2,
+            "failed": 0,
+            "total": 2
+          }
+        }
+      }
+    },
+    {
+      "input_data": {
+        "product_id": "PRD-2024-0003",
+        "dimensions": {
+          "length": 100.5,
+          "width": 50.0,
+          "height": 25.0
+        },
+        "inspection_time": "2024-05-15T10:32:00Z",
+        "sensor_readings": [
+          {
+            "sensor_id": "temp-001",
+            "value": 35.2,
+            "unit": "C"
+          },
+          {
+            "sensor_id": "pressure-002",
+            "value": 1.55,
+            "unit": "bar"
+          },
+          {
+            "sensor_id": "vibration-003",
+            "value": 0.15,
+            "unit": "mm/s"
+          }
+        ]
+      },
+      "expected_output": {
+        "passed": false,
+        "quality_score": 68.5,
+        "timestamp": "2024-05-15T10:32:03Z",
+        "defects": [
+          {
+            "code": "Q003",
+            "severity": "medium",
+            "description": "Temperature reading above warning threshold",
+            "location": "heatsink area"
+          },
+          {
+            "code": "Q003",
+            "severity": "medium",
+            "description": "Pressure reading exceeds operating range",
+            "location": "hydraulic system"
+          }
+        ],
+        "recommendations": {
+          "action": "hold",
+          "notes": "Sensor readings indicate potential issues requiring further investigation"
+        },
+        "metrics": {
+          "dimension_checks": {
+            "passed": 3,
+            "failed": 0,
+            "total": 3
+          },
+          "sensor_checks": {
+            "passed": 1,
+            "failed": 2,
+            "total": 3
+          }
+        }
+      }
+    },
+    {
+      "input_data": {
+        "product_id": "PRD-2024-0004",
+        "dimensions": {
+          "length": 100.5,
+          "width": 50.1,
+          "height": 24.95
+        },
+        "inspection_time": "2024-05-15T10:33:00Z",
+        "sensor_readings": [
+          {
+            "sensor_id": "temp-001",
+            "value": 22.8,
+            "unit": "C"
+          },
+          {
+            "sensor_id": "pressure-002",
+            "value": 1.22,
+            "unit": "bar"
+          }
+        ]
+      },
+      "expected_output": {
+        "passed": true,
+        "quality_score": 92.0,
+        "timestamp": "2024-05-15T10:33:01Z",
+        "defects": [],
+        "recommendations": {
+          "action": "accept",
+          "notes": "Minor dimensional variations within acceptable tolerance"
+        },
+        "metrics": {
+          "dimension_checks": {
+            "passed": 3,
+            "failed": 0,
+            "total": 3
+          },
+          "sensor_checks": {
+            "passed": 2,
+            "failed": 0,
+            "total": 2
+          }
+        }
+      }
+    },
+    {
+      "input_data": {
+        "product_id": "PRD-2024-0005",
+        "dimensions": {
+          "length": 98.0,
+          "width": 48.5,
+          "height": 23.0
+        },
+        "inspection_time": "2024-05-15T10:34:00Z",
+        "sensor_readings": []
+      },
+      "expected_output": {
+        "passed": false,
+        "quality_score": 15.0,
+        "timestamp": "2024-05-15T10:34:02Z",
+        "defects": [
+          {
+            "code": "Q001",
+            "severity": "critical",
+            "description": "Length significantly below minimum specification",
+            "location": "main body"
+          },
+          {
+            "code": "Q001",
+            "severity": "critical",
+            "description": "Width significantly below minimum specification",
+            "location": "main body"
+          },
+          {
+            "code": "Q001",
+            "severity": "high",
+            "description": "Height below minimum specification",
+            "location": "main body"
+          },
+          {
+            "code": "Q004",
+            "severity": "medium",
+            "description": "No sensor readings provided",
+            "location": "sensor array"
+          }
+        ],
+        "recommendations": {
+          "action": "reject",
+          "notes": "Multiple critical defects detected. Part should be quarantined for further analysis."
+        },
+        "metrics": {
+          "dimension_checks": {
+            "passed": 0,
+            "failed": 3,
+            "total": 3
+          },
+          "sensor_checks": {
+            "passed": 0,
+            "failed": 0,
+            "total": 0
+          }
+        }
+      }
+    }
+  ]
+}
