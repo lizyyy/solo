@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>手部康复节拍教练</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body, #root {
+        width: 100%;
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        font-size: 14px;
+        color: #333;
+        background-color: #f5f7fa;
+      }
+
+      :root {
+        --primary-color: #409eff;
+        --primary-light: #ecf5ff;
+        --success-color: #67c23a;
+        --warning-color: #e6a23c;
+        --danger-color: #f56c6c;
+        --info-color: #909399;
+        --text-color: #303133;
+        --text-color-secondary: #606266;
+        --text-color-placeholder: #909399;
+        --border-color: #dcdfe6;
+        --border-color-light: #e4e7ed;
+        --background-color: #f5f7fa;
+        --header-height: 60px;
+        --sidebar-width: 200px;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        outline: none;
+        font-family: inherit;
+      }
+
+      input, textarea, select {
+        font-family: inherit;
+        outline: none;
+      }
+
+      .fade-enter {
+        opacity: 0;
+      }
+
+      .fade-enter-active {
+        opacity: 1;
+        transition: opacity 200ms;
+      }
+
+      .fade-exit {
+        opacity: 1;
+      }
+
+      .fade-exit-active {
+        opacity: 0;
+        transition: opacity 200ms;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
