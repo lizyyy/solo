@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛道遥测黑匣子 - Track Telemetry Blackbox</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="main-header">
+      <div class="header-left">
+        <h1 class="logo">
+          <span class="logo-icon">🚀</span>
+          赛道遥测黑匣子
+        </h1>
+        <span class="version">v1.0.0</span>
+      </div>
+      <div class="header-right">
+        <div class="mode-switcher">
+          <button id="mode-replay" class="mode-btn active" data-mode="replay">
+            <span class="btn-icon">⏮️</span>
+            历史回放
+          </button>
+          <button id="mode-realtime" class="mode-btn" data-mode="realtime">
+            <span class="btn-icon">📡</span>
+            实时接收
+          </button>
+        </div>
+        <div class="connection-status" id="connection-status">
+          <span class="status-dot disconnected"></span>
+          <span class="status-text">未连接</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3 class="section-title">📁 数据源</h3>
+          <div class="data-sources">
+            <div class="source-item">
+              <label class="file-input-label">
+                <input type="file" id="load-jsonl" accept=".jsonl,.json">
+                <span class="file-input-text">📄 加载 JSONL 日志</span>
+              </label>
+            </div>
+            <div class="source-item">
+              <label class="file-input-label">
+                <input type="file" id="load-csv" accept=".csv">
+                <span class="file-input-text">📊 加载 CSV 指令</span>
+              </label>
+            </div>
+            <div class="source-item">
+              <label class="file-input-label">
+                <input type="file" id="load-yaml" accept=".yaml,.yml">
+                <span class="file-input-text">🗺️ 加载 YAML 赛道</span>
+              </label>
+            </div>
+          </div>
+          <button id="load-sample" class="btn btn-secondary btn-full">
+            📦 加载示例数据
+          </button>
+          <button id="clear-data" class="btn btn-danger btn-full">
+            🗑️ 清空数据
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="section-title">💾 会话管理</h3>
+          <div class="session-controls">
+            <button id="save-session" class="btn btn-primary btn-full">
+              💾 保存会话
+            </button>
+            <button id="load-session" class="btn btn-secondary btn-full">
+              📂 加载会话
+            </button>
+          </div>
+          <div id="session-list" class="session-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="section-title">📤 导出报告</h3>
+          <div class="export-controls">
+            <button id="export-markdown" class="btn btn-secondary btn-full">
+              📝 导出 Markdown
+            </button>
+            <button id="export-csv" class="btn btn-secondary btn-full">
+              📊 导出 CSV
+            </button>
+            <button id="export-json" class="btn btn-secondary btn-full">
+              📋 导出 JSON
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content-area">
+        <div class="status-panel">
+          <div class="status-grid">
+            <div class="status-card">
+              <div class="status-label">当前状态</div>
+              <div id="current-state" class="status-value state-idle">IDLE</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">运行时间</div>
+              <div id="runtime" class="status-value">00:00:00</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">当前帧</div>
+              <div id="frame-count" class="status-value">0 / 0</div>
+            </div>
+            <div class="status-card">
+              <div class="status-label">播放速度</div>
+              <div id="playback-speed" class="status-value">1.0x</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-panel">
+          <div class="control-bar">
+            <div class="playback-controls">
+              <button id="step-back" class="control-btn" title="逐帧后退">⏮️</button>
+              <button id="play-pause" class="control-btn control-btn-large" title="播放/暂停">▶️</button>
+              <button id="step-forward" class="control-btn" title="逐帧前进">⏭️</button>
+            </div>
+            <div class="speed-controls">
+              <button id="speed-05" class="speed-btn" data-speed="0.5">0.5x</button>
+              <button id="speed-1" class="speed-btn active" data-speed="1">1.0x</button>
+              <button id="speed-2" class="speed-btn" data-speed="2">2.0x</button>
+              <button id="speed-5" class="speed-btn" data-speed="5">5.0x</button>
+            </div>
+            <div class="loop-control">
+              <label class="checkbox-label">
+                <input type="checkbox" id="loop-playback">
+                <span class="checkmark"></span>
+                循环播放
+              </label>
+            </div>
+          </div>
+
+          <div class="timeline-container">
+            <div class="timeline-header">
+              <div class="timeline-start" id="timeline-start">--:--:--</div>
+              <div class="timeline-title">时间轴</div>
+              <div class="timeline-end" id="timeline-end">--:--:--</div>
+            </div>
+            <div class="timeline-track" id="timeline-track">
+              <div class="timeline-progress" id="timeline-progress"></div>
+              <div class="timeline-cursor" id="timeline-cursor"></div>
+              <div class="timeline-markers" id="timeline-markers"></div>
+            </div>
+            <div class="timeline-ruler" id="timeline-ruler"></div>
+          </div>
+        </div>
+
+        <div class="main-grid">
+          <div class="grid-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">🤖 状态机视图</h3>
+              <button id="refresh-state" class="btn btn-small btn-secondary">刷新</button>
+            </div>
+            <div class="panel-content">
+              <div class="state-machine" id="state-machine">
+                <div class="state-node state-idle" data-state="IDLE">
+                  <div class="state-icon">⏸️</div>
+                  <div class="state-name">IDLE</div>
+                </div>
+                <div class="state-node state-initializing" data-state="INITIALIZING">
+                  <div class="state-icon">⚙️</div>
+                  <div class="state-name">INITIALIZING</div>
+                </div>
+                <div class="state-node state-running" data-state="RUNNING">
+                  <div class="state-icon">▶️</div>
+                  <div class="state-name">RUNNING</div>
+                </div>
+                <div class="state-node state-paused" data-state="PAUSED">
+                  <div class="state-icon">⏸️</div>
+                  <div class="state-name">PAUSED</div>
+                </div>
+                <div class="state-node state-emergency" data-state="EMERGENCY_STOP">
+                  <div class="state-icon">🚨</div>
+                  <div class="state-name">EMERGENCY</div>
+                </div>
+                <div class="state-node state-error" data-state="ERROR">
+                  <div class="state-icon">❌</div>
+                  <div class="state-name">ERROR</div>
+                </div>
+                <div class="state-node state-completed" data-state="COMPLETED">
+                  <div class="state-icon">✅</div>
+                  <div class="state-name">COMPLETED</div>
+                </div>
+              </div>
+              <div class="state-history" id="state-history">
+                <h4>状态切换历史</h4>
+                <div class="history-list" id="history-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">📌 关键事件</h3>
+              <button id="add-tag" class="btn btn-small btn-primary">+ 添加标签</button>
+            </div>
+            <div class="panel-content">
+              <div class="events-list" id="events-list">
+                <div class="events-empty">暂无事件数据</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">📊 延迟统计</h3>
+              <button id="refresh-latency" class="btn btn-small btn-secondary">刷新</button>
+            </div>
+            <div class="panel-content">
+              <div class="latency-stats">
+                <div class="latency-card">
+                  <div class="latency-title">指令确认延迟</div>
+                  <div class="latency-values">
+                    <div class="latency-item">
+                      <span class="latency-label">平均</span>
+                      <span class="latency-value" id="latency-avg">-- ms</span>
+                    </div>
+                    <div class="latency-item">
+                      <span class="latency-label">最大</span>
+                      <span class="latency-value" id="latency-max">-- ms</span>
+                    </div>
+                    <div class="latency-item">
+                      <span class="latency-label">最小</span>
+                      <span class="latency-value" id="latency-min">-- ms</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="latency-card">
+                  <div class="latency-title">传感器更新间隔</div>
+                  <div class="latency-values">
+                    <div class="latency-item">
+                      <span class="latency-label">平均</span>
+                      <span class="latency-value" id="sensor-avg">-- ms</span>
+                    </div>
+                    <div class="latency-item">
+                      <span class="latency-label">最大</span>
+                      <span class="latency-value" id="sensor-max">-- ms</span>
+                    </div>
+                    <div class="latency-item">
+                      <span class="latency-label">最小</span>
+                      <span class="latency-value" id="sensor-min">-- ms</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="latency-warnings" id="latency-warnings">
+                <h4>⚠️ 延迟警告</h4>
+                <div class="warnings-list" id="warnings-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">📍 实时遥测数据</h3>
+            </div>
+            <div class="panel-content">
+              <div class="telemetry-details">
+                <div class="detail-row">
+                  <span class="detail-label">位置 (X, Y, θ)</span>
+                  <span class="detail-value" id="telemetry-position">--, --, --</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">速度 (线速度, 角速度)</span>
+                  <span class="detail-value" id="telemetry-velocity">--, --</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">电池电压</span>
+                  <span class="detail-value" id="telemetry-battery">-- V</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">急停状态</span>
+                  <span class="detail-value" id="telemetry-estop">--</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">时间戳</span>
+                  <span class="detail-value" id="telemetry-timestamp">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="tag-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>添加复盘标签</h3>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">标签名称</label>
+            <input type="text" id="tag-name" class="form-input" placeholder="输入标签名称...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">描述 (可选)</label>
+            <textarea id="tag-description" class="form-textarea" placeholder="添加详细描述..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">颜色</label>
+            <div class="color-picker" id="color-picker">
+              <div class="color-option color-blue active" data-color="#3498db"></div>
+              <div class="color-option color-green" data-color="#2ecc71"></div>
+              <div class="color-option color-yellow" data-color="#f1c40f"></div>
+              <div class="color-option color-red" data-color="#e74c3c"></div>
+              <div class="color-option color-purple" data-color="#9b59b6"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">时间戳</label>
+            <input type="text" id="tag-timestamp" class="form-input" readonly>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-cancel" class="btn btn-secondary">取消</button>
+          <button id="modal-save" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="notification" class="notification hidden">
+      <span class="notification-icon" id="notification-icon">ℹ️</span>
+      <span class="notification-message" id="notification-message"></span>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+name: "TrackAlpha_Round1"
+version: "1.0"
+created_at: "2024-05-02T10:00:00Z"
+description: "标准 L 型赛道，包含检查点和障碍物"
+
+track_bounds:
+  width: 10.0
+  height: 6.0
+  boundary_points:
+    - x: 0.0
+      y: 0.0
+    - x: 10.0
+      y: 0.0
+    - x: 10.0
+      y: 6.0
+    - x: 0.0
+      y: 6.0
+
+checkpoints:
+  - id: "CP-001"
+    name: "起点"
+    position:
+      x: 0.0
+      y: 0.0
+    radius: 0.5
+    type: "start"
+    description: "比赛起始点，机器人必须从此处出发"
+
+  - id: "CP-002"
+    name: "第一检查点"
+    position:
+      x: 5.0
+      y: 0.0
+    radius: 0.5
+    type: "waypoint"
+    description: "沿 X 轴的中间检查点"
+
+  - id: "CP-003"
+    name: "第二检查点"
+    position:
+      x: 10.0
+      y: 0.0
+    radius: 0.5
+    type: "waypoint"
+    description: "赛道东北角检查点"
+
+  - id: "CP-004"
+    name: "第三检查点"
+    position:
+      x: 10.0
+      y: 3.0
+    radius: 0.5
+    type: "waypoint"
+    description: "沿 Y 轴向上的中间检查点"
+
+  - id: "CP-005"
+    name: "第四检查点"
+    position:
+      x: 10.0
+      y: 6.0
+    radius: 0.5
+    type: "waypoint"
+    description: "赛道东南角检查点"
+
+  - id: "CP-006"
+    name: "第五检查点"
+    position:
+      x: 5.0
+      y: 6.0
+    radius: 0.5
+    type: "waypoint"
+    description: "返回途中的中间检查点"
+
+  - id: "CP-007"
+    name: "终点"
+    position:
+      x: 0.0
+      y: 6.0
+    radius: 0.8
+    type: "finish"
+    description: "比赛终点，到达此处任务完成"
+
+obstacles:
+  - id: "OBS-001"
+    name: "静态障碍物1"
+    position:
+      x: 3.0
+      y: 1.5
+    dimensions:
+      width: 0.8
+      height: 0.8
+    type: "static"
+    visible: true
+    description: "赛道上的方形障碍物，需要绕行"
+
+  - id: "OBS-002"
+    name: "静态障碍物2"
+    position:
+      x: 7.0
+      y: 4.0
+    dimensions:
+      width: 1.0
+      height: 0.6
+    type: "static"
+    visible: true
+    description: "长方形障碍物"
+
+  - id: "OBS-003"
+    name: "动态障碍物1"
+    position:
+      x: 5.0
+      y: 5.5
+    dimensions:
+      width: 0.6
+      height: 0.6
+    type: "dynamic"
+    visible: false
+    movement:
+      start_x: 4.0
+      start_y: 5.5
+      end_x: 6.0
+      end_y: 5.5
+      duration_ms: 5000
+    description: "移动障碍物，比赛中可能出现"
+
+danger_zones:
+  - id: "DZ-001"
+    name: "边界警告区"
+    polygon:
+      - x: 0.0
+        y: 0.0
+      - x: 10.0
+        y: 0.0
+      - x: 10.0
+        y: 0.3
+      - x: 0.0
+        y: 0.3
+    risk_level: "medium"
+    description: "靠近赛道下边界的警告区域"
+
+  - id: "DZ-002"
+    name: "边界警告区"
+    polygon:
+      - x: 0.0
+        y: 5.7
+      - x: 10.0
+        y: 5.7
+      - x: 10.0
+        y: 6.0
+      - x: 0.0
+        y: 6.0
+    risk_level: "medium"
+    description: "靠近赛道上边界的警告区域"
+
+mission_params:
+  target_time_ms: 30000
+  max_speed: 3.0
+  emergency_stop_distance: 1.0
+  collision_warning_threshold: 0.5
+  battery_critical_level: 11.0
