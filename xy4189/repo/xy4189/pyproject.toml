@@ -1,0 +1,29 @@
+[project]
+name = "rescue-car-inspector"
+version = "0.1.0"
+description = "抢救车封签巡检员 - 急诊科设备护士自动化巡检工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=1.3.0",
+    "pillow>=8.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+rescue-inspector = "rescue_car_inspector.cli:cli"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rescue_car_inspector"]

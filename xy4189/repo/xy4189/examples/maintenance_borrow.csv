@@ -1,0 +1,5 @@
+record_id,device_id,device_name,operation_type,request_time,operator,expected_return_time,actual_return_time,status,notes,rescue_car_id
+MB001,DEV-001,除颤仪1号,借用,2026-04-28T09:00:00,王医生,2026-04-29T17:00:00,,active,ICU借用检查,RC-001
+MB002,DEV-002,心电图机1号,借用,2026-05-02T14:00:00,李医生,2026-05-05T17:00:00,,active,心内科会诊使用,RC-002
+MB003,DEV-003,除颤仪2号,维修,2026-04-20T10:00:00,设备科,2026-04-25T17:00:00,2026-04-24T16:30:00,completed,已维修完成,RC-003
+MB004,DEV-004,喉镜1号,借用,2026-04-30T08:00:00,张医生,2026-05-01T17:00:00,,active,手术室借用 - 超期未还,RC-001
