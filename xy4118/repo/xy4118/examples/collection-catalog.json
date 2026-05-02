@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-05-02T10:00:00.000Z",
+  "museum": "XX博物馆",
+  "department": "文物数字化部",
+  "items": [
+    {
+      "id": "CUL-0001",
+      "name": "青铜器 - 商代青铜鼎",
+      "category": "青铜器",
+      "era": "商代",
+      "location": "展厅A区",
+      "status": "正常",
+      "notes": "国家一级文物"
+    },
+    {
+      "id": "CUL-0002",
+      "name": "瓷器 - 宋代青瓷瓶",
+      "category": "瓷器",
+      "era": "宋代",
+      "location": "展厅B区",
+      "status": "正常",
+      "notes": ""
+    },
+    {
+      "id": "CUL-0003",
+      "name": "书法 - 王羲之兰亭序摹本",
+      "category": "书法",
+      "era": "唐代",
+      "location": "书画展厅",
+      "status": "正常",
+      "notes": "珍贵摹本"
+    },
+    {
+      "id": "ART-1001",
+      "name": "绘画 - 清明上河图局部",
+      "category": "绘画",
+      "era": "北宋",
+      "location": "书画展厅",
+      "status": "正常",
+      "notes": ""
+    },
+    {
+      "id": "ART-1002",
+      "name": "玉器 - 和田玉佩",
+      "category": "玉器",
+      "era": "清代",
+      "location": "珍宝馆",
+      "status": "正常",
+      "notes": ""
+    }
+  ]
+}
