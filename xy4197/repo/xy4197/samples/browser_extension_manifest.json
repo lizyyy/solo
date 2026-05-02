@@ -1,0 +1,52 @@
+{
+    "manifest_version": 3,
+    "name": "设计辅助插件",
+    "version": "1.0",
+    "description": "设计团队专用浏览器辅助插件",
+    "permissions": ["activeTab", "scripting"],
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+A",
+                "mac": "MacCtrl+Shift+A"
+            },
+            "description": "打开插件面板"
+        },
+        "copy-element-info": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+C",
+                "mac": "MacCtrl+Shift+C"
+            },
+            "description": "复制元素信息"
+        },
+        "toggle-grid": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+G",
+                "mac": "MacCtrl+Shift+G"
+            },
+            "description": "切换网格"
+        },
+        "screenshot-area": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S",
+                "mac": "MacCtrl+Shift+S"
+            },
+            "description": "区域截图"
+        },
+        "undo-action": {
+            "suggested_key": {
+                "default": "Ctrl+Z",
+                "mac": "MacCtrl+Z"
+            },
+            "description": "撤销操作"
+        }
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    }
+}

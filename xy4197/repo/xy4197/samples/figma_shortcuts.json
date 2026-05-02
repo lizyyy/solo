@@ -1,0 +1,52 @@
+[
+    {
+        "key": "ctrl+c",
+        "command": "Copy",
+        "menu": "Edit > Copy"
+    },
+    {
+        "key": "ctrl+v",
+        "command": "Paste",
+        "menu": "Edit > Paste"
+    },
+    {
+        "key": "ctrl+s",
+        "command": "Save",
+        "menu": "File > Save"
+    },
+    {
+        "key": "ctrl+z",
+        "command": "Undo",
+        "menu": "Edit > Undo"
+    },
+    {
+        "key": "ctrl+y",
+        "command": "Redo",
+        "menu": "Edit > Redo"
+    },
+    {
+        "key": "ctrl+g",
+        "command": "Group",
+        "menu": "Object > Group"
+    },
+    {
+        "key": "ctrl+shift+g",
+        "command": "Ungroup",
+        "menu": "Object > Ungroup"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "Duplicate",
+        "menu": "Edit > Duplicate"
+    },
+    {
+        "key": "ctrl+r",
+        "command": "Show Rulers",
+        "menu": "View > Rulers > Show Rulers"
+    },
+    {
+        "key": "ctrl+shift+alt+c",
+        "command": "Copy Properties",
+        "menu": "Edit > Copy Properties"
+    }
+]

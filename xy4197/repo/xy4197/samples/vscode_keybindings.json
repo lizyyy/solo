@@ -1,0 +1,42 @@
+[
+    {
+        "key": "ctrl+c",
+        "command": "editor.action.clipboardCopyAction",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+v",
+        "command": "editor.action.clipboardPasteAction",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+s",
+        "command": "workbench.action.files.save"
+    },
+    {
+        "key": "ctrl+shift+p",
+        "command": "workbench.action.showCommands"
+    },
+    {
+        "key": "ctrl+shift+i",
+        "command": "editor.action.formatDocument"
+    },
+    {
+        "key": "ctrl+z",
+        "command": "undo"
+    },
+    {
+        "key": "ctrl+y",
+        "command": "redo"
+    },
+    {
+        "key": "ctrl+alt+cmd+shift+k",
+        "command": "workbench.action.quickOpenView",
+        "when": "inQuickOpen"
+    },
+    {
+        "key": "cmd+c",
+        "command": "editor.action.clipboardCopyAction",
+        "when": "editorTextFocus && isMac"
+    }
+]
