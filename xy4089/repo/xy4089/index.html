@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>吊点载荷预演台 - 舞台机械安全3D交互工具</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+      }
+      #canvas-container {
+        flex: 1;
+        position: relative;
+      }
+      #canvas-container canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .sidebar {
+        width: 380px;
+        background: #1a1a2e;
+        color: #eee;
+        overflow-y: auto;
+        border-left: 1px solid #333;
+      }
+      .panel {
+        padding: 16px;
+        border-bottom: 1px solid #333;
+      }
+      .panel-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #4fc3f7;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+      }
+      .btn-primary {
+        background: #4fc3f7;
+        color: #000;
+      }
+      .btn-primary:hover {
+        background: #29b6f6;
+      }
+      .btn-secondary {
+        background: #333;
+        color: #ccc;
+      }
+      .btn-secondary:hover {
+        background: #444;
+      }
+      .btn-danger {
+        background: #f44336;
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #e53935;
+      }
+      .btn-small {
+        padding: 4px 8px;
+        font-size: 12px;
+      }
+      .stat {
+        padding: 8px 0;
+        font-size: 13px;
+      }
+      .stat-label {
+        color: #888;
+      }
+      .stat-value {
+        color: #fff;
+        font-weight: 500;
+      }
+      .stat-value.warning {
+        color: #ffb74d;
+      }
+      .stat-value.error {
+        color: #ef5350;
+      }
+      .stat-value.success {
+        color: #66bb6a;
+      }
+      .list-item {
+        padding: 8px;
+        background: #252540;
+        border-radius: 4px;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+      }
+      .list-item.selected {
+        background: #3949ab;
+      }
+      .list-item-actions {
+        display: flex;
+        gap: 4px;
+      }
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 8px;
+      }
+      .input-group label {
+        font-size: 12px;
+        color: #aaa;
+      }
+      .input-group input,
+      .input-group select {
+        padding: 8px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        background: #252540;
+        color: #fff;
+        font-size: 13px;
+      }
+      .input-group input:focus,
+      .input-group select:focus {
+        outline: none;
+        border-color: #4fc3f7;
+      }
+      .coords {
+        display: flex;
+        gap: 8px;
+      }
+      .coords .input-group {
+        flex: 1;
+      }
+      .alert {
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        font-size: 12px;
+      }
+      .alert-warning {
+        background: rgba(255, 183, 77, 0.2);
+        border-left: 3px solid #ffb74d;
+        color: #ffb74d;
+      }
+      .alert-error {
+        background: rgba(239, 83, 80, 0.2);
+        border-left: 3px solid #ef5350;
+        color: #ef5350;
+      }
+      .alert-success {
+        background: rgba(102, 187, 106, 0.2);
+        border-left: 3px solid #66bb6a;
+        color: #66bb6a;
+      }
+      .progress-bar {
+        height: 6px;
+        background: #333;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 4px;
+      }
+      .progress-fill {
+        height: 100%;
+        background: #66bb6a;
+        transition: width 0.3s;
+      }
+      .progress-fill.warning {
+        background: #ffb74d;
+      }
+      .progress-fill.error {
+        background: #ef5350;
+      }
+      .toolbar {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 100;
+      }
+      .toolbar .btn {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      .info-bar {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="canvas-container">
+        <div class="toolbar" id="toolbar">
+        </div>
+        <div class="info-bar" id="info-bar">
+          鼠标左键: 旋转 | 滚轮: 缩放 | 右键: 平移 | 选中设备后拖动: 移动
+        </div>
+      </div>
+      <div class="sidebar" id="sidebar">
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
