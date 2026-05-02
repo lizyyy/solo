@@ -1,0 +1,13 @@
+{
+    "name": "live-director",
+    "version": "1.0.0",
+    "description": "直播运营导播单整理工具",
+    "main": "main.py",
+    "scripts": {
+        "start": "python main.py"
+    },
+    "dependencies": {
+        "PyQt5": "^5.15.10",
+        "pandas": "^2.1.0"
+    }
+}
