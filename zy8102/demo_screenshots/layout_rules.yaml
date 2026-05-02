@@ -1,0 +1,67 @@
+safe_areas:
+  iPhone15:
+    top: 47
+    bottom: 34
+    left: 0
+    right: 0
+  iPhone14:
+    top: 47
+    bottom: 30
+    left: 0
+    right: 0
+
+text_regions:
+  - device: iPhone15
+    page: home
+    x: 50
+    y: 200
+    width: 280
+    height: 40
+  - device: iPhone15
+    page: home
+    x: 50
+    y: 260
+    width: 280
+    height: 60
+  - device: iPhone15
+    page: settings
+    x: 50
+    y: 150
+    width: 280
+    height: 40
+  - device: iPhone14
+    page: home
+    x: 40
+    y: 160
+    width: 220
+    height: 32
+
+button_regions:
+  - device: iPhone15
+    page: home
+    x: 50
+    y: 750
+    width: 280
+    height: 50
+  - device: iPhone14
+    page: home
+    x: 40
+    y: 600
+    width: 220
+    height: 40
+
+truncation_checks:
+  - device: iPhone15
+    page: home
+    region:
+      x: 250
+      y: 200
+      width: 80
+      height: 40
+  - device: iPhone15
+    page: settings
+    region:
+      x: 260
+      y: 150
+      width: 70
+      height: 40

@@ -1,0 +1,28 @@
+{
+  "name": "screenshot-localization-checker",
+  "version": "1.0.0",
+  "description": "移动端截图本地化遮挡预检工具",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "demo": "node cli.js analyze --demo",
+    "analyze": "node cli.js analyze",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "screenshot",
+    "localization",
+    "mobile",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.0",
+    "js-yaml": "^4.1.0",
+    "jimp": "^0.22.12",
+    "mustache": "^4.2.0"
+  },
+  "devDependencies": {}
+}
