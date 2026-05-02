@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>离线凭证验签沙盒</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>离线凭证验签沙盒</h1>
+            <p>公益活动签到组专用 - 离线验签、防伪造、防重复入场</p>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" data-tab="import">数据导入</button>
+            <button class="nav-btn" data-tab="verify">凭证验签</button>
+            <button class="nav-btn" data-tab="batch">批量复核</button>
+            <button class="nav-btn" data-tab="records">入场流水</button>
+            <button class="nav-btn" data-tab="export">导出复盘</button>
+        </nav>
+
+        <main>
+            <!-- 数据导入模块 -->
+            <section id="import" class="tab-content active">
+                <div class="card">
+                    <h2>数据导入</h2>
+                    <p class="subtitle">导入凭证、公钥包和吊销名单</p>
+                    
+                    <div class="import-section">
+                        <h3>公钥包</h3>
+                        <p class="description">导入主办方提供的公钥包 (JSON格式)，包含不同版本的验证公钥</p>
+                        <div class="file-upload">
+                            <input type="file" id="publicKeyFile" accept=".json,.pem">
+                            <label for="publicKeyFile">选择公钥包文件</label>
+                        </div>
+                        <div id="publicKeyStatus" class="status-info"></div>
+                    </div>
+
+                    <div class="import-section">
+                        <h3>凭证数据</h3>
+                        <p class="description">导入凭证数据 (JSON或CSV格式)，包含所有有效凭证信息</p>
+                        <div class="file-upload">
+                            <input type="file" id="credentialFile" accept=".json,.csv">
+                            <label for="credentialFile">选择凭证文件</label>
+                        </div>
+                        <div id="credentialStatus" class="status-info"></div>
+                    </div>
+
+                    <div class="import-section">
+                        <h3>吊销名单</h3>
+                        <p class="description">导入已吊销的凭证ID列表 (JSON或CSV格式)，这些凭证将被拒绝</p>
+                        <div class="file-upload">
+                            <input type="file" id="revocationFile" accept=".json,.csv">
+                            <label for="revocationFile">选择吊销名单文件</label>
+                        </div>
+                        <div id="revocationStatus" class="status-info"></div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="clearAllData" class="btn btn-danger">清空所有数据</button>
+                        <button id="loadSampleData" class="btn btn-secondary">加载示例数据</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 凭证验签模块 -->
+            <section id="verify" class="tab-content">
+                <div class="card">
+                    <h2>凭证验签</h2>
+                    <p class="subtitle">扫码或手动输入凭证进行验签</p>
+                    
+                    <div class="verify-input-section">
+                        <div class="input-method">
+                            <button id="scanMode" class="btn btn-primary active">扫码模式</button>
+                            <button id="manualMode" class="btn btn-secondary">手动输入</button>
+                        </div>
+
+                        <div id="scanInputSection" class="input-section">
+                            <div class="scanner-area">
+                                <video id="qrScanner" autoplay playsinline></video>
+                                <canvas id="qrCanvas" style="display: none;"></canvas>
+                                <div class="scanner-overlay">
+                                    <p>扫描二维码</p>
+                                    <button id="startScanner" class="btn btn-primary">启动摄像头</button>
+                                </div>
+                            </div>
+                            <p class="scanner-hint">或者将二维码图片拖放到此处</p>
+                            <input type="file" id="qrImageFile" accept="image/*" style="display: none;">
+                            <label for="qrImageFile" class="btn btn-secondary">选择二维码图片</label>
+                        </div>
+
+                        <div id="manualInputSection" class="input-section" style="display: none;">
+                            <textarea id="manualCredentialInput" placeholder="输入凭证内容 (JSON格式或凭证ID)"></textarea>
+                            <button id="verifyManual" class="btn btn-primary btn-large">验签</button>
+                        </div>
+                    </div>
+
+                    <div class="verify-result">
+                        <h3>验签结果</h3>
+                        <div id="verifyResult" class="result-box">
+                            <p class="placeholder">请扫描或输入凭证进行验签</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="statTotal">0</span>
+                            <span class="stat-label">总验签数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value stat-success" id="statSuccess">0</span>
+                            <span class="stat-label">通过</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value stat-failed" id="statFailed">0</span>
+                            <span class="stat-label">拒绝</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value stat-warning" id="statWarning">0</span>
+                            <span class="stat-label">异常</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 批量复核模块 -->
+            <section id="batch" class="tab-content">
+                <div class="card">
+                    <h2>批量复核</h2>
+                    <p class="subtitle">离线批量复核凭证，异常隔离处理</p>
+                    
+                    <div class="batch-actions">
+                        <button id="batchVerifyAll" class="btn btn-primary">批量验证所有凭证</button>
+                        <button id="batchIsolate" class="btn btn-warning">隔离异常凭证</button>
+                        <button id="batchClearIsolated" class="btn btn-danger">清空隔离区</button>
+                    </div>
+
+                    <div class="batch-stats">
+                        <div class="stat-card">
+                            <h4>总凭证数</h4>
+                            <span id="batchTotal" class="batch-stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>已验证</h4>
+                            <span id="batchVerified" class="batch-stat-value stat-success">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>有效</h4>
+                            <span id="batchValid" class="batch-stat-value stat-success">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>无效</h4>
+                            <span id="batchInvalid" class="batch-stat-value stat-failed">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>已隔离</h4>
+                            <span id="batchIsolated" class="batch-stat-value stat-warning">0</span>
+                        </div>
+                    </div>
+
+                    <div class="batch-list">
+                        <h3>凭证列表</h3>
+                        <div class="filter-controls">
+                            <select id="batchFilter">
+                                <option value="all">全部</option>
+                                <option value="valid">有效</option>
+                                <option value="invalid">无效</option>
+                                <option value="isolated">已隔离</option>
+                                <option value="unverified">未验证</option>
+                            </select>
+                            <input type="text" id="batchSearch" placeholder="搜索凭证ID...">
+                        </div>
+                        <table id="batchTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>凭证ID</th>
+                                    <th>票种</th>
+                                    <th>场次</th>
+                                    <th>状态</th>
+                                    <th>验签结果</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="placeholder">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 入场流水模块 -->
+            <section id="records" class="tab-content">
+                <div class="card">
+                    <h2>入场流水</h2>
+                    <p class="subtitle">查看所有入场验证记录，本地持久化存储</p>
+                    
+                    <div class="records-actions">
+                        <button id="refreshRecords" class="btn btn-secondary">刷新</button>
+                        <button id="clearRecords" class="btn btn-danger">清空流水</button>
+                    </div>
+
+                    <div class="records-stats">
+                        <div class="stat-card">
+                            <h4>总流水数</h4>
+                            <span id="recordsTotal" class="records-stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>今日入场</h4>
+                            <span id="recordsToday" class="records-stat-value stat-success">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <h4>重复入场尝试</h4>
+                            <span id="recordsDuplicate" class="records-stat-value stat-warning">0</span>
+                        </div>
+                    </div>
+
+                    <div class="records-list">
+                        <div class="filter-controls">
+                            <select id="recordsFilter">
+                                <option value="all">全部</option>
+                                <option value="success">验签通过</option>
+                                <option value="failed">验签失败</option>
+                                <option value="duplicate">重复入场</option>
+                            </select>
+                            <input type="text" id="recordsSearch" placeholder="搜索凭证ID...">
+                        </div>
+                        <table id="recordsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>凭证ID</th>
+                                    <th>票种</th>
+                                    <th>场次</th>
+                                    <th>结果</th>
+                                    <th>详情</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="placeholder">暂无流水记录</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 导出复盘模块 -->
+            <section id="export" class="tab-content">
+                <div class="card">
+                    <h2>导出复盘</h2>
+                    <p class="subtitle">导出Markdown复盘报告和CSV流水数据</p>
+                    
+                    <div class="export-section">
+                        <h3>导出Markdown复盘报告</h3>
+                        <p class="description">生成包含统计信息、异常情况和关键数据的复盘报告</p>
+                        <div class="export-options">
+                            <label>
+                                <input type="checkbox" id="includeStats" checked> 包含统计数据
+                            </label>
+                            <label>
+                                <input type="checkbox" id="includeAnomalies" checked> 包含异常记录
+                            </label>
+                            <label>
+                                <input type="checkbox" id="includeSample"> 包含样本数据
+                            </label>
+                        </div>
+                        <button id="exportMarkdown" class="btn btn-primary">导出Markdown</button>
+                    </div>
+
+                    <div class="export-section">
+                        <h3>导出CSV流水数据</h3>
+                        <p class="description">导出所有入场流水记录为CSV格式，便于后续分析</p>
+                        <div class="export-options">
+                            <label>
+                                <input type="checkbox" id="includeAllFields" checked> 包含所有字段
+                            </label>
+                            <label>
+                                <input type="checkbox" id="filterByDate"> 按日期筛选
+                            </label>
+                        </div>
+                        <button id="exportCSV" class="btn btn-primary">导出CSV</button>
+                    </div>
+
+                    <div class="export-preview">
+                        <h3>预览</h3>
+                        <pre id="exportPreview">选择导出选项后，预览将显示在这里...</pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>离线凭证验签沙盒 v1.0 | 数据完全本地存储，保护隐私安全</p>
+            <p class="footer-note">提示：本工具支持完全离线使用，所有数据仅保存在本地浏览器中</p>
+        </footer>
+    </div>
+
+    <!-- 模块脚本 -->
+    <script src="js/core/crypto.js"></script>
+    <script src="js/core/models.js"></script>
+    <script src="js/core/rules.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/ui/app.js"></script>
+</body>
+</html>
