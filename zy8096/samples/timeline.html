@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subtitle Timeline Viewer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00d4ff;
+    }
+    .timeline-container {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .timeline {
+      position: relative;
+      height: 60px;
+      background: #0f3460;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .cue {
+      position: absolute;
+      height: 30px;
+      top: 15px;
+      background: linear-gradient(90deg, #00d4ff, #0099cc);
+      border-radius: 4px;
+      min-width: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cue:hover {
+      background: linear-gradient(90deg, #00ffcc, #00cc99);
+      transform: scaleY(1.2);
+    }
+    .scene-marker {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: 60px;
+      background: #ff6b6b;
+    }
+    .scene-marker::after {
+      content: attr(data-label);
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #ff6b6b;
+      white-space: nowrap;
+    }
+    .time-ruler {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .legend-cue {
+      width: 20px;
+      height: 15px;
+      background: linear-gradient(90deg, #00d4ff, #0099cc);
+      border-radius: 2px;
+    }
+    .legend-marker {
+      width: 2px;
+      height: 15px;
+      background: #ff6b6b;
+    }
+    .subtitle-list {
+      background: #16213e;
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .subtitle-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #0f3460;
+      border-radius: 4px;
+      border-left: 3px solid #00d4ff;
+    }
+    .subtitle-time {
+      font-size: 12px;
+      color: #00d4ff;
+      margin-bottom: 5px;
+    }
+    .subtitle-text {
+      font-size: 14px;
+    }
+    .drift-indicator {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 10px;
+    }
+    .drift-positive { background: #ff6b6b; color: #fff; }
+    .drift-negative { background: #4ecdc4; color: #fff; }
+    .drift-zero { background: #95a5a6; color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Subtitle Timeline Viewer</h1>
+
+  <div class="timeline-container">
+    <div class="timeline" id="timeline">
+      <div class="cue" style="left: 1.5871504301177664%; width: 4.7614512903533%;" title="Hello, welcome to our program." data-index="1" data-drift="0.00"></div>
+      <div class="cue" style="left: 7.935752150588833%; width: 4.7614512903533%;" title="Today we have a very special guest." data-index="2" data-drift="0.00"></div>
+      <div class="cue" style="left: 14.2843538710599%; width: 4.7614512903533%;" title="Let me introduce Dr. Smith." data-index="3" data-drift="0.00"></div>
+      <div class="cue" style="left: 20.632955591530965%; width: 4.7614512903533%;" title="Thank you for having me." data-index="4" data-drift="0.00"></div>
+      <div class="cue" style="left: 25.39440688188426%; width: 6.348601720471065%;" title="I brings some interesting topics." data-index="5" data-drift="0.00"></div>
+      <div class="cue" style="left: 33.3301590324731%; width: 4.7614512903533%;" title="First, let us talk about climate." data-index="6" data-drift="0.00"></div>
+      <div class="cue" style="left: 39.678760752944164%; width: 4.7614512903533%;" title="The Earth is getting warmer." data-index="7" data-drift="0.00"></div>
+      <div class="cue" style="left: 46.02736247341523%; width: 4.7614512903533%;" title="This is a global challenge." data-index="8" data-drift="0.00"></div>
+      <div class="cue" style="left: 52.37596419388629%; width: 4.7614512903533%;" title="We need to act now." data-index="9" data-drift="0.00"></div>
+      <div class="cue" style="left: 58.72456591435736%; width: 4.7614512903533%;" title="Thank you for your attention." data-index="10" data-drift="0.00"></div>
+      <div class="cue" style="left: 68.2506427959242%; width: 6.348601720471065%;" title="Now let us open for questions." data-index="11" data-drift="3001.50"></div>
+      <div class="cue" style="left: 84.1253213979621%; width: 4.7614512903533%;" title="Any questions from the audience?" data-index="12" data-drift="8004.00"></div>
+      <div class="cue" style="left: 93.65139827952893%; width: 6.348601720471065%;" title="Yes, we have time for a few." data-index="13" data-drift="11005.50"></div>
+      <div class="scene-marker" style="left: 1.5871504301177664%;" data-label="Opening"></div>
+      <div class="scene-marker" style="left: 15.077929086118782%;" data-label="Introduction Start"></div>
+      <div class="scene-marker" style="left: 33.3301590324731%;" data-label="Climate Topic Begin"></div>
+      <div class="scene-marker" style="left: 58.72456591435736%;" data-label="Q&A Section"></div>
+      <div class="scene-marker" style="left: 71.42176935529949%;" data-label="Audience Questions"></div>
+    </div>
+    <div class="time-ruler">
+      <span>0:00</span><span>0:06</span><span>0:12</span><span>0:18</span><span>0:25</span><span>0:31</span><span>0:37</span><span>0:44</span><span>0:50</span><span>0:56</span><span>1:03</span>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-cue"></div> Subtitles</div>
+      <div class="legend-item"><div class="legend-marker"></div> Scene Marks</div>
+    </div>
+  </div>
+
+  <div class="subtitle-list" id="subtitleList">
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:01 --> 0:04 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">Hello, welcome to our program.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:05 --> 0:08 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">Today we have a very special guest.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:09 --> 0:12 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">Let me introduce Dr. Smith.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:13 --> 0:16 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">Thank you for having me.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:16 --> 0:20 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">I brings some interesting topics.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:21 --> 0:24 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">First, let us talk about climate.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:25 --> 0:28 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">The Earth is getting warmer.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:29 --> 0:32 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">This is a global challenge.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:33 --> 0:36 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">We need to act now.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:37 --> 0:40 <span class="drift-indicator drift-zero">0ms</span></div>
+        <div class="subtitle-text">Thank you for your attention.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:43 --> 0:47 <span class="drift-indicator drift-positive">+3002ms</span></div>
+        <div class="subtitle-text">Now let us open for questions.</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:53 --> 0:56 <span class="drift-indicator drift-positive">+8004ms</span></div>
+        <div class="subtitle-text">Any questions from the audience?</div>
+      </div>
+    <div class="subtitle-item">
+        <div class="subtitle-time">0:59 --> 1:03 <span class="drift-indicator drift-positive">+11006ms</span></div>
+        <div class="subtitle-text">Yes, we have time for a few.</div>
+      </div>
+  </div>
+
+  <script>
+    const cues = document.querySelectorAll('.cue');
+    const list = document.getElementById('subtitleList');
+
+    cues.forEach(cue => {
+      cue.addEventListener('click', () => {
+        const index = parseInt(cue.dataset.index) - 1;
+        const items = list.querySelectorAll('.subtitle-item');
+        if (items[index]) {
+          items[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+          items[index].style.background = '#1f4068';
+          setTimeout(() => { items[index].style.background = '#0f3460'; }, 1000);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+anchorPoints:
+  - originalTime: 1000
+    translatedTime: 1000
+    label: "Opening"
+  - originalTime: 9500
+    translatedTime: 9500
+    label: "Introduction Start"
+  - originalTime: 21000
+    translatedTime: 21000
+    label: "Climate Topic Begin"
+  - originalTime: 37000
+    translatedTime: 37000
+    label: "Q&A Section"
+
+linearDrift:
+  slope: 1.0005
+  intercept: 0
+
+overlapHandling: split
+
+maxDrift: 2000
