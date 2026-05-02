@@ -1,0 +1,48 @@
+{
+  "inventory": [
+    {
+      "part_number": "SP-PSU-001",
+      "part_name": "服务器电源模块 750W",
+      "quantity": 2,
+      "unit_price": 1200.00,
+      "warehouse_location": "A-03-12"
+    },
+    {
+      "part_number": "SP-SFP-001",
+      "part_name": "SFP+ 光模块 10G",
+      "quantity": 10,
+      "unit_price": 850.00,
+      "warehouse_location": "A-02-05"
+    },
+    {
+      "part_number": "SP-MB-002",
+      "part_name": "主板电源接口组件",
+      "quantity": 3,
+      "unit_price": 3500.00,
+      "warehouse_location": "B-01-08"
+    },
+    {
+      "part_number": "SP-FAN-001",
+      "part_name": "CPU散热风扇",
+      "quantity": 5,
+      "unit_price": 280.00,
+      "warehouse_location": "A-03-15"
+    },
+    {
+      "part_number": "SP-HDD-001",
+      "part_name": "SAS硬盘 2.5寸 1.2TB",
+      "quantity": 8,
+      "unit_price": 1500.00,
+      "warehouse_location": "B-02-03"
+    },
+    {
+      "part_number": "SP-BAT-001",
+      "part_name": "UPS电池模块 12V/100AH",
+      "quantity": 4,
+      "unit_price": 850.00,
+      "warehouse_location": "C-01-01"
+    }
+  ],
+  "last_updated": "2024-05-01 08:00:00",
+  "warehouse": "主仓库-地下机房"
+}

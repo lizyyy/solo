@@ -1,0 +1,3 @@
+ticket_number,device_id,device_name,device_location,status,priority,engineer_name,issue_description,inspection_results,solution_taken,start_time,end_time,created_at,updated_at
+WO-2024-005,DEV-MON-001,环境监控系统,地下机房入口,pending,normal,赵六,温湿度传感器数据异常,传感器读数不稳定,待进一步检查,2024-05-03 09:00:00,,2024-05-03 09:00:00,2024-05-03 09:00:00
+WO-2024-006,DEV-AC-002,精密空调-02,地下机房B区,in_progress,high,赵六,空调制冷不足,压缩机工作异常,已联系厂家维修,2024-05-03 10:00:00,,2024-05-03 10:00:00,2024-05-03 12:00:00
