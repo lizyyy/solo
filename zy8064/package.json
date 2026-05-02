@@ -1,0 +1,24 @@
+{
+  "name": "epub-a11y-inspector",
+  "version": "1.0.0",
+  "description": "EPUB 无障碍巡检工具 - 本地运行的 Web 前端工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "generate-sample": "node scripts/generate-sample-epub.js"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "xml2js": "^0.6.2",
+    "dompurify": "^3.0.6",
+    "vue": "^3.4.15"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.3",
+    "vite": "^5.0.12",
+    "jest": "^29.7.0"
+  }
+}
