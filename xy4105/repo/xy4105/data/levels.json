@@ -1,0 +1,139 @@
+[
+    {
+        "id": "level_001",
+        "title": "第1关: 三人行",
+        "description": "还原《论语》经典短句，体验活字排版的魅力",
+        "hint": "子曰：三人行，必有我师焉",
+        "difficulty": 1,
+        "gridSize": {
+            "rows": 2,
+            "cols": 4
+        },
+        "targetSentence": "三人行必有我师",
+        "characterPool": [
+            "三", "人", "行", "必", "有", "我", "师", "焉",
+            "曰", "子", "，", "。", "则", "其", "善", "者"
+        ],
+        "forbiddenCells": [],
+        "punctuationDirection": "horizontal",
+        "maxSteps": 12,
+        "targetTime": 60,
+        "isCustom": false
+    },
+    {
+        "id": "level_002",
+        "title": "第2关: 学而时习之",
+        "description": "《论语》开篇第一句，注意版心中间的禁排格",
+        "hint": "学而时习之，不亦说乎",
+        "difficulty": 2,
+        "gridSize": {
+            "rows": 3,
+            "cols": 3
+        },
+        "targetSentence": "学而时习之",
+        "characterPool": [
+            "学", "而", "时", "习", "之",
+            "不", "亦", "说", "乎", "，", "。",
+            "温", "故", "知", "新", "可", "为", "师"
+        ],
+        "forbiddenCells": [
+            {
+                "row": 1,
+                "col": 1,
+                "reason": "此处为古籍版框装饰，不可放置活字"
+            }
+        ],
+        "punctuationDirection": "horizontal",
+        "maxSteps": 15,
+        "targetTime": 90,
+        "isCustom": false
+    },
+    {
+        "id": "level_003",
+        "title": "第3关: 床前明月光",
+        "description": "李白《静夜思》，注意标点使用横排形式",
+        "hint": "床前明月光，疑是地上霜",
+        "difficulty": 2,
+        "gridSize": {
+            "rows": 2,
+            "cols": 5
+        },
+        "targetSentence": "床前明月光疑是地上霜",
+        "characterPool": [
+            "床", "前", "明", "月", "光",
+            "疑", "是", "地", "上", "霜",
+            "，", "。", "举", "头", "望", "低", "思", "故", "乡"
+        ],
+        "forbiddenCells": [],
+        "punctuationDirection": "horizontal",
+        "maxSteps": 18,
+        "targetTime": 120,
+        "isCustom": false
+    },
+    {
+        "id": "level_004",
+        "title": "第4关: 春眠不觉晓",
+        "description": "孟浩然《春晓》，更多禁排格增加难度",
+        "hint": "春眠不觉晓，处处闻啼鸟",
+        "difficulty": 3,
+        "gridSize": {
+            "rows": 3,
+            "cols": 4
+        },
+        "targetSentence": "春眠不觉晓处处闻啼鸟",
+        "characterPool": [
+            "春", "眠", "不", "觉", "晓",
+            "处", "闻", "啼", "鸟",
+            "，", "。", "夜", "来", "风", "雨", "声", "花", "知", "多", "少"
+        ],
+        "forbiddenCells": [
+            {
+                "row": 0,
+                "col": 0,
+                "reason": "天头留白，不可放置"
+            },
+            {
+                "row": 2,
+                "col": 3,
+                "reason": "地脚装饰，不可放置"
+            }
+        ],
+        "punctuationDirection": "horizontal",
+        "maxSteps": 20,
+        "targetTime": 150,
+        "isCustom": false
+    },
+    {
+        "id": "level_005",
+        "title": "第5关: 人之初",
+        "description": "《三字经》开篇，难度最高关卡",
+        "hint": "人之初，性本善。性相近，习相远。",
+        "difficulty": 4,
+        "gridSize": {
+            "rows": 3,
+            "cols": 5
+        },
+        "targetSentence": "人之初性本善性相近习相远",
+        "characterPool": [
+            "人", "之", "初", "性", "本", "善",
+            "相", "近", "习", "远",
+            "，", "。", "苟", "不", "教", "乃", "迁", "教", "之", "道", "贵", "以", "专"
+        ],
+        "forbiddenCells": [
+            {
+                "row": 0,
+                "col": 2,
+                "reason": "版心装饰格"
+            },
+            {
+                "row": 2,
+                "col": 2,
+                "reason": "版心装饰格"
+            }
+        ],
+        "punctuationDirection": "horizontal",
+        "maxSteps": 25,
+        "targetTime": 180,
+        "isCustom": false
+    }
+]
