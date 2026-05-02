@@ -1,0 +1,95 @@
+{
+  "Id": "urn:uuid:12345678-1234-1234-1234-123456789001",
+  "AnnotationText": "Sample DCP Package",
+  "Assets": [
+    {
+      "Id": "urn:uuid:aaaa1111-1111-1111-1111-111111111111",
+      "Type": "application/x-smpte-mxf;dcpType=main",
+      "Hash": "abc123def456",
+      "Size": 1073741824,
+      "Language": "en"
+    },
+    {
+      "Id": "urn:uuid:aaaa2222-2222-2222-2222-222222222222",
+      "Type": "application/x-smpte-mxf;dcpType=main",
+      "Hash": "def456ghi789",
+      "Size": 536870912,
+      "Language": "zh"
+    },
+    {
+      "Id": "urn:uuid:aaaa3333-3333-3333-3333-333333333333",
+      "Type": "application/x-smpte-mxf;dcpType=subtitle",
+      "Hash": "ghi789jkl012",
+      "Size": 10485760,
+      "Language": "zh"
+    },
+    {
+      "Id": "urn:uuid:aaaa4444-4444-4444-4444-444444444444",
+      "Type": "application/x-smpte-mxf;dcpType=audio",
+      "Hash": "jkl012mno345",
+      "Size": 52428800
+    }
+  ],
+  "CPLs": [
+    {
+      "Id": "urn:uuid:cpl11111-1111-1111-1111-111111111111",
+      "UUID": "urn:uuid:cpl11111-1111-1111-1111-111111111111",
+      "AnnotationText": "Theater Main Feature",
+      "ContentTitleText": "Demo Movie 2026",
+      "ContentKind": "feature",
+      "Rating": "PG-13",
+      "ReelIds": ["urn:uuid:reel001"],
+      "AssetIds": [
+        "urn:uuid:aaaa1111-1111-1111-1111-111111111111",
+        "urn:uuid:aaaa3333-3333-3333-3333-333333333333",
+        "urn:uuid:aaaa4444-4444-4444-4444-444444444444"
+      ],
+      "RequiredAssets": [
+        "urn:uuid:aaaa1111-1111-1111-1111-111111111111",
+        "urn:uuid:aaaa3333-3333-3333-3333-333333333333",
+        "urn:uuid:aaaa4444-4444-4444-4444-444444444444"
+      ]
+    },
+    {
+      "Id": "urn:uuid:cpl22222-2222-2222-2222-222222222222",
+      "UUID": "urn:uuid:cpl22222-2222-2222-2222-222222222222",
+      "AnnotationText": "Trailer",
+      "ContentTitleText": "Upcoming Trailer",
+      "ContentKind": "trailer",
+      "ReelIds": ["urn:uuid:reel002"],
+      "AssetIds": ["urn:uuid:aaaa2222-2222-2222-2222-222222222222"],
+      "RequiredAssets": ["urn:uuid:aaaa2222-2222-2222-2222-222222222222"]
+    }
+  ],
+  "PKLs": [
+    {
+      "Id": "urn:uuid:pkl11111-1111-1111-1111-111111111111",
+      "UUID": "urn:uuid:pkl11111-1111-1111-1111-111111111111",
+      "AnnotationText": "Main Package",
+      "Hash": "pklhash123456",
+      "Size": 1610612736,
+      "AssetList": [
+        {
+          "id": "urn:uuid:aaaa1111-1111-1111-1111-111111111111",
+          "hash": "abc123def456",
+          "size": "1073741824"
+        },
+        {
+          "id": "urn:uuid:aaaa2222-2222-2222-2222-222222222222",
+          "hash": "def456ghi789",
+          "size": "536870912"
+        },
+        {
+          "id": "urn:uuid:aaaa3333-3333-3333-3333-333333333333",
+          "hash": "ghi789jkl012",
+          "size": "10485760"
+        },
+        {
+          "id": "urn:uuid:aaaa4444-4444-4444-4444-444444444444",
+          "hash": "jkl012mno345",
+          "size": "52428800"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompositionPlaylist xmlns="http://www.smpte-ra.org/schemas/429-7/2006/CPL"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     Id="urn:uuid:cpl11111-1111-1111-1111-111111111111"
+                     UUID="urn:uuid:cpl11111-1111-1111-1111-111111111111">
+  <ContentTitleText>Demo Movie 2026</ContentTitleText>
+  <ContentKind>feature</ContentKind>
+  <Rating>
+    <AuthenticatedPrivacy>PG-13</AuthenticatedPrivacy>
+  </Rating>
+  <AnnotationText>Theater Main Feature</AnnotationText>
+  <EditRate>24 1</EditRate>
+  <Version>Version-1</Version>
+  <ReelList>
+    <Reel Id="urn:uuid:reel001">
+      <Asset id="urn:uuid:aaaa1111-1111-1111-1111-111111111111"/>
+    </Reel>
+    <Reel Id="urn:uuid:reel002">
+      <Asset id="urn:uuid:aaaa3333-3333-3333-3333-333333333333"/>
+    </Reel>
+    <Reel Id="urn:uuid:reel003">
+      <Asset id="urn:uuid:aaaa4444-4444-4444-4444-444444444444"/>
+    </Reel>
+  </ReelList>
+</CompositionPlaylist>

@@ -1,0 +1,79 @@
+showtimes:
+  - screen_id: SCREEN01
+    screen_name: Main Hall 1
+    title: Demo Movie 2026
+    show_date: "2026-05-15"
+    show_time: "14:00"
+    cpl_id: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    cpl_uuid: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+      - "urn:uuid:aaaa3333-3333-3333-3333-333333333333"
+    duration_seconds: 7200
+
+  - screen_id: SCREEN02
+    screen_name: Main Hall 2
+    title: Demo Movie 2026
+    show_date: "2026-05-15"
+    show_time: "14:00"
+    cpl_id: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    cpl_uuid: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+    duration_seconds: 7200
+
+  - screen_id: SCREEN01
+    screen_name: Main Hall 1
+    title: Demo Movie 2026
+    show_date: "2026-05-15"
+    show_time: "19:00"
+    cpl_id: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    cpl_uuid: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+      - "urn:uuid:aaaa3333-3333-3333-3333-333333333333"
+    duration_seconds: 7200
+
+  - screen_id: SCREEN03
+    screen_name: VIP Hall
+    title: Demo Movie 2026
+    show_date: "2026-05-20"
+    show_time: "15:00"
+    cpl_id: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    cpl_uuid: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+    duration_seconds: 7200
+
+  - screen_id: SCREEN01
+    screen_name: Main Hall 1
+    title: Upcoming Trailer
+    show_date: "2026-05-15"
+    show_time: "13:30"
+    cpl_id: "urn:uuid:cpl22222-2222-2222-2222-222222222222"
+    cpl_uuid: "urn:uuid:cpl22222-2222-2222-2222-222222222222"
+    required_assets:
+      - "urn:uuid:aaaa2222-2222-2222-2222-222222222222"
+    duration_seconds: 120
+
+  - screen_id: SCREEN02
+    screen_name: Main Hall 2
+    title: Demo Movie 2026
+    show_date: "2026-08-10"
+    show_time: "20:00"
+    cpl_id: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    cpl_uuid: "urn:uuid:cpl11111-1111-1111-1111-111111111111"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+    duration_seconds: 7200
+
+  - screen_id: SCREEN01
+    screen_name: Main Hall 1
+    title: Demo Movie 2026
+    show_date: "2026-05-15"
+    show_time: "14:00"
+    cpl_id: "urn:uuid:cpl33333-3333-3333-3333-333333333333"
+    cpl_uuid: "urn:uuid:cpl33333-3333-3333-3333-333333333333"
+    required_assets:
+      - "urn:uuid:aaaa1111-1111-1111-1111-111111111111"
+    duration_seconds: 7200

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KDM xmlns="http://www.smpte-ra.org/standards/429-10/2007/KDM"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      Id="urn:uuid:kdm22222-2222-2222-2222-222222222222"
+      uuid="urn:uuid:kdm22222-2222-2222-2222-222222222222">
+  <ContentTitleText>Demo Movie 2026</ContentTitleText>
+  <ContentAuthenticator>
+    <ContentKeys>
+      <ContentKey>
+        <Private>XYZ789</Private>
+      </ContentKey>
+    </ContentKeys>
+    <AuthenticatedPermissions>cinema</AuthenticatedPermissions>
+  </ContentAuthenticator>
+  <KDMValidityStart>2026-07-01T00:00:00</KDMValidityStart>
+  <KDMValidityEnd>2026-07-31T23:59:59</KDMValidityEnd>
+  <ServerFingerprint>AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99</ServerFingerprint>
+  <ScreenList>
+    <Screen ScreenName="SCREEN01"/>
+  </ScreenList>
+  <CPL Id="urn:uuid:cpl11111-1111-1111-1111-111111111111"
+       UUID="urn:uuid:cpl11111-1111-1111-1111-111111111111"
+       AnnotationText="Theater Main Feature">Demo Movie 2026</CPL>
+</KDM>
