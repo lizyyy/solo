@@ -1,0 +1,17 @@
+{
+    "name": "高白泥素烧 - 标准",
+    "firing_type": "bisque",
+    "target_temperature": 980.0,
+    "total_thickness": 1.2,
+    "max_allowed_heating_rate": 4.5,
+    "notes": "适用于0.8-1.5cm厚的高白泥作品素烧",
+    "body": {
+        "name": "高白泥",
+        "thickness_range": [0.5, 2.5],
+        "thermal_conductivity": 1.2,
+        "porosity": 0.28,
+        "recommended_bisque_temp": 980.0,
+        "critical_cooling_rate": 3.0
+    },
+    "glaze": null
+}

@@ -1,0 +1,12 @@
+{
+    "name": "中型气窑 0.3m³",
+    "max_temperature": 1400.0,
+    "chamber_volume": 300.0,
+    "power_rating": 15.0,
+    "thermal_inertia_factor": 3.5,
+    "max_heating_rate": 6.0,
+    "max_cooling_rate": 4.0,
+    "sensor_accuracy": 3.0,
+    "heating_elements_count": 6,
+    "notes": "工作室中型气窑，热惯性较大，升温需要更平缓"
+}

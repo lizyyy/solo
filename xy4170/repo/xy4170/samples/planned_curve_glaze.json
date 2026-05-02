@@ -1,0 +1,44 @@
+{
+    "recipe_name": "中温釉烧 - 透明釉",
+    "kiln_name": "小型电窑 0.06m³",
+    "created_at": "2026-05-02T09:00:00",
+    "preheat_included": true,
+    "segments": [
+        {
+            "segment_type": "ramp",
+            "start_temp": 25.0,
+            "end_temp": 200.0,
+            "duration": 70.0,
+            "rate": 2.5
+        },
+        {
+            "segment_type": "ramp",
+            "start_temp": 200.0,
+            "end_temp": 600.0,
+            "duration": 100.0,
+            "rate": 4.0
+        },
+        {
+            "segment_type": "ramp",
+            "start_temp": 600.0,
+            "end_temp": 1240.0,
+            "duration": 240.0,
+            "rate": 2.67
+        },
+        {
+            "segment_type": "hold",
+            "start_temp": 1240.0,
+            "end_temp": 1240.0,
+            "duration": 35.0,
+            "rate": 0.0
+        },
+        {
+            "segment_type": "cool",
+            "start_temp": 1240.0,
+            "end_temp": 500.0,
+            "duration": 180.0,
+            "rate": -4.11
+        }
+    ],
+    "notes": "标准中温釉烧曲线，适用于1.5-2.5cm厚作品"
+}

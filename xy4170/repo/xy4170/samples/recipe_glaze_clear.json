@@ -1,0 +1,23 @@
+{
+    "name": "中温釉烧 - 透明釉",
+    "firing_type": "glaze",
+    "target_temperature": 1240.0,
+    "total_thickness": 1.8,
+    "max_allowed_heating_rate": 3.5,
+    "notes": "适用于1.5-2.5cm厚的艺术瓷中温釉烧",
+    "body": {
+        "name": "瓷泥",
+        "thickness_range": [0.8, 3.0],
+        "thermal_conductivity": 1.0,
+        "porosity": 0.22,
+        "recommended_bisque_temp": 950.0,
+        "critical_cooling_rate": 2.0
+    },
+    "glaze": {
+        "name": "透明釉",
+        "maturing_temp_range": [1220.0, 1260.0],
+        "hold_time_recommended": 35.0,
+        "expansion_coefficient": 5.2,
+        "is_matte": false
+    }
+}
