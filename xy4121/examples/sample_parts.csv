@@ -1,0 +1,6 @@
+part_number,part_name,material_grade,material_thickness,quantity,overall_length,overall_width,notes,bend_id,bend_angle,bend_radius,flange_length,inside_length,direction,k_factor_override,die_v_width,bend_notes,hole_id,hole_type,diameter,width,height,x_position,y_position,distance_to_bend,hole_notes,bend_id_2,bend_angle_2,bend_radius_2,flange_length_2,inside_length_2,direction_2,bend_id_3,bend_angle_3,bend_radius_3,flange_length_3,inside_length_3,direction_3,hole_id_2,hole_type_2,diameter_2,distance_to_bend_2
+P-001,左侧板,SPCC,1.5,50,150,80,标准U型件,B1,90,1.5,25,100,up,,,第一个折弯,H1,circular,8,,,20,15,15,安装孔,B2,90,1.5,25,100,up,B3,90,1.5,20,80,down,H2,circular,6,12
+P-002,右侧板,SPCC,1.5,50,150,80,P-001的对称件,B1,90,1.5,25,100,up,,,第一个折弯,H1,circular,8,,,20,15,15,安装孔,B2,90,1.5,25,100,up,B3,90,1.5,20,80,down,H2,circular,6,12
+P-003,前挡板,SUS304,1.0,30,120,60,不锈钢件,需要特殊折弯顺序,B1,90,1.0,30,90,up,,,长边先折,H1,circular,5,,,15,10,20,定位孔,B2,90,1.0,20,70,down,,,,,,
+P-004,支架,AL5052,2.0,20,200,100,铝合金厚板件,大吨位需求,B1,90,2.0,40,160,up,,,主折弯,H1,circular,10,,,25,50,25,固定孔,B2,120,2.0,35,145,up,,,大角度折弯,B3,90,2.0,25,120,down,H2,slotted,,,20,10,30,
+P-005,小角板,SPCC,1.0,100,50,30,简单L型零件,快速验证件,B1,90,1.0,15,35,up,,,单折弯件,H1,circular,4,,,10,10,8,近孔风险,,,,,,,,
