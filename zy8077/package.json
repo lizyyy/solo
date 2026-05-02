@@ -1,0 +1,16 @@
+{
+  "name": "offline-inspection-sync",
+  "version": "1.0.0",
+  "description": "离线巡检表同步演练台",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node tests/sync-strategy.test.js"
+  },
+  "keywords": ["offline", "indexeddb", "sync", "inspection"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
