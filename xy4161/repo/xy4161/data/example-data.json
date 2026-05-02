@@ -1,0 +1,167 @@
+{
+  "cases": [
+    {
+      "caseNumber": "CASE-2024-001",
+      "patientName": "张三",
+      "doctorName": "李明医生",
+      "clinicName": "阳光口腔诊所",
+      "status": "DESIGNING",
+      "notes": "左上后牙烤瓷冠修复，患者对美学要求较高"
+    },
+    {
+      "caseNumber": "CASE-2024-002",
+      "patientName": "李四",
+      "doctorName": "王医生",
+      "clinicName": "康泰口腔医院",
+      "status": "MANUFACTURING",
+      "notes": "下颌种植修复，种植体型号Nobel"
+    },
+    {
+      "caseNumber": "CASE-2024-003",
+      "patientName": "王五",
+      "doctorName": "陈医生",
+      "clinicName": "美佳口腔",
+      "status": "TRY_IN_FEEDBACK_RECEIVED",
+      "notes": "前牙美学修复，已完成试戴，等待医生反馈跟进"
+    },
+    {
+      "caseNumber": "CASE-2024-004",
+      "patientName": "赵六",
+      "doctorName": "刘医生",
+      "clinicName": "和谐口腔",
+      "status": "REWORK_IN_PROGRESS",
+      "notes": "就位问题返工，需重新设计"
+    },
+    {
+      "caseNumber": "CASE-2024-005",
+      "patientName": "钱七",
+      "doctorName": "周医生",
+      "clinicName": "仁爱口腔",
+      "status": "COMPLETED",
+      "notes": "已完成交付"
+    }
+  ],
+  "teeth": [
+    {
+      "toothNumber": 15,
+      "toothType": "CROWN",
+      "isRework": false,
+      "reworkCount": 0,
+      "version": 1,
+      "status": "DESIGNING"
+    },
+    {
+      "toothNumber": 16,
+      "toothType": "CROWN",
+      "isRework": false,
+      "reworkCount": 0,
+      "version": 1,
+      "status": "DESIGNING"
+    },
+    {
+      "toothNumber": 36,
+      "toothType": "IMPLANT",
+      "isRework": false,
+      "reworkCount": 0,
+      "version": 1,
+      "status": "MANUFACTURING"
+    },
+    {
+      "toothNumber": 37,
+      "toothType": "CROWN",
+      "isRework": true,
+      "reworkCount": 1,
+      "version": 2,
+      "status": "REWORK_IN_PROGRESS"
+    },
+    {
+      "toothNumber": 11,
+      "toothType": "VENEER",
+      "isRework": false,
+      "reworkCount": 0,
+      "version": 1,
+      "status": "TRY_IN"
+    },
+    {
+      "toothNumber": 21,
+      "toothType": "VENEER",
+      "isRework": false,
+      "reworkCount": 0,
+      "version": 1,
+      "status": "TRY_IN"
+    }
+  ],
+  "prescriptions": [
+    {
+      "prescriptionNumber": "RX-2024-001",
+      "doctorName": "李明医生",
+      "toothNumbers": "15,16",
+      "restorationType": "PFM",
+      "material": "镍铬合金烤瓷",
+      "shade": "A3",
+      "dueDate": "2024-05-15",
+      "notes": "肩台清晰，边缘密合度要求高"
+    },
+    {
+      "prescriptionNumber": "RX-2024-002",
+      "doctorName": "王医生",
+      "toothNumbers": "36",
+      "restorationType": "IMPLANT_CROWN",
+      "material": "氧化锆",
+      "shade": "A2",
+      "dueDate": "2024-05-20",
+      "notes": "种植体Nobel Replace 4.5x13mm"
+    },
+    {
+      "prescriptionNumber": "RX-2024-003",
+      "doctorName": "陈医生",
+      "toothNumbers": "11,21",
+      "restorationType": "EMAX_VENEER",
+      "material": "E-MAX",
+      "shade": "BL2",
+      "dueDate": "2024-05-10",
+      "notes": "美学要求高，需与邻牙形态协调"
+    }
+  ],
+  "rework_requests": [
+    {
+      "reasonCode": "FIT_ISSUE",
+      "reasonDescription": "就位不良，边缘不密合约0.1mm，需重新制作",
+      "reworkType": "MANUFACTURING",
+      "requestedBy": "张技师",
+      "sourceStep": "QUALITY_INSPECTION",
+      "targetStep": "DIGITAL_DESIGN",
+      "status": "APPROVED"
+    },
+    {
+      "reasonCode": "OCCLUSION_ISSUE",
+      "reasonDescription": "试戴时发现咬合高，需调整咬合面形态",
+      "reworkType": "DESIGN",
+      "requestedBy": "刘医生",
+      "sourceStep": "TRY_IN",
+      "targetStep": "DIGITAL_DESIGN",
+      "status": "PENDING"
+    }
+  ],
+  "try_in_feedbacks": [
+    {
+      "doctorName": "陈医生",
+      "fitStatus": "MINOR_ADJUSTMENT",
+      "occlusionStatus": "HIGH",
+      "estheticsStatus": "GOOD",
+      "notes": "整体就位尚可，咬合需微调",
+      "needsRework": true,
+      "reworkReason": "咬合高",
+      "isFollowedUp": false
+    },
+    {
+      "doctorName": "王医生",
+      "fitStatus": "GOOD",
+      "occlusionStatus": "GOOD",
+      "estheticsStatus": "GOOD",
+      "notes": "完美，无需调整",
+      "needsRework": false,
+      "isFollowedUp": true
+    }
+  ]
+}

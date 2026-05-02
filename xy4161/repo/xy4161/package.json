@@ -1,0 +1,22 @@
+{
+  "name": "denture-rework-console",
+  "version": "1.0.0",
+  "description": "义齿返工闭环台 - 口腔诊所技工室本地业务系统",
+  "private": true,
+  "scripts": {
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "test": "cd backend && npm test",
+    "test:watch": "cd backend && npm run test:watch",
+    "init:data": "cd backend && npm run init:data",
+    "start": "cd backend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
