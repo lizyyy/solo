@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烟雾逃生路线演练场</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>烟雾逃生路线演练场</h1>
+            <div class="header-controls">
+                <select id="level-select">
+                    <option value="">选择关卡</option>
+                </select>
+                <button id="btn-save" class="btn-secondary">保存方案</button>
+                <button id="btn-load" class="btn-secondary">加载方案</button>
+                <button id="btn-export" class="btn-secondary">导出复盘</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="toolbox">
+                <h3>工具面板</h3>
+                <div class="tool-item" draggable="true" data-tool="arrow">
+                    <span class="tool-icon">→</span>
+                    <span class="tool-label">疏散箭头</span>
+                </div>
+                <div class="tool-item" draggable="true" data-tool="block">
+                    <span class="tool-icon">🚫</span>
+                    <span class="tool-label">封堵危险门</span>
+                </div>
+                <div class="tool-item" draggable="true" data-tool="extinguisher">
+                    <span class="tool-icon">🧯</span>
+                    <span class="tool-label">灭火器</span>
+                </div>
+                <div class="tool-item" draggable="true" data-tool="assembly">
+                    <span class="tool-icon">🏁</span>
+                    <span class="tool-label">集合点</span>
+                </div>
+                
+                <div class="tool-info">
+                    <p><strong>操作提示：</strong></p>
+                    <ul>
+                        <li>拖拽工具到楼层图放置</li>
+                        <li>点击已放置的物品可删除</li>
+                        <li>点击箭头可旋转方向</li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-controls">
+                    <h4>模拟控制</h4>
+                    <button id="btn-start-sim" class="btn-primary">开始模拟</button>
+                    <button id="btn-stop-sim" class="btn-danger" disabled>停止模拟</button>
+                    <button id="btn-reset" class="btn-secondary">重置</button>
+                </div>
+            </aside>
+
+            <main class="game-area">
+                <div class="level-info">
+                    <div id="level-title">请选择关卡</div>
+                    <div id="level-description"></div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="game-canvas" width="800" height="600"></canvas>
+                    <div id="simulation-overlay" class="simulation-overlay hidden">
+                        <div class="simulation-status">
+                            <span>模拟进度: <span id="sim-progress">0</span>%</span>
+                            <span>时间: <span id="sim-time">0</span>秒</span>
+                            <span>已逃生: <span id="sim-escaped">0</span>/<span id="sim-total">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="result-panel" class="result-panel hidden">
+                    <h3>模拟结果</h3>
+                    <div class="score-display">
+                        <div class="score-item">
+                            <span class="score-label">总分</span>
+                            <span class="score-value" id="result-score">0</span>
+                        </div>
+                        <div class="score-item">
+                            <span class="score-label">评级</span>
+                            <span class="score-grade" id="result-grade">--</span>
+                        </div>
+                    </div>
+                    <div class="issues-list" id="result-issues">
+                    </div>
+                    <div class="result-actions">
+                        <button id="btn-retry" class="btn-secondary">重新设计</button>
+                        <button id="btn-save-best" class="btn-primary">保存为最佳方案</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

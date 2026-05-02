@@ -1,0 +1,19 @@
+{
+  "name": "smoke-evacuation-simulator",
+  "version": "1.0.0",
+  "description": "烟雾逃生路线演练场 - 消防安全培训2D小游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "echo \"测试模块待完善\" && exit 0"
+  },
+  "keywords": [
+    "消防安全",
+    "逃生演练",
+    "模拟器",
+    "游戏"
+  ],
+  "author": "FireSafety Training Team",
+  "license": "MIT",
+  "devDependencies": {}
+}
