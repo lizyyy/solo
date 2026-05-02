@@ -1,0 +1,8 @@
+{
+  "package_id": "ROLLBACK_2024_001",
+  "version": "1.0.0",
+  "created_at": "2024-03-10T12:00:00",
+  "affected_parcels": ["PARCEL_001", "PARCEL_002"],
+  "description": "回滚到春耕前的稳定版本",
+  "checksum": "sha256:abc123def456"
+}

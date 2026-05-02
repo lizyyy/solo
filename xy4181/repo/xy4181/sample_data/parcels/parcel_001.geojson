@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "properties": {
+    "parcel_id": "PARCEL_001",
+    "name": "东河村一号地块",
+    "version": "1.0.0",
+    "area_m2": 150000,
+    "crop_type": "小麦",
+    "required_zoom_levels": [14, 15, 16, 17]
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [116.397, 39.908],
+        [116.407, 39.908],
+        [116.407, 39.918],
+        [116.397, 39.918],
+        [116.397, 39.908]
+      ]
+    ]
+  }
+}

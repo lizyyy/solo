@@ -1,0 +1,23 @@
+{
+  "type": "Feature",
+  "properties": {
+    "parcel_id": "PARCEL_002",
+    "name": "东河村二号地块",
+    "version": "1.0.0",
+    "area_m2": 120000,
+    "crop_type": "玉米",
+    "required_zoom_levels": [14, 15, 16]
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [116.408, 39.908],
+        [116.418, 39.908],
+        [116.418, 39.918],
+        [116.408, 39.918],
+        [116.408, 39.908]
+      ]
+    ]
+  }
+}

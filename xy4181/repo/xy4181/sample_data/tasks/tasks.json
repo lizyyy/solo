@@ -1,0 +1,31 @@
+[
+  {
+    "task_id": "TASK_2024_001",
+    "name": "东河村春耕作业-小麦",
+    "status": "in_progress",
+    "assigned_terminal": "T001",
+    "created_at": "2024-03-15T08:00:00",
+    "updated_at": "2024-03-15T09:30:00",
+    "parcel_ids": ["PARCEL_001"],
+    "version": "1.0.0",
+    "metadata": {
+      "operator": "张三",
+      "equipment": "拖拉机_01",
+      "target_date": "2024-03-20"
+    }
+  },
+  {
+    "task_id": "TASK_2024_002",
+    "name": "东河村春耕作业-玉米",
+    "status": "pending",
+    "assigned_terminal": "T002",
+    "created_at": "2024-03-15T10:00:00",
+    "parcel_ids": ["PARCEL_002"],
+    "version": "1.0.0",
+    "metadata": {
+      "operator": "李四",
+      "equipment": "拖拉机_02",
+      "target_date": "2024-03-22"
+    }
+  }
+]
