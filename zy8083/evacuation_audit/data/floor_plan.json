@@ -1,0 +1,23 @@
+{
+  "floors": {
+    "1": {"name": "Ground Floor", "elevation": 0, "zones": ["Zone A", "Zone B"]},
+    "2": {"name": "Floor 2", "elevation": 3.5, "zones": ["Zone A", "Zone B"]},
+    "3": {"name": "Floor 3", "elevation": 7.0, "zones": ["Zone A", "Zone B"]},
+    "4": {"name": "Floor 4", "elevation": 10.5, "zones": ["Zone A", "Zone B"]}
+  },
+  "doors": {
+    "D101": {"name": "Zone A Stair Door", "floor": 1, "connects_floors": [1, 2], "type": "internal"},
+    "D102": {"name": "Zone B Stair Door", "floor": 1, "connects_floors": [1, 2], "type": "internal"},
+    "D201": {"name": "Zone A Stair Door", "floor": 2, "connects_floors": [1, 2], "type": "internal"},
+    "D202": {"name": "Zone B Stair Door", "floor": 2, "connects_floors": [1, 2], "type": "internal"},
+    "D301": {"name": "Zone A Stair Door", "floor": 3, "connects_floors": [2, 3], "type": "internal"},
+    "D302": {"name": "Zone B Stair Door", "floor": 3, "connects_floors": [2, 3], "type": "internal"},
+    "D303": {"name": "Emergency Exit Door", "floor": 3, "connects_floors": [3], "type": "internal"},
+    "D401": {"name": "Zone A Stair Door", "floor": 4, "connects_floors": [3, 4], "type": "internal"},
+    "D402": {"name": "Zone B Stair Door", "floor": 4, "connects_floors": [3, 4], "type": "internal"},
+    "EXIT_MAIN": {"name": "Main Exit", "floor": 1, "connects_floors": [1], "type": "exit"}
+  },
+  "exits": {
+    "EXIT_MAIN": {"name": "Main Exit", "floor": 1, "capacity": 20}
+  }
+}

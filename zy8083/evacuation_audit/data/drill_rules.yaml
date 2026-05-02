@@ -1,0 +1,7 @@
+evacuation_rules:
+  max_evacuation_time_seconds: 300
+  max_stay_time_seconds: 60
+  reverse_threshold_meters: 2.0
+  congestion_threshold_people: 10
+  min_exit_width_meters: 1.5
+  max_queue_time_seconds: 30

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evacuation-audit"
+version = "1.0.0"
+description = "CLI tool for reviewing building evacuation drills"
+requires-python = ">=3.9"
+dependencies = ["pyyaml", "click"]
+readme = "README.md"
+
+[project.scripts]
+evacuation-audit = "evacuation_audit.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["evacuation_audit*"]
