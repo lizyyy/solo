@@ -1,0 +1,12 @@
+{
+  "name": "deicing-dispatch",
+  "version": "1.0.0",
+  "description": "冬季机场机坪除冰调度模拟游戏",
+  "scripts": {
+    "start": "npx http-server -p 8080 -c-1",
+    "preview": "python3 -m http.server 8080"
+  },
+  "keywords": ["game", "simulation", "airport", "deicing"],
+  "author": "",
+  "license": "MIT"
+}
