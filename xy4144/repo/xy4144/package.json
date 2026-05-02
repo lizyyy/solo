@@ -1,0 +1,30 @@
+{
+  "name": "blockade-conflict-audit-station",
+  "version": "1.0.0",
+  "description": "地铁检修调度室封锁点施工冲突审校站 - 本地 REST API 服务",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node tests/run-tests.js",
+    "init-data": "node scripts/init-sample-data.js"
+  },
+  "keywords": [
+    "metro",
+    "maintenance",
+    "blockade",
+    "conflict-check",
+    "scheduling"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.8.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4"
+  }
+}
