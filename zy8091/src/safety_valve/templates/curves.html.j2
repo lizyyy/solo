@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全阀校验曲线浏览</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; border-bottom: 2px solid #4a90d9; padding-bottom: 10px; }
+        .valve-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px; overflow: hidden; }
+        .valve-header { background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%); color: white; padding: 16px 20px; }
+        .valve-header h2 { margin: 0; font-size: 18px; }
+        .valve-info { padding: 12px 20px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; }
+        .valve-info span { margin-right: 24px; color: #666; }
+        .curve-section { padding: 20px; }
+        .curve-title { font-weight: 600; color: #333; margin-bottom: 12px; display: flex; gap: 16px; }
+        .curve-title span { color: #888; font-weight: normal; }
+        .chart-container { height: 300px; margin-bottom: 20px; }
+        canvas { width: 100% !important; height: 100% !important; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab { padding: 8px 16px; background: #e9ecef; border: none; border-radius: 4px; cursor: pointer; }
+        .tab.active { background: #4a90d9; color: white; }
+        .legend { display: flex; gap: 24px; margin-top: 12px; padding-left: 20px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 16px; height: 16px; border-radius: 2px; }
+        .pressure-color { background: #4a90d9; }
+        .lift-color { background: #e74c3c; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>安全阀校验曲线浏览</h1>
+        
+        {% for item in valve_data %}
+        <div class="valve-card">
+            <div class="valve-header">
+                <h2>阀门编号：{{ item.valve.valve_id }}</h2>
+            </div>
+            <div class="valve-info">
+                <span><strong>型号：</strong>{{ item.valve.model }}</span>
+                <span><strong>公称直径：</strong>{{ item.valve.nominal_diameter }} mm</span>
+                <span><strong>公称压力：</strong>{{ item.valve.nominal_pressure }} MPa</span>
+                <span><strong>整定压力：</strong>{{ item.valve.set_pressure }} MPa</span>
+                <span><strong>制造单位：</strong>{{ item.valve.manufacturer }}</span>
+                <span><strong>安装位置：</strong>{{ item.valve.installation_location }}</span>
+            </div>
+            <div class="curve-section">
+                <div class="tabs">
+                    {% for curve in item.curves %}
+                    <button class="tab" onclick="showCurve({{ loop.index0 }}, '{{ item.valve.valve_id }}')">
+                        {{ curve.test_time }}
+                    </button>
+                    {% endfor %}
+                </div>
+                {% for curve in item.curves %}
+                <div id="curve-{{ item.valve.valve_id }}-{{ loop.index0 }}" style="display: {% if loop.first %}block{% else %}none{% endif %}">
+                    <div class="curve-title">
+                        <span>测试类型：{{ curve.test_type }}</span>
+                        <span>测试时间：{{ curve.test_time }}</span>
+                        <span>操作员：{{ curve.operator }}</span>
+                        <span>设备编号：{{ curve.equipment_id }}</span>
+                        <span>采样点数：{{ curve.point_count }}</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-{{ item.valve.valve_id }}-{{ loop.index0 }}"></canvas>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-color pressure-color"></div><span>压力 (MPa)</span></div>
+                        <div class="legend-item"><div class="legend-color lift-color"></div><span>开度 (mm)</span></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        {% for item in valve_data %}
+        {% for curve in item.curves %}
+        (function() {
+            var ctx = document.getElementById('chart-{{ item.valve.valve_id }}-{{ loop.index0 }}').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ curve.timestamps | tojson }},
+                    datasets: [
+                        {
+                            label: '压力 (MPa)',
+                            data: {{ curve.pressures | tojson }},
+                            borderColor: '#4a90d9',
+                            backgroundColor: 'rgba(74, 144, 217, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: '开度 (mm)',
+                            data: {{ curve.lifts | tojson }},
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: '压力 (MPa)' },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: '开度 (mm)' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: {
+                            title: { display: true, text: '时间 (s)' },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        })();
+        {% endfor %}
+        {% endfor %}
+
+        function showCurve(index, valveId) {
+            var curves = document.querySelectorAll('[id^="curve-' + valveId + '-"]');
+            curves.forEach(function(el, i) {
+                el.style.display = i === index ? 'block' : 'none';
+            });
+            var tabs = document.querySelectorAll('[onclick*="' + valveId + '"]');
+            tabs.forEach(function(el, i) {
+                el.classList.toggle('active', i === index);
+            });
+        }
+    </script>
+</body>
+</html>

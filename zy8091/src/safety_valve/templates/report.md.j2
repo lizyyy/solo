@@ -1,0 +1,77 @@
+# 安全阀校验批次复核报告
+
+## 概述
+
+本报告对安全阀校验批次进行复核分析，统计校验结果并标识异常情况。
+
+## 判定规则
+
+| 规则项 | 限值 |
+|--------|------|
+| 整定压力偏差 | ±{{ rules.set_pressure_tolerance }}% |
+| 最大启闭压差 | {{ rules.opening_closing_diff_max }} MPa |
+| 最小采样点数 | {{ rules.min_sample_points }} |
+| 铅封要求 | {{ '是' if rules.lead_seal_required else '否' }} |
+
+## 统计摘要
+
+| 项目 | 数量 |
+|------|------|
+| 阀门总数 | {{ summary.total_valves }} |
+| 测试总数 | {{ summary.total_tests }} |
+| 通过测试数 | {{ summary.passed_tests }} |
+| 异常测试数 | {{ summary.failed_tests }} |
+| 异常阀门数 | {{ summary.abnormal_valves | length }} |
+
+## 详细结果
+
+{% for item in report_data %}
+### 阀门 {{ item.valve.valve_id }}
+
+**基本信息**
+- 型号：{{ item.valve.model }}
+- 公称直径：{{ item.valve.nominal_diameter }} mm
+- 公称压力：{{ item.valve.nominal_pressure }} MPa
+- 整定压力：{{ item.valve.set_pressure }} MPa
+- 制造单位：{{ item.valve.manufacturer }}
+- 安装位置：{{ item.valve.installation_location }}
+
+**测试记录**
+
+| 测试时间 | 测试类型 | 实际整定压力(MPa) | 整定压力偏差(%) | 开启压力(MPa) | 回座压力(MPa) | 启闭压差(MPa) | 状态 |
+|----------|----------|-------------------|-----------------|---------------|---------------|---------------|------|
+{% for result in item.results %}
+| {{ result.test_time }} | {{ result.test_type }} | {{ "%.3f" % result.actual_set_pressure if result.actual_set_pressure else '-' }} | {{ "%.2f" % result.set_pressure_deviation if result.set_pressure_deviation else '-' }} | {{ "%.3f" % result.opening_pressure if result.opening_pressure else '-' }} | {{ "%.3f" % result.closing_pressure if result.closing_pressure else '-' }} | {{ "%.3f" % result.opening_closing_diff if result.opening_closing_diff else '-' }} | {{ '异常' if result.violations else '正常' }} |
+{% endfor %}
+
+{% if item.has_violations %}
+**异常原因**
+{% for result in item.results %}
+{% if result.violations %}
+- {{ result.test_time }} ({{ result.test_type }}):
+  {% for vio in result.violations %}
+  - {{ vio }}
+  {% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+---
+{% endfor %}
+
+## 异常阀门清单
+
+{% if summary.abnormal_valves %}
+| 阀门编号 | 型号 | 安装位置 |
+|----------|------|----------|
+{% for vid in summary.abnormal_valves %}
+{% set v = valve_index.get(vid) %}
+| {{ vid }} | {{ v.model if v else '' }} | {{ v.installation_location if v else '' }} |
+{% endfor %}
+{% else %}
+无异常阀门
+{% endif %}
+
+---
+
+*报告生成时间：自动生成*
