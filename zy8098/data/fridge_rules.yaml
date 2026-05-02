@@ -1,0 +1,12 @@
+- rule_name: "标准冷藏规则"
+  fridge_code: "FRIDGE_A"
+  retention_hours: 48
+  temperature_min: 0.0
+  temperature_max: 4.0
+  priority: 1
+- rule_name: "低温冷藏规则"
+  fridge_code: "FRIDGE_B"
+  retention_hours: 72
+  temperature_min: -2.0
+  temperature_max: 2.0
+  priority: 2
