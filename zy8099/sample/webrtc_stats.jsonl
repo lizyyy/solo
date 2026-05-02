@@ -1,0 +1,7 @@
+{"timestamp":1746153600000,"clientId":"doctor_001","role":"doctor","type":"inbound-rtp","id":"audio_1","packetsLost":5,"packetsReceived":100,"jitter":0.02}
+{"timestamp":1746153601000,"clientId":"doctor_001","role":"doctor","type":"inbound-rtp","id":"video_1","packetsLost":10,"packetsReceived":200,"jitter":0.05}
+{"timestamp":1746153602000,"clientId":"patient_001","role":"patient","type":"inbound-rtp","id":"audio_2","packetsLost":3,"packetsReceived":150,"jitter":0.03}
+{"timestamp":1746153603000,"clientId":"patient_001","role":"patient","type":"inbound-rtp","id":"video_2","packetsLost":20,"packetsReceived":200,"jitter":0.15}
+{"timestamp":1746153604000,"clientId":"doctor_001","role":"doctor","type":"outbound-rtp","id":"audio_3","audioLevel":0.5,"videoLevel":0.5}
+{"timestamp":1746153605000,"clientId":"doctor_001","role":"doctor","type":"inbound-rtp","id":"audio_1","packetsLost":8,"packetsReceived":100,"jitter":0.04}
+{"timestamp":1746153606000,"clientId":"patient_001","role":"patient","type":"inbound-rtp","id":"video_2","packetsLost":25,"packetsReceived":200,"jitter":0.2}

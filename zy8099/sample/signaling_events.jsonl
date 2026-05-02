@@ -1,0 +1,7 @@
+{"timestamp":1746153595000,"clientId":"doctor_001","role":"doctor","eventType":"ice_candidate"}
+{"timestamp":1746153596000,"clientId":"patient_001","role":"patient","eventType":"ice_candidate"}
+{"timestamp":1746153597000,"clientId":"doctor_001","role":"doctor","eventType":"ice_connection_state_change","state":"connected"}
+{"timestamp":1746153600000,"clientId":"doctor_001","role":"doctor","eventType":"offer_sent"}
+{"timestamp":1746153601000,"clientId":"patient_001","role":"patient","eventType":"answer_received"}
+{"timestamp":1746153607000,"clientId":"patient_001","role":"patient","eventType":"ice_disconnect"}
+{"timestamp":1746153608000,"clientId":"patient_001","role":"patient","eventType":"ice_reconnect_fail"}

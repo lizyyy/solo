@@ -1,0 +1,28 @@
+rules:
+  - id: ice_reconnect_fail
+    name: ICE 重连失败
+    description: 检测 ICE 连接重连失败
+    category: ice
+    threshold: 2
+    enabled: true
+
+  - id: av_sync_issue
+    name: 音视频不同步
+    description: 检测音频和视频不同步问题
+    category: av_sync
+    threshold: 0.5
+    enabled: true
+
+  - id: packet_loss_spike
+    name: 丢包率尖峰
+    description: 检测丢包率突然升高
+    category: packet_loss
+    threshold: 0.05
+    enabled: true
+
+  - id: jitter_spike
+    name: 抖动尖峰
+    description: 检测网络抖动突然升高
+    category: jitter
+    threshold: 0.1
+    enabled: true
