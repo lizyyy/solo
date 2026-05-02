@@ -1,0 +1,44 @@
+{
+    "plan_id": "FP-2024-001",
+    "name": "标准氧化烧成计划",
+    "description": "适用于瓷泥的标准氧化烧成曲线，包含预热、快速升温和保温阶段",
+    "created_at": "2024-01-10T08:00:00",
+    "segments": [
+        {
+            "segment_id": "S1",
+            "name": "预热阶段",
+            "start_temperature": 25,
+            "end_temperature": 300,
+            "rate": 150,
+            "hold_time_minutes": 0,
+            "description": "缓慢升温以排除坯体中的水分"
+        },
+        {
+            "segment_id": "S2",
+            "name": "氧化阶段",
+            "start_temperature": 300,
+            "end_temperature": 800,
+            "rate": 200,
+            "hold_time_minutes": 0,
+            "description": "快速升温，有机物燃烧氧化"
+        },
+        {
+            "segment_id": "S3",
+            "name": "快速升温",
+            "start_temperature": 800,
+            "end_temperature": 1220,
+            "rate": 210,
+            "hold_time_minutes": 0,
+            "description": "接近最高温的升温阶段"
+        },
+        {
+            "segment_id": "S4",
+            "name": "最高温保温",
+            "start_temperature": 1220,
+            "end_temperature": 1220,
+            "rate": 0,
+            "hold_time_minutes": 30,
+            "description": "最高温保温30分钟，确保釉料充分熔融"
+        }
+    ]
+}
