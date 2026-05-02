@@ -1,0 +1,50 @@
+{
+  "project_name": "示例演出项目",
+  "tracks": [
+    {
+      "name": "序曲",
+      "start_time": 0.0,
+      "end_time": 8.0,
+      "duration": 8.0,
+      "cue_points": [0.0, 2.5, 5.0],
+      "description": "开场序曲，包含主持人登场"
+    },
+    {
+      "name": "第一幕主题曲",
+      "start_time": 10.0,
+      "end_time": 28.0,
+      "duration": 18.0,
+      "cue_points": [0.0, 5.0, 10.0, 15.0],
+      "description": "第一幕主题音乐"
+    },
+    {
+      "name": "第二幕曲",
+      "start_time": 30.0,
+      "end_time": 38.0,
+      "duration": 8.0,
+      "cue_points": [0.0, 1.0, 3.0],
+      "description": "第二幕过渡音乐"
+    },
+    {
+      "name": "第三幕曲",
+      "start_time": 35.0,
+      "end_time": 55.0,
+      "duration": 20.0,
+      "cue_points": [0.0, 5.0, 10.0, 15.0],
+      "description": "第三幕高潮音乐"
+    },
+    {
+      "name": "片尾曲",
+      "start_time": 55.0,
+      "end_time": 65.0,
+      "duration": 10.0,
+      "cue_points": [0.0, 5.0],
+      "description": "结束曲"
+    }
+  ],
+  "metadata": {
+    "created_at": "2024-01-15T10:30:00",
+    "version": "1.0",
+    "total_duration": 65.0
+  }
+}

@@ -1,0 +1,113 @@
+# 设备通道配置文件
+# 定义舞台灯光设备及其对应的DMX通道
+
+project_info:
+  name: "示例演出设备配置"
+  venue: "实验剧场"
+  created_at: "2024-01-15"
+  total_channels: 9
+
+scenes:
+  - name: "开场"
+    description: "开场和主持人区域"
+    devices:
+      - channel: 1
+        name: "主舞台面光1"
+        type: "LED Par"
+        description: "主舞台正面照明"
+        patch: 1
+      - channel: 2
+        name: "主舞台面光2"
+        type: "LED Par"
+        description: "主舞台正面照明补光"
+        patch: 2
+      - channel: 3
+        name: "主舞台顶光1"
+        type: "Moving Head"
+        description: "主舞台顶部染色"
+        patch: 3
+
+  - name: "第一幕"
+    description: "第一幕场景设备"
+    devices:
+      - channel: 4
+        name: "追光1"
+        type: "Spotlight"
+        description: "主持人/演员追光"
+        patch: 4
+      - channel: 5
+        name: "背景光1"
+        type: "LED Bar"
+        description: "背景染色灯光"
+        patch: 5
+      - channel: 6
+        name: "侧光1"
+        type: "LED Par"
+        description: "舞台左侧氛围灯"
+        patch: 6
+      - channel: 7
+        name: "侧光2"
+        type: "LED Par"
+        description: "舞台右侧氛围灯"
+        patch: 7
+      - channel: 8
+        name: "道具照明1"
+        type: "Pinspot"
+        description: "重点道具聚焦照明"
+        patch: 8
+      - channel: 9
+        name: "道具照明2"
+        type: "Pinspot"
+        description: "重点道具聚焦照明"
+        patch: 9
+
+  - name: "第二幕"
+    description: "第二幕场景设备（复用部分设备）"
+    devices:
+      - channel: 1
+        name: "主舞台面光1"
+        type: "LED Par"
+        description: "主舞台正面照明"
+        patch: 1
+      - channel: 2
+        name: "主舞台面光2"
+        type: "LED Par"
+        description: "主舞台正面照明补光"
+        patch: 2
+      - channel: 4
+        name: "追光1"
+        type: "Spotlight"
+        description: "主持人/演员追光"
+        patch: 4
+
+  - name: "第三幕"
+    description: "第三幕场景设备"
+    devices:
+      - channel: 1
+        name: "主舞台面光1"
+        type: "LED Par"
+        description: "主舞台正面照明"
+        patch: 1
+      - channel: 2
+        name: "主舞台面光2"
+        type: "LED Par"
+        description: "主舞台正面照明补光"
+        patch: 2
+      - channel: 5
+        name: "背景光1"
+        type: "LED Bar"
+        description: "背景染色灯光"
+        patch: 5
+      - channel: 6
+        name: "侧光1"
+        type: "LED Par"
+        description: "舞台左侧氛围灯"
+        patch: 6
+
+notes: |
+  通道说明：
+  - 通道1-3: 主舞台基础照明
+  - 通道4: 追光灯
+  - 通道5-7: 氛围和背景灯光
+  - 通道8-9: 道具和特殊效果照明
+  - 通道99-100: 未定义（测试用）
