@@ -1,0 +1,35 @@
+# 示例保护分支和标签表
+# 格式: 每行一个引用名，使用 # is_tag: true 标记标签
+# 标签通常在 LFS 迁移时需要特别注意，因为它们指向固定提交
+
+# 主分支（保护分支）
+main
+master
+
+# 开发分支
+develop
+
+# 发布分支
+release/1.0
+release/1.1
+release/2.0
+
+# 标签（使用 is_tag: true 标记）
+v1.0.0  # is_tag: true
+v1.0.1  # is_tag: true
+v1.1.0  # is_tag: true
+v1.2.0  # is_tag: true
+v2.0.0  # is_tag: true
+
+# 预发布标签
+v1.0.0-alpha  # is_tag: true
+v1.0.0-beta   # is_tag: true
+v1.0.0-rc1    # is_tag: true
+
+# 热修复分支
+hotfix/critical-bug
+hotfix/security-patch
+
+# 功能分支（通常不需要保护）
+# feature/new-ui
+# feature/api-v2
