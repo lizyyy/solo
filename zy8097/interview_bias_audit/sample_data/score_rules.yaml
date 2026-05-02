@@ -1,0 +1,51 @@
+version: "1.0"
+description: "面试评分规则配置"
+
+thresholds:
+  high_score: 85.0
+  low_score: 50.0
+  scale_drift_std: 15.0
+  round_conflict_diff: 20.0
+
+scoring_criteria:
+  technical_foundation:
+    weight: 0.3
+    min_score: 60
+    description: "技术基础"
+  problem_solving:
+    weight: 0.25
+    min_score: 55
+    description: "问题解决能力"
+  communication:
+    weight: 0.15
+    min_score: 50
+    description: "沟通表达能力"
+  project_experience:
+    weight: 0.2
+    min_score: 50
+    description: "项目经验"
+  learning_ability:
+    weight: 0.1
+    min_score: 50
+    description: "学习能力"
+
+detection_rules:
+  - type: "scale_drift"
+    enabled: true
+    description: "检测同一岗位评分尺度漂移"
+
+  - type: "round_conflict"
+    enabled: true
+    description: "检测同一候选人不同轮次结论冲突"
+
+  - type: "unevidenced_extreme_score"
+    enabled: true
+    description: "检测缺少证据的高分或低分"
+
+  - type: "same_name_different_position"
+    enabled: true
+    description: "检测同名候选人不同岗位"
+
+  - type: "empty_notes"
+    enabled: true
+    description: "检测空备注"

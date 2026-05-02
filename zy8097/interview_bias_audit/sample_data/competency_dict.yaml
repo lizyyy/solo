@@ -1,0 +1,78 @@
+version: "1.0"
+description: "岗位能力词库"
+
+competencies:
+  技术基础:
+    keywords:
+      - 算法
+      - 数据结构
+      - 数据库
+      - SQL
+      - Python
+      - Java
+      - 分布式
+      - 微服务
+      - 架构
+      - 基础
+
+  问题解决能力:
+    keywords:
+      - 问题解决
+      - 逻辑思维
+      - 分析能力
+      - 解决方案
+      - 调试
+      - 优化
+
+  沟通表达:
+    keywords:
+      - 沟通
+      - 表达
+      - 讲解
+      - 协调
+      - 推动
+
+  项目经验:
+    keywords:
+      - 项目
+      - 经验
+      - 实践
+      - 迭代
+      - 开发
+      - 团队
+
+  学习能力:
+    keywords:
+      - 学习
+      - 成长
+      - 潜力
+      - 适应
+
+  前端技术:
+    keywords:
+      - HTML
+      - CSS
+      - JavaScript
+      - React
+      - Vue
+      - 框架
+      - 页面
+      - 性能优化
+
+  数据分析:
+    keywords:
+      - SQL
+      - Python
+      - 数据处理
+      - 统计
+      - 可视化
+      - 清洗
+      - 建模
+
+  产品思维:
+    keywords:
+      - 需求分析
+      - 用户痛点
+      - 产品迭代
+      - 用户体验
+      - 竞品分析
