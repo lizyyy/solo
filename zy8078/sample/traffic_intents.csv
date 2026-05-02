@@ -1,0 +1,7 @@
+SourceNamespace,SourceLabels,DestinationNamespace,DestinationLabels,DestinationService,Port,Protocol,Description
+frontend,"app=frontend,tier=web",backend,"app=backend,tier=api",,8080,TCP,Frontend to Backend API
+frontend,"app=frontend,tier=web",backend,"app=backend,tier=api",backend-service,80,TCP,Frontend to Backend Service
+backend,"app=backend,tier=api",db,"app=database,tier=db",db-service,3306,TCP,Backend to Database
+frontend,"app=frontend,tier=web",db,"app=database,tier=db",,3306,TCP,Frontend to Database (Blocked)
+backend,"app=backend,tier=api",frontend,"app=frontend,tier=web",,80,TCP,Backend to Frontend (Blocked)
+default,,frontend,"app=frontend,tier=web",,80,TCP,External to Frontend
