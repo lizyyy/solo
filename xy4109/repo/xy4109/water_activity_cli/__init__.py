@@ -1,0 +1,3 @@
+from water_activity_cli.version import __version__
+
+__all__ = ["__version__"]
