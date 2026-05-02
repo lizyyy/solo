@@ -1,0 +1,26 @@
+capabilities:
+  - deviceType: ble_sensor_v2
+    model: BLE-SENSOR-2000
+    maxChunkSize: 2048
+    supportedHashAlgorithms:
+      - SHA-256
+      - MD5
+    minBatteryLevel: 20
+    supportsResume: true
+    maxRolloutRate: 100
+  - deviceType: ble_sensor_v1
+    model: BLE-SENSOR-1000
+    maxChunkSize: 1024
+    supportedHashAlgorithms:
+      - MD5
+    minBatteryLevel: 30
+    supportsResume: false
+    maxRolloutRate: 50
+  - deviceType: ble_beacon_v3
+    model: BLE-BEACON-3000
+    maxChunkSize: 4096
+    supportedHashAlgorithms:
+      - SHA-256
+    minBatteryLevel: 15
+    supportsResume: true
+    maxRolloutRate: 200

@@ -1,0 +1,30 @@
+{
+  "name": "ble-ota-precheck",
+  "version": "1.0.0",
+  "description": "CLI tool for pre-checking BLE device OTA packages before rollout",
+  "main": "dist/cli.js",
+  "bin": {
+    "ota-precheck": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "demo": "npm run build && node dist/cli.js --manifest sample/firmware_manifest.json --chunks sample/chunks --caps sample/device_caps.yaml --rollout sample/rollout.csv",
+    "start": "node dist/cli.js"
+  },
+  "keywords": ["BLE", "OTA", "IoT", "firmware"],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "csv-parser": "^3.0.0",
+    "figlet": "^1.7.0",
+    "yaml": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.8",
+    "@types/node": "^20.11.0",
+    "@types/yaml": "^1.9.7",
+    "typescript": "^5.3.3"
+  }
+}

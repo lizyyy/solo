@@ -1,0 +1,9 @@
+device_id,device_type,current_version,target_version,priority,region
+sensor-001,ble_sensor_v2,2.0.0,2.1.0,high,us-west
+sensor-002,ble_sensor_v2,2.0.5,2.1.0,high,us-east
+sensor-003,ble_sensor_v2,2.1.1,2.1.0,medium,eu-west
+sensor-004,ble_sensor_v2,1.4.0,2.1.0,medium,apac
+sensor-005,ble_sensor_v1,1.8.0,2.1.0,low,us-west
+sensor-006,ble_sensor_v2,2.0.3,2.1.0,low,eu-north
+sensor-007,ble_beacon_v3,1.9.0,2.1.0,high,us-east
+sensor-008,ble_sensor_v2,2.0.0,2.1.0,medium,apac

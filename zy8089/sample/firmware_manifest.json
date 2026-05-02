@@ -1,0 +1,33 @@
+{
+  "version": "2.1.0",
+  "targetDeviceType": "ble_sensor_v2",
+  "minSupportedVersion": "1.5.0",
+  "maxSupportedVersion": "2.0.9",
+  "releaseDate": "2024-01-15",
+  "chunks": [
+    {
+      "index": 0,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 1024,
+      "filename": "chunk_0.bin"
+    },
+    {
+      "index": 1,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 1024,
+      "filename": "chunk_1.bin"
+    },
+    {
+      "index": 2,
+      "hash": "7d2b2f0d0c6e7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2",
+      "size": 512,
+      "filename": "chunk_2.bin"
+    }
+  ],
+  "totalSize": 2560,
+  "metadata": {
+    "buildId": "build-20240115-001",
+    "commitHash": "a1b2c3d4e5f6",
+    "signingKey": "rsa-2048-pub-key-id-001"
+  }
+}
