@@ -1,0 +1,51 @@
+billing_rules:
+  default:
+    price_per_kwh: 1.2
+    minimum_charge: 0
+    service_fee_ratio: 0.1
+    overtime_multiplier: 1.5
+
+  area_type_multipliers:
+    retail: 1.0
+    food_court: 1.2
+    entertainment: 1.5
+    shared: 0.8
+
+  shop_billing_rules:
+    A001:
+      price_per_kwh: 1.3
+      service_fee_ratio: 0.12
+    B001:
+      price_per_kwh: 1.25
+      service_fee_ratio: 0.1
+    C001:
+      price_per_kwh: 1.35
+    D001:
+      price_per_kwh: 1.4
+      food_court_surcharge: 0.2
+    E001:
+      price_per_kwh: 1.2
+      minimum_charge: 100
+    F001:
+      price_per_kwh: 1.2
+      vacant_processing: "按空铺处理，不计基础电费但分摊公共区域"
+
+  shared_area_allocation:
+    method: "area_proportional"
+    min_share: 0.1
+    max_share: 0.5
+
+  cross_month_handling:
+    method: "prorate"
+    fallback_method: "use_previous_month"
+
+  holiday_handling:
+    method: "apply_discount"
+    holiday_discount: 0.85
+    peak_hours_multiplier: 1.3
+
+  anomaly_detection:
+    max_monthly_increase_ratio: 2.0
+    max_daily_kwh: 500
+    min_daily_kwh: 0
+    zero_reading_threshold_days: 30

@@ -1,0 +1,67 @@
+{
+  "meter_shop_mapping": {
+    "M001": {
+      "shop_no": ["A001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M002": {
+      "shop_no": ["B001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M003": {
+      "shop_no": ["C001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M004": {
+      "shop_no": ["A001", "B001", "C001"],
+      "area_type": "shared",
+      "shared_ratio": 0.33
+    },
+    "M005": {
+      "shop_no": ["D001"],
+      "area_type": "food_court",
+      "shared_ratio": 0
+    },
+    "M006": {
+      "shop_no": ["E001"],
+      "area_type": "retail",
+      "multiplier": 100,
+      "shared_ratio": 0
+    },
+    "M007": {
+      "shop_no": ["F001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M008": {
+      "shop_no": ["G001", "G002"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M009": {
+      "shop_no": ["H001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    },
+    "M010": {
+      "shop_no": ["I001"],
+      "area_type": "retail",
+      "shared_ratio": 0
+    }
+  },
+  "shop_info": {
+    "A001": {"shop_name": "服装店A001", "area": 50, "status": "active"},
+    "B001": {"shop_name": "鞋店B001", "area": 30, "status": "active"},
+    "C001": {"shop_name": "饰品店C001", "area": 25, "status": "active"},
+    "D001": {"shop_name": "餐饮店D001", "area": 80, "status": "active"},
+    "E001": {"shop_name": "书店E001", "area": 40, "status": "active"},
+    "F001": {"shop_name": "空铺F001", "area": 35, "status": "vacant"},
+    "G001": {"shop_name": "杂货店G001", "area": 20, "status": "active"},
+    "G002": {"shop_name": "水果店G002", "area": 20, "status": "active"},
+    "H001": {"shop_name": "缺失读数测试H001", "area": 45, "status": "active"},
+    "I001": {"shop_name": "节假日测试I001", "area": 30, "status": "active"}
+  }
+}
