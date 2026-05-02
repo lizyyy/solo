@@ -1,0 +1,29 @@
+{
+  "amendments": [
+    {
+      "amendment_id": "AM-001",
+      "protocol_version": "2.0",
+      "effective_date": "2026-01-23",
+      "effective_timezone": "UTC",
+      "description": "Protocol Amendment 1 - Extended visit windows",
+      "visit_changes": [
+        {
+          "visit_name": "Day 7",
+          "change": "Window extended from ±1 days to ±2 days"
+        },
+        {
+          "visit_name": "Day 14",
+          "change": "Window extended from ±2 days to ±3 days"
+        },
+        {
+          "visit_name": "Day 28",
+          "change": "Window extended from ±3 days to ±4 days"
+        },
+        {
+          "visit_name": "Day 56",
+          "change": "Window extended from ±5 days to ±7 days"
+        }
+      ]
+    }
+  ]
+}

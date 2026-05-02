@@ -1,0 +1,22 @@
+subject_id,visit_name,visit_date,visit_timezone,is_missed
+S001,Screening,2026-01-15,America/New_York,false
+S001,Day 1,2026-01-15,America/New_York,false
+S001,Day 7,2026-01-20,America/New_York,false
+S001,Day 14,2026-02-04,America/New_York,false
+S001,Day 28,2026-02-12,America/New_York,false
+S002,Screening,2026-01-20,America/New_York,false
+S002,Day 1,2026-01-20,America/New_York,false
+S002,Day 7,2026-01-27,America/New_York,false
+S002,Day 7,2026-01-27,America/New_York,false
+S002,Day 14,2026-02-03,America/New_York,false
+S003,Screening,2026-01-25,Europe/London,false
+S003,Day 1,2026-01-25,Europe/London,false
+S003,Day 7,2026-02-01,Europe/London,false
+S003,Day 14,2026-02-08,Europe/London,false
+S004,Screening,2026-01-30,Asia/Tokyo,false
+S004,Day 1,2026-01-30,Asia/Tokyo,true
+S004,Day 7,2026-02-06,Asia/Tokyo,false
+S005,Screening,2026-02-01,UTC,false
+S005,Day 1,2026-02-01,UTC,false
+S005,Day 7,2026-02-08,UTC,false
+S005,Day 14,2026-02-15,UTC,false

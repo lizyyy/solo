@@ -1,0 +1,76 @@
+versions:
+  - version: "1.0"
+    windows:
+      - visit_name: "Screening"
+        target_days: 0
+        window_early_days: 7
+        window_late_days: 0
+        is_mandatory: true
+
+      - visit_name: "Day 1"
+        target_days: 0
+        window_early_days: 0
+        window_late_days: 0
+        is_mandatory: true
+
+      - visit_name: "Day 7"
+        target_days: 7
+        window_early_days: 1
+        window_late_days: 1
+        is_mandatory: true
+
+      - visit_name: "Day 14"
+        target_days: 14
+        window_early_days: 2
+        window_late_days: 2
+        is_mandatory: true
+
+      - visit_name: "Day 28"
+        target_days: 28
+        window_early_days: 3
+        window_late_days: 3
+        is_mandatory: true
+
+      - visit_name: "Day 56"
+        target_days: 56
+        window_early_days: 5
+        window_late_days: 5
+        is_mandatory: true
+
+  - version: "2.0"
+    windows:
+      - visit_name: "Screening"
+        target_days: 0
+        window_early_days: 14
+        window_late_days: 0
+        is_mandatory: true
+
+      - visit_name: "Day 1"
+        target_days: 0
+        window_early_days: 0
+        window_late_days: 0
+        is_mandatory: true
+
+      - visit_name: "Day 7"
+        target_days: 7
+        window_early_days: 2
+        window_late_days: 2
+        is_mandatory: true
+
+      - visit_name: "Day 14"
+        target_days: 14
+        window_early_days: 3
+        window_late_days: 3
+        is_mandatory: true
+
+      - visit_name: "Day 28"
+        target_days: 28
+        window_early_days: 4
+        window_late_days: 4
+        is_mandatory: true
+
+      - visit_name: "Day 56"
+        target_days: 56
+        window_early_days: 7
+        window_late_days: 7
+        is_mandatory: true

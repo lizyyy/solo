@@ -1,0 +1,35 @@
+[project]
+name = "ctv-monitor"
+version = "0.1.0"
+description = "Clinical Trial Visit Window Deviation Checker - CLI tool for monitoring visit window compliance"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=2.0.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.0.0",
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+ctv-monitor = "ctv_monitor.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ctv_monitor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
