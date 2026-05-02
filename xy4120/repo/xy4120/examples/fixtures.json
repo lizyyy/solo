@@ -1,0 +1,41 @@
+[
+  {
+    "name": "虎钳左钳口",
+    "offset_x": -100.0,
+    "offset_y": 0.0,
+    "offset_z": 0.0,
+    "min_x": -120.0,
+    "max_x": -80.0,
+    "min_y": -50.0,
+    "max_y": 50.0,
+    "min_z": 0.0,
+    "max_z": 150.0,
+    "description": "左侧虎钳固定钳口，高度150mm"
+  },
+  {
+    "name": "虎钳右钳口",
+    "offset_x": 150.0,
+    "offset_y": 0.0,
+    "offset_z": 0.0,
+    "min_x": 130.0,
+    "max_x": 180.0,
+    "min_y": -50.0,
+    "max_y": 50.0,
+    "min_z": 0.0,
+    "max_z": 150.0,
+    "description": "右侧虎钳活动钳口"
+  },
+  {
+    "name": "工作台T型槽",
+    "offset_x": 0.0,
+    "offset_y": 0.0,
+    "offset_z": -20.0,
+    "min_x": -500.0,
+    "max_x": 500.0,
+    "min_y": -500.0,
+    "max_y": 500.0,
+    "min_z": -100.0,
+    "max_z": -5.0,
+    "description": "工作台面下方区域，禁止进入"
+  }
+]
