@@ -1,0 +1,127 @@
+missionId: MIS-2026-0503-001
+missionName: 110kV 阳光线电力巡检
+flightDate: '2026-05-03'
+pilot: 张三
+aircraft: DJI M300 RTK
+totalWaypoints: 12
+expectedPhotos: 12
+waypoints:
+  - id: WP-TOWER-A-001
+    towerId: TOWER-A
+    index: 1
+    latitude: 31.2304
+    longitude: 121.4737
+    altitude: 50.0
+    cameraAngle: -45.0
+    photoRequired: true
+    sequence: 1
+
+  - id: WP-TOWER-A-002
+    towerId: TOWER-A
+    index: 2
+    latitude: 31.2305
+    longitude: 121.4738
+    altitude: 45.0
+    cameraAngle: 0.0
+    photoRequired: true
+    sequence: 2
+
+  - id: WP-TOWER-A-003
+    towerId: TOWER-A
+    index: 3
+    latitude: 31.2306
+    longitude: 121.4739
+    altitude: 50.0
+    cameraAngle: 45.0
+    photoRequired: true
+    sequence: 3
+
+  - id: WP-TOWER-A-004
+    towerId: TOWER-A
+    index: 4
+    latitude: 31.2307
+    longitude: 121.4740
+    altitude: 55.0
+    cameraAngle: 90.0
+    photoRequired: true
+    sequence: 4
+
+  - id: WP-TOWER-B-001
+    towerId: TOWER-B
+    index: 1
+    latitude: 31.2314
+    longitude: 121.4747
+    altitude: 50.0
+    cameraAngle: -45.0
+    photoRequired: true
+    sequence: 5
+
+  - id: WP-TOWER-B-002
+    towerId: TOWER-B
+    index: 2
+    latitude: 31.2315
+    longitude: 121.4748
+    altitude: 45.0
+    cameraAngle: 0.0
+    photoRequired: true
+    sequence: 6
+
+  - id: WP-TOWER-B-003
+    towerId: TOWER-B
+    index: 3
+    latitude: 31.2316
+    longitude: 121.4749
+    altitude: 50.0
+    cameraAngle: 45.0
+    photoRequired: true
+    sequence: 7
+
+  - id: WP-TOWER-C-001
+    towerId: TOWER-C
+    index: 1
+    latitude: 31.2324
+    longitude: 121.4757
+    altitude: 50.0
+    cameraAngle: -45.0
+    photoRequired: true
+    sequence: 8
+
+  - id: WP-TOWER-C-002
+    towerId: TOWER-C
+    index: 2
+    latitude: 31.2325
+    longitude: 121.4758
+    altitude: 45.0
+    cameraAngle: 0.0
+    photoRequired: true
+    sequence: 9
+
+  - id: WP-TOWER-C-003
+    towerId: TOWER-C
+    index: 3
+    latitude: 31.2326
+    longitude: 121.4759
+    altitude: 50.0
+    cameraAngle: 45.0
+    photoRequired: true
+    sequence: 10
+
+  - id: WP-TOWER-D-001
+    towerId: TOWER-D
+    index: 1
+    latitude: 31.2334
+    longitude: 121.4767
+    altitude: 50.0
+    cameraAngle: -45.0
+    photoRequired: true
+    sequence: 11
+
+  - id: WP-TOWER-D-002
+    towerId: TOWER-D
+    index: 2
+    latitude: 31.2335
+    longitude: 121.4768
+    altitude: 45.0
+    cameraAngle: 0.0
+    photoRequired: true
+    sequence: 12

@@ -1,0 +1,6 @@
+{"id":"DEF-001","filename":"TOWER-A_001_20260503_090000.jpg","towerId":"TOWER-A","defectType":"绝缘子破损","severity":"critical","bbox":{"x":100,"y":200,"width":150,"height":100},"confidence":0.95,"notes":"严重破损需要更换"}
+{"id":"DEF-002","filename":"TOWER-A_002_20260503_090010.jpg","towerId":"TOWER-A","defectType":"金具松动","severity":"major","bbox":{"x":500,"y":800,"width":100,"height":80},"confidence":0.87,"notes":"需要复检"}
+{"id":"DEF-003","filename":"TOWER-B_001_20260503_091500.jpg","towerId":"TOWER-B","defectType":"导线放电痕迹","severity":"minor","bbox":{"x":3800,"y":1500,"width":300,"height":200},"confidence":0.72,"notes":"越界标注示例 - 超出图像右边界"}
+{"id":"DEF-004","filename":"TOWER-C_001_20260503_093000.jpg","towerId":"TOWER-C","defectType":"塔材锈蚀","severity":"minor","bbox":{"x":-50,"y":100,"width":200,"height":150},"confidence":0.81,"notes":"越界标注示例 - x为负"}
+{"id":"DEF-005","filename":"TOWER-A_003_20260503_090020.jpg","towerId":"TOWER-A","defectType":"绝缘子污秽","severity":"minor","bbox":{"x":200,"y":2800,"width":150,"height":300},"confidence":0.65,"notes":"越界标注示例 - 超出图像下边界"}
+{"id":"DEF-006","filename":"NON_EXISTENT.jpg","towerId":"TOWER-Z","defectType":"测试缺陷","severity":"critical","bbox":{"x":100,"y":100,"width":50,"height":50},"confidence":0.99,"notes":"引用不存在的图片"}
