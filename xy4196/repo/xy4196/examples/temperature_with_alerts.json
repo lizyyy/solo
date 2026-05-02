@@ -1,0 +1,53 @@
+{
+  "freezer_id": "FREEZER001",
+  "readings": [
+    {
+      "timestamp": "2026-05-03T08:00:00",
+      "temperature": -78.5,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": false,
+      "alert_marked": false
+    },
+    {
+      "timestamp": "2026-05-03T08:30:00",
+      "temperature": -65.0,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": true,
+      "alert_marked": false
+    },
+    {
+      "timestamp": "2026-05-03T08:45:00",
+      "temperature": -60.5,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": true,
+      "alert_marked": false
+    },
+    {
+      "timestamp": "2026-05-03T09:00:00",
+      "temperature": -79.2,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": false,
+      "alert_marked": false
+    },
+    {
+      "timestamp": "2026-05-03T10:00:00",
+      "temperature": -88.0,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": true,
+      "alert_marked": true
+    },
+    {
+      "timestamp": "2026-05-03T11:00:00",
+      "temperature": -80.1,
+      "freezer_id": "FREEZER001",
+      "probe_id": "PROBE01",
+      "is_alert": false,
+      "alert_marked": false
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "transfer_id": "TRANSFER_20260503_001",
+  "transfer_date": "2026-05-03T09:00:00",
+  "sender_name": "张三",
+  "sender_signature": "ZS_20260503",
+  "sender_sign_date": "2026-05-03T09:10:00",
+  "receiver_name": "李四",
+  "receiver_signature": "LS_20260503",
+  "receiver_sign_date": "2026-05-03T09:15:00",
+  "box_ids": ["BOX001", "BOX002"],
+  "notes": "常规样本交接，共2个冻存盒"
+}
