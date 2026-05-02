@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>窄水道避碰演练</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>窄水道避碰演练</h1>
+            <div class="header-info">
+                <span id="level-name">关卡：示例关卡</span>
+                <span id="turn-counter">回合：1</span>
+                <span id="score">扣分：0</span>
+            </div>
+        </header>
+        
+        <main class="main-container">
+            <aside class="sidebar left">
+                <div class="panel">
+                    <h3>关卡管理</h3>
+                    <div class="btn-group">
+                        <button id="btn-new-level">新建关卡</button>
+                        <button id="btn-load-level">加载关卡</button>
+                        <button id="btn-save-level">保存关卡</button>
+                    </div>
+                    <div class="level-list" id="level-list">
+                        <!-- 关卡列表 -->
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h3>关卡编辑</h3>
+                    <div class="edit-tools" id="edit-tools">
+                        <button class="edit-btn" data-tool="select" disabled>选择</button>
+                        <button class="edit-btn" data-tool="deep-water">深水航道</button>
+                        <button class="edit-btn" data-tool="shallow-water">浅滩</button>
+                        <button class="edit-btn" data-tool="speed-limit">限速区</button>
+                        <button class="edit-btn" data-tool="berth">泊位</button>
+                        <button class="edit-btn" data-tool="current">设置潮流</button>
+                        <button class="edit-btn" data-tool="tug">拖轮</button>
+                        <button class="edit-btn" data-tool="cargo">货船</button>
+                        <button class="edit-btn" data-tool="other-ship">来船</button>
+                    </div>
+                    <div class="edit-config" id="edit-config">
+                        <!-- 编辑配置区 -->
+                    </div>
+                </div>
+            </aside>
+            
+            <section class="game-area">
+                <div class="game-controls">
+                    <div class="btn-group">
+                        <button id="btn-edit-mode" class="mode-btn active">编辑模式</button>
+                        <button id="btn-play-mode" class="mode-btn">演练模式</button>
+                    </div>
+                    <div class="play-controls" id="play-controls" style="display: none;">
+                        <button id="btn-undo">撤销</button>
+                        <button id="btn-next-turn">下一回合</button>
+                        <button id="btn-restart">重新开始</button>
+                        <button id="btn-export-md">导出复盘</button>
+                        <button id="btn-export-json">导出回放</button>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+                
+                <div class="info-panel" id="info-panel">
+                    <h4>操作提示</h4>
+                    <p id="info-text">选择编辑工具开始绘制关卡</p>
+                </div>
+            </section>
+            
+            <aside class="sidebar right">
+                <div class="panel">
+                    <h3>船舶状态</h3>
+                    <div class="ship-list" id="ship-list">
+                        <!-- 船舶列表 -->
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h3>事故记录</h3>
+                    <div class="incident-list" id="incident-list">
+                        <p class="no-incidents">暂无事故记录</p>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h3>规则提示</h3>
+                    <div class="rules-info">
+                        <ul>
+                            <li><strong>交叉相遇：</strong>让右方来船</li>
+                            <li><strong>对遇：</strong>各自向右转向</li>
+                            <li><strong>追越：</strong>追越船让路</li>
+                            <li><strong>限速区：</strong>每回合最多1格</li>
+                            <li><strong>浅滩：</strong>禁止进入</li>
+                            <li><strong>潮流：</strong>自动位移叠加</li>
+                        </ul>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    
+    <script src="js/engine/Board.js"></script>
+    <script src="js/engine/Ship.js"></script>
+    <script src="js/engine/GameEngine.js"></script>
+    <script src="js/rules/CurrentSystem.js"></script>
+    <script src="js/rules/InertiaSystem.js"></script>
+    <script src="js/rules/CollisionRules.js"></script>
+    <script src="js/levels/Level.js"></script>
+    <script src="js/levels/LevelEditor.js"></script>
+    <script src="js/levels/SampleLevels.js"></script>
+    <script src="js/rendering/Renderer.js"></script>
+    <script src="js/rendering/InputHandler.js"></script>
+    <script src="js/storage/Storage.js"></script>
+    <script src="js/storage/UndoManager.js"></script>
+    <script src="js/storage/ReplaySystem.js"></script>
+    <script src="js/export/MarkdownExporter.js"></script>
+    <script src="js/export/JSONExporter.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
