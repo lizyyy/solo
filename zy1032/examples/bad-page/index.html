@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>坏的页面示例 - 可访问性问题演示</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="container">
+    <h1>这个页面有很多可访问性问题</h1>
+    
+    <div class="section">
+      <h2>图片问题</h2>
+      
+      <img src="logo.png">
+      
+      <img src="banner.jpg" alt="">
+      
+      <img src="product.jpg" alt=" ">
+    </div>
+    
+    <div class="section">
+      <h2>表单问题</h2>
+      
+      <form id="login-form">
+        <div>
+          <input type="text" id="username" name="username">
+          <span>用户名</span>
+        </div>
+        
+        <div>
+          <label for="password">密码</label>
+          <input type="password" name="password">
+        </div>
+        
+        <div>
+          <input type="email" placeholder="邮箱">
+        </div>
+        
+        <div>
+          <textarea id="message" name="message"></textarea>
+        </div>
+        
+        <div>
+          <select id="country">
+            <option value="">选择国家</option>
+            <option value="cn">中国</option>
+            <option value="us">美国</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    
+    <div class="section">
+      <h2>按钮问题</h2>
+      
+      <button class="icon-btn">
+        <span class="icon">🔍</span>
+      </button>
+      
+      <button class="icon-btn" role="button">
+        <span class="icon">✉️</span>
+      </button>
+      
+      <div class="fake-button" onclick="submitForm()">
+        提交
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>链接问题</h2>
+      
+      <a href="/docs">点击这里</a>
+      
+      <a href="/more">更多</a>
+      
+      <a href="/help">
+        <span class="icon">❓</span>
+      </a>
+      
+      <a>没有 href 的链接</a>
+    </div>
+    
+    <div class="section">
+      <h2>重复 ID 问题</h2>
+      
+      <div id="card">第一个卡片</div>
+      <div id="card">第二个卡片</div>
+      
+      <form>
+        <input type="text" id="field" name="field1">
+        <input type="text" id="field" name="field2">
+      </form>
+    </div>
+    
+    <div class="section">
+      <h2>Tabindex 问题</h2>
+      
+      <div>
+        <input type="text" placeholder="第一个输入框" tabindex="3">
+        <input type="text" placeholder="第二个输入框" tabindex="1">
+        <input type="text" placeholder="第三个输入框" tabindex="2">
+      </div>
+      
+      <div>
+        <a href="/link" tabindex="-1">这个链接无法用 Tab 聚焦</a>
+        <button tabindex="-1">这个按钮也无法用 Tab 聚焦</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>ARIA 误用问题</h2>
+      
+      <button role="button" aria-label="">空的 aria-label</button>
+      
+      <button role="button">多余的 role="button"</button>
+      
+      <a href="#" role="link">多余的 role="link"</a>
+      
+      <button aria-hidden="true">这个按钮对屏幕阅读器隐藏</button>
+      
+      <div role="main" class="content">
+        这个 div 用了 role="main"，但语义上应该用 main 标签
+      </div>
+    </div>
+    
+    <div class="section contrast-problem">
+      <h2>颜色对比度问题</h2>
+      
+      <p class="low-contrast-text">
+        这段文字的颜色对比度很低，视力障碍用户可能无法阅读。
+      </p>
+      
+      <div class="light-bg-dark-text">
+        浅色背景上的深色文字（应该没问题）
+      </div>
+      
+      <div class="dark-bg-light-text">
+        深色背景上的浅色文字（对比度不足）
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function submitForm() {
+      console.log('表单提交');
+    }
+  </script>
+</body>
+</html>

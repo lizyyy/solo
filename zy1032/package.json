@@ -1,0 +1,30 @@
+{
+  "name": "a11y-smoke-cli",
+  "version": "1.0.0",
+  "description": "本地前端无障碍冒烟巡检器 - 快速扫描可访问性问题",
+  "main": "src/index.js",
+  "bin": {
+    "a11y-smoke": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node src/cli.js scan examples/bad-page",
+    "start": "node src/cli.js"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "linter",
+    "cli",
+    "react",
+    "html"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "commander": "^11.1.0",
+    "css-tree": "^2.3.1",
+    "glob": "^10.3.10",
+    "minimatch": "^9.0.3"
+  }
+}

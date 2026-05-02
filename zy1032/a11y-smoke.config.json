@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "img-alt": { "enabled": true, "severity": "error" },
+    "form-label": { "enabled": true, "severity": "error" },
+    "button-text": { "enabled": true, "severity": "error" },
+    "link-text": { "enabled": true, "severity": "error" },
+    "duplicate-id": { "enabled": true, "severity": "error" },
+    "tabindex": { "enabled": true, "severity": "warning" },
+    "aria-misuse": { "enabled": true, "severity": "error" },
+    "color-contrast": { "enabled": true, "severity": "warning" }
+  },
+  "contrastThreshold": 4.5,
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".git/**",
+    "*.min.css",
+    "vendor/**"
+  ],
+  "fileExtensions": [".html", ".jsx", ".tsx", ".css"]
+}
