@@ -1,0 +1,18 @@
+{
+  "name": "webrtc-file-transfer",
+  "version": "1.0.0",
+  "description": "WebRTC本地文件互传演练台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["webrtc", "file-transfer", "datachannel"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC 文件互传演练台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>📁 WebRTC 文件互传演练台</h1>
+      <p class="subtitle">本地点对点，无需登录，实时传输</p>
+    </header>
+
+    <div class="connection-panel" id="connectionPanel">
+      <div class="status-bar" id="statusBar">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">未连接</span>
+      </div>
+
+      <div class="room-controls" id="roomControls">
+        <div class="control-group">
+          <button class="btn btn-primary" id="createRoomBtn">创建房间</button>
+          <span class="divider">或</span>
+          <div class="join-input-group">
+            <input type="text" id="roomCodeInput" placeholder="输入房间码" maxlength="6">
+            <button class="btn btn-secondary" id="joinRoomBtn">加入</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="room-info" id="roomInfo" style="display: none;">
+        <div class="room-code-display">
+          <span class="label">房间码:</span>
+          <span class="code" id="displayRoomCode"></span>
+          <button class="btn btn-small btn-secondary" id="copyRoomCode">复制</button>
+        </div>
+        <div class="peer-status" id="peerStatus">
+          <span class="peer-dot" id="peerDot"></span>
+          <span id="peerStatusText">等待对方加入...</span>
+        </div>
+        <button class="btn btn-danger btn-small" id="leaveRoomBtn">离开房间</button>
+      </div>
+    </div>
+
+    <div class="main-content" id="mainContent" style="display: none;">
+      <div class="content-tabs">
+        <button class="tab-btn active" data-tab="send">📤 发送</button>
+        <button class="tab-btn" data-tab="receive">📥 接收</button>
+        <button class="tab-btn" data-tab="logs">📋 日志</button>
+        <button class="tab-btn" data-tab="history">📜 历史</button>
+      </div>
+
+      <div class="tab-content active" id="sendTab">
+        <div class="send-panel">
+          <div class="file-drop-zone" id="fileDropZone">
+            <div class="drop-icon">📁</div>
+            <p>拖拽文件到此处</p>
+            <p class="small-text">或点击下方按钮选择</p>
+            <input type="file" id="fileInput" multiple style="display: none;">
+            <button class="btn btn-secondary" id="selectFilesBtn">选择文件</button>
+          </div>
+
+          <div class="selected-files" id="selectedFiles" style="display: none;">
+            <div class="section-header">
+              <h3>已选择文件</h3>
+              <span class="file-count" id="selectedFileCount">0 个文件</span>
+            </div>
+            <div class="file-list" id="selectedFileList"></div>
+            <div class="send-controls">
+              <button class="btn btn-primary" id="sendAllBtn">全部发送</button>
+              <button class="btn btn-secondary" id="clearFilesBtn">清空</button>
+            </div>
+          </div>
+
+          <div class="transfer-queue" id="transferQueue" style="display: none;">
+            <div class="section-header">
+              <h3>传输队列</h3>
+              <div class="queue-controls">
+                <button class="btn btn-small btn-secondary" id="pauseAllBtn">全部暂停</button>
+                <button class="btn btn-small btn-secondary" id="cancelAllBtn">全部取消</button>
+              </div>
+            </div>
+            <div class="transfer-list" id="transferList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="receiveTab">
+        <div class="receive-panel">
+          <div class="receive-queue" id="receiveQueue">
+            <div class="empty-state" id="receiveEmpty">
+              <div class="empty-icon">📥</div>
+              <p>等待对方发送文件...</p>
+            </div>
+            <div class="receive-list" id="receiveList" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="logsTab">
+        <div class="logs-panel">
+          <div class="logs-controls">
+            <button class="btn btn-small btn-secondary" id="clearLogsBtn">清空日志</button>
+          </div>
+          <div class="logs-container" id="logsContainer"></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="historyTab">
+        <div class="history-panel">
+          <div class="history-controls">
+            <button class="btn btn-small btn-secondary" id="clearHistoryBtn">清空历史</button>
+          </div>
+          <div class="empty-state" id="historyEmpty" style="display: none;">
+            <div class="empty-icon">📜</div>
+            <p>暂无传输历史</p>
+          </div>
+          <div class="history-list" id="historyList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/signaling.js"></script>
+  <script src="js/webrtc.js"></script>
+  <script src="js/transfer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
