@@ -1,0 +1,52 @@
+[
+    {
+        "workorder_id": "WO20260501001",
+        "store_name": "中关村店",
+        "machine_id": "M001",
+        "issue_type": "锅炉故障",
+        "reported_time": "2026-05-01 10:30:00",
+        "assigned_time": "2026-05-01 11:00:00",
+        "status": "open",
+        "description": "咖啡机锅炉压力异常，无法正常出咖啡",
+        "reported_by": "张三",
+        "priority": "high"
+    },
+    {
+        "workorder_id": "WO20260501002",
+        "store_name": "国贸店",
+        "machine_id": "M002",
+        "issue_type": "萃取头堵塞",
+        "reported_time": "2026-04-29 14:00:00",
+        "assigned_time": "2026-04-29 15:00:00",
+        "resolved_time": "2026-04-30 09:30:00",
+        "closed_time": "2026-04-30 10:00:00",
+        "status": "closed",
+        "description": "萃取头严重堵塞，需要深度清洁",
+        "reported_by": "吴九",
+        "priority": "medium",
+        "resolution": "已更换萃取头密封圈并深度清洁"
+    },
+    {
+        "workorder_id": "WO20260501003",
+        "store_name": "望京店",
+        "machine_id": "M001",
+        "issue_type": "水泵异响",
+        "reported_time": "2026-05-02 08:00:00",
+        "status": "in_progress",
+        "description": "水泵工作时有异常噪音，影响制作效率",
+        "reported_by": "陈一",
+        "priority": "medium"
+    },
+    {
+        "workorder_id": "WO20260501004",
+        "store_name": "三里屯店",
+        "machine_id": "M001",
+        "issue_type": "显示屏故障",
+        "reported_time": "2026-04-28 09:00:00",
+        "assigned_time": "2026-04-28 10:00:00",
+        "status": "open",
+        "description": "触摸屏无响应，无法设置参数",
+        "reported_by": "黄十一",
+        "priority": "high"
+    }
+]
