@@ -1,0 +1,62 @@
+[
+  {
+    "id": "hazard_001",
+    "type": "ice",
+    "location": { "x": 15, "y": 20, "z": 1815 },
+    "severity": "high",
+    "description": "雪道中段发现大面积结冰区域，约10米长5米宽，冰层厚度约2厘米，位于缓坡转陡坡处，滑雪者在此处容易失控",
+    "radius": 8,
+    "photos": ["photo_001", "photo_002"],
+    "notes": "建议撒盐处理或放置警示标识，待气温回升后检查是否完全融化",
+    "timestamp": "2024-01-15T08:35:00Z",
+    "status": "pending"
+  },
+  {
+    "id": "hazard_002",
+    "type": "pit",
+    "location": { "x": 30, "y": 35, "z": 1825 },
+    "severity": "medium",
+    "description": "雪道右侧发现一个约2米宽、1米深的坑洼，坑边有暴露的岩石，可能导致滑雪者受伤",
+    "radius": 5,
+    "photos": ["photo_004"],
+    "notes": "需要用雪填充并压实，建议在雪量充足时处理",
+    "timestamp": "2024-01-15T08:50:00Z",
+    "status": "pending"
+  },
+  {
+    "id": "hazard_003",
+    "type": "rock",
+    "location": { "x": 40, "y": 45, "z": 1832 },
+    "severity": "critical",
+    "description": "山顶区域雪层较薄，有多处岩石露出，其中一块约3平方米的岩石完全暴露，位置在主雪道中央，非常危险",
+    "radius": 6,
+    "photos": ["photo_004"],
+    "notes": "立即用防护网隔离该区域，建议绕道规划新路线，待降雪后再检查",
+    "timestamp": "2024-01-15T09:30:00Z",
+    "status": "in_progress"
+  },
+  {
+    "id": "hazard_004",
+    "type": "ice",
+    "location": { "x": 10, "y": 10, "z": 1806 },
+    "severity": "medium",
+    "description": "山脚起点区域，由于人流频繁踩踏，部分区域雪面压实形成薄冰，特别是缆车出口处",
+    "radius": 4,
+    "photos": ["photo_005"],
+    "notes": "建议放置防滑垫或增加雪量覆盖，在高峰时段安排人员疏导",
+    "timestamp": "2024-01-15T09:45:00Z",
+    "status": "pending"
+  },
+  {
+    "id": "hazard_005",
+    "type": "debris",
+    "location": { "x": 25, "y": 25, "z": 1817 },
+    "severity": "low",
+    "description": "雪道中间隔离护栏附近发现少量树枝和落叶，可能影响滑雪体验，但危险性较低",
+    "radius": 3,
+    "photos": ["photo_003"],
+    "notes": "已清理大部分，剩余少量在下次巡检时再检查",
+    "timestamp": "2024-01-15T09:15:00Z",
+    "status": "resolved"
+  }
+]

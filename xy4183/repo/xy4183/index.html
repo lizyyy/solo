@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雪道隐患巡检沙盘</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航栏 -->
+    <header class="toolbar">
+      <div class="logo">
+        <span class="logo-icon">❄️</span>
+        <span class="logo-text">雪道隐患巡检沙盘</span>
+      </div>
+      
+      <div class="toolbar-actions">
+        <button id="btn-load-sample" class="btn btn-primary">
+          <span>📁</span> 导入示例数据
+        </button>
+        <button id="btn-save-project" class="btn btn-secondary">
+          <span>💾</span> 保存项目
+        </button>
+        <button id="btn-load-project" class="btn btn-secondary">
+          <span>📂</span> 加载项目
+        </button>
+        <div class="divider"></div>
+        <button id="btn-export-report" class="btn btn-success">
+          <span>📄</span> 导出巡检报告
+        </button>
+        <button id="btn-export-json" class="btn btn-info">
+          <span>📋</span> 导出标注JSON
+        </button>
+      </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+      <!-- 左侧工具栏 -->
+      <aside class="sidebar-left">
+        <div class="sidebar-section">
+          <h3>交互模式</h3>
+          <div class="mode-buttons">
+            <button id="mode-view" class="mode-btn active" data-mode="view">
+              <span class="mode-icon">👁️</span>
+              <span class="mode-text">浏览查看</span>
+            </button>
+            <button id="mode-mark" class="mode-btn" data-mode="mark_hazard">
+              <span class="mode-icon">🎯</span>
+              <span class="mode-text">标注隐患</span>
+            </button>
+            <button id="mode-route" class="mode-btn" data-mode="plan_route">
+              <span class="mode-icon">🛤️</span>
+              <span class="mode-text">规划路线</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>风险着色</h3>
+          <div class="color-mode-buttons">
+            <button class="color-mode-btn active" data-view="slope">坡度风险</button>
+            <button class="color-mode-btn" data-view="ice">结冰风险</button>
+            <button class="color-mode-btn" data-view="crowd">客流风险</button>
+            <button class="color-mode-btn" data-view="elevation">海拔高度</button>
+            <button class="color-mode-btn" data-view="composite">综合风险</button>
+          </div>
+          <div id="legend-container" class="legend-container"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>统计信息</h3>
+          <div id="stats-container" class="stats-container">
+            <div class="stat-item">
+              <span class="stat-label">隐患总数</span>
+              <span class="stat-value" id="stat-hazards">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">严重风险</span>
+              <span class="stat-value critical" id="stat-critical">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">路线点</span>
+              <span class="stat-value" id="stat-waypoints">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">预估距离</span>
+              <span class="stat-value" id="stat-distance">0 km</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 中间3D场景区域 -->
+      <section class="scene-container">
+        <div id="scene3d"></div>
+        
+        <!-- 场景加载状态 -->
+        <div id="loading-overlay" class="loading-overlay">
+          <div class="loading-content">
+            <div class="spinner"></div>
+            <p>正在加载3D场景...</p>
+          </div>
+        </div>
+
+        <!-- 模式提示 -->
+        <div id="mode-indicator" class="mode-indicator hidden">
+          <span id="mode-indicator-text"></span>
+        </div>
+      </section>
+
+      <!-- 右侧信息面板 -->
+      <aside class="sidebar-right">
+        <!-- 隐患列表 -->
+        <div class="sidebar-section collapsible">
+          <div class="section-header" data-target="hazards-panel">
+            <h3>🚨 隐患列表</h3>
+            <span class="collapse-icon">▼</span>
+          </div>
+          <div id="hazards-panel" class="section-content">
+            <div id="hazards-list" class="hazard-list">
+              <p class="empty-message">暂无隐患数据</p>
+            </div>
+            <button id="btn-clear-hazards" class="btn btn-danger btn-small mt-10">
+              清除所有隐患
+            </button>
+          </div>
+        </div>
+
+        <!-- 路线规划 -->
+        <div class="sidebar-section collapsible">
+          <div class="section-header" data-target="route-panel">
+            <h3>🛤️ 巡检路线</h3>
+            <span class="collapse-icon">▼</span>
+          </div>
+          <div id="route-panel" class="section-content">
+            <div id="route-list" class="route-list">
+              <p class="empty-message">暂无路线点，请在"规划路线"模式下点击雪道添加</p>
+            </div>
+            <div class="route-actions">
+              <button id="btn-clear-route" class="btn btn-danger btn-small">
+                清除路线
+              </button>
+              <button id="btn-optimize-route" class="btn btn-secondary btn-small">
+                优化路线
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据导入 -->
+        <div class="sidebar-section collapsible">
+          <div class="section-header" data-target="import-panel">
+            <h3>📥 数据导入</h3>
+            <span class="collapse-icon">▼</span>
+          </div>
+          <div id="import-panel" class="section-content">
+            <div class="import-section">
+              <label class="import-label">
+                <span>高程网格 CSV</span>
+                <input type="file" id="import-elevation" accept=".csv" hidden>
+                <span class="btn btn-secondary btn-small">选择文件</span>
+              </label>
+              <span id="elevation-filename" class="filename-display">未选择</span>
+            </div>
+            <div class="import-section">
+              <label class="import-label">
+                <span>设施 GeoJSON</span>
+                <input type="file" id="import-facilities" accept=".geojson,.json" hidden>
+                <span class="btn btn-secondary btn-small">选择文件</span>
+              </label>
+              <span id="facilities-filename" class="filename-display">未选择</span>
+            </div>
+            <div class="import-section">
+              <label class="import-label">
+                <span>隐患记录 JSON</span>
+                <input type="file" id="import-hazards" accept=".json" hidden>
+                <span class="btn btn-secondary btn-small">选择文件</span>
+              </label>
+              <span id="hazards-filename" class="filename-display">未选择</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- 隐患标注弹窗 -->
+    <div id="hazard-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>标注隐患</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="hazard-form">
+            <div class="form-group">
+              <label>隐患类型</label>
+              <select id="hazard-type" required>
+                <option value="">请选择类型</option>
+                <option value="ice">结冰</option>
+                <option value="pit">坑洼</option>
+                <option value="rock">岩石</option>
+                <option value="debris">杂物</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>严重程度</label>
+              <select id="hazard-severity" required>
+                <option value="low">🟢 低风险</option>
+                <option value="medium" selected>🟡 中风险</option>
+                <option value="high">🟠 高风险</option>
+                <option value="critical">🔴 严重风险</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>影响范围 (米)</label>
+              <input type="number" id="hazard-radius" value="5" min="1" max="50">
+            </div>
+            <div class="form-group">
+              <label>隐患描述</label>
+              <textarea id="hazard-description" rows="3" placeholder="请详细描述隐患情况..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>处理建议</label>
+              <textarea id="hazard-notes" rows="2" placeholder="输入处理建议..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>状态</label>
+              <select id="hazard-status">
+                <option value="pending">待处理</option>
+                <option value="in_progress">处理中</option>
+                <option value="resolved">已解决</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>位置坐标</label>
+              <div class="coords-display">
+                <span>X: <span id="coord-x">0</span></span>
+                <span>Y: <span id="coord-y">0</span></span>
+                <span>Z: <span id="coord-z">0</span></span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-cancel-hazard" class="btn btn-secondary">取消</button>
+          <button id="btn-save-hazard" class="btn btn-primary">保存标注</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 项目列表弹窗 -->
+    <div id="project-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>选择项目</h2>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="project-list" class="project-list">
+            <p class="empty-message">暂无保存的项目</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast hidden">
+      <span id="toast-message"></span>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

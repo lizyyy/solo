@@ -1,0 +1,19 @@
+{
+  "name": "snow-resort-inspection-sandbox",
+  "version": "1.0.0",
+  "description": "雪道隐患巡检沙盘 - 滑雪场巡检员3D交互工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node tests/test.js"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "cable_001",
+        "name": "主缆车线A",
+        "type": "cableCar",
+        "capacity": 4,
+        "speed": 2.5,
+        "stations": ["山脚站", "山腰中转站", "山顶站"]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [5, 5, 1800],
+          [15, 20, 1815],
+          [25, 30, 1820],
+          [35, 40, 1825],
+          [45, 48, 1834]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "cable_002",
+        "name": "副缆车线B",
+        "type": "cableCar",
+        "capacity": 6,
+        "speed": 3.0,
+        "stations": ["东站", "西站"]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [10, 10, 1805],
+          [20, 25, 1817],
+          [30, 35, 1825],
+          [40, 45, 1832]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "guardrail_001",
+        "name": "雪道左侧护栏",
+        "type": "guardrail",
+        "material": "steel",
+        "height": 1.2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [0, 0, 1800],
+          [0, 10, 1802],
+          [0, 20, 1805],
+          [0, 30, 1808],
+          [0, 40, 1810],
+          [0, 50, 1812]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "guardrail_002",
+        "name": "雪道右侧护栏",
+        "type": "guardrail",
+        "material": "steel",
+        "height": 1.2
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [50, 0, 1803],
+          [50, 10, 1806],
+          [50, 20, 1810],
+          [50, 30, 1814],
+          [50, 40, 1818],
+          [50, 50, 1820]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "guardrail_003",
+        "name": "中间隔离护栏",
+        "type": "guardrail",
+        "material": "plastic",
+        "height": 0.8
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [25, 10, 1808],
+          [25, 20, 1815],
+          [25, 30, 1822],
+          [25, 40, 1828]
+        ]
+      }
+    }
+  ]
+}
