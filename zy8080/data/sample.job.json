@@ -1,0 +1,61 @@
+{
+  "id": "job_20240115_001",
+  "name": "名片印刷订单",
+  "paper": {
+    "name": "A4 铜版纸",
+    "width": "210mm",
+    "height": "297mm"
+  },
+  "bleed": "3mm",
+  "safeMargin": "5mm",
+  "workpieces": [
+    {
+      "id": "wp_001",
+      "name": "张三名片-正面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 500
+    },
+    {
+      "id": "wp_002",
+      "name": "张三名片-背面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 500
+    },
+    {
+      "id": "wp_003",
+      "name": "李四名片-正面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 300
+    },
+    {
+      "id": "wp_004",
+      "name": "李四名片-背面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 300
+    },
+    {
+      "id": "wp_005",
+      "name": "王五名片-正面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 200
+    },
+    {
+      "id": "wp_006",
+      "name": "王五名片-背面",
+      "width": "90mm",
+      "height": "54mm",
+      "rotation": 0,
+      "copies": 200
+    }
+  ]
+}

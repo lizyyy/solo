@@ -1,0 +1,34 @@
+rules:
+  - id: bleed_min
+    name: 最小出血
+    type: bleed
+    min: 3
+    required: true
+    message: 出血不足可能导致切边问题
+  
+  - id: safe_min
+    name: 最小安全边距
+    type: safeMargin
+    min: 5
+    required: true
+    message: 安全边距不足可能导致内容被裁切
+  
+  - id: rotation_valid
+    name: 有效旋转角度
+    type: rotation
+    max: 360
+    required: true
+    message: 旋转角度应在 0-360 度之间
+  
+  - id: waste_max
+    name: 最大纸张浪费
+    type: waste
+    max: 30
+    required: false
+    message: 纸张浪费超过 30%，建议优化排版
+  
+  - id: overlap_check
+    name: 作品重叠检查
+    type: overlap
+    required: true
+    message: 作品之间不能重叠
