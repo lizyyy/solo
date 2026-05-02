@@ -1,0 +1,27 @@
+default:
+  max_tension_kn: 500
+  peak_threshold_kn: 400
+  drift_threshold_pct: 0.05
+  missing_gap_seconds: 300
+  min_peak_duration_sec: 10
+
+cargo:
+  max_tension_kn: 450
+  peak_threshold_kn: 380
+  drift_threshold_pct: 0.05
+  missing_gap_seconds: 300
+  min_peak_duration_sec: 10
+
+tanker:
+  max_tension_kn: 600
+  peak_threshold_kn: 500
+  drift_threshold_pct: 0.04
+  missing_gap_seconds: 240
+  min_peak_duration_sec: 15
+
+container:
+  max_tension_kn: 550
+  peak_threshold_kn: 450
+  drift_threshold_pct: 0.05
+  missing_gap_seconds: 300
+  min_peak_duration_sec: 10
