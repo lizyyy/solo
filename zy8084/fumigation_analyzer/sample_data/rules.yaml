@@ -1,0 +1,71 @@
+rules:
+  - name: "danger_critical"
+    priority: 100
+    risk_level: critical
+    condition: "concentration_above"
+    params:
+      threshold_ppm: 500
+    action: "do_not_enter"
+    message: "浓度严重超标，禁止进入"
+
+  - name: "danger_high"
+    priority: 90
+    risk_level: high
+    condition: "combined"
+    params:
+      operator: "and"
+      conditions:
+        - type: "concentration_above"
+          threshold_ppm: 200
+        - type: "ventilation_inactive"
+    action: "do_not_enter"
+    message: "浓度偏高且通风停止，禁止进入"
+
+  - name: "warning_medium"
+    priority: 60
+    risk_level: medium
+    condition: "combined"
+    params:
+      operator: "and"
+      conditions:
+        - type: "concentration_above"
+          threshold_ppm: 100
+        - type: "ventilation_inactive"
+    action: "ventilate_now"
+    message: "浓度偏高，建议继续通风"
+
+  - name: "safe_below_100_vent"
+    priority: 30
+    risk_level: safe
+    condition: "combined"
+    params:
+      operator: "and"
+      conditions:
+        - type: "concentration_below"
+          threshold_ppm: 100
+        - type: "ventilation_active"
+    action: "safe_to_enter"
+    message: "浓度低于安全阈值且通风运行，可以进入"
+
+  - name: "safe_below_50"
+    priority: 20
+    risk_level: safe
+    condition: "combined"
+    params:
+      operator: "and"
+      conditions:
+        - type: "concentration_below"
+          threshold_ppm: 50
+        - type: "time_after_application"
+          hours: 24
+    action: "safe_to_enter"
+    message: "熏蒸超过24小时且浓度低于50ppm，可以进入"
+
+  - name: "monitor_above_50"
+    priority: 10
+    risk_level: medium
+    condition: "concentration_above"
+    params:
+      threshold_ppm: 50
+    action: "continue_monitoring"
+    message: "继续监测浓度变化"
