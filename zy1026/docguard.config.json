@@ -1,0 +1,46 @@
+{
+  "docsDir": "./examples/docs",
+  "ignorePatterns": ["node_modules/**", ".git/**", "*.test.ts", "dist/**"],
+  "ignoreUrls": [
+    "https://example.com/ignore-me",
+    "https://localhost:*"
+  ],
+  "external": {
+    "enabled": true,
+    "concurrency": 5,
+    "timeout": 10000,
+    "retries": 2,
+    "retryDelay": 1000,
+    "cacheDir": "./.docguard/cache",
+    "cacheTTL": 86400000,
+    "userAgent": "docguard/1.0.0"
+  },
+  "images": {
+    "enabled": true,
+    "manifestPath": "./examples/snapshots.manifest.json",
+    "checkMtime": true,
+    "checkHash": false
+  },
+  "anchors": {
+    "enabled": true,
+    "caseSensitive": false,
+    "allowDuplicates": false
+  },
+  "severity": {
+    "missingImage": "error",
+    "expiredImage": "warning",
+    "missingLink": "error",
+    "invalidAnchor": "error",
+    "duplicateAnchor": "warning",
+    "failedExternal": "error"
+  },
+  "output": {
+    "terminal": true,
+    "markdown": true,
+    "markdownPath": "./reports/docguard-report.md",
+    "html": true,
+    "htmlPath": "./reports/docguard-report.html",
+    "json": true,
+    "jsonPath": "./reports/docguard-results.json"
+  }
+}

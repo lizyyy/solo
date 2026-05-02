@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "snapshots": {
+    "./images/main-interface.png": {
+      "mtime": 1746000000000,
+      "lastUpdated": "2025-01-01T00:00:00.000Z",
+      "relatedDocs": ["index.md", "features.md"],
+      "note": "产品主界面截图 - 版本 2.0"
+    },
+    "./images/settings-page.png": {
+      "mtime": 1746000000000,
+      "lastUpdated": "2025-01-01T00:00:00.000Z",
+      "relatedDocs": ["index.md", "features.md"],
+      "note": "设置页面截图 - 包含深色模式"
+    },
+    "./images/old-screenshot.png": {
+      "mtime": 1600000000000,
+      "lastUpdated": "2020-01-01T00:00:00.000Z",
+      "relatedDocs": ["features.md"],
+      "note": "这是一个过期的截图，mtime 已过期"
+    },
+    "./images/welcome-screen.png": {
+      "mtime": 1746000000000,
+      "lastUpdated": "2025-01-01T00:00:00.000Z",
+      "relatedDocs": ["getting-started.md"],
+      "note": "欢迎界面截图"
+    }
+  }
+}
