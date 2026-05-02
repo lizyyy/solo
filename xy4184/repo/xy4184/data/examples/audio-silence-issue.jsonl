@@ -1,0 +1,17 @@
+{"type": "offer", "sdp": "v=0\r\no=- 123456 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo\r\na=ice-pwd:demodemodemodemo\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000100000}
+{"type": "ice_connection_state_change", "state": "connecting", "timestamp": 1700000100100}
+{"type": "ice_candidate", "candidate": "candidate:0 1 UDP 2122252543 192.168.1.100 12345 typ host", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000100200}
+{"type": "ice_connection_state_change", "state": "checking", "timestamp": 1700000100500}
+{"type": "answer", "sdp": "v=0\r\no=- 654321 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo2\r\na=ice-pwd:demo2demo2demo2\r\na=mid:0\r\na=recvonly\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000101000}
+{"type": "ice_connection_state_change", "state": "connected", "timestamp": 1700000102000}
+{"type": "track", "kind": "audio", "trackId": "audio-0", "label": "microphone", "timestamp": 1700000102500}
+{"type": "recording_start", "recordingId": "rec-interview-001", "timestamp": 1700000103000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000105000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000110000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000115000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000120000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000125000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000130000}
+{"type": "audio_level", "level": 0.0, "timestamp": 1700000135000}
+{"type": "recording_stop", "recordingId": "rec-interview-001", "timestamp": 1700000180000}
+{"type": "ice_connection_state_change", "state": "completed", "timestamp": 1700000185000}

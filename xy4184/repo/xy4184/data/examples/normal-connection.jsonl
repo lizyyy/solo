@@ -1,0 +1,16 @@
+{"type": "offer", "sdp": "v=0\r\no=- 123456 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0 1\r\na=msid-semantic: WMS\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:demo\r\na=ice-pwd:demodemodemodemo\r\na=fingerprint:sha-256 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00\r\na=setup:actpass\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000000000}
+{"type": "ice_connection_state_change", "state": "connecting", "timestamp": 1700000000100}
+{"type": "ice_candidate", "candidate": "candidate:0 1 UDP 2122252543 192.168.1.100 12345 typ host", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000000200}
+{"type": "ice_candidate", "candidate": "candidate:1 1 UDP 1686052607 203.0.113.45 54321 typ srflx raddr 192.168.1.100 rport 12345", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000000500}
+{"type": "ice_connection_state_change", "state": "checking", "timestamp": 1700000000600}
+{"type": "answer", "sdp": "v=0\r\no=- 654321 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\na=msid-semantic: WMS\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=rtcp:9 IN IP4 0.0.0.0\r\na=ice-ufrag:demo2\r\na=ice-pwd:demo2demo2demo2\r\na=fingerprint:sha-256 11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11:11\r\na=setup:active\r\na=mid:0\r\na=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000001000}
+{"type": "ice_connection_state_change", "state": "connected", "timestamp": 1700000002000}
+{"type": "track", "kind": "audio", "trackId": "audio-0", "label": "microphone", "timestamp": 1700000002500}
+{"type": "recording_start", "recordingId": "rec-001", "timestamp": 1700000003000}
+{"type": "audio_level", "level": 0.5, "timestamp": 1700000005000}
+{"type": "audio_level", "level": 0.4, "timestamp": 1700000010000}
+{"type": "audio_level", "level": 0.6, "timestamp": 1700000015000}
+{"type": "audio_level", "level": 0.3, "timestamp": 1700000020000}
+{"type": "audio_level", "level": 0.7, "timestamp": 1700000025000}
+{"type": "recording_stop", "recordingId": "rec-001", "timestamp": 1700000060000}
+{"type": "ice_connection_state_change", "state": "completed", "timestamp": 1700000065000}

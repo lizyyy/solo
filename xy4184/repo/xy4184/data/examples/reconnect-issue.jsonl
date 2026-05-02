@@ -1,0 +1,29 @@
+{"type": "offer", "sdp": "v=0\r\no=- 123456 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo\r\na=ice-pwd:demodemodemodemo\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000200000}
+{"type": "ice_connection_state_change", "state": "connecting", "timestamp": 1700000200100}
+{"type": "ice_candidate", "candidate": "candidate:0 1 UDP 2122252543 192.168.1.100 12345 typ host", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000200200}
+{"type": "ice_candidate", "candidate": "candidate:1 1 UDP 1686052607 203.0.113.45 54321 typ srflx raddr 192.168.1.100 rport 12345", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000200500}
+{"type": "ice_connection_state_change", "state": "checking", "timestamp": 1700000200600}
+{"type": "answer", "sdp": "v=0\r\no=- 654321 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo2\r\na=ice-pwd:demo2demo2demo2\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000201000}
+{"type": "ice_connection_state_change", "state": "connected", "timestamp": 1700000202000}
+{"type": "track", "kind": "audio", "trackId": "audio-0", "label": "microphone", "timestamp": 1700000202500}
+{"type": "recording_start", "recordingId": "rec-reconnect-test", "timestamp": 1700000203000}
+{"type": "audio_level", "level": 0.5, "timestamp": 1700000205000}
+{"type": "audio_level", "level": 0.4, "timestamp": 1700000210000}
+{"type": "ice_connection_state_change", "state": "disconnected", "timestamp": 1700000230000}
+{"type": "reconnect_start", "attempt": 1, "timestamp": 1700000231000}
+{"type": "recording_gap", "recordingId": "rec-reconnect-test", "gapDuration": 15000, "timestamp": 1700000245000}
+{"type": "offer", "sdp": "v=0\r\no=- 123457 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo3\r\na=ice-pwd:demo3demo3demo3\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000235000}
+{"type": "ice_connection_state_change", "state": "connecting", "timestamp": 1700000235500}
+{"type": "ice_candidate", "candidate": "candidate:2 1 UDP 2122252543 10.0.0.5 12346 typ host", "sdpMid": "0", "sdpMLineIndex": 0, "timestamp": 1700000236000}
+{"type": "ice_connection_state_change", "state": "checking", "timestamp": 1700000237000}
+{"type": "reconnect_failed", "timestamp": 1700000265000}
+{"type": "ice_connection_state_change", "state": "disconnected", "timestamp": 1700000265500}
+{"type": "reconnect_start", "attempt": 2, "timestamp": 1700000266000}
+{"type": "offer", "sdp": "v=0\r\no=- 123458 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo4\r\na=ice-pwd:demo4demo4demo4\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000267000}
+{"type": "answer", "sdp": "v=0\r\no=- 654323 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:demo5\r\na=ice-pwd:demo5demo5demo5\r\na=mid:0\r\na=sendrecv\r\na=rtpmap:111 opus/48000/2\r\n", "timestamp": 1700000269000}
+{"type": "ice_connection_state_change", "state": "checking", "timestamp": 1700000270000}
+{"type": "ice_connection_state_change", "state": "connected", "timestamp": 1700000272000}
+{"type": "reconnect_success", "timestamp": 1700000272500}
+{"type": "audio_level", "level": 0.6, "timestamp": 1700000275000}
+{"type": "recording_stop", "recordingId": "rec-reconnect-test", "timestamp": 1700000320000}
+{"type": "ice_connection_state_change", "state": "completed", "timestamp": 1700000325000}
