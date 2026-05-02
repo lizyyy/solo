@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+.venv.bak/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 临时数据
+*.temp
+*.tmp
+tmp/
+temp/
+logs/
+*.log
+
+# 归档输出
+archive/
+output/
+export/
+
+# 测试输出
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# 示例数据中的 PDF（可能很大）
+examples/**/*.pdf
+!examples/**/*.pdf.example
+
+# 配置文件（包含敏感信息）
+*.local.ini
+*.local.yml
+*.local.yaml
+secrets.*
