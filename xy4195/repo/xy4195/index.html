@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>展柜光照眩光排练板</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>展柜光照眩光排练板</h1>
+            <div class="header-actions">
+                <button id="import-btn" class="btn btn-primary">导入数据</button>
+                <button id="save-btn" class="btn btn-secondary">保存方案</button>
+                <button id="compare-btn" class="btn btn-secondary">对比方案</button>
+                <button id="export-btn" class="btn btn-success">导出</button>
+            </div>
+        </header>
+        
+        <main class="main-content">
+            <aside class="sidebar">
+                <div class="data-section">
+                    <h3>数据导入</h3>
+                    <div class="import-group">
+                        <label for="case-json">展柜尺寸 JSON</label>
+                        <input type="file" id="case-json" accept=".json">
+                    </div>
+                    <div class="import-group">
+                        <label for="lights-csv">灯具角度 CSV</label>
+                        <input type="file" id="lights-csv" accept=".csv">
+                    </div>
+                    <div class="import-group">
+                        <label for="materials-csv">文物材质表</label>
+                        <input type="file" id="materials-csv" accept=".csv">
+                    </div>
+                    <div class="import-group">
+                        <label for="paths-json">观众动线</label>
+                        <input type="file" id="paths-json" accept=".json">
+                    </div>
+                    <button id="load-example-btn" class="btn btn-outline">加载示例数据</button>
+                </div>
+                
+                <div class="view-section">
+                    <h3>视图切换</h3>
+                    <div class="view-toggle">
+                        <button id="plan-view-btn" class="btn view-btn active">平面图</button>
+                        <button id="section-view-btn" class="btn view-btn">侧视图</button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>显示设置</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-beams" checked> 显示灯束
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-glare" checked> 显示眩光风险
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-visibility" checked> 显示说明牌可见区
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="show-paths" checked> 显示观众动线
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="risks-section">
+                    <h3>风险清单</h3>
+                    <div id="risks-list" class="risks-list">
+                        <p class="no-data">暂无风险数据</p>
+                    </div>
+                </div>
+            </aside>
+            
+            <section class="canvas-section">
+                <div class="canvas-container">
+                    <canvas id="main-canvas" width="800" height="600"></canvas>
+                    <div class="canvas-info" id="canvas-info">
+                        <span>请先导入数据或加载示例数据</span>
+                    </div>
+                </div>
+                
+                <div class="compare-container" id="compare-container" style="display: none;">
+                    <div class="compare-label">方案 A</div>
+                    <canvas id="compare-canvas-a" width="400" height="300"></canvas>
+                    <div class="compare-label">方案 B</div>
+                    <canvas id="compare-canvas-b" width="400" height="300"></canvas>
+                    <div class="compare-summary" id="compare-summary">
+                        <p>选择两个方案进行对比</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="app-footer">
+            <p>展柜光照眩光排练板 - 博物馆展陈工具</p>
+        </footer>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+    
+    <script src="js/utils.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/geometry.js"></script>
+    <script src="js/visualization.js"></script>
+    <script src="js/interaction.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

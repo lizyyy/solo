@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "createdAt": "2026-05-03T00:00:00Z",
+    "description": "博物馆展柜尺寸示例数据"
+  },
+  "cases": [
+    {
+      "id": "case_1",
+      "name": "主展柜 - 古代书画",
+      "width": 2.0,
+      "height": 1.2,
+      "depth": 0.6,
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "glass": {
+        "front": true,
+        "reflectivity": 0.08,
+        "antiReflective": false
+      },
+      "infoPanel": {
+        "position": {
+          "x": 1.0,
+          "y": 0.2,
+          "z": 1.0
+        },
+        "width": 0.4,
+        "height": 0.3,
+        "angle": 0
+      },
+      "description": "展示古代书画的独立展柜，位于展厅入口处"
+    },
+    {
+      "id": "case_2",
+      "name": "副展柜 - 陶瓷器",
+      "width": 1.5,
+      "height": 1.0,
+      "depth": 0.5,
+      "position": {
+        "x": 3.0,
+        "y": 0
+      },
+      "glass": {
+        "front": true,
+        "reflectivity": 0.08,
+        "antiReflective": false
+      },
+      "infoPanel": {
+        "position": {
+          "x": 0.75,
+          "y": 0.2,
+          "z": 0.9
+        },
+        "width": 0.3,
+        "height": 0.25,
+        "angle": 0
+      },
+      "description": "展示陶瓷器的靠墙展柜"
+    },
+    {
+      "id": "case_3",
+      "name": "中央展柜 - 青铜器",
+      "width": 2.5,
+      "height": 1.5,
+      "depth": 1.0,
+      "position": {
+        "x": 6.0,
+        "y": 0
+      },
+      "glass": {
+        "front": true,
+        "left": true,
+        "right": true,
+        "reflectivity": 0.06,
+        "antiReflective": true
+      },
+      "infoPanel": {
+        "position": {
+          "x": 1.25,
+          "y": 0.3,
+          "z": 1.2
+        },
+        "width": 0.5,
+        "height": 0.3,
+        "angle": 0
+      },
+      "description": "展厅中央的大型独立展柜，四面玻璃，展示重要青铜器"
+    }
+  ]
+}
