@@ -1,0 +1,185 @@
+{
+  "caseId": "CASE-2026-001",
+  "position": "lower",
+  "unit": "mm",
+  "scale": 1.0,
+  "notes": "下颌矫治方案 - 示例数据",
+  "teeth": [
+    {
+      "id": 1,
+      "fdiNumber": 31,
+      "present": true,
+      "hasAttachment": true,
+      "attachment": {
+        "type": "rectangular",
+        "position": { "x": -15, "y": -10, "z": 5 },
+        "size": { "x": 2.5, "y": 3, "z": 1.5 },
+        "rotation": 0
+      },
+      "movement": {
+        "translation": { "x": 0, "y": 0, "z": -0.5 },
+        "rotation": { "x": 0, "y": 0, "z": 1 }
+      },
+      "meshId": "tooth_31"
+    },
+    {
+      "id": 2,
+      "fdiNumber": 32,
+      "present": true,
+      "hasAttachment": true,
+      "attachment": {
+        "type": "rectangular",
+        "position": { "x": -10, "y": -9, "z": 5 },
+        "size": { "x": 2.5, "y": 3, "z": 1.5 },
+        "rotation": 0
+      },
+      "movement": {
+        "translation": { "x": 0.3, "y": 0, "z": -0.3 },
+        "rotation": { "x": 0, "y": 0, "z": 0.5 }
+      },
+      "meshId": "tooth_32"
+    },
+    {
+      "id": 3,
+      "fdiNumber": 33,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_33"
+    },
+    {
+      "id": 4,
+      "fdiNumber": 34,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_34"
+    },
+    {
+      "id": 5,
+      "fdiNumber": 35,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_35"
+    },
+    {
+      "id": 6,
+      "fdiNumber": 36,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_36"
+    },
+    {
+      "id": 7,
+      "fdiNumber": 37,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_37"
+    },
+    {
+      "id": 8,
+      "fdiNumber": 38,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_38"
+    },
+    {
+      "id": 9,
+      "fdiNumber": 41,
+      "present": true,
+      "hasAttachment": true,
+      "attachment": {
+        "type": "rectangular",
+        "position": { "x": 15, "y": -10, "z": 5 },
+        "size": { "x": 2.5, "y": 3, "z": 1.5 },
+        "rotation": 0
+      },
+      "movement": {
+        "translation": { "x": 0, "y": 0, "z": -0.5 },
+        "rotation": { "x": 0, "y": 0, "z": -1 }
+      },
+      "meshId": "tooth_41"
+    },
+    {
+      "id": 10,
+      "fdiNumber": 42,
+      "present": true,
+      "hasAttachment": true,
+      "attachment": {
+        "type": "rectangular",
+        "position": { "x": 10, "y": -9, "z": 5 },
+        "size": { "x": 2.5, "y": 3, "z": 1.5 },
+        "rotation": 0
+      },
+      "movement": {
+        "translation": { "x": -0.3, "y": 0, "z": -0.3 },
+        "rotation": { "x": 0, "y": 0, "z": -0.5 }
+      },
+      "meshId": "tooth_42"
+    },
+    {
+      "id": 11,
+      "fdiNumber": 43,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_43"
+    },
+    {
+      "id": 12,
+      "fdiNumber": 44,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_44"
+    },
+    {
+      "id": 13,
+      "fdiNumber": 45,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_45"
+    },
+    {
+      "id": 14,
+      "fdiNumber": 46,
+      "present": true,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_46"
+    },
+    {
+      "id": 15,
+      "fdiNumber": 47,
+      "present": false,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_47"
+    },
+    {
+      "id": 16,
+      "fdiNumber": 48,
+      "present": false,
+      "hasAttachment": false,
+      "attachment": null,
+      "movement": null,
+      "meshId": "tooth_48"
+    }
+  ]
+}
