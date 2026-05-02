@@ -1,0 +1,81 @@
+zones:
+  - zone_id: Z001
+    zone_name: 主大门
+    device_ids:
+      - DEV001
+    allowed_roles:
+      - engineer
+      - security
+      - admin
+      - visitor
+    time_windows:
+      - start_time: "08:00"
+        end_time: "20:00"
+        days: [0, 1, 2, 3, 4, 5, 6]
+    mutex_zones: []
+  
+  - zone_id: Z002
+    zone_name: 设备机房
+    device_ids:
+      - DEV002
+    allowed_roles:
+      - engineer
+      - admin
+    time_windows:
+      - start_time: "09:00"
+        end_time: "18:00"
+        days: [0, 1, 2, 3, 4]
+    mutex_zones:
+      - Z003
+  
+  - zone_id: Z003
+    zone_name: 数据中心
+    device_ids:
+      - DEV003
+    allowed_roles:
+      - engineer
+      - admin
+    time_windows:
+      - start_time: "10:00"
+        end_time: "17:00"
+        days: [0, 1, 2, 3, 4]
+    mutex_zones:
+      - Z002
+  
+  - zone_id: Z004
+    zone_name: 行政办公区
+    device_ids:
+      - DEV004
+    allowed_roles:
+      - admin
+      - security
+    time_windows:
+      - start_time: "08:30"
+        end_time: "18:00"
+        days: [0, 1, 2, 3, 4]
+    mutex_zones: []
+
+devices:
+  - device_id: DEV001
+    device_name: 主大门控制器
+    location: 园区正门
+    hmac_key: "secret_key_dev001_2024"
+    clock_drift_threshold_seconds: 300
+  
+  - device_id: DEV002
+    device_name: 设备机房控制器
+    location: 负一楼设备间
+    hmac_key: "secret_key_dev002_2024"
+    clock_drift_threshold_seconds: 300
+  
+  - device_id: DEV003
+    device_name: 数据中心控制器
+    location: 二楼数据中心
+    hmac_key: "secret_key_dev003_2024"
+    clock_drift_threshold_seconds: 120
+  
+  - device_id: DEV004
+    device_name: 行政办公区控制器
+    location: 三楼办公区
+    hmac_key: "secret_key_dev004_2024"
+    clock_drift_threshold_seconds: 300
