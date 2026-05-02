@@ -1,0 +1,32 @@
+{
+  "name": "sqlite-migration-checker",
+  "version": "1.0.0",
+  "description": "SQLite 迁移体检 CLI 工具 - 检查迁移文件顺序、执行错误、破坏性操作等",
+  "main": "src/cli.js",
+  "bin": {
+    "sqlite-migrate-check": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node src/cli.js --schema examples/pass/schema.sql --migrations examples/pass/migrations --output reports/pass",
+    "test:pass": "node src/cli.js --schema examples/pass/schema.sql --migrations examples/pass/migrations --output reports/pass",
+    "test:danger": "node src/cli.js --schema examples/danger/schema.sql --migrations examples/danger/migrations --output reports/danger",
+    "test:fail": "node src/cli.js --schema examples/fail/schema.sql --migrations examples/fail/migrations --output reports/fail",
+    "self-test": "node test/self-test.js"
+  },
+  "keywords": [
+    "sqlite",
+    "migration",
+    "checker",
+    "lint",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sql.js": "^1.10.3",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {}
+}
