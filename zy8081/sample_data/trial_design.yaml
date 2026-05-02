@@ -1,0 +1,26 @@
+trial_name: 2024年玉米品种比较试验
+location: 北京顺义试验站
+year: 2024
+design_type: randomized_complete_block
+total_blocks: 4
+total_reps: 3
+varieties:
+  - name: A品种
+    code: VA001
+  - name: B品种
+    code: VB002
+  - name: C品种
+    code: VC003
+  - name: D品种
+    code: VD004
+  - name: E品种
+    code: VE005
+  - name: F品种
+    code: VF006
+block_dimensions:
+  rows: 6
+  cols: 4
+boundary_rows: [1, 6]
+plot_prefix: P
+data_collection_start: 2024-09-01
+data_collection_end: 2024-09-30
