@@ -1,0 +1,12 @@
+spectrum_id,spectrum_name,manufacturer,model,total_power,photon_flux_density,wavelength_range,wavelength_nm,intensity_ratio,photon_efficiency,notes
+SPEC001,全光谱生长灯,SunGrow,SG-100W,100,280,UV,380,0.05,2.8,标准全光谱，适合叶菜
+SPEC001,,,,,,Blue,450,0.25,2.5,
+SPEC001,,,,,,Green,520,0.10,2.2,
+SPEC001,,,,,,Red,660,0.50,2.8,
+SPEC001,,,,,,Far-Red,730,0.10,2.5,
+SPEC002,番茄专用灯,AgriLight,AL-Tomato-120,120,320,Blue,450,0.20,2.5,番茄专用，优化红蓝光比例
+SPEC002,,,,,,Red,660,0.70,2.8,
+SPEC002,,,,,,Far-Red,730,0.10,2.5,
+SPEC003,草莓专用灯,BerryGrow,BG-Straw-90,90,260,Blue,450,0.30,2.5,高蓝光促进开花结果
+SPEC003,,,,,,Red,660,0.60,2.8,
+SPEC003,,,,,,Far-Red,730,0.10,2.5,

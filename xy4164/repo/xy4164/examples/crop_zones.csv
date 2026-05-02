@@ -1,0 +1,5 @@
+zone_id,zone_name,crop_type,shelf_count,shelf_height,shelf_width,led_spectrum_id,sensor_id,min_dli,max_dli,target_dli,installed_power,photoperiod_start,photoperiod_end,notes
+Z001,叶菜区A,leafy_lettuce,5,0.5,1.2,SPEC001,S001,10,20,15,800,06:00,22:00,玻璃温室北侧，自然光较弱
+Z002,番茄种植区A,tomato,4,0.8,1.5,SPEC002,S002,15,25,20,1200,06:00,20:00,需要较高DLI需求，注意光谱需保证蓝红比
+Z003,草莓区A,strawberry,6,0.6,1.2,SPEC003,S003,12,22,17,900,08:00,20:00,需高蓝光比例促进开花
+Z004,药草区,herb,8,0.4,1.0,SPEC001,S004,8,18,12,600,06:00,22:00,生长周期短，DLI需求适中

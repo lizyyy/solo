@@ -1,0 +1,5 @@
+price_id,price_name,region,effective_date,tier_name,start_time,end_time,price_per_kwh,notes
+PRICE001,工业分时电价,华东地区,2024-05-01,峰电时段,08:00,11:00,0.85,早高峰
+PRICE001,,,,平电时段,11:00,18:00,0.55,平段
+PRICE001,,,,峰电时段,18:00,23:00,0.85,晚高峰
+PRICE001,,,,谷电时段,23:00,08:00,0.25,低谷电价

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lighting-previewer"
+version = "1.0.0"
+description = "补光配方预演器 - 植物工厂光照优化与成本计算工具"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "补光配方预演器开发团队"}
+]
+keywords = ["plant-factory", "lighting", "DLI", "LED", "agriculture", "optimization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Manufacturing",
+    "Topic :: Scientific/Engineering :: Agriculture",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = []
+
+[project.scripts]
+lighting-previewer = "lighting_previewer.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/your-org/lighting-previewer"
+Documentation = "https://github.com/your-org/lighting-previewer#readme"
+Issues = "https://github.com/your-org/lighting-previewer/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lighting_previewer*"]
+
+[tool.setuptools.package-data]
+"*" = ["examples/*.csv", "output/*.py", "tests/*.py"]
+
+[tool.setuptools.include-package-data]
+true = [
+    "examples/*.csv",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
