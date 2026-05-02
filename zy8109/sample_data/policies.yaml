@@ -1,0 +1,50 @@
+policies:
+  - clause_id: REFUND_POLICY
+    version: "1.0"
+    category: "退款政策"
+    content: "根据公司退款政策，用户在收到商品后的15天内可以申请无理由退款。退款需要满足以下条件：商品未使用、包装完好、不影响二次销售。退款申请审核通过后，款项将在3-5个工作日内原路返回。"
+    keywords: ["退款", "15天", "无理由", "包装完好", "原路返回"]
+    effective_date: "2023-01-01"
+    expiry_date: "2024-05-31"
+    is_active: false
+
+  - clause_id: REFUND_POLICY
+    version: "2.0"
+    category: "退款政策"
+    content: "根据最新退款政策，用户在收到商品后的7天内可以申请无理由退款。对于存在质量问题或与描述不符的商品，退款期限延长至30天。退款需要满足以下条件：商品未使用、包装完好、不影响二次销售。退款申请审核通过后，款项将在3-5个工作日内原路返回。"
+    keywords: ["退款", "7天", "30天", "无理由", "质量问题", "描述不符"]
+    effective_date: "2024-06-01"
+    is_active: true
+
+  - clause_id: SHIPPING_POLICY
+    version: "1.0"
+    category: "发货政策"
+    content: "普通订单在下单后24小时内发货，特殊商品（如定制商品）可能需要48小时。加急订单可以享受24小时内优先发货。发货后会通过短信通知用户物流信息。"
+    keywords: ["发货", "24小时", "48小时", "加急", "物流"]
+    effective_date: "2024-01-01"
+    is_active: true
+
+  - clause_id: MEMBER_POLICY
+    version: "1.0"
+    category: "会员政策"
+    content: "会员可以享受以下权益：1. 专属折扣（95折优惠）；2. 积分双倍累计；3. 优先发货；4. 专属客服通道。会员等级分为白银、黄金、白金三个等级，等级越高优惠越大。"
+    keywords: ["会员", "折扣", "积分", "优先发货", "等级"]
+    effective_date: "2024-01-01"
+    is_active: true
+
+  - clause_id: QUALITY_ISSUE
+    version: "1.0"
+    category: "质量问题"
+    content: "如果商品存在质量问题或与描述不符，用户可以在收到后30天内申请退款或换货。质量问题包括但不限于：商品破损、功能故障、与图片描述严重不符。用户需要提供相关照片作为证据。"
+    keywords: ["质量问题", "描述不符", "30天", "换货", "证据"]
+    effective_date: "2024-01-01"
+    is_active: true
+
+  - clause_id: REFUND_POLICY
+    version: "1.5"
+    category: "退款政策"
+    content: "过渡版本：退款期限为10天。这是一个测试版本，用于新旧政策过渡期间。"
+    keywords: ["退款", "10天", "过渡"]
+    effective_date: "2024-05-15"
+    expiry_date: "2024-06-15"
+    is_active: false

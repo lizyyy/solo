@@ -1,0 +1,4 @@
+record_id,session_id,risk_types,risk_level,confirmed,inspector,inspection_time,comments
+r001,conv_002,OLD_POLICY,high,True,张质检,2024-06-15 16:00:00,确认使用旧政策话术，需要再培训
+r002,conv_005,IRRELEVANT_ANSWER,medium,False,李质检,2024-06-16 10:00:00,
+r003,conv_008,FABRICATED_CLAUSE,high,True,王质检,2024-06-16 15:00:00,引用了不存在的内部规定
