@@ -1,0 +1,40 @@
+validations:
+  - version: 1
+    field: user.id
+    rules:
+      - required: true
+      - type: string
+      - pattern: "^user_"
+
+  - version: 2
+    field: user
+    rules:
+      - type: object
+
+  - version: 2
+    field: preferences.emailUpdates
+    rules:
+      - type: boolean
+
+  - version: 3
+    field: user.displayName
+    rules:
+      - type: string
+      - minLength: 1
+
+  - version: 3
+    field: settings.volume
+    rules:
+      - type: number
+      - min: 0
+      - max: 100
+
+  - version: "*"
+    field: settings.quality
+    rules:
+      - enum: ["low", "medium", "high"]
+
+  - version: "*"
+    field: preferences.theme
+    rules:
+      - enum: ["light", "dark", "auto"]

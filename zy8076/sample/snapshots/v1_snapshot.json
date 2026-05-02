@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "data": {
+    "user": {
+      "id": "user_001",
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    "preferences": {
+      "theme": "light",
+      "language": "en",
+      "notifications": true
+    },
+    "settings": {
+      "volume": 50,
+      "quality": "medium"
+    }
+  },
+  "metadata": {
+    "createdAt": "2024-01-15T10:00:00Z",
+    "source": "indexedDB"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "data": {
+    "user": {
+      "id": "user_001",
+      "displayName": "John Doe",
+      "email": "john@example.com",
+      "avatar": null,
+      "createdAt": "2024-01-15T10:00:00Z"
+    },
+    "preferences": {
+      "theme": "light",
+      "language": "en",
+      "notifications": true,
+      "emailUpdates": false,
+      "smsUpdates": false
+    },
+    "settings": {
+      "volume": 50,
+      "quality": "medium",
+      "autoplay": true,
+      "subtitles": true
+    },
+    "lastLogin": "2024-03-10T09:15:00Z",
+    "profile": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    }
+  },
+  "metadata": {
+    "createdAt": "2024-03-10T09:15:00Z",
+    "source": "indexedDB"
+  }
+}
