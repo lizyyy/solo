@@ -1,0 +1,14 @@
+door_jitter:
+  max: 1.0
+jerk:
+  ax: 10.0
+peak:
+  ax: 2.0
+  ay: 2.0
+  az: 2.0
+rms:
+  ax: 0.5
+  ay: 0.5
+  az: 0.5
+stop_deviation:
+  max: 0.5
