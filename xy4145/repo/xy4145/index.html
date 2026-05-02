@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>钻孔地层拼接台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
+      background: #1a1a2e;
+      color: #e0e0e0;
+    }
+    #app {
+      display: flex;
+      height: 100vh;
+    }
+    #sidebar {
+      width: 380px;
+      background: #16213e;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #0f3460;
+    }
+    #canvas-container {
+      flex: 1;
+      position: relative;
+    }
+    #canvas-container canvas {
+      display: block;
+    }
+    h1, h2, h3 {
+      color: #e94560;
+      margin-bottom: 15px;
+    }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 20px; }
+    h3 { font-size: 1rem; color: #00d9ff; }
+    .btn {
+      background: linear-gradient(135deg, #e94560, #0f3460);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px 5px 5px 0;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #0f3460, #16213e);
+    }
+    .file-input {
+      display: none;
+    }
+    .file-label {
+      display: inline-block;
+      background: #0f3460;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px 5px 5px 0;
+      border: 1px dashed #00d9ff;
+    }
+    .file-label:hover {
+      background: #1a1a2e;
+    }
+    .info-panel {
+      background: #0f3460;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .info-panel p {
+      margin: 5px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .stat {
+      display: inline-block;
+      background: #16213e;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin: 3px;
+      font-size: 12px;
+    }
+    .warning {
+      color: #ffc107;
+      border-left: 3px solid #ffc107;
+      padding-left: 10px;
+    }
+    .error {
+      color: #ff4757;
+      border-left: 3px solid #ff4757;
+      padding-left: 10px;
+    }
+    .success {
+      color: #2ed573;
+      border-left: 3px solid #2ed573;
+      padding-left: 10px;
+    }
+    #layer-info {
+      display: none;
+    }
+    #layer-info.visible {
+      display: block;
+    }
+    .mark-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    .mark-suspicious {
+      background: linear-gradient(135deg, #ffc107, #ff9800);
+    }
+    .mark-confirmed {
+      background: linear-gradient(135deg, #2ed573, #1dd1a1);
+    }
+    .mark-danger {
+      background: linear-gradient(135deg, #ff4757, #ff3838);
+    }
+    #validation-results {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .validation-item {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .controls-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 33, 62, 0.9);
+      padding: 10px 20px;
+      border-radius: 30px;
+      display: flex;
+      gap: 10px;
+    }
+    .toggle-btn {
+      background: #0f3460;
+      border: 1px solid #00d9ff;
+      color: #00d9ff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+    .toggle-btn.active {
+      background: #00d9ff;
+      color: #0f3460;
+    }
+    .toggle-btn:hover {
+      transform: scale(1.05);
+    }
+    .legend {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(22, 33, 62, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 5px 0;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <h1>🔬 钻孔地层拼接台</h1>
+      <p style="font-size: 13px; color: #aaa; margin-bottom: 20px;">
+        城市更新勘察数据 3D 可视化分析工具
+      </p>
+      
+      <h2>📁 数据导入</h2>
+      <div class="info-panel">
+        <p>支持 CSV 格式：钻孔坐标、分层深度、土类、地下水位、污染采样</p>
+        <label class="file-label">
+          📂 选择钻孔数据 CSV
+          <input type="file" id="csv-input" class="file-input" accept=".csv">
+        </label>
+        <button class="btn btn-secondary" id="load-sample-btn">📋 加载示例数据</button>
+      </div>
+      
+      <div id="data-stats" class="info-panel" style="display: none;">
+        <h3>📊 数据统计</h3>
+        <div id="stats-content"></div>
+      </div>
+      
+      <h2>✅ 数据校验</h2>
+      <button class="btn" id="validate-btn">🔍 执行校验</button>
+      <div id="validation-results" class="info-panel" style="display: none;"></div>
+      
+      <h2>📍 层段详情</h2>
+      <div id="layer-info" class="info-panel">
+        <div id="layer-detail"></div>
+        <div style="margin-top: 15px;">
+          <h3>标记状态</h3>
+          <button class="btn mark-btn mark-suspicious" id="mark-suspicious">⚠️ 标记可疑</button>
+          <button class="btn mark-btn mark-confirmed" id="mark-confirmed">✓ 确认正常</button>
+          <button class="btn mark-btn mark-danger" id="mark-danger">🚨 重点关注</button>
+          <button class="btn btn-secondary mark-btn" id="clear-mark">❌ 清除标记</button>
+        </div>
+      </div>
+      
+      <h2>💾 数据导出</h2>
+      <button class="btn btn-secondary" id="export-json">📄 导出 JSON</button>
+      <button class="btn btn-secondary" id="export-csv">📊 导出 CSV</button>
+      <button class="btn btn-secondary" id="export-markdown">📑 导出 Markdown</button>
+      <button class="btn btn-secondary" id="save-marks">💾 保存标记</button>
+      
+      <h2>📖 操作说明</h2>
+      <div class="info-panel">
+        <p>🖱️ <strong>鼠标左键拖动</strong>：旋转视角</p>
+        <p>🖱️ <strong>鼠标右键拖动</strong>：平移场景</p>
+        <p>🖱️ <strong>滚轮</strong>：缩放</p>
+        <p>👆 <strong>点击钻孔层段</strong>：查看详情并标记</p>
+      </div>
+    </div>
+    
+    <div id="canvas-container">
+      <div class="legend" id="legend">
+        <h3>土类图例</h3>
+        <div id="legend-items"></div>
+      </div>
+      <div class="controls-overlay">
+        <button class="toggle-btn active" id="toggle-boreholes">钻孔柱</button>
+        <button class="toggle-btn" id="toggle-surfaces">地层面</button>
+        <button class="toggle-btn" id="toggle-water">地下水位</button>
+        <button class="toggle-btn" id="toggle-grid">网格</button>
+        <button class="toggle-btn" id="reset-view">重置视角</button>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

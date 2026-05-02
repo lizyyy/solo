@@ -1,0 +1,20 @@
+{
+  "name": "drilling-stratum-station",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "@types/three": "^0.160.0",
+    "papaparse": "^5.4.1",
+    "@types/papaparse": "^5.3.14"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  }
+}
