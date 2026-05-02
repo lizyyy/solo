@@ -1,0 +1,4 @@
+device_id,device_name,can_ids,description,location,model,serial_number
+MCU001,电机控制器,0x123;0x124,主驱动电机控制器,前舱,MCU-V2.0,MCU-2024-001
+BMS001,电池管理系统,0x150;0x151;0x152,动力电池BMS,后舱,BMS-V1.5,BMS-2024-001
+VCU001,整车控制器,0x180,整车控制单元,驾驶舱,VCU-V3.0,VCU-2024-001

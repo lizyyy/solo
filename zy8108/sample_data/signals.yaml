@@ -1,0 +1,277 @@
+# CAN信号定义文件
+# 定义CAN ID到信号的映射关系
+
+can_ids:
+  # 电机控制器 - 心跳帧
+  0x123:
+    name: "Motor_Controller_Heartbeat"
+    description: "电机控制器心跳帧"
+    dlc: 8
+    cycle_time_ms: 1000
+    is_heartbeat: true
+    signals:
+      heartbeat_counter:
+        start_bit: 0
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: 0.0
+        unit: ""
+        min: 0
+        max: 255
+      motor_status:
+        start_bit: 8
+        bit_length: 4
+        is_signed: false
+        is_little_endian: true
+        enum:
+          0: "STANDBY"
+          1: "RUNNING"
+          2: "ERROR"
+          3: "WARNING"
+      vcu_enable:
+        start_bit: 12
+        bit_length: 1
+        is_signed: false
+        is_little_endian: true
+  
+  # 电机控制器 - 状态帧
+  0x124:
+    name: "Motor_Controller_Status"
+    description: "电机控制器实时状态"
+    dlc: 8
+    cycle_time_ms: 100
+    signals:
+      motor_speed:
+        start_bit: 0
+        bit_length: 16
+        is_signed: true
+        is_little_endian: true
+        scale: 1.0
+        offset: 0.0
+        unit: "rpm"
+        min: -8000
+        max: 8000
+      motor_torque:
+        start_bit: 16
+        bit_length: 16
+        is_signed: true
+        is_little_endian: true
+        scale: 0.1
+        offset: 0.0
+        unit: "Nm"
+        min: -300.0
+        max: 300.0
+      motor_temp:
+        start_bit: 32
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: -40.0
+        unit: "°C"
+        min: -40.0
+        max: 215.0
+      inverter_temp:
+        start_bit: 40
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: -40.0
+        unit: "°C"
+        min: -40.0
+        max: 215.0
+      status_counter:
+        start_bit: 56
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        min: 0
+        max: 255
+  
+  # 电池管理系统 - 心跳帧
+  0x150:
+    name: "BMS_Heartbeat"
+    description: "电池管理系统心跳帧"
+    dlc: 8
+    cycle_time_ms: 1000
+    is_heartbeat: true
+    signals:
+      bms_counter:
+        start_bit: 0
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        min: 0
+        max: 255
+      bms_status:
+        start_bit: 8
+        bit_length: 4
+        is_signed: false
+        is_little_endian: true
+        enum:
+          0: "NORMAL"
+          1: "CHARGING"
+          2: "DISCHARGING"
+          3: "FAULT"
+          4: "PRECHARGE"
+  
+  # 电池管理系统 - 电压电流帧
+  0x151:
+    name: "BMS_Voltage_Current"
+    description: "电池电压和电流数据"
+    dlc: 8
+    cycle_time_ms: 100
+    signals:
+      pack_voltage:
+        start_bit: 0
+        bit_length: 16
+        is_signed: false
+        is_little_endian: true
+        scale: 0.01
+        offset: 0.0
+        unit: "V"
+        min: 0.0
+        max: 800.0
+      pack_current:
+        start_bit: 16
+        bit_length: 16
+        is_signed: true
+        is_little_endian: true
+        scale: 0.1
+        offset: 0.0
+        unit: "A"
+        min: -500.0
+        max: 500.0
+      soc:
+        start_bit: 32
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 0.5
+        offset: 0.0
+        unit: "%"
+        min: 0.0
+        max: 100.0
+      soh:
+        start_bit: 40
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 0.5
+        offset: 0.0
+        unit: "%"
+        min: 0.0
+        max: 100.0
+      data_counter:
+        start_bit: 56
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        min: 0
+        max: 255
+  
+  # 电池管理系统 - 温度帧
+  0x152:
+    name: "BMS_Temperature"
+    description: "电池温度数据"
+    dlc: 8
+    cycle_time_ms: 500
+    signals:
+      max_temp:
+        start_bit: 0
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: -40.0
+        unit: "°C"
+        min: -40.0
+        max: 85.0
+      min_temp:
+        start_bit: 8
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: -40.0
+        unit: "°C"
+        min: -40.0
+        max: 85.0
+      avg_temp:
+        start_bit: 16
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 1.0
+        offset: -40.0
+        unit: "°C"
+        min: -40.0
+        max: 85.0
+  
+  # VCU - 控制帧
+  0x180:
+    name: "VCU_Control"
+    description: "整车控制器控制指令"
+    dlc: 8
+    cycle_time_ms: 20
+    signals:
+      target_torque:
+        start_bit: 0
+        bit_length: 16
+        is_signed: true
+        is_little_endian: true
+        scale: 0.1
+        offset: 0.0
+        unit: "Nm"
+        min: -300.0
+        max: 300.0
+      accelerator_pos:
+        start_bit: 16
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 0.4
+        offset: 0.0
+        unit: "%"
+        min: 0.0
+        max: 100.0
+      brake_pos:
+        start_bit: 24
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        scale: 0.4
+        offset: 0.0
+        unit: "%"
+        min: 0.0
+        max: 100.0
+      gear_position:
+        start_bit: 32
+        bit_length: 3
+        is_signed: false
+        is_little_endian: true
+        enum:
+          0: "P"
+          1: "R"
+          2: "N"
+          3: "D"
+          4: "S"
+      drive_mode:
+        start_bit: 35
+        bit_length: 2
+        is_signed: false
+        is_little_endian: true
+        enum:
+          0: "ECO"
+          1: "NORMAL"
+          2: "SPORT"
+      vcu_counter:
+        start_bit: 56
+        bit_length: 8
+        is_signed: false
+        is_little_endian: true
+        min: 0
+        max: 255

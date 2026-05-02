@@ -1,0 +1,66 @@
+# CAN总线诊断规则配置
+# 定义各类问题的检测规则
+
+rules:
+  # 心跳丢失检测规则
+  heartbeat_miss:
+    name: "心跳丢失检测"
+    description: "检测设备心跳帧是否按时发送"
+    severity: "CRITICAL"
+    enabled: true
+    parameters:
+      default_interval_ms: 1000
+      max_multiplier: 3.0
+
+  # 信号越界检测规则
+  signal_out_of_range:
+    name: "信号越界检测"
+    description: "检测信号值是否超出定义的有效范围"
+    severity: "WARNING"
+    enabled: true
+    parameters:
+      check_min: true
+      check_max: true
+
+  # 计数器回跳检测规则
+  counter_jump_back:
+    name: "计数器回跳检测"
+    description: "检测滚动计数器是否出现异常回跳"
+    severity: "CRITICAL"
+    enabled: true
+    parameters:
+      counter_signals:
+        heartbeat_counter:
+          bit_length: 8
+          allow_rollover: true
+        status_counter:
+          bit_length: 8
+          allow_rollover: true
+        bms_counter:
+          bit_length: 8
+          allow_rollover: true
+        data_counter:
+          bit_length: 8
+          allow_rollover: true
+        vcu_counter:
+          bit_length: 8
+          allow_rollover: true
+
+  # ID冲突检测规则
+  id_conflict:
+    name: "ID冲突检测"
+    description: "检测同一CAN ID是否被多个设备占用"
+    severity: "CRITICAL"
+    enabled: true
+    parameters:
+      check_all_ids: true
+
+  # 周期违规检测规则
+  cycle_violation:
+    name: "周期违规检测"
+    description: "检测CAN帧发送周期是否异常"
+    severity: "WARNING"
+    enabled: true
+    parameters:
+      min_multiplier: 0.5
+      max_multiplier: 2.0
