@@ -1,0 +1,61 @@
+{
+  "name": "example-plugin",
+  "version": "1.0.0",
+  "platformVersion": "2.0.0",
+  "hooks": [
+    {
+      "id": "transform-data",
+      "entry": "hooks/transform-data.js",
+      "timeout": 2000,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "data": { "type": "array" }
+        },
+        "required": ["data"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "transformed": { "type": "array" },
+          "count": { "type": "number" }
+        },
+        "required": ["transformed", "count"]
+      }
+    },
+    {
+      "id": "timeout-hook",
+      "entry": "hooks/timeout-hook.js",
+      "timeout": 1000,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "id": "drift-output",
+      "entry": "hooks/drift-output.js",
+      "timeout": 2000,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" }
+        },
+        "required": ["name"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "greeting": { "type": "string" }
+        },
+        "required": ["greeting"]
+      }
+    }
+  ]
+}
