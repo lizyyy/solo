@@ -1,0 +1,101 @@
+{
+  "name": "pr-review-evidence-folder",
+  "displayName": "PR 评审证据夹",
+  "description": "给开源维护者用的 PR 评审证据管理工具 - 扩展端",
+  "version": "0.1.0",
+  "publisher": "your-publisher",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "prReviewEvidenceFolder.showPanel",
+        "title": "PR 评审证据夹: 打开面板",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "prReviewEvidenceFolder.createCard",
+        "title": "PR 评审证据夹: 创建评审卡片",
+        "icon": "$(plus)"
+      },
+      {
+        "command": "prReviewEvidenceFolder.importDiff",
+        "title": "PR 评审证据夹: 导入 Git Diff",
+        "icon": "$(git-pull-request)"
+      },
+      {
+        "command": "prReviewEvidenceFolder.exportMarkdown",
+        "title": "PR 评审证据夹: 导出 Markdown",
+        "icon": "$(markdown)"
+      },
+      {
+        "command": "prReviewEvidenceFolder.exportJson",
+        "title": "PR 评审证据夹: 导出 JSON 审计包",
+        "icon": "$(json)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "prReviewEvidenceFolder.createCard",
+          "when": "editorTextFocus",
+          "group": "prReviewEvidenceFolder@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "prReviewEvidenceFolder.showPanel",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "prReviewEvidenceFolder",
+          "title": "PR 评审证据夹",
+          "icon": "$(folder)"
+        }
+      ]
+    },
+    "views": {
+      "prReviewEvidenceFolder": [
+        {
+          "type": "webview",
+          "id": "prReviewEvidenceFolder.panel",
+          "name": "评审面板"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "uuid": "^9.0.0"
+  }
+}
