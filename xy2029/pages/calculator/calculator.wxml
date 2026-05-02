@@ -1,0 +1,172 @@
+<view class="container">
+  <view class="input-section card">
+    <view class="section-title">输入你的月薪</view>
+    <view class="input-container">
+      <view class="input-prefix">¥</view>
+      <input 
+        class="salary-input" 
+        type="number" 
+        placeholder="请输入月薪金额" 
+        value="{{salary}}"
+        bindinput="onSalaryInput"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+    
+    <view class="quick-tier">
+      <text class="quick-label">快速选择档位：</text>
+      <view class="tier-buttons">
+        <view 
+          class="tier-btn {{currentTier === '3k' ? 'active' : ''}}" 
+          bindtap="selectTier"
+          data-tier="3k"
+          data-salary="3000"
+        >
+          3k档
+        </view>
+        <view 
+          class="tier-btn {{currentTier === '9k' ? 'active' : ''}}" 
+          bindtap="selectTier"
+          data-tier="9k"
+          data-salary="9000"
+        >
+          9k档
+        </view>
+        <view 
+          class="tier-btn {{currentTier === '3w' ? 'active' : ''}}" 
+          bindtap="selectTier"
+          data-tier="3w"
+          data-salary="30000"
+        >
+          3w档
+        </view>
+        <view 
+          class="tier-btn {{currentTier === '5w' ? 'active' : ''}}" 
+          bindtap="selectTier"
+          data-tier="5w"
+          data-salary="50000"
+        >
+          5w档
+        </view>
+        <view 
+          class="tier-btn {{currentTier === '10w' ? 'active' : ''}}" 
+          bindtap="selectTier"
+          data-tier="10w"
+          data-salary="100000"
+        >
+          10w档
+        </view>
+      </view>
+    </view>
+
+    <view class="calc-btn primary-btn" bindtap="calculate">计算分配</view>
+  </view>
+
+  <view class="result-section" wx:if="{{showResult}}">
+    <view class="result-header card">
+      <view class="result-tier-info">
+        <view class="tier-badge tier-{{currentTier}}">
+          <text class="tier-icon">{{tierInfo.icon}}</text>
+          <text class="tier-name">{{tierInfo.name}}</text>
+        </view>
+        <view class="result-salary">
+          <text class="salary-label">月薪</text>
+          <text class="salary-value">¥{{formattedSalary}}</text>
+        </view>
+      </view>
+      <view class="tier-desc">{{tierInfo.description}}</view>
+    </view>
+
+    <view class="allocation-card card">
+      <view class="card-header">
+        <view class="card-title">💰 薪资分配方案</view>
+        <view class="allocation-tip">配比贴合{{tierInfo.name}}，保证幸福感</view>
+      </view>
+
+      <view class="allocation-chart">
+        <view class="chart-legend">
+          <view 
+            class="legend-item" 
+            wx:for="{{allocationList}}" 
+            wx:key="key"
+          >
+            <view class="legend-color" style="background-color: {{item.color}};"></view>
+            <view class="legend-text">
+              <text class="legend-name">{{item.name}}</text>
+              <text class="legend-ratio">{{item.ratio}}%</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="allocation-list">
+        <view 
+          class="allocation-item" 
+          wx:for="{{allocationList}}" 
+          wx:key="key"
+        >
+          <view class="item-left">
+            <view class="item-icon" style="background-color: {{item.color}};">{{item.icon}}</view>
+            <view class="item-info">
+              <view class="item-name">{{item.name}}</view>
+              <view class="item-bar">
+                <view class="bar-bg">
+                  <view class="bar-fill" style="width: {{item.ratio}}%; background-color: {{item.color}};"></view>
+                </view>
+                <text class="bar-ratio">{{item.ratio}}%</text>
+              </view>
+            </view>
+          </view>
+          <view class="item-right">
+            <view class="item-amount">¥{{item.formattedAmount}}</view>
+            <view class="item-tip">{{item.tip}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="summary-card card">
+      <view class="card-header">
+        <view class="card-title">📊 分配说明</view>
+      </view>
+      <view class="summary-content">
+        <view class="summary-item">
+          <view class="summary-icon">🏠</view>
+          <view class="summary-text">
+            <text class="summary-title">房租占比{{allocation.rent.ratio * 100}}%</text>
+            <text class="summary-desc">每月约¥{{allocation.rent.formattedAmount}}，符合{{tierInfo.name}}的居住水准</text>
+          </view>
+        </view>
+        <view class="divider"></view>
+        <view class="summary-item">
+          <view class="summary-icon">🍜</view>
+          <view class="summary-text">
+            <text class="summary-title">伙食占比{{allocation.food.ratio * 100}}%</text>
+            <text class="summary-desc">每月约¥{{allocation.food.formattedAmount}}，保证日常饮食品质</text>
+          </view>
+        </view>
+        <view class="divider"></view>
+        <view class="summary-item">
+          <view class="summary-icon">💰</view>
+          <view class="summary-text">
+            <text class="summary-title">存款占比{{allocation.savings.ratio * 100}}%</text>
+            <text class="summary-desc">每月约¥{{allocation.savings.formattedAmount}}，积少成多</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <view class="action-btn secondary-btn" bindtap="saveSalary">保存为我的月薪</view>
+      <view class="action-btn primary-btn" bindtap="shareResult">分享分配方案</view>
+    </view>
+  </view>
+
+  <view class="empty-section card" wx:else>
+    <view class="empty-icon">🧮</view>
+    <view class="empty-text">输入月薪，一键生成最适合你的薪资分配方案</view>
+    <view class="empty-tip">不强行省钱，保证幸福感</view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

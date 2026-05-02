@@ -1,0 +1,27 @@
+[project]
+name = "water-activity-calculator"
+version = "0.1.0"
+description = "烘焙水分活度配方校算器 - 为小型食品实验室设计的本地配方计算工具"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+wacalc = "water_activity_cli.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["water_activity_cli"]

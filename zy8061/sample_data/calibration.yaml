@@ -1,0 +1,10 @@
+temperature:
+  scale: 0.01
+  offset: 0.0
+  min: -50.0
+  max: 85.0
+voltage:
+  scale: 0.001
+  offset: 0.0
+  min: 28.0
+  max: 33.0

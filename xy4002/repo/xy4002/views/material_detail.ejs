@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= material.name %> - 物资详情</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials" class="active">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>物资详情</h1>
+            <a href="/materials" class="btn btn-secondary">返回列表</a>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><%= material.name %></h2>
+                <span class="status status-<%= material.status %>">
+                    <%= material.status === 'active' ? '正常' : '已报废' %>
+                </span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>物资名称</label>
+                    <p><%= material.name %></p>
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <p><%= material.category || '-' %></p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>总数量</label>
+                    <p><%= material.total_quantity %> <%= material.unit %></p>
+                </div>
+                <div class="form-group">
+                    <label>可用数量</label>
+                    <p style="color: <%= material.available_quantity > 0 ? '#2ecc71' : '#e74c3c' %>; font-weight: bold;">
+                        <%= material.available_quantity %> <%= material.unit %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>描述</label>
+                <p><%= material.description || '暂无描述' %></p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>创建时间</label>
+                    <p><%= formatDate(material.created_at) %></p>
+                </div>
+                <div class="form-group">
+                    <label>更新时间</label>
+                    <p><%= formatDate(material.updated_at) %></p>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <a href="/materials/<%= material.id %>/edit" class="btn btn-warning">编辑物资</a>
+                <% if (material.status === 'active' && material.available_quantity > 0) { %>
+                    <a href="/borrow/new?material_id=<%= material.id %>" class="btn btn-primary">办理借出</a>
+                <% } %>
+                <% if (material.status === 'active') { %>
+                    <form method="POST" action="/materials/<%= material.id %>/scrap" class="inline-form" style="margin-left: 10px;" onsubmit="return confirm('确定要报废这个物资吗？报废后将无法再借出。');">
+                        <input type="text" name="scrap_reason" placeholder="报废原因（可选）" style="padding: 6px; border: 1px solid #ddd; border-radius: 4px; margin-right: 5px;">
+                        <button type="submit" class="btn btn-danger">报废物资</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+
+        <% if (records.length > 0) { %>
+            <div class="card">
+                <div class="card-header">
+                    <h2>相关借还记录</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>记录ID</th>
+                            <th>居民姓名</th>
+                            <th>联系电话</th>
+                            <th>借出数量</th>
+                            <th>预计归还</th>
+                            <th>实际归还</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% records.forEach(record => { %>
+                            <tr>
+                                <td><%= record.id %></td>
+                                <td><%= record.resident_name %></td>
+                                <td><%= record.resident_phone || '-' %></td>
+                                <td><%= record.borrow_quantity %> <%= material.unit %></td>
+                                <td><%= record.expected_return_date || '-' %></td>
+                                <td><%= record.actual_return_date ? formatDate(record.actual_return_date) : '-' %></td>
+                                <td>
+                                    <span class="status status-<%= record.status %>">
+                                        <%= getStatusText(record.status) %>
+                                    </span>
+                                </td>
+                                <td class="actions">
+                                    <a href="/borrow-records/<%= record.id %>" class="btn btn-sm btn-info">详情</a>
+                                    <% if (record.status !== 'returned') { %>
+                                        <form method="POST" action="/return/<%= record.id %>" class="inline-form">
+                                            <button type="submit" class="btn btn-sm btn-success">归还</button>
+                                        </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>
+
+<% function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function getStatusText(status) {
+    const map = {
+        'borrowed': '借出中',
+        'overdue': '已逾期',
+        'returned': '已归还'
+    };
+    return map[status] || status;
+}
+%>

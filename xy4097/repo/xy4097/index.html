@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>展厅人流热区推演器</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      overflow: hidden;
+      background: #1a1a2e;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      position: relative;
+    }
+
+    #scene-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    #info-panel {
+      width: 380px;
+      background: #16213e;
+      color: #e94560;
+      padding: 20px;
+      overflow-y: auto;
+      border-left: 2px solid #0f3460;
+    }
+
+    #info-panel h1 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    #info-panel h2 {
+      font-size: 1.1rem;
+      margin: 20px 0 10px;
+      color: #e94560;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #0f3460;
+    }
+
+    .section {
+      margin-bottom: 15px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #0f3460;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #e94560;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.primary {
+      background: #e94560;
+    }
+
+    button.primary:hover {
+      background: #ff6b8a;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .file-label {
+      display: block;
+      background: #0f3460;
+      color: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .file-label:hover {
+      background: #1a4a7a;
+    }
+
+    .file-label.active {
+      background: #4CAF50;
+    }
+
+    .info-text {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .risk-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #0f3460;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .risk-indicator.critical { border-left: 4px solid #ff0000; }
+    .risk-indicator.high { border-left: 4px solid #ff4444; }
+    .risk-indicator.medium { border-left: 4px solid #ffaa00; }
+    .risk-indicator.low { border-left: 4px solid #4CAF50; }
+
+    .risk-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+
+    .risk-count {
+      margin-left: auto;
+      font-weight: bold;
+    }
+
+    .timeslot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeslot-item {
+      background: #0f3460;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .timeslot-item:hover {
+      background: #1a4a7a;
+    }
+
+    .timeslot-item.selected {
+      background: #e94560;
+    }
+
+    .timeslot-item .time {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .timeslot-item .visitors {
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-item {
+      background: #0f3460;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #e94560;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    #loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #loading-overlay.hidden {
+      display: none;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #0f3460;
+      border-top-color: #e94560;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(22, 33, 62, 0.9);
+      padding: 15px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    .legend-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+    }
+
+    .help-text {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="scene-container">
+      <div id="canvas-container"></div>
+      <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+      </div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #4CAF50;"></div>
+          <span>入口 (Entrance)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #2196F3;"></div>
+          <span>出口 (Exit)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #FF9800;"></div>
+          <span>展柜 (Exhibit)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background: #9E9E9E;"></div>
+          <span>禁行区 (Restricted)</span>
+        </div>
+        <div class="help-text">鼠标拖动: 旋转视角 | 滚轮: 缩放 | 拖动展柜: 移动位置</div>
+      </div>
+    </div>
+    <div id="info-panel">
+      <h1>🏛️ 展厅人流热区推演器</h1>
+      <p class="info-text">临展前安全检查工具，提前发现人流瓶颈</p>
+
+      <h2>📁 数据导入</h2>
+      <div class="section">
+        <div class="file-input-wrapper">
+          <input type="file" id="json-input" accept=".json">
+          <label class="file-label" for="json-input">选择展厅配置 JSON</label>
+        </div>
+        <p class="info-text" id="json-status">未选择文件</p>
+      </div>
+      <div class="section">
+        <div class="file-input-wrapper">
+          <input type="file" id="csv-input" accept=".csv">
+          <label class="file-label" for="csv-input">选择时段数据 CSV</label>
+        </div>
+        <p class="info-text" id="csv-status">未选择文件</p>
+      </div>
+      <div class="button-group">
+        <button id="load-demo" class="primary">加载示例数据</button>
+      </div>
+
+      <h2>⏰ 时段选择</h2>
+      <div class="section">
+        <div class="timeslot-list" id="timeslot-list">
+          <p class="info-text">请先导入数据</p>
+        </div>
+      </div>
+
+      <h2>🔧 模拟控制</h2>
+      <div class="section">
+        <div class="button-group">
+          <button id="start-simulation" disabled>开始模拟</button>
+          <button id="pause-simulation" disabled>暂停</button>
+          <button id="reset-simulation" disabled>重置</button>
+        </div>
+        <div class="button-group">
+          <button id="recalculate" disabled>重新计算</button>
+        </div>
+      </div>
+
+      <h2>📊 实时数据</h2>
+      <div class="section">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="stat-visitors">0</div>
+            <div class="stat-label">当前访客数</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-max-density">0</div>
+            <div class="stat-label">最大密度</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-critical">0</div>
+            <div class="stat-label">严重风险</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-bottlenecks">0</div>
+            <div class="stat-label">瓶颈点</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>⚠️ 风险等级</h2>
+      <div class="section" id="risk-section">
+        <div class="risk-indicator critical">
+          <div class="risk-color" style="background: #ff0000;"></div>
+          <span>严重 (Critical)</span>
+          <span class="risk-count" id="risk-critical">0</span>
+        </div>
+        <div class="risk-indicator high">
+          <div class="risk-color" style="background: #ff4444;"></div>
+          <span>高风险 (High)</span>
+          <span class="risk-count" id="risk-high">0</span>
+        </div>
+        <div class="risk-indicator medium">
+          <div class="risk-color" style="background: #ffaa00;"></div>
+          <span>中风险 (Medium)</span>
+          <span class="risk-count" id="risk-medium">0</span>
+        </div>
+        <div class="risk-indicator low">
+          <div class="risk-color" style="background: #4CAF50;"></div>
+          <span>低风险 (Low)</span>
+          <span class="risk-count" id="risk-low">0</span>
+        </div>
+      </div>
+
+      <h2>💾 保存与导出</h2>
+      <div class="section">
+        <div class="button-group">
+          <button id="save-plan" disabled>保存方案</button>
+          <button id="screenshot" disabled>导出 PNG</button>
+          <button id="export-report" disabled>导出报告</button>
+        </div>
+      </div>
+
+      <h2>📖 操作说明</h2>
+      <div class="section">
+        <p class="info-text">1. 导入展厅JSON和时段CSV，或点击"加载示例数据"</p>
+        <p class="info-text">2. 选择时段并点击"开始模拟"</p>
+        <p class="info-text">3. 拖动展柜后点击"重新计算"</p>
+        <p class="info-text">4. 导出截图和风险报告</p>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

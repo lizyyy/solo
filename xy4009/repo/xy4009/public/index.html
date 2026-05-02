@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>供应商报价比价台账系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>供应商报价比价台账系统</h1>
+    </header>
+
+    <nav>
+      <ul>
+        <li><a href="#" class="nav-link active" data-page="dashboard">首页</a></li>
+        <li><a href="#" class="nav-link" data-page="materials">物料管理</a></li>
+        <li><a href="#" class="nav-link" data-page="suppliers">供应商管理</a></li>
+        <li><a href="#" class="nav-link" data-page="quotations">报价单管理</a></li>
+        <li><a href="#" class="nav-link" data-page="price-comparison">比价分析</a></li>
+        <li><a href="#" class="nav-link" data-page="import-export">导入导出</a></li>
+      </ul>
+    </nav>
+
+    <!-- 首页 -->
+    <div id="page-dashboard" class="page-section active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4 id="stat-materials">0</h4>
+          <p>物料数量</p>
+        </div>
+        <div class="stat-card">
+          <h4 id="stat-suppliers">0</h4>
+          <p>供应商数量</p>
+        </div>
+        <div class="stat-card">
+          <h4 id="stat-quotations">0</h4>
+          <p>报价单数量</p>
+        </div>
+        <div class="stat-card">
+          <h4 id="stat-currencies">0</h4>
+          <p>支持币种</p>
+        </div>
+      </div>
+      <div class="card">
+        <h2>系统说明</h2>
+        <p>欢迎使用供应商报价比价台账系统！本系统支持以下功能：</p>
+        <ul style="margin-left: 20px; margin-top: 10px;">
+          <li>📦 物料管理：维护物料基础信息（编码、名称、规格、单位）</li>
+          <li>🏢 供应商管理：维护供应商信息（编码、名称、联系方式）</li>
+          <li>📋 报价单管理：录入报价单，支持多行物料、多币种、含税/未税价格</li>
+          <li>📊 比价分析：自动计算最低报价，标记异常高价</li>
+          <li>📁 导入导出：支持 CSV 格式批量导入导出数据</li>
+        </ul>
+        <div style="margin-top: 20px; padding: 15px; background: #e7e9fc; border-radius: 6px;">
+          <p><strong>使用提示：</strong></p>
+          <ol style="margin-left: 20px; margin-top: 10px;">
+            <li>请先在「物料管理」和「供应商管理」中添加基础数据</li>
+            <li>报价单中的含税价和未税价只需输入一个，系统会自动计算另一个</li>
+            <li>比价分析页面会显示每个物料的最新有效报价，并标记最低价和高价</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- 物料管理 -->
+    <div id="page-materials" class="page-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; border: none; padding: 0;">物料管理</h2>
+          <button class="btn btn-primary" onclick="openMaterialModal()">新增物料</button>
+        </div>
+        <div class="filter-section">
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="material-search-code" placeholder="搜索物料编码..." onkeyup="searchMaterials()">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="material-search-name" placeholder="搜索物料名称..." onkeyup="searchMaterials()">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <button class="btn btn-secondary" onclick="searchMaterials()">搜索</button>
+              <button class="btn btn-info" onclick="resetMaterialSearch()">重置</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="materials-table">
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>规格型号</th>
+                <th>单位</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 供应商管理 -->
+    <div id="page-suppliers" class="page-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; border: none; padding: 0;">供应商管理</h2>
+          <button class="btn btn-primary" onclick="openSupplierModal()">新增供应商</button>
+        </div>
+        <div class="filter-section">
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="supplier-search-code" placeholder="搜索供应商编码..." onkeyup="searchSuppliers()">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <input type="text" id="supplier-search-name" placeholder="搜索供应商名称..." onkeyup="searchSuppliers()">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <button class="btn btn-secondary" onclick="searchSuppliers()">搜索</button>
+              <button class="btn btn-info" onclick="resetSupplierSearch()">重置</button>
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="suppliers-table">
+            <thead>
+              <tr>
+                <th>供应商编码</th>
+                <th>供应商名称</th>
+                <th>联系人</th>
+                <th>电话</th>
+                <th>邮箱</th>
+                <th>地址</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 报价单管理 -->
+    <div id="page-quotations" class="page-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; border: none; padding: 0;">报价单管理</h2>
+          <button class="btn btn-primary" onclick="openQuotationModal()">新增报价单</button>
+        </div>
+        <div class="filter-section">
+          <h3>筛选条件</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>供应商</label>
+              <select id="quotation-filter-supplier" onchange="loadQuotations()">
+                <option value="">全部</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>物料</label>
+              <select id="quotation-filter-material" onchange="loadQuotations()">
+                <option value="">全部</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>开始日期</label>
+              <input type="date" id="quotation-filter-start-date" onchange="loadQuotations()">
+            </div>
+            <div class="form-group">
+              <label>结束日期</label>
+              <input type="date" id="quotation-filter-end-date" onchange="loadQuotations()">
+            </div>
+            <div class="form-group">
+              <label>状态</label>
+              <select id="quotation-filter-status" onchange="loadQuotations()">
+                <option value="">全部</option>
+                <option value="active">有效</option>
+                <option value="inactive">无效</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="quotations-table">
+            <thead>
+              <tr>
+                <th>报价单号</th>
+                <th>供应商</th>
+                <th>报价日期</th>
+                <th>币种</th>
+                <th>汇率</th>
+                <th>状态</th>
+                <th>物料数量</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 比价分析 -->
+    <div id="page-price-comparison" class="page-section">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; border: none; padding: 0;">比价分析</h2>
+          <div class="form-group" style="margin: 0;">
+            <select id="comparison-filter-material" onchange="loadPriceComparison()">
+              <option value="">全部物料</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; display: flex; gap: 20px;">
+          <span><span class="badge badge-success">最低价</span> 该物料当前最低报价</span>
+          <span><span class="badge badge-danger">高价</span> 比最低价高 20% 以上</span>
+        </div>
+        <div class="table-container">
+          <table id="price-comparison-table">
+            <thead>
+              <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>规格型号</th>
+                <th>单位</th>
+                <th>供应商</th>
+                <th>报价日期</th>
+                <th>币种</th>
+                <th>含税单价(原币)</th>
+                <th>未税单价(原币)</th>
+                <th>含税单价(人民币)</th>
+                <th>未税单价(人民币)</th>
+                <th>比价(%)</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导入导出 -->
+    <div id="page-import-export" class="page-section">
+      <div class="import-export-section">
+        <div class="import-export-card">
+          <h3>物料导入</h3>
+          <p style="margin-bottom: 15px; color: #666;">导入物料基础数据，支持 CSV 格式</p>
+          <div class="btn-group" style="margin-bottom: 15px;">
+            <a href="/api/csv/template/materials" class="btn btn-info btn-sm" download>下载模板</a>
+          </div>
+          <div class="file-input-wrapper" onclick="document.getElementById('material-import-file').click()">
+            <input type="file" id="material-import-file" accept=".csv" onchange="importMaterials(this)">
+            <p>点击选择文件或拖拽文件到此处</p>
+            <p style="font-size: 12px;">支持 .csv 格式文件</p>
+          </div>
+          <div id="material-import-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="import-export-card">
+          <h3>供应商导入</h3>
+          <p style="margin-bottom: 15px; color: #666;">导入供应商基础数据，支持 CSV 格式</p>
+          <div class="btn-group" style="margin-bottom: 15px;">
+            <a href="/api/csv/template/suppliers" class="btn btn-info btn-sm" download>下载模板</a>
+          </div>
+          <div class="file-input-wrapper" onclick="document.getElementById('supplier-import-file').click()">
+            <input type="file" id="supplier-import-file" accept=".csv" onchange="importSuppliers(this)">
+            <p>点击选择文件或拖拽文件到此处</p>
+            <p style="font-size: 12px;">支持 .csv 格式文件</p>
+          </div>
+          <div id="supplier-import-result" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="import-export-card">
+          <h3>数据导出</h3>
+          <p style="margin-bottom: 15px; color: #666;">导出所有数据，方便查看和备份</p>
+          <div class="btn-group">
+            <button class="btn btn-success" onclick="exportMaterials()">导出物料</button>
+            <button class="btn btn-success" onclick="exportSuppliers()">导出供应商</button>
+            <button class="btn btn-success" onclick="exportQuotations()">导出报价单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 物料弹窗 -->
+    <div id="material-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="material-modal-title">新增物料</h3>
+          <button class="modal-close" onclick="closeMaterialModal()">&times;</button>
+        </div>
+        <form id="material-form" onsubmit="saveMaterial(event)">
+          <input type="hidden" id="material-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>物料编码 <span style="color: red;">*</span></label>
+              <input type="text" id="material-code" required>
+            </div>
+            <div class="form-group">
+              <label>物料名称 <span style="color: red;">*</span></label>
+              <input type="text" id="material-name" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>规格型号</label>
+              <input type="text" id="material-spec">
+            </div>
+            <div class="form-group">
+              <label>单位</label>
+              <input type="text" id="material-unit">
+            </div>
+          </div>
+          <div class="btn-group" style="justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeMaterialModal()">取消</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 供应商弹窗 -->
+    <div id="supplier-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="supplier-modal-title">新增供应商</h3>
+          <button class="modal-close" onclick="closeSupplierModal()">&times;</button>
+        </div>
+        <form id="supplier-form" onsubmit="saveSupplier(event)">
+          <input type="hidden" id="supplier-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label>供应商编码 <span style="color: red;">*</span></label>
+              <input type="text" id="supplier-code" required>
+            </div>
+            <div class="form-group">
+              <label>供应商名称 <span style="color: red;">*</span></label>
+              <input type="text" id="supplier-name" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>联系人</label>
+              <input type="text" id="supplier-contact">
+            </div>
+            <div class="form-group">
+              <label>电话</label>
+              <input type="text" id="supplier-phone">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="email" id="supplier-email">
+            </div>
+            <div class="form-group">
+              <label>地址</label>
+              <input type="text" id="supplier-address">
+            </div>
+          </div>
+          <div class="btn-group" style="justify-content: flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeSupplierModal()">取消</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 报价单弹窗 -->
+    <div id="quotation-modal" class="modal">
+      <div class="modal-content" style="max-width: 1200px;">
+        <div class="modal-header">
+          <h3 id="quotation-modal-title">新增报价单</h3>
+          <button class="modal-close" onclick="closeQuotationModal()">&times;</button>
+        </div>
+        <form id="quotation-form" onsubmit="saveQuotation(event)">
+          <input type="hidden" id="quotation-id">
+          <div class="card" style="padding: 15px; margin-bottom: 20px;">
+            <h4 style="margin-bottom: 15px; color: #667eea;">基本信息</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>供应商 <span style="color: red;">*</span></label>
+                <select id="quotation-supplier" required>
+                  <option value="">请选择供应商</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>报价日期 <span style="color: red;">*</span></label>
+                <input type="date" id="quotation-date" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>币种 <span style="color: red;">*</span></label>
+                <select id="quotation-currency" required onchange="onCurrencyChange()">
+                  <option value="">请选择币种</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>汇率</label>
+                <input type="number" id="quotation-exchange-rate" step="0.0001" placeholder="留空使用默认汇率">
+              </div>
+              <div class="form-group">
+                <label>税率</label>
+                <input type="number" id="quotation-tax-rate" step="0.01" value="0.13">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>状态</label>
+                <select id="quotation-status">
+                  <option value="active">有效</option>
+                  <option value="inactive">无效</option>
+                </select>
+              </div>
+              <div class="form-group" style="flex: 2;">
+                <label>备注</label>
+                <input type="text" id="quotation-remarks" placeholder="输入备注信息...">
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h4 style="margin: 0; color: #667eea;">报价明细 <span style="color: red;">*</span></h4>
+              <button type="button" class="btn btn-sm btn-success" onclick="addQuotationItem()">+ 添加一行</button>
+            </div>
+            <p style="margin-bottom: 15px; font-size: 13px; color: #666;">
+              提示：含税价和未税价只需输入一个，系统会根据税率自动计算另一个价格
+            </p>
+            <div class="table-container">
+              <table id="quotation-items-table" class="quotation-items-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">序号</th>
+                    <th>物料 <span style="color: red;">*</span></th>
+                    <th>数量</th>
+                    <th>含税单价</th>
+                    <th>未税单价</th>
+                    <th>税额</th>
+                    <th>价税合计</th>
+                    <th style="width: 80px;">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="quotation-items-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="btn-group" style="justify-content: flex-end; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" onclick="closeQuotationModal()">取消</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 报价单详情弹窗 -->
+    <div id="quotation-detail-modal" class="modal">
+      <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+          <h3>报价单详情</h3>
+          <button class="modal-close" onclick="closeQuotationDetailModal()">&times;</button>
+        </div>
+        <div id="quotation-detail-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

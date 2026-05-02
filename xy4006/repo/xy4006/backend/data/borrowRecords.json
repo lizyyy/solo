@@ -1,0 +1,26 @@
+[
+  {
+    "id": "80e4e8dd-5f6d-4cc8-9b2a-975699fbbe65",
+    "supplyId": "d241ba99-3ef8-4e8d-b5c4-f108b2649915",
+    "quantity": 2,
+    "borrower": "质检员",
+    "phone": "13800138000",
+    "expectedReturnDate": "2026-05-01",
+    "status": "returned",
+    "returnedQuantity": 2,
+    "returnHistory": [
+      {
+        "quantity": 1,
+        "remark": "部分归还",
+        "returnedAt": "2026-05-01T04:24:40.201Z"
+      },
+      {
+        "quantity": 1,
+        "remark": "全部归还",
+        "returnedAt": "2026-05-01T04:24:40.216Z"
+      }
+    ],
+    "createdAt": "2026-05-01T04:24:40.160Z",
+    "updatedAt": "2026-05-01T04:24:40.216Z"
+  }
+]

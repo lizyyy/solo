@@ -1,0 +1,88 @@
+{
+    "pageWidth": 210,
+    "pageHeight": 297,
+    "bleed": 3,
+    "unit": "mm",
+    "dies": [
+        {
+            "id": "die_001",
+            "name": "正面主图",
+            "x": 10,
+            "y": 20,
+            "width": 80,
+            "height": 60,
+            "colors": ["C", "M", "Y", "K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_002",
+            "name": "左侧信息栏",
+            "x": -5,
+            "y": 100,
+            "width": 40,
+            "height": 100,
+            "colors": ["C", "M", "Y", "K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_003",
+            "name": "底部条码区",
+            "x": 95,
+            "y": 250,
+            "width": 100,
+            "height": 35,
+            "colors": ["K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_004",
+            "name": "中心Logo区",
+            "x": 80,
+            "y": 85,
+            "width": 50,
+            "height": 50,
+            "colors": ["C", "M", "Y"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_005",
+            "name": "右下角装饰",
+            "x": 140,
+            "y": 120,
+            "width": 55,
+            "height": 55,
+            "colors": ["C", "M", "Y", "K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_006",
+            "name": "顶部标题区",
+            "x": 15,
+            "y": -8,
+            "width": 120,
+            "height": 25,
+            "colors": ["M", "Y", "K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_007",
+            "name": "测试重叠区A",
+            "x": 55,
+            "y": 55,
+            "width": 30,
+            "height": 30,
+            "colors": ["C", "M", "Y", "K"],
+            "shape": "rect"
+        },
+        {
+            "id": "die_008",
+            "name": "测试重叠区B",
+            "x": 70,
+            "y": 65,
+            "width": 30,
+            "height": 30,
+            "colors": ["C", "M", "Y", "K"],
+            "shape": "rect"
+        }
+    ]
+}

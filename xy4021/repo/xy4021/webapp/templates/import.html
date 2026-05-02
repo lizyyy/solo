@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}导入数据 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item active">导入数据</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>📥 从CSV导入器械包</h4>
+            <form method="POST" action="{{ url_for('import_packages') }}" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">选择CSV文件</label>
+                    <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                    <div class="form-text">支持 .csv 格式文件</div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        开始导入
+                    </button>
+                    <a href="{{ url_for('packages') }}" class="btn btn-outline-secondary">
+                        取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>📋 CSV格式要求</h4>
+            
+            <div class="alert alert-info">
+                <strong>必需字段:</strong> <code>package_number</code>, <code>template_name</code>
+                <br>
+                <strong>可选字段:</strong> <code>notes</code>
+            </div>
+            
+            <h6 class="mt-4">示例内容:</h6>
+            <div class="bg-light p-3 rounded">
+                <pre class="mb-0" style="font-size: 12px;">package_number,template_name,notes
+PKG-001,拔牙包,新入库
+PKG-002,种植包,
+PKG-003,洁牙包,待灭菌</pre>
+            </div>
+            
+            <h6 class="mt-4">可用模板:</h6>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">拔牙包</li>
+                <li class="list-group-item">种植包</li>
+                <li class="list-group-item">洁牙包</li>
+                <li class="list-group-item">检查包</li>
+                <li class="list-group-item">补牙包</li>
+            </ul>
+            
+            <div class="alert alert-warning mt-4 mb-0">
+                <strong>注意:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>器械包编号必须唯一</li>
+                    <li>模板名称必须与系统中的模板完全匹配</li>
+                    <li>重复的编号会被跳过</li>
+                    <li>导入后可以在"器械包管理"中查看</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

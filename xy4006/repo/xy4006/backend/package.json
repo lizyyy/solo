@@ -1,0 +1,16 @@
+{
+  "name": "supply-borrow-backend",
+  "version": "1.0.0",
+  "description": "物资借还小台账 - 后端",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0"
+  }
+}

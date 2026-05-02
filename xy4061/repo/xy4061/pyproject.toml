@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jumpguard"
+version = "1.0.0"
+description = "跳板机权限漂移巡检员 - 堡垒机/AD/服务器资产/sudoers 权限一致性审计工具"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "pyyaml>=6.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+jumpguard = "jumpguard.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["jumpguard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

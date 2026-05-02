@@ -1,0 +1,24 @@
+{
+  "mode": "dry_run",
+  "include_retries": true,
+  "respect_timing": true,
+  "filter_tools": null,
+  "stop_on_first_error": true,
+  "field_mappings": [
+    {
+      "old_name": "query",
+      "new_name": "query_text",
+      "confidence": 0.9
+    },
+    {
+      "old_name": "language",
+      "new_name": "lang",
+      "confidence": 0.9
+    },
+    {
+      "old_name": "content",
+      "new_name": "data",
+      "confidence": 0.9
+    }
+  ]
+}

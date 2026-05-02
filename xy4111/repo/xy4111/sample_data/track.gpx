@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="GPS Tracker" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>西湖调查轨迹</name>
+    <time>2024-05-10T08:00:00Z</time>
+  </metadata>
+  
+  <wpt lat="30.2672" lon="120.1551">
+    <ele>12.5</ele>
+    <time>2024-05-10T08:30:00Z</time>
+    <name>WP001</name>
+    <desc>断桥起点</desc>
+  </wpt>
+  
+  <wpt lat="30.2567" lon="120.1523">
+    <ele>10.2</ele>
+    <time>2024-05-10T09:15:00Z</time>
+    <name>WP002</name>
+    <desc>平湖秋月</desc>
+  </wpt>
+  
+  <wpt lat="30.2489" lon="120.1498">
+    <ele>8.7</ele>
+    <time>2024-05-10T10:00:00Z</time>
+    <name>WP003</name>
+    <desc>苏堤</desc>
+  </wpt>
+  
+  <trk>
+    <name>调查路线</name>
+    <trkseg>
+      <trkpt lat="30.2672" lon="120.1551">
+        <ele>12.5</ele>
+        <time>2024-05-10T08:30:00Z</time>
+      </trkpt>
+      <trkpt lat="30.2650" lon="120.1540">
+        <ele>11.8</ele>
+        <time>2024-05-10T08:45:00Z</time>
+      </trkpt>
+      <trkpt lat="30.2567" lon="120.1523">
+        <ele>10.2</ele>
+        <time>2024-05-10T09:15:00Z</time>
+      </trkpt>
+      <trkpt lat="30.2520" lon="120.1510">
+        <ele>9.5</ele>
+        <time>2024-05-10T09:35:00Z</time>
+      </trkpt>
+      <trkpt lat="30.2489" lon="120.1498">
+        <ele>8.7</ele>
+        <time>2024-05-10T10:00:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,64 @@
+factors:
+  - energy_type: electricity
+    factor_value: 0.581
+    unit: kgCO2/kWh
+    scope: Scope 2
+    version: v2024.1
+    effective_date: 2024-01
+    source: NDRC 2024
+
+  - energy_type: electricity
+    factor_value: 0.610
+    unit: kgCO2/kWh
+    scope: Scope 2
+    version: v2023.2
+    effective_date: 2023-07
+    source: NDRC 2023
+
+  - energy_type: electricity
+    factor_value: 0.645
+    unit: kgCO2/kWh
+    scope: Scope 2
+    version: v2022.1
+    effective_date: 2022-01
+    source: NDRC 2022
+
+  - energy_type: natural_gas
+    factor_value: 2.02
+    unit: kgCO2/m³
+    scope: Scope 1
+    version: v2024.1
+    effective_date: 2024-01
+    source: IPCC 2023
+
+  - energy_type: diesel
+    factor_value: 2.68
+    unit: kgCO2/L
+    scope: Scope 1
+    version: v2024.1
+    effective_date: 2024-01
+    source: IPCC 2023
+
+  - energy_type: gasoline
+    factor_value: 2.31
+    unit: kgCO2/L
+    scope: Scope 1
+    version: v2024.1
+    effective_date: 2024-01
+    source: IPCC 2023
+
+  - energy_type: coal
+    factor_value: 2.42
+    unit: kgCO2/kg
+    scope: Scope 1
+    version: v2024.1
+    effective_date: 2024-01
+    source: IPCC 2023
+
+  - energy_type: lng
+    factor_value: 2.75
+    unit: kgCO2/m³
+    scope: Scope 1
+    version: v2024.1
+    effective_date: 2024-01
+    source: IPCC 2023

@@ -1,0 +1,86 @@
+{
+  "stores": [
+    {
+      "store_code": "SH001",
+      "store_name": "上海南京路店",
+      "checkpoints": ["入口", "收银台", "货架A", "货架B", "仓库", "卫生间", "消防设备"],
+      "time_window": {
+        "start": "09:00",
+        "end": "21:00"
+      },
+      "photo_patterns": ["SH001", "上海南京路"],
+      "checkpoint_patterns": {
+        "入口": ["入口", "门口", "entrance", "door"],
+        "收银台": ["收银", "收银台", "cashier", "checkout"],
+        "货架A": ["货架A", "货架1", "shelfA", "shelf1"],
+        "货架B": ["货架B", "货架2", "shelfB", "shelf2"],
+        "仓库": ["仓库", "库房", "warehouse", "storage"],
+        "卫生间": ["卫生间", "厕所", "洗手间", "toilet", "restroom"],
+        "消防设备": ["消防", "灭火器", "消防栓", "fire", "safety"]
+      }
+    },
+    {
+      "store_code": "SH002",
+      "store_name": "上海陆家嘴店",
+      "checkpoints": ["入口", "收银台", "货架区", "仓库", "卫生间", "消防设备", "前台"],
+      "time_window": {
+        "start": "10:00",
+        "end": "22:00"
+      },
+      "photo_patterns": ["SH002", "上海陆家嘴"],
+      "checkpoint_patterns": {
+        "入口": ["入口", "门口", "entrance"],
+        "收银台": ["收银", "收银台", "cashier"],
+        "货架区": ["货架", "shelf"],
+        "仓库": ["仓库", "warehouse"],
+        "卫生间": ["卫生间", "toilet"],
+        "消防设备": ["消防", "fire"],
+        "前台": ["前台", "front"]
+      }
+    },
+    {
+      "store_code": "BJ001",
+      "store_name": "北京王府井店",
+      "checkpoints": ["入口", "收银台", "食品区", "非食品区", "仓库", "卫生间", "消防设备", "办公区"],
+      "time_window": {
+        "start": "08:30",
+        "end": "21:30"
+      },
+      "photo_patterns": ["BJ001", "北京王府井"],
+      "checkpoint_patterns": {
+        "入口": ["入口", "门口"],
+        "收银台": ["收银", "收银台"],
+        "食品区": ["食品", "food"],
+        "非食品区": ["非食品", "non-food"],
+        "仓库": ["仓库", "库房"],
+        "卫生间": ["卫生间", "厕所"],
+        "消防设备": ["消防", "灭火器"],
+        "办公区": ["办公", "office"]
+      }
+    },
+    {
+      "store_code": "GZ001",
+      "store_name": "广州天河店",
+      "checkpoints": ["入口", "收银台", "生鲜区", "日用品区", "仓库", "卫生间", "消防设备"],
+      "time_window": {
+        "start": "08:00",
+        "end": "22:00"
+      },
+      "photo_patterns": ["GZ001", "广州天河"],
+      "checkpoint_patterns": {
+        "入口": ["入口", "门口"],
+        "收银台": ["收银", "收银台"],
+        "生鲜区": ["生鲜", "fresh"],
+        "日用品区": ["日用品", "daily"],
+        "仓库": ["仓库"],
+        "卫生间": ["卫生间"],
+        "消防设备": ["消防"]
+      }
+    }
+  ],
+  "global_settings": {
+    "time_deviation_threshold_minutes": 30,
+    "duplicate_detection_enabled": true,
+    "exif_fallback_to_filename": true
+  }
+}

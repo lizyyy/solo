@@ -1,0 +1,8 @@
+timestamp,alertname,severity,status,description,source,service
+2024-01-15 10:30:00,HighCPUUsage,critical,firing,CPU使用率超过90%持续5分钟,Prometheus,api-gateway
+2024-01-15 10:31:00,HighMemoryUsage,warning,firing,内存使用率超过80%,Prometheus,api-gateway
+2024-01-15 10:32:00,ServiceUnavailable,critical,firing,api-gateway服务健康检查失败,Prometheus,api-gateway
+2024-01-15 10:35:00,HighCPUUsage,critical,firing,CPU使用率超过90%持续5分钟,Prometheus,api-gateway
+2024-01-15 10:40:00,HighCPUUsage,critical,resolved,CPU使用率已恢复正常,Prometheus,api-gateway
+2024-01-15 10:41:00,ServiceUnavailable,critical,resolved,api-gateway服务健康检查已恢复,Prometheus,api-gateway
+2024-01-15 10:42:00,HighMemoryUsage,warning,resolved,内存使用率已恢复正常,Prometheus,api-gateway

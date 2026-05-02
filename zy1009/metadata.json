@@ -1,0 +1,47 @@
+{
+  "idea_id": "zy1009",
+  "idea_short_title": "我想给小区团购团长做一个本地可运行的预售订单小工具。每周三晚上截单，团长会先录入本周商品、每个用户的订单和取货时间段；如",
+  "folder_name": "zy1009",
+  "idea_dir": "/Users/lzy/pro/solocoder/pro/zy1009",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "全栈 Web 应用",
+    "修改范围": "跨系统多模块"
+  },
+  "repo_plan": {
+    "base_branch": "idea/zy1009/base",
+    "round_branch": "idea/zy1009/r1",
+    "pr_title": "[zy1009][第一轮] 我想给小区团购团长做一个本地可运行的预售订单小工具。每周三晚上截单，团长会先录入本周商品、每个用户的",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": "uid/x01",
+      "repo_probe_inconclusive": false,
+      "ls_remote_returncode": 0,
+      "ls_remote_stderr": "",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/zy1009/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/zy1009/base...idea/zy1009/r1?expand=1",
+    "repo_dir": "/Users/lzy/pro/solocoder/pro/zy1009/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/lzy/pro/solocoder/pro/zy1009/zy1009.xlsx",
+    "uid": "zy1009",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/lzy/pro/solocoder/pro/zy1009/idea.md",
+    "prompt_raw": "/Users/lzy/pro/solocoder/pro/zy1009/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/lzy/pro/solocoder/pro/zy1009/prompts/第一轮-优化建议.md",
+    "pr": "/Users/lzy/pro/solocoder/pro/zy1009/pr/第一轮.md",
+    "round_json": "/Users/lzy/pro/solocoder/pro/zy1009/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T02:15:17.294344+08:00"
+}

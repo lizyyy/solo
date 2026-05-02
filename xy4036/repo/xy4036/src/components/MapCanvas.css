@@ -1,0 +1,168 @@
+.map-container {
+  position: relative;
+  background: #0a0e27;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.map-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.map-canvas:hover {
+  opacity: 0.98;
+}
+
+.map-tooltip {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.95);
+  color: #e2e8f0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 100;
+  max-width: 250px;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.map-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 20px;
+  border-width: 0 8px 8px;
+  border-style: solid;
+  border-color: transparent transparent rgba(15, 23, 42, 0.95);
+}
+
+.map-tooltip-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #6366f1;
+}
+
+.map-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.map-tooltip-label {
+  color: #94a3b8;
+}
+
+.map-tooltip-value {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #94a3b8;
+}
+
+.map-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.map-overlay-info {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.map-overlay-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.9);
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #94a3b8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.legend-title {
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-color-passenger { background: #4ECDC4; }
+.legend-color-danger { background: #FF6B6B; }
+.legend-color-container { background: #45B7D1; }
+.legend-color-bulk { background: #96CEB4; }
+.legend-color-tanker { background: #FFEAA7; }
+.legend-color-waiting { background: #FF9F43; }
+.legend-color-moving { background: #54A0FF; }
+.legend-color-docked { background: #1DD1A1; }
+.legend-color-berth-passenger { background: #48BB78; }
+.legend-color-berth-danger { background: #ED8936; }
+.legend-color-berth-occupied { background: #E53E3E; }
+.legend-color-channel-open { background: #3182CE; }
+.legend-color-channel-closed { background: #4A5568; }
+.legend-color-channel-restricted { background: #D69E2E; }
+.legend-color-tug-available { background: #10B981; }
+.legend-color-tug-assigned { background: #8B5CF6; }

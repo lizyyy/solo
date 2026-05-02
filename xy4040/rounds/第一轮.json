@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4040",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4040/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给纪录片外拍助理用的本地命令行工具，叫“素材回卡守门员”。拍摄回酒店后会把多张 SD 卡里的视频、音频和字幕边车文件拷到移动硬盘，最怕漏拷一段、卡号混淆、文件名重复覆盖、时间码错位，第二天才发现补不了。请从 0 到 1 做一个可运行的 Python CLI 项目：scan 命令能扫描一个或多个卡目录，识别相机素材、录音文件、代理文件和 .srt/.json 边车，读取文件大小、修改时间、可用的 timecode/拍摄日期元数据（读不到也要有降级策略），写入本地 manifest.json；plan 命令根据项目配置生成拷贝计划，按拍摄日/机位/卡号归档，发现重复文件名、同名不同内容、缺失边车、音视频时间窗没有对应、卡内序号断档、目标盘剩余空间不足时要给出阻断或警告；copy 命令按计划执行可续传拷贝，使用哈希校验，不允许覆盖未确认的不同内容，支持 dry-run 和 resume；verify 命令能重新扫描目标目录并比对 manifest，输出漏拷、校验失败和多余文件；report 命令导出 Markdown 交接报告和 CSV 问题清单。配置、文件扫描、元数据适配、规则校验、拷贝执行、manifest 存储、报告生成和 CLI 入口请拆成多个文件，提供示例素材目录生成脚本和测试/自检命令，README 里写清楚怎么用临时目录完整验证 scan、plan、copy、resume、verify、report 流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4040/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n项目编号：xy4040\n本轮：第一轮\n模型要求：必须使用 Seed-Code-DogFooding\n智能体要求：必须使用 SOLO Coder\n代码目录要求：在仓库根目录创建并只修改 `xy4040/`\n\n原始想法：\n我想做一个给纪录片外拍助理用的本地命令行工具，叫“素材回卡守门员”。拍摄回酒店后会把多张 SD 卡里的视频、音频和字幕边车文件拷到移动硬盘，最怕漏拷一段、卡号混淆、文件名重复覆盖、时间码错位，第二天才发现补不了。请从 0 到 1 做一个可运行的 Python CLI 项目：scan 命令能扫描一个或多个卡目录，识别相机素材、录音文件、代理文件和 .srt/.json 边车，读取文件大小、修改时间、可用的 timecode/拍摄日期元数据（读不到也要有降级策略），写入本地 manifest.json；plan 命令根据项目配置生成拷贝计划，按拍摄日/机位/卡号归档，发现重复文件名、同名不同内容、缺失边车、音视频时间窗没有对应、卡内序号断档、目标盘剩余空间不足时要给出阻断或警告；copy 命令按计划执行可续传拷贝，使用哈希校验，不允许覆盖未确认的不同内容，支持 dry-run 和 resume；verify 命令能重新扫描目标目录并比对 manifest，输出漏拷、校验失败和多余文件；report 命令导出 Markdown 交接报告和 CSV 问题清单。配置、文件扫描、元数据适配、规则校验、拷贝执行、manifest 存储、报告生成和 CLI 入口请拆成多个文件，提供示例素材目录生成脚本和测试/自检命令，README 里写清楚怎么用临时目录完整验证 scan、plan、copy、resume、verify、report 流程。\n\n开发目标：\n- 将上面的想法落成一个不简单、可运行、可演示的项目原型\n- 所有代码集中在 `xy4040/`\n- 如果仓库当前为空，请自行初始化最小但完整的项目结构\n- 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n工作方式要求：\n- 先快速审视当前仓库是否为空、已有文件结构和运行方式\n- 再给出极简执行计划，然后立即开始写代码\n- 不要把大量时间花在空泛分析或模板化总结上\n- 不要偏离需求去做无关的大重构\n- 如需新增依赖，只增加必要依赖，并说明原因\n\n交付要求：\n- 必须给出完整代码\n- 必须给出运行步骤\n- 必须说明关键文件和实现点\n- 如有未完成项，明确列出\n\n验收标准：\n- 项目可以启动或运行\n- 页面或功能不是纯占位\n- 至少包含 3 个以上互相关联的功能点或模块\n- 代码结构清晰，文件划分合理\n- 不要只生成单文件 demo\n\n输出方式：\n- 先简短说明你将创建什么\n- 然后直接开始改文件\n- 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4040/r1",
+  "base_branch_name": "idea/xy4040/base",
+  "parent_branch_name": "idea/xy4040/base",
+  "pr_title": "[xy4040][第一轮] 我想做一个给纪录片外拍助理用的本地命令行工具，叫“素材回卡守门员”。拍摄回酒店后会把多张 SD 卡里",
+  "session_id": "69f47798e644eb6dd6d4c0e7",
+  "message_id": "69f4779fd357c86ceda28d12",
+  "trace_id": null,
+  "task_type": "0-1代码生成",
+  "business_domain": "端侧与基础工具",
+  "modification_scope": "跨模块多文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4040/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4040/repo/xy4040",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4040/base...idea/xy4040/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T17:50:45.213303+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4040/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4040/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4040"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4040/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4040/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4040/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4040/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给纪录片外拍助理用的本地命令行工具，叫“素材回卡守门员”。拍摄回酒店后会把多张 SD 卡里的视频、音频和字幕边车文件拷到移动硬盘，最怕漏拷一段、卡号混淆、文件名重复覆盖、时间码错位，第二天才发现补不了。请从 0 到 1 做一个可运行的 Python CLI 项目：scan 命令能扫描一个或多个卡目录，识别相机素材、录音文件、代理文件和 .srt/.json 边车，读取文件大小、修改时间、可用的 timecode/拍摄日期元数据（读不到也要有降级策略），写入本地 manifest.json；plan 命令根据项目配置生成拷贝计划，按拍摄日/机位/卡号归档，发现重复文件名、同名不同内容、缺失边车、音视频时间窗没有对应、卡内序号断档、目标盘剩余空间不足时要给出阻断或警告；copy 命令按计划执行可续传拷贝，使用哈希校验，不允许覆盖未确认的不同内容，支持 dry-run 和 resume；verify 命令能重新扫描目标目录并比对 manifest，输出漏拷、校验失败和多余文件；report 命令导出 Markdown 交接报告和 CSV 问题清单。配置、文件扫描、元数据适配、规则校验、拷贝执行、manifest 存储、报告生成和 CLI 入口请拆成多个文件，提供示例素材目录生成脚本和测试/自检命令，README 里写清楚怎么用临时目录完整验证 scan、plan、copy、resume、verify、report 流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T17:51:29.019048+08:00"
+}

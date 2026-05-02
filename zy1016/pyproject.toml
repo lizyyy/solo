@@ -1,0 +1,21 @@
+[project]
+name = "content-deduplicator"
+version = "0.1.0"
+description = "选题素材去重和分组助手 - 本地算法检测重复灵感，自动分组，状态管理"
+requires-python = ">=3.9"
+dependencies = [
+    "scikit-learn>=1.0.0",
+    "numpy>=1.19.0",
+    "click>=8.0.0",
+    "jieba>=0.42.1",
+]
+
+[project.scripts]
+content-dedup = "content_deduplicator.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["content_deduplicator"]

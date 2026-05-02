@@ -1,0 +1,38 @@
+[project]
+name = "postmortem-puzzle"
+version = "0.1.0"
+description = "故障复盘拼图器 - 统一时间线的故障分析工具"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "SRE Team"}
+]
+keywords = ["sre", "devops", "postmortem", "incident", "timeline"]
+dependencies = [
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+postmortem = "postmortem_puzzle.cli:cli"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["postmortem_puzzle*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

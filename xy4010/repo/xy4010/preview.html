@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>外勤维修工单台账 - 预览</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .modal { display: none; }
+    .modal.active { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- 导航栏 -->
+  <nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-gray-800">
+            🔧 外勤维修工单台账
+          </span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button class="tab-btn px-3 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-700" data-tab="list">
+            工单列表
+          </button>
+          <button class="tab-btn px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100" data-tab="stats">
+            数据统计
+          </button>
+          <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors" onclick="showModal('newTicketModal')">
+            + 新建工单
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主内容区 -->
+  <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    
+    <!-- 工单列表页面 -->
+    <div id="tab-list" class="tab-content active space-y-6">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">工单列表</h1>
+        <div class="text-sm text-gray-500">共 6 条记录</div>
+      </div>
+
+      <!-- 筛选区域 -->
+      <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex flex-wrap items-end gap-4">
+          <div class="flex flex-col min-w-32">
+            <label class="text-sm font-medium text-gray-700 mb-1">状态</label>
+            <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">全部状态</option>
+              <option>待派单</option>
+              <option>处理中</option>
+              <option>待验收</option>
+              <option>已完成</option>
+              <option>已逾期</option>
+            </select>
+          </div>
+          <div class="flex flex-col min-w-40">
+            <label class="text-sm font-medium text-gray-700 mb-1">维修师傅</label>
+            <select class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">全部师傅</option>
+              <option>张师傅</option>
+              <option>李师傅</option>
+              <option>王师傅</option>
+            </select>
+          </div>
+          <div class="flex flex-col min-w-36">
+            <label class="text-sm font-medium text-gray-700 mb-1">开始日期</label>
+            <input type="date" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="flex flex-col min-w-36">
+            <label class="text-sm font-medium text-gray-700 mb-1">结束日期</label>
+            <input type="date" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <button class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">
+            清除筛选
+          </button>
+        </div>
+      </div>
+
+      <!-- 工单表格 -->
+      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">工单编号</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">报修人</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">地点</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">师傅</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer" onclick="showModal('ticketDetailModal')">WD2026050001</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  张三 <span class="text-gray-400 ml-2">13800138001</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">A栋101室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">张师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">处理中</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-05-01 09:30</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <button class="text-green-600 hover:text-green-900" onclick="showModal('transitionModal')">流转</button>
+                    <button class="text-blue-600 hover:text-blue-900" onclick="showModal('editTicketModal')">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">WD2026050002</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  李四 <span class="text-gray-400 ml-2">13800138002</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">B栋203室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">李师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">待派单</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-05-01 10:15</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <button class="text-green-600 hover:text-green-900">流转</button>
+                    <button class="text-blue-600 hover:text-blue-900">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">WD2026050003</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  王五 <span class="text-gray-400 ml-2">13800138003</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">C栋305室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">王师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">待验收</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-04-30 14:20</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <button class="text-green-600 hover:text-green-900">流转</button>
+                    <button class="text-blue-600 hover:text-blue-900">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">WD2026050004</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  赵六 <span class="text-gray-400 ml-2">13800138004</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">A栋502室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">张师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已完成</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-04-29 16:45</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <span class="text-gray-300">流转</span>
+                    <button class="text-blue-600 hover:text-blue-900">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">WD2026040005</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  钱七 <span class="text-gray-400 ml-2">13800138005</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">D栋108室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">李师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">已逾期</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-04-25 09:00</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <button class="text-green-600 hover:text-green-900">流转</button>
+                    <button class="text-blue-600 hover:text-blue-900">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="text-blue-600 hover:text-blue-900 font-medium cursor-pointer">WD2026040006</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
+                  孙八 <span class="text-gray-400 ml-2">13800138006</span>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-700">B栋401室</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">张师傅</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">已完成</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">2026-04-28 11:30</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm">
+                  <div class="flex justify-end space-x-2">
+                    <span class="text-gray-300">流转</span>
+                    <button class="text-blue-600 hover:text-blue-900">编辑</button>
+                    <button class="text-red-600 hover:text-red-900">删除</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据统计页面 -->
+    <div id="tab-stats" class="tab-content space-y-6">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">数据统计</h1>
+      </div>
+
+      <!-- 筛选 -->
+      <div class="bg-white p-4 rounded-lg shadow-sm border">
+        <div class="flex flex-wrap items-end gap-4">
+          <div class="flex flex-col min-w-36">
+            <label class="text-sm font-medium text-gray-700 mb-1">开始日期</label>
+            <input type="date" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div class="flex flex-col min-w-36">
+            <label class="text-sm font-medium text-gray-700 mb-1">结束日期</label>
+            <input type="date" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">查询</button>
+          <button class="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50">清除筛选</button>
+        </div>
+      </div>
+
+      <!-- 逾期警告 -->
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex items-center">
+          <span class="text-red-600 font-semibold text-lg mr-2">⚠️</span>
+          <span class="text-red-800">
+            当前有 <span class="font-bold text-xl">1</span> 个已逾期工单
+          </span>
+        </div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">6</div>
+          <div class="text-sm text-gray-500 mt-1">总工单数</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">1</div>
+          <div class="inline-flex px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-sm mt-1">待派单</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">1</div>
+          <div class="inline-flex px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-sm mt-1">处理中</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">1</div>
+          <div class="inline-flex px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-sm mt-1">待验收</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">2</div>
+          <div class="inline-flex px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-sm mt-1">已完成</div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm border p-4 text-center">
+          <div class="text-3xl font-bold text-gray-900">1</div>
+          <div class="inline-flex px-2 py-0.5 rounded-full bg-red-100 text-red-800 text-sm mt-1">已逾期</div>
+        </div>
+      </div>
+
+      <!-- 两列统计 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 状态分布 -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">工单状态分布</h2>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-700">待派单</span>
+                <span class="text-gray-500">1 单 (17%)</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-yellow-500 transition-all" style="width: 17%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-700">处理中</span>
+                <span class="text-gray-500">1 单 (17%)</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-blue-500 transition-all" style="width: 17%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-700">待验收</span>
+                <span class="text-gray-500">1 单 (17%)</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-purple-500 transition-all" style="width: 17%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-700">已完成</span>
+                <span class="text-gray-500">2 单 (33%)</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-green-500 transition-all" style="width: 33%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-gray-700">已逾期</span>
+                <span class="text-gray-500">1 单 (17%)</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-red-500 transition-all" style="width: 17%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 材料使用排行 -->
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">材料使用排行</h2>
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <div class="w-8 text-center mr-3">
+                <span class="text-xs font-bold text-yellow-600">1</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-gray-700">PPR水管 φ20</span>
+                  <span class="text-gray-500">15 件</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-teal-500 transition-all" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 text-center mr-3">
+                <span class="text-xs font-bold text-gray-400">2</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-gray-700">生料带</span>
+                  <span class="text-gray-500">10 件</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-teal-500 transition-all" style="width: 67%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 text-center mr-3">
+                <span class="text-xs font-bold text-orange-600">3</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-gray-700">水龙头阀芯</span>
+                  <span class="text-gray-500">8 件</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-teal-500 transition-all" style="width: 53%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 text-center mr-3">
+                <span class="text-xs font-bold text-gray-600">4</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-gray-700">密封胶</span>
+                  <span class="text-gray-500">5 件</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-teal-500 transition-all" style="width: 33%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-8 text-center mr-3">
+                <span class="text-xs font-bold text-gray-600">5</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between text-sm mb-1">
+                  <span class="text-gray-700">电线 2.5平方</span>
+                  <span class="text-gray-500">3 件</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full bg-teal-500 transition-all" style="width: 20%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 师傅工作量 -->
+      <div class="bg-white rounded-lg shadow-sm border p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">维修师傅工作量</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">师傅姓名</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">派单总数</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">已完成</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">完成率</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">进度</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="font-medium text-gray-900">张师傅</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-gray-700 font-medium">3</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-green-600 font-medium">2</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="font-medium text-green-600">67%</span>
+                </td>
+                <td class="px-4 py-3 w-48">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full bg-green-500 transition-all" style="width: 67%"></div>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="font-medium text-gray-900">李师傅</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-gray-700 font-medium">2</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-green-600 font-medium">0</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="font-medium text-red-600">0%</span>
+                </td>
+                <td class="px-4 py-3 w-48">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full bg-red-500 transition-all" style="width: 0%"></div>
+                  </div>
+                </td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <span class="font-medium text-gray-900">王师傅</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-gray-700 font-medium">1</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="text-green-600 font-medium">0</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-center">
+                  <span class="font-medium text-yellow-600">0%</span>
+                </td>
+                <td class="px-4 py-3 w-48">
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full bg-yellow-500 transition-all" style="width: 0%"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 新建工单弹窗 -->
+  <div id="newTicketModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-900">新建工单</h3>
+          <button class="text-gray-400 hover:text-gray-600" onclick="hideModal('newTicketModal')">✕</button>
+        </div>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">报修人姓名 <span class="text-red-500">*</span></label>
+            <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入报修人姓名">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">联系电话 <span class="text-red-500">*</span></label>
+            <input type="tel" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入联系电话">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">地点 <span class="text-red-500">*</span></label>
+          <input type="text" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入故障地点">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+            <select class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="1">普通</option>
+              <option value="2">紧急</option>
+              <option value="3">特急</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">预计完成日期</label>
+            <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">故障描述 <span class="text-red-500">*</span></label>
+          <textarea rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请详细描述故障情况"></textarea>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium text-gray-700">使用材料</label>
+            <button class="text-sm text-blue-600 hover:text-blue-800">+ 添加材料</button>
+          </div>
+          <div class="flex items-center gap-4">
+            <input type="text" class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="材料名称">
+            <input type="number" min="1" value="1" class="w-24 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="数量">
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t flex justify-end space-x-3">
+        <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50" onclick="hideModal('newTicketModal')">取消</button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 状态流转弹窗 -->
+  <div id="transitionModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-900">状态流转</h3>
+          <button class="text-gray-400 hover:text-gray-600" onclick="hideModal('transitionModal')">✕</button>
+        </div>
+      </div>
+      <div class="p-6">
+        <p class="text-gray-600 mb-4">当前工单状态：<span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">处理中</span></p>
+        <p class="text-sm text-gray-500 mb-4">选择要流转到的下一个状态：</p>
+        <div class="space-y-2">
+          <button class="w-full text-left px-4 py-3 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors">
+            <span class="font-medium text-purple-700">申请验收</span>
+            <span class="text-gray-400 text-sm ml-2">→ 待验收</span>
+          </button>
+          <button class="w-full text-left px-4 py-3 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+            <span class="font-medium text-red-700">标记逾期</span>
+            <span class="text-gray-400 text-sm ml-2">→ 已逾期</span>
+          </button>
+        </div>
+      </div>
+      <div class="p-6 border-t flex justify-end">
+        <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50" onclick="hideModal('transitionModal')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工单详情弹窗 -->
+  <div id="ticketDetailModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-4">
+            <h3 class="text-lg font-semibold text-gray-900">工单详情</h3>
+            <span class="font-mono text-sm text-gray-500">WD2026050001</span>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">处理中</span>
+          </div>
+          <button class="text-gray-400 hover:text-gray-600" onclick="hideModal('ticketDetailModal')">✕</button>
+        </div>
+      </div>
+      <div class="p-6 space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-gray-500">报修人</p>
+            <p class="font-medium">张三</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">联系电话</p>
+            <p class="font-medium">13800138001</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">地点</p>
+            <p class="font-medium">A栋101室</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">派给师傅</p>
+            <p class="font-medium">张师傅</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">优先级</p>
+            <p class="font-medium">普通</p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-500">创建时间</p>
+            <p class="font-medium">2026-05-01 09:30</p>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">故障描述</p>
+          <p class="text-gray-700 bg-gray-50 p-3 rounded-md">卫生间水龙头漏水，需要更换阀芯。用户说漏水已经有一周了，现在越来越严重。</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-2">使用材料</p>
+          <div class="bg-gray-50 p-3 rounded-md">
+            <div class="flex justify-between text-sm">
+              <span>水龙头阀芯</span>
+              <span class="text-gray-500">2 件</span>
+            </div>
+            <div class="flex justify-between text-sm mt-1">
+              <span>生料带</span>
+              <span class="text-gray-500">1 卷</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">处理结果</p>
+          <p class="text-gray-400 italic">（待回填）</p>
+        </div>
+      </div>
+      <div class="p-6 border-t flex justify-end space-x-3">
+        <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50" onclick="hideModal('ticketDetailModal')">关闭</button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">编辑工单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提示信息 -->
+  <div class="fixed bottom-4 right-4 max-w-sm">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg">
+      <p class="text-sm text-blue-800">
+        <strong>📌 提示：</strong>这是一个预览页面。完整功能需要启动后端服务。
+      </p>
+      <p class="text-xs text-blue-600 mt-2">
+        请在终端执行：<code class="bg-blue-100 px-1 py-0.5 rounded">npm install && cd server && npx prisma migrate dev --name init && cd .. && npm run dev</code>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // 标签页切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const tabId = this.dataset.tab;
+        
+        // 更新按钮样式
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('bg-blue-100', 'text-blue-700');
+          b.classList.add('text-gray-600');
+        });
+        this.classList.add('bg-blue-100', 'text-blue-700');
+        this.classList.remove('text-gray-600');
+        
+        // 显示对应内容
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+      });
+    });
+
+    // 弹窗控制
+    function showModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+    function hideModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // 点击弹窗背景关闭
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.remove('active');
+        }
+      });
+    });
+
+    // 导出函数供 onclick 使用
+    window.showModal = showModal;
+    window.hideModal = hideModal;
+  </script>
+</body>
+</html>

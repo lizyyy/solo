@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>取餐入口 - 共享冷藏柜取餐登记系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        .nav-back {
+            display: inline-block;
+            color: #43e97b;
+            text-decoration: none;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: rgba(67, 233, 123, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e1e5eb;
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 4px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #43e97b;
+            box-shadow: 0 0 0 3px rgba(67, 233, 123, 0.2);
+        }
+        .input-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 233, 123, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: left;
+        }
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success-details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .success-details h3 {
+            color: #155724;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .detail-value {
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .icon-large {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 15px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .form-group input {
+                padding: 14px 16px;
+                font-size: 16px;
+            }
+            .btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-back">← 返回首页</a>
+        
+        <div class="header">
+            <div class="icon-large">🥡</div>
+            <h1>取餐验证</h1>
+            <p class="subtitle">请输入您的手机号后四位和取餐码</p>
+        </div>
+        
+        <div id="messageArea"></div>
+        
+        <form id="pickupForm" style="display: block;">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="phoneLastFour">手机号后四位</label>
+                    <input type="text" id="phoneLastFour" placeholder="请输入4位数字" maxlength="4" pattern="\d{4}" required>
+                    <p class="input-hint">例如：1234</p>
+                </div>
+                <div class="form-group">
+                    <label for="pickupCode">取餐码</label>
+                    <input type="text" id="pickupCode" placeholder="请输入6位取餐码" maxlength="6" pattern="\d{6}" required>
+                    <p class="input-hint">取餐码由值班员提供</p>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">确认取餐</button>
+        </form>
+        
+        <div id="successSection" style="display: none;">
+            <div class="icon-large">✅</div>
+            <h2 style="color: #155724; margin-bottom: 10px;">取餐成功！</h2>
+            <p style="color: #666; margin-bottom: 20px;">请从冷藏柜取出您的餐品</p>
+            
+            <div class="success-details" id="successDetails">
+            </div>
+            
+            <button type="button" class="btn btn-primary" style="margin-top: 20px;" onclick="resetForm()">继续取餐</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        
+        function showMessage(message, type = 'success') {
+            const area = document.getElementById('messageArea');
+            const className = type === 'success' ? 'message-success' : 'message-error';
+            area.innerHTML = `<div class="message ${className}">${message}</div>`;
+            setTimeout(() => {
+                area.innerHTML = '';
+            }, 5000);
+        }
+        
+        function showSuccess(slot, record) {
+            document.getElementById('pickupForm').style.display = 'none';
+            document.getElementById('successSection').style.display = 'block';
+            
+            const detailsHtml = `
+                <h3>取餐详情</h3>
+                <div class="detail-item">
+                    <span class="detail-label">格口号</span>
+                    <span class="detail-value">${slot.slotNumber} 号格口</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">餐品名称</span>
+                    <span class="detail-value">${slot.foodName}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">取餐时间</span>
+                    <span class="detail-value">${new Date(record.timestamp).toLocaleString('zh-CN')}</span>
+                </div>
+            `;
+            
+            document.getElementById('successDetails').innerHTML = detailsHtml;
+        }
+        
+        function resetForm() {
+            document.getElementById('pickupForm').style.display = 'block';
+            document.getElementById('successSection').style.display = 'none';
+            document.getElementById('pickupForm').reset();
+            document.getElementById('phoneLastFour').focus();
+        }
+        
+        document.getElementById('pickupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phoneLastFour = document.getElementById('phoneLastFour').value.trim();
+            const pickupCode = document.getElementById('pickupCode').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!/^\d{4}$/.test(phoneLastFour)) {
+                showMessage('请输入正确的4位手机号后四位', 'error');
+                return;
+            }
+            
+            if (!/^\d{6}$/.test(pickupCode)) {
+                showMessage('请输入正确的6位取餐码', 'error');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '验证中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/pickup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneLastFour, pickupCode })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(data.data.slot, data.data.record);
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (err) {
+                showMessage('取餐验证失败，请稍后重试', 'error');
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '确认取餐';
+            }
+        });
+        
+        document.getElementById('phoneLastFour').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^\d]/g, '');
+        });
+        
+        document.getElementById('pickupCode').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^\d]/g, '');
+        });
+    </script>
+</body>
+</html>

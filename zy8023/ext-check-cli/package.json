@@ -1,0 +1,20 @@
+{
+  "name": "ext-check-cli",
+  "version": "1.0.0",
+  "description": "Browser extension local publishing pre-check CLI tool",
+  "main": "src/cli/index.js",
+  "bin": {
+    "ext-check": "src/cli/index.js"
+  },
+  "scripts": {
+    "start": "node src/cli/index.js",
+    "test": "node src/cli/index.js --dir samples/sample-extension --whitelist samples/permission-whitelist.yaml --output out"
+  },
+  "keywords": ["browser-extension", "chrome", "firefox", "pre-check", "publishing"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "glob": "^7.2.0"
+  }
+}

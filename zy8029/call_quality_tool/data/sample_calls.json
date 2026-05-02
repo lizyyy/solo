@@ -1,0 +1,115 @@
+[
+  {
+    "call_id": "CALL001",
+    "agent_id": "AGENT001",
+    "customer_id": "CUST001",
+    "start_time": "2024-01-15T09:00:00",
+    "utterances": [
+      {"speaker": "customer", "text": "喂，我想查一下我的订单", "start_time": 0.0, "end_time": 3.5},
+      {"speaker": "agent", "text": "好的，请问您的订单号是多少？", "start_time": 3.8, "end_time": 7.2},
+      {"speaker": "customer", "text": "订单号是123456", "start_time": 7.5, "end_time": 10.0},
+      {"speaker": "agent", "text": "我帮您查一下，稍等", "start_time": 10.3, "end_time": 14.0},
+      {"speaker": "agent", "text": "您的订单已经发货了，预计3天内送达", "start_time": 35.0, "end_time": 40.0},
+      {"speaker": "customer", "text": "好的，谢谢", "start_time": 40.5, "end_time": 42.0},
+      {"speaker": "agent", "text": "不客气，再见", "start_time": 42.5, "end_time": 44.0}
+    ]
+  },
+  {
+    "call_id": "CALL002",
+    "agent_id": "AGENT002",
+    "customer_id": "CUST002",
+    "start_time": "2024-01-15T10:00:00",
+    "utterances": [
+      {"speaker": "agent", "text": "您好，某某客服，请问有什么可以帮您？", "start_time": 0.0, "end_time": 4.0},
+      {"speaker": "customer", "text": "我的货怎么还没到，都一周了", "start_time": 4.2, "end_time": 8.0},
+      {"speaker": "agent", "text": "抱歉给您带来不便，我马上帮您查询", "start_time": 8.5, "end_time": 12.0},
+      {"speaker": "agent", "text": "您的包裹正在派送中，稍后才能到", "start_time": 12.3, "end_time": 16.0},
+      {"speaker": "customer", "text": "但是你们之前说3天就能到的", "start_time": 16.5, "end_time": 20.0},
+      {"speaker": "agent", "text": "我给您催一下，明天之前一定送到", "start_time": 20.3, "end_time": 24.0},
+      {"speaker": "customer", "text": "那好吧", "start_time": 24.5, "end_time": 26.0},
+      {"speaker": "agent", "text": "请问还有其他问题吗？", "start_time": 26.5, "end_time": 29.0},
+      {"speaker": "customer", "text": "没有了", "start_time": 29.5, "end_time": 31.0},
+      {"speaker": "agent", "text": "好的，再见", "start_time": 31.5, "end_time": 33.0}
+    ]
+  },
+  {
+    "call_id": "CALL003",
+    "agent_id": "AGENT001",
+    "customer_id": "CUST003",
+    "start_time": "2024-01-15T11:00:00",
+    "utterances": [
+      {"speaker": "agent", "text": "喂，什么事？", "start_time": 0.0, "end_time": 2.0},
+      {"speaker": "customer", "text": "我要投诉", "start_time": 2.5, "end_time": 4.0},
+      {"speaker": "agent", "text": "投诉什么？", "start_time": 4.5, "end_time": 6.0},
+      {"speaker": "customer", "text": "你们的服务太差了", "start_time": 6.5, "end_time": 9.0},
+      {"speaker": "agent", "text": "不可能的，我们服务很好的", "start_time": 9.5, "end_time": 12.0},
+      {"speaker": "customer", "text": "我要求退款", "start_time": 12.5, "end_time": 14.0},
+      {"speaker": "agent", "text": "退款不可能的", "start_time": 14.5, "end_time": 16.0},
+      {"speaker": "customer", "text": "我要投诉到你们领导那里", "start_time": 16.5, "end_time": 19.0},
+      {"speaker": "agent", "text": "随便你", "start_time": 19.5, "end_time": 21.0}
+    ]
+  },
+  {
+    "call_id": "CALL004",
+    "agent_id": "AGENT003",
+    "customer_id": "CUST004",
+    "start_time": "2024-01-15T14:00:00",
+    "utterances": [
+      {"speaker": "customer", "text": "你好", "start_time": 0.0, "end_time": 1.5},
+      {"speaker": "agent", "text": "您好，请问有什么需要帮助的吗？", "start_time": 2.0, "end_time": 5.0},
+      {"speaker": "customer", "text": "我想修改收货地址", "start_time": 5.5, "end_time": 8.0},
+      {"speaker": "agent", "text": "好的，我帮您修改，请提供新的地址", "start_time": 8.5, "end_time": 12.0},
+      {"speaker": "customer", "text": "北京市朝阳区某某路123号", "start_time": 12.5, "end_time": 16.0},
+      {"speaker": "agent", "text": "好的，已经帮您修改成功", "start_time": 16.5, "end_time": 20.0},
+      {"speaker": "customer", "text": "谢谢，再见", "start_time": 20.5, "end_time": 22.0},
+      {"speaker": "agent", "text": "再见", "start_time": 22.5, "end_time": 24.0}
+    ]
+  },
+  {
+    "call_id": "CALL005",
+    "agent_id": "AGENT002",
+    "customer_id": "CUST005",
+    "start_time": "2024-01-15T15:00:00",
+    "utterances": [
+      {"speaker": "agent", "text": "您好，客服中心，请问您需要什么服务？", "start_time": 0.0, "end_time": 4.0},
+      {"speaker": "customer", "text": "我要咨询产品功能", "start_time": 4.5, "end_time": 7.0},
+      {"speaker": "agent", "text": "我们产品有三大核心功能，首先是智能识别", "start_time": 7.5, "end_time": 12.0},
+      {"speaker": "customer", "text": "能详细说一下吗", "start_time": 12.5, "end_time": 14.0},
+      {"speaker": "agent", "text": "当然可以，我们使用最先进的人工智能技术", "start_time": 14.5, "end_time": 18.0},
+      {"speaker": "customer", "text": "听起来不错", "start_time": 18.5, "end_time": 20.0},
+      {"speaker": "agent", "text": "如果您现在购买，可以享受8折优惠", "start_time": 20.5, "end_time": 24.0},
+      {"speaker": "customer", "text": "我再考虑考虑", "start_time": 24.5, "end_time": 26.0},
+      {"speaker": "agent", "text": "好的，欢迎随时联系我们，再见", "start_time": 26.5, "end_time": 29.0}
+    ]
+  },
+  {
+    "call_id": "CALL006",
+    "agent_id": "AGENT001",
+    "customer_id": "CUST006",
+    "start_time": "2024-01-15T16:00:00",
+    "utterances": [
+      {"speaker": "customer", "text": "在吗", "start_time": 0.0, "end_time": 1.5},
+      {"speaker": "agent", "text": "您好，请问有什么问题？", "start_time": 45.0, "end_time": 48.0},
+      {"speaker": "customer", "text": "产品坏了", "start_time": 48.5, "end_time": 50.0},
+      {"speaker": "agent", "text": "抱歉给您带来不便，请您描述一下具体情况", "start_time": 50.5, "end_time": 54.0},
+      {"speaker": "customer", "text": "就是开不了机", "start_time": 54.5, "end_time": 56.0},
+      {"speaker": "agent", "text": "请问您是否尝试过重启？", "start_time": 56.5, "end_time": 59.0},
+      {"speaker": "customer", "text": "试过了，不行", "start_time": 59.5, "end_time": 61.0},
+      {"speaker": "agent", "text": "好的，我们可以为您安排上门维修，3天内", "start_time": 61.5, "end_time": 65.0},
+      {"speaker": "customer", "text": "好的，谢谢", "start_time": 65.5, "end_time": 67.0}
+    ]
+  },
+  {
+    "call_id": "CALL007",
+    "agent_id": "AGENT003",
+    "customer_id": "CUST007",
+    "start_time": "2024-01-15T17:00:00",
+    "utterances": [
+      {"speaker": "agent", "text": "您好，我是客服小王，很高兴为您服务", "start_time": 0.0, "end_time": 4.0},
+      {"speaker": "customer", "text": "你好，我想问一下你们的保密政策", "start_time": 4.5, "end_time": 8.0},
+      {"speaker": "agent", "text": "我们承诺对客户的个人信息严格保密，绝不会泄露", "start_time": 8.5, "end_time": 13.0},
+      {"speaker": "customer", "text": "那我就放心了", "start_time": 13.5, "end_time": 15.0},
+      {"speaker": "agent", "text": "请放心，再见", "start_time": 15.5, "end_time": 17.0}
+    ]
+  }
+]

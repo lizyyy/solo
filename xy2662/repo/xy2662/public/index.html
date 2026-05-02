@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>预约押金核销台系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1>📸 预约押金核销台</h1>
+        <div class="header-actions">
+          <label class="btn btn-secondary file-upload-btn">
+            <input type="file" id="importCsv" accept=".csv" style="display: none;">
+            📥 导入 CSV
+          </label>
+          <button class="btn btn-secondary" id="exportAllCsv">
+            📤 导出全部
+          </button>
+          <button class="btn btn-primary" id="newBookingBtn">
+            ➕ 新建预约
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="filters">
+      <div class="filter-group">
+        <label>日期筛选：</label>
+        <input type="date" id="filterDate" class="filter-input">
+        <button class="btn btn-sm" id="clearDate">清除</button>
+        <button class="btn btn-primary btn-sm" id="exportTodayCsv">
+          📊 导出当日核销报表
+        </button>
+      </div>
+      <div class="filter-group">
+        <label>搜索：</label>
+        <input type="text" id="searchInput" class="filter-input" placeholder="客户姓名、电话、棚位...">
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-label">今日预约</span>
+        <span class="stat-value" id="todayCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">待收押金</span>
+        <span class="stat-value pending" id="pendingCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">已收押金</span>
+        <span class="stat-value deposited" id="depositedCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">已核销</span>
+        <span class="stat-value verified" id="verifiedCount">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">已退款</span>
+        <span class="stat-value refunded" id="refundedCount">0</span>
+      </div>
+      <div class="stat-item overdue-warning">
+        <span class="stat-label">⚠️ 逾期</span>
+        <span class="stat-value overdue" id="overdueCount">0</span>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div id="bookingList" class="booking-list">
+      </div>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <div id="bookingModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">新建预约</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <form id="bookingForm" class="modal-body">
+        <input type="hidden" id="bookingId">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="customerName">客户姓名 <span class="required">*</span></label>
+            <input type="text" id="customerName" required placeholder="请输入客户姓名">
+          </div>
+          <div class="form-group">
+            <label for="phone">联系电话 <span class="required">*</span></label>
+            <input type="tel" id="phone" required placeholder="请输入11位手机号">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studio">棚位 <span class="required">*</span></label>
+            <select id="studio" required>
+              <option value="">请选择棚位</option>
+              <option value="A">棚位 A</option>
+              <option value="B">棚位 B</option>
+              <option value="C">棚位 C</option>
+              <option value="D">棚位 D</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="bookingDate">预约日期 <span class="required">*</span></label>
+            <input type="date" id="bookingDate" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startTime">开始时间 <span class="required">*</span></label>
+            <input type="time" id="startTime" required>
+          </div>
+          <div class="form-group">
+            <label for="endTime">结束时间 <span class="required">*</span></label>
+            <input type="time" id="endTime" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="depositAmount">押金金额 (元)</label>
+            <input type="number" id="depositAmount" min="0" step="0.01" value="0" placeholder="请输入押金金额">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="note">备注</label>
+          <textarea id="note" rows="3" placeholder="请输入备注信息..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancelModal">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal hidden">
+    <div class="modal-content detail-modal">
+      <div class="modal-header">
+        <h2>预约详情</h2>
+        <button class="modal-close" id="closeDetailModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-section">
+          <h3>基本信息</h3>
+          <div class="detail-grid" id="detailBasic">
+          </div>
+        </div>
+
+        <div class="detail-section" id="detailStatusSection">
+          <h3>状态变更</h3>
+          <div class="status-actions" id="statusActions">
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>操作记录</h3>
+          <div class="audit-list" id="auditList">
+          </div>
+        </div>
+
+        <div class="form-actions detail-actions">
+          <button class="btn btn-secondary" id="editBookingBtn">编辑信息</button>
+          <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

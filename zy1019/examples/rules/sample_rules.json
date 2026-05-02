@@ -1,0 +1,48 @@
+[
+  {
+    "rule_id": "R001",
+    "name": "支付成功前必须提交订单",
+    "type": "sequence",
+    "description": "支付成功(payment_success)事件之前必须有提交订单(submit_order)事件",
+    "before_event": "submit_order",
+    "after_event": "payment_success",
+    "strict": false
+  },
+  {
+    "rule_id": "R002",
+    "name": "曝光事件不能连续重复超过3次",
+    "type": "duplicate",
+    "description": "同一个session中，product_impression事件不能连续重复上报超过3次",
+    "target_event": "product_impression",
+    "max_count": 3,
+    "consecutive": true,
+    "include_page": false
+  },
+  {
+    "rule_id": "R003",
+    "name": "每个session必须有page_view",
+    "type": "presence",
+    "description": "每个有效的session都应该至少有一个page_view事件",
+    "target_event": "page_view",
+    "must_exist": true,
+    "min_count": 1
+  },
+  {
+    "rule_id": "R004",
+    "name": "不应出现测试事件",
+    "type": "presence",
+    "description": "生产环境日志中不应该出现test_event测试事件",
+    "target_event": "test_event",
+    "must_exist": false
+  },
+  {
+    "rule_id": "R005",
+    "name": "每个session最多10个product_impression",
+    "type": "presence",
+    "description": "每个session中的product_impression事件总数不应该超过10个",
+    "target_event": "product_impression",
+    "must_exist": true,
+    "min_count": 0,
+    "max_count": 10
+  }
+]

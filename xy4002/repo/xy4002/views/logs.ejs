@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>操作流水 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs" class="active">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>操作流水记录</h1>
+            <a href="/export/logs" class="btn btn-success">导出流水</a>
+        </header>
+
+        <div class="filters">
+            <form method="GET" action="/logs">
+                <div class="search-box">
+                    <input type="text" name="keyword" placeholder="搜索操作描述或物资名称..." value="<%= keyword || '' %>">
+                </div>
+                <div class="filter-group">
+                    <label for="operation_type">操作类型：</label>
+                    <select name="operation_type" id="operation_type">
+                        <option value="">全部</option>
+                        <option value="register" <%= operation_type === 'register' ? 'selected' : '' %>>登记</option>
+                        <option value="edit" <%= operation_type === 'edit' ? 'selected' : '' %>>编辑</option>
+                        <option value="borrow" <%= operation_type === 'borrow' ? 'selected' : '' %>>借出</option>
+                        <option value="return" <%= operation_type === 'return' ? 'selected' : '' %>>归还</option>
+                        <option value="scrap" <%= operation_type === 'scrap' ? 'selected' : '' %>>报废</option>
+                        <option value="import" <%= operation_type === 'import' ? 'selected' : '' %>>导入</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-secondary">筛选</button>
+                <a href="/logs" class="btn btn-link">清除筛选</a>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <% if (logs.length === 0) { %>
+                <div class="no-data">
+                    <p>暂无操作流水记录</p>
+                </div>
+            <% } else { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>记录ID</th>
+                            <th>操作时间</th>
+                            <th>操作类型</th>
+                            <th>相关物资</th>
+                            <th>操作描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% logs.forEach(log => { %>
+                            <tr>
+                                <td><%= log.id %></td>
+                                <td><%= formatDate(log.created_at) %></td>
+                                <td>
+                                    <span class="<%= getOperationClass(log.operation_type) %>">
+                                        <%= getOperationText(log.operation_type) %>
+                                    </span>
+                                </td>
+                                <td><%= log.material_name || '-' %></td>
+                                <td><%= log.description %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
+
+<% function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+function getOperationText(type) {
+    const map = {
+        'register': '登记',
+        'edit': '编辑',
+        'borrow': '借出',
+        'return': '归还',
+        'scrap': '报废',
+        'import': '导入'
+    };
+    return map[type] || type;
+}
+
+function getOperationClass(type) {
+    const map = {
+        'register': 'status status-active',
+        'edit': 'status status-borrowed',
+        'borrow': 'status status-borrowed',
+        'return': 'status status-returned',
+        'scrap': 'status status-scrapped',
+        'import': 'status status-active'
+    };
+    return map[type] || 'status';
+}
+%>

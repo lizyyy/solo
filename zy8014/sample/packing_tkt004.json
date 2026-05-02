@@ -1,0 +1,21 @@
+{
+  "ticket_no": "TKT004",
+  "packing_date": "2024-05-06",
+  "total_weight": 500,
+  "total_volume": 3.0,
+  "items": [
+    {
+      "ticket_no": "TKT004",
+      "container_no": "MSKU9876543",
+      "description": "化工原料 Chemical Materials",
+      "hs_code": "380891",
+      "weight": 500,
+      "weight_unit": "KG",
+      "volume": 3.0,
+      "volume_unit": "CBM",
+      "quantity": 20,
+      "package_type": "DRUM",
+      "marks": "HAZARDOUS"
+    }
+  ]
+}

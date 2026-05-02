@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sampler-merger"
+version = "1.0.0"
+description = "离线采样包合并器 - 野外水文调查数据合并工具"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+  { name = "Hydrology Survey Team" }
+]
+keywords = ["hydrology", "survey", "data-merging", "gps", "gpx", "csv"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "pillow>=9.0",
+    "openpyxl>=3.0",
+    "pytz>=2023.0",
+]
+
+test = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+sampler-merger = "sampler_merger.cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sampler_merger*"]

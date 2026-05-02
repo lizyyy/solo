@@ -1,0 +1,30 @@
+{
+  "name": "esl-preflight-check",
+  "version": "1.0.0",
+  "description": "电子价签发布预检 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "esl-preflight": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "demo": "npm run build && node dist/cli.js --products sample/products.csv --locales sample/locales.json --font-coverage sample/font_coverage.json --device-profiles sample/device_profiles.yaml --output output",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "keywords": ["esl", "electronic-shelf-label", "preflight", "retail"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "js-yaml": "^4.1.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "@types/yargs": "^17.0.32",
+    "typescript": "^5.3.3"
+  }
+}

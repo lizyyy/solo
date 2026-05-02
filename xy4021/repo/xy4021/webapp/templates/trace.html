@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}追溯查询 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="mb-0">追溯查询</h2>
+        <p class="text-muted">查询器械包的完整历史记录</p>
+    </div>
+</div>
+
+<div class="form-section mb-4">
+    <form method="GET" action="{{ url_for('trace') }}" class="row g-3 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label">器械包编号</label>
+            <div class="input-group">
+                <input type="text" name="package_number" class="form-control" 
+                       placeholder="请输入器械包编号" value="{{ package_number }}" required>
+                <button class="btn btn-primary" type="submit">
+                    🔍 查询
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if package %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="form-section">
+            <h4>📦 器械包信息</h4>
+            <div class="detail-card">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">器械包编号</div>
+                        <div class="detail-value">{{ package.package_number }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">模板类型</div>
+                        <div class="detail-value">{{ package.template_name }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">当前状态</div>
+                        <div><span class="status-badge status-{{ package.status }}">{{ package.status }}</span></div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">当前锅次</div>
+                        <div class="detail-value">
+                            {% if package.current_cycle_id %}
+                            <a href="{{ url_for('cycle_detail', cycle_id=package.current_cycle_id) }}" class="text-decoration-none">
+                                #{{ package.current_cycle_id }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <div class="detail-label">创建时间</div>
+                    <div class="detail-value small">{{ package.created_at }}</div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('package_history', package_id=package.id) }}" class="btn btn-outline-primary">
+                    📋 查看完整历史
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="form-section">
+            <h4>📊 状态历史 ({{ history|length }} 条记录)</h4>
+            {% if history %}
+            <div class="table-responsive mt-3">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>从状态</th>
+                            <th>到状态</th>
+                            <th>关联锅次</th>
+                            <th>操作人</th>
+                            <th>原因</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in history %}
+                        <tr>
+                            <td class="text-muted small">{{ record.changed_at }}</td>
+                            <td>
+                                {% if record.from_status %}
+                                <span class="status-badge status-{{ record.from_status }}" style="font-size: 0.75em;">{{ record.from_status }}</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ record.to_status }}" style="font-size: 0.75em;">{{ record.to_status }}</span>
+                            </td>
+                            <td>
+                                {% if record.cycle_number %}
+                                <a href="{{ url_for('cycle_detail', cycle_id=record.cycle_id) }}" class="text-decoration-none">
+                                    {{ record.cycle_number }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ record.operator or '-' }}</td>
+                            <td>{{ record.reason or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <div class="mb-2">📋</div>
+                <p>暂无状态历史记录</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% elif package_number %}
+<div class="alert alert-warning">
+    <strong>未找到:</strong> 器械包编号 "{{ package_number }}" 不存在
+</div>
+{% else %}
+<div class="card card-stat">
+    <div class="card-body text-center py-5">
+        <div class="mb-3 display-4 text-muted">🔍</div>
+        <h5 class="text-muted mb-3">输入器械包编号进行查询</h5>
+        <p class="text-muted small">可以查询器械包的完整生命周期历史</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纪录片字幕质检工具 - 演示报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .card h3 {
+            color: #4a5568;
+            margin: 20px 0 10px;
+            font-size: 1.2em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .critical {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .error {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .warning {
+            background: #10b981;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .file-card {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .file-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .issue-list {
+            list-style: none;
+        }
+        
+        .issue-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        
+        .issue-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .fixer-info {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .fixer-info h4 {
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .link-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .link-card h3 {
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .link-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            opacity: 0.8;
+        }
+        
+        .comparison-table {
+            font-size: 0.9em;
+        }
+        
+        .comparison-table td {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .original {
+            color: #ef4444;
+            text-decoration: line-through;
+        }
+        
+        .fixed {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0 auto 10px;
+        }
+        
+        .step-arrow {
+            color: #667eea;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 纪录片字幕质检工具</h1>
+            <p>Subtitle Checker - 演示报告</p>
+        </header>
+        
+        <div class="card">
+            <h2>📊 检查结果摘要</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">检查文件数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">29</div>
+                    <div class="stat-label">发现问题数</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-number">11</div>
+                    <div class="stat-label">已修复问题</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-number">18</div>
+                    <div class="stat-label">需手动修复</div>
+                </div>
+            </div>
+            
+            <h3>按严重程度统计</h3>
+            <div>
+                <span class="severity-badge critical">🚨 严重: 1</span>
+                <span class="severity-badge error">❌ 错误: 3</span>
+                <span class="severity-badge warning">⚠️ 警告: 25</span>
+            </div>
+            
+            <h3>按问题类型统计</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>问题类型</th>
+                        <th>数量</th>
+                        <th>是否可自动修复</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>阅读速度过快</td>
+                        <td>13</td>
+                        <td>❌ 需手动调整时间轴</td>
+                    </tr>
+                    <tr>
+                        <td>序号断裂</td>
+                        <td>5</td>
+                        <td>✅ 已自动修复</td>
+                    </tr>
+                    <tr>
+                        <td>术语不一致</td>
+                        <td>4</td>
+                        <td>✅ 已自动修复</td>
+                    </tr>
+                    <tr>
+                        <td>时间轴重叠</td>
+                        <td>2</td>
+                        <td>❌ 需手动调整时间轴</td>
+                    </tr>
+                    <tr>
+                        <td>说话人不一致</td>
+                        <td>2</td>
+                        <td>✅ 已自动修复</td>
+                    </tr>
+                    <tr>
+                        <td>单行过长</td>
+                        <td>1</td>
+                        <td>❌ 需手动拆分</td>
+                    </tr>
+                    <tr>
+                        <td>禁用词命中</td>
+                        <td>1</td>
+                        <td>❌ 需手动替换</td>
+                    </tr>
+                    <tr>
+                        <td>时间码错误</td>
+                        <td>1</td>
+                        <td>❌ 需手动修正</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>📁 文件检查详情</h2>
+            
+            <div class="file-card">
+                <h4>📄 interview_ep01.srt (SRT 格式)</h4>
+                <p><strong>字幕条目数:</strong> 7 条</p>
+                <p><strong>发现问题数:</strong> 17 个</p>
+                <ul class="issue-list">
+                    <li>❌ <strong>时间轴重叠</strong>: 字幕 1 和 2 重叠 0.5 秒</li>
+                    <li>⚠️ <strong>序号断裂</strong>: 5 处 (已自动修复)</li>
+                    <li>⚠️ <strong>单行过长</strong>: 第 5 条字幕 43 字 (超过 40 字限制)</li>
+                    <li>⚠️ <strong>阅读速度过快</strong>: 7 条字幕需调整时间</li>
+                    <li>⚠️ <strong>说话人不一致</strong>: '张老师' 应统一为 '张教授' (已自动修复)</li>
+                    <li>⚠️ <strong>术语不一致</strong>: 2 处 (已自动修复: AI→人工智能, 机器智能→人工智能)</li>
+                </ul>
+            </div>
+            
+            <div class="file-card">
+                <h4>📄 interview_ep02.vtt (VTT 格式)</h4>
+                <p><strong>字幕条目数:</strong> 6 条</p>
+                <p><strong>发现问题数:</strong> 12 个</p>
+                <ul class="issue-list">
+                    <li>🚨 <strong>禁用词命中</strong>: 发现 '敏感内容' (需手动替换)</li>
+                    <li>❌ <strong>时间轴重叠</strong>: 字幕 1 和 2 重叠 0.5 秒</li>
+                    <li>❌ <strong>时间码错误</strong>: 字幕 6 开始时间 >= 结束时间</li>
+                    <li>⚠️ <strong>阅读速度过快</strong>: 6 条字幕需调整时间</li>
+                    <li>⚠️ <strong>说话人不一致</strong>: '张老师' 应统一为 '张教授' (已自动修复)</li>
+                    <li>⚠️ <strong>术语不一致</strong>: 2 处 (已自动修复)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>🔧 修复效果对比</h2>
+            
+            <div class="fixer-info">
+                <h4>✅ 已应用的安全修复</h4>
+                <p>以下修复已自动应用到新文件（不会覆盖原文件）：</p>
+            </div>
+            
+            <h3>序号修复</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>原序号</th>
+                        <th>修复后序号</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="original">4</td>
+                        <td class="fixed">3</td>
+                        <td>✅ 已修复</td>
+                    </tr>
+                    <tr>
+                        <td class="original">5</td>
+                        <td class="fixed">4</td>
+                        <td>✅ 已修复</td>
+                    </tr>
+                    <tr>
+                        <td class="original">6</td>
+                        <td class="fixed">5</td>
+                        <td>✅ 已修复</td>
+                    </tr>
+                    <tr>
+                        <td class="original">7</td>
+                        <td class="fixed">6</td>
+                        <td>✅ 已修复</td>
+                    </tr>
+                    <tr>
+                        <td class="original">8</td>
+                        <td class="fixed">7</td>
+                        <td>✅ 已修复</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>说话人统一</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>原文</th>
+                        <th>修复后</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="original">张老师：你说得对。</td>
+                        <td class="fixed">张教授：你说得对。</td>
+                        <td>✅ 已统一</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>术语统一</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>原文</th>
+                        <th>修复后</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="original">AI 技术正在改变我们的生活。</td>
+                        <td class="fixed">人工智能 技术正在改变我们的生活。</td>
+                        <td>✅ 已统一</td>
+                    </tr>
+                    <tr>
+                        <td class="original">机器智能的伦理问题。</td>
+                        <td class="fixed">人工智能的伦理问题。</td>
+                        <td>✅ 已统一</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>📋 项目配置</h2>
+            
+            <h3>👥 说话人配置</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标准名称</th>
+                        <th>别名</th>
+                        <th>类型</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>张教授</td>
+                        <td>张老师, 张先生</td>
+                        <td>⭐ 主要说话人</td>
+                    </tr>
+                    <tr>
+                        <td>李博士</td>
+                        <td>李医生</td>
+                        <td>⭐ 主要说话人</td>
+                    </tr>
+                    <tr>
+                        <td>王总</td>
+                        <td>无</td>
+                        <td>⭐ 主要说话人</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>📚 术语配置</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标准术语</th>
+                        <th>替代术语</th>
+                        <th>分类</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>人工智能</td>
+                        <td>AI, 机器智能</td>
+                        <td>技术</td>
+                    </tr>
+                    <tr>
+                        <td>访谈</td>
+                        <td>采访</td>
+                        <td>内容</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>🚫 禁用词配置</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>禁用词</th>
+                        <th>分类</th>
+                        <th>建议替换</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>敏感内容</td>
+                        <td>内容</td>
+                        <td>请替换为中性表述</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>🔗 相关文件链接</h2>
+            
+            <div class="links-grid">
+                <a href="subtitle_report.md" class="link-card">
+                    <h3>📄 Markdown 报告</h3>
+                    <p>详细的质检报告（推荐查看）</p>
+                </a>
+                <a href="subtitle_report.json" class="link-card">
+                    <h3>📊 JSON 报告</h3>
+                    <p>机器可读的结构化数据</p>
+                </a>
+            </div>
+            
+            <h3>📁 生成的文件</h3>
+            <ul class="issue-list">
+                <li><strong>配置文件:</strong> .subtitle-checker.json</li>
+                <li><strong>修复后的字幕:</strong> demo-output/ 目录</li>
+                <li><strong>缓存文件:</strong> .subtitle-checker-cache/ 目录</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>💡 使用说明</h2>
+            
+            <h3>完整工作流程</h3>
+            <div class="workflow-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div><strong>初始化项目</strong></div>
+                    <small>subtitle-checker init</small>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div><strong>配置规则</strong></div>
+                    <small>添加说话人、术语、禁用词</small>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div><strong>检查字幕</strong></div>
+                    <small>subtitle-checker check</small>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div><strong>生成报告</strong></div>
+                    <small>subtitle-checker report</small>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div><strong>应用修复</strong></div>
+                    <small>subtitle-checker apply</small>
+                </div>
+            </div>
+            
+            <h3>常用命令</h3>
+            <pre style="background: #f7fafc; padding: 15px; border-radius: 8px; overflow-x: auto;">
+# 初始化项目
+subtitle-checker init "我的纪录片项目"
+
+# 添加说话人
+subtitle-checker speaker add "张教授" --alias "张老师" "张先生"
+
+# 添加术语
+subtitle-checker term add "人工智能" --alt "AI" "机器智能"
+
+# 检查字幕
+subtitle-checker check ./subtitles/
+
+# 生成报告
+subtitle-checker report ./subtitles/ --output-dir ./reports
+
+# 应用安全修复
+subtitle-checker apply ./subtitles/ --output-dir ./fixed
+            </pre>
+            
+            <div class="fixer-info">
+                <h4>⚠️ 重要提示</h4>
+                <ul>
+                    <li><strong>时间轴问题</strong>（重叠、阅读速度过快、时间码错误）需要手动调整，因为涉及到视频同步</li>
+                    <li><strong>禁用词</strong>需要手动审查替换，确保语义正确</li>
+                    <li><strong>单行过长</strong>需要手动拆分，保持阅读体验</li>
+                    <li>所有自动修复都会<strong>生成新文件</strong>，不会覆盖原文件</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🎬 Subtitle Checker - 纪录片字幕质检工具</p>
+            <p>版本 0.1.0 | 检查时间: 2026-05-01</p>
+        </footer>
+    </div>
+</body>
+</html>

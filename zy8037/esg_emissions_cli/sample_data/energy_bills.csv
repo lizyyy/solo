@@ -1,0 +1,11 @@
+site,month,energy_type,consumption,unit,bill_id,amount,currency
+Shanghai Factory,2024-01,electricity,150000,kWh,ELEC_2024_001,120000,CNY
+Shanghai Factory,2024-01,electricity,150000,kWh,ELEC_2024_001_DUP,120000,CNY
+Shanghai Factory,2024-01,natural_gas,5000,m³,GAS_2024_001,15000,CNY
+北京办公室,2024-01,electricity,30000,kWh,ELEC_BJ_001,24000,CNY
+Beijing Office,2024-01,electricity,30000,kWh,ELEC_BJ_001_2,24000,CNY
+Guangzhou Site,2024-02,electricity,80000,kWh,ELEC_GZ_001,64000,CNY
+Guangzhou Site,2024-02,diesel,2000,L,DIESEL_GZ_001,16000,CNY
+Shenzhen Factory,2024-02,electricity,120000,kWh,ELEC_SZ_001,96000,CNY
+Shenzhen Factory,2024-02,coal,50000,kg,COAL_SZ_001,25000,CNY
+上海工厂,2024-03,electricity,200000,kWh,ELEC_SH_003,160000,CNY

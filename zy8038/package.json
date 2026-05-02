@@ -1,0 +1,26 @@
+{
+  "name": "crdt-playback-tool",
+  "version": "1.0.0",
+  "description": "CLI tool for replaying offline operation logs of multi-user editors using CRDT/RGA algorithms",
+  "main": "dist/index.js",
+  "bin": {
+    "crdt-playback": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "test": "jest",
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,21 @@
+name: 标准灭菌装载规则
+version: 1.0
+maxHeight: 200
+minGap: 10
+rules:
+  - id: HEIGHT_LIMIT
+    name: 高度限制
+    description: 器械总高度不得超过托盘最大高度
+    enabled: true
+  - id: MIN_GAP
+    name: 最小间距
+    description: 器械之间必须保持最小间距
+    enabled: true
+  - id: NO_OVERLAP
+    name: 禁止重叠
+    description: 器械之间不得重叠遮挡
+    enabled: true
+  - id: MUST_LAYER
+    name: 分层要求
+    description: 指定器械必须放置在底层
+    enabled: true

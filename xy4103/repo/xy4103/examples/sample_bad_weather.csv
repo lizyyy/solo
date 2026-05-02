@@ -1,0 +1,6 @@
+observer_name,observation_date,start_time,end_time,timezone,latitude,longitude,elevation,cloud_cover,limiting_magnitude,meteor_count,remarks
+坏天气A,2024-08-12,20:00,22:00,Asia/Shanghai,40.0,116.5,50,0.8,6.5,10,云量80%，数据不可靠
+坏天气B,2024-08-12,21:00,23:00,Asia/Shanghai,39.9,116.4,40,0.9,5.0,5,云量90%+极限星等低
+正常A,2024-08-12,20:00,22:00,Asia/Shanghai,40.1,116.6,60,0.1,6.5,25,正常观测
+光污染A,2024-08-12,20:00,22:00,Asia/Shanghai,39.8,116.3,35,0.1,4.0,8,城市中心，极限星等低
+短时观测,2024-08-12,20:00,20:10,Asia/Shanghai,40.0,116.5,50,0.1,6.5,2,仅观测10分钟，流星数少

@@ -1,0 +1,22 @@
+- batch_id: YARN-2024-001
+  yarn_type: 纯棉40s
+  machine_ids:
+    - Loom-001
+    - Loom-002
+  start_date: 2024-05-01
+  end_date: 2024-05-07
+
+- batch_id: YARN-2024-002
+  yarn_type: 涤棉混纺32s
+  machine_ids:
+    - Loom-003
+    - Loom-004
+  start_date: 2024-05-01
+  end_date: 2024-05-10
+
+- batch_id: YARN-2024-003
+  yarn_type: 精梳棉60s
+  machine_ids:
+    - Loom-001
+  start_date: 2024-05-08
+  end_date: 2024-05-15

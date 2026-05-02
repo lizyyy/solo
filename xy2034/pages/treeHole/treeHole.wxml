@@ -1,0 +1,58 @@
+<view class="container">
+  <!-- 顶部提示 -->
+  <view class="tips-section card">
+    <view class="tips-icon">💡</view>
+    <view class="tips-content">
+      <view class="tips-title">情绪树洞</view>
+      <view class="tips-desc text-secondary">
+        在这里你可以匿名倾诉你的心声，所有发言都是匿名的，不用担心被识别。禁止说教，只允许共情和理解。
+      </view>
+    </view>
+  </view>
+
+  <!-- 帖子列表 -->
+  <view class="posts-section">
+    <view class="section-header">
+      <view class="section-title">树洞帖子</view>
+      <view class="post-count text-secondary">共 {{posts.length}} 条</view>
+    </view>
+
+    <view class="posts-list" wx:if="{{posts.length > 0}}">
+      <view 
+        class="post-item card" 
+        wx:for="{{posts}}" 
+        wx:key="id"
+        bindtap="goToPostDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="post-content">
+          {{item.content}}
+        </view>
+        <view class="post-footer flex flex-between">
+          <view class="post-time text-secondary">
+            {{item.createTime}}
+          </view>
+          <view class="post-stats text-secondary">
+            <view class="stat-item">
+              <text class="stat-icon">💬</text>
+              <text class="stat-text">{{item.commentCount}} 评论</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">🕳️</view>
+      <view class="empty-text text-secondary">
+        还没有帖子，快来成为第一个倾诉者吧！
+      </view>
+    </view>
+  </view>
+
+  <!-- 发帖按钮 -->
+  <view class="create-post-btn" bindtap="goToCreatePost">
+    <text class="btn-icon">+</text>
+    <text class="btn-text">发布倾诉</text>
+  </view>
+</view>

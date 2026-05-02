@@ -1,0 +1,17 @@
+[
+  "tests/test_core.py::TestCSVParser::test_action_parsing",
+  "tests/test_core.py::TestCSVParser::test_parse_roster",
+  "tests/test_core.py::TestCSVParser::test_parse_scan_log",
+  "tests/test_core.py::TestCSVParser::test_parse_timestamp_formats",
+  "tests/test_core.py::TestConfig::test_device_time_offset",
+  "tests/test_core.py::TestConfig::test_entry_rules",
+  "tests/test_core.py::TestConfig::test_init_project",
+  "tests/test_core.py::TestConfig::test_reentry_allowed",
+  "tests/test_core.py::TestReconciler::test_basic_reconciliation",
+  "tests/test_core.py::TestReconciler::test_duplicate_scan_merging",
+  "tests/test_core.py::TestReconciler::test_unknown_ticket",
+  "tests/test_core.py::TestRuleEngine::test_validate_blacklisted_ticket",
+  "tests/test_core.py::TestRuleEngine::test_validate_duplicate_entry",
+  "tests/test_core.py::TestRuleEngine::test_validate_vip_reentry",
+  "tests/test_core.py::TestRuleEngine::test_validate_wrong_entry"
+]

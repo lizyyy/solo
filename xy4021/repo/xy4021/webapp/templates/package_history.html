@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}器械包历史 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('packages') }}">器械包管理</a></li>
+                <li class="breadcrumb-item active">{{ package.package_number }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="form-section">
+            <h4>📦 器械包信息</h4>
+            <div class="detail-card">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">器械包编号</div>
+                        <div class="detail-value">{{ package.package_number }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">模板类型</div>
+                        <div class="detail-value">{{ package.template_name }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">当前状态</div>
+                        <div><span class="status-badge status-{{ package.status }}">{{ package.status }}</span></div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">当前锅次</div>
+                        <div class="detail-value">
+                            {% if package.current_cycle_id %}
+                            <a href="{{ url_for('cycle_detail', cycle_id=package.current_cycle_id) }}" class="text-decoration-none">
+                                #{{ package.current_cycle_id }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">创建时间</div>
+                        <div class="detail-value small">{{ package.created_at }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">更新时间</div>
+                        <div class="detail-value small">{{ package.updated_at }}</div>
+                    </div>
+                </div>
+                {% if package.notes %}
+                <div class="mb-0">
+                    <div class="detail-label">备注</div>
+                    <div class="detail-value">{{ package.notes }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-grid gap-2">
+                {% if package.status == '已放行' %}
+                <form method="POST" action="{{ url_for('use_package', package_id=package.id) }}"
+                      onsubmit="return confirmAction('确定要领用这个器械包吗？')">
+                    <button type="submit" class="btn btn-success w-100">
+                        ✅ 领用器械包
+                    </button>
+                </form>
+                {% endif %}
+                
+                {% if package.status != '已领用' and package.status != '已报废' %}
+                <button type="button" class="btn btn-outline-danger"
+                        onclick="showDiscardModal()">
+                    🗑️ 报废器械包
+                </button>
+                {% endif %}
+                
+                <a href="{{ url_for('packages') }}" class="btn btn-outline-secondary">
+                    ← 返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="form-section">
+            <h4>📊 状态历史</h4>
+            {% if history %}
+            <div class="mt-4">
+                {% for record in history %}
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="mb-2">
+                                    {% if record.from_status %}
+                                    <span class="status-badge status-{{ record.from_status }}" style="font-size: 0.75em;">{{ record.from_status }}</span>
+                                    <span class="mx-2 text-muted">→</span>
+                                    {% endif %}
+                                    <span class="status-badge status-{{ record.to_status }}">{{ record.to_status }}</span>
+                                </div>
+                                {% if record.reason %}
+                                <div class="text-muted small mb-1">{{ record.reason }}</div>
+                                {% endif %}
+                                {% if record.notes %}
+                                <div class="small">{{ record.notes }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-muted">{{ record.changed_at }}</div>
+                                {% if record.operator %}
+                                <div class="small">操作人: {{ record.operator }}</div>
+                                {% endif %}
+                                {% if record.cycle_number %}
+                                <div class="small">
+                                    锅次: <a href="{{ url_for('cycle_detail', cycle_id=record.cycle_id) }}" class="text-decoration-none">
+                                        {{ record.cycle_number }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <div class="mb-2">📋</div>
+                <p>暂无状态历史记录</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="discardModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">报废器械包</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('discard_package', package_id=package.id) }}">
+                <div class="modal-body">
+                    <p>确定要报废器械包 <strong>{{ package.package_number }}</strong> 吗？</p>
+                    <div class="mb-3">
+                        <label class="form-label">报废原因</label>
+                        <input type="text" name="reason" class="form-control" placeholder="请输入报废原因" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">确认报废</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showDiscardModal() {
+    new bootstrap.Modal(document.getElementById('discardModal')).show();
+}
+</script>
+{% endblock %}

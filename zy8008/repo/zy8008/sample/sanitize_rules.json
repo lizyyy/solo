@@ -1,0 +1,81 @@
+{
+  "rules": [
+    {
+      "name": "phone_number",
+      "pattern": "(?<![\\d])1[3-9]\\d{9}(?![\\d])",
+      "action": "mask",
+      "mask_char": "*",
+      "keep_prefix": 3,
+      "keep_suffix": 4,
+      "description": "中国手机号"
+    },
+    {
+      "name": "email",
+      "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}",
+      "action": "mask",
+      "mask_char": "*",
+      "keep_prefix": 2,
+      "keep_suffix": 0,
+      "description": "电子邮箱"
+    },
+    {
+      "name": "id_card",
+      "pattern": "(?<![\\d])[1-9]\\d{5}(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])\\d{3}[\\dXx](?![\\d])",
+      "action": "mask",
+      "mask_char": "*",
+      "keep_prefix": 6,
+      "keep_suffix": 4,
+      "description": "身份证号"
+    },
+    {
+      "name": "token_bearer",
+      "pattern": "(?i)(?:bearer|token)[\\s:=]+[A-Za-z0-9\\-._~+/]+=*",
+      "action": "replace",
+      "replacement": "[REDACTED_TOKEN]",
+      "description": "Bearer Token"
+    },
+    {
+      "name": "jwt_token",
+      "pattern": "eyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+",
+      "action": "replace",
+      "replacement": "[JWT_REDACTED]",
+      "description": "JWT Token"
+    },
+    {
+      "name": "user_id",
+      "pattern": "(?i)(?:user[_-]?id|uid|userid)[\"']?\\s*[:=]\\s*[\"']?[a-zA-Z0-9_-]+[\"']?",
+      "action": "replace",
+      "replacement": "\"userId\": \"[REDACTED]\"",
+      "description": "用户ID"
+    }
+  ],
+  "sensitive_json_keys": [
+    "token",
+    "access_token",
+    "refresh_token",
+    "id_token",
+    "password",
+    "pwd",
+    "secret",
+    "api_key",
+    "apiKey",
+    "authorization",
+    "phone",
+    "mobile",
+    "phoneNumber",
+    "手机号",
+    "email",
+    "邮箱",
+    "idCard",
+    "身份证",
+    "cardNumber",
+    "address",
+    "location",
+    "name",
+    "realName",
+    "姓名",
+    "userId",
+    "user_id",
+    "uid"
+  ]
+}

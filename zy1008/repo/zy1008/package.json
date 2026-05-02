@@ -1,0 +1,19 @@
+{
+  "name": "event-registration-system",
+  "version": "1.0.0",
+  "description": "线下分享会报名、候补、签到管理系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "keywords": ["event", "registration", "checkin"],
+  "author": "",
+  "license": "MIT"
+}

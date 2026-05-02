@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4007",
+  "idea_short_title": "我想做一个给小型手机维修店用的工单排班小系统，店里每天会接很多换屏、换电池和检测单，现在靠微信群和纸本很容易漏掉。请从 ",
+  "folder_name": "xy4007",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4007",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "纯后端API服务",
+    "修改范围": "跨模块多文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4007/base",
+    "round_branch": "idea/xy4007/r1",
+    "pr_title": "[xy4007][第一轮] 我想做一个给小型手机维修店用的工单排班小系统，店里每天会接很多换屏、换电池和检测单，现在靠微信群和纸",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4007/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4007/base...idea/xy4007/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4007/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4007/xy4007.xlsx",
+    "uid": "xy4007",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4007/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4007/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4007/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4007/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4007/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T12:08:22.485113+08:00"
+}

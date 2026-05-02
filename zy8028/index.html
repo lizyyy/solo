@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>急诊分诊夜班</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+            min-height: 100vh;
+            color: #EAEAEA;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #E94560;
+            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .stat-value.score { color: #FFD700; }
+        .stat-value.combo { color: #E94560; }
+        .stat-value.timer { color: #00D9FF; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-pause { background: #FFC107; color: #1A1A2E; }
+        .btn-undo { background: #6C757D; color: white; }
+        .btn-restart { background: #E94560; color: white; }
+        .btn-resume { background: #28A745; color: white; }
+
+        .patient-area {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 280px;
+        }
+
+        .patient-area h3 {
+            margin-bottom: 15px;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .patient-cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .patient-card {
+            background: linear-gradient(145deg, #1E3A5F 0%, #16213E 100%);
+            border-radius: 12px;
+            padding: 20px;
+            width: 280px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .patient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-color: #E94560;
+        }
+
+        .patient-card.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+            transform: rotate(5deg);
+        }
+
+        .patient-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .patient-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00D9FF;
+        }
+
+        .patient-age {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .patient-info {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            color: #EAEAEA;
+        }
+
+        .info-value.alert {
+            color: #E94560;
+            font-weight: bold;
+        }
+
+        .chief-complaint {
+            background: rgba(233, 69, 96, 0.15);
+            border-left: 3px solid #E94560;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.95em;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .allergy-warning {
+            background: rgba(255, 193, 7, 0.15);
+            border-left: 3px solid #FFC107;
+            padding: 8px 10px;
+            margin-top: 8px;
+            font-size: 0.85em;
+            border-radius: 0 8px 8px 0;
+            color: #FFC107;
+        }
+
+        .edge-case-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #E94560;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+        }
+
+        .queue-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .queue-zone {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            min-height: 200px;
+            transition: all 0.3s ease;
+            border: 3px dashed transparent;
+        }
+
+        .queue-zone.drag-over {
+            border-color: #00D9FF;
+            background: rgba(0, 217, 255, 0.1);
+            transform: scale(1.02);
+        }
+
+        .queue-zone.red { border-color: #DC3545; }
+        .queue-zone.yellow { border-color: #FFC107; }
+        .queue-zone.green { border-color: #28A745; }
+        .queue-zone.observe { border-color: #6C757D; }
+
+        .queue-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .queue-zone.red .queue-title { color: #DC3545; }
+        .queue-zone.yellow .queue-title { color: #FFC107; }
+        .queue-zone.green .queue-title { color: #28A745; }
+        .queue-zone.observe .queue-title { color: #6C757D; }
+
+        .queue-subtitle {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .queue-count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #EAEAEA;
+        }
+
+        .queue-patients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .queue-patient-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .feedback-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 16px;
+            padding: 30px 50px;
+            text-align: center;
+            z-index: 1000;
+            display: none;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .feedback-popup.show { display: block; }
+
+        .feedback-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .feedback-text {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .feedback-reason {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .feedback-points {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .feedback-points.positive { color: #28A745; }
+        .feedback-points.negative { color: #DC3545; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show { display: block; }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #1E3A5F 0%, #16213E 100%);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            z-index: 1001;
+            min-width: 400px;
+            display: none;
+        }
+
+        .modal.show { display: block; }
+
+        .modal h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #E94560;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .modal-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .modal-stat-label {
+            font-size: 0.85em;
+            color: #888;
+        }
+
+        .modal-stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #00D9FF;
+        }
+
+        .menu-modal h2 {
+            font-size: 2.5em;
+            color: #E94560;
+            text-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+        }
+
+        .menu-subtitle {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-menu {
+            padding: 15px 40px;
+            font-size: 1.2em;
+        }
+
+        .btn-start { background: linear-gradient(135deg, #E94560, #c73e54); color: white; }
+        .btn-leaderboard { background: #16213E; color: #00D9FF; border: 2px solid #00D9FF; }
+        .btn-continue { background: #28A745; color: white; }
+
+        .leaderboard-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .leaderboard-rank {
+            font-weight: bold;
+            color: #FFD700;
+            width: 40px;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            text-align: left;
+        }
+
+        .leaderboard-score {
+            font-weight: bold;
+            color: #00D9FF;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .close-btn:hover { color: #E94560; }
+
+        .level-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .level-name {
+            font-size: 1.5em;
+            color: #E94560;
+        }
+
+        .level-progress {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 900px) {
+            .queue-area {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .queue-area {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats {
+                justify-content: center;
+            }
+
+            .patient-card {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="title">🚑 急诊分诊夜班</div>
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <div class="stat-label">得分</div>
+                    <div class="stat-value score" id="score">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">连击</div>
+                    <div class="stat-value combo" id="combo">x1.0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">剩余时间</div>
+                    <div class="stat-value timer" id="timer">3:00</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-undo" id="undoBtn" title="撤销上一张">↩ 撤销</button>
+                <button class="btn btn-pause" id="pauseBtn" title="暂停">⏸ 暂停</button>
+                <button class="btn btn-restart" id="restartBtn" title="重新开始">🔄 重开</button>
+            </div>
+        </div>
+
+        <div class="level-indicator" id="levelIndicator">
+            <div class="level-name" id="levelName">夜班第一关</div>
+            <div class="level-progress" id="levelProgress">患者 0/5</div>
+        </div>
+
+        <div class="patient-area">
+            <h3>待分诊患者</h3>
+            <div class="patient-cards" id="patientCards"></div>
+        </div>
+
+        <div class="queue-area" id="queueArea">
+            <div class="queue-zone red" data-queue="red">
+                <div class="queue-title">🔴 红区</div>
+                <div class="queue-subtitle">1级 / 立即处理</div>
+                <div class="queue-count" id="redCount">0</div>
+                <div class="queue-patients" id="redPatients"></div>
+            </div>
+            <div class="queue-zone yellow" data-queue="yellow">
+                <div class="queue-title">🟡 黄区</div>
+                <div class="queue-subtitle">2级 / 紧急</div>
+                <div class="queue-count" id="yellowCount">0</div>
+                <div class="queue-patients" id="yellowPatients"></div>
+            </div>
+            <div class="queue-zone green" data-queue="green">
+                <div class="queue-title">🟢 绿区</div>
+                <div class="queue-subtitle">3级 / 非紧急</div>
+                <div class="queue-count" id="greenCount">0</div>
+                <div class="queue-patients" id="greenPatients"></div>
+            </div>
+            <div class="queue-zone observe" data-queue="observe">
+                <div class="queue-title">⚪ 留观</div>
+                <div class="queue-subtitle">4级 / 需观察</div>
+                <div class="queue-count" id="observeCount">0</div>
+                <div class="queue-patients" id="observePatients"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="modal menu-modal" id="menuModal">
+        <h2>🚑 急诊分诊夜班</h2>
+        <p class="menu-subtitle">夜班开始了，患者陆续到来...</p>
+        <div class="menu-buttons">
+            <button class="btn btn-menu btn-start" id="startBtn">开始夜班</button>
+            <button class="btn btn-menu btn-continue" id="continueBtn" style="display:none;">继续游戏</button>
+            <button class="btn btn-menu btn-leaderboard" id="leaderboardBtn">📊 排行榜</button>
+        </div>
+    </div>
+
+    <div class="modal" id="pauseModal">
+        <h2>⏸ 游戏暂停</h2>
+        <p style="color: #888; margin-bottom: 20px;">按继续按钮恢复游戏</p>
+        <button class="btn btn-resume" id="resumeBtn">继续游戏</button>
+    </div>
+
+    <div class="modal" id="resultModal">
+        <h2 id="resultTitle">关卡完成!</h2>
+        <div class="modal-stats" id="resultStats"></div>
+        <button class="btn btn-start" id="nextLevelBtn">下一关</button>
+        <button class="btn btn-restart" id="replayBtn" style="margin-left: 10px;">重玩</button>
+    </div>
+
+    <div class="modal" id="leaderboardModal">
+        <h2>📊 排行榜</h2>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+        <button class="btn btn-restart" id="closeLeaderboardBtn">关闭</button>
+    </div>
+
+    <div class="feedback-popup" id="feedbackPopup">
+        <div class="feedback-icon" id="feedbackIcon">✓</div>
+        <div class="feedback-text" id="feedbackText">分诊正确!</div>
+        <div class="feedback-reason" id="feedbackReason"></div>
+        <div class="feedback-points" id="feedbackPoints">+100</div>
+    </div>
+
+    <script src="levelLoader.js"></script>
+    <script src="triageRules.js"></script>
+    <script src="gameState.js"></script>
+    <script src="storage.js"></script>
+    <script src="uiRenderer.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

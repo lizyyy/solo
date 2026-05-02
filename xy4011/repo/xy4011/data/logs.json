@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "reservation_id": 1,
+    "action": "created",
+    "details": "{\"roomId\":1,\"date\":\"2026-05-10\",\"startTime\":\"10:00\",\"endTime\":\"12:00\",\"peopleCount\":8,\"purpose\":\"居民议事会\"}",
+    "operator": "张三",
+    "created_at": "2026-05-01T05:32:39.702Z"
+  },
+  {
+    "id": 2,
+    "reservation_id": 2,
+    "action": "created",
+    "details": "{\"roomId\":1,\"date\":\"2026-05-10\",\"startTime\":\"10:30\",\"endTime\":\"11:30\",\"peopleCount\":6,\"purpose\":\"亲子读书会\"}",
+    "operator": "李四",
+    "created_at": "2026-05-01T05:32:39.710Z"
+  },
+  {
+    "id": 3,
+    "reservation_id": 1,
+    "action": "cancelled",
+    "details": "{\"previousStatus\":\"confirmed\",\"date\":\"2026-05-10\",\"time\":\"10:00-12:00\"}",
+    "operator": "验收",
+    "created_at": "2026-05-01T05:32:53.956Z"
+  }
+]

@@ -1,0 +1,83 @@
+<view class="container">
+  <!-- 顶部说明 -->
+  <view class="intro-section card">
+    <view class="intro-icon">💥</view>
+    <view class="intro-content">
+      <view class="intro-title">避雷吐槽区</view>
+      <view class="intro-desc text-secondary">
+        在这里你可以释放负面情绪，吐槽亲戚、偏见、学历焦虑等。把不满说出来，心情会好很多！
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类筛选 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <view 
+          class="category-item {{selectedCategory === item ? 'active' : ''}}" 
+          wx:for="{{categories}}" 
+          wx:key="index"
+          bindtap="selectCategory"
+          data-category="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 吐槽列表 -->
+  <view class="complaints-section">
+    <view class="section-header">
+      <view class="section-title">吐槽列表</view>
+      <view class="complaint-count text-secondary">{{complaints.length}} 条</view>
+    </view>
+
+    <view class="complaints-list" wx:if="{{complaints.length > 0}}">
+      <view class="complaint-item card" wx:for="{{complaints}}" wx:key="id">
+        <!-- 头部 -->
+        <view class="complaint-header" bindtap="goToComplaintDetail" data-id="{{item.id}}">
+          <view class="category-tag" style="background-color: {{item.category === '亲戚' ? '#ff6b6b' : item.category === '学历焦虑' ? '#fcc419' : item.category === '家庭' ? '#6B8DD6' : '#8E9ACF'}}20; color: {{item.category === '亲戚' ? '#ff6b6b' : item.category === '学历焦虑' ? '#fcc419' : item.category === '家庭' ? '#6B8DD6' : '#8E9ACF'}}">
+            {{item.category}}
+          </view>
+          <view class="complaint-title">{{item.title}}</view>
+        </view>
+
+        <!-- 内容预览 -->
+        <view class="complaint-content" bindtap="goToComplaintDetail" data-id="{{item.id}}">
+          {{item.content}}
+        </view>
+
+        <!-- 底部信息 -->
+        <view class="complaint-footer flex flex-between">
+          <view class="post-time text-secondary">{{item.createTime}}</view>
+          <view class="complaint-stats">
+            <view class="stat-item" bindtap="toggleLike" data-id="{{item.id}}">
+              <text class="stat-icon {{item.likeCount > 0 ? 'liked' : ''}}">❤️</text>
+              <text class="stat-text">{{item.likeCount > 0 ? item.likeCount : '点赞'}}</text>
+            </view>
+            <view class="stat-item" bindtap="goToComplaintDetail" data-id="{{item.id}}">
+              <text class="stat-icon">💬</text>
+              <text class="stat-text">{{item.commentCount > 0 ? item.commentCount : '评论'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <view class="empty-icon">😤</view>
+      <view class="empty-text text-secondary">
+        还没有吐槽，快来释放你的情绪吧！
+      </view>
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="create-complaint-btn" bindtap="goToCreateComplaint">
+    <text class="btn-icon">+</text>
+    <text class="btn-text">我要吐槽</text>
+  </view>
+</view>

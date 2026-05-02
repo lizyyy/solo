@@ -1,0 +1,25 @@
+duration:
+  tolerance: 0.5
+
+subtitle:
+  safetyMargin: 0.5
+
+platforms:
+  douyin:
+    resolution: 1080x1920
+    minBitrate: 4000
+    maxBitrate: 8000
+  
+  kuaishou:
+    resolution: 1080x1920
+    minBitrate: 3500
+    maxBitrate: 7000
+  
+  bilibili:
+    resolution: 1920x1080
+    minBitrate: 5000
+    maxBitrate: 10000
+  
+  default:
+    resolution: 1080x1920
+    minBitrate: 3000

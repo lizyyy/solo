@@ -1,0 +1,28 @@
+{
+  "name": "repair-order-manager",
+  "version": "1.0.0",
+  "description": "小型手机维修店工单管理系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node server/test-api.js",
+    "test-db": "node server/test-api.js --db-only"
+  },
+  "keywords": [
+    "repair",
+    "workorder",
+    "phone",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}

@@ -1,0 +1,180 @@
+.login-section {
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-content {
+  display: flex;
+  align-items: center;
+}
+
+.login-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.login-text {
+  
+}
+
+.login-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6rpx;
+}
+
+.login-desc {
+  font-size: 22rpx;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #6B8DD6 0%, #8E9ACF 100%);
+  color: #fff;
+  padding: 16rpx 32rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.moment-count {
+  font-size: 24rpx;
+}
+
+.moments-list {
+  
+}
+
+.moment-item {
+  margin-bottom: 24rpx;
+}
+
+.moment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.user-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  background-color: #e0e0e0;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.post-time {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+.privacy-tag {
+  font-size: 20rpx;
+  color: #999;
+  background-color: #f0f0f0;
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+}
+
+.moment-content {
+  font-size: 30rpx;
+  line-height: 1.7;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.moment-actions {
+  display: flex;
+  border-top: 2rpx solid #f0f0f0;
+  padding-top: 20rpx;
+}
+
+.action-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.action-icon {
+  font-size: 28rpx;
+  margin-right: 8rpx;
+  opacity: 0.6;
+}
+
+.action-icon.liked {
+  opacity: 1;
+}
+
+.action-text {
+  
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.create-moment-btn {
+  position: fixed;
+  bottom: 40rpx;
+  right: 40rpx;
+  background: linear-gradient(135deg, #6B8DD6 0%, #8E9ACF 100%);
+  color: #fff;
+  border-radius: 50rpx;
+  padding: 20rpx 36rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8rpx 24rpx rgba(107, 141, 214, 0.4);
+  z-index: 100;
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  font-weight: 300;
+  margin-right: 10rpx;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  font-weight: 500;
+}

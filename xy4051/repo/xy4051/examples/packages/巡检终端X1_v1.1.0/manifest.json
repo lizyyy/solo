@@ -1,0 +1,42 @@
+{
+  "manifest_version": "1.0",
+  "package_name": "巡检终端X1升级包",
+  "package_version": "v1.1.0",
+  "target_device_models": ["巡检终端X1"],
+  "target_regions": null,
+  
+  "firmware": {
+    "filename": "firmware_v1.1.0.bin",
+    "sha256": "97166a2116b5157856ccd4cd986721c3ad5ca26320c5dfff3f8a80003bb5e657",
+    "size": 175,
+    "file_type": "firmware"
+  },
+  "firmware_version": "v1.1.0",
+  
+  "calibration": {
+    "filename": "calibration_v1.1.json",
+    "sha256": "47993d0490dbde23979cbaa15c9b5d6ddc78c729bfd93afba2b1737120e9369d",
+    "size": 248,
+    "file_type": "calibration"
+  },
+  "calibration_version": "v1.1",
+  "calibration_date": "2026-04-01T00:00:00",
+  "calibration_validity_days": 365,
+  
+  "rollback": {
+    "filename": "rollback_v1.0.0.bin",
+    "sha256": "1efbb6a717d85ed79c9d3dab2c75e81949acb8387ad547dace9c852603152f43",
+    "size": 161,
+    "file_type": "rollback"
+  },
+  "rollback_from_version": "v1.0.0",
+  
+  "dependencies": ["v1.0.0"],
+  
+  "signature": null,
+  "signed_by": null,
+  "signature_algorithm": "SHA256withRSA",
+  
+  "created_at": "2026-04-25T10:00:00",
+  "description": "巡检终端X1 v1.1.0 固件升级包，包含性能优化和bug修复"
+}

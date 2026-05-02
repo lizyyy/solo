@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4031",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4031/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给小型无人机测绘队用的纯后端 API 服务，叫“电池包放行管家”。我们有十几块电池包轮流充电、飞行、存放，现在靠群消息和 Excel 记录循环次数，经常出现电池刚经历低压告警还被第二天带出去飞，风险很大。请从 0 到 1 做一个可本地运行的后端项目，不需要前端页面：提供 REST API 和 OpenAPI/README 说明，用 SQLite 或本地文件数据库持久化电池包、充电记录、飞行记录、单体电压读数、维修/封存备注和放行结论。\n\n核心流程要能跑通：新增电池包后，可以导入充电器导出的 CSV 和飞控日志 CSV；系统要按电池编号和时间把记录归并，识别重复导入、时间倒序、循环次数跳变、单体压差过大、低压告警后未复检、存放超过指定天数这些问题。提供一个 /release-check 接口，输入任务日期、最低温度、预计飞行架次和候选电池编号，返回每块电池“可放行/需复检/禁止使用”的结论、命中的规则和证据记录；同一份导入文件重复提交时要幂等，坏行不能静默丢弃，要进入 quarantine 并能查询原因。还要有 history 查询、按电池导出 Markdown/CSV 追溯报告、规则阈值配置接口，以及几条能运行的测试或自检命令。\n\n请把路由层、数据模型、CSV 解析、归并去重、放行规则引擎、隔离区、报告导出、配置和测试数据拆成清晰的多文件结构，不要写成一个大脚本。README 里写清楚安装、启动、示例 curl 命令，以及如何用示例 CSV 验证新增电池、导入记录、查询隔离区、执行放行检查和导出报告这些主流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4031/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n        项目编号：xy4031\n        本轮：第一轮\n        模型要求：必须使用 Seed-Code-DogFooding\n        智能体要求：必须使用 SOLO Coder\n        代码目录要求：在仓库根目录创建并只修改 `xy4031/`\n\n        原始想法：\n        我想做一个给小型无人机测绘队用的纯后端 API 服务，叫“电池包放行管家”。我们有十几块电池包轮流充电、飞行、存放，现在靠群消息和 Excel 记录循环次数，经常出现电池刚经历低压告警还被第二天带出去飞，风险很大。请从 0 到 1 做一个可本地运行的后端项目，不需要前端页面：提供 REST API 和 OpenAPI/README 说明，用 SQLite 或本地文件数据库持久化电池包、充电记录、飞行记录、单体电压读数、维修/封存备注和放行结论。\n\n核心流程要能跑通：新增电池包后，可以导入充电器导出的 CSV 和飞控日志 CSV；系统要按电池编号和时间把记录归并，识别重复导入、时间倒序、循环次数跳变、单体压差过大、低压告警后未复检、存放超过指定天数这些问题。提供一个 /release-check 接口，输入任务日期、最低温度、预计飞行架次和候选电池编号，返回每块电池“可放行/需复检/禁止使用”的结论、命中的规则和证据记录；同一份导入文件重复提交时要幂等，坏行不能静默丢弃，要进入 quarantine 并能查询原因。还要有 history 查询、按电池导出 Markdown/CSV 追溯报告、规则阈值配置接口，以及几条能运行的测试或自检命令。\n\n请把路由层、数据模型、CSV 解析、归并去重、放行规则引擎、隔离区、报告导出、配置和测试数据拆成清晰的多文件结构，不要写成一个大脚本。README 里写清楚安装、启动、示例 curl 命令，以及如何用示例 CSV 验证新增电池、导入记录、查询隔离区、执行放行检查和导出报告这些主流程。\n\n        开发目标：\n        - 将上面的想法落成一个不简单、可运行、可演示的项目原型\n        - 所有代码集中在 `xy4031/`\n        - 如果仓库当前为空，请自行初始化最小但完整的项目结构\n        - 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n        工作方式要求：\n        - 先快速审视当前仓库是否为空、已有文件结构和运行方式\n        - 再给出极简执行计划，然后立即开始写代码\n        - 不要把大量时间花在空泛分析或模板化总结上\n        - 不要偏离需求去做无关的大重构\n        - 如需新增依赖，只增加必要依赖，并说明原因\n\n        交付要求：\n        - 必须给出完整代码\n        - 必须给出运行步骤\n        - 必须说明关键文件和实现点\n        - 如有未完成项，明确列出\n\n        验收标准：\n        - 项目可以启动或运行\n        - 页面或功能不是纯占位\n        - 至少包含 3 个以上互相关联的功能点或模块\n        - 代码结构清晰，文件划分合理\n        - 不要只生成单文件 demo\n\n        输出方式：\n        - 先简短说明你将创建什么\n        - 然后直接开始改文件\n        - 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4031/r1",
+  "base_branch_name": "idea/xy4031/base",
+  "parent_branch_name": "idea/xy4031/base",
+  "pr_title": "[xy4031][第一轮] 我想做一个给小型无人机测绘队用的纯后端 API 服务，叫“电池包放行管家”。我们有十几块电池包轮流充",
+  "session_id": "69f45d47e644eb6dd6d4bb19",
+  "message_id": "69f45d52417b7feec09d3aef",
+  "trace_id": null,
+  "task_type": "0-1代码生成",
+  "business_domain": "纯后端 API 服务",
+  "modification_scope": "跨模块多文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4031/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4031/repo/xy4031",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4031/base...idea/xy4031/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T15:58:14.925089+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4031/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4031/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4031"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4031/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4031/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4031/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4031/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给小型无人机测绘队用的纯后端 API 服务，叫“电池包放行管家”。我们有十几块电池包轮流充电、飞行、存放，现在靠群消息和 Excel 记录循环次数，经常出现电池刚经历低压告警还被第二天带出去飞，风险很大。请从 0 到 1 做一个可本地运行的后端项目，不需要前端页面：提供 REST API 和 OpenAPI/README 说明，用 SQLite 或本地文件数据库持久化电池包、充电记录、飞行记录、单体电压读数、维修/封存备注和放行结论。\n\n核心流程要能跑通：新增电池包后，可以导入充电器导出的 CSV 和飞控日志 CSV；系统要按电池编号和时间把记录归并，识别重复导入、时间倒序、循环次数跳变、单体压差过大、低压告警后未复检、存放超过指定天数这些问题。提供一个 /release-check 接口，输入任务日期、最低温度、预计飞行架次和候选电池编号，返回每块电池“可放行/需复检/禁止使用”的结论、命中的规则和证据记录；同一份导入文件重复提交时要幂等，坏行不能静默丢弃，要进入 quarantine 并能查询原因。还要有 history 查询、按电池导出 Markdown/CSV 追溯报告、规则阈值配置接口，以及几条能运行的测试或自检命令。\n\n请把路由层、数据模型、CSV 解析、归并去重、放行规则引擎、隔离区、报告导出、配置和测试数据拆成清晰的多文件结构，不要写成一个大脚本。README 里写清楚安装、启动、示例 curl 命令，以及如何用示例 CSV 验证新增电池、导入记录、查询隔离区、执行放行检查和导出报告这些主流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T15:59:15.729129+08:00"
+}

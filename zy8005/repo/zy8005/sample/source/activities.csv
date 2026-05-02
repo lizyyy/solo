@@ -1,0 +1,6 @@
+id,account_id,contact_id,activity_type,activity_date,subject,duration_minutes,status
+ACT001,ACC001,CON001,meeting,2023-10-15,产品需求讨论会,60,completed
+ACT002,ACC001,CON002,call,2023-10-16 14:30:00,跟进项目进展,30,completed
+ACT003,ACC002,CON003,email,2023/10/17,发送报价单,,completed
+ACT004,ACC999,CON004,meeting,2023-10-18,商务洽谈,90,scheduled
+ACT005,ACC003,,call,2023-10-19,回访客户,,planned

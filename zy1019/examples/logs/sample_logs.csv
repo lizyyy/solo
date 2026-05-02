@@ -1,0 +1,7 @@
+session_id,user_id,event,timestamp,page,props
+sess_005,user_1005,page_view,2024-01-15 14:00:00,home,"{""referrer"": ""search""}"
+sess_005,user_1005,product_impression,2024-01-15 14:00:05,home,"{""product_id"": ""p_5001""}"
+sess_005,user_1005,click_product,2024-01-15 14:00:10,home,"{""product_id"": ""p_5001""}"
+sess_005,user_1005,page_view,2024-01-15 14:00:15,detail,"{""product_id"": ""p_5001""}"
+sess_005,user_1005,click_buy,2024-01-15 14:02:00,detail,"{""product_id"": ""p_5001"", ""quantity"": 1}"
+sess_005,user_1005,payment_success,2024-01-15 14:02:30,checkout,"{""order_id"": ""o_005"", ""payment_method"": ""alipay""}"

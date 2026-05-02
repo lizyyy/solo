@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>制作队列 - 咖啡店预订单系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; min-height: 100vh; }
+    .nav { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; transition: background 0.3s; }
+    .nav a:hover { background: rgba(255,255,255,0.2); }
+    .nav .active { background: rgba(255,255,255,0.25); font-weight: 600; }
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+    .filter-bar { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; }
+    .filter-group label { font-size: 0.85rem; color: #666; }
+    .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.95rem; }
+    .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 500; }
+    .btn:hover { opacity: 0.9; }
+    .btn-secondary { background: #e2e8f0; color: #4a5568; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+    .status-待确认 { background: #fef3c7; color: #92400e; }
+    .status-已确认 { background: #dbeafe; color: #1e40af; }
+    .status-制作中 { background: #fce7f3; color: #9d174d; }
+    .status-已完成 { background: #d1fae5; color: #065f46; }
+    .status-已取消 { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+    .time-group { margin-bottom: 30px; }
+    .time-header { background: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .time-title { font-size: 1.1rem; font-weight: 600; color: #333; }
+    .time-stats { font-size: 0.9rem; color: #666; }
+    .order-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+    .order-card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+    .order-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .order-card.已取消 { opacity: 0.6; }
+    .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .order-id { font-size: 0.8rem; color: #999; }
+    .order-customer { font-weight: 600; font-size: 1rem; color: #333; }
+    .order-phone { font-size: 0.85rem; color: #666; margin-top: 2px; }
+    .order-drink { background: #f7fafc; border-radius: 8px; padding: 12px; margin: 10px 0; }
+    .drink-name { font-weight: 600; color: #2d3748; margin-bottom: 5px; }
+    .drink-details { font-size: 0.85rem; color: #718096; }
+    .order-notes { background: #fffbeb; border-left: 3px solid #f59e0b; padding: 8px 12px; margin: 10px 0; font-size: 0.85rem; color: #92400e; }
+    .order-actions { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+    .action-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 500; transition: opacity 0.2s; }
+    .action-btn:hover { opacity: 0.8; }
+    .action-btn.confirm { background: #dbeafe; color: #1e40af; }
+    .action-btn.start { background: #fce7f3; color: #9d174d; }
+    .action-btn.finish { background: #d1fae5; color: #065f46; }
+    .action-btn.cancel { background: #fee2e2; color: #991b1b; }
+    .action-btn:disabled { background: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 12px; padding: 25px; width: 90%; max-width: 400px; }
+    .modal-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+    .modal-form { display: flex; flex-direction: column; gap: 15px; }
+    .modal-form textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; resize: vertical; min-height: 80px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .toast { position: fixed; top: 80px; right: 20px; background: #333; color: white; padding: 15px 25px; border-radius: 8px; opacity: 0; transform: translateX(100px); transition: all 0.3s; z-index: 2000; }
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+    .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <div style="display: flex; gap: 10px;">
+      <a href="index.html">🏠 首页</a>
+      <a href="order-form.html">📝 订单录入</a>
+      <a href="queue.html" class="active">📋 制作队列</a>
+      <a href="exceptions.html">⚠️ 异常处理</a>
+      <a href="stats.html">📊 出杯统计</a>
+    </div>
+    <button class="btn" onclick="loadOrders()">🔄 刷新</button>
+  </div>
+
+  <div class="container">
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>日期</label>
+        <input type="date" id="filterDate">
+      </div>
+      <div class="filter-group">
+        <label>状态</label>
+        <select id="filterStatus">
+          <option value="">全部状态</option>
+          <option value="待确认">待确认</option>
+          <option value="已确认">已确认</option>
+          <option value="制作中">制作中</option>
+          <option value="已完成">已完成</option>
+          <option value="已取消">已取消</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>时间段起始</label>
+        <input type="time" id="filterTimeStart">
+      </div>
+      <div class="filter-group">
+        <label>时间段结束</label>
+        <input type="time" id="filterTimeEnd">
+      </div>
+      <div style="display: flex; gap: 10px; align-items: flex-end;">
+        <button class="btn" onclick="applyFilters()">筛选</button>
+        <button class="btn btn-secondary" onclick="clearFilters()">清除</button>
+      </div>
+    </div>
+
+    <div id="ordersContainer"></div>
+  </div>
+
+  <div id="cancelModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">取消订单</h3>
+      <div class="modal-form">
+        <label>
+          <span style="font-size: 0.9rem; color: #666; margin-bottom: 5px; display: block;">取消原因 *</span>
+          <textarea id="cancelReason" placeholder="请填写取消原因..."></textarea>
+        </label>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="closeCancelModal()">取消</button>
+          <button class="btn" onclick="confirmCancel()">确认取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_BASE = '';
+    let currentCancelOrderId = null;
+
+    document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000);
+    }
+
+    function getStatusFlow(currentStatus) {
+      const flow = {
+        '待确认': ['已确认', '已取消'],
+        '已确认': ['制作中', '已取消'],
+        '制作中': ['已完成', '已取消'],
+        '已完成': [],
+        '已取消': []
+      };
+      return flow[currentStatus] || [];
+    }
+
+    function renderOrderCard(order) {
+      const nextStatuses = getStatusFlow(order.status);
+      
+      return `
+        <div class="order-card ${order.status}">
+          <div class="order-header">
+            <div>
+              <div class="order-customer">${order.customer_name}</div>
+              <div class="order-phone">${order.phone}</div>
+              <div class="order-id">#${order.id}</div>
+            </div>
+            <span class="status-badge status-${order.status}">${order.status}</span>
+          </div>
+          
+          <div class="order-drink">
+            <div class="drink-name">${order.drink} × ${order.quantity}</div>
+            <div class="drink-details">${order.temperature} · ${order.sweetness}</div>
+          </div>
+          
+          ${order.notes ? `<div class="order-notes">📝 ${order.notes}</div>` : ''}
+          ${order.cancel_reason ? `<div class="order-notes" style="background: #fee2e2; border-left-color: #ef4444; color: #991b1b;">❌ 取消原因: ${order.cancel_reason}</div>` : ''}
+          
+          <div class="order-actions">
+            ${nextStatuses.includes('已确认') ? `<button class="action-btn confirm" onclick="updateStatus(${order.id}, '已确认')">✓ 确认</button>` : ''}
+            ${nextStatuses.includes('制作中') ? `<button class="action-btn start" onclick="updateStatus(${order.id}, '制作中')">⚡ 开始制作</button>` : ''}
+            ${nextStatuses.includes('已完成') ? `<button class="action-btn finish" onclick="updateStatus(${order.id}, '已完成')">🏁 完成</button>` : ''}
+            ${nextStatuses.includes('已取消') ? `<button class="action-btn cancel" onclick="openCancelModal(${order.id})">✕ 取消</button>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function groupByTime(orders) {
+      const groups = {};
+      orders.forEach(order => {
+        const time = order.pickup_time;
+        if (!groups[time]) groups[time] = [];
+        groups[time].push(order);
+      });
+      return Object.keys(groups).sort().map(time => ({
+        time,
+        orders: groups[time]
+      }));
+    }
+
+    async function loadOrders() {
+      try {
+        const date = document.getElementById('filterDate').value;
+        const status = document.getElementById('filterStatus').value;
+        const timeStart = document.getElementById('filterTimeStart').value;
+        const timeEnd = document.getElementById('filterTimeEnd').value;
+
+        let url = `${API_BASE}/api/orders?date=${date}`;
+        if (status) url += `&status=${encodeURIComponent(status)}`;
+        if (timeStart) url += `&pickupTimeStart=${timeStart}`;
+        if (timeEnd) url += `&pickupTimeEnd=${timeEnd}`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+          showToast(data.message, 'error');
+          return;
+        }
+
+        const container = document.getElementById('ordersContainer');
+        
+        if (data.data.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="icon">☕</div>
+              <h3>暂无订单</h3>
+              <p style="margin-top: 10px;">去订单录入页面添加新订单吧</p>
+            </div>
+          `;
+          return;
+        }
+
+        const timeGroups = groupByTime(data.data);
+        container.innerHTML = timeGroups.map(group => {
+          const totalCups = group.orders.reduce((sum, o) => sum + o.quantity, 0);
+          return `
+            <div class="time-group">
+              <div class="time-header">
+                <span class="time-title">🕐 ${group.time} 取杯</span>
+                <span class="time-stats">${group.orders.length} 笔订单 · ${totalCups} 杯</span>
+              </div>
+              <div class="order-cards">
+                ${group.orders.map(renderOrderCard).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        showToast('加载失败，请刷新重试', 'error');
+      }
+    }
+
+    async function updateStatus(orderId, newStatus) {
+      try {
+        const res = await fetch(`${API_BASE}/api/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast(`状态已更新为：${newStatus}`, 'success');
+          loadOrders();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('操作失败，请重试', 'error');
+      }
+    }
+
+    function openCancelModal(orderId) {
+      currentCancelOrderId = orderId;
+      document.getElementById('cancelReason').value = '';
+      document.getElementById('cancelModal').classList.add('show');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.remove('show');
+      currentCancelOrderId = null;
+    }
+
+    async function confirmCancel() {
+      const reason = document.getElementById('cancelReason').value.trim();
+      if (!reason) {
+        showToast('请填写取消原因', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/orders/${currentCancelOrderId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: '已取消', reason })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          showToast('订单已取消', 'success');
+          closeCancelModal();
+          loadOrders();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('操作失败，请重试', 'error');
+      }
+    }
+
+    function applyFilters() {
+      loadOrders();
+    }
+
+    function clearFilters() {
+      document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterTimeStart').value = '';
+      document.getElementById('filterTimeEnd').value = '';
+      loadOrders();
+    }
+
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+      if (e.target === this) closeCancelModal();
+    });
+
+    loadOrders();
+    setInterval(loadOrders, 30000);
+  </script>
+</body>
+</html>

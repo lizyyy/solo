@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>值班换班看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab:hover {
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .content-area {
+            display: none;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(235, 51, 73, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e4e7eb;
+            color: #333;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e4e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e4e7eb;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .shift-morning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .shift-evening {
+            background: #e7f5ff;
+            color: #0c5460;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e4e7eb;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-item label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            border: 2px solid #e4e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .schedule-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .date-group {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .date-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 15px;
+        }
+
+        .shift-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .shift-card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shift-card-info h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .shift-card-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-upload {
+            border: 2px dashed #e4e7eb;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-label {
+            color: #666;
+            cursor: pointer;
+        }
+
+        .file-upload-label strong {
+            color: #667eea;
+        }
+
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .week-navigation button {
+            background: #f0f2f5;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .week-navigation button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .week-navigation span {
+            font-weight: 600;
+            font-size: 16px;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.employee {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.schedule {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .stat-icon.pending {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-info p {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 值班换班看板</h1>
+            <p>小团队排班管理系统 | 支持早/晚班、换班申请审批、CSV导入导出</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard">📊 概览</button>
+            <button class="tab" data-tab="employees">👥 员工管理</button>
+            <button class="tab" data-tab="schedules">📅 排班管理</button>
+            <button class="tab" data-tab="exchanges">🔄 换班申请</button>
+            <button class="tab" data-tab="import-export">📁 导入导出</button>
+        </div>
+
+        <div id="dashboard" class="content-area active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon employee">👥</div>
+                    <div class="stat-info">
+                        <h3 id="stat-employees">0</h3>
+                        <p>员工总数</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon schedule">📅</div>
+                    <div class="stat-info">
+                        <h3 id="stat-schedules">0</h3>
+                        <p>本周排班</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending">⏳</div>
+                    <div class="stat-info">
+                        <h3 id="stat-pending">0</h3>
+                        <p>待处理换班</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>本周排班预览</h2>
+                </div>
+                <div id="dashboard-schedules"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>最新换班申请</h2>
+                </div>
+                <div id="dashboard-exchanges"></div>
+            </div>
+        </div>
+
+        <div id="employees" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2>员工列表</h2>
+                    <button class="btn btn-primary" onclick="openEmployeeModal()">
+                        ➕ 添加员工
+                    </button>
+                </div>
+                <table id="employees-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>姓名</th>
+                            <th>电话</th>
+                            <th>邮箱</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="schedules" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2>排班管理</h2>
+                    <button class="btn btn-primary" onclick="openScheduleModal()">
+                        ➕ 添加排班
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label>开始日期</label>
+                        <input type="date" id="filter-start-date">
+                    </div>
+                    <div class="filter-item">
+                        <label>结束日期</label>
+                        <input type="date" id="filter-end-date">
+                    </div>
+                    <div class="filter-item">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-secondary" onclick="loadSchedules()">🔍 查询</button>
+                    </div>
+                </div>
+
+                <div class="week-navigation">
+                    <button onclick="changeWeek(-1)">◀</button>
+                    <span id="current-week">本周</span>
+                    <button onclick="changeWeek(1)">▶</button>
+                </div>
+
+                <div id="schedules-container"></div>
+            </div>
+        </div>
+
+        <div id="exchanges" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2>换班申请</h2>
+                    <button class="btn btn-primary" onclick="openExchangeModal()">
+                        ➕ 发起换班
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label>状态</label>
+                        <select id="exchange-status-filter" onchange="loadExchanges()">
+                            <option value="">全部</option>
+                            <option value="pending">待处理</option>
+                            <option value="approved">已同意</option>
+                            <option value="rejected">已拒绝</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table id="exchanges-table">
+                    <thead>
+                        <tr>
+                            <th>申请时间</th>
+                            <th>日期</th>
+                            <th>班次</th>
+                            <th>申请人</th>
+                            <th>目标员工</th>
+                            <th>原因</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="import-export" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2>导入排班</h2>
+                </div>
+                <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                    CSV格式要求：必须包含 <strong>日期</strong>、<strong>班次</strong>、<strong>员工</strong> 三列
+                    <br>班次名称：早班 或 晚班
+                    <br>员工姓名必须已存在于系统中
+                </p>
+                <div class="file-upload" onclick="document.getElementById('csv-input').click()">
+                    <input type="file" id="csv-input" accept=".csv" onchange="handleCsvUpload(event)">
+                    <div class="file-upload-label">
+                        <strong>点击选择文件</strong> 或拖拽到此处上传 CSV
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>导出数据</h2>
+                </div>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="exportSchedules()">
+                        📥 导出排班记录
+                    </button>
+                    <button class="btn btn-success" onclick="exportExchanges()">
+                        📥 导出换班记录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="employee-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="employee-modal-title">添加员工</h3>
+                <button class="modal-close" onclick="closeEmployeeModal()">×</button>
+            </div>
+            <form id="employee-form">
+                <input type="hidden" id="edit-employee-id">
+                <div class="form-group">
+                    <label>姓名 *</label>
+                    <input type="text" id="employee-name" required>
+                </div>
+                <div class="form-group">
+                    <label>电话</label>
+                    <input type="text" id="employee-phone">
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="employee-email">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="schedule-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加排班</h3>
+                <button class="modal-close" onclick="closeScheduleModal()">×</button>
+            </div>
+            <form id="schedule-form">
+                <div class="form-group">
+                    <label>日期 *</label>
+                    <input type="date" id="schedule-date" required>
+                </div>
+                <div class="form-group">
+                    <label>班次 *</label>
+                    <select id="schedule-shift" required>
+                        <option value="">请选择班次</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>员工 *</label>
+                    <select id="schedule-employee" required>
+                        <option value="">请选择员工</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="exchange-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>发起换班申请</h3>
+                <button class="modal-close" onclick="closeExchangeModal()">×</button>
+            </div>
+            <form id="exchange-form">
+                <div class="form-group">
+                    <label>我的排班 *</label>
+                    <select id="exchange-my-schedule" required>
+                        <option value="">请选择要换出的排班</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>目标员工 *</label>
+                    <select id="exchange-to-employee" required>
+                        <option value="">请选择要换入的员工</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>换班原因</label>
+                    <textarea id="exchange-reason" placeholder="请输入换班原因..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeExchangeModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">提交申请</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentWeekOffset = 0;
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(API_BASE + url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                showToast('网络请求失败: ' + error.message, 'error');
+                return { success: false, message: error.message };
+            }
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.getElementById(tabName).classList.add('active');
+
+                if (tabName === 'employees') loadEmployees();
+                if (tabName === 'schedules') loadSchedules();
+                if (tabName === 'exchanges') loadExchanges();
+                if (tabName === 'dashboard') loadDashboard();
+            });
+        });
+
+        async function loadEmployees() {
+            const result = await apiRequest('/api/employees');
+            if (result.success) {
+                renderEmployees(result.data);
+            }
+        }
+
+        function renderEmployees(employees) {
+            const tbody = document.querySelector('#employees-table tbody');
+            if (employees.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div>暂无员工数据，请添加员工</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            tbody.innerHTML = employees.map(emp => `
+                <tr>
+                    <td>${emp.id}</td>
+                    <td><strong>${emp.name}</strong></td>
+                    <td>${emp.phone || '-'}</td>
+                    <td>${emp.email || '-'}</td>
+                    <td>${emp.created_at}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary btn-small" onclick="editEmployee(${emp.id})">编辑</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteEmployee(${emp.id}, '${emp.name}')">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openEmployeeModal(employee = null) {
+            const modal = document.getElementById('employee-modal');
+            const title = document.getElementById('employee-modal-title');
+            const form = document.getElementById('employee-form');
+            const idInput = document.getElementById('edit-employee-id');
+
+            if (employee) {
+                title.textContent = '编辑员工';
+                idInput.value = employee.id;
+                document.getElementById('employee-name').value = employee.name;
+                document.getElementById('employee-phone').value = employee.phone || '';
+                document.getElementById('employee-email').value = employee.email || '';
+            } else {
+                title.textContent = '添加员工';
+                idInput.value = '';
+                form.reset();
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employee-modal').classList.remove('active');
+        }
+
+        async function editEmployee(id) {
+            const result = await apiRequest('/api/employees');
+            if (result.success) {
+                const employee = result.data.find(e => e.id === id);
+                if (employee) {
+                    openEmployeeModal(employee);
+                }
+            }
+        }
+
+        async function deleteEmployee(id, name) {
+            if (!confirm(`确定要删除员工"${name}"吗？\n\n注意：如果该员工有排班记录，将无法删除。`)) return;
+
+            const result = await apiRequest(`/api/employees/${id}`, { method: 'DELETE' });
+            if (result.success) {
+                showToast('员工删除成功');
+                loadEmployees();
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        document.getElementById('employee-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-employee-id').value;
+            const data = {
+                name: document.getElementById('employee-name').value.trim(),
+                phone: document.getElementById('employee-phone').value.trim() || null,
+                email: document.getElementById('employee-email').value.trim() || null
+            };
+
+            let result;
+            if (id) {
+                result = await apiRequest(`/api/employees/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            } else {
+                result = await apiRequest('/api/employees', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+            if (result.success) {
+                showToast(result.message);
+                closeEmployeeModal();
+                loadEmployees();
+            } else {
+                showToast(result.message, 'error');
+            }
+        });
+
+        async function loadShifts() {
+            const result = await apiRequest('/api/shifts');
+            if (result.success) {
+                const select = document.getElementById('schedule-shift');
+                select.innerHTML = '<option value="">请选择班次</option>' +
+                    result.data.map(s => `<option value="${s.id}">${s.name} (${s.start_time}-${s.end_time})</option>`).join('');
+            }
+        }
+
+        async function loadSchedules() {
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+            
+            let url = '/api/schedules';
+            if (startDate && endDate) {
+                url += `?start_date=${startDate}&end_date=${endDate}`;
+            } else {
+                const weekDates = getWeekDates(currentWeekOffset);
+                url += `?start_date=${weekDates.start}&end_date=${weekDates.end}`;
+            }
+
+            const result = await apiRequest(url);
+            if (result.success) {
+                renderSchedules(result.data);
+            }
+        }
+
+        function getWeekDates(offset = 0) {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1) + (offset * 7));
+            
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const formatDate = (d) => {
+                return d.toISOString().split('T')[0];
+            };
+
+            return {
+                start: formatDate(monday),
+                end: formatDate(sunday),
+                monday: monday,
+                sunday: sunday
+            };
+        }
+
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            const weekDates = getWeekDates(currentWeekOffset);
+            const weekText = currentWeekOffset === 0 ? '本周' : 
+                            currentWeekOffset === -1 ? '上周' :
+                            currentWeekOffset === 1 ? '下周' :
+                            `${weekDates.monday.getMonth() + 1}月${weekDates.monday.getDate()}日 - ${weekDates.sunday.getMonth() + 1}月${weekDates.sunday.getDate()}日`;
+            
+            document.getElementById('current-week').textContent = weekText;
+            loadSchedules();
+        }
+
+        function renderSchedules(schedules) {
+            const container = document.getElementById('schedules-container');
+            
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div>暂无排班数据，请添加排班</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const grouped = {};
+            const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            
+            schedules.forEach(s => {
+                if (!grouped[s.date]) {
+                    grouped[s.date] = [];
+                }
+                grouped[s.date].push(s);
+            });
+
+            const sortedDates = Object.keys(grouped).sort();
+            let html = '<div class="schedule-grid">';
+
+            sortedDates.forEach(date => {
+                const d = new Date(date);
+                const dayName = dayNames[d.getDay()];
+                const dateList = grouped[date];
+                
+                html += `
+                    <div class="date-group">
+                        <div class="date-header">
+                            📅 ${date} (${dayName})
+                        </div>
+                        <div class="shift-cards">
+                `;
+
+                dateList.forEach(s => {
+                    const shiftClass = s.shift_type === 'morning' ? 'shift-morning' : 'shift-evening';
+                    html += `
+                        <div class="shift-card">
+                            <div class="shift-card-info">
+                                <h4><span class="status-badge ${shiftClass}">${s.shift_name}</span></h4>
+                                <p><strong>${s.employee_name}</strong></p>
+                                <p>${s.start_time} - ${s.end_time}</p>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn btn-danger btn-small" onclick="deleteSchedule(${s.id}, '${s.date}', '${s.shift_name}', '${s.employee_name}')">删除</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function openScheduleModal() {
+            document.getElementById('schedule-form').reset();
+            loadShifts();
+            loadEmployeeOptions('schedule-employee');
+            document.getElementById('schedule-modal').classList.add('active');
+        }
+
+        function closeScheduleModal() {
+            document.getElementById('schedule-modal').classList.remove('active');
+        }
+
+        async function loadEmployeeOptions(selectId, excludeId = null) {
+            const result = await apiRequest('/api/employees');
+            const select = document.getElementById(selectId);
+            if (result.success && result.data.length > 0) {
+                select.innerHTML = '<option value="">请选择员工</option>' +
+                    result.data
+                        .filter(e => !excludeId || e.id !== excludeId)
+                        .map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+            } else {
+                select.innerHTML = '<option value="">暂无员工</option>';
+            }
+        }
+
+        async function loadScheduleOptions() {
+            const today = new Date().toISOString().split('T')[0];
+            const result = await apiRequest(`/api/schedules?start_date=${today}&end_date=2099-12-31`);
+            const select = document.getElementById('exchange-my-schedule');
+            
+            if (result.success && result.data.length > 0) {
+                select.innerHTML = '<option value="">请选择要换出的排班</option>' +
+                    result.data.map(s => `
+                        <option value="${s.id}" data-date="${s.date}" data-shift="${s.shift_id}" data-employee="${s.employee_id}">
+                            ${s.date} ${s.shift_name} - ${s.employee_name}
+                        </option>
+                    `).join('');
+            } else {
+                select.innerHTML = '<option value="">暂无排班</option>';
+            }
+        }
+
+        document.getElementById('schedule-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                date: document.getElementById('schedule-date').value,
+                shift_id: parseInt(document.getElementById('schedule-shift').value),
+                employee_id: parseInt(document.getElementById('schedule-employee').value)
+            };
+
+            const result = await apiRequest('/api/schedules', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showToast('排班添加成功');
+                closeScheduleModal();
+                loadSchedules();
+            } else {
+                showToast(result.message, 'error');
+            }
+        });
+
+        async function deleteSchedule(id, date, shiftName, employeeName) {
+            if (!confirm(`确定要删除该排班吗？\n\n日期: ${date}\n班次: ${shiftName}\n员工: ${employeeName}\n\n注意：如果该排班有未处理的换班申请，将无法删除。`)) return;
+
+            const result = await apiRequest(`/api/schedules/${id}`, { method: 'DELETE' });
+            if (result.success) {
+                showToast('排班删除成功');
+                loadSchedules();
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        async function loadExchanges() {
+            const status = document.getElementById('exchange-status-filter').value;
+            let url = '/api/shift-exchanges';
+            if (status) {
+                url += `?status=${status}`;
+            }
+
+            const result = await apiRequest(url);
+            if (result.success) {
+                renderExchanges(result.data);
+            }
+        }
+
+        function renderExchanges(exchanges) {
+            const tbody = document.querySelector('#exchanges-table tbody');
+            
+            if (exchanges.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div>暂无换班申请</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const statusMap = {
+                'pending': { text: '待处理', class: 'status-pending' },
+                'approved': { text: '已同意', class: 'status-approved' },
+                'rejected': { text: '已拒绝', class: 'status-rejected' }
+            };
+
+            tbody.innerHTML = exchanges.map(e => {
+                const status = statusMap[e.status] || { text: e.status, class: '' };
+                let actions = '';
+
+                if (e.status === 'pending') {
+                    actions = `
+                        <div class="action-buttons">
+                            <button class="btn btn-success btn-small" onclick="approveExchange(${e.id}, '${e.from_employee_name}', '${e.to_employee_name}')">同意</button>
+                            <button class="btn btn-danger btn-small" onclick="rejectExchange(${e.id})">拒绝</button>
+                        </div>
+                    `;
+                } else {
+                    actions = '-';
+                }
+
+                return `
+                    <tr>
+                        <td>${e.created_at}</td>
+                        <td>${e.date}</td>
+                        <td><span class="status-badge ${e.shift_name.includes('早') ? 'shift-morning' : 'shift-evening'}">${e.shift_name}</span></td>
+                        <td><strong>${e.from_employee_name}</strong></td>
+                        <td><strong>${e.to_employee_name}</strong></td>
+                        <td>${e.reason || '-'}</td>
+                        <td><span class="status-badge ${status.class}">${status.text}</span></td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openExchangeModal() {
+            document.getElementById('exchange-form').reset();
+            loadScheduleOptions();
+            document.getElementById('exchange-modal').classList.add('active');
+        }
+
+        function closeExchangeModal() {
+            document.getElementById('exchange-modal').classList.remove('active');
+        }
+
+        document.getElementById('exchange-my-schedule').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (selected && selected.value) {
+                const employeeId = parseInt(selected.dataset.employee);
+                loadEmployeeOptions('exchange-to-employee', employeeId);
+            }
+        });
+
+        document.getElementById('exchange-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const scheduleId = document.getElementById('exchange-my-schedule').value;
+            const selectedOption = document.querySelector('#exchange-my-schedule option[value="' + scheduleId + '"]');
+            
+            if (!selectedOption) {
+                showToast('请选择排班', 'error');
+                return;
+            }
+
+            const data = {
+                from_employee_id: parseInt(selectedOption.dataset.employee),
+                to_employee_id: parseInt(document.getElementById('exchange-to-employee').value),
+                schedule_id: parseInt(scheduleId),
+                reason: document.getElementById('exchange-reason').value || null
+            };
+
+            const result = await apiRequest('/api/shift-exchanges', {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+
+            if (result.success) {
+                showToast('换班申请提交成功');
+                closeExchangeModal();
+                loadExchanges();
+            } else {
+                showToast(result.message, 'error');
+            }
+        });
+
+        async function approveExchange(id, fromName, toName) {
+            if (!confirm(`确定同意这次换班申请吗？\n\n将把排班从 ${fromName} 变更为 ${toName}\n\n此操作将自动更新排班。`)) return;
+
+            const result = await apiRequest(`/api/shift-exchanges/${id}/approve`, {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+
+            if (result.success) {
+                showToast(result.message);
+                loadExchanges();
+                loadSchedules();
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        async function rejectExchange(id) {
+            const reason = prompt('请输入拒绝原因（可选）:');
+            if (reason === null) return;
+
+            const result = await apiRequest(`/api/shift-exchanges/${id}/reject`, {
+                method: 'POST',
+                body: JSON.stringify({ reason: reason || null })
+            });
+
+            if (result.success) {
+                showToast('换班申请已拒绝');
+                loadExchanges();
+            } else {
+                showToast(result.message, 'error');
+            }
+        }
+
+        async function loadDashboard() {
+            const empResult = await apiRequest('/api/employees');
+            if (empResult.success) {
+                document.getElementById('stat-employees').textContent = empResult.data.length;
+            }
+
+            const weekDates = getWeekDates(0);
+            const schedResult = await apiRequest(`/api/schedules?start_date=${weekDates.start}&end_date=${weekDates.end}`);
+            if (schedResult.success) {
+                document.getElementById('stat-schedules').textContent = schedResult.data.length;
+            }
+
+            const exchangeResult = await apiRequest('/api/shift-exchanges?status=pending');
+            if (exchangeResult.success) {
+                document.getElementById('stat-pending').textContent = exchangeResult.data.length;
+            }
+
+            const dashboardSchedules = document.getElementById('dashboard-schedules');
+            if (schedResult.success && schedResult.data.length > 0) {
+                const grouped = {};
+                schedResult.data.forEach(s => {
+                    if (!grouped[s.date]) grouped[s.date] = [];
+                    grouped[s.date].push(s);
+                });
+
+                let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">';
+                Object.keys(grouped).sort().slice(0, 7).forEach(date => {
+                    html += `<div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">${date}</div>
+                        ${grouped[date].map(s => `
+                            <div style="font-size: 13px; margin-bottom: 4px;">
+                                <span class="status-badge ${s.shift_type === 'morning' ? 'shift-morning' : 'shift-evening'}" style="margin-right: 6px;">${s.shift_name}</span>
+                                ${s.employee_name}
+                            </div>
+                        `).join('')}
+                    </div>`;
+                });
+                html += '</div>';
+                dashboardSchedules.innerHTML = html;
+            } else {
+                dashboardSchedules.innerHTML = '<div class="empty-state">本周暂无排班</div>';
+            }
+
+            const dashboardExchanges = document.getElementById('dashboard-exchanges');
+            const allExchanges = await apiRequest('/api/shift-exchanges');
+            if (allExchanges.success && allExchanges.data.length > 0) {
+                const statusMap = {
+                    'pending': { text: '待处理', class: 'status-pending' },
+                    'approved': { text: '已同意', class: 'status-approved' },
+                    'rejected': { text: '已拒绝', class: 'status-rejected' }
+                };
+
+                dashboardExchanges.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 10px; text-align: left;">日期</th>
+                                <th style="padding: 10px; text-align: left;">班次</th>
+                                <th style="padding: 10px; text-align: left;">申请人</th>
+                                <th style="padding: 10px; text-align: left;">目标</th>
+                                <th style="padding: 10px; text-align: left;">状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allExchanges.data.slice(0, 5).map(e => {
+                                const status = statusMap[e.status] || { text: e.status, class: '' };
+                                return `
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 10px;">${e.date}</td>
+                                        <td style="padding: 10px;">${e.shift_name}</td>
+                                        <td style="padding: 10px;">${e.from_employee_name}</td>
+                                        <td style="padding: 10px;">${e.to_employee_name}</td>
+                                        <td style="padding: 10px;"><span class="status-badge ${status.class}">${status.text}</span></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                dashboardExchanges.innerHTML = '<div class="empty-state">暂无换班记录</div>';
+            }
+        }
+
+        function handleCsvUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                let content = e.target.result;
+                if (content.charCodeAt(0) === 0xFEFF) {
+                    content = content.slice(1);
+                }
+
+                const result = await apiRequest('/api/import/schedules', {
+                    method: 'POST',
+                    body: JSON.stringify({ csvData: content })
+                });
+
+                if (result.success) {
+                    showToast(result.message);
+                    loadSchedules();
+                } else {
+                    let errorMsg = result.message;
+                    if (result.errors) {
+                        errorMsg += '\n\n详细错误：\n' + result.errors.slice(0, 10).join('\n');
+                    }
+                    alert(errorMsg);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function exportSchedules() {
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+            
+            let url = '/api/export/schedules';
+            if (startDate && endDate) {
+                url += `?start_date=${startDate}&end_date=${endDate}`;
+            }
+
+            window.location.href = url;
+            showToast('正在导出排班记录...');
+        }
+
+        function exportExchanges() {
+            window.location.href = '/api/export/exchanges';
+            showToast('正在导出换班记录...');
+        }
+
+        function init() {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const formatDate = (d) => d.toISOString().split('T')[0];
+            
+            document.getElementById('filter-start-date').value = formatDate(monday);
+            document.getElementById('filter-end-date').value = formatDate(sunday);
+            document.getElementById('current-week').textContent = '本周';
+
+            loadDashboard();
+        }
+
+        init();
+    </script>
+</body>
+</html>

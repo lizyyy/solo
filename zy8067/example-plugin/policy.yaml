@@ -1,0 +1,12 @@
+forbiddenAPIs:
+  - fs
+  - net
+  - http
+  - https
+  - child_process
+maxExecutionTime: 5000
+allowedGlobals:
+  - console
+  - JSON
+  - Math
+  - Date

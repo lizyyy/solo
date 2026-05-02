@@ -1,0 +1,29 @@
+{
+  "name": "community-material-lending",
+  "version": "1.0.0",
+  "description": "社区活动物资借还登记系统 - Node.js Express + SQLite",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "init-db": "node database.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "keywords": [
+    "community",
+    "material",
+    "lending",
+    "sqlite",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT"
+}

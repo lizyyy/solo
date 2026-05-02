@@ -1,0 +1,6 @@
+number,name,type,diameter,length,radius,flute_count,material,max_feed,max_speed,description
+1,10mm 立铣刀,endmill,10.0,75.0,0.0,4,硬质合金,5000.0,8000.0,粗加工用立铣刀
+2,6mm 钻头,drill,6.0,100.0,0.0,2,高速钢,3000.0,10000.0,标准麻花钻
+3,8mm 立铣刀,endmill,8.0,70.0,0.5,4,硬质合金,4500.0,9000.0,半精铣用立铣刀
+4,12mm 面铣刀,facemill,12.0,60.0,0.0,6,硬质合金,3000.0,6000.0,面加工用
+5,4mm 中心钻,spotdrill,4.0,50.0,0.0,2,高速钢,2000.0,12000.0,中心孔定位

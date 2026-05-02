@@ -1,0 +1,29 @@
+{
+  "name": "occlusal-check-station",
+  "version": "1.0.0",
+  "description": "口扫咬合预检台 - 牙科技工室3D交互校验工具",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "dentistry",
+    "3d",
+    "stl",
+    "obj",
+    "orthodontics",
+    "occlusion"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

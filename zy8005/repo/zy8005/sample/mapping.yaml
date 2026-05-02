@@ -1,0 +1,61 @@
+accounts:
+  source_file: accounts.csv
+  natural_keys:
+    - id
+  fields:
+    id: id
+    name: company_name
+    website: website
+    industry: industry
+    status: status
+    created_at: created_at
+    description: description
+  transformations:
+    name:
+      type: trim
+    website:
+      type: lowercase
+    created_at:
+      type: normalize_date
+      format: "%Y-%m-%d"
+
+contacts:
+  source_file: contacts.csv
+  natural_keys:
+    - id
+  fields:
+    id: id
+    account_id: account_id
+    first_name: first_name
+    last_name: last_name
+    email: email
+    phone: phone
+    position: position
+    is_primary: is_primary
+  transformations:
+    email:
+      type: normalize_email
+    phone:
+      type: normalize_phone
+    is_primary:
+      type: boolean
+
+activities:
+  source_file: activities.csv
+  natural_keys:
+    - id
+  fields:
+    id: id
+    account_id: account_id
+    contact_id: contact_id
+    activity_type: activity_type
+    activity_date: activity_date
+    subject: subject
+    duration_minutes: duration_minutes
+    status: status
+  transformations:
+    activity_date:
+      type: normalize_datetime
+      format: "%Y-%m-%d %H:%M:%S"
+    duration_minutes:
+      type: integer

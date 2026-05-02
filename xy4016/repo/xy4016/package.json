@@ -1,0 +1,29 @@
+{
+  "name": "shift-handover-risk-board",
+  "version": "1.0.0",
+  "description": "轮班交接风险看板 - 小团队客服交接管理系统",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev": "nodemon backend/src/server.js",
+    "test": "jest --testPathPattern=backend/tests --verbose",
+    "test:watch": "jest --testPathPattern=backend/tests --watch"
+  },
+  "keywords": ["shift", "handover", "risk", "board", "kanban"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "sequelize": "^6.35.2",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.2"
+  }
+}

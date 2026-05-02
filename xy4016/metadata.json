@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4016",
+  "idea_short_title": "我想做一个给小团队用的“轮班交接风险看板”。场景是客服主管每天要把白班、晚班交接的问题整理出来，但现在大家都在群里发零散",
+  "folder_name": "xy4016",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4016",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "代码测试",
+    "业务领域": "纯后端API服务",
+    "修改范围": "单文件"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4016/base",
+    "round_branch": "idea/xy4016/r1",
+    "pr_title": "[xy4016][第一轮] 我想做一个给小团队用的“轮班交接风险看板”。场景是客服主管每天要把白班、晚班交接的问题整理出来，但现",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4016/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4016/base...idea/xy4016/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4016/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4016/xy4016.xlsx",
+    "uid": "xy4016",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4016/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4016/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4016/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4016/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4016/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T13:42:08.459795+08:00"
+}

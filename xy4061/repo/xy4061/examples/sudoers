@@ -1,0 +1,23 @@
+# 这是sudoers片段示例
+# 包含一些危险的配置用于测试
+
+# 危险规则1: 测试用户lisi有ALL权限 (越权)
+lisi ALL=(root) NOPASSWD: ALL
+
+# 危险规则2: 离职用户zhaoliu仍有权限
+zhaoliu prod-web-01=(root) /bin/su, /usr/bin/passwd
+
+# 危险规则3: 普通用户有rm -rf权限
+qianqi prod-db-01=(root) /bin/rm -rf /data
+
+# 正常规则
+zhangsan prod-web-01=(root) /usr/bin/systemctl restart nginx
+
+# 正常规则
+zhoujiu prod-db-01=(root) /usr/bin/mysqldump
+
+# 危险规则4: 测试用户在生产服务器有权限 (资产环境不匹配
+lisi prod-app-01=(root) /usr/bin/java -jar
+
+# 危险规则5: NOPASSWD 危险
+sunba dev-web-01=(root) NOPASSWD: /usr/bin/apt-get, /usr/bin/yum

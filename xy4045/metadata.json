@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4045",
+  "idea_short_title": "我想做一个给内网安全培训小组用的本地 Passkey/WebAuthn 演练沙盒，叫“无密码登录训练场”。我们给业务系统",
+  "folder_name": "xy4045",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4045",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "前沿技术",
+    "修改范围": "跨系统多模块"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4045/base",
+    "round_branch": "idea/xy4045/r1",
+    "pr_title": "[xy4045][第一轮] 我想做一个给内网安全培训小组用的本地 Passkey/WebAuthn 演练沙盒，叫“无密码登录训练",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4045/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4045/base...idea/xy4045/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4045/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4045/xy4045.xlsx",
+    "uid": "xy4045",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4045/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4045/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4045/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4045/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4045/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T18:28:16.926308+08:00"
+}

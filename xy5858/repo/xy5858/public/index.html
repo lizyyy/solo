@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>共享设备借用台账</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>共享设备借用台账</h1>
+      <div class="header-actions">
+        <button id="refreshBtn" class="btn btn-secondary">刷新</button>
+        <button id="addDeviceBtn" class="btn btn-primary">+ 新增设备</button>
+      </div>
+    </header>
+
+    <div id="reminders" class="reminders hidden">
+      <h3>提醒</h3>
+      <div id="remindersList"></div>
+    </div>
+
+    <section class="filters">
+      <div class="filter-group">
+        <label>状态筛选：</label>
+        <select id="statusFilter">
+          <option value="">全部</option>
+          <option value="available">可用</option>
+          <option value="borrowed">借用中</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>类型筛选：</label>
+        <select id="typeFilter">
+          <option value="">全部类型</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <button id="resetFilters" class="btn btn-secondary">重置筛选</button>
+      </div>
+    </section>
+
+    <section class="device-stats">
+      <div class="stat-card">
+        <span class="stat-number" id="totalDevices">0</span>
+        <span class="stat-label">设备总数</span>
+      </div>
+      <div class="stat-card available">
+        <span class="stat-number" id="availableDevices">0</span>
+        <span class="stat-label">可用设备</span>
+      </div>
+      <div class="stat-card borrowed">
+        <span class="stat-number" id="borrowedDevices">0</span>
+        <span class="stat-label">借用中</span>
+      </div>
+      <div class="stat-card overdue">
+        <span class="stat-number" id="overdueDevices">0</span>
+        <span class="stat-label">已逾期</span>
+      </div>
+    </section>
+
+    <section class="device-list">
+      <table id="deviceTable">
+        <thead>
+          <tr>
+            <th>设备名称</th>
+            <th>类型</th>
+            <th>状态</th>
+            <th>当前借用人</th>
+            <th>借出日期</th>
+            <th>预计归还日期</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="deviceTableBody">
+          <tr>
+            <td colspan="7" class="loading">加载中...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="csv-actions">
+      <div class="csv-group">
+        <h3>数据导入/导出</h3>
+        <div class="csv-buttons">
+          <div class="file-input-wrapper">
+            <button class="btn btn-secondary">导入设备 CSV</button>
+            <input type="file" id="csvFileInput" accept=".csv">
+          </div>
+          <button id="exportDevicesBtn" class="btn btn-secondary">导出设备列表</button>
+          <button id="exportRecordsBtn" class="btn btn-secondary">导出借用记录</button>
+        </div>
+        <p class="csv-hint">CSV 格式要求：包含 name（设备名称）、type（设备类型）列，可选 description（描述）列</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">标题</h2>
+        <button id="modalClose" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

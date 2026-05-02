@@ -1,0 +1,19 @@
+opening_rules:
+  required_phrases:
+    - "您好"
+    - "请问有什么可以帮助您的"
+  max_time_seconds: 15
+  agent_role: "agent"
+
+promise_rules:
+  time_patterns:
+    - regex: r'(\d+)\s*小时'
+      unit: hour
+    - regex: r'(\d+)\s*天'
+      unit: day
+    - regex: r'(\d+)\s*分钟'
+      unit: minute
+  conflict_threshold_hours: 24
+
+silence_rules:
+  max_silence_seconds: 10

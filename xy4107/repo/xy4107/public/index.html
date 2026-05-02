@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无密码登录彩排台 - Passkey Rehearsal Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .result-box {
+            background: #1a1a2e;
+            color: #00ff88;
+            padding: 16px;
+            border-radius: 10px;
+            font-family: 'Fira Code', 'Monaco', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .result-box.error {
+            color: #ff6b6b;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .result-box.success {
+            color: #00ff88;
+            border-left: 4px solid #00ff88;
+        }
+
+        .backup-codes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .backup-code {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            color: #333;
+            letter-spacing: 2px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.3rem;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 20px 0;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-link {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+        }
+
+        .action-link.revoke {
+            color: #ef4444;
+        }
+
+        .action-link.view {
+            color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-label {
+            display: block;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-label span {
+            color: #666;
+        }
+
+        .file-label strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .backup-codes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 无密码登录彩排台</h1>
+            <p>Passkey Rehearsal Platform - WebAuthn 演练测试工具</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard">📊 仪表板</button>
+            <button class="tab" data-tab="register">📝 注册演练</button>
+            <button class="tab" data-tab="login">🔑 登录演练</button>
+            <button class="tab" data-tab="users">👥 用户管理</button>
+            <button class="tab" data-tab="audit">📋 审计日志</button>
+            <button class="tab" data-tab="import-export">📦 导入导出</button>
+        </div>
+
+        <!-- 仪表板 -->
+        <div class="tab-content active" id="tab-dashboard">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>📊 系统统计</h2>
+                    <div class="stats-grid" id="stats-grid">
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="refreshStats()">🔄 刷新统计</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>⚡ 快捷操作</h2>
+                    <div class="btn-group" style="flex-direction: column;">
+                        <button class="btn btn-primary" onclick="switchTab('register')">📝 开始注册演练</button>
+                        <button class="btn btn-success" onclick="switchTab('login')">🔑 开始登录演练</button>
+                        <button class="btn btn-secondary" onclick="exportReport()">📄 导出演练报告</button>
+                        <button class="btn btn-danger" onclick="confirmReset()">🗑️ 重置所有数据</button>
+                    </div>
+                </div>
+
+                <div class="card full-width-card">
+                    <h2>📋 最近审计记录</h2>
+                    <div class="table-container">
+                        <table id="recent-audit-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>用户</th>
+                                    <th>操作</th>
+                                    <th>结果</th>
+                                    <th>详情</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 注册演练 -->
+        <div class="tab-content" id="tab-register">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>📝 步骤 1: 创建用户</h2>
+                    <div class="form-group">
+                        <label>用户名 *</label>
+                        <input type="text" id="reg-username" placeholder="输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <label>显示名称</label>
+                        <input type="text" id="reg-displayName" placeholder="输入显示名称">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="reg-email" placeholder="输入邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>设备名称</label>
+                        <input type="text" id="reg-deviceName" placeholder="如：MacBook Pro、iPhone 15" value="演练测试设备">
+                    </div>
+                    <div class="form-group">
+                        <label>设备类型</label>
+                        <select id="reg-deviceType">
+                            <option value="platform">内置设备 (Touch ID / Face ID)</option>
+                            <option value="cross-platform">跨平台 (安全密钥)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="reg-useSimulation" checked>
+                            <label for="reg-useSimulation">使用模拟模式 (无需真实 Passkey 设备)</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startRegistration()">🚀 开始注册流程</button>
+                </div>
+
+                <div class="card">
+                    <h2>📝 步骤 2: 完成注册</h2>
+                    <div class="alert alert-info" id="reg-info">
+                        请先完成步骤 1，获取注册挑战值。
+                    </div>
+                    <div class="form-group" id="reg-challenge-group" style="display: none;">
+                        <label>挑战值 (Challenge)</label>
+                        <textarea id="reg-challenge" rows="3" readonly></textarea>
+                    </div>
+                    <div class="form-group" id="reg-userId-group" style="display: none;">
+                        <label>用户 ID</label>
+                        <input type="text" id="reg-userId" readonly>
+                    </div>
+                    <button class="btn btn-success" id="reg-complete-btn" style="display: none;" onclick="completeRegistration()">✅ 完成注册 (模拟验证)</button>
+                    
+                    <div id="reg-result"></div>
+                </div>
+
+                <div class="card full-width-card" id="reg-credentials-card" style="display: none;">
+                    <h2>✅ 注册结果 - 凭证信息</h2>
+                    <div class="alert alert-success">
+                        <strong>注册成功！</strong> 以下是生成的凭证和备用码，请妥善保存。
+                    </div>
+                    <div id="reg-credentials-display"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录演练 -->
+        <div class="tab-content" id="tab-login">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>🔑 步骤 1: 发起登录挑战</h2>
+                    <div class="form-group">
+                        <label>用户名 *</label>
+                        <input type="text" id="login-username" placeholder="输入已注册的用户名">
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="login-useSimulation" checked>
+                            <label for="login-useSimulation">使用模拟模式</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="startLogin()">🔐 获取登录挑战</button>
+                    
+                    <div class="divider"></div>
+                    
+                    <h3>🔐 使用备用码登录</h3>
+                    <div class="alert alert-warning">
+                        当设备丢失或不可用时，可以使用备用码登录。
+                    </div>
+                    <div class="form-group">
+                        <label>用户 ID</label>
+                        <input type="text" id="backup-userId" placeholder="输入用户 ID">
+                    </div>
+                    <div class="form-group">
+                        <label>备用码</label>
+                        <input type="text" id="backup-code" placeholder="输入备用码 (如: ABCD1234)">
+                    </div>
+                    <button class="btn btn-warning" onclick="loginWithBackupCode()">🔑 使用备用码登录</button>
+                </div>
+
+                <div class="card">
+                    <h2>🔑 步骤 2: 选择设备并验证</h2>
+                    <div class="alert alert-info" id="login-info">
+                        请先输入用户名并获取登录挑战。
+                    </div>
+                    <div class="form-group" id="login-userId-group" style="display: none;">
+                        <label>用户 ID</label>
+                        <input type="text" id="login-userId" readonly>
+                    </div>
+                    <div class="form-group" id="login-credentials-group" style="display: none;">
+                        <label>选择凭证设备</label>
+                        <select id="login-credentialId">
+                            <option value="">请选择...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="login-challenge-group" style="display: none;">
+                        <label>挑战值 (Challenge)</label>
+                        <textarea id="login-challenge" rows="3" readonly></textarea>
+                    </div>
+                    <button class="btn btn-success" id="login-complete-btn" style="display: none;" onclick="completeLogin()">✅ 完成登录 (模拟验证)</button>
+                    
+                    <div id="login-result"></div>
+                </div>
+
+                <div class="card">
+                    <h2>❌ 模拟设备丢失演练</h2>
+                    <div class="alert alert-warning">
+                        <strong>演练场景：</strong>用户设备丢失，管理员需要撤销该设备的凭证。
+                    </div>
+                    <div class="form-group">
+                        <label>选择要撤销的凭证</label>
+                        <select id="revoke-credentialId">
+                            <option value="">请先选择用户...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>撤销原因</label>
+                        <input type="text" id="revoke-reason" placeholder="如：设备丢失、设备更换" value="模拟设备丢失">
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="loadCredentialsForRevoke()">📋 加载用户凭证</button>
+                        <button class="btn btn-danger" onclick="revokeCredential()">❌ 撤销凭证</button>
+                    </div>
+                    
+                    <div id="revoke-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户管理 -->
+        <div class="tab-content" id="tab-users">
+            <div class="card full-width-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>👥 用户列表</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="refreshUsers()">🔄 刷新</button>
+                        <button class="btn btn-primary" onclick="switchTab('register')">➕ 添加用户</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="users-table">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>显示名称</th>
+                                <th>邮箱</th>
+                                <th>状态</th>
+                                <th>凭证数</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 审计日志 -->
+        <div class="tab-content" id="tab-audit">
+            <div class="card full-width-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>📋 审计日志</h2>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="refreshAudit()">🔄 刷新</button>
+                        <button class="btn btn-primary" onclick="exportReport()">📄 导出报告</button>
+                        <button class="btn btn-success" onclick="exportAuditPackage()">📦 导出审计包</button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div>
+                        <label>操作类型</label>
+                        <select id="audit-filter-action">
+                            <option value="">全部</option>
+                            <option value="REGISTRATION_STARTED">注册开始</option>
+                            <option value="REGISTRATION_COMPLETED">注册完成</option>
+                            <option value="AUTHENTICATION_CHALLENGE_ISSUED">认证挑战</option>
+                            <option value="AUTHENTICATION_COMPLETED">认证完成</option>
+                            <option value="BACKUP_CODE_USED">备用码使用</option>
+                            <option value="CREDENTIAL_REVOKED">凭证撤销</option>
+                            <option value="USER_IMPORTED">用户导入</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>开始日期</label>
+                        <input type="date" id="audit-filter-start">
+                    </div>
+                    <div>
+                        <label>结束日期</label>
+                        <input type="date" id="audit-filter-end">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-secondary" onclick="applyAuditFilter()">🔍 筛选</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="audit-table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>用户</th>
+                                <th>操作</th>
+                                <th>结果</th>
+                                <th>详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导入导出 -->
+        <div class="tab-content" id="tab-import-export">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>📥 导入用户 (CSV)</h2>
+                    <div class="alert alert-info">
+                        <strong>CSV 格式要求：</strong>包含 username, displayName, email 列。
+                        <br><a href="/api/audit/sample/csv" download>下载示例 CSV</a>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <label class="file-label">
+                            <input type="file" id="import-csv-file" accept=".csv" onchange="handleCsvSelect(event)">
+                            <span>📁 点击选择 CSV 文件 或 拖拽到此处</span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <label>或直接粘贴 CSV 内容</label>
+                        <textarea id="import-csv-content" rows="6" placeholder="username,displayName,email
+zhangsan,张三,zhangsan@example.com
+lisi,李四,lisi@example.com"></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="importUsers()">📥 导入用户</button>
+                        <button class="btn btn-secondary" onclick="clearImport()">🗑️ 清空</button>
+                    </div>
+                    <div id="import-result"></div>
+                </div>
+
+                <div class="card">
+                    <h2>📤 导出数据</h2>
+                    <div class="alert alert-info">
+                        <strong>导出说明：</strong>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li><strong>用户 CSV</strong>: 导出所有用户基本信息</li>
+                            <li><strong>演练报告</strong>: 导出 Markdown 格式的安全演练报告</li>
+                            <li><strong>审计包</strong>: 导出完整的 JSON 格式审计数据包</li>
+                        </ul>
+                    </div>
+                    <div class="btn-group" style="flex-direction: column;">
+                        <button class="btn btn-secondary" onclick="exportUsersCsv()">👥 导出用户 CSV</button>
+                        <button class="btn btn-primary" onclick="exportReport()">📄 导出 Markdown 报告</button>
+                        <button class="btn btn-success" onclick="exportAuditPackage()">📦 导出 JSON 审计包</button>
+                    </div>
+                </div>
+
+                <div class="card full-width-card">
+                    <h2>🧪 加载示例数据</h2>
+                    <div class="alert alert-warning">
+                        <strong>注意：</strong>这将创建示例用户、凭证和审计日志，用于演示和测试。
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" onclick="loadSampleData()">🧪 加载示例演练数据</button>
+                    </div>
+                    <div id="sample-result"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">详情</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

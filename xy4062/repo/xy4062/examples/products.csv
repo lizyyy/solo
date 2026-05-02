@@ -1,0 +1,9 @@
+product_id,product_name,specific_heat,density,default_target_temp,max_precool_time,heat_transfer_coeff,respiration_rate,notes
+APPLE_FUJI,红富士苹果,3.65,500,0,120,12.0,0.005,新鲜苹果，呼吸热较低
+APPLE_GALA,嘎啦苹果,3.65,480,2,90,12.0,0.006,嘎啦苹果目标温度稍高
+ORANGE_NAVEL,脐橙,3.75,550,5,90,10.0,0.008,柑橘类，呼吸热较高
+GRAPE_RED,红提葡萄,3.60,520,0,60,15.0,0.010,葡萄，需快速预冷
+STRAWBERRY,草莓,3.80,400,2,30,18.0,0.020,草莓，呼吸热高，预冷时间短
+BROCCOLI,西兰花,3.90,450,0,45,16.0,0.015,西兰花，呼吸热较高
+CHICKEN_FROZEN,冻鸡肉,2.10,900,-18,60,8.0,0.0,冷冻肉品，比热容较低
+PORK_FRESH,冷鲜猪肉,3.50,1050,0,90,10.0,0.003,冷鲜肉，有轻微呼吸热

@@ -1,0 +1,150 @@
+# 剧院演出票档与退改规则配置
+
+# 票档配置
+ticket_categories:
+  VIP:
+    name: VIP 票
+    price: 280.0
+    description: 中央区域最佳观演位置
+    refund_allowed: true
+    exchange_allowed: true
+    refund_fee_rate: 0.0
+    exchange_fee_rate: 0.0
+    sections:
+      - A区
+  
+  Standard:
+    name: 标准票
+    price: 180.0
+    description: 侧区标准座位
+    refund_allowed: true
+    exchange_allowed: true
+    refund_fee_rate: 0.05
+    exchange_fee_rate: 0.0
+    sections:
+      - B区
+  
+  Economy:
+    name: 经济票
+    price: 120.0
+    description: 后区经济座位
+    refund_allowed: true
+    exchange_allowed: true
+    refund_fee_rate: 0.10
+    exchange_fee_rate: 0.0
+    sections:
+      - C区
+  
+  Accessible:
+    name: 无障碍票
+    price: 180.0
+    description: 无障碍专用座位
+    refund_allowed: true
+    exchange_allowed: true
+    refund_fee_rate: 0.0
+    exchange_fee_rate: 0.0
+    sections:
+      - 无障碍区
+
+# 退票规则
+refund_rules:
+  enabled: true
+  
+  # 退票截止时间（开演前多少分钟内禁止退票）
+  deadline_minutes: 60
+  deadline_hours: 0
+  
+  # 分级手续费规则（按距离开演时间）
+  # 注意：规则按时间从长到短匹配
+  tiered_fees:
+    # 7天以上退票：免手续费
+    - threshold_hours: 168
+      threshold_minutes: 0
+      fee_rate: 0.0
+      fee_amount: 0.0
+    
+    # 3-7天退票：5%手续费
+    - threshold_hours: 72
+      threshold_minutes: 0
+      fee_rate: 0.05
+      fee_amount: 0.0
+    
+    # 24-72小时退票：10%手续费
+    - threshold_hours: 24
+      threshold_minutes: 0
+      fee_rate: 0.10
+      fee_amount: 0.0
+    
+    # 1-24小时退票：20%手续费
+    - threshold_hours: 1
+      threshold_minutes: 0
+      fee_rate: 0.20
+      fee_amount: 0.0
+  
+  # 默认手续费率（当以上规则都不匹配时）
+  default_fee_rate: 0.30
+  
+  # 禁止退票的原因列表
+  forbidden_reasons:
+    - 演出已开始
+    - 超过退票截止时间
+    - 特殊场次不支持退票
+
+# 换座规则
+exchange_rules:
+  enabled: true
+  
+  # 换座截止时间（开演前多少分钟内禁止换座）
+  deadline_minutes: 30
+  deadline_hours: 0
+  
+  # 是否允许跨区域换座
+  allow_cross_section: true
+  
+  # 是否允许跨票档换座
+  allow_cross_category: true
+  
+  # 价格差异处理策略
+  # customer_pays: 客户补差价
+  # theatre_absorbs: 剧院承担
+  # split: 双方分担
+  price_difference_policy: customer_pays
+  
+  # 换座手续费（如果有）
+  exchange_fee_rate: 0.0
+  exchange_fee_amount: 0.0
+  
+  # 禁止换座的原因列表
+  forbidden_reasons:
+    - 演出已开始
+    - 超过换座截止时间
+    - 目标座位已售出
+    - 特殊场次不支持换座
+
+# 通用规则
+general_rules:
+  # 连座保护：换座时尽量保持连座不被拆分
+  consecutive_seats_protection: true
+  
+  # 无障碍座位使用限制
+  accessible_seat_restrictions:
+    # 是否需要确认客户需求
+    require_confirmation: true
+    # 是否允许从无障碍座换到普通座
+    allow_accessible_to_regular: true
+    # 是否允许从普通座换到无障碍座
+    allow_regular_to_accessible: true
+  
+  # 重复订单处理
+  duplicate_order_handling:
+    # 是否自动合并重复订单
+    auto_merge: false
+    # 是否需要人工审核
+    require_review: true
+  
+  # 价格补差规则
+  price_adjustment:
+    # 升级换座：客户需补差价
+    upgrade: customer_pays
+    # 降级换座：退还客户差价
+    downgrade: refund_customer

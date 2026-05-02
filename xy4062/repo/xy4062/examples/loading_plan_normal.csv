@@ -1,0 +1,4 @@
+plan_id,plan_name,vehicle_id,ambient_temp,total_precool_time,door_open_duration,batch_id,product_id,product_name,volume,mass,initial_temp,target_temp,arrival_time,deadline_time,notes
+PLAN_NORMAL_001,正常配送示例,REF_001,28.0,90,15,B001,APPLE_FUJI,红富士苹果,2.5,1250,12.0,0.0,0,70,第一批到货
+PLAN_NORMAL_001,正常配送示例,REF_001,28.0,90,15,B002,ORANGE_NAVEL,脐橙,2.0,1100,15.0,5.0,10,80,第二批到货
+PLAN_NORMAL_001,正常配送示例,REF_001,28.0,90,15,B003,GRAPE_RED,红提葡萄,1.5,780,10.0,0.0,20,60,第三批，需快速预冷

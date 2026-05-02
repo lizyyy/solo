@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电池日志分析报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #34495e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h4 {
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .severity-critical { background-color: #fff5f5; border-left: 4px solid #e74c3c; }
+        .severity-high { background-color: #fffbf5; border-left: 4px solid #e67e22; }
+        .severity-medium { background-color: #fffef5; border-left: 4px solid #f1c40f; }
+        .severity-low { background-color: #f5fff5; border-left: 4px solid #2ecc71; }
+        .anomaly-box {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .anomaly-box h4 { margin-top: 0; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        .badge-charge { background: #d4edda; color: #155724; }
+        .badge-discharge { background: #f8d7da; color: #721c24; }
+        .badge-idle { background: #e2e3e5; color: #383d41; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card.charge {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        .summary-card.discharge {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+        .summary-card.metrics {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .summary-card-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .summary-card-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .status-ok {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        .chart-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .chart-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .ascii-chart {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            overflow-x: auto;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>电池日志分析报告</h1>
+        <div class="meta">
+            <strong>生成时间:</strong> 2026-05-02 01:01:01<br>
+            <strong>源文件:</strong> with_anomalies.csv
+        </div>
+<h2>1. 摘要</h2>
+        <div class="summary-grid">
+            <div class="summary-card metrics">
+                <div class="summary-card-label">数据点数</div>
+                <div class="summary-card-value">52</div>
+                <div class="summary-card-label">总时长</div>
+                <div class="summary-card-value">51.0 秒</div>
+            </div>
+
+            <div class="summary-card charge">
+                <div class="summary-card-label">充电容量</div>
+                <div class="summary-card-value">2.3 mAh</div>
+                <div class="summary-card-label">充电能量</div>
+                <div class="summary-card-value">0.009 Wh</div>
+            </div>
+
+            <div class="summary-card discharge">
+                <div class="summary-card-label">放电容量</div>
+                <div class="summary-card-value">4.4 mAh</div>
+                <div class="summary-card-label">放电能量</div>
+                <div class="summary-card-value">0.016 Wh</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-card-label">充放电效率</div>
+                <div class="summary-card-value">194.3%</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-card-label">估算内阻</div>
+                <div class="summary-card-value">87.79 mΩ</div>
+            </div>
+</div>
+        <h3>详细指标</h3>
+        <table>
+            <tr><th>指标</th><th>数值</th></tr>
+            <tr><td>平均电流</td><td>-159.81 mA</td></tr>
+            <tr><td>平均电压</td><td>3.699 V</td></tr>
+            <tr><td>起始电压</td><td>3.600 V</td></tr>
+            <tr><td>终止电压</td><td>2.000 V</td></tr>
+        </table>
+<h2>2. 异常检测</h2>
+        <table>
+            <tr><th>严重程度</th><th>数量</th></tr>
+            <tr><td>🔴 严重</td><td>0</td></tr>
+            <tr><td>🟠 高</td><td>5</td></tr>
+            <tr><td>🟡 中</td><td>2</td></tr>
+            <tr><td>🟢 低</td><td>0</td></tr>
+            <tr><th>总计</th><th>7</th></tr>
+        </table>
+<h3>异常清单</h3>
+        <div class="anomaly-box severity-medium">
+            <h4>异常 #1: 电流尖峰</h4>
+            <p><strong>严重程度:</strong> 中</p>
+            <p><strong>位置:</strong> 第 5 行 (时间: 4.00s)</p>
+            <p><strong>描述:</strong> 电流尖峰: 2500.0mA (基线: 500.0mA, 差值: 2000.0mA)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>current_spike: 2500.000000</li>
+                <li>baseline: 500.000000</li>
+                <li>delta: 2000.000000</li>
+                <li>window_size: 3</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-medium">
+            <h4>异常 #2: 电压停滞</h4>
+            <p><strong>严重程度:</strong> 中</p>
+            <p><strong>位置:</strong> 第 14 行 (时间: 13.00s)</p>
+            <p><strong>描述:</strong> 电压停滞: 从行 14 开始, 持续 17.0s (18个点), 电压变化 0.0080V</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>start_row: 13</li>
+                <li>end_row: 30</li>
+                <li>duration_points: 18</li>
+                <li>duration_seconds: 17.000000</li>
+                <li>voltage_range: 0.008000</li>
+                <li>start_voltage: 3.865000</li>
+                <li>end_voltage: 3.873000</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-high">
+            <h4>异常 #3: 电压低于下限</h4>
+            <p><strong>严重程度:</strong> 高</p>
+            <p><strong>位置:</strong> 第 48 行 (时间: 47.00s)</p>
+            <p><strong>描述:</strong> 电压低于下限: 2.400V (阈值: 2.50V)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>voltage: 2.400000</li>
+                <li>threshold: 2.500000</li>
+                <li>delta: 0.100000</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-high">
+            <h4>异常 #4: 电压低于下限</h4>
+            <p><strong>严重程度:</strong> 高</p>
+            <p><strong>位置:</strong> 第 49 行 (时间: 48.00s)</p>
+            <p><strong>描述:</strong> 电压低于下限: 2.300V (阈值: 2.50V)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>voltage: 2.300000</li>
+                <li>threshold: 2.500000</li>
+                <li>delta: 0.200000</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-high">
+            <h4>异常 #5: 电压低于下限</h4>
+            <p><strong>严重程度:</strong> 高</p>
+            <p><strong>位置:</strong> 第 50 行 (时间: 49.00s)</p>
+            <p><strong>描述:</strong> 电压低于下限: 2.200V (阈值: 2.50V)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>voltage: 2.200000</li>
+                <li>threshold: 2.500000</li>
+                <li>delta: 0.300000</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-high">
+            <h4>异常 #6: 电压低于下限</h4>
+            <p><strong>严重程度:</strong> 高</p>
+            <p><strong>位置:</strong> 第 51 行 (时间: 50.00s)</p>
+            <p><strong>描述:</strong> 电压低于下限: 2.100V (阈值: 2.50V)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>voltage: 2.100000</li>
+                <li>threshold: 2.500000</li>
+                <li>delta: 0.400000</li>
+            </ul>
+        </div>
+
+        <div class="anomaly-box severity-high">
+            <h4>异常 #7: 电压低于下限</h4>
+            <p><strong>严重程度:</strong> 高</p>
+            <p><strong>位置:</strong> 第 52 行 (时间: 51.00s)</p>
+            <p><strong>描述:</strong> 电压低于下限: 2.000V (阈值: 2.50V)</p>
+            <p><strong>详情:</strong></p>
+            <ul>
+                <li>voltage: 2.000000</li>
+                <li>threshold: 2.500000</li>
+                <li>delta: 0.500000</li>
+            </ul>
+        </div>
+<h2>3. 分段分析</h2>
+        <h3>分段列表</h3>
+        <table>
+            <tr>
+                <th>段号</th>
+                <th>类型</th>
+                <th>起始行</th>
+                <th>结束行</th>
+                <th>时长</th>
+                <th>容量</th>
+                <th>能量</th>
+                <th>起始电压</th>
+                <th>终止电压</th>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td><span class="badge badge-charge">充电</span></td>
+                <td>1</td>
+                <td>17</td>
+                <td>16.0 秒</td>
+                <td>2.29 mAh</td>
+                <td>0.009 Wh</td>
+                <td>3.600 V</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td><span class="badge badge-idle">静置</span></td>
+                <td>18</td>
+                <td>24</td>
+                <td>6.0 秒</td>
+                <td>0.00 mAh</td>
+                <td>0.000 Wh</td>
+                <td>3.873 V</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td><span class="badge badge-idle">静置</span></td>
+                <td>25</td>
+                <td>31</td>
+                <td>6.0 秒</td>
+                <td>0.00 mAh</td>
+                <td>0.000 Wh</td>
+                <td>3.873 V</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td><span class="badge badge-discharge">放电</span></td>
+                <td>32</td>
+                <td>52</td>
+                <td>20.0 秒</td>
+                <td>4.44 mAh</td>
+                <td>0.016 Wh</td>
+                <td>4.100 V</td>
+                <td>2.000 V</td>
+            </tr>
+        </table>
+<h3>内阻估算详情</h3>
+<h4>段 1 (充电)</h4>
+
+                <table>
+                    <tr>
+                        <th>行号</th>
+                        <th>时间</th>
+                        <th>电流变化</th>
+                        <th>电压变化</th>
+                        <th>估算内阻</th>
+                        <th>置信度</th>
+                    </tr>
+
+                    <tr>
+                        <td>4</td>
+                        <td>3.0s</td>
+                        <td>+667 mA</td>
+                        <td>+0.0600 V</td>
+                        <td>90.00 mΩ</td>
+                        <td>⭐⭐ medium</td>
+                    </tr>
+
+                    <tr>
+                        <td>5</td>
+                        <td>4.0s</td>
+                        <td>+667 mA</td>
+                        <td>+0.0583 V</td>
+                        <td>87.50 mΩ</td>
+                        <td>⭐⭐ medium</td>
+                    </tr>
+
+                    <tr>
+                        <td>6</td>
+                        <td>5.0s</td>
+                        <td>-667 mA</td>
+                        <td>+0.0550 V</td>
+                        <td>82.50 mΩ</td>
+                        <td>⭐⭐ medium</td>
+                    </tr>
+
+                    <tr>
+                        <td>7</td>
+                        <td>6.0s</td>
+                        <td>-667 mA</td>
+                        <td>+0.0500 V</td>
+                        <td>75.00 mΩ</td>
+                        <td>⭐⭐ medium</td>
+                    </tr>
+
+                    <tr>
+                        <td>8</td>
+                        <td>7.0s</td>
+                        <td>-673 mA</td>
+                        <td>+0.0700 V</td>
+                        <td>103.96 mΩ</td>
+                        <td>⭐⭐ medium</td>
+                    </tr>
+                </table>
+<h2>4. 曲线数据预览</h2><p>数据采样 (每 1 点采样一个)</p>
+        <table>
+            <tr><th>行号</th><th>时间</th><th>电流</th><th>电压</th></tr>
+
+            <tr>
+                <td>1</td>
+                <td>0.0s</td>
+                <td>500.0 mA</td>
+                <td>3.600 V</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>1.0s</td>
+                <td>500.0 mA</td>
+                <td>3.620 V</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>2.0s</td>
+                <td>500.0 mA</td>
+                <td>3.640 V</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>3.0s</td>
+                <td>500.0 mA</td>
+                <td>3.660 V</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>4.0s</td>
+                <td>2500.0 mA</td>
+                <td>3.680 V</td>
+            </tr>
+
+            <tr>
+                <td>6</td>
+                <td>5.0s</td>
+                <td>500.0 mA</td>
+                <td>3.700 V</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td>6.0s</td>
+                <td>500.0 mA</td>
+                <td>3.715 V</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td>7.0s</td>
+                <td>500.0 mA</td>
+                <td>3.730 V</td>
+            </tr>
+
+            <tr>
+                <td>9</td>
+                <td>8.0s</td>
+                <td>500.0 mA</td>
+                <td>3.745 V</td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td>9.0s</td>
+                <td>480.0 mA</td>
+                <td>3.830 V</td>
+            </tr>
+
+            <tr>
+                <td>11</td>
+                <td>10.0s</td>
+                <td>450.0 mA</td>
+                <td>3.840 V</td>
+            </tr>
+
+            <tr>
+                <td>12</td>
+                <td>11.0s</td>
+                <td>400.0 mA</td>
+                <td>3.850 V</td>
+            </tr>
+
+            <tr>
+                <td>13</td>
+                <td>12.0s</td>
+                <td>300.0 mA</td>
+                <td>3.860 V</td>
+            </tr>
+
+            <tr>
+                <td>14</td>
+                <td>13.0s</td>
+                <td>200.0 mA</td>
+                <td>3.865 V</td>
+            </tr>
+
+            <tr>
+                <td>15</td>
+                <td>14.0s</td>
+                <td>100.0 mA</td>
+                <td>3.870 V</td>
+            </tr>
+
+            <tr>
+                <td>16</td>
+                <td>15.0s</td>
+                <td>50.0 mA</td>
+                <td>3.872 V</td>
+            </tr>
+
+            <tr>
+                <td>17</td>
+                <td>16.0s</td>
+                <td>10.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>18</td>
+                <td>17.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>19</td>
+                <td>18.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>20</td>
+                <td>19.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>21</td>
+                <td>20.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>22</td>
+                <td>21.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>23</td>
+                <td>22.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>24</td>
+                <td>23.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>25</td>
+                <td>24.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>26</td>
+                <td>25.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>27</td>
+                <td>26.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>28</td>
+                <td>27.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>29</td>
+                <td>28.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>30</td>
+                <td>29.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>31</td>
+                <td>30.0s</td>
+                <td>0.0 mA</td>
+                <td>3.873 V</td>
+            </tr>
+
+            <tr>
+                <td>32</td>
+                <td>31.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.100 V</td>
+            </tr>
+
+            <tr>
+                <td>33</td>
+                <td>32.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.080 V</td>
+            </tr>
+
+            <tr>
+                <td>34</td>
+                <td>33.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.060 V</td>
+            </tr>
+
+            <tr>
+                <td>35</td>
+                <td>34.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.040 V</td>
+            </tr>
+
+            <tr>
+                <td>36</td>
+                <td>35.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.020 V</td>
+            </tr>
+
+            <tr>
+                <td>37</td>
+                <td>36.0s</td>
+                <td>-800.0 mA</td>
+                <td>4.000 V</td>
+            </tr>
+
+            <tr>
+                <td>38</td>
+                <td>37.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.980 V</td>
+            </tr>
+
+            <tr>
+                <td>39</td>
+                <td>38.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.960 V</td>
+            </tr>
+
+            <tr>
+                <td>40</td>
+                <td>39.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.940 V</td>
+            </tr>
+
+            <tr>
+                <td>41</td>
+                <td>40.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.920 V</td>
+            </tr>
+
+            <tr>
+                <td>42</td>
+                <td>41.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.900 V</td>
+            </tr>
+
+            <tr>
+                <td>43</td>
+                <td>42.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.880 V</td>
+            </tr>
+
+            <tr>
+                <td>44</td>
+                <td>43.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.860 V</td>
+            </tr>
+
+            <tr>
+                <td>45</td>
+                <td>44.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.840 V</td>
+            </tr>
+
+            <tr>
+                <td>46</td>
+                <td>45.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.820 V</td>
+            </tr>
+
+            <tr>
+                <td>47</td>
+                <td>46.0s</td>
+                <td>-800.0 mA</td>
+                <td>3.800 V</td>
+            </tr>
+
+            <tr>
+                <td>48</td>
+                <td>47.0s</td>
+                <td>-800.0 mA</td>
+                <td>2.400 V</td>
+            </tr>
+
+            <tr>
+                <td>49</td>
+                <td>48.0s</td>
+                <td>-800.0 mA</td>
+                <td>2.300 V</td>
+            </tr>
+
+            <tr>
+                <td>50</td>
+                <td>49.0s</td>
+                <td>-800.0 mA</td>
+                <td>2.200 V</td>
+            </tr>
+
+            <tr>
+                <td>51</td>
+                <td>50.0s</td>
+                <td>-800.0 mA</td>
+                <td>2.100 V</td>
+            </tr>
+
+            <tr>
+                <td>52</td>
+                <td>51.0s</td>
+                <td>-800.0 mA</td>
+                <td>2.000 V</td>
+            </tr>
+        </table>
+<h3>数据范围</h3>
+            <table>
+                <tr><th>指标</th><th>最小值</th><th>最大值</th><th>范围</th></tr>
+                <tr><td>电流</td><td>-800.0 mA</td><td>2500.0 mA</td><td>3300.0 mA</td></tr>
+                <tr><td>电压</td><td>2.000 V</td><td>4.100 V</td><td>2.100 V</td></tr>
+            </table>
+
+        <div class="chart-container">
+            <div class="chart-title">电压/电流趋势 (ASCII 图)</div>
+            <pre class="ascii-chart">
+4.10V │    ●                          ■·······             
+│         ·······················■■■■■■■·······      
+│    ·····■■■■■■■■■■■■■■■■■■■■■■ ·······■■■■■■■·     
+│····■■■■■······················        ·······■     
+│■■■■·····                                     ·     
+│····                                                
+│                                                    
+│                                                    
+3.05V │                                                    
+│                                                    
+│●●●● ●●●●●●●●                                       
+│             ●●                                     
+│               ●●●●●●●●●●●●●●●●                ··   
+│                                               ■■·  
+│                                               ··■··
+2.00V │                               ●●●●●●●●●●●●●●●●●●◆◆◆
+        └────────────────────────────────────────────────────
+        电压 ■  电流 ●  交点 ◆  样本数: 52
+            </pre>
+        </div>
+
+        <div class="footer">
+            此报告由 <strong>battery-log-lab</strong> 生成
+        </div>
+    </div>
+</body>
+</html>

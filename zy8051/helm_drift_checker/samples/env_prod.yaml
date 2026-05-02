@@ -1,0 +1,4 @@
+replicaCount: 5
+resources:
+  limits:
+    cpu: 4

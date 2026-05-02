@@ -1,0 +1,24 @@
+{
+  "name": "homestay-task-manager",
+  "version": "1.0.0",
+  "description": "民宿房态交接和异常追踪系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "homestay",
+    "task",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.5",
+    "cors": "^2.8.6",
+    "csv-parser": "^3.2.0",
+    "express": "^4.22.1",
+    "uuid": "^9.0.1"
+  }
+}

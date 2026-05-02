@@ -1,0 +1,62 @@
+materials:
+  氧化锆:
+    supported_restorations:
+      - 全瓷冠
+      - 贴面
+    supported_teeth:
+      - 11
+      - 12
+      - 13
+      - 21
+      - 22
+      - 23
+      - 31
+      - 32
+      - 33
+      - 41
+      - 42
+      - 43
+  钴铬合金:
+    supported_restorations:
+      - 金属烤瓷
+      - 金属冠
+    supported_teeth:
+      - 14
+      - 15
+      - 16
+      - 17
+      - 24
+      - 25
+      - 26
+      - 27
+      - 34
+      - 35
+      - 36
+      - 37
+      - 44
+      - 45
+      - 46
+      - 47
+  金合金:
+    supported_restorations:
+      - 嵌体
+      - 高嵌体
+      - 金属冠
+    supported_teeth:
+      - 14
+      - 15
+      - 16
+      - 24
+      - 25
+      - 26
+      - 34
+      - 35
+      - 36
+      - 44
+      - 45
+      - 46
+  树脂:
+    supported_restorations:
+      - 贴面
+      - 充填
+    supported_teeth: []

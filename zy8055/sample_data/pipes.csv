@@ -1,0 +1,11 @@
+pipe_id,from_node,to_node,diameter,length,material,island
+P1,N1,N2,300,500,steel,false
+P2,N2,N3,300,400,steel,false
+P3,N3,N4,250,400,steel,false
+P4,N4,N5,250,300,steel,false
+P5,N2,N6,200,300,steel,false
+P6,N6,N7,200,250,steel,false
+P7,N7,N8,150,200,steel,false
+P8,N5,N9,200,300,steel,false
+P9,N9,N10,150,250,steel,false
+P10,N3,N7,200,350,steel,false

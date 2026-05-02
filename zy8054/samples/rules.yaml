@@ -1,0 +1,19 @@
+rules:
+  - name: "Critical Defect"
+    max_depth: 50.0
+    max_length: 100.0
+    amplitude_threshold: 80.0
+    severity_level: 3
+    unit: mm
+  - name: "Major Defect"
+    max_depth: 50.0
+    max_length: 50.0
+    amplitude_threshold: 50.0
+    severity_level: 2
+    unit: mm
+  - name: "Minor Defect"
+    max_depth: 50.0
+    max_length: 20.0
+    amplitude_threshold: 20.0
+    severity_level: 1
+    unit: mm

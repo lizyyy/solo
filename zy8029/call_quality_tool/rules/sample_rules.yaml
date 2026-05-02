@@ -1,0 +1,28 @@
+rules:
+  - name: 开场白缺失
+    type: opening_missing
+    severity: medium
+    description: 坐席未在通话开始时说开场白（您好等）
+    enabled: true
+
+  - name: 承诺时效矛盾
+    type: promise_timing_conflict
+    severity: high
+    description: 坐席承诺的时效存在矛盾
+    conflict_pairs:
+      - [time, later]
+      - [soon, later]
+    enabled: true
+
+  - name: 敏感词命中
+    type: sensitive_word
+    severity: critical
+    description: 坐席话语命中敏感词
+    enabled: true
+
+  - name: 长时间静默
+    type: long_silence
+    severity: medium
+    description: 通话过程中存在长时间静默
+    threshold: 30
+    enabled: true

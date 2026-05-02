@@ -1,0 +1,81 @@
+{
+  "engineer": {
+    "id": "ENG001",
+    "name": "张三",
+    "employee_id": "E2024001",
+    "phone": "13800138001",
+    "department": "维修一部"
+  },
+  "work_orders": [
+    {
+      "ticket_number": "WO-2024-001",
+      "device_id": "DEV-SRV-001",
+      "device_name": "主服务器-01",
+      "device_location": "地下机房A区-U08",
+      "status": "in_progress",
+      "priority": "high",
+      "issue_description": "服务器无法启动，电源指示灯闪烁",
+      "inspection_results": "检查发现电源模块故障，已初步诊断为电源供应问题",
+      "solution_taken": "临时更换备用电源模块进行测试",
+      "temporary_measures": "已使用备用电源临时支撑系统，建议尽快更换原装电源",
+      "photos": [
+        {
+          "filename": "IMG_20240501_093001.jpg",
+          "photo_type": "fault",
+          "description": "电源指示灯闪烁状态",
+          "capture_time": "2024-05-01 09:30:00"
+        },
+        {
+          "filename": "IMG_20240501_094502.jpg",
+          "photo_type": "inspection",
+          "description": "电源模块内部检查",
+          "capture_time": "2024-05-01 09:45:00"
+        }
+      ],
+      "spare_parts": [
+        {
+          "part_number": "SP-PSU-001",
+          "part_name": "服务器电源模块 750W",
+          "quantity": 1,
+          "unit_price": 1200.00,
+          "used_at": "2024-05-01 10:00:00"
+        }
+      ],
+      "start_time": "2024-05-01 09:00:00",
+      "created_at": "2024-05-01 09:00:00",
+      "updated_at": "2024-05-01 11:30:00"
+    },
+    {
+      "ticket_number": "WO-2024-002",
+      "device_id": "DEV-SW-001",
+      "device_name": "核心交换机-01",
+      "device_location": "地下机房A区-U02",
+      "status": "completed",
+      "priority": "critical",
+      "issue_description": "交换机端口故障，部分服务器断网",
+      "inspection_results": "端口4-8出现故障，检测到端口模块损坏",
+      "solution_taken": "更换SFP光模块，端口已恢复正常",
+      "photos": [
+        {
+          "filename": "IMG_20240501_140001.jpg",
+          "photo_type": "fault",
+          "description": "故障端口指示灯状态",
+          "capture_time": "2024-05-01 14:00:00"
+        }
+      ],
+      "spare_parts": [
+        {
+          "part_number": "SP-SFP-001",
+          "part_name": "SFP+ 光模块 10G",
+          "quantity": 2,
+          "unit_price": 850.00,
+          "used_at": "2024-05-01 14:30:00"
+        }
+      ],
+      "start_time": "2024-05-01 13:30:00",
+      "end_time": "2024-05-01 15:00:00",
+      "created_at": "2024-05-01 13:30:00",
+      "updated_at": "2024-05-01 15:00:00"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+    "stations": [
+        {"station_id": "ST001", "name": "人民广场", "line": "L1"},
+        {"station_id": "ST002", "name": "南京东路", "line": "L1"},
+        {"station_id": "ST003", "name": "静安寺", "line": "L2"},
+        {"station_id": "ST004", "name": "徐家汇", "line": "L2"},
+        {"station_id": "ST005", "name": "陆家嘴", "line": "L3"},
+        {"station_id": "ST006", "name": "浦东机场", "line": "L3"}
+    ],
+    "edges": [
+        {"from": "ST001", "to": "ST002", "distance": 2000},
+        {"from": "ST001", "to": "ST003", "distance": 3000},
+        {"from": "ST002", "to": "ST003", "distance": 2500},
+        {"from": "ST003", "to": "ST004", "distance": 4000},
+        {"from": "ST001", "to": "ST005", "distance": 5000},
+        {"from": "ST005", "to": "ST006", "distance": 30000}
+    ]
+}

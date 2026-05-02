@@ -1,0 +1,55 @@
+{
+  "example.com": {
+    "TXT": [
+      "v=spf1 include:_spf.google.com include:mailgun.org include:sendgrid.net include:spf.protection.outlook.com -all",
+      "v=spf1 include:loop-a.com include:loop-b.com -all",
+      "v=DMARC1; p=none; rua=mailto:dmarc@example.com"
+    ]
+  },
+  "_spf.google.com": {
+    "TXT": [
+      "v=spf1 include:_netblocks.google.com include:_netblocks2.google.com include:_netblocks3.google.com ~all"
+    ]
+  },
+  "_netblocks.google.com": {
+    "TXT": ["v=spf1 ip4:35.190.248.0/22 ip4:64.233.160.0/19 ~all"]
+  },
+  "mailgun.org": {
+    "TXT": ["v=spf1 include:mailgun.org include:mailgun.net ~all"]
+  },
+  "loop-a.com": {
+    "TXT": ["v=spf1 include:loop-b.com ~all"]
+  },
+  "loop-b.com": {
+    "TXT": ["v=spf1 include:loop-a.com ~all"]
+  },
+  "selector1._domainkey.example.com": {
+    "TXT": ["v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."]
+  },
+  "_dmarc.example.com": {
+    "TXT": ["v=DMARC1; p=none; rua=mailto:dmarc-reports@example.com"]
+  },
+  "test-domain.com": {
+    "TXT": [
+      "v=spf1 include:spf.protection.outlook.com -all",
+      "google-site-verification=abc123"
+    ]
+  },
+  "default._domainkey.test-domain.com": {
+    "TXT": ["v=DKIM1; k=rsa; p=..."]
+  },
+  "_dmarc.test-domain.com": {
+    "TXT": ["v=DMARC1; p=quarantine; rua=mailto:dmarc@test-domain.com"]
+  },
+  "good-domain.com": {
+    "TXT": [
+      "v=spf1 include:_spf.google.com include:sendgrid.net -all"
+    ]
+  },
+  "mail._domainkey.good-domain.com": {
+    "TXT": ["v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."]
+  },
+  "_dmarc.good-domain.com": {
+    "TXT": ["v=DMARC1; p=reject; rua=mailto:dmarc@good-domain.com"]
+  }
+}

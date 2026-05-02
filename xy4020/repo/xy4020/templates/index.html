@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}AlkCalc - 首页{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1><i class="fa fa-flask"></i> AlkCalc</h1>
+            <p class="lead">水质碱度滴定计算工具</p>
+            <p>为野外水质采样小组设计的专业碱度分析工具</p>
+        </div>
+    </div>
+
+    <!-- 功能卡片 -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-4">
+            <a href="{{ url_for('calculate') }}" class="text-decoration-none">
+                <div class="feature-card">
+                    <div class="feature-icon primary">
+                        <i class="fa fa-calculator"></i>
+                    </div>
+                    <h5>开始计算</h5>
+                    <p class="text-muted small mb-0">上传样品清单和滴定数据，执行Gran法计算</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <a href="{{ url_for('history') }}" class="text-decoration-none">
+                <div class="feature-card">
+                    <div class="feature-icon success">
+                        <i class="fa fa-history"></i>
+                    </div>
+                    <h5>历史记录</h5>
+                    <p class="text-muted small mb-0">查看和管理所有计算批次的历史记录</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <a href="{{ url_for('config_page') }}" class="text-decoration-none">
+                <div class="feature-card">
+                    <div class="feature-icon warning">
+                        <i class="fa fa-sliders"></i>
+                    </div>
+                    <h5>参数配置</h5>
+                    <p class="text-muted small mb-0">设置标准液浓度、质控阈值等参数</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="feature-card">
+                <div class="feature-icon info">
+                    <i class="fa fa-book"></i>
+                </div>
+                <h5>使用说明</h5>
+                <p class="text-muted small mb-0">了解Gran法计算原理和质控规则</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近的计算批次 -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fa fa-clock-o"></i> 最近的计算批次</h5>
+            <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-primary">
+                查看全部 <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="card-body">
+            {% if batches %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>批次ID</th>
+                                <th>批次名称</th>
+                                <th>创建时间</th>
+                                <th>标准液浓度</th>
+                                <th>质控状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in batches[:5] %}
+                                <tr>
+                                    <td><strong>#{{ batch.batch_id }}</strong></td>
+                                    <td>{{ batch.batch_name }}</td>
+                                    <td>{{ batch.created_at|datetime_format('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ "%.4f"|format(batch.standard_concentration_mol_l) }} mol/L</td>
+                                    <td>
+                                        {{ batch.overall_qc_status|status_badge|safe }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('view_result', batch_id=batch.batch_id) }}" 
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fa fa-eye"></i> 查看
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fa fa-inbox fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">暂无计算记录</h5>
+                    <p class="text-muted">上传您的第一个样品清单和滴定数据开始计算</p>
+                    <a href="{{ url_for('calculate') }}" class="btn btn-primary mt-2">
+                        <i class="fa fa-calculator"></i> 开始计算
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 系统信息 -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fa fa-info-circle"></i> 系统信息</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted" style="width: 40%;">当前项目:</td>
+                            <td><strong>{{ config.project_name if config else '未设置' }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">标准液浓度:</td>
+                            <td>
+                                {% if config and config.standard_solution and config.standard_solution.concentration_mol_l %}
+                                    <span class="badge bg-success">
+                                        {{ "%.4f"|format(config.standard_solution.concentration_mol_l) }} mol/L
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">未设置</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">质控阈值:</td>
+                            <td>
+                                <small class="text-muted">
+                                    RPD: {{ config.qc_thresholds.duplicate_rpd_limit if config else 10 }}%,
+                                    最小读数: {{ config.qc_thresholds.min_readings if config else 5 }}点
+                                </small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">当前时间:</td>
+                            <td><small>{{ now }}</small></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fa fa-lightbulb-o"></i> 快速入门</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary me-2">1</span>
+                            <strong>准备数据文件</strong>
+                        </div>
+                        <p class="text-muted small mb-0 ms-4">
+                            准备样品清单CSV和滴定读数CSV文件
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary me-2">2</span>
+                            <strong>上传并计算</strong>
+                        </div>
+                        <p class="text-muted small mb-0 ms-4">
+                            在计算页面上传文件，系统自动执行Gran法计算
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary me-2">3</span>
+                            <strong>查看结果</strong>
+                        </div>
+                        <p class="text-muted small mb-0 ms-4">
+                            查看碱度计算结果和质控状态，下载报告
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

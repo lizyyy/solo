@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "exhibitionName": "古代文明特展 - 示例配置",
+  "exhibitionDate": "2026-06-01",
+  "venue": "城市博物馆一层展厅",
+  "floor": {
+    "width": 20,
+    "depth": 15,
+    "height": 0.1
+  },
+  "elements": [
+    {
+      "id": "entrance_1",
+      "type": "entrance",
+      "name": "主入口",
+      "position": { "x": -9, "z": 0 },
+      "dimensions": { "width": 2, "depth": 2, "height": 0.1 }
+    },
+    {
+      "id": "exit_1",
+      "type": "exit",
+      "name": "主出口",
+      "position": { "x": 9, "z": 0 },
+      "dimensions": { "width": 2, "depth": 2, "height": 0.1 }
+    },
+    {
+      "id": "exhibit_1",
+      "type": "exhibit",
+      "name": "青铜器展区",
+      "position": { "x": -5, "z": -3 },
+      "dimensions": { "width": 3, "depth": 2, "height": 2 }
+    },
+    {
+      "id": "exhibit_2",
+      "type": "exhibit",
+      "name": "陶瓷展区",
+      "position": { "x": -5, "z": 3 },
+      "dimensions": { "width": 3, "depth": 2, "height": 2 }
+    },
+    {
+      "id": "exhibit_3",
+      "type": "exhibit",
+      "name": "书画展区",
+      "position": { "x": 0, "z": -5 },
+      "dimensions": { "width": 4, "depth": 1.5, "height": 2.5 }
+    },
+    {
+      "id": "exhibit_4",
+      "type": "exhibit",
+      "name": "玉器展区",
+      "position": { "x": 0, "z": 5 },
+      "dimensions": { "width": 4, "depth": 1.5, "height": 2 }
+    },
+    {
+      "id": "exhibit_5",
+      "type": "exhibit",
+      "name": "镇馆之宝",
+      "position": { "x": 5, "z": 0 },
+      "dimensions": { "width": 2.5, "depth": 2.5, "height": 3 }
+    },
+    {
+      "id": "restricted_1",
+      "type": "restricted",
+      "name": "工作区",
+      "position": { "x": -9, "z": 5 },
+      "dimensions": { "width": 2, "depth": 3, "height": 0.1 }
+    }
+  ]
+}

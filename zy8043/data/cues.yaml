@@ -1,0 +1,111 @@
+- cue_id: Q1
+  name: 开场 - 蓝紫光
+  fixture_values:
+    SPOT1:
+      Dimmer: 255
+      Red: 0
+      Green: 0
+      Blue: 200
+    SPOT2:
+      Dimmer: 255
+      Red: 100
+      Green: 0
+      Blue: 200
+    WASH1:
+      Dimmer: 180
+      Red: 50
+      Green: 0
+      Blue: 255
+    MOV1:
+      Dimmer: 0
+      Red: 0
+      Green: 0
+      Blue: 0
+      Pan: 127
+      Tilt: 127
+  fade_in: 2.0
+  fade_out: 1.0
+
+- cue_id: Q2
+  name: 表演 - 暖白光
+  fixture_values:
+    SPOT1:
+      Dimmer: 200
+      Red: 255
+      Green: 200
+      Blue: 150
+    SPOT2:
+      Dimmer: 200
+      Red: 255
+      Green: 200
+      Blue: 150
+    WASH1:
+      Dimmer: 100
+      Red: 255
+      Green: 255
+      Blue: 255
+    MOV1:
+      Dimmer: 150
+      Red: 255
+      Green: 255
+      Blue: 200
+      Pan: 64
+      Tilt: 64
+  fade_in: 1.5
+  fade_out: 0.5
+
+- cue_id: Q3
+  name: 高潮 - 多彩频闪
+  fixture_values:
+    SPOT1:
+      Dimmer: 255
+      Red: 255
+      Green: 0
+      Blue: 0
+    SPOT2:
+      Dimmer: 255
+      Red: 0
+      Green: 255
+      Blue: 0
+    WASH1:
+      Dimmer: 255
+      Red: 0
+      Green: 0
+      Blue: 255
+    MOV1:
+      Dimmer: 255
+      Red: 255
+      Green: 0
+      Blue: 255
+      Pan: 191
+      Tilt: 191
+  fade_in: 0.5
+  fade_out: 0.5
+
+- cue_id: Q4
+  name: 结束 - 暗场
+  fixture_values:
+    SPOT1:
+      Dimmer: 0
+      Red: 0
+      Green: 0
+      Blue: 0
+    SPOT2:
+      Dimmer: 0
+      Red: 0
+      Green: 0
+      Blue: 0
+    WASH1:
+      Dimmer: 0
+      Red: 0
+      Green: 0
+      Blue: 0
+    MOV1:
+      Dimmer: 0
+      Red: 0
+      Green: 0
+      Blue: 0
+      Pan: 127
+      Tilt: 127
+  fade_in: 1.0
+  fade_out: 0.0

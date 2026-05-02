@@ -1,0 +1,29 @@
+bleed:
+  width: 3
+  checkInner: true
+  checkOuter: true
+
+safeLine:
+  width: 3
+  isOuter: false
+
+colors:
+  required:
+    - C
+    - M
+    - Y
+    - K
+  optional:
+    - Gold
+    - Silver
+  cmykOnly: false
+
+check:
+  bleed: true
+  safeLine: true
+  colorLayer: true
+  overlap: true
+
+units:
+  mixed: true
+  default: mm

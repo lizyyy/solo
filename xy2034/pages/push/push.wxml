@@ -1,0 +1,75 @@
+<view class="container">
+  <!-- 顶部问候 -->
+  <view class="greeting-section card">
+    <view class="greeting-icon">🌙</view>
+    <view class="greeting-text">
+      <view class="greeting-title">深夜治愈时间</view>
+      <view class="greeting-desc text-secondary">
+        每晚10点，为你推送温暖内容，陪伴你度过难熬的夜晚
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类筛选 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list flex">
+        <view 
+          class="category-item {{selectedCategory === item ? 'category-active' : ''}}" 
+          wx:for="{{categories}}" 
+          wx:key="this"
+          bindtap="selectCategory"
+          data-category="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 推送列表 -->
+  <view class="push-list">
+    <view 
+      class="push-item card" 
+      wx:for="{{pushContents}}" 
+      wx:key="id"
+      bindtap="goToPushDetail"
+      data-id="{{item.id}}"
+    >
+      <!-- 类型标签 -->
+      <view class="push-type" style="background-color: {{item.type === '同龄人经历' ? '#ecf8f7' : item.type === '清醒文案' ? '#eef3fb' : '#fef0f0'}}; color: {{item.type === '同龄人经历' ? '#4ecdc4' : item.type === '清醒文案' ? '#6B8DD6' : '#ff6b6b'}}">
+        {{item.type === '同龄人经历' ? '👥' : item.type === '清醒文案' ? '📝' : '✨'}} {{item.type}}
+      </view>
+      
+      <!-- 每日标识 -->
+      <view class="daily-badge" wx:if="{{item.isDaily}}">
+        今日推送
+      </view>
+      
+      <!-- 标题 -->
+      <view class="push-title">{{item.title}}</view>
+      
+      <!-- 预览内容 -->
+      <view class="push-preview text-secondary">
+        {{item.content.length > 80 ? item.content.substring(0, 80) + '...' : item.content}}
+      </view>
+      
+      <!-- 底部信息 -->
+      <view class="push-footer flex flex-between">
+        <view class="push-author text-secondary">
+          {{item.author}}
+        </view>
+        <view class="push-time text-secondary">
+          {{item.createTime}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{pushContents.length === 0}}">
+      <view class="empty-icon">📭</view>
+      <view class="empty-text text-secondary">暂无推送内容</view>
+      <view class="empty-desc text-secondary">每晚10点，准时更新</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,15 @@
+{
+  "device_id": "GW-001",
+  "registers": [
+    {"address": 0, "name": "DEVICE_ID", "type": "string", "value": "GW-001", "readonly": true},
+    {"address": 1, "name": "FW_VERSION", "type": "string", "value": "1.2.3", "readonly": true},
+    {"address": 16, "name": "SENSOR_INTERVAL", "type": "int", "value": 5000, "readonly": false},
+    {"address": 17, "name": "SENSOR_ENABLED", "type": "bool", "value": true, "readonly": false},
+    {"address": 18, "name": "THRESHOLD_TEMP", "type": "float", "value": 25.5, "readonly": false},
+    {"address": 19, "name": "THRESHOLD_HUM", "type": "float", "value": 70.0, "readonly": false},
+    {"address": 32, "name": "UART_BAUD", "type": "int", "value": 115200, "readonly": false},
+    {"address": 33, "name": "UART_BITS", "type": "int", "value": 8, "readonly": false},
+    {"address": 48, "name": "LED_MODE", "type": "int", "value": 1, "readonly": false},
+    {"address": 49, "name": "BUZZER_ENABLED", "type": "bool", "value": false, "readonly": false}
+  ]
+}

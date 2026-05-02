@@ -1,0 +1,123 @@
+{
+  "id": "level1",
+  "name": "普通夜班",
+  "description": "一个典型的夜班分诊场景，包含胸痛、发热、外伤等常见病例",
+  "duration": 600,
+  "resources": {
+    "nurse": { "count": 2 },
+    "ecg_machine": { "count": 1 },
+    "lab": { "count": 2 },
+    "doctor": { "count": 1 },
+    "isolation_room": { "count": 1 }
+  },
+  "patients": [
+    {
+      "id": "p1",
+      "arrivalTime": 0,
+      "chiefComplaint": "胸痛30分钟",
+      "vitalSigns": {
+        "heartRate": 110,
+        "bloodPressure": "150/90",
+        "temperature": 36.8,
+        "spo2": 94,
+        "respiratoryRate": 22
+      },
+      "riskFactors": ["高血压史", "糖尿病", "吸烟"],
+      "correctTriage": "red",
+      "requiredActions": ["measure_vitals", "ecg", "blood_test", "call_doctor"],
+      "deteriorationTime": 120,
+      "needsIsolation": false,
+      "description": "56岁男性，主诉压榨性胸痛，向左肩放射，伴出汗和恶心。"
+    },
+    {
+      "id": "p2",
+      "arrivalTime": 60,
+      "chiefComplaint": "发热伴咳嗽",
+      "vitalSigns": {
+        "heartRate": 120,
+        "bloodPressure": "90/60",
+        "temperature": 39.5,
+        "spo2": 92,
+        "respiratoryRate": 28
+      },
+      "riskFactors": ["近期流感接触史"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "blood_test", "isolation"],
+      "deteriorationTime": 180,
+      "needsIsolation": true,
+      "description": "3岁女童，发热3天，今天出现呼吸急促和咳嗽。家长说孩子精神不好。"
+    },
+    {
+      "id": "p3",
+      "arrivalTime": 150,
+      "chiefComplaint": "醉酒后头部外伤",
+      "vitalSigns": {
+        "heartRate": 95,
+        "bloodPressure": "130/85",
+        "temperature": 36.5,
+        "spo2": 96,
+        "respiratoryRate": 16,
+        "gcs": 14
+      },
+      "riskFactors": ["酒精中毒"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals", "blood_test"],
+      "deteriorationTime": 240,
+      "needsIsolation": false,
+      "description": "45岁男性，朋友送诊，说患者喝醉后摔倒，头部有伤口。现在患者嗜睡，但能唤醒。"
+    },
+    {
+      "id": "p4",
+      "arrivalTime": 240,
+      "chiefComplaint": "跌倒后髋部疼痛",
+      "vitalSigns": {
+        "heartRate": 88,
+        "bloodPressure": "145/85",
+        "temperature": 36.6,
+        "spo2": 97,
+        "respiratoryRate": 18
+      },
+      "riskFactors": ["骨质疏松", "高血压"],
+      "correctTriage": "yellow",
+      "requiredActions": ["measure_vitals"],
+      "deteriorationTime": 300,
+      "needsIsolation": false,
+      "description": "78岁女性，在家中浴室跌倒，左侧髋部着地，现在不能站立。"
+    },
+    {
+      "id": "p5",
+      "arrivalTime": 300,
+      "chiefComplaint": "家属催问病情",
+      "vitalSigns": {
+        "heartRate": 78,
+        "bloodPressure": "120/80",
+        "temperature": 36.7,
+        "spo2": 98
+      },
+      "riskFactors": [],
+      "correctTriage": "green",
+      "requiredActions": ["calm_family"],
+      "deteriorationTime": 600,
+      "needsIsolation": false,
+      "description": "这是p3患者的家属，一直在等待医生来看患者，情绪越来越激动。"
+    },
+    {
+      "id": "p6",
+      "arrivalTime": 360,
+      "chiefComplaint": "腹痛伴呕吐",
+      "vitalSigns": {
+        "heartRate": 90,
+        "bloodPressure": "115/75",
+        "temperature": 37.2,
+        "spo2": 98,
+        "respiratoryRate": 18
+      },
+      "riskFactors": [],
+      "correctTriage": "green",
+      "requiredActions": ["measure_vitals"],
+      "deteriorationTime": 480,
+      "needsIsolation": false,
+      "description": "32岁女性，腹痛5小时，呕吐2次，能忍受疼痛，想做个检查。"
+    }
+  ]
+}

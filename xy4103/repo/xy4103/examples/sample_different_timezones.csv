@@ -1,0 +1,6 @@
+observer_name,observation_date,start_time,end_time,timezone,latitude,longitude,elevation,cloud_cover,limiting_magnitude,meteor_count,remarks
+北京观测者,2024-08-12,20:00,22:00,Asia/Shanghai,40.0,116.5,50,0.1,6.5,25,北京时间
+东京观测者,2024-08-12,21:00,23:00,Asia/Tokyo,35.7,139.7,40,0.15,6.3,30,东京时间
+纽约观测者,2024-08-12,08:00,10:00,America/New_York,40.7,-74.0,10,0.2,6.0,15,纽约时间（注意：这是白天）
+伦敦观测者,2024-08-12,13:00,15:00,Europe/London,51.5,-0.1,20,0.1,6.2,20,伦敦时间
+悉尼观测者,2024-08-12,22:00,00:00,Australia/Sydney,-33.9,151.2,30,0.05,6.8,35,悉尼时间（跨午夜）

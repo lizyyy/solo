@@ -1,0 +1,112 @@
+{
+  "generated_at": "2026-05-01T19:14:49.544401",
+  "summary": {
+    "status": "error",
+    "total_tables": 3,
+    "total_rows": 15,
+    "total_errors": 4,
+    "total_warnings": 1,
+    "force_mode": true
+  },
+  "tables": {
+    "accounts": {
+      "name": "accounts",
+      "row_count": 5,
+      "error_count": 1,
+      "warning_count": 0,
+      "columns": [
+        "status",
+        "id",
+        "industry",
+        "created_at",
+        "website",
+        "name",
+        "description"
+      ]
+    },
+    "contacts": {
+      "name": "contacts",
+      "row_count": 5,
+      "error_count": 1,
+      "warning_count": 1,
+      "columns": [
+        "position",
+        "id",
+        "last_name",
+        "first_name",
+        "is_primary",
+        "account_id",
+        "email",
+        "phone"
+      ]
+    },
+    "activities": {
+      "name": "activities",
+      "row_count": 5,
+      "error_count": 2,
+      "warning_count": 0,
+      "columns": [
+        "activity_type",
+        "status",
+        "id",
+        "contact_id",
+        "duration_minutes",
+        "subject",
+        "account_id",
+        "activity_date"
+      ]
+    }
+  },
+  "issues": [
+    {
+      "severity": "error",
+      "message": "字段 'industry' 的值 'unknown' 不在允许的枚举值列表中: ['technology', 'energy', 'retail', 'finance', 'healthcare', 'education']",
+      "source_file": "accounts.csv",
+      "row_num": 6,
+      "table_name": "accounts",
+      "field_name": "industry",
+      "value": "unknown",
+      "rule": "enum_check"
+    },
+    {
+      "severity": "warning",
+      "message": "字段 'email' 的邮箱格式可能无效: 'wangqiang.greenenergy.cn'",
+      "source_file": "contacts.csv",
+      "row_num": 4,
+      "table_name": "contacts",
+      "field_name": "email",
+      "value": "wangqiang.greenenergy.cn",
+      "rule": "email_format"
+    },
+    {
+      "severity": "error",
+      "message": "外键引用不存在: 'contacts.account_id' = 'ACC999' 引用 'accounts.id'",
+      "source_file": "contacts.csv",
+      "row_num": 5,
+      "table_name": "contacts",
+      "field_name": "account_id",
+      "value": "ACC999",
+      "rule": "foreign_key"
+    },
+    {
+      "severity": "error",
+      "message": "字段 'status' 的值 'scheduled' 不在允许的枚举值列表中: ['planned', 'in_progress', 'completed', 'cancelled']",
+      "source_file": "activities.csv",
+      "row_num": 5,
+      "table_name": "activities",
+      "field_name": "status",
+      "value": "scheduled",
+      "rule": "enum_check"
+    },
+    {
+      "severity": "error",
+      "message": "外键引用不存在: 'activities.account_id' = 'ACC999' 引用 'accounts.id'",
+      "source_file": "activities.csv",
+      "row_num": 5,
+      "table_name": "activities",
+      "field_name": "account_id",
+      "value": "ACC999",
+      "rule": "foreign_key"
+    }
+  ]
+}

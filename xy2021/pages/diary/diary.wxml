@@ -1,0 +1,312 @@
+<view class="container">
+  <!-- 地球状态卡片 -->
+  <view class="card earth-status-card" bindtap="showEarthInfo">
+    <view class="earth-icon animate-pulse">🌍</view>
+    <view class="earth-title">地球今日状态</view>
+    <view class="earth-stats grid-4 mt-16">
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{earthStatus.treesPlanted.toLocaleString()}}</view>
+        <view class="stat-label text-secondary text-small">植树(棵)</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{earthStatus.carbonSaved.toFixed(1)}}</view>
+        <view class="stat-label text-secondary text-small">减碳(kg)</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{earthStatus.wasteRecycled.toFixed(1)}}</view>
+        <view class="stat-label text-secondary text-small">回收(kg)</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number text-primary">{{earthStatus.peopleInvolved.toLocaleString()}}</view>
+        <view class="stat-label text-secondary text-small">参与(人)</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 顶部Tab -->
+  <view class="card tab-card">
+    <view class="tabs flex">
+      <view 
+        class="tab-item {{selectedTab === 'diary' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="diary"
+      >
+        地球日记
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'wish' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="wish"
+      >
+        许愿墙
+      </view>
+      <view 
+        class="tab-item {{selectedTab === 'heal' ? 'active' : ''}}" 
+        bindtap="switchTab" 
+        data-tab="heal"
+      >
+        治愈游戏
+      </view>
+    </view>
+  </view>
+
+  <!-- 地球日记 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'diary'}}">
+    <!-- 今日消息 -->
+    <view class="card message-card" wx:if="{{todayMessage}}">
+      <view class="message-header flex flex-between flex-center">
+        <view class="message-icon">{{todayMessage.icon}}</view>
+        <view class="message-title">{{todayMessage.title}}</view>
+      </view>
+      <view class="message-content mt-16 text-secondary">
+        {{todayMessage.content}}
+      </view>
+    </view>
+
+    <!-- 治愈语录 -->
+    <view class="card quote-card">
+      <view class="quote-header flex flex-between flex-center">
+        <text class="quote-title">💚 治愈语录</text>
+        <text class="refresh-btn" catchtap="refreshQuote">🔄</text>
+      </view>
+      <view class="quote-content mt-16">
+        <text class="quote-text">"{{todayQuote}}"</text>
+      </view>
+    </view>
+
+    <!-- 写日记按钮 -->
+    <view class="card write-card" bindtap="openWriteModal">
+      <view class="write-content flex flex-center flex-column">
+        <view class="write-icon">📝</view>
+        <view class="write-text text-primary">写一篇地球日记</view>
+        <view class="write-bonus text-secondary text-small mt-4">记录心情，获得15积分</view>
+      </view>
+    </view>
+
+    <!-- 日记列表 -->
+    <view class="card diaries-card" wx:if="{{diaryEntries.length > 0}}">
+      <view class="card-title">我的日记</view>
+      <view class="diary-list mt-16">
+        <view 
+          wx:for="{{diaryEntries}}" 
+          wx:key="id" 
+          class="diary-item"
+        >
+          <view class="diary-header flex flex-between flex-center">
+            <view class="diary-left flex flex-center">
+              <view class="diary-mood">{{getMoodIcon(item.mood)}}</view>
+              <view class="diary-date text-secondary">{{item.date}}</view>
+            </view>
+          </view>
+          <view class="diary-content mt-12">
+            {{item.content}}
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="card empty-card" wx:else>
+      <view class="empty-state text-center">
+        <view class="empty-icon">📔</view>
+        <view class="empty-text text-secondary">暂无日记</view>
+        <view class="empty-hint text-secondary text-small mt-8">
+          点击上方按钮，开始记录你的环保心情
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 许愿墙 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'wish'}}">
+    <!-- 发愿望按钮 -->
+    <view class="card wish-card" bindtap="openWishModal">
+      <view class="wish-content flex flex-center flex-column">
+        <view class="wish-icon">🌟</view>
+        <view class="wish-text text-primary">发布环保愿望</view>
+        <view class="wish-bonus text-secondary text-small mt-4">发布愿望，获得10积分</view>
+      </view>
+    </view>
+
+    <!-- 愿望列表 -->
+    <view class="card wishes-card" wx:if="{{wishes.length > 0}}">
+      <view class="card-title">环保愿望墙</view>
+      <view class="wish-list mt-16">
+        <view 
+          wx:for="{{wishes}}" 
+          wx:key="id" 
+          class="wish-item"
+        >
+          <view class="wish-content">
+            {{item.content}}
+          </view>
+          <view class="wish-footer flex flex-between flex-center mt-12">
+            <view class="wish-date text-secondary text-small">{{item.date}}</view>
+            <view class="wish-actions flex flex-center" bindtap="likeWish" data-id="{{item.id}}">
+              <view class="like-icon">❤️</view>
+              <view class="like-count text-secondary text-small">{{item.likes}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="card empty-card" wx:else>
+      <view class="empty-state text-center">
+        <view class="empty-icon">🌟</view>
+        <view class="empty-text text-secondary">暂无愿望</view>
+        <view class="empty-hint text-secondary text-small mt-8">
+          发布你的环保愿望，让更多人看到
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 治愈游戏 -->
+  <view class="tab-content" wx:if="{{selectedTab === 'heal'}}">
+    <view class="card game-card">
+      <view class="game-header flex flex-between flex-center">
+        <view class="game-title">🗑️ 垃圾治愈消除</view>
+        <view class="game-score">
+          <text class="score-label text-secondary">得分：</text>
+          <text class="score-value text-primary text-bold">{{score}}</text>
+        </view>
+      </view>
+      
+      <view class="game-description mt-16 text-secondary text-small text-center">
+        点击垃圾将它们分类回收，帮助地球恢复健康！
+      </view>
+      
+      <!-- 游戏区域 -->
+      <view class="game-area mt-24" wx:if="{{activeTrashItems.length > 0}}">
+        <view class="game-grid grid-3">
+          <view 
+            wx:for="{{activeTrashItems}}" 
+            wx:key="id" 
+            class="trash-item flex flex-column flex-center animate-bounce"
+            bindtap="clickTrash"
+            data-id="{{item.id}}"
+            data-index="{{index}}"
+          >
+            <view class="trash-icon">{{item.icon}}</view>
+            <view class="trash-name text-secondary text-small mt-4">{{item.name}}</view>
+          </view>
+        </view>
+        
+        <!-- 治愈动画 -->
+        <view class="healing-effects">
+          <view 
+            wx:for="{{healingAnimations}}" 
+            wx:key="id" 
+            class="heal-effect animate-heal"
+            style="left: {{(item.index % 3) * 33 + 16}}%; top: {{Math.floor(item.index / 3) * 33 + 20}}%;"
+          >
+            ✨ 已回收 ✨
+          </view>
+        </view>
+      </view>
+      
+      <view class="game-empty text-center mt-24" wx:else>
+        <view class="empty-icon">🌱</view>
+        <view class="empty-text text-primary text-bold mt-8">地球已治愈！</view>
+        <view class="empty-hint text-secondary text-small mt-4">
+          点击下方按钮开始新一轮
+        </view>
+        <button class="btn-primary mt-16" bindtap="resetGame">开始游戏</button>
+      </view>
+      
+      <view class="game-tips mt-24">
+        <view class="tip-item flex">
+          <view class="tip-bullet">💡</view>
+          <view class="tip-text text-secondary text-small">
+            完成游戏可获得20绿色积分奖励！
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 写日记弹窗 -->
+<view class="modal-mask {{showWriteModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content write-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title">写地球日记</text>
+      <text class="close-btn" bindtap="closeWriteModal">×</text>
+    </view>
+    
+    <!-- 心情选择 -->
+    <view class="mood-section mt-16">
+      <view class="section-title text-secondary text-small mb-12">选择今日心情</view>
+      <view class="mood-list flex flex-around">
+        <view 
+          wx:for="{{moods}}" 
+          wx:key="id" 
+          class="mood-item {{selectedMood === item.id ? 'active' : ''}} flex flex-column flex-center"
+          bindtap="selectMood"
+          data-mood="{{item.id}}"
+        >
+          <view class="mood-icon">{{item.icon}}</view>
+          <view class="mood-name text-secondary text-small">{{item.name}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 日记内容 -->
+    <view class="content-section mt-24">
+      <view class="section-title text-secondary text-small mb-12">日记内容</view>
+      <textarea 
+        class="diary-textarea" 
+        placeholder="记录今天的环保心情、地球状态感悟，或者写下你的环保承诺..."
+        value="{{diaryContent}}"
+        bindinput="inputDiary"
+        maxlength="500"
+      />
+      <view class="char-count text-secondary text-small text-right mt-8">
+        {{diaryContent.length}}/500
+      </view>
+    </view>
+    
+    <view class="modal-actions flex mt-24">
+      <button class="btn-secondary flex-1" bindtap="closeWriteModal">取消</button>
+      <button class="btn-primary flex-1" bindtap="submitDiary">保存日记</button>
+    </view>
+  </view>
+</view>
+
+<!-- 许愿弹窗 -->
+<view class="modal-mask {{showWishModal ? 'show' : ''}}" catchtouchmove="preventMove">
+  <view class="modal-content wish-modal">
+    <view class="modal-header flex flex-between">
+      <text class="modal-title">发布环保愿望</text>
+      <text class="close-btn" bindtap="closeWishModal">×</text>
+    </view>
+    
+    <view class="wish-input-section mt-16">
+      <view class="section-title text-secondary text-small mb-12">你的环保愿望</view>
+      <textarea 
+        class="wish-textarea" 
+        placeholder="写下你对地球的美好愿望，比如：\n• 希望每天都能看到蓝天白云\n• 希望更多人加入环保行动\n• 希望河流变得清澈见底"
+        value="{{wishContent}}"
+        bindinput="inputWish"
+        maxlength="200"
+      />
+      <view class="char-count text-secondary text-small text-right mt-8">
+        {{wishContent.length}}/200
+      </view>
+    </view>
+    
+    <view class="wish-tips mt-16">
+      <view class="tip-item flex">
+        <view class="tip-bullet">💡</view>
+        <view class="tip-text text-secondary text-small">
+          发布愿望后可获得10绿色积分，让更多人看到你的环保心愿！
+        </view>
+      </view>
+    </view>
+    
+    <view class="modal-actions flex mt-24">
+      <button class="btn-secondary flex-1" bindtap="closeWishModal">取消</button>
+      <button class="btn-primary flex-1" bindtap="submitWish">发布愿望</button>
+    </view>
+  </view>
+</view>

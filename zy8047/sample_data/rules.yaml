@@ -1,0 +1,16 @@
+overlap:
+  min_percent: 60
+
+altitude:
+  target_m: 120
+  tolerance_m: 10
+
+gsd:
+  min_cm_px: 2.0
+  max_cm_px: 10.0
+
+camera:
+  focal_length_mm: 4.5
+  sensor_width_mm: 6.4
+  image_width_px: 4000
+  image_height_px: 3000

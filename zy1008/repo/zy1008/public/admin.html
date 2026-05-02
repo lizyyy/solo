@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>活动管理后台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #1f2937;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header h2 {
+      font-size: 18px;
+      color: #1f2937;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #4f46e5;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: #059669;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #d1d5db;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .form-select:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .alert svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #9ca3af;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+    }
+
+    .event-list-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s ease;
+    }
+
+    .event-list-item:hover {
+      border-color: #6366f1;
+    }
+
+    .event-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .event-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .stat-card.registered .stat-value { color: #6366f1; }
+    .stat-card.waitlist .stat-value { color: #f59e0b; }
+    .stat-card.checked .stat-value { color: #10b981; }
+    .stat-card.not-arrived .stat-value { color: #ef4444; }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 20px;
+    }
+
+    .badge-checked {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-registered {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .badge-waitlist {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #1f2937;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #6b7280;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .session-filter {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .session-btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .session-btn:hover {
+      border-color: #6366f1;
+    }
+
+    .session-btn.active {
+      background: #6366f1;
+      color: white;
+      border-color: #6366f1;
+    }
+
+    .checkin-code-display {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .checkin-code-display .label {
+      font-size: 12px;
+      color: #92400e;
+      margin-bottom: 4px;
+    }
+
+    .checkin-code-display .code {
+      font-size: 24px;
+      font-weight: 700;
+      color: #78350f;
+      font-family: monospace;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #9ca3af;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .section-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .section-toggle-btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .section-toggle-btn.active {
+      background: #6366f1;
+      color: white;
+      border-color: #6366f1;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .event-title-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .event-actions {
+        width: 100%;
+      }
+
+      .event-actions .btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>活动管理后台</h1>
+      <button id="create-event-btn" class="btn btn-primary">+ 创建新活动</button>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <div id="events-container">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>加载中...</p>
+      </div>
+
+      <div id="empty-state" class="card empty-state hidden">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <p>暂无活动，点击上方按钮创建第一个活动</p>
+      </div>
+
+      <div id="events-list" class="hidden"></div>
+    </div>
+
+    <div id="event-detail" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2 id="detail-event-title">活动详情</h2>
+          <button id="back-btn" class="btn btn-secondary">← 返回列表</button>
+        </div>
+        <div class="card-body">
+          <div id="checkin-code-section" class="checkin-code-display">
+            <div class="label">活动签到码（请保密）</div>
+            <div class="code" id="detail-checkin-code"></div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card registered">
+              <div class="stat-value" id="stat-registered">0</div>
+              <div class="stat-label">已报名</div>
+            </div>
+            <div class="stat-card waitlist">
+              <div class="stat-value" id="stat-waitlist">0</div>
+              <div class="stat-label">候补</div>
+            </div>
+            <div class="stat-card checked">
+              <div class="stat-value" id="stat-checked">0</div>
+              <div class="stat-label">已签到</div>
+            </div>
+            <div class="stat-card not-arrived">
+              <div class="stat-value" id="stat-not-arrived">0</div>
+              <div class="stat-label">未到场</div>
+            </div>
+          </div>
+
+          <div id="session-filter-container">
+            <div class="session-filter" id="session-filter"></div>
+          </div>
+
+          <div class="section-toggle">
+            <button class="section-toggle-btn active" data-section="registrations">报名列表</button>
+            <button class="section-toggle-btn" data-section="waitlist">候补列表</button>
+          </div>
+
+          <div id="registrations-section">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>姓名</th>
+                    <th>手机后四位</th>
+                    <th>场次</th>
+                    <th>状态</th>
+                    <th>签到时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="registrations-table"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="waitlist-section" class="hidden">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>排位</th>
+                    <th>姓名</th>
+                    <th>手机后四位</th>
+                    <th>场次</th>
+                    <th>候补时间</th>
+                  </tr>
+                </thead>
+                <tbody id="waitlist-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="export-btn" class="btn btn-primary">导出 CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="create-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>创建新活动</h3>
+        <button class="modal-close" onclick="closeCreateModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="create-alert"></div>
+        <div class="form-group">
+          <label class="form-label">活动标题 *</label>
+          <input type="text" id="create-title" class="form-input" placeholder="例如：2024春季分享会">
+        </div>
+        <div class="form-group">
+          <label class="form-label">活动时间 *</label>
+          <input type="datetime-local" id="create-date" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">总名额 *</label>
+          <input type="number" id="create-slots" class="form-input" min="1" value="50" placeholder="例如：50">
+        </div>
+        <div class="form-group">
+          <label class="form-label">签到码 *</label>
+          <input type="text" id="create-code" class="form-input" placeholder="例如：123456">
+        </div>
+        <div class="form-group">
+          <label class="form-label">可选场次（每行一个，留空则不分场次）</label>
+          <textarea id="create-sessions" class="form-input" rows="4" placeholder="上午场&#10;下午场"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCreateModal()">取消</button>
+        <button id="create-submit" class="btn btn-primary">创建活动</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="checkin-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>签到确认</h3>
+        <button class="modal-close" onclick="closeCheckinModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="checkin-alert"></div>
+        <p id="checkin-user-info" style="margin-bottom: 16px; font-size: 14px;"></p>
+        <div class="form-group">
+          <label class="form-label">请输入签到码 *</label>
+          <input type="text" id="checkin-code-input" class="form-input" placeholder="输入签到码">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCheckinModal()">取消</button>
+        <button id="checkin-submit" class="btn btn-success">确认签到</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    let currentEvent = null;
+    let currentSession = null;
+    let currentSection = 'registrations';
+    let checkinRegistrationId = null;
+
+    async function fetchEvents() {
+      try {
+        const response = await fetch(`${API_BASE}/api/events`);
+        const events = await response.json();
+        renderEvents(events);
+      } catch (error) {
+        showAlert('加载活动失败', 'error');
+      } finally {
+        document.getElementById('loading').classList.add('hidden');
+      }
+    }
+
+    function renderEvents(events) {
+      const emptyState = document.getElementById('empty-state');
+      const eventsList = document.getElementById('events-list');
+
+      if (events.length === 0) {
+        emptyState.classList.remove('hidden');
+        eventsList.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      eventsList.classList.remove('hidden');
+
+      let html = '';
+      events.forEach(event => {
+        const sessions = event.sessions ? JSON.parse(event.sessions) : null;
+        html += `
+          <div class="card">
+            <div class="card-body">
+              <div class="event-list-item" style="border: none; padding: 0; margin: 0;">
+                <div class="event-title-row">
+                  <div class="event-title">${escapeHtml(event.title)}</div>
+                </div>
+                <div class="event-meta">
+                  <span>📅 ${formatDateTime(event.date_time)}</span>
+                  <span>👥 ${event.total_slots} 个名额</span>
+                  ${sessions ? `<span>🎯 ${sessions.length} 场次</span>` : ''}
+                </div>
+                <div class="event-actions">
+                  <button class="btn btn-primary btn-sm" onclick="viewEvent(${event.id})">查看详情</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      eventsList.innerHTML = html;
+    }
+
+    async function viewEvent(eventId) {
+      currentEvent = eventId;
+      currentSession = null;
+      
+      try {
+        const [eventResponse, statsResponse] = await Promise.all([
+          fetch(`${API_BASE}/api/events/${eventId}`),
+          fetch(`${API_BASE}/api/events/${eventId}/stats`)
+        ]);
+
+        const event = await eventResponse.json();
+        const stats = await statsResponse.json();
+
+        document.getElementById('events-container').classList.add('hidden');
+        document.getElementById('event-detail').classList.remove('hidden');
+
+        document.getElementById('detail-event-title').textContent = event.title;
+        document.getElementById('detail-checkin-code').textContent = event.checkin_code;
+
+        renderStats(stats);
+        renderSessionFilter(event);
+        renderRegistrations(stats.registrations);
+        renderWaitlist(stats.waitlist);
+      } catch (error) {
+        showAlert('加载活动详情失败', 'error');
+      }
+    }
+
+    function renderStats(stats) {
+      document.getElementById('stat-registered').textContent = stats.registered_count;
+      document.getElementById('stat-waitlist').textContent = stats.waitlist_count;
+      document.getElementById('stat-checked').textContent = stats.checked_in;
+      document.getElementById('stat-not-arrived').textContent = stats.not_arrived;
+    }
+
+    function renderSessionFilter(event) {
+      const sessions = event.sessions ? JSON.parse(event.sessions) : null;
+      const container = document.getElementById('session-filter-container');
+      const filter = document.getElementById('session-filter');
+
+      if (!sessions || sessions.length === 0) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      let html = `<button class="session-btn active" data-session="">全部场次</button>`;
+      sessions.forEach(session => {
+        html += `<button class="session-btn" data-session="${escapeHtml(session)}">${escapeHtml(session)}</button>`;
+      });
+      filter.innerHTML = html;
+
+      filter.querySelectorAll('.session-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filter.querySelectorAll('.session-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentSession = btn.dataset.session || null;
+          refreshEventStats();
+        });
+      });
+    }
+
+    async function refreshEventStats() {
+      if (!currentEvent) return;
+
+      try {
+        const url = currentSession 
+          ? `${API_BASE}/api/events/${currentEvent}/stats?session=${encodeURIComponent(currentSession)}`
+          : `${API_BASE}/api/events/${currentEvent}/stats`;
+        
+        const response = await fetch(url);
+        const stats = await response.json();
+
+        renderStats(stats);
+        renderRegistrations(stats.registrations);
+        renderWaitlist(stats.waitlist);
+      } catch (error) {
+        showAlert('刷新数据失败', 'error');
+      }
+    }
+
+    function renderRegistrations(registrations) {
+      const tbody = document.getElementById('registrations-table');
+      
+      if (registrations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 32px;">暂无报名数据</td></tr>';
+        return;
+      }
+
+      let html = '';
+      registrations.forEach(r => {
+        const statusBadge = r.status === 'checked_in' 
+          ? '<span class="badge badge-checked">已签到</span>'
+          : '<span class="badge badge-registered">已报名</span>';
+        
+        html += `
+          <tr>
+            <td>${escapeHtml(r.name)}</td>
+            <td>${escapeHtml(r.phone_last4)}</td>
+            <td>${r.session ? escapeHtml(r.session) : '-'}</td>
+            <td>${statusBadge}</td>
+            <td>${r.checkin_time ? formatTime(r.checkin_time) : '-'}</td>
+            <td>
+              ${r.status !== 'checked_in' ? `
+                <button class="btn btn-success btn-sm" onclick="openCheckinModal(${r.id}, '${escapeHtml(r.name)}')">签到</button>
+                <button class="btn btn-danger btn-sm" onclick="cancelRegistration(${r.id})" style="margin-left: 4px;">取消</button>
+              ` : '-'}
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function renderWaitlist(waitlist) {
+      const tbody = document.getElementById('waitlist-table');
+      
+      if (waitlist.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 32px;">暂无候补数据</td></tr>';
+        return;
+      }
+
+      let html = '';
+      waitlist.forEach(w => {
+        html += `
+          <tr>
+            <td><span class="badge badge-waitlist">第 ${w.position} 位</span></td>
+            <td>${escapeHtml(w.name)}</td>
+            <td>${escapeHtml(w.phone_last4)}</td>
+            <td>${w.session ? escapeHtml(w.session) : '-'}</td>
+            <td>${formatTime(w.created_at)}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function openCheckinModal(registrationId, name) {
+      checkinRegistrationId = registrationId;
+      document.getElementById('checkin-user-info').innerHTML = `为 <strong>${escapeHtml(name)}</strong> 签到`;
+      document.getElementById('checkin-code-input').value = '';
+      document.getElementById('checkin-alert').innerHTML = '';
+      document.getElementById('checkin-modal').classList.remove('hidden');
+    }
+
+    function closeCheckinModal() {
+      document.getElementById('checkin-modal').classList.add('hidden');
+      checkinRegistrationId = null;
+    }
+
+    async function submitCheckin() {
+      const code = document.getElementById('checkin-code-input').value.trim();
+      if (!code) {
+        showModalAlert('checkin-alert', '请输入签到码', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/registrations/${checkinRegistrationId}/checkin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ checkin_code: code })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || '签到失败');
+        }
+
+        closeCheckinModal();
+        showAlert('签到成功', 'success');
+        refreshEventStats();
+      } catch (error) {
+        showModalAlert('checkin-alert', error.message, 'error');
+      }
+    }
+
+    async function cancelRegistration(registrationId) {
+      if (!confirm('确定要取消此报名吗？取消后候补中第一位将自动递补。')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/registrations/${registrationId}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || '取消失败');
+        }
+
+        showAlert('取消成功，候补中第一位已自动递补', 'success');
+        refreshEventStats();
+      } catch (error) {
+        showAlert(error.message, 'error');
+      }
+    }
+
+    function openCreateModal() {
+      document.getElementById('create-title').value = '';
+      document.getElementById('create-slots').value = '50';
+      document.getElementById('create-code').value = '';
+      document.getElementById('create-sessions').value = '';
+      
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('create-date').value = now.toISOString().slice(0, 16);
+      
+      document.getElementById('create-alert').innerHTML = '';
+      document.getElementById('create-modal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('create-modal').classList.add('hidden');
+    }
+
+    async function submitCreateEvent() {
+      const title = document.getElementById('create-title').value.trim();
+      const date = document.getElementById('create-date').value;
+      const slots = document.getElementById('create-slots').value;
+      const code = document.getElementById('create-code').value.trim();
+      const sessionsText = document.getElementById('create-sessions').value.trim();
+
+      if (!title) {
+        showModalAlert('create-alert', '请输入活动标题', 'error');
+        return;
+      }
+      if (!date) {
+        showModalAlert('create-alert', '请选择活动时间', 'error');
+        return;
+      }
+      if (!slots || parseInt(slots) < 1) {
+        showModalAlert('create-alert', '请输入有效的名额数', 'error');
+        return;
+      }
+      if (!code) {
+        showModalAlert('create-alert', '请输入签到码', 'error');
+        return;
+      }
+
+      const sessions = sessionsText 
+        ? sessionsText.split('\n').map(s => s.trim()).filter(s => s.length > 0)
+        : [];
+
+      try {
+        const response = await fetch(`${API_BASE}/api/events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            date_time: date,
+            total_slots: parseInt(slots),
+            checkin_code: code,
+            sessions: sessions.length > 0 ? sessions : null
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || '创建失败');
+        }
+
+        closeCreateModal();
+        showAlert('活动创建成功', 'success');
+        fetchEvents();
+      } catch (error) {
+        showModalAlert('create-alert', error.message, 'error');
+      }
+    }
+
+    function exportCSV() {
+      if (!currentEvent) return;
+      
+      let url = `${API_BASE}/api/events/${currentEvent}/export`;
+      if (currentSession) {
+        url += `?session=${encodeURIComponent(currentSession)}`;
+      }
+      
+      window.open(url, '_blank');
+    }
+
+    function showAlert(message, type) {
+      const container = document.getElementById('alert-container');
+      const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+      const icon = type === 'error' 
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      
+      container.innerHTML = `<div class="alert ${alertClass}">${icon}<span>${escapeHtml(message)}</span></div>`;
+      
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 5000);
+    }
+
+    function showModalAlert(containerId, message, type) {
+      const container = document.getElementById(containerId);
+      const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+      const icon = type === 'error' 
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      
+      container.innerHTML = `<div class="alert ${alertClass}">${icon}<span>${escapeHtml(message)}</span></div>`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDateTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function formatTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    document.getElementById('create-event-btn').addEventListener('click', openCreateModal);
+    document.getElementById('create-submit').addEventListener('click', submitCreateEvent);
+    document.getElementById('checkin-submit').addEventListener('click', submitCheckin);
+    document.getElementById('export-btn').addEventListener('click', exportCSV);
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      document.getElementById('event-detail').classList.add('hidden');
+      document.getElementById('events-container').classList.remove('hidden');
+      currentEvent = null;
+      fetchEvents();
+    });
+
+    document.querySelectorAll('.section-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.section-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSection = btn.dataset.section;
+        
+        document.getElementById('registrations-section').classList.toggle('hidden', currentSection !== 'registrations');
+        document.getElementById('waitlist-section').classList.toggle('hidden', currentSection !== 'waitlist');
+      });
+    });
+
+    fetchEvents();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+plan_name,plan_description,firing_type,segment_type,name,start_temp_c,end_temp_c,duration_min
+有问题的曲线,升温太快且保温不足,釉烧,ramp_up,快速升温1,25,300,30
+有问题的曲线,升温太快且保温不足,釉烧,ramp_up,快速升温2,300,800,60
+有问题的曲线,升温太快且保温不足,釉烧,ramp_up,急速升温,800,1250,60
+有问题的曲线,升温太快且保温不足,釉烧,soak,保温太短,1250,1250,10
+有问题的曲线,升温太快且保温不足,釉烧,ramp_down,强制冷却太快,1250,600,20

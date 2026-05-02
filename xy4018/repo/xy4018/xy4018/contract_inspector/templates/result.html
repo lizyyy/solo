@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}巡检结果 - 合同改稿巡检器{% endblock %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+        <h2 style="margin: 0; color: #1a1a2e;">📋 巡检结果</h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('export', task_id=task.id, format='markdown') }}" class="btn btn-secondary">
+                📄 导出Markdown
+            </a>
+            <a href="{{ url_for('export', task_id=task.id, format='csv') }}" class="btn btn-secondary">
+                📊 导出CSV
+            </a>
+            <a href="{{ url_for('tasks') }}" class="btn btn-primary">
+                📋 查看所有任务
+            </a>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 30px;">
+        <div class="card-title">📋 基本信息</div>
+        <div class="two-col">
+            <div style="padding: 10px 0;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 4px;">任务ID</div>
+                <div style="font-weight: 600; font-family: monospace;">{{ task.id }}</div>
+            </div>
+            <div style="padding: 10px 0;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 4px;">客户名称</div>
+                <div style="font-weight: 600;">{{ task.client }}</div>
+            </div>
+            <div style="padding: 10px 0;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 4px;">合同名称</div>
+                <div style="font-weight: 600;">{{ task.contract_name }}</div>
+            </div>
+            <div style="padding: 10px 0;">
+                <div style="color: #666; font-size: 14px; margin-bottom: 4px;">巡检时间</div>
+                <div style="font-weight: 600;">{{ task.created_at|datetime_format }}</div>
+            </div>
+        </div>
+    </div>
+
+    {% if risk_results %}
+    <div class="card" style="margin-bottom: 30px;">
+        <div class="card-title">⚠️ 风险扫描结果</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card high">
+                <div class="stat-value">{{ risk_stats.high }}</div>
+                <div class="stat-label">🔴 高风险</div>
+            </div>
+            <div class="stat-card medium">
+                <div class="stat-value">{{ risk_stats.medium }}</div>
+                <div class="stat-label">🟡 中风险</div>
+            </div>
+            <div class="stat-card low">
+                <div class="stat-value">{{ risk_stats.low }}</div>
+                <div class="stat-label">🟢 低风险</div>
+            </div>
+        </div>
+
+        {% for rule_id, risks in risk_results.items() %}
+            {% for risk in risks %}
+            <div class="diff-item {{ 'added' if risk.level == 'high' else 'modified' if risk.level == 'medium' else '' }}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                    <div style="font-weight: 600; font-size: 16px;">
+                        {% if risk.level == 'high' %}🔴{% elif risk.level == 'medium' %}🟡{% else %}🟢{% endif %}
+                        {{ risk.rule_name or rule_id }}
+                    </div>
+                    <span class="risk-badge risk-{{ risk.level }}">
+                        {{ risk.level.upper() }}
+                    </span>
+                </div>
+                
+                {% if risk.old_text %}
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">原文:</div>
+                    <div class="diff-old">{{ risk.old_text }}</div>
+                </div>
+                {% endif %}
+                
+                {% if risk.new_text %}
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">新文:</div>
+                    <div class="diff-new">{{ risk.new_text }}</div>
+                </div>
+                {% endif %}
+                
+                {% if risk.old_amount or risk.new_amount %}
+                <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                    {% if risk.old_amount %}<span>原金额: <strong>{{ "%.0f"|format(risk.old_amount) }}</strong> 元</span>{% endif %}
+                    {% if risk.new_amount %}<span style="margin-left: 20px;">新金额: <strong>{{ "%.0f"|format(risk.new_amount) }}</strong> 元</span>{% endif %}
+                    {% if risk.increase_rate %}<span style="margin-left: 20px; color: #dc2626; font-weight: 600;">涨幅: {{ "%.1f"|format(risk.increase_rate * 100) }}%</span>{% endif %}
+                </div>
+                {% endif %}
+                
+                {% if risk.old_days or risk.new_days %}
+                <div style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                    {% if risk.old_days %}<span>原周期: <strong>{{ risk.old_days }}</strong> 天</span>{% endif %}
+                    {% if risk.new_days %}<span style="margin-left: 20px;">新周期: <strong>{{ risk.new_days }}</strong> 天</span>{% endif %}
+                </div>
+                {% endif %}
+                
+                {% if risk.suggestion %}
+                <div style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, #ffecd2, #fcb69f); border-radius: 8px;">
+                    <div style="font-weight: 600; color: #7c2d12; margin-bottom: 4px;">💡 建议复核:</div>
+                    <div style="color: #92400e;">{{ risk.suggestion }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-title">📊 差异统计</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.added_sections|length }}</div>
+                <div class="stat-label">📝 新增章节</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.removed_sections|length }}</div>
+                <div class="stat-label">🗑️ 删除章节</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.modified_sections|length }}</div>
+                <div class="stat-label">✏️ 修改章节</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.added_clauses|length }}</div>
+                <div class="stat-label">📝 新增条款</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.removed_clauses|length }}</div>
+                <div class="stat-label">🗑️ 删除条款</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ diff_result.modified_clauses|length }}</div>
+                <div class="stat-label">✏️ 修改条款</div>
+            </div>
+        </div>
+
+        {% if diff_result.added_sections %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #16a34a;">📝 新增章节</h4>
+            {% for section in diff_result.added_sections %}
+            <div class="diff-item added">
+                <div class="diff-title">➕ {{ section.title or '未命名章节' }}</div>
+                <div class="diff-content">{{ section.content[:300] }}{% if section.content|length > 300 %}...{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if diff_result.removed_sections %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #dc2626;">🗑️ 删除章节</h4>
+            {% for section in diff_result.removed_sections %}
+            <div class="diff-item removed">
+                <div class="diff-title">➖ {{ section.title or '未命名章节' }}</div>
+                <div class="diff-content">{{ section.content[:300] }}{% if section.content|length > 300 %}...{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if diff_result.modified_sections %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #d97706;">✏️ 修改章节</h4>
+            {% for mod in diff_result.modified_sections %}
+            <div class="diff-item modified">
+                <div class="diff-title">🔄 {{ mod.old.title or '未命名章节' }}</div>
+                {% if mod.diff.removed_lines %}
+                <div style="margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">删除的内容:</div>
+                    {% for line in mod.diff.removed_lines[:3] %}
+                    <div class="diff-old">- {{ line.content }}</div>
+                    {% endfor %}
+                    {% if mod.diff.removed_lines|length > 3 %}
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">... 还有 {{ mod.diff.removed_lines|length - 3 }} 行</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if mod.diff.added_lines %}
+                <div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 4px;">新增的内容:</div>
+                    {% for line in mod.diff.added_lines[:3] %}
+                    <div class="diff-new">+ {{ line.content }}</div>
+                    {% endfor %}
+                    {% if mod.diff.added_lines|length > 3 %}
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">... 还有 {{ mod.diff.added_lines|length - 3 }} 行</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if diff_result.added_clauses %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #16a34a;">📝 新增条款</h4>
+            {% for clause in diff_result.added_clauses %}
+            <div class="diff-item added">
+                <div class="diff-title">➕ {{ clause.title or '未命名条款' }}</div>
+                <div class="diff-content">{{ clause.content[:200] }}{% if clause.content|length > 200 %}...{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if diff_result.removed_clauses %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #dc2626;">🗑️ 删除条款</h4>
+            {% for clause in diff_result.removed_clauses %}
+            <div class="diff-item removed">
+                <div class="diff-title">➖ {{ clause.title or '未命名条款' }}</div>
+                <div class="diff-content">{{ clause.content[:200] }}{% if clause.content|length > 200 %}...{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if diff_result.modified_clauses %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin-bottom: 15px; color: #d97706;">✏️ 修改条款</h4>
+            {% for mod in diff_result.modified_clauses %}
+            <div class="diff-item modified">
+                <div class="diff-title">🔄 {{ mod.old.title or '未命名条款' }}</div>
+                <div style="margin-bottom: 4px;">
+                    <span class="diff-old">原文: {{ mod.old.content[:100] }}{% if mod.old.content|length > 100 %}...{% endif %}</span>
+                </div>
+                <div>
+                    <span class="diff-new">新文: {{ mod.new.content[:100] }}{% if mod.new.content|length > 100 %}...{% endif %}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+fare_rules:
+  - min_distance: 0
+    max_distance: 3000
+    price: 200
+  - min_distance: 3001
+    max_distance: 6000
+    price: 300
+  - min_distance: 6001
+    max_distance: 10000
+    price: 400
+  - min_distance: 10001
+    max_distance: 999999
+    price: 500
+max_trip_time: 7200
+transfer_time_window: 1800

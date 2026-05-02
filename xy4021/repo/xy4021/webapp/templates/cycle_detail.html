@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+
+{% block title %}锅次详情 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('cycles') }}">锅次管理</a></li>
+                <li class="breadcrumb-item active">{{ cycle.cycle_number }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="form-section">
+            <h4>🔥 锅次信息</h4>
+            <div class="mb-3">
+                <span class="status-badge cycle-status-{{ cycle.status }}" style="font-size: 1em;">
+                    {{ cycle.status }}
+                </span>
+            </div>
+            
+            <div class="detail-card">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">锅次编号</div>
+                        <div class="detail-value">{{ cycle.cycle_number }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">灭菌锅号</div>
+                        <div class="detail-value">{{ cycle.autoclave_id }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">操作人</div>
+                        <div class="detail-value">{{ cycle.operator }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">创建时间</div>
+                        <div class="detail-value small">{{ cycle.created_at }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">温度</div>
+                        <div class="detail-value">
+                            {% if cycle.temperature %}{{ cycle.temperature }}℃{% else %}-{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">压力</div>
+                        <div class="detail-value">
+                            {% if cycle.pressure %}{{ cycle.pressure }}kPa{% else %}-{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">开始时间</div>
+                        <div class="detail-value small">{{ cycle.start_time or '-' }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">结束时间</div>
+                        <div class="detail-value small">{{ cycle.end_time or '-' }}</div>
+                    </div>
+                </div>
+                
+                {% if cycle.status != CycleStatus.IN_PROGRESS.value %}
+                <hr>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">生物指示</div>
+                        <div>
+                            {% if cycle.biological_indicator %}
+                            <span class="status-badge {% if cycle.biological_indicator == '通过' %}status-已放行{% else %}status-已隔离{% endif %}">
+                                {{ cycle.biological_indicator }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="detail-label">化学指示</div>
+                        <div>
+                            {% if cycle.chemical_indicator %}
+                            <span class="status-badge {% if cycle.chemical_indicator == '通过' %}status-已放行{% else %}status-已隔离{% endif %}">
+                                {{ cycle.chemical_indicator }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if cycle.failure_reason %}
+                <div class="alert alert-danger py-2 mb-0">
+                    <strong>失败原因:</strong> {{ cycle.failure_reason }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-grid gap-2">
+                {% if cycle.status == CycleStatus.IN_PROGRESS.value %}
+                <button type="button" class="btn btn-success" onclick="showCompleteModal()">
+                    ✅ 完成锅次
+                </button>
+                <button type="button" class="btn btn-outline-danger" onclick="showFailModal()">
+                    ❌ 标记失败
+                </button>
+                {% endif %}
+                
+                {% if cycle.status == CycleStatus.COMPLETED.value %}
+                    {% if cycle.biological_indicator == IndicatorResult.PASS.value and cycle.chemical_indicator == IndicatorResult.PASS.value %}
+                    <form method="POST" action="{{ url_for('release_cycle', cycle_id=cycle.id) }}"
+                          onsubmit="return confirmAction('确定要放行这个锅次的所有器械包吗？')">
+                        <button type="submit" class="btn btn-primary w-100">
+                            📤 放行器械包
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <strong>提示:</strong> 生物/化学指示结果未通过或缺失，无法放行。
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+                <a href="{{ url_for('cycles') }}" class="btn btn-outline-secondary">
+                    ← 返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        {% if cycle.status == CycleStatus.IN_PROGRESS.value and available_packages %}
+        <div class="form-section">
+            <h4>➕ 添加器械包</h4>
+            <form method="POST" action="{{ url_for('add_package_to_cycle', cycle_id=cycle.id) }}">
+                <div class="mb-3">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"></th>
+                                    <th>器械包编号</th>
+                                    <th>模板类型</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pkg in available_packages %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="package_ids" value="{{ pkg.id }}">
+                                    </td>
+                                    <td><strong>{{ pkg.package_number }}</strong></td>
+                                    <td>{{ pkg.template_name }}</td>
+                                    <td><span class="status-badge status-{{ pkg.status }}" style="font-size: 0.8em;">{{ pkg.status }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleAllCheckboxes()">
+                        全选/取消全选
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        添加选中的器械包
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+        
+        <div class="form-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">📦 锅内器械包 ({{ packages|length }})</h4>
+            </div>
+            
+            {% if packages %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>器械包编号</th>
+                            <th>模板类型</th>
+                            <th>当前状态</th>
+                            <th>加入时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pkg in packages %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('package_history', package_id=pkg.id) }}" class="text-decoration-none">
+                                    <strong>{{ pkg.package_number }}</strong>
+                                </a>
+                            </td>
+                            <td>{{ pkg.template_name }}</td>
+                            <td>
+                                <span class="status-badge status-{{ pkg.status }}">{{ pkg.status }}</span>
+                            </td>
+                            <td class="text-muted small">{{ pkg.added_at }}</td>
+                            <td>
+                                {% if cycle.status == CycleStatus.IN_PROGRESS.value %}
+                                <form method="POST" action="{{ url_for('remove_package_from_cycle', cycle_id=cycle.id, package_id=pkg.id) }}" 
+                                      style="display:inline;"
+                                      onsubmit="return confirmAction('确定要从锅次中移除此器械包吗？')">
+                                    <input type="hidden" name="reason" value="手动移除">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        移除
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <div class="mb-2">📦</div>
+                <p>暂无器械包</p>
+                {% if cycle.status == CycleStatus.IN_PROGRESS.value %}
+                <p class="small">可在上方添加待灭菌的器械包</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="completeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">完成锅次</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('complete_cycle', cycle_id=cycle.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">温度 (℃)</label>
+                        <input type="number" name="temperature" class="form-control" 
+                               value="{{ cycle.temperature or '' }}" step="0.1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">压力 (kPa)</label>
+                        <input type="number" name="pressure" class="form-control"
+                               value="{{ cycle.pressure or '' }}" step="0.1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">生物指示结果 <span class="text-danger">*</span></label>
+                        <select name="biological_indicator" class="form-select" required>
+                            <option value="">请选择</option>
+                            <option value="通过">通过</option>
+                            <option value="未通过">未通过</option>
+                            <option value="待确认">待确认</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">化学指示结果 <span class="text-danger">*</span></label>
+                        <select name="chemical_indicator" class="form-select" required>
+                            <option value="">请选择</option>
+                            <option value="通过">通过</option>
+                            <option value="未通过">未通过</option>
+                            <option value="待确认">待确认</option>
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">操作人</label>
+                        <input type="text" name="operator" class="form-control"
+                               value="{{ cycle.operator }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">确认完成</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="failModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">⚠️ 标记锅次失败</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('fail_cycle', cycle_id=cycle.id) }}">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>警告:</strong> 标记失败后，锅内所有未领用的器械包将被自动隔离！
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">失败原因 <span class="text-danger">*</span></label>
+                        <textarea name="failure_reason" class="form-control" rows="3" required
+                                  placeholder="请输入失败原因..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">确认标记失败</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showCompleteModal() {
+    new bootstrap.Modal(document.getElementById('completeModal')).show();
+}
+
+function showFailModal() {
+    new bootstrap.Modal(document.getElementById('failModal')).show();
+}
+
+function toggleAllCheckboxes() {
+    const checkboxes = document.querySelectorAll('input[name="package_ids"]');
+    const firstChecked = checkboxes.length > 0 ? checkboxes[0].checked : false;
+    checkboxes.forEach(cb => cb.checked = !firstChecked);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('reports') }}">报表中心</a></li>
+                <li class="breadcrumb-item active">{{ title }}</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('reports') }}" class="btn btn-outline-secondary">
+            ← 返回报表中心
+        </a>
+    </div>
+</div>
+
+<div class="form-section">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">📄 {{ title }}</h4>
+        <button class="btn btn-outline-primary btn-sm" onclick="printReport()">
+            🖨️ 打印 / 复制
+        </button>
+    </div>
+    
+    <div class="bg-light p-4 rounded" id="reportContent">
+        <pre style="white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; margin: 0;">{{ content }}</pre>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function printReport() {
+    const content = document.getElementById('reportContent').innerText;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>{{ title }}</title>
+            <style>
+                body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; padding: 20px; }
+                pre { white-space: pre-wrap; margin: 0; }
+            </style>
+        </head>
+        <body>
+            <pre>${content}</pre>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+}
+</script>
+{% endblock %}

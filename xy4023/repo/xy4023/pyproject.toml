@@ -1,0 +1,23 @@
+[project]
+name = "hydrocalc"
+version = "0.1.0"
+description = "水培营养液配方计算 CLI 工具"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+hydrocalc = "hydrocalc.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hydrocalc"]

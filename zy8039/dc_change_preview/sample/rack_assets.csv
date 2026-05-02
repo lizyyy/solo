@@ -1,0 +1,12 @@
+device_id,name,device_type,rack_id,u_start,u_end,power_circuits,primary_switch_port,secondary_switch_port,status
+srv-001,Web Server 1,server,RACK-A01,1,2,circuit-A1;circuit-B1,port-001,,online
+srv-002,Web Server 2,server,RACK-A01,3,4,circuit-A1;circuit-B1,port-002,,online
+srv-003,DB Server 1,server,RACK-A01,5,6,circuit-A2;circuit-B2,port-003,,online
+srv-004,App Server 1,server,RACK-A02,1,2,circuit-A3;circuit-B3,port-005,,online
+srv-005,App Server 2,server,RACK-A02,3,4,circuit-A3;circuit-B3,port-006,,online
+srv-006,Storage Node 1,storage,RACK-B01,10,12,circuit-C1;circuit-D1,port-010,,online
+srv-007,Cache Server 1,server,RACK-B01,20,21,circuit-C2;circuit-D2,port-015,,online
+sw-001,Core Switch 1,switch,RACK-A03,43,44,circuit-E1,,,online
+sw-002,Access Switch 1,switch,RACK-A03,45,46,circuit-E1,,,online
+srv-008,New Web Server,server,RACK-A01,,,,,,offline
+srv-009,Migrated Server,server,RACK-A02,,,,,,offline

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}复核问题 - 借展装箱交接核对台{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">首页</a> / 
+    <a href="{{ url_for('session_detail', session_id=session.session_id) }}">{{ session.name }}</a> / 
+    复核问题
+</div>
+
+<div class="card">
+    <h2>问题详情</h2>
+    
+    <div class="issue-detail">
+        <p><strong>问题ID：</strong>{{ issue.issue_id }}</p>
+        <p><strong>问题类型：</strong>{{ issue.issue_type.value if issue.issue_type else '-' }}</p>
+        <p><strong>严重程度：</strong>
+            <span class="status-badge status-{{ issue.severity.value if issue.severity else 'info' }}">
+                {{ issue.severity.value if issue.severity else '未知' }}
+            </span>
+        </p>
+        <p><strong>当前状态：</strong>
+            <span class="status-badge status-{{ issue.review_status.value if issue.review_status else 'pending' }}">
+                {{ issue.review_status.value if issue.review_status else '待处理' }}
+            </span>
+        </p>
+        <p><strong>问题描述：</strong>{{ issue.message }}</p>
+        
+        {% if issue.affected_items %}
+        <p><strong>影响的藏品：</strong>{{ issue.affected_items|join(', ') }}</p>
+        {% endif %}
+        
+        {% if issue.affected_boxes %}
+        <p><strong>影响的箱子：</strong>{{ issue.affected_boxes|join(', ') }}</p>
+        {% endif %}
+        
+        {% if issue.affected_seals %}
+        <p><strong>影响的封签：</strong>{{ issue.affected_seals|join(', ') }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <h2>复核处理</h2>
+    
+    <form action="{{ url_for('review_issue', session_id=session.session_id, issue_id=issue.issue_id) }}" method="post">
+        <div class="form-group">
+            <label for="author">复核人</label>
+            <input type="text" id="author" name="author" placeholder="请输入您的姓名" value="管理员">
+        </div>
+        
+        <div class="form-group">
+            <label for="status">更新状态</label>
+            <select id="status" name="status">
+                <option value="">-- 不改变状态 --</option>
+                <option value="pending" {% if issue.review_status.value == 'pending' %}selected{% endif %}>待处理</option>
+                <option value="reviewed" {% if issue.review_status.value == 'reviewed' %}selected{% endif %}>已复核</option>
+                <option value="resolved" {% if issue.review_status.value == 'resolved' %}selected{% endif %}>已解决</option>
+                <option value="dismissed" {% if issue.review_status.value == 'dismissed' %}selected{% endif %}>忽略</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="note">复核备注</label>
+            <textarea id="note" name="note" placeholder="请输入复核备注..."></textarea>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 0;">
+            <button type="submit" class="btn btn-primary">保存复核记录</button>
+            <a href="{{ url_for('session_detail', session_id=session.session_id) }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+
+{% if issue.review_notes %}
+<div class="card">
+    <h2>复核历史 ({{ issue.review_notes|length }} 条记录)</h2>
+    
+    {% for note in issue.review_notes %}
+    <div class="note-item">
+        <p style="font-weight: 500; margin-bottom: 8px;">{{ note.content }}</p>
+        <div class="note-meta">
+            <span><strong>{{ note.author }}</strong></span>
+            <span style="margin-left: 15px;">{{ note.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+            {% if note.status_change %}
+            <span style="margin-left: 15px;">
+                状态变更为: 
+                <span class="status-badge status-{{ note.status_change.value }}">
+                    {{ note.status_change.value }}
+                </span>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

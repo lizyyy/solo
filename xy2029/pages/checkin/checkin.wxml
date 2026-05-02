@@ -1,0 +1,112 @@
+<view class="container">
+  <view class="checkin-header card">
+    <view class="today-status">
+      <view class="status-icon">{{todayChecked ? '✅' : '📅'}}</view>
+      <view class="status-text">
+        <view class="status-title">{{todayChecked ? '今日已打卡' : '今日未打卡'}}</view>
+        <view class="status-desc">连续打卡 {{continuousDays}} 天</view>
+      </view>
+    </view>
+    <view class="checkin-stats">
+      <view class="stat-item">
+        <view class="stat-value">{{totalSavings}}</view>
+        <view class="stat-label">累计存钱(元)</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{totalIncome}}</view>
+        <view class="stat-label">额外收入(元)</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <view class="action-grid">
+      <view class="action-item card" bindtap="showSavingsModal">
+        <view class="action-icon">💰</view>
+        <view class="action-text">存钱打卡</view>
+      </view>
+      <view class="action-item card" bindtap="showIncomeModal">
+        <view class="action-icon">💼</view>
+        <view class="action-text">收入记录</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tabs-section">
+    <view class="tabs">
+      <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" bindtap="switchTab" data-index="0">
+        全部记录
+      </view>
+      <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" bindtap="switchTab" data-index="1">
+        存钱记录
+      </view>
+      <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" bindtap="switchTab" data-index="2">
+        收入记录
+      </view>
+    </view>
+  </view>
+
+  <view class="records-list" wx:if="{{filteredRecords.length > 0}}">
+    <view class="record-item card" wx:for="{{filteredRecords}}" wx:key="id">
+      <view class="record-left">
+        <view class="record-type-icon">{{item.type === 'savings' ? '💰' : '💼'}}</view>
+        <view class="record-info">
+          <view class="record-title">{{item.title}}</view>
+          <view class="record-time">{{item.createTime}}</view>
+        </view>
+      </view>
+      <view class="record-right">
+        <view class="record-amount amount-{{item.type === 'savings' ? 'savings' : 'income'}}">
+          {{item.type === 'income' ? '+' : '-'}}¥{{item.amount}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-icon">📝</view>
+    <view class="empty-text">暂无记录</view>
+    <view class="empty-desc">点击上方按钮开始记录你的财务</view>
+  </view>
+
+  <view class="bottom-space"></view>
+
+  <view class="modal-mask" wx:if="{{showModal}}" bindtap="hideModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-title">{{currentModal === 'savings' ? '存钱打卡' : '收入记录'}}</view>
+      
+      <view class="form-group">
+        <view class="form-label">金额(元)</view>
+        <input class="form-input" type="digit" placeholder="请输入金额" value="{{inputAmount}}" bindinput="onAmountInput" />
+      </view>
+      
+      <view class="form-group" wx:if="{{currentModal === 'income'}}">
+        <view class="form-label">收入类型</view>
+        <view class="type-picker">
+          <view class="type-item {{incomeType === 'salary' ? 'active' : ''}}" bindtap="selectIncomeType" data-type="salary">
+            💼 工资
+          </view>
+          <view class="type-item {{incomeType === 'side' ? 'active' : ''}}" bindtap="selectIncomeType" data-type="side">
+            🛠️ 副业
+          </view>
+          <view class="type-item {{incomeType === 'bonus' ? 'active' : ''}}" bindtap="selectIncomeType" data-type="bonus">
+            🎉 奖金
+          </view>
+          <view class="type-item {{incomeType === 'other' ? 'active' : ''}}" bindtap="selectIncomeType" data-type="other">
+            💵 其他
+          </view>
+        </view>
+      </view>
+      
+      <view class="form-group">
+        <view class="form-label">备注(选填)</view>
+        <input class="form-input" type="text" placeholder="添加备注" value="{{inputRemark}}" bindinput="onRemarkInput" />
+      </view>
+      
+      <view class="modal-actions">
+        <view class="modal-btn cancel-btn" bindtap="hideModal">取消</view>
+        <view class="modal-btn confirm-btn" bindtap="submitRecord">确认</view>
+      </view>
+    </view>
+  </view>
+</view>

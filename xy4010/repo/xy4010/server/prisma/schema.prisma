@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum TicketStatus {
+  PENDING_ASSIGNMENT
+  IN_PROGRESS
+  PENDING_INSPECTION
+  COMPLETED
+  OVERDUE
+}
+
+model Technician {
+  id       String  @id @default(uuid())
+  name     String  @unique
+  tickets  Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ticket {
+  id              String         @id @default(uuid())
+  ticketNumber    String         @unique
+  callerName      String
+  callerPhone     String
+  location        String
+  description     String
+  priority        Int            @default(1)
+  status          TicketStatus   @default(PENDING_ASSIGNMENT)
+  assignedToId    String?
+  assignedTo      Technician?    @relation(fields: [assignedToId], references: [id])
+  materials       MaterialItem[]
+  result          String?
+  expectedDueDate DateTime?
+  actualEndDate   DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model MaterialItem {
+  id          String  @id @default(uuid())
+  name        String
+  quantity    Int
+  ticketId    String
+  ticket      Ticket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}

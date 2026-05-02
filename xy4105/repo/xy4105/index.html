@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活字排版急救员 - 博物馆研学小游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="menu-screen" class="screen active">
+            <header class="game-header">
+                <h1>活字排版急救员</h1>
+                <p class="subtitle">古籍文献抢救行动</p>
+            </header>
+            
+            <div class="menu-container">
+                <button id="start-game" class="btn btn-primary btn-large">开始游戏</button>
+            </div>
+            
+            <footer class="game-footer">
+                <p>博物馆研学活动专用 · 体验古法活字印刷</p>
+            </footer>
+        </div>
+
+        <div id="level-select" class="screen">
+            <header class="screen-header">
+                <h2>选择关卡</h2>
+                <button id="back-to-menu" class="btn btn-secondary">返回主菜单</button>
+            </header>
+            
+            <div id="level-list" class="level-grid"></div>
+            
+            <div class="custom-level-section">
+                <h3>自定义关卡</h3>
+                <div class="custom-controls">
+                    <input type="file" id="import-level" accept=".json" style="display: none;">
+                    <button id="btn-import-level" class="btn btn-secondary">导入JSON关卡</button>
+                    <button id="btn-export-template" class="btn btn-secondary">导出关卡模板</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <header class="game-header">
+                <div class="level-info">
+                    <h2 id="level-title">第1关</h2>
+                    <p id="level-hint" class="hint">提示: 将活字按正确顺序放入版框</p>
+                </div>
+                
+                <div class="game-stats">
+                    <div class="stat">
+                        <span class="stat-label">用时</span>
+                        <span id="timer" class="stat-value">00:00</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">步数</span>
+                        <span id="step-count" class="stat-value">0</span>
+                        <span id="max-steps" class="stat-max">/∞</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">得分</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button id="btn-pause" class="btn btn-icon" title="暂停">⏸</button>
+                    <button id="btn-restart" class="btn btn-icon" title="重新开始">🔄</button>
+                    <button id="btn-undo" class="btn btn-icon" title="撤销">↩</button>
+                    <button id="btn-redo" class="btn btn-icon" title="重做">↪</button>
+                    <button id="btn-exit" class="btn btn-icon" title="退出关卡">✕</button>
+                </div>
+            </header>
+
+            <main class="game-main">
+                <div class="character-pool">
+                    <h3>字库</h3>
+                    <div id="char-pool" class="pool-grid"></div>
+                </div>
+
+                <div class="frame-area">
+                    <div class="frame-container">
+                        <div id="print-frame" class="print-frame"></div>
+                    </div>
+                    <div class="frame-info">
+                        <span id="frame-dimensions">版心: 4×4</span>
+                        <span id="forbidden-info">禁排格: 无</span>
+                    </div>
+                </div>
+            </main>
+
+            <div id="message-toast" class="message-toast hidden">
+                <span id="message-text"></span>
+            </div>
+        </div>
+
+        <div id="pause-overlay" class="overlay hidden">
+            <div class="overlay-content">
+                <h2 id="overlay-title">游戏暂停</h2>
+                <div id="pause-content">
+                    <p>休息一下，准备好后继续吧！</p>
+                </div>
+                <div id="victory-content" class="hidden">
+                    <div class="victory-stats">
+                        <div class="victory-stat">
+                            <span class="label">用时</span>
+                            <span id="final-time" class="value">--:--</span>
+                        </div>
+                        <div class="victory-stat">
+                            <span class="label">步数</span>
+                            <span id="final-steps" class="value">--</span>
+                        </div>
+                        <div class="victory-stat">
+                            <span class="label">得分</span>
+                            <span id="final-score" class="value">--</span>
+                        </div>
+                        <div class="victory-stat">
+                            <span class="label">评级</span>
+                            <span id="final-rating" class="value rating">--</span>
+                        </div>
+                    </div>
+                    <div class="reconstructed-text">
+                        <h4>还原的古籍:</h4>
+                        <p id="reconstructed-text"></p>
+                    </div>
+                </div>
+                <div class="overlay-buttons">
+                    <button id="btn-resume" class="btn btn-primary">继续游戏</button>
+                    <button id="btn-restart-level" class="btn btn-secondary">重新开始</button>
+                    <button id="btn-next-level" class="btn btn-primary hidden">下一关</button>
+                    <button id="btn-to-level-select" class="btn btn-secondary">选择关卡</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/game.js"></script>
+</body>
+</html>

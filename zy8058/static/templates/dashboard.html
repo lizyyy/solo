@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生态样方复核看板</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+        }
+        
+        .panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        #map {
+            height: 400px;
+            border-radius: 4px;
+        }
+        
+        #chart-container {
+            height: 350px;
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        
+        select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            padding: 0.5rem 1.5rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .anomaly-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        
+        .anomaly-high {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .anomaly-medium {
+            background: #fff3e0;
+            border-color: #ff9800;
+        }
+        
+        .anomaly-low {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌿 生态样方复核看板</h1>
+    </div>
+    
+    <div class="container">
+        <div class="panel full-width">
+            <h2>📊 总体统计</h2>
+            <div class="stats-grid" id="stats-grid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>🗺️ 样方地图</h2>
+            <div class="filter-section">
+                <label>样地筛选:</label>
+                <select id="site-filter">
+                    <option value="all">全部</option>
+                </select>
+            </div>
+            <div id="map"></div>
+        </div>
+        
+        <div class="panel">
+            <h2>📈 多样性指数</h2>
+            <div id="chart-container">
+                <canvas id="diversity-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="panel full-width">
+            <h2>⚠️ 异常检测</h2>
+            <div class="filter-section">
+                <button id="export-btn">导出报告</button>
+            </div>
+            <div id="anomalies-list">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appData = null;
+        let map = null;
+        let chart = null;
+        let markers = [];
+
+        async function loadData() {
+            const response = await fetch('/api/data');
+            appData = await response.json();
+            initializeDashboard();
+        }
+
+        function initializeDashboard() {
+            updateStats();
+            initializeMap();
+            initializeChart();
+            initializeFilter();
+            updateAnomalies();
+        }
+
+        function updateStats() {
+            const totalQuadrats = new Set(appData.survey_data.map(d => d.quadrat_id)).size;
+            const totalSpecies = new Set(appData.survey_data.map(d => d.species_name)).size;
+            const totalSites = appData.sites.length;
+            const totalAnomalies = appData.anomalies.length;
+
+            document.getElementById('stats-grid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalSites}</div>
+                    <div class="stat-label">样地数量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalQuadrats}</div>
+                    <div class="stat-label">样方数量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalSpecies}</div>
+                    <div class="stat-label">物种数量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalAnomalies}</div>
+                    <div class="stat-label">异常数量</div>
+                </div>
+            `;
+        }
+
+        function initializeMap() {
+            if (map) return;
+            
+            const firstCoord = appData.geojson.features[0]?.geometry.coordinates;
+            map = L.map('map').setView([firstCoord ? [firstCoord[1], firstCoord[0]] : [40, 116], 10);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            updateMapMarkers('all');
+        }
+
+        function updateMapMarkers(siteId) {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            appData.geojson.features.forEach(feature => {
+                if (siteId !== 'all' && feature.properties.site_id !== siteId) return;
+                
+                const hasAnomaly = appData.anomalies.some(a => a.quadrat_id === feature.properties.quadrat_id);
+                const color = hasAnomaly ? '#f44336' : '#4caf50';
+                
+                const marker = L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <b>样方: ${feature.properties.quadrat_id}<br>
+                    样地: ${feature.properties.site_id}
+                `);
+                markers.push(marker);
+            });
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('diversity-chart');
+            const labels = appData.quadrat_metrics.map(q => q.quadrat_id);
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Shannon指数',
+                            data: appData.quadrat_metrics.map(q => q.shannon),
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Simpson指数',
+                            data: appData.quadrat_metrics.map(q => q.simpson),
+                            backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                    }
+                }
+            });
+        }
+
+        function initializeFilter() {
+            const filter = document.getElementById('site-filter');
+            appData.sites.forEach(site => {
+                const option = document.createElement('option');
+                option.value = site;
+                option.textContent = site;
+                filter.appendChild(option);
+            });
+
+            filter.addEventListener('change', (e) => {
+                updateMapMarkers(e.target.value);
+            });
+        }
+
+        function updateAnomalies() {
+            const container = document.getElementById('anomalies-list');
+            
+            if (appData.anomalies.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: #4caf50;">✅ 无异常检测</div>';
+                return;
+            }
+
+            const typeLabels = {
+                'spelling_drift': '拼写漂移',
+                'duplicate_record': '重复记录',
+                'area_inconsistency': '面积不一致',
+                'invasive_concentration': '入侵物种集中',
+                'missing_coordinates': '坐标缺失'
+            };
+
+            container.innerHTML = appData.anomalies.map(anomaly => `
+                <div class="anomaly-item anomaly-${anomaly.severity}">
+                    <strong>${typeLabels[anomaly.type] || anomaly.type}</strong>
+                    <div style="margin-top: 0.5rem; font-size: 0.9rem;">
+                        ${Object.entries(anomaly).filter(([k]) => !['type', 'severity'].includes(k)).map(([k, v]) => `${k}: ${v}`).join(' | ')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('export-btn').addEventListener('click', async () => {
+            const response = await fetch('/api/export', { method: 'POST' });
+            const result = await response.json();
+            if (result.success) {
+                alert('报告已导出！\nsummary.md 和 anomalies.csv');
+            }
+        });
+
+        loadData();
+    </script>
+</body>
+</html>

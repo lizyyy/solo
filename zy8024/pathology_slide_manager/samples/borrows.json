@@ -1,0 +1,77 @@
+{
+  "borrows": [
+    {
+      "record_id": "B001",
+      "slide_id": "SL001",
+      "borrower_name": "张医生",
+      "borrower_dept": "肿瘤科",
+      "borrow_date": "2024-02-01",
+      "expected_return_date": "2024-02-08",
+      "notes": "常规借阅用于会诊"
+    },
+    {
+      "record_id": "B002",
+      "slide_id": "SL003",
+      "borrower_name": "李医生",
+      "borrower_dept": "外科",
+      "borrow_date": "2024-02-05",
+      "expected_return_date": "2024-02-12",
+      "notes": "手术前对比"
+    },
+    {
+      "record_id": "B003",
+      "slide_id": "SL005",
+      "borrower_name": "王研究员",
+      "borrower_dept": "研究所",
+      "borrow_date": "2024-01-28",
+      "expected_return_date": "2024-02-04",
+      "notes": "科研项目使用"
+    },
+    {
+      "record_id": "B004",
+      "slide_id": "SL007",
+      "borrower_name": "赵医生",
+      "borrower_dept": "肿瘤科",
+      "borrow_date": "2024-02-10",
+      "expected_return_date": "2024-02-15",
+      "notes": "MDT讨论"
+    },
+    {
+      "record_id": "B005",
+      "slide_id": "SL009",
+      "borrower_name": "钱医生",
+      "borrower_dept": "外科",
+      "borrow_date": "2024-01-20",
+      "expected_return_date": "2024-01-27",
+      "actual_return_date": "2024-02-05",
+      "notes": "术后病理复核-逾期归还"
+    },
+    {
+      "record_id": "B006",
+      "slide_id": "SL002",
+      "borrower_name": "孙医生",
+      "borrower_dept": "病理科",
+      "borrow_date": "2024-02-15",
+      "expected_return_date": "2024-02-22",
+      "notes": "内部质控"
+    },
+    {
+      "record_id": "B007",
+      "slide_id": "SL006",
+      "borrower_name": "周研究员",
+      "borrower_dept": "研究所",
+      "borrow_date": "2024-02-01",
+      "expected_return_date": "2024-02-15",
+      "notes": "免疫组化研究"
+    },
+    {
+      "record_id": "B008",
+      "slide_id": "SL004",
+      "borrower_name": "吴医生",
+      "borrower_dept": "外科",
+      "borrow_date": "2024-02-20",
+      "expected_return_date": "2024-02-25",
+      "notes": "术中快速病理支持"
+    }
+  ]
+}

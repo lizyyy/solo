@@ -1,0 +1,29 @@
+{"session_id": "sess_001", "user_id": "user_1001", "event": "page_view", "timestamp": "2024-01-15 10:00:00", "page": "home", "props": {"referrer": "search"}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "product_impression", "timestamp": "2024-01-15 10:00:05", "page": "home", "props": {"product_id": "p_1001"}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "product_impression", "timestamp": "2024-01-15 10:00:06", "page": "home", "props": {"product_id": "p_1002"}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "click_product", "timestamp": "2024-01-15 10:00:10", "page": "home", "props": {"product_id": "p_1001"}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "page_view", "timestamp": "2024-01-15 10:00:12", "page": "detail", "props": {"product_id": "p_1001"}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "click_buy", "timestamp": "2024-01-15 10:02:30", "page": "detail", "props": {"product_id": "p_1001", "quantity": 1}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "submit_order", "timestamp": "2024-01-15 10:03:00", "page": "checkout", "props": {"order_id": "o_001", "total": 99.0}}
+{"session_id": "sess_001", "user_id": "user_1001", "event": "payment_success", "timestamp": "2024-01-15 10:03:15", "page": "checkout", "props": {"order_id": "o_001", "payment_method": "alipay"}}
+
+{"session_id": "sess_002", "user_id": "user_1002", "event": "page_view", "timestamp": "2024-01-15 11:00:00", "page": "home", "props": {"referrer": "direct"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "product_impression", "timestamp": "2024-01-15 11:00:03", "page": "home", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "click_product", "timestamp": "2024-01-15 11:00:10", "page": "home", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "page_view", "timestamp": "2024-01-15 11:00:15", "page": "detail", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "product_impression", "timestamp": "2024-01-15 11:00:16", "page": "detail", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "product_impression", "timestamp": "2024-01-15 11:00:17", "page": "detail", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "product_impression", "timestamp": "2024-01-15 11:00:18", "page": "detail", "props": {"product_id": "p_2001"}}
+{"session_id": "sess_002", "user_id": "user_1002", "event": "product_impression", "timestamp": "2024-01-15 11:00:19", "page": "detail", "props": {"product_id": "p_2001"}}
+
+{"session_id": "sess_003", "user_id": "user_1003", "event": "page_view", "timestamp": "2024-01-15 12:00:00", "page": "home", "props": {"referrer": "social"}}
+{"session_id": "sess_003", "user_id": "user_1003", "event": "click_product", "timestamp": "2024-01-15 12:00:05", "page": "home", "props": {"product_id": "p_3001"}}
+{"session_id": "sess_003", "user_id": "user_1003", "event": "page_view", "timestamp": "2024-01-15 12:00:10", "page": "detail", "props": {"product_id": "p_3001"}}
+{"session_id": "sess_003", "user_id": "user_1003", "event": "payment_success", "timestamp": "2024-01-15 12:01:00", "page": "checkout", "props": {"order_id": "o_003", "payment_method": "wechat"}}
+
+{"session_id": "sess_004", "user_id": "user_1004", "event": "page_view", "timestamp": "2024-01-15 13:00:00", "page": "home", "props": {"referrer": "search"}}
+{"session_id": "sess_004", "user_id": "user_1004", "event": "product_impression", "timestamp": "2024-01-15 13:00:02", "page": "home", "props": {"product_id": "p_4001"}}
+{"session_id": "sess_004", "user_id": "user_1004", "event": "product_impression", "timestamp": "2024-01-15 13:00:03", "page": "home", "props": {"product_id": "p_4002"}}
+{"session_id": "sess_004", "user_id": "user_1004", "event": "click_product", "timestamp": "2024-01-15 13:00:10", "page": "home", "props": {"product_id": "p_4001"}}
+{"session_id": "sess_004", "user_id": "user_1004", "event": "page_view", "timestamp": "2024-01-15 13:00:15", "page": "detail", "props": {"product_id": "p_4001"}}
+{"session_id": "sess_004", "user_id": "user_1004", "event": "add_to_cart", "timestamp": "2024-01-15 13:03:00", "page": "detail", "props": {"product_id": "p_4001", "quantity": 2}}

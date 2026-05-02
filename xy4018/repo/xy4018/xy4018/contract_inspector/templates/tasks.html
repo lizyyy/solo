@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}历史任务 - 合同改稿巡检器{% endblock %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+        <h2 style="margin: 0; color: #1a1a2e;">📋 历史巡检任务</h2>
+        <a href="{{ url_for('inspect') }}" class="btn btn-primary">
+            🔍 新建巡检
+        </a>
+    </div>
+
+    <div class="card" style="margin-bottom: 30px;">
+        <form method="GET" action="{{ url_for('tasks') }}" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 200px;">
+                <label class="form-label" style="margin-bottom: 8px;">客户名称</label>
+                <input type="text" name="client" class="form-input" 
+                       placeholder="输入客户名称筛选" value="{{ current_client }}">
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label class="form-label" style="margin-bottom: 8px;">合同名称</label>
+                <input type="text" name="contract_name" class="form-input" 
+                       placeholder="输入合同名称筛选" value="{{ current_contract }}">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-secondary">
+                    🔍 筛选
+                </button>
+                <a href="{{ url_for('tasks') }}" class="btn btn-secondary" style="background: #f0f0f0; color: #333;">
+                    🔄 重置
+                </a>
+            </div>
+        </form>
+    </div>
+
+    {% if tasks %}
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>任务ID</th>
+                    <th>客户名称</th>
+                    <th>合同名称</th>
+                    <th>巡检时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td style="font-family: monospace; color: #667eea; font-weight: 500;">
+                        {{ task.id }}
+                    </td>
+                    <td>{{ task.client }}</td>
+                    <td>{{ task.contract_name }}</td>
+                    <td>{{ task.created_at|datetime_format }}</td>
+                    <td>
+                        <a href="{{ url_for('result', task_id=task.id) }}" class="btn btn-primary" 
+                           style="padding: 8px 16px; font-size: 14px;">
+                            查看详情
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 20px; text-align: center; color: #666; font-size: 14px;">
+            共 {{ tasks|length }} 条记录
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3>暂无巡检记录</h3>
+        <p style="margin-bottom: 20px;">
+            {% if current_client or current_contract %}
+                没有找到匹配的任务，请尝试其他筛选条件
+            {% else %}
+                上传两版合同开始第一次巡检
+            {% endif %}
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('inspect') }}" class="btn btn-primary">
+                📄 开始新巡检
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                🏠 返回首页
+            </a>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

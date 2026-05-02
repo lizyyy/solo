@@ -1,0 +1,113 @@
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card card">
+    <view class="flex align-center">
+      <image 
+        class="user-avatar" 
+        src="{{isLoggedIn ? userInfo.avatar : 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20avatar%20simple&image_size=square'}}" 
+        mode="aspectFill"
+        bindtap="handleLogin"
+      />
+      <view class="user-info flex-1 ml-30">
+        <view class="user-name">
+          {{isLoggedIn ? userInfo.userName : '点击登录'}}
+        </view>
+        <view class="user-desc text-secondary" wx:if="{{isLoggedIn}}">
+          加入时间：{{userInfo.createTime}}
+        </view>
+        <view class="login-tip text-secondary" wx:else bindtap="handleLogin">
+          登录后体验更多功能
+        </view>
+      </view>
+    </view>
+    
+    <!-- 统计数据 -->
+    <view class="stats-row flex flex-between mt-30" wx:if="{{isLoggedIn}}">
+      <view class="stat-item text-center">
+        <view class="stat-num">{{userPosts}}</view>
+        <view class="stat-label text-secondary">动态</view>
+      </view>
+      <view class="stat-item text-center">
+        <view class="stat-num">{{friends}}</view>
+        <view class="stat-label text-secondary">关注</view>
+      </view>
+      <view class="stat-item text-center">
+        <view class="stat-num">{{followers}}</view>
+        <view class="stat-label text-secondary">粉丝</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section card">
+    <view class="menu-title">功能菜单</view>
+    <view class="menu-list">
+      <view 
+        class="menu-item flex flex-between align-center" 
+        wx:for="{{menuItems}}" 
+        wx:key="id"
+        bindtap="handleMenuClick"
+        data-action="{{item.action}}"
+      >
+        <view class="flex align-center">
+          <image class="menu-icon" src="{{item.icon}}" mode="aspectFill" />
+          <text class="menu-name">{{item.name}}</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的动态预览 -->
+  <view class="moments-section card" wx:if="{{isLoggedIn && userMoments.length > 0}}">
+    <view class="section-header flex flex-between">
+      <view class="section-title">我的动态</view>
+      <text class="more-text text-secondary">查看全部 ›</text>
+    </view>
+    <view class="moments-list">
+      <view 
+        class="moment-item" 
+        wx:for="{{userMoments.slice(0, 3)}}" 
+        wx:key="id"
+        bindtap="goToMomentDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="moment-content">{{item.content}}</view>
+        <view class="moment-footer flex flex-between text-secondary">
+          <text>{{item.createTime}}</text>
+          <view class="moment-stats">
+            <text>❤ {{item.likeCount}}</text>
+            <text class="ml-20">💬 {{item.commentCount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史测试记录 -->
+  <view class="test-section card" wx:if="{{isLoggedIn && testHistory.length > 0}}">
+    <view class="section-header flex flex-between">
+      <view class="section-title">最近测试</view>
+    </view>
+    <view class="test-list">
+      <view class="test-item" wx:for="{{testHistory.slice(-3)}}" wx:key="id">
+        <view class="test-info flex flex-between">
+          <text class="test-date">{{item.createTime}}</text>
+          <text class="test-level {{item.level}}">{{item.levelText}}</text>
+        </view>
+        <view class="test-score">得分：{{item.score}}分</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录按钮 -->
+  <view class="logout-section" wx:if="{{isLoggedIn}}">
+    <button class="logout-btn" bindtap="handleLogout">退出登录</button>
+  </view>
+
+  <!-- 底部信息 -->
+  <view class="footer-info text-center text-secondary">
+    <text>高考失利帮 v1.0.0</text>
+    <view class="mt-10">你不是一个人在战斗</view>
+  </view>
+</view>

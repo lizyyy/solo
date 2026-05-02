@@ -1,0 +1,54 @@
+{
+  "name": "纪录片项目 - 演示",
+  "speakers": [
+    {
+      "name": "张教授",
+      "aliases": [
+        "张老师",
+        "张先生"
+      ],
+      "is_primary": true
+    },
+    {
+      "name": "李博士",
+      "aliases": [
+        "李医生"
+      ],
+      "is_primary": true
+    },
+    {
+      "name": "王总",
+      "aliases": [],
+      "is_primary": true
+    }
+  ],
+  "terms": [
+    {
+      "correct": "人工智能",
+      "alternatives": [
+        "AI",
+        "机器智能"
+      ],
+      "category": "技术"
+    },
+    {
+      "correct": "访谈",
+      "alternatives": [
+        "采访"
+      ],
+      "category": "内容"
+    }
+  ],
+  "forbidden_words": [
+    {
+      "word": "敏感内容",
+      "category": "内容",
+      "suggestion": "请替换为中性表述"
+    }
+  ],
+  "max_line_length": 40,
+  "max_reading_speed": 180,
+  "min_gap_between_subtitles": 0.05,
+  "subtitle_dirs": [],
+  "output_dir": "output"
+}

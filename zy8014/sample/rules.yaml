@@ -1,0 +1,284 @@
+rules:
+  - rule_id: PROHIBIT_001
+    rule_name: 禁止进口象牙制品
+    rule_type: prohibited
+    priority: 1
+    conditions:
+      hs_codes:
+        - "9601*"
+      keywords:
+        - "象牙"
+        - "ivory"
+    risk_level: CRITICAL
+    description: 象牙制品属于国际禁运商品
+    required_certificates: []
+
+  - rule_id: PROHIBIT_002
+    rule_name: 禁止进口濒危物种
+    rule_type: prohibited
+    priority: 1
+    conditions:
+      hs_codes:
+        - "4101*"
+        - "4102*"
+        - "4103*"
+      keywords:
+        - "虎骨"
+        - "犀牛角"
+        - "tiger"
+        - "rhino"
+    risk_level: CRITICAL
+    description: 濒危物种及其制品禁止进口
+    required_certificates: []
+
+  - rule_id: PROHIBIT_003
+    rule_name: 禁止进口枪支弹药
+    rule_type: prohibited
+    priority: 1
+    conditions:
+      hs_codes:
+        - "9301*"
+        - "9302*"
+        - "9303*"
+        - "9304*"
+        - "9305*"
+        - "9306*"
+        - "9307*"
+      keywords:
+        - "枪支"
+        - "弹药"
+        - "gun"
+        - "firearm"
+        - "ammunition"
+    risk_level: CRITICAL
+    description: 枪支弹药属于严格禁运商品
+    required_certificates: []
+
+  - rule_id: PROHIBIT_004
+    rule_name: 禁止进口毒品
+    rule_type: prohibited
+    priority: 1
+    conditions:
+      hs_codes:
+        - "3004*"
+        - "2939*"
+      keywords:
+        - "海洛因"
+        - "可卡因"
+        - "大麻"
+        - "heroin"
+        - "cocaine"
+        - "marijuana"
+        - "cannabis"
+    risk_level: CRITICAL
+    description: 毒品及其相关制品禁止进口
+    required_certificates: []
+
+  - rule_id: RESTRICT_001
+    rule_name: 限制进口化工产品
+    rule_type: restricted
+    priority: 2
+    conditions:
+      hs_codes:
+        - "3808*"
+        - "3824*"
+        - "29*"
+      keywords:
+        - "化工"
+        - "chemical"
+        - " hazardous"
+        - "危险"
+    risk_level: HIGH
+    description: 化工产品需要特殊许可证
+    required_certificates:
+      - "危险化学品进口许可证"
+      - "MSDS报告"
+
+  - rule_id: RESTRICT_002
+    rule_name: 限制进口食品
+    rule_type: restricted
+    priority: 2
+    conditions:
+      hs_codes:
+        - "02*"
+        - "03*"
+        - "04*"
+        - "07*"
+        - "08*"
+        - "16*"
+        - "17*"
+        - "18*"
+        - "19*"
+        - "20*"
+        - "21*"
+        - "22*"
+      keywords:
+        - "食品"
+        - "food"
+        - "饮料"
+        - "beverage"
+    risk_level: MEDIUM
+    description: 食品进口需要检验检疫证明
+    required_certificates:
+      - "入境货物检验检疫证明"
+      - "食品卫生证书"
+      - "原产地证明"
+
+  - rule_id: RESTRICT_003
+    rule_name: 限制进口动植物产品
+    rule_type: restricted
+    priority: 2
+    conditions:
+      hs_codes:
+        - "01*"
+        - "02*"
+        - "03*"
+        - "04*"
+        - "05*"
+        - "06*"
+        - "07*"
+        - "08*"
+        - "09*"
+        - "10*"
+        - "11*"
+        - "12*"
+        - "13*"
+        - "14*"
+        - "15*"
+        - "44*"
+        - "45*"
+        - "46*"
+      keywords:
+        - "动物"
+        - "植物"
+        - "animal"
+        - "plant"
+        - "木材"
+        - "wood"
+    risk_level: MEDIUM
+    description: 动植物产品需要检疫审批
+    required_certificates:
+      - "进境动植物检疫许可证"
+      - "原产地证书"
+      - "植物检疫证书"
+
+  - rule_id: RESTRICT_004
+    rule_name: 限制进口药品
+    rule_type: restricted
+    priority: 2
+    conditions:
+      hs_codes:
+        - "3001*"
+        - "3002*"
+        - "3003*"
+        - "3004*"
+        - "3005*"
+        - "3006*"
+      keywords:
+        - "药品"
+        - "medicine"
+        - "drug"
+        - "pharmaceutical"
+    risk_level: HIGH
+    description: 药品进口需要特殊审批
+    required_certificates:
+      - "药品进口注册证"
+      - "进口药品通关单"
+      - "药品检验报告书"
+
+  - rule_id: CERT_001
+    rule_name: 机电产品需提供3C认证
+    rule_type: certificate
+    priority: 3
+    conditions:
+      hs_codes:
+        - "84*"
+        - "85*"
+      keywords:
+        - "机械"
+        - "电子"
+        - "电器"
+        - "machinery"
+        - "electronic"
+        - "electrical"
+    risk_level: MEDIUM
+    description: 大部分机电产品需要3C强制性认证
+    required_certificates:
+      - "3C认证证书"
+      - "产品说明书"
+      - "技术规格书"
+
+  - rule_id: CERT_002
+    rule_name: 纺织品需提供产地证
+    rule_type: certificate
+    priority: 3
+    conditions:
+      hs_codes:
+        - "50*"
+        - "51*"
+        - "52*"
+        - "53*"
+        - "54*"
+        - "55*"
+        - "56*"
+        - "57*"
+        - "58*"
+        - "59*"
+        - "60*"
+        - "61*"
+        - "62*"
+        - "63*"
+      keywords:
+        - "纺织"
+        - "布料"
+        - "服装"
+        - "textile"
+        - "fabric"
+        - "clothing"
+        - "garment"
+    risk_level: LOW
+    description: 纺织品进口需提供原产地证书
+    required_certificates:
+      - "原产地证书"
+      - "发票"
+      - "装箱单"
+
+  - rule_id: CERT_003
+    rule_name: 塑料产品需提供材质证明
+    rule_type: certificate
+    priority: 3
+    conditions:
+      hs_codes:
+        - "39*"
+      keywords:
+        - "塑料"
+        - "plastic"
+        - "塑胶"
+    risk_level: LOW
+    description: 塑料产品需提供材质证明
+    required_certificates:
+      - "材质证明"
+      - "MSDS报告"
+
+  - rule_id: CERT_004
+    rule_name: 玩具需提供安全认证
+    rule_type: certificate
+    priority: 3
+    conditions:
+      hs_codes:
+        - "9503*"
+        - "9504*"
+        - "9505*"
+        - "9506*"
+        - "9507*"
+        - "9508*"
+      keywords:
+        - "玩具"
+        - "toy"
+        - "游戏"
+        - "game"
+    risk_level: MEDIUM
+    description: 玩具产品需提供安全认证
+    required_certificates:
+      - "玩具安全认证证书"
+      - "检测报告"

@@ -1,0 +1,7 @@
+{"sql": "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, email TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)", "params": []}
+{"sql": "INSERT INTO users (name, email) VALUES (?, ?)", "params": ["张三", "zhangsan@example.com"]}
+{"sql": "INSERT INTO users (name, email) VALUES (?, ?)", "params": ["李四", "lisi@example.com"]}
+{"sql": "INSERT INTO users (name, email) VALUES (?, ?)", "params": ["王五", "wangwu@example.com"]}
+{"sql": "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, user_id INTEGER, product TEXT, amount REAL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)", "params": []}
+{"sql": "INSERT INTO orders (user_id, product, amount) VALUES (?, ?, ?)", "params": [1, "笔记本电脑", 5999.0]}
+{"sql": "INSERT INTO orders (user_id, product, amount) VALUES (?, ?, ?)", "params": [2, "无线鼠标", 99.0]}

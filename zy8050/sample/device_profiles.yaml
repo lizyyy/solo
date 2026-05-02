@@ -1,0 +1,29 @@
+device_2.13:
+  width: 250
+  height: 122
+  color_mode: black_red
+  supported_templates:
+    - template_square
+    - template_slim
+  max_pixel_width: 240
+  char_width: 12
+
+device_2.9:
+  width: 296
+  height: 128
+  color_mode: black_white
+  supported_templates:
+    - template_wide
+    - template_square
+  max_pixel_width: 286
+  char_width: 10
+
+device_4.2:
+  width: 400
+  height: 300
+  color_mode: black_white_red
+  supported_templates:
+    - template_large
+    - template_wide
+  max_pixel_width: 390
+  char_width: 14

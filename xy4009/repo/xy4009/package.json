@@ -1,0 +1,25 @@
+{
+  "name": "supplier-quotation-comparison",
+  "version": "1.0.0",
+  "description": "供应商报价比价台账系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["supplier", "quotation", "comparison", "pricing"],
+  "author": "",
+  "license": "MIT"
+}

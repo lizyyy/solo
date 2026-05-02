@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物业寄存管理系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <h1>物业寄存管理系统</h1>
+      <div class="header-actions">
+        <button id="exportBtn" class="btn btn-secondary">导出 CSV</button>
+        <label class="btn btn-secondary">
+          导入 CSV
+          <input type="file" id="importFile" accept=".csv" style="display: none;">
+        </label>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="left-panel">
+        <div class="panel-header">
+          <h2>新增寄存记录</h2>
+        </div>
+        <form id="recordForm" class="form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="room_number">房号 <span class="required">*</span></label>
+              <input type="text" id="room_number" name="room_number" placeholder="如：1栋101" required>
+            </div>
+            <div class="form-group">
+              <label for="resident_name">住户姓名 <span class="required">*</span></label>
+              <input type="text" id="resident_name" name="resident_name" placeholder="住户姓名" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="phone">手机号 <span class="required">*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="11位手机号" required>
+            </div>
+            <div class="form-group">
+              <label for="storage_type">寄存物类型 <span class="required">*</span></label>
+              <select id="storage_type" name="storage_type" required>
+                <option value="">请选择</option>
+                <option value="钥匙">钥匙</option>
+                <option value="临时放行条">临时放行条</option>
+                <option value="快递">快递</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="receiver_name">领取人</label>
+            <input type="text" id="receiver_name" name="receiver_name" placeholder="预计领取人（可选）">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="valid_from">有效期开始 <span class="required">*</span></label>
+              <input type="date" id="valid_from" name="valid_from" required>
+            </div>
+            <div class="form-group">
+              <label for="valid_to">有效期结束 <span class="required">*</span></label>
+              <input type="date" id="valid_to" name="valid_to" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="remarks">备注</label>
+            <textarea id="remarks" name="remarks" rows="3" placeholder="备注信息（可选）"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">提交登记</button>
+        </form>
+      </div>
+
+      <div class="right-panel">
+        <div class="panel-header">
+          <h2>寄存记录查询</h2>
+          <button id="refreshBtn" class="btn btn-small">刷新</button>
+        </div>
+        
+        <div class="search-bar">
+          <input type="text" id="search_room" placeholder="按房号搜索">
+          <input type="text" id="search_phone" placeholder="按手机号搜索">
+          <select id="search_status">
+            <option value="">全部状态</option>
+            <option value="待领取">待领取</option>
+            <option value="已领取">已领取</option>
+            <option value="已过期">已过期</option>
+          </select>
+          <button id="searchBtn" class="btn btn-primary">搜索</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>房号</th>
+                <th>住户</th>
+                <th>手机号</th>
+                <th>类型</th>
+                <th>领取人</th>
+                <th>有效期</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="noData" class="no-data" style="display: none;">
+          <p>暂无数据</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="receiveModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>确认领取</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px;">请确认以下记录已领取：</p>
+        <div id="receiveRecordInfo" class="record-info"></div>
+        <div class="form-group" style="margin-top: 16px;">
+          <label for="received_by">操作人姓名 <span class="required">*</span></label>
+          <input type="text" id="received_by" placeholder="请输入操作人姓名">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelReceive" class="btn btn-secondary">取消</button>
+        <button id="confirmReceive" class="btn btn-primary">确认领取</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="importModal" class="modal" style="display: none;">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3>导入结果</h3>
+        <span class="close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div id="importSummary" class="import-summary"></div>
+        <div id="importDetails" class="import-details"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeImport" class="btn btn-primary">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

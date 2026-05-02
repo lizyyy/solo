@@ -1,0 +1,25 @@
+{
+  "name": "scheduling-wall-debugger",
+  "version": "1.0.0",
+  "description": "多人排班墙 WebSocket 事件回放调试台",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket",
+    "scheduling",
+    "debugger",
+    "event-sourcing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {}
+}

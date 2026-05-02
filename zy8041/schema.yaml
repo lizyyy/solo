@@ -1,0 +1,57 @@
+recipe_schema:
+  recipe_id:
+    type: string
+    required: true
+  recipe_name:
+    type: string
+    required: true
+  ingredients:
+    type: array
+    required: true
+    item_schema:
+      name:
+        type: string
+        required: true
+      quantity:
+        type: string
+        required: true
+      unit:
+        type: string
+        required: false
+  steps:
+    type: array
+    required: true
+    item_schema:
+      step_number:
+        type: integer
+        required: true
+      instruction:
+        type: string
+        required: true
+      heat_level:
+        type: string
+        required: false
+        allowed_values:
+          - low
+          - medium
+          - high
+          - steaming
+          - boiling
+          - stir-frying
+          - baking
+          - null
+
+heat_level_mapping:
+  synonyms:
+    小火: low
+    中火: medium
+    大火: high
+    文火: low
+    猛火: high
+    微火: low
+  strict_mode: false
+
+validation_rules:
+  step_order_strict: false
+  allow_missing_heat: true
+  quantity_fuzzy_match: true

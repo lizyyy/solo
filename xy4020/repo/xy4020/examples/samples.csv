@@ -1,0 +1,8 @@
+sample_id,sampling_point,bottle_number,temperature_c,dilution_factor,is_blank,is_duplicate,parent_sample_id,notes
+BLK001,实验室空白,BLK-001,25.0,1.0,yes,no,,空白对照样
+S001,河流上游,A-001,24.5,1.0,no,no,,正常样品
+S002,河流上游,A-002,24.5,1.0,no,yes,S001,S001平行样
+S003,河流中游,B-001,25.2,1.0,no,no,,正常样品
+S004,河流下游,C-001,26.0,1.0,no,no,,正常样品
+S005,河流下游,C-002,26.0,1.0,no,yes,S004,S004平行样
+S006,池塘样,D-001,23.8,2.0,no,no,,稀释2倍

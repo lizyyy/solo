@@ -1,0 +1,99 @@
+<view class="container" id="chat-container">
+  <!-- 登录提示 -->
+  <view class="login-section card" wx:if="{{!isLoggedIn}}">
+    <view class="login-content">
+      <view class="login-text">
+        <view class="login-title">登录后体验更多功能</view>
+      </view>
+    </view>
+    <view class="login-btn" bindtap="handleLogin">
+      立即登录
+    </view>
+  </view>
+
+  <!-- 消息列表 -->
+  <view class="messages-section">
+    <view 
+      class="message-item {{item.type === 'ai' ? 'ai-message' : 'user-message'}}" 
+      wx:for="{{messages}}" 
+      wx:key="id"
+    >
+      <!-- AI消息 -->
+      <view class="message-wrapper ai-wrapper" wx:if="{{item.type === 'ai'}}">
+        <view class="message-avatar">
+          <text class="avatar-text">AI</text>
+        </view>
+        <view class="message-bubble ai-bubble">
+          <view class="message-content">{{item.content}}</view>
+          <view class="message-time text-secondary">{{item.createTime}}</view>
+        </view>
+      </view>
+
+      <!-- 用户消息 -->
+      <view class="message-wrapper user-wrapper" wx:else>
+        <view class="message-bubble user-bubble">
+          <view class="message-content">{{item.content}}</view>
+          <view class="message-time text-secondary">{{item.createTime}}</view>
+        </view>
+        <view class="message-avatar" wx:if="{{userInfo}}">
+          <image class="avatar-image" src="{{userInfo.avatar}}" mode="aspectFill" wx:if="{{userInfo.avatar}}" />
+          <text class="avatar-text" wx:else>我</text>
+        </view>
+        <view class="message-avatar" wx:else>
+          <text class="avatar-text">我</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI正在输入 -->
+    <view class="typing-indicator" wx:if="{{isTyping}}">
+      <view class="typing-avatar">
+        <text class="avatar-text">AI</text>
+      </view>
+      <view class="typing-bubble">
+        <view class="typing-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷回复 -->
+  <view class="quick-replies-section" wx:if="{{!isTyping && messages.length <= 3}}">
+    <view class="quick-replies-title">常见问题</view>
+    <view class="quick-replies-list">
+      <view 
+        class="quick-reply-item" 
+        wx:for="{{quickReplies}}" 
+        wx:key="index"
+        bindtap="sendQuickReply"
+        data-message="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <view class="input-wrapper">
+      <textarea 
+        class="message-input" 
+        placeholder="输入你的感受..."
+        value="{{inputValue}}"
+        bindinput="onInputChange"
+        bindconfirm="sendMessage"
+        confirm-type="send"
+        maxlength="500"
+      />
+    </view>
+    <view 
+      class="send-btn {{!inputValue.trim() ? 'disabled' : ''}}" 
+      bindtap="sendMessage"
+    >
+      发送
+    </view>
+  </view>
+</view>

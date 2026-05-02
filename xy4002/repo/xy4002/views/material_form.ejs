@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= material ? '编辑物资' : '登记新物资' %> - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials" class="active">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1><%= material ? '编辑物资' : '登记新物资' %></h1>
+            <a href="/materials" class="btn btn-secondary">返回列表</a>
+        </header>
+
+        <div class="card">
+            <form method="POST" action="<%= material ? '/materials/' + material.id : '/materials' %>">
+                <div class="form-group">
+                    <label for="name">物资名称 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required value="<%= material ? material.name : '' %>" placeholder="请输入物资名称">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">分类</label>
+                        <input type="text" id="category" name="category" value="<%= material ? material.category : '' %>" placeholder="例如：桌椅类、电子设备">
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">单位</label>
+                        <input type="text" id="unit" name="unit" value="<%= material ? material.unit : '个' %>" placeholder="例如：个、件、套、台">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="total_quantity">总数量 <span class="required">*</span></label>
+                        <input type="number" id="total_quantity" name="total_quantity" required min="0" value="<%= material ? material.total_quantity : 0 %>" placeholder="请输入总数量">
+                    </div>
+                    <div class="form-group">
+                        <label for="available_quantity">可用数量</label>
+                        <input type="number" id="available_quantity" name="available_quantity" min="0" value="<%= material ? material.available_quantity : '' %>" placeholder="默认等于总数量">
+                        <small style="color: #7f8c8d;">留空则默认等于总数量</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">描述</label>
+                    <textarea id="description" name="description" placeholder="请输入物资描述（可选）"><%= material ? material.description : '' %></textarea>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary"><%= material ? '保存修改' : '登记物资' %></button>
+                    <a href="/materials" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

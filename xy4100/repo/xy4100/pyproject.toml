@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opto-guardian"
+version = "0.1.0"
+description = "配镜加工单守门员 - 眼镜店处方复核工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "pydantic>=2.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+opto-guardian = "opto_guardian.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]

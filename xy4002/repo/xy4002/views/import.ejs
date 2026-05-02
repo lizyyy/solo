@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV导入 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import" class="active">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>CSV 物资导入</h1>
+            <a href="/materials" class="btn btn-secondary">返回物资列表</a>
+        </header>
+
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">导入说明</h3>
+            <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
+                <p><strong>CSV 文件格式要求：</strong></p>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li><strong>name / 物资名称</strong>（必填）：物资的名称</li>
+                    <li><strong>category / 分类</strong>（可选）：物资分类，如"桌椅类"、"电子设备"</li>
+                    <li><strong>total_quantity / 总数量</strong>（可选）：物资总数量，默认 0</li>
+                    <li><strong>available_quantity / 可用数量</strong>（可选）：可用数量，默认等于总数量</li>
+                    <li><strong>unit / 单位</strong>（可选）：计量单位，默认"个"</li>
+                    <li><strong>description / 描述</strong>（可选）：物资描述</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>示例 CSV 内容：</strong></p>
+                <pre style="background-color: #e9ecef; padding: 10px; border-radius: 4px; margin-top: 10px; overflow-x: auto;">name,category,total_quantity,available_quantity,unit,description
+折叠桌,桌椅类,20,20,张,社区活动用折叠桌
+折叠椅,桌椅类,50,50,把,社区活动用折叠椅
+音响设备,音响灯光,2,2,套,便携式音响系统</pre>
+            </div>
+
+            <form method="POST" action="/import" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="csvfile">选择 CSV 文件 <span class="required">*</span></label>
+                    <input type="file" id="csvfile" name="csvfile" accept=".csv" required style="padding: 10px; border: 2px dashed #ddd; border-radius: 5px; width: 100%;">
+                </div>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">开始导入</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 15px;">数据导出</h3>
+            <p style="margin-bottom: 15px;">您也可以导出当前系统中的数据：</p>
+            <div class="export-buttons">
+                <a href="/export/inventory" class="btn btn-success">导出库存清单</a>
+                <a href="/export/borrows" class="btn btn-info">导出借还记录</a>
+                <a href="/export/logs" class="btn btn-secondary">导出操作流水</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

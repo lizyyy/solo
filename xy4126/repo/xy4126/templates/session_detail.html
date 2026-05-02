@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.name }} - 借展装箱交接核对台{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">首页</a> / {{ session.name }}
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.item_count }}</div>
+        <div class="stat-label">藏品数量</div>
+    </div>
+    <div class="stat-card alt1">
+        <div class="stat-value">{{ stats.box_count }}</div>
+        <div class="stat-label">箱子数量</div>
+    </div>
+    <div class="stat-card alt2">
+        <div class="stat-value">{{ stats.seal_count }}</div>
+        <div class="stat-label">封签数量</div>
+    </div>
+    <div class="stat-card alt3">
+        <div class="stat-value">{{ stats.env_record_count }}</div>
+        <div class="stat-label">环境记录</div>
+    </div>
+</div>
+
+{% if stats.critical_issues > 0 %}
+<div class="flash error">
+    <strong>严重问题：</strong>发现 {{ stats.critical_issues }} 个严重问题需要立即处理！
+</div>
+{% endif %}
+
+{% if stats.warning_issues > 0 %}
+<div class="flash warning">
+    <strong>警告：</strong>发现 {{ stats.warning_issues }} 个警告问题需要关注。
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>会话信息</h2>
+    <table style="max-width: 600px;">
+        <tr>
+            <th style="width: 120px;">会话ID</th>
+            <td>{{ session.session_id }}</td>
+        </tr>
+        <tr>
+            <th>名称</th>
+            <td>{{ session.name }}</td>
+        </tr>
+        <tr>
+            <th>描述</th>
+            <td>{{ session.description or '-' }}</td>
+        </tr>
+        <tr>
+            <th>创建时间</th>
+            <td>{{ session.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        <tr>
+            <th>更新时间</th>
+            <td>{{ session.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>操作</h2>
+    <div class="action-bar">
+        <a href="{{ url_for('upload_files', session_id=session.session_id) }}" class="btn btn-primary">导入数据文件</a>
+        
+        {% if stats.item_count > 0 and stats.box_count > 0 %}
+        <form action="{{ url_for('validate_session', session_id=session.session_id) }}" method="post" style="display: inline;">
+            <button type="submit" class="btn btn-success">执行校验</button>
+        </form>
+        {% endif %}
+        
+        {% if stats.critical_issues > 0 or stats.warning_issues > 0 or stats.info_issues > 0 %}
+        <a href="{{ url_for('export_report', session_id=session.session_id, format_type='markdown') }}" class="btn btn-secondary">导出 Markdown</a>
+        <a href="{{ url_for('export_report', session_id=session.session_id, format_type='csv') }}" class="btn btn-secondary">导出 CSV</a>
+        <a href="{{ url_for('export_report', session_id=session.session_id, format_type='json') }}" class="btn btn-secondary">导出 JSON</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if stats.critical_issues > 0 or stats.warning_issues > 0 or stats.info_issues > 0 %}
+<div class="card">
+    <h2>校验问题</h2>
+    
+    {% if issues_by_severity.critical %}
+    <h3 style="color: #dc3545; margin-bottom: 10px;">严重问题 ({{ issues_by_severity.critical|length }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>问题类型</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues_by_severity.critical %}
+            <tr>
+                <td>{{ issue.issue_type.value if issue.issue_type else '-' }}</td>
+                <td>{{ issue.message }}</td>
+                <td>
+                    <span class="status-badge status-{{ issue.review_status.value if issue.review_status else 'pending' }}">
+                        {{ issue.review_status.value if issue.review_status else '待处理' }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('review_issue', session_id=session.session_id, issue_id=issue.issue_id) }}" class="btn btn-sm btn-primary">复核</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    {% if issues_by_severity.warning %}
+    <h3 style="color: #ffc107; margin: 20px 0 10px 0;">警告 ({{ issues_by_severity.warning|length }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>问题类型</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues_by_severity.warning %}
+            <tr>
+                <td>{{ issue.issue_type.value if issue.issue_type else '-' }}</td>
+                <td>{{ issue.message }}</td>
+                <td>
+                    <span class="status-badge status-{{ issue.review_status.value if issue.review_status else 'pending' }}">
+                        {{ issue.review_status.value if issue.review_status else '待处理' }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('review_issue', session_id=session.session_id, issue_id=issue.issue_id) }}" class="btn btn-sm btn-primary">复核</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    
+    {% if issues_by_severity.info %}
+    <h3 style="color: #17a2b8; margin: 20px 0 10px 0;">提示 ({{ issues_by_severity.info|length }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>问题类型</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for issue in issues_by_severity.info %}
+            <tr>
+                <td>{{ issue.issue_type.value if issue.issue_type else '-' }}</td>
+                <td>{{ issue.message }}</td>
+                <td>
+                    <span class="status-badge status-{{ issue.review_status.value if issue.review_status else 'pending' }}">
+                        {{ issue.review_status.value if issue.review_status else '待处理' }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('review_issue', session_id=session.session_id, issue_id=issue.issue_id) }}" class="btn btn-sm btn-primary">复核</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if session.items %}
+<div class="card">
+    <h2>藏品列表 ({{ session.items|length }})</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>藏品编号</th>
+                <th>名称</th>
+                <th>类别</th>
+                <th>箱号</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item_id, item in session.items.items() %}
+            <tr>
+                <td><strong>{{ item.item_id }}</strong></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.category or '-' }}</td>
+                <td>{{ item.box_id or '未装箱' }}</td>
+                <td>
+                    {% set has_issue = namespace(value=false) %}
+                    {% for issue in session.issues.values() %}
+                        {% if item_id in issue.affected_items %}
+                            {% set has_issue.value = true %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if has_issue.value %}
+                        <span class="status-badge status-warning">有问题</span>
+                    {% else %}
+                        <span class="status-badge status-info">正常</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if session.boxes %}
+<div class="card">
+    <h2>箱子列表 ({{ session.boxes|length }})</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>箱号</th>
+                <th>描述</th>
+                <th>藏品数</th>
+                <th>封签数</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for box_id, box in session.boxes.items() %}
+            <tr>
+                <td><strong>{{ box.box_id }}</strong></td>
+                <td>{{ box.description or '-' }}</td>
+                <td>{{ box.item_ids|length }}</td>
+                <td>{{ box.seal_ids|length }}</td>
+                <td>
+                    {% set has_issue = namespace(value=false) %}
+                    {% for issue in session.issues.values() %}
+                        {% if box_id in issue.affected_boxes %}
+                            {% set has_issue.value = true %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if has_issue.value %}
+                        <span class="status-badge status-warning">有问题</span>
+                    {% else %}
+                        <span class="status-badge status-info">正常</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if session.env_records %}
+<div class="card">
+    <h2>环境记录概览 ({{ session.env_records|length }} 条记录)</h2>
+    {% set loggers = {} %}
+    {% for record_id, record in session.env_records.items() %}
+        {% if record.logger_id not in loggers %}
+            {% set _ = loggers.update({record.logger_id: {'count': 0, 'temps': [], 'humidities': []}}) %}
+        {% endif %}
+        {% set _ = loggers[record.logger_id].count.__add__(1) %}
+        {% set _ = loggers[record.logger_id].temps.append(record.temperature) %}
+        {% set _ = loggers[record.logger_id].humidities.append(record.humidity) %}
+    {% endfor %}
+    
+    <table>
+        <thead>
+            <tr>
+                <th>记录仪编号</th>
+                <th>记录数</th>
+                <th>温度范围</th>
+                <th>湿度范围</th>
+                <th>状态</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for logger_id, data in loggers.items() %}
+            <tr>
+                <td><strong>{{ logger_id }}</strong></td>
+                <td>{{ data.count }}</td>
+                <td>
+                    {% if data.temps %}
+                        {{ data.temps|min|round(1) }}°C ~ {{ data.temps|max|round(1) }}°C
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.humidities %}
+                        {{ data.humidities|min|round(1) }}% ~ {{ data.humidities|max|round(1) }}%
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% set has_exceed = namespace(value=false) %}
+                    {% for record_id, record in session.env_records.items() %}
+                        {% if record.logger_id == logger_id and (record.is_temperature_exceeded or record.is_humidity_exceeded) %}
+                            {% set has_exceed.value = true %}
+                        {% endif %}
+                    {% endfor %}
+                    {% if has_exceed.value %}
+                        <span class="status-badge status-critical">超限</span>
+                    {% else %}
+                        <span class="status-badge status-info">正常</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

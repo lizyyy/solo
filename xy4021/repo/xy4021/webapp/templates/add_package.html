@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}新增器械包 - 器械包追踪台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">仪表盘</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('packages') }}">器械包管理</a></li>
+                <li class="breadcrumb-item active">新增器械包</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>📦 新增器械包</h4>
+            <form method="POST" action="{{ url_for('add_package') }}">
+                <div class="mb-3">
+                    <label class="form-label">模板类型 <span class="text-danger">*</span></label>
+                    <select name="template_id" class="form-select" required>
+                        <option value="">请选择模板类型</option>
+                        {% for t in templates %}
+                        <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text">选择器械包所属的模板类型</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">器械包编号 <span class="text-danger">*</span></label>
+                    <input type="text" name="package_number" class="form-control" required
+                           placeholder="例如: PKG-2026-001">
+                    <div class="form-text">请输入唯一的器械包编号</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">备注</label>
+                    <textarea name="notes" class="form-control" rows="3" 
+                              placeholder="可选，输入备注信息..."></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        💾 保存
+                    </button>
+                    <a href="{{ url_for('packages') }}" class="btn btn-outline-secondary">
+                        取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="form-section">
+            <h4>📋 可用模板</h4>
+            <div class="list-group">
+                {% for t in templates %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ t.name }}</strong>
+                            {% if t.description %}
+                            <div class="text-muted small">{{ t.description }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                onclick="selectTemplate({{ t.id }})">
+                            选择
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h4>💡 提示</h4>
+            <ul class="mb-0">
+                <li class="mb-2">器械包编号必须唯一</li>
+                <li class="mb-2">新创建的器械包状态为"待灭菌"</li>
+                <li class="mb-2">可以通过CSV批量导入器械包</li>
+                <li>状态流转: 待灭菌 → 灭菌中 → 待放行 → 已放行 → 已领用</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectTemplate(templateId) {
+    document.querySelector('select[name="template_id"]').value = templateId;
+}
+</script>
+{% endblock %}

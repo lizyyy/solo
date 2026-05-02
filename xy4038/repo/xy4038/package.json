@@ -1,0 +1,27 @@
+{
+  "name": "hoist-point-rehearsal-studio",
+  "version": "1.0.0",
+  "description": "吊点载荷排练台 - 3D交互预演工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "3d",
+    "stage",
+    "hoist",
+    "load",
+    "rehearsal",
+    "theater"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

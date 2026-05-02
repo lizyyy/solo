@@ -1,0 +1,15 @@
+probes:
+  - probe_id: PROBE-70
+    angle: 70.0
+    frequency: 5.0
+    velocity: 5900.0
+    wedge_delay: 0.2
+    ref_point: 10.0
+    unit: mm
+  - probe_id: PROBE-45
+    angle: 45.0
+    frequency: 5.0
+    velocity: 5900.0
+    wedge_delay: 0.15
+    ref_point: 8.0
+    unit: mm

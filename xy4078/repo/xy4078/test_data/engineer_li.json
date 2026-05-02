@@ -1,0 +1,80 @@
+{
+  "engineer": {
+    "id": "ENG002",
+    "name": "李四",
+    "employee_id": "E2024002",
+    "phone": "13800138002",
+    "department": "维修二部"
+  },
+  "work_orders": [
+    {
+      "ticket_number": "WO-2024-001",
+      "device_id": "DEV-SRV-001",
+      "device_name": "主服务器-01",
+      "device_location": "地下机房A区-U08",
+      "status": "completed",
+      "priority": "high",
+      "issue_description": "服务器电源故障，无法正常启动",
+      "inspection_results": "经详细检测，确认是主板电源接口问题，非电源模块本身故障",
+      "solution_taken": "更换主板电源接口组件，系统已完全恢复",
+      "temporary_measures": "临时电源已拆除，系统使用原装电源运行",
+      "photos": [
+        {
+          "filename": "IMG_20240501_140001.jpg",
+          "photo_type": "repair",
+          "description": "更换电源接口过程",
+          "capture_time": "2024-05-01 14:00:00"
+        },
+        {
+          "filename": "IMG_20240501_150002.jpg",
+          "photo_type": "completed",
+          "description": "系统恢复正常运行",
+          "capture_time": "2024-05-01 15:00:00"
+        }
+      ],
+      "spare_parts": [
+        {
+          "part_number": "SP-PSU-001",
+          "part_name": "服务器电源模块 750W",
+          "quantity": 1,
+          "unit_price": 1200.00,
+          "used_at": "2024-05-01 14:00:00"
+        },
+        {
+          "part_number": "SP-MB-002",
+          "part_name": "主板电源接口组件",
+          "quantity": 1,
+          "unit_price": 3500.00,
+          "used_at": "2024-05-01 14:30:00"
+        }
+      ],
+      "start_time": "2024-05-01 13:00:00",
+      "end_time": "2024-05-01 15:30:00",
+      "created_at": "2024-05-01 13:00:00",
+      "updated_at": "2024-05-01 15:30:00"
+    },
+    {
+      "ticket_number": "WO-2024-003",
+      "device_id": "DEV-STO-001",
+      "device_name": "存储阵列-01",
+      "device_location": "地下机房B区-U15",
+      "status": "in_progress",
+      "priority": "high",
+      "issue_description": "存储阵列硬盘告警，RAID降级",
+      "inspection_results": "硬盘槽位3-4出现故障，需要更换硬盘",
+      "solution_taken": "已标记坏盘，待申请备件后更换",
+      "photos": [
+        {
+          "filename": "IMG_20240501_160001.jpg",
+          "photo_type": "fault",
+          "description": "硬盘告警指示灯",
+          "capture_time": "2024-05-01 16:00:00"
+        }
+      ],
+      "spare_parts": [],
+      "start_time": "2024-05-01 15:30:00",
+      "created_at": "2024-05-01 15:30:00",
+      "updated_at": "2024-05-01 16:30:00"
+    }
+  ]
+}

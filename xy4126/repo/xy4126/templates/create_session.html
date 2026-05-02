@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}新建会话 - 借展装箱交接核对台{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">首页</a> / 新建会话
+</div>
+
+<div class="card">
+    <h2>新建会话</h2>
+    
+    <form action="{{ url_for('create_session') }}" method="post">
+        <div class="form-group">
+            <label for="name">会话名称 *</label>
+            <input type="text" id="name" name="name" required placeholder="例如：2024故宫特展文物借展">
+        </div>
+        
+        <div class="form-group">
+            <label for="description">描述</label>
+            <textarea id="description" name="description" placeholder="可选：描述本次借展的基本信息..."></textarea>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 0;">
+            <button type="submit" class="btn btn-primary">创建会话</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>导入数据说明</h2>
+    <div style="line-height: 2;">
+        <h3 style="margin-bottom: 10px;">需要导入的数据文件</h3>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+            <h4 style="margin-bottom: 5px; color: #667eea;">1. 藏品清单 CSV</h4>
+            <p><strong>必需列：</strong>item_id（藏品编号）、name（藏品名称）</p>
+            <p><strong>可选列：</strong>category、description、dimensions、weight、condition、insurance_value、box_id</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+            <h4 style="margin-bottom: 5px; color: #667eea;">2. 箱号/封签记录 CSV</h4>
+            <p><strong>必需列：</strong>box_id（箱号）、seal_id（封签号）</p>
+            <p><strong>可选列：</strong>box_description、box_type、box_dimension、applied_at、removed_at、applied_by、removed_by、previous_seal_id、next_seal_id、is_intact、item_id</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+            <h4 style="margin-bottom: 5px; color: #667eea;">3. 环境记录仪 JSON</h4>
+            <p><strong>必需字段：</strong>logger_id（记录仪编号）、temperature（温度）、humidity（湿度）</p>
+            <p><strong>可选字段：</strong>timestamp、box_id、temp_min、temp_max、humidity_min、humidity_max</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+            <h4 style="margin-bottom: 5px; color: #667eea;">4. 交接照片清单 JSON</h4>
+            <p><strong>必需字段：</strong>filename（文件名）</p>
+            <p><strong>可选字段：</strong>photo_id、description、category、box_id、item_id、seal_id、timestamp、photographer</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <h4 style="margin-bottom: 5px; color: #667eea;">5. 签收记录 CSV</h4>
+            <p><strong>必需列：</strong>person_name（签收人）、action（动作）</p>
+            <p><strong>可选列：</strong>sign_id、role、box_id、item_id、seal_id、timestamp、location、notes、order</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

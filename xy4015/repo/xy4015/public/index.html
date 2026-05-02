@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身工作室预约系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-tab:hover {
+            background: #f0f2f5;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #ff3344;
+        }
+        
+        .btn-success {
+            background: #2ed573;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #26c066;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-frozen {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-arrears {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-booked {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .badge-canceled {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .badge-no-show {
+            background: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 22px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-close:hover {
+            color: #333;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .date-filter input[type="date"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .schedule-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .schedule-card.full {
+            border-left-color: #ff4757;
+            opacity: 0.7;
+        }
+        
+        .schedule-card h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .schedule-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .schedule-info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .capacity-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+        }
+        
+        .capacity-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .member-detail {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .member-detail h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            padding-left: 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 22px;
+            }
+            
+            .nav-tabs {
+                gap: 5px;
+            }
+            
+            .nav-tab {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏋️ 健身工作室预约系统</h1>
+            <p>会员管理、课程排班、预约管理一体化系统</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="schedules">📅 课表</button>
+            <button class="nav-tab" data-tab="members">👥 会员管理</button>
+            <button class="nav-tab" data-tab="courses">🎯 课程管理</button>
+            <button class="nav-tab" data-tab="coaches">👨‍🏫 教练管理</button>
+            <button class="nav-tab" data-tab="bookings">📝 预约管理</button>
+            <button class="nav-tab" data-tab="export">📊 数据导出</button>
+        </div>
+        
+        <div id="schedules" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3>课表查询</h3>
+                    <div class="date-filter">
+                        <label for="schedule-date">选择日期：</label>
+                        <input type="date" id="schedule-date">
+                        <button class="btn btn-primary" onclick="loadSchedules()">查询</button>
+                        <button class="btn btn-secondary" onclick="showAddScheduleModal()">添加排班</button>
+                    </div>
+                </div>
+                <div id="schedules-list" class="schedule-grid"></div>
+            </div>
+        </div>
+        
+        <div id="members" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>会员列表</h3>
+                    <button class="btn btn-primary" onclick="showAddMemberModal()">添加会员</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="member-search" placeholder="搜索会员姓名或电话..." oninput="searchMembers()">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>邮箱</th>
+                                <th>剩余课时</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="member-detail-section" class="card hidden">
+                <div class="card-header">
+                    <h3 id="member-detail-title">会员详情</h3>
+                    <button class="btn btn-secondary" onclick="closeMemberDetail()">关闭</button>
+                </div>
+                <div id="member-detail-content"></div>
+            </div>
+        </div>
+        
+        <div id="courses" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>课程列表</h3>
+                    <button class="btn btn-primary" onclick="showAddCourseModal()">添加课程</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>课程名称</th>
+                                <th>描述</th>
+                                <th>时长(分钟)</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="coaches" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>教练列表</h3>
+                    <button class="btn btn-primary" onclick="showAddCoachModal()">添加教练</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coaches-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="bookings" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>预约管理</h3>
+                    <button class="btn btn-primary" onclick="showAddBookingModal()">添加预约</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="booking-filter-status">状态筛选</label>
+                        <select id="booking-filter-status" onchange="loadBookings()">
+                            <option value="">全部</option>
+                            <option value="booked">已预约</option>
+                            <option value="canceled">已取消</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-filter-member">会员筛选</label>
+                        <select id="booking-filter-member" onchange="loadBookings()">
+                            <option value="">全部会员</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>会员</th>
+                                <th>课程</th>
+                                <th>教练</th>
+                                <th>日期</th>
+                                <th>时间</th>
+                                <th>状态</th>
+                                <th>爽约</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="export" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3>数据导出</h3>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="export-date">导出日期</label>
+                        <input type="date" id="export-date">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="exportTodayBookings()">导出当天预约名单</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="member-modal-title">添加会员</h2>
+                <button class="modal-close" onclick="closeModal('member-modal')">&times;</button>
+            </div>
+            <form id="member-form">
+                <input type="hidden" id="member-id">
+                <div class="form-group">
+                    <label for="member-name">姓名 *</label>
+                    <input type="text" id="member-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="member-phone">电话 *</label>
+                    <input type="tel" id="member-phone" required pattern="1[3-9]\d{9}">
+                </div>
+                <div class="form-group">
+                    <label for="member-email">邮箱</label>
+                    <input type="email" id="member-email">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="member-sessions">剩余课时</label>
+                        <input type="number" id="member-sessions" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="member-status">状态</label>
+                        <select id="member-status">
+                            <option value="active">正常</option>
+                            <option value="frozen">冻结</option>
+                            <option value="arrears">欠费</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('member-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="course-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="course-modal-title">添加课程</h2>
+                <button class="modal-close" onclick="closeModal('course-modal')">&times;</button>
+            </div>
+            <form id="course-form">
+                <input type="hidden" id="course-id">
+                <div class="form-group">
+                    <label for="course-name">课程名称 *</label>
+                    <input type="text" id="course-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="course-description">描述</label>
+                    <textarea id="course-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="course-duration">时长(分钟)</label>
+                    <input type="number" id="course-duration" min="1" value="60">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('course-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="coach-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="coach-modal-title">添加教练</h2>
+                <button class="modal-close" onclick="closeModal('coach-modal')">&times;</button>
+            </div>
+            <form id="coach-form">
+                <input type="hidden" id="coach-id">
+                <div class="form-group">
+                    <label for="coach-name">姓名 *</label>
+                    <input type="text" id="coach-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="coach-phone">电话</label>
+                    <input type="tel" id="coach-phone">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('coach-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="schedule-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="schedule-modal-title">添加排班</h2>
+                <button class="modal-close" onclick="closeModal('schedule-modal')">&times;</button>
+            </div>
+            <form id="schedule-form">
+                <input type="hidden" id="schedule-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="schedule-course">课程 *</label>
+                        <select id="schedule-course" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-coach">教练 *</label>
+                        <select id="schedule-coach" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schedule-date-form">日期 *</label>
+                    <input type="date" id="schedule-date-form" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="schedule-start-time">开始时间 *</label>
+                        <input type="time" id="schedule-start-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule-end-time">结束时间 *</label>
+                        <input type="time" id="schedule-end-time" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schedule-capacity">容量</label>
+                    <input type="number" id="schedule-capacity" min="1" value="10">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('schedule-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加预约</h2>
+                <button class="modal-close" onclick="closeModal('booking-modal')">&times;</button>
+            </div>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="booking-member">选择会员 *</label>
+                    <select id="booking-member" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="booking-schedule">选择课程安排 *</label>
+                    <select id="booking-schedule" required></select>
+                </div>
+                <div id="booking-info" class="alert alert-success hidden"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('booking-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">确认预约</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="schedule-bookings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="schedule-bookings-title">预约名单</h2>
+                <button class="modal-close" onclick="closeModal('schedule-bookings-modal')">&times;</button>
+            </div>
+            <div id="schedule-bookings-list"></div>
+        </div>
+    </div>
+    
+    <div id="toast" class="alert hidden" style="position: fixed; top: 20px; right: 20px; z-index: 2000; min-width: 300px;"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

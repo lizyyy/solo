@@ -1,0 +1,21 @@
+[project]
+name = "loom-downtime-analyzer"
+version = "0.1.0"
+description = "纺织车间织机停台原因分析CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "click>=8.0",
+]
+
+[project.scripts]
+loom-analyze = "loom_analyzer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["loom_analyzer"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

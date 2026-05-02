@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Bad Extension",
+  "description": "An extension with many issues",
+  "version": "0.0.0",
+  "permissions": [
+    "tabs",
+    "<all_urls>",
+    "webRequest",
+    "privacy"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "page": "background.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.example.com/*"],
+      "js": ["content.js"]
+    },
+    {
+      "matches": ["https://example.com/*", "https://*.example.com/*"],
+      "js": ["content2.js"]
+    }
+  ]
+}

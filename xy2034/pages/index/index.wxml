@@ -1,0 +1,53 @@
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-section card" bindtap="goToLogin">
+    <view class="flex flex-center">
+      <image 
+        class="avatar" 
+        src="{{isLoggedIn ? userInfo.avatar : 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=default%20avatar%20simple&image_size=square'}}" 
+        mode="aspectFill"
+      />
+      <view class="flex-1 ml-20">
+        <view class="user-name">
+          {{isLoggedIn ? userInfo.userName : '点击登录'}}
+        </view>
+        <view class="user-desc text-secondary">
+          {{isLoggedIn ? '欢迎回来，这里是你的情绪港湾' : '登录后体验更多功能'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 欢迎语 -->
+  <view class="welcome-section">
+    <view class="welcome-title">
+      高考失利帮
+    </view>
+    <view class="welcome-desc text-secondary">
+      这里是一个温暖的地方，接纳你的情绪，陪伴你走过这段艰难的时光。
+    </view>
+  </view>
+
+  <!-- 功能模块 -->
+  <view class="modules-section">
+    <view class="section-title">功能模块</view>
+    <view class="modules-grid">
+      <view 
+        class="module-item" 
+        wx:for="{{functionModules}}" 
+        wx:key="id"
+        bindtap="goToModule"
+        data-path="{{item.path}}"
+      >
+        <image class="module-icon" src="{{item.icon}}" mode="aspectFill" />
+        <view class="module-name">{{item.name}}</view>
+        <view class="module-desc text-secondary">{{item.description}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-text text-center text-secondary">
+    你不是一个人在战斗，我们与你同在
+  </view>
+</view>

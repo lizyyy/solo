@@ -1,0 +1,5 @@
+target_dir: ./backups
+compression: false
+max_backups: 5
+auto_checkpoint: true
+verify_on_restore: true

@@ -1,0 +1,64 @@
+<view class="container">
+  <!-- 标题输入 -->
+  <view class="input-section card">
+    <view class="input-label">标题</view>
+    <input 
+      class="title-input" 
+      placeholder="用一句话概括你的吐槽..." 
+      value="{{title}}"
+      bindinput="onTitleInput"
+      maxlength="{{maxTitleWords}}"
+    />
+    <view class="word-count text-secondary">
+      {{titleWordCount}}/{{maxTitleWords}}
+    </view>
+  </view>
+
+  <!-- 分类选择 -->
+  <view class="category-section card">
+    <view class="input-label">选择分类</view>
+    <view class="category-list flex">
+      <view 
+        class="category-item {{selectedCategory === item ? 'category-active' : ''}}" 
+        wx:for="{{categories}}" 
+        wx:key="this"
+        bindtap="selectCategory"
+        data-category="{{item}}"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 内容输入 -->
+  <view class="content-section card">
+    <view class="input-label">内容</view>
+    <textarea 
+      class="content-textarea" 
+      placeholder="尽情吐槽，释放你的负面情绪..." 
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="{{maxContentWords}}"
+      auto-height
+    />
+    <view class="word-count text-secondary">
+      {{contentWordCount}}/{{maxContentWords}}
+    </view>
+  </view>
+
+  <!-- 发布按钮 -->
+  <view class="submit-section">
+    <button 
+      class="submit-btn {{isSubmitting ? 'btn-disabled' : ''}}" 
+      bindtap="submitComplaint"
+      disabled="{{isSubmitting}}"
+    >
+      {{isSubmitting ? '发布中...' : '发布吐槽'}}
+    </button>
+  </view>
+
+  <!-- 温馨提示 -->
+  <view class="tips-section text-center text-secondary">
+    💡 温馨提示：吐槽是为了释放情绪，请注意文明用语
+  </view>
+</view>

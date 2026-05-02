@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>风场航迹黑匣子 - 无人机巡检航线回放工具</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-title">
+        <h1>🛫 风场航迹黑匣子</h1>
+        <span class="subtitle">无人机巡检航线回放与风险分析工具</span>
+      </div>
+      <div class="header-actions">
+        <button id="importBtn" class="btn btn-primary">
+          📁 导入数据
+        </button>
+        <button id="loadSampleBtn" class="btn btn-secondary">
+          📦 加载示例数据
+        </button>
+        <button id="saveSessionBtn" class="btn btn-secondary" disabled>
+          💾 保存会话
+        </button>
+        <button id="exportBtn" class="btn btn-secondary" disabled>
+          📤 导出报告
+        </button>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="sidebar left-sidebar" id="leftSidebar">
+        <div class="sidebar-header">
+          <h3>📋 风险事件</h3>
+          <div class="event-stats" id="eventStats">
+            <span class="stat-critical">⚠️ 严重: 0</span>
+            <span class="stat-warning">⚠️ 警告: 0</span>
+            <span class="stat-info">ℹ️ 信息: 0</span>
+          </div>
+        </div>
+        <div class="event-list" id="eventList">
+          <div class="empty-state">
+            <p>暂无数据</p>
+            <p class="hint">请导入无人机巡检数据</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <div id="map" class="map-container"></div>
+        
+        <div class="timeline-container" id="timelineContainer" style="display: none;">
+          <div class="timeline-header">
+            <div class="replay-controls">
+              <button id="prevEventBtn" class="control-btn" title="上一事件">⏮️</button>
+              <button id="rewindBtn" class="control-btn" title="后退">⏪</button>
+              <button id="playPauseBtn" class="control-btn play-btn" title="播放/暂停">▶️</button>
+              <button id="forwardBtn" class="control-btn" title="快进">⏩</button>
+              <button id="nextEventBtn" class="control-btn" title="下一事件">⏭️</button>
+            </div>
+            <div class="playback-speed">
+              <label>速度:</label>
+              <select id="speedSelect">
+                <option value="0.5">0.5x</option>
+                <option value="1" selected>1x</option>
+                <option value="2">2x</option>
+                <option value="5">5x</option>
+                <option value="10">10x</option>
+              </select>
+            </div>
+            <div class="current-time" id="currentTime">
+              时间: --:--:--
+            </div>
+          </div>
+          <div class="timeline-track" id="timelineTrack">
+            <canvas id="timelineCanvas" class="timeline-canvas"></canvas>
+            <input type="range" id="timelineSlider" min="0" max="100" value="0" step="0.1">
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar right-sidebar" id="rightSidebar">
+        <div class="sidebar-section">
+          <h3>📊 当前状态</h3>
+          <div class="status-grid" id="statusGrid">
+            <div class="status-item">
+              <span class="label">经度</span>
+              <span class="value" id="statusLng">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">纬度</span>
+              <span class="value" id="statusLat">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">高度 (m)</span>
+              <span class="value" id="statusAlt">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">速度 (m/s)</span>
+              <span class="value" id="statusSpeed">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">航向角 (°)</span>
+              <span class="value" id="statusHeading">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">云台俯仰 (°)</span>
+              <span class="value" id="statusGimbal">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🌬️ 气象信息</h3>
+          <div class="weather-info" id="weatherInfo">
+            <div class="status-item">
+              <span class="label">风速 (m/s)</span>
+              <span class="value" id="weatherWindSpeed">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">风向 (°)</span>
+              <span class="value" id="weatherWindDir">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">风航夹角 (°)</span>
+              <span class="value" id="weatherWindAngle">--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section" id="annotationSection" style="display: none;">
+          <h3>✏️ 人工标注</h3>
+          <div class="annotation-form">
+            <label>标注级别:</label>
+            <select id="annotationLevel">
+              <option value="info">信息</option>
+              <option value="warning">警告</option>
+              <option value="critical">严重</option>
+            </select>
+            <label>标注描述:</label>
+            <textarea id="annotationDescription" rows="3" placeholder="请输入标注描述..."></textarea>
+            <button id="addAnnotationBtn" class="btn btn-primary btn-sm">添加标注</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📁 数据概览</h3>
+          <div class="data-overview" id="dataOverview">
+            <div class="overview-item">
+              <span class="label">轨迹点数量</span>
+              <span class="value" id="overviewTrackPoints">0</span>
+            </div>
+            <div class="overview-item">
+              <span class="label">气象记录数</span>
+              <span class="value" id="overviewWeatherRecords">0</span>
+            </div>
+            <div class="overview-item">
+              <span class="label">告警点数量</span>
+              <span class="value" id="overviewAlertPoints">0</span>
+            </div>
+            <div class="overview-item">
+              <span class="label">禁飞区数量</span>
+              <span class="value" id="overviewNoFlyZones">0</span>
+            </div>
+            <div class="overview-item">
+              <span class="label">总飞行时间</span>
+              <span class="value" id="overviewFlightTime">--:--:--</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="import-modal" id="importModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>导入数据</h2>
+        <button class="modal-close" id="modalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="import-section">
+          <h3>🛫 飞控轨迹 (JSON)</h3>
+          <input type="file" id="trackFileInput" accept=".json">
+          <div class="file-preview" id="trackFilePreview">未选择文件</div>
+        </div>
+        <div class="import-section">
+          <h3>🌬️ 气象数据 (CSV)</h3>
+          <input type="file" id="weatherFileInput" accept=".csv">
+          <div class="file-preview" id="weatherFilePreview">未选择文件</div>
+        </div>
+        <div class="import-section">
+          <h3>⚠️ 告警点 (GeoJSON)</h3>
+          <input type="file" id="alertFileInput" accept=".geojson,.json">
+          <div class="file-preview" id="alertFilePreview">未选择文件</div>
+        </div>
+        <div class="import-section">
+          <h3>🚫 禁飞区 (GeoJSON)</h3>
+          <input type="file" id="noFlyZoneFileInput" accept=".geojson,.json">
+          <div class="file-preview" id="noFlyZoneFilePreview">未选择文件</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="importCancelBtn" class="btn btn-secondary">取消</button>
+        <button id="importConfirmBtn" class="btn btn-primary">导入并分析</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-modal" id="exportModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>导出报告</h2>
+        <button class="modal-close" id="exportModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="export-option">
+          <label>
+            <input type="checkbox" id="exportMarkdown" checked>
+            <span>📄 巡检复盘报告 (Markdown)</span>
+          </label>
+        </div>
+        <div class="export-option">
+          <label>
+            <input type="checkbox" id="exportCsv" checked>
+            <span>📊 风险事件清单 (CSV)</span>
+          </label>
+        </div>
+        <div class="export-option">
+          <label>
+            <input type="checkbox" id="exportAnnotations" checked>
+            <span>✏️ 包含人工标注</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="exportCancelBtn" class="btn btn-secondary">取消</button>
+        <button id="exportConfirmBtn" class="btn btn-primary">导出</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

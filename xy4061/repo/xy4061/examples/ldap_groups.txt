@@ -1,0 +1,18 @@
+# LDAP 组成员列表
+# 格式: 组名: 描述
+#   成员1
+#   成员2
+
+production_admin: 生产环境管理员组
+  zhangsan
+  zhaoliu
+  zhoujiu
+
+test_admin: 测试环境管理员组
+  lisi
+  qianqi
+  zhaoliu
+
+dev_admin: 开发环境管理员组
+  wangwu
+  sunba

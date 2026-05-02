@@ -1,0 +1,20 @@
+providers:
+  - name: google_workspace
+    spf_includes:
+      - _spf.google.com
+    dkim_selectors:
+      - google
+    dmarc_org_domain: example.com
+
+  - name: sendgrid
+    spf_includes:
+      - sendgrid.net
+    dkim_selectors:
+      - s1
+      - s2
+
+  - name: mailgun
+    spf_includes:
+      - mailgun.org
+    dkim_selectors:
+      - mg

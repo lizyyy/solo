@@ -1,0 +1,18 @@
+{
+  "name": "lost-and-found-app",
+  "version": "1.0.0",
+  "description": "失物招领与证件找回系统",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "失物招领",
+    "证件找回",
+    "web-app"
+  ],
+  "author": "Solo Coder",
+  "license": "MIT"
+}

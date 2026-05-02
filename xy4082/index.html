@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>抱石线路预排台</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <div class="header-left">
+          <h1 class="app-title">🧗 抱石线路预排台</h1>
+          <span class="app-subtitle">Bouldering Route Planner</span>
+        </div>
+        <div class="header-right">
+          <div class="toolbar">
+            <button id="btn-undo" class="toolbar-btn" title="撤销 (Ctrl+Z)">
+              <span>↶</span> 撤销
+            </button>
+            <button id="btn-redo" class="toolbar-btn" title="重做 (Ctrl+Y)">
+              <span>↷</span> 重做
+            </button>
+            <div class="separator"></div>
+            <button id="btn-new-session" class="toolbar-btn" title="新建方案">
+              <span>+</span> 新建
+            </button>
+            <button id="btn-save-session" class="toolbar-btn" title="保存方案">
+              <span>💾</span> 保存
+            </button>
+            <div class="separator"></div>
+            <button id="btn-import" class="toolbar-btn" title="导入">
+              <span>📥</span> 导入
+            </button>
+            <button id="btn-export" class="toolbar-btn" title="导出">
+              <span>📤</span> 导出
+            </button>
+            <div class="separator"></div>
+            <button id="btn-load-sample" class="toolbar-btn primary" title="加载示例数据">
+              <span>🎯</span> 加载示例
+            </button>
+          </div>
+        </div>
+      </header>
+      
+      <main class="main-content">
+        <aside class="sidebar left-sidebar">
+          <div class="sidebar-section">
+            <h3 class="section-title">📋 线路列表</h3>
+            <div id="route-list" class="route-list">
+              <div class="empty-state">
+                <p>暂无线路</p>
+                <p class="hint">点击"加载示例"或导入数据</p>
+              </div>
+            </div>
+            <button id="btn-add-route" class="action-btn">
+              <span>+</span> 添加线路
+            </button>
+          </div>
+          
+          <div class="sidebar-section" id="route-detail-section" style="display: none;">
+            <h3 class="section-title">📝 线路详情</h3>
+            <div id="route-detail" class="route-detail">
+              <form class="route-form">
+                <div class="form-group">
+                  <label>线路名称</label>
+                  <input type="text" id="route-name" class="form-input" />
+                </div>
+                <div class="form-group">
+                  <label>难度级别</label>
+                  <select id="route-difficulty" class="form-select">
+                    <option value="V0">V0</option>
+                    <option value="V1">V1</option>
+                    <option value="V2">V2</option>
+                    <option value="V3">V3</option>
+                    <option value="V4">V4</option>
+                    <option value="V5">V5</option>
+                    <option value="V6">V6</option>
+                    <option value="V7">V7</option>
+                    <option value="V8">V8</option>
+                    <option value="V9">V9</option>
+                    <option value="V10">V10</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>线路颜色</label>
+                  <div id="route-color-picker" class="color-picker"></div>
+                </div>
+                <div class="form-group">
+                  <label>
+                    <input type="checkbox" id="route-is-kids" /> 儿童线路
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>备注</label>
+                  <textarea id="route-notes" class="form-textarea" rows="3"></textarea>
+                </div>
+              </form>
+              
+              <div class="action-row">
+                <button id="btn-set-start" class="action-btn small">设为起步点</button>
+                <button id="btn-set-end" class="action-btn small">设为结束点</button>
+              </div>
+              
+              <h4 class="sub-title">岩点列表 (<span id="route-hold-count">0</span>)</h4>
+              <div id="route-holds-list" class="route-holds-list">
+                <p class="empty-hint">点击 3D 墙面上的岩点添加到线路</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+        
+        <div class="canvas-container">
+          <div id="scene-3d" class="scene-3d"></div>
+          <div class="canvas-overlay">
+            <div class="view-controls">
+              <button id="btn-reset-view" class="icon-btn" title="重置视角">🔄</button>
+              <button id="btn-toggle-grid" class="icon-btn active" title="显示/隐藏网格">📐</button>
+            </div>
+            <div id="status-bar" class="status-bar">
+              <span id="status-text">就绪</span>
+            </div>
+          </div>
+        </div>
+        
+        <aside class="sidebar right-sidebar">
+          <div class="sidebar-section">
+            <h3 class="section-title">🔍 选中岩点</h3>
+            <div id="hold-detail" class="hold-detail">
+              <p class="empty-hint">点击 3D 场景中的岩点查看详情</p>
+            </div>
+          </div>
+          
+          <div class="sidebar-section">
+            <h3 class="section-title">⚠️ 校验结果</h3>
+            <div id="validation-results" class="validation-results">
+              <p class="empty-hint">加载数据后自动校验</p>
+            </div>
+          </div>
+          
+          <div class="sidebar-section">
+            <h3 class="section-title">📊 可达性分析</h3>
+            <div id="reachability-analysis" class="reachability-analysis">
+              <p class="empty-hint">选择线路后分析</p>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+    
+    <div id="modal-overlay" class="modal-overlay" style="display: none;">
+      <div id="modal" class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">标题</h3>
+          <button id="modal-close" class="icon-btn">✕</button>
+        </div>
+        <div id="modal-content" class="modal-content"></div>
+        <div id="modal-footer" class="modal-footer"></div>
+      </div>
+    </div>
+    
+    <input type="file" id="file-input" style="display: none;" accept=".json" />
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

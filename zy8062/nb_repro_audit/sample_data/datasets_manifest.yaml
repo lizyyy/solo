@@ -1,0 +1,12 @@
+datasets:
+  sample_dataset.csv:
+    description: "Sample dataset for testing"
+    path: "data/sample_dataset.csv"
+    size: "1MB"
+    format: "csv"
+
+  trained_model.pkl:
+    description: "Pre-trained model for inference"
+    path: "models/trained_model.pkl"
+    size: "500KB"
+    format: "pickle"

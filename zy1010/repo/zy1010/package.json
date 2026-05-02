@@ -1,0 +1,25 @@
+{
+  "name": "patrol-maintenance-system",
+  "version": "1.0.0",
+  "description": "巡修排班台 - 物业维修队全栈 Web 应用",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev:server & npm run dev:client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "build": "npm run build --workspace=server && npm run build --workspace=client",
+    "seed": "npm run seed --workspace=server"
+  },
+  "keywords": [
+    "patrol",
+    "maintenance",
+    "property",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+hostname,ip_address,environment,department,owner,status,tags
+prod-web-01,192.168.1.10,production,运维部,zhangsan,active,web,nginx
+prod-db-01,192.168.1.20,production,运维部,zhoujiu,active,database,mysql
+prod-app-01,192.168.1.30,production,运维部,zhangsan,active,app,java
+test-web-01,192.168.2.10,test,测试部,lisi,active,web,nginx
+test-db-01,192.168.2.20,test,测试部,qianqi,active,database,mysql
+dev-web-01,192.168.3.10,dev,开发部,wangwu,active,web,nginx

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入结果 - 社区活动物资借还登记系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/materials">物资管理</a>
+            <a href="/borrow/new">办理借出</a>
+            <a href="/borrow-records">借还记录</a>
+            <a href="/logs">操作流水</a>
+            <a href="/import" class="active">CSV导入</a>
+        </nav>
+
+        <header>
+            <h1>导入结果</h1>
+            <a href="/materials" class="btn btn-secondary">返回物资列表</a>
+        </header>
+
+        <div class="card">
+            <div class="<%= errors.length > 0 ? 'alert alert-warning' : 'alert alert-success' %>">
+                <h3 style="margin-bottom: 10px;">导入完成</h3>
+                <p>
+                    总共处理 <strong><%= total %></strong> 条记录，
+                    成功导入 <strong><%= imported %></strong> 条，
+                    失败 <strong><%= errors.length %></strong> 条。
+                </p>
+            </div>
+
+            <% if (errors.length > 0) { %>
+                <div style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 15px;">错误详情</h3>
+                    <ul style="background-color: #f8d7da; color: #721c24; padding: 15px 30px; border-radius: 5px;">
+                        <% errors.forEach(error => { %>
+                            <li><%= error %></li>
+                        <% }) %>
+                    </ul>
+                </div>
+            <% } %>
+
+            <div style="margin-top: 30px;">
+                <a href="/import" class="btn btn-primary">继续导入</a>
+                <a href="/materials" class="btn btn-secondary">查看物资列表</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

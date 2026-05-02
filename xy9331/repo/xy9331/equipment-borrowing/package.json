@@ -1,0 +1,22 @@
+{
+  "name": "equipment-borrowing-system",
+  "version": "1.0.0",
+  "description": "共享设备借用台账系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-data": "node scripts/initData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "csv-writer": "^1.6.0",
+    "csv-parser": "^3.0.0"
+  },
+  "keywords": ["equipment", "borrowing", "management"],
+  "author": "",
+  "license": "MIT"
+}

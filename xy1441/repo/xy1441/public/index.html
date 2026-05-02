@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享冷藏柜取餐登记系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .staff-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .pickup-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        .exception-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .icon {
+            font-size: 24px;
+        }
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥡 共享冷藏柜取餐登记系统</h1>
+        <p class="subtitle">小区便民取餐服务 - 安全、便捷、高效</p>
+        
+        <div class="nav-buttons">
+            <a href="staff.html" class="nav-btn staff-btn">
+                <span class="icon">👨‍💼</span>
+                <span>值班员入口</span>
+            </a>
+            <a href="pickup.html" class="nav-btn pickup-btn">
+                <span class="icon">👤</span>
+                <span>居民取餐入口</span>
+            </a>
+            <a href="exception.html" class="nav-btn exception-btn">
+                <span class="icon">⚠️</span>
+                <span>异常处理入口</span>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>项目编号: xy1441 | 本地运行版本</p>
+        </div>
+    </div>
+</body>
+</html>

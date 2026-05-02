@@ -1,0 +1,13 @@
+{
+  "version": "v1.1",
+  "date": "2026-04-01",
+  "parameters": {
+    "temperature_offset": 0.02,
+    "humidity_gain": 1.001,
+    "pressure_base": 1013.25
+  },
+  "sensors": [
+    {"id": "TMP001", "calibration": {"offset": 0.05}},
+    {"id": "HUM001", "calibration": {"gain": 0.998}}
+  ]
+}

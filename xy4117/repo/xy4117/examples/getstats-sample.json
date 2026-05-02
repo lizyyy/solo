@@ -1,0 +1,384 @@
+[
+  {
+    "timestamp": 1714644000000,
+    "reports": [
+      {
+        "id": "RTCIceCandidatePair_abc123",
+        "type": "candidate-pair",
+        "state": "succeeded",
+        "nominated": true,
+        "writable": true,
+        "readable": true,
+        "packetsSent": 1000,
+        "packetsReceived": 950,
+        "bytesSent": 1000000,
+        "bytesReceived": 900000,
+        "currentRoundTripTime": 0.05,
+        "totalRoundTripTime": 50
+      },
+      {
+        "id": "RTCIceCandidatePair_def456",
+        "type": "candidate-pair",
+        "state": "waiting",
+        "nominated": false,
+        "writable": false,
+        "readable": true,
+        "packetsSent": 0,
+        "packetsReceived": 0,
+        "bytesSent": 0,
+        "bytesReceived": 0
+      },
+      {
+        "id": "RTCInboundRTPVideo_1",
+        "type": "inbound-rtp",
+        "kind": "video",
+        "ssrc": "123456",
+        "packetsReceived": 500,
+        "packetsLost": 10,
+        "jitter": 0.01,
+        "frameWidth": 1280,
+        "frameHeight": 720,
+        "framesPerSecond": 30,
+        "framesReceived": 300,
+        "framesDecoded": 295,
+        "framesDropped": 5,
+        "keyFramesDecoded": 10,
+        "bytesReceived": 500000,
+        "totalInterFrameDelay": 100
+      },
+      {
+        "id": "RTCInboundRTPAudio_1",
+        "type": "inbound-rtp",
+        "kind": "audio",
+        "ssrc": "789012",
+        "packetsReceived": 1000,
+        "packetsLost": 5,
+        "jitter": 0.005,
+        "bytesReceived": 100000,
+        "totalInterFrameDelay": 50
+      },
+      {
+        "id": "RTCOutboundRTPVideo_1",
+        "type": "outbound-rtp",
+        "kind": "video",
+        "ssrc": "345678",
+        "packetsSent": 600,
+        "bytesSent": 600000,
+        "targetBitrate": 2500000,
+        "framesEncoded": 300,
+        "keyFramesEncoded": 10,
+        "totalEncodeTime": 5,
+        "qualityLimitationReason": "none"
+      },
+      {
+        "id": "RTCOutboundRTPAudio_1",
+        "type": "outbound-rtp",
+        "kind": "audio",
+        "ssrc": "901234",
+        "packetsSent": 1200,
+        "bytesSent": 120000
+      },
+      {
+        "id": "RTCTransport_1",
+        "type": "transport",
+        "bytesSent": 1720000,
+        "bytesReceived": 1000000,
+        "packetsSent": 2800,
+        "packetsReceived": 1950,
+        "selectedCandidatePairId": "RTCIceCandidatePair_abc123",
+        "dtlsState": "connected",
+        "iceState": "connected"
+      }
+    ]
+  },
+  {
+    "timestamp": 1714644005000,
+    "reports": [
+      {
+        "id": "RTCIceCandidatePair_abc123",
+        "type": "candidate-pair",
+        "state": "succeeded",
+        "nominated": true,
+        "writable": true,
+        "readable": true,
+        "packetsSent": 1500,
+        "packetsReceived": 1300,
+        "bytesSent": 1500000,
+        "bytesReceived": 1200000,
+        "currentRoundTripTime": 0.08,
+        "totalRoundTripTime": 80
+      },
+      {
+        "id": "RTCIceCandidatePair_def456",
+        "type": "candidate-pair",
+        "state": "waiting",
+        "nominated": false,
+        "writable": false,
+        "readable": true,
+        "packetsSent": 0,
+        "packetsReceived": 0,
+        "bytesSent": 0,
+        "bytesReceived": 0
+      },
+      {
+        "id": "RTCInboundRTPVideo_1",
+        "type": "inbound-rtp",
+        "kind": "video",
+        "ssrc": "123456",
+        "packetsReceived": 1000,
+        "packetsLost": 150,
+        "jitter": 0.6,
+        "frameWidth": 1280,
+        "frameHeight": 720,
+        "framesPerSecond": 15,
+        "framesReceived": 450,
+        "framesDecoded": 420,
+        "framesDropped": 30,
+        "keyFramesDecoded": 12,
+        "bytesReceived": 800000,
+        "totalInterFrameDelay": 300
+      },
+      {
+        "id": "RTCInboundRTPAudio_1",
+        "type": "inbound-rtp",
+        "kind": "audio",
+        "ssrc": "789012",
+        "packetsReceived": 2000,
+        "packetsLost": 200,
+        "jitter": 0.5,
+        "bytesReceived": 200000,
+        "totalInterFrameDelay": 200
+      },
+      {
+        "id": "RTCOutboundRTPVideo_1",
+        "type": "outbound-rtp",
+        "kind": "video",
+        "ssrc": "345678",
+        "packetsSent": 800,
+        "bytesSent": 700000,
+        "targetBitrate": 800000,
+        "framesEncoded": 420,
+        "keyFramesEncoded": 12,
+        "totalEncodeTime": 8,
+        "qualityLimitationReason": "bandwidth",
+        "qualityLimitationDurations": {
+          "cpu": 0,
+          "bandwidth": 5,
+          "none": 0,
+          "other": 0
+        }
+      },
+      {
+        "id": "RTCOutboundRTPAudio_1",
+        "type": "outbound-rtp",
+        "kind": "audio",
+        "ssrc": "901234",
+        "packetsSent": 2400,
+        "bytesSent": 240000
+      },
+      {
+        "id": "RTCTransport_1",
+        "type": "transport",
+        "bytesSent": 2440000,
+        "bytesReceived": 2000000,
+        "packetsSent": 5200,
+        "packetsReceived": 3300,
+        "selectedCandidatePairId": "RTCIceCandidatePair_abc123",
+        "dtlsState": "connected",
+        "iceState": "connected"
+      }
+    ]
+  },
+  {
+    "timestamp": 1714644010000,
+    "reports": [
+      {
+        "id": "RTCIceCandidatePair_abc123",
+        "type": "candidate-pair",
+        "state": "failed",
+        "nominated": false,
+        "writable": false,
+        "readable": false,
+        "packetsSent": 1600,
+        "packetsReceived": 1320,
+        "bytesSent": 1600000,
+        "bytesReceived": 1250000,
+        "currentRoundTripTime": 0.5,
+        "totalRoundTripTime": 200
+      },
+      {
+        "id": "RTCIceCandidatePair_def456",
+        "type": "candidate-pair",
+        "state": "in-progress",
+        "nominated": false,
+        "writable": false,
+        "readable": true,
+        "packetsSent": 50,
+        "packetsReceived": 40,
+        "bytesSent": 50000,
+        "bytesReceived": 40000,
+        "currentRoundTripTime": 0.03,
+        "totalRoundTripTime": 3
+      },
+      {
+        "id": "RTCInboundRTPVideo_1",
+        "type": "inbound-rtp",
+        "kind": "video",
+        "ssrc": "123456",
+        "packetsReceived": 1050,
+        "packetsLost": 200,
+        "jitter": 0.8,
+        "frameWidth": 640,
+        "frameHeight": 360,
+        "framesPerSecond": 10,
+        "framesReceived": 500,
+        "framesDecoded": 450,
+        "framesDropped": 50,
+        "keyFramesDecoded": 15,
+        "bytesReceived": 900000,
+        "totalInterFrameDelay": 500
+      },
+      {
+        "id": "RTCInboundRTPAudio_1",
+        "type": "inbound-rtp",
+        "kind": "audio",
+        "ssrc": "789012",
+        "packetsReceived": 2100,
+        "packetsLost": 300,
+        "jitter": 0.7,
+        "bytesReceived": 210000,
+        "totalInterFrameDelay": 350
+      },
+      {
+        "id": "RTCOutboundRTPVideo_1",
+        "type": "outbound-rtp",
+        "kind": "video",
+        "ssrc": "345678",
+        "packetsSent": 850,
+        "bytesSent": 750000,
+        "targetBitrate": 500000,
+        "framesEncoded": 480,
+        "keyFramesEncoded": 15,
+        "totalEncodeTime": 10,
+        "qualityLimitationReason": "bandwidth",
+        "qualityLimitationDurations": {
+          "cpu": 0,
+          "bandwidth": 10,
+          "none": 0,
+          "other": 0
+        }
+      },
+      {
+        "id": "RTCOutboundRTPAudio_1",
+        "type": "outbound-rtp",
+        "kind": "audio",
+        "ssrc": "901234",
+        "packetsSent": 2600,
+        "bytesSent": 260000
+      },
+      {
+        "id": "RTCTransport_1",
+        "type": "transport",
+        "bytesSent": 2660000,
+        "bytesReceived": 2360000,
+        "packetsSent": 5550,
+        "packetsReceived": 3460,
+        "selectedCandidatePairId": "RTCIceCandidatePair_def456",
+        "dtlsState": "connected",
+        "iceState": "checking"
+      }
+    ]
+  },
+  {
+    "timestamp": 1714644015000,
+    "reports": [
+      {
+        "id": "RTCIceCandidatePair_abc123",
+        "type": "candidate-pair",
+        "state": "failed",
+        "nominated": false,
+        "writable": false,
+        "readable": false,
+        "packetsSent": 1600,
+        "packetsReceived": 1320,
+        "bytesSent": 1600000,
+        "bytesReceived": 1250000
+      },
+      {
+        "id": "RTCIceCandidatePair_def456",
+        "type": "candidate-pair",
+        "state": "succeeded",
+        "nominated": true,
+        "writable": true,
+        "readable": true,
+        "packetsSent": 500,
+        "packetsReceived": 480,
+        "bytesSent": 500000,
+        "bytesReceived": 480000,
+        "currentRoundTripTime": 0.04,
+        "totalRoundTripTime": 10
+      },
+      {
+        "id": "RTCInboundRTPVideo_1",
+        "type": "inbound-rtp",
+        "kind": "video",
+        "ssrc": "123456",
+        "packetsReceived": 1200,
+        "packetsLost": 210,
+        "jitter": 0.02,
+        "frameWidth": 1280,
+        "frameHeight": 720,
+        "framesPerSecond": 30,
+        "framesReceived": 600,
+        "framesDecoded": 590,
+        "framesDropped": 10,
+        "keyFramesDecoded": 18,
+        "bytesReceived": 1200000,
+        "totalInterFrameDelay": 150
+      },
+      {
+        "id": "RTCInboundRTPAudio_1",
+        "type": "inbound-rtp",
+        "kind": "audio",
+        "ssrc": "789012",
+        "packetsReceived": 2400,
+        "packetsLost": 310,
+        "jitter": 0.01,
+        "bytesReceived": 240000,
+        "totalInterFrameDelay": 80
+      },
+      {
+        "id": "RTCOutboundRTPVideo_1",
+        "type": "outbound-rtp",
+        "kind": "video",
+        "ssrc": "345678",
+        "packetsSent": 1100,
+        "bytesSent": 1100000,
+        "targetBitrate": 2500000,
+        "framesEncoded": 600,
+        "keyFramesEncoded": 18,
+        "totalEncodeTime": 12,
+        "qualityLimitationReason": "none"
+      },
+      {
+        "id": "RTCOutboundRTPAudio_1",
+        "type": "outbound-rtp",
+        "kind": "audio",
+        "ssrc": "901234",
+        "packetsSent": 3000,
+        "bytesSent": 300000
+      },
+      {
+        "id": "RTCTransport_1",
+        "type": "transport",
+        "bytesSent": 3000000,
+        "bytesReceived": 2870000,
+        "packetsSent": 6700,
+        "packetsReceived": 4080,
+        "selectedCandidatePairId": "RTCIceCandidatePair_def456",
+        "dtlsState": "connected",
+        "iceState": "connected"
+      }
+    ]
+  }
+]

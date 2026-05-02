@@ -1,0 +1,91 @@
+{
+  "idea_id": "xy4024",
+  "round_name": "第一轮",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "prompt_path": "/Users/mac/pro/solocoder/pro/xy4024/prompts/第一轮-提示词.md",
+  "prompt": "我想做一个给徒步领队用的本地命令行工具，叫“轨迹净化和行程报告器”。每次活动结束后，队员发来的 GPX/KML 轨迹经常混着 GPS 漂移、断点、重复时间戳和海拔毛刺，靠手工在地图软件里修很费时间。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护时区、速度阈值、断点阈值、海拔突变阈值和默认导出目录；import 命令能读取 GPX、KML 或 CSV 轨迹文件并保留原始文件不被覆盖；clean 命令先给出 dry-run 清洗计划，识别重复时间戳、时间倒序、瞬时速度不合理、长时间断点、海拔尖峰和坐标缺失，再按配置生成清洗后的轨迹段；summary 命令要计算总距离、移动时间、累计爬升/下降、平均速度、移动速度，并能结合一份检查点 CSV 标记哪些检查点实际经过；compare 命令能把计划路线和实际路线对比，提示偏离路线的区间、漏掉的检查点和异常停留；export 命令能导出清洗后的 GPX、GeoJSON、Markdown 报告和 CSV 摘要；history 命令能从本地 JSON 或 SQLite 数据目录查询过去的清洗任务。希望核心代码拆成 CLI 入口、轨迹解析、地理计算、异常规则、清洗计划、存储层、报告导出和示例数据/测试，不要做成单文件演示。README 请写清楚安装方式、示例命令，以及如何用临时目录验证 import、clean、summary、compare、export、history 的完整流程。\n",
+  "optimized_prompt_path": "/Users/mac/pro/solocoder/pro/xy4024/prompts/第一轮-优化建议.md",
+  "optimized_prompt": "你现在在一个真实开发任务里，请直接产出可运行代码，而不是只给方案。\n\n项目编号：xy4024\n本轮：第一轮\n模型要求：必须使用 Seed-Code-DogFooding\n智能体要求：必须使用 SOLO Coder\n代码目录要求：在仓库根目录创建并只修改 `xy4024/`\n\n原始想法：\n我想做一个给徒步领队用的本地命令行工具，叫“轨迹净化和行程报告器”。每次活动结束后，队员发来的 GPX/KML 轨迹经常混着 GPS 漂移、断点、重复时间戳和海拔毛刺，靠手工在地图软件里修很费时间。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护时区、速度阈值、断点阈值、海拔突变阈值和默认导出目录；import 命令能读取 GPX、KML 或 CSV 轨迹文件并保留原始文件不被覆盖；clean 命令先给出 dry-run 清洗计划，识别重复时间戳、时间倒序、瞬时速度不合理、长时间断点、海拔尖峰和坐标缺失，再按配置生成清洗后的轨迹段；summary 命令要计算总距离、移动时间、累计爬升/下降、平均速度、移动速度，并能结合一份检查点 CSV 标记哪些检查点实际经过；compare 命令能把计划路线和实际路线对比，提示偏离路线的区间、漏掉的检查点和异常停留；export 命令能导出清洗后的 GPX、GeoJSON、Markdown 报告和 CSV 摘要；history 命令能从本地 JSON 或 SQLite 数据目录查询过去的清洗任务。希望核心代码拆成 CLI 入口、轨迹解析、地理计算、异常规则、清洗计划、存储层、报告导出和示例数据/测试，不要做成单文件演示。README 请写清楚安装方式、示例命令，以及如何用临时目录验证 import、clean、summary、compare、export、history 的完整流程。\n\n开发目标：\n- 将上面的想法落成一个不简单、可运行、可演示的项目原型\n- 所有代码集中在 `xy4024/`\n- 如果仓库当前为空，请自行初始化最小但完整的项目结构\n- 优先做成具备明显功能闭环的版本，不要只搭空壳\n\n工作方式要求：\n- 先快速审视当前仓库是否为空、已有文件结构和运行方式\n- 再给出极简执行计划，然后立即开始写代码\n- 不要把大量时间花在空泛分析或模板化总结上\n- 不要偏离需求去做无关的大重构\n- 如需新增依赖，只增加必要依赖，并说明原因\n\n交付要求：\n- 必须给出完整代码\n- 必须给出运行步骤\n- 必须说明关键文件和实现点\n- 如有未完成项，明确列出\n\n验收标准：\n- 项目可以启动或运行\n- 页面或功能不是纯占位\n- 至少包含 3 个以上互相关联的功能点或模块\n- 代码结构清晰，文件划分合理\n- 不要只生成单文件 demo\n\n输出方式：\n- 先简短说明你将创建什么\n- 然后直接开始改文件\n- 最后用简短清单说明运行命令、关键文件、已完成项、未完成项\n",
+  "branch_name": "idea/xy4024/r1",
+  "base_branch_name": "idea/xy4024/base",
+  "parent_branch_name": "idea/xy4024/base",
+  "pr_title": "[xy4024][第一轮] 我想做一个给徒步领队用的本地命令行工具，叫“轨迹净化和行程报告器”。每次活动结束后，队员发来的 GP",
+  "session_id": "69f44d8ee644eb6dd6d4b63e",
+  "message_id": "69f44d98d5dc8539d6008d06",
+  "trace_id": null,
+  "task_type": "0-1代码生成",
+  "business_domain": "端侧与基础工具",
+  "modification_scope": "跨模块多文件",
+  "repo_dir": "/Users/mac/pro/solocoder/pro/xy4024/repo",
+  "work_folder": "/Users/mac/pro/solocoder/pro/xy4024/repo/xy4024",
+  "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4024/base...idea/xy4024/r1?expand=1",
+  "repo_prepared_at": "2026-05-01T15:01:07.190967+08:00",
+  "repo_setup": {
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4024/repo",
+    "actions": [
+      {
+        "step": "git-init",
+        "returncode": 0,
+        "stdout": "Initialized empty Git repository in /Users/mac/pro/solocoder/pro/xy4024/repo/.git/\n",
+        "stderr": ""
+      },
+      {
+        "step": "remote-add-origin",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "step": "remote-fetch-refspec",
+        "status": "already-configured",
+        "refspec": "+refs/heads/*:refs/remotes/origin/*"
+      },
+      {
+        "step": "fetch-origin",
+        "status": "skipped-remote-unreachable"
+      },
+      {
+        "step": "sparse-checkout",
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "paths": [
+          "xy4024"
+        ]
+      }
+    ],
+    "ok": true
+  },
+  "branch_actions": [
+    {
+      "action": "checkout-orphan",
+      "branch": "idea/xy4024/base",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4024/base'\n"
+    },
+    {
+      "action": "checkout-create",
+      "branch": "idea/xy4024/r1",
+      "start_point": null,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "Switched to a new branch 'idea/xy4024/r1'\n"
+    }
+  ],
+  "repo_remote_state": {
+    "repo_url": "https://github.com/lizyyy/solo.git",
+    "has_refs": true,
+    "default_branch": null,
+    "repo_probe_inconclusive": true,
+    "ls_remote_returncode": 128,
+    "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+    "symref_returncode": 0,
+    "symref_stderr": ""
+  },
+  "last_prompt": "我想做一个给徒步领队用的本地命令行工具，叫“轨迹净化和行程报告器”。每次活动结束后，队员发来的 GPX/KML 轨迹经常混着 GPS 漂移、断点、重复时间戳和海拔毛刺，靠手工在地图软件里修很费时间。请从 0 到 1 做一个可运行的 Python CLI 项目：init 命令能创建项目配置，维护时区、速度阈值、断点阈值、海拔突变阈值和默认导出目录；import 命令能读取 GPX、KML 或 CSV 轨迹文件并保留原始文件不被覆盖；clean 命令先给出 dry-run 清洗计划，识别重复时间戳、时间倒序、瞬时速度不合理、长时间断点、海拔尖峰和坐标缺失，再按配置生成清洗后的轨迹段；summary 命令要计算总距离、移动时间、累计爬升/下降、平均速度、移动速度，并能结合一份检查点 CSV 标记哪些检查点实际经过；compare 命令能把计划路线和实际路线对比，提示偏离路线的区间、漏掉的检查点和异常停留；export 命令能导出清洗后的 GPX、GeoJSON、Markdown 报告和 CSV 摘要；history 命令能从本地 JSON 或 SQLite 数据目录查询过去的清洗任务。希望核心代码拆成 CLI 入口、轨迹解析、地理计算、异常规则、清洗计划、存储层、报告导出和示例数据/测试，不要做成单文件演示。README 请写清楚安装方式、示例命令，以及如何用临时目录验证 import、clean、summary、compare、export、history 的完整流程。",
+  "model": "Seed-Code-DogFooding",
+  "agent": "SOLO Coder",
+  "updated_at": "2026-05-01T15:02:17.612154+08:00"
+}

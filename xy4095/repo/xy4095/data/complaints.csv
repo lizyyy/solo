@@ -1,0 +1,4 @@
+﻿complaint_id,timestamp,site_id,complainant_name,complainant_phone,complainant_address,complaint_type,complaint_content,expected_noise_source,review_status,severity
+CMPL-2026-001,2026-05-01 23:00:00,SITE-001,张三,13800138001,幸福小区1号楼,noise,楼下工地夜间施工，噪声很大，无法入睡,建筑工地,pending,high
+CMPL-2026-002,2026-05-02 00:30:00,SITE-001,李四,13800138002,幸福小区2号楼,noise,听到突然的巨响，像是爆炸声,未知,pending,critical
+CMPL-2026-003,2026-05-02 01:15:00,SITE-002,王五,13800138003,阳光小区3号楼,noise,持续的机械噪声，像是有设备在运行,工厂,pending,normal

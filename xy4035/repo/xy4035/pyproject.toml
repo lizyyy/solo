@@ -1,0 +1,39 @@
+[project]
+name = "strain_calibrator"
+version = "0.1.0"
+description = "梁板应变漂移校准器 - 土木实验室科学计算命令行工具"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "pydantic>=2.0",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+strain-calibrator = "strain_calibrator.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["strain_calibrator"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"

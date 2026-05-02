@@ -1,0 +1,47 @@
+{
+  "idea_id": "xy4039",
+  "idea_short_title": "我想做一个给智能售货柜运维小组用的本地后端工具，叫“离线补账包回放器”。柜机断网时会把开门、拿取、归还、称重、支付回调和",
+  "folder_name": "xy4039",
+  "idea_dir": "/Users/mac/pro/solocoder/pro/xy4039",
+  "repo_url": "https://github.com/lizyyy/solo.git",
+  "required_model": "Seed-Code-DogFooding",
+  "required_agent": "SOLO Coder",
+  "required_agent_id": "solo_coder",
+  "round_name": "第一轮",
+  "suggested_labels": {
+    "任务类型": "0-1代码生成",
+    "业务领域": "纯后端 API 服务",
+    "修改范围": "跨系统多模块"
+  },
+  "repo_plan": {
+    "base_branch": "idea/xy4039/base",
+    "round_branch": "idea/xy4039/r1",
+    "pr_title": "[xy4039][第一轮] 我想做一个给智能售货柜运维小组用的本地后端工具，叫“离线补账包回放器”。柜机断网时会把开门、拿取、归",
+    "remote_repo_state": {
+      "repo_url": "https://github.com/lizyyy/solo.git",
+      "has_refs": true,
+      "default_branch": null,
+      "repo_probe_inconclusive": true,
+      "ls_remote_returncode": 128,
+      "ls_remote_stderr": "remote: Invalid username or token. Password authentication is not supported for Git operations.\nfatal: Authentication failed for 'https://github.com/lizyyy/solo.git/'",
+      "symref_returncode": 0,
+      "symref_stderr": ""
+    },
+    "parent_branch": "idea/xy4039/base",
+    "compare_url": "https://github.com/lizyyy/solo/compare/idea/xy4039/base...idea/xy4039/r1?expand=1",
+    "repo_dir": "/Users/mac/pro/solocoder/pro/xy4039/repo"
+  },
+  "workbook_hint": {
+    "path": "/Users/mac/pro/solocoder/pro/xy4039/xy4039.xlsx",
+    "uid": "xy4039",
+    "round_name": "第一轮"
+  },
+  "paths": {
+    "idea": "/Users/mac/pro/solocoder/pro/xy4039/idea.md",
+    "prompt_raw": "/Users/mac/pro/solocoder/pro/xy4039/prompts/第一轮-提示词.md",
+    "prompt_optimized": "/Users/mac/pro/solocoder/pro/xy4039/prompts/第一轮-优化建议.md",
+    "pr": "/Users/mac/pro/solocoder/pro/xy4039/pr/第一轮.md",
+    "round_json": "/Users/mac/pro/solocoder/pro/xy4039/rounds/第一轮.json"
+  },
+  "created_at": "2026-05-01T17:30:52.635195+08:00"
+}

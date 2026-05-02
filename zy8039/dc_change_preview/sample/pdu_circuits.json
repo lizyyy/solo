@@ -1,0 +1,45 @@
+{
+  "pdus": [
+    {
+      "pdu_id": "PDU-A01",
+      "rack_id": "RACK-A01",
+      "circuits": [
+        {"circuit_id": "circuit-A1", "phase": "A", "max_amps": 20.0, "used_amps": 8.0},
+        {"circuit_id": "circuit-A2", "phase": "A", "max_amps": 20.0, "used_amps": 12.0},
+        {"circuit_id": "circuit-A3", "phase": "A", "max_amps": 20.0, "used_amps": 15.0}
+      ]
+    },
+    {
+      "pdu_id": "PDU-B01",
+      "rack_id": "RACK-A01",
+      "circuits": [
+        {"circuit_id": "circuit-B1", "phase": "B", "max_amps": 20.0, "used_amps": 8.0},
+        {"circuit_id": "circuit-B2", "phase": "B", "max_amps": 20.0, "used_amps": 12.0},
+        {"circuit_id": "circuit-B3", "phase": "B", "max_amps": 20.0, "used_amps": 15.0}
+      ]
+    },
+    {
+      "pdu_id": "PDU-C01",
+      "rack_id": "RACK-B01",
+      "circuits": [
+        {"circuit_id": "circuit-C1", "phase": "A", "max_amps": 30.0, "used_amps": 10.0},
+        {"circuit_id": "circuit-C2", "phase": "A", "max_amps": 20.0, "used_amps": 5.0}
+      ]
+    },
+    {
+      "pdu_id": "PDU-D01",
+      "rack_id": "RACK-B01",
+      "circuits": [
+        {"circuit_id": "circuit-D1", "phase": "B", "max_amps": 30.0, "used_amps": 10.0},
+        {"circuit_id": "circuit-D2", "phase": "B", "max_amps": 20.0, "used_amps": 5.0}
+      ]
+    },
+    {
+      "pdu_id": "PDU-E01",
+      "rack_id": "RACK-A03",
+      "circuits": [
+        {"circuit_id": "circuit-E1", "phase": "A", "max_amps": 40.0, "used_amps": 20.0}
+      ]
+    }
+  ]
+}
