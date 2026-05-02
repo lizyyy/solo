@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "releaseDate": "2026-05-02T10:00:00Z",
+  "artifacts": [
+    {
+      "name": "app-service:v1.2.3",
+      "type": "image",
+      "digest": "sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "tags": ["latest", "v1", "v1.2", "v1.2.3"]
+    },
+    {
+      "name": "worker-service:v1.2.3",
+      "type": "image",
+      "digest": "sha256:0987654321fedcba0987654321fedcba0987654321fedcba0987654321fedcba",
+      "tags": ["latest", "v1", "v1.2", "v1.2.3"]
+    },
+    {
+      "name": "cli-tools.tar.gz",
+      "type": "archive",
+      "digest": "sha256:1122334455667788990011223344556677889900112233445566778899001122",
+      "path": "/dist/cli-tools.tar.gz"
+    }
+  ]
+}

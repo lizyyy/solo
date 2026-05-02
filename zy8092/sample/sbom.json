@@ -1,0 +1,40 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "name": "app-release",
+  "documentNamespace": "https://example.com/app-release",
+  "packages": [
+    {
+      "name": "app-service",
+      "versionInfo": "1.2.3",
+      "downloadLocation": "https://example.com/app-service",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "worker-service",
+      "versionInfo": "1.2.3",
+      "downloadLocation": "https://example.com/worker-service",
+      "licenseConcluded": "Apache-2.0",
+      "licenseDeclared": "Apache-2.0"
+    },
+    {
+      "name": "lodash",
+      "versionInfo": "4.17.21",
+      "downloadLocation": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "express",
+      "versionInfo": "4.18.2",
+      "downloadLocation": "https://registry.npmjs.org/express/-/express-4.18.2.tgz",
+      "licenseConcluded": "MIT",
+      "licenseDeclared": "MIT"
+    },
+    {
+      "name": "internal-package",
+      "versionInfo": "0.1.0",
+      "downloadLocation": "NOASSERTION"
+    }
+  ]
+}

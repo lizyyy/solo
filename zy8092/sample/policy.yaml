@@ -1,0 +1,12 @@
+version: "1.0"
+allowedBuilders:
+  - "https://github.com/MyOrg/MyRepo/.github/workflows/release.yml@refs/tags/v1"
+  - "https://github.com/MyOrg/*"
+allowedLicenses:
+  - "MIT"
+  - "Apache-2.0"
+  - "BSD-3-Clause"
+signatureWindowHours: 720
+requiredAttestations:
+  - "slsa-provenance"
+strict: false
