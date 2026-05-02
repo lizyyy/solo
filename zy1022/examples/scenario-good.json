@@ -1,0 +1,87 @@
+{
+  "id": "good-scenario-001",
+  "name": "优选方案 - 多肉养护间",
+  "description": "一个设计良好的多肉植物补光灯方案，全覆盖、预算内、无风险",
+  
+  "room": {
+    "width": 3.0,
+    "depth": 2.0,
+    "height": 2.4,
+    "name": "阳台种植区"
+  },
+
+  "plantTrays": [
+    {
+      "id": "tray-1",
+      "name": "多肉托盘 A",
+      "position": {
+        "x": 0.3,
+        "y": 0.3,
+        "width": 1.2,
+        "depth": 0.8
+      },
+      "height": 0.8,
+      "minLuxRequired": 8000,
+      "plantType": "多肉植物"
+    },
+    {
+      "id": "tray-2",
+      "name": "多肉托盘 B",
+      "position": {
+        "x": 1.7,
+        "y": 0.3,
+        "width": 1.0,
+        "depth": 0.8
+      },
+      "height": 0.8,
+      "minLuxRequired": 8000,
+      "plantType": "多肉植物"
+    }
+  ],
+
+  "lightModels": [
+    {
+      "id": "model-led-s",
+      "name": "全光谱 LED 补光灯 S 型",
+      "power": 50,
+      "beamAngle": 120,
+      "baseLux": 15000,
+      "heatLevel": "low",
+      "description": "低发热、高效率 LED 灯，适合长时间使用"
+    }
+  ],
+
+  "fixtures": [
+    {
+      "id": "light-1",
+      "name": "主灯 A",
+      "modelId": "model-led-s",
+      "position": {
+        "x": 0.9,
+        "y": 0.7,
+        "z": 2.0
+      },
+      "timeSlots": [
+        { "startHour": 8, "endHour": 18 }
+      ]
+    },
+    {
+      "id": "light-2",
+      "name": "主灯 B",
+      "modelId": "model-led-s",
+      "position": {
+        "x": 2.2,
+        "y": 0.7,
+        "z": 2.0
+      },
+      "timeSlots": [
+        { "startHour": 8, "endHour": 18 }
+      ]
+    }
+  ],
+
+  "electricity": {
+    "pricePerKwh": 0.6,
+    "dailyBudget": 1.5
+  }
+}

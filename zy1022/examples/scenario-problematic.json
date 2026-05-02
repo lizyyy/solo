@@ -1,0 +1,97 @@
+{
+  "id": "problematic-scenario-001",
+  "name": "问题方案 - 光照不均",
+  "description": "一个存在多种问题的方案：暗区、灯具重叠浪费、预算超限",
+  
+  "room": {
+    "width": 3.0,
+    "depth": 2.0,
+    "height": 2.4,
+    "name": "阳台种植区"
+  },
+
+  "plantTrays": [
+    {
+      "id": "tray-1",
+      "name": "育苗托盘",
+      "position": {
+        "x": 0.2,
+        "y": 0.2,
+        "width": 1.8,
+        "depth": 1.2
+      },
+      "height": 0.8,
+      "minLuxRequired": 10000,
+      "plantType": "育苗盘 - 需要高照度"
+    }
+  ],
+
+  "lightModels": [
+    {
+      "id": "model-hps-high",
+      "name": "HPS 高压钠灯 400W",
+      "power": 400,
+      "beamAngle": 90,
+      "baseLux": 35000,
+      "heatLevel": "high",
+      "description": "高功率 HPS 灯，发热量大"
+    },
+    {
+      "id": "model-led-small",
+      "name": "小功率 LED 灯",
+      "power": 20,
+      "beamAngle": 60,
+      "baseLux": 5000,
+      "heatLevel": "low",
+      "description": "小功率辅助灯"
+    }
+  ],
+
+  "fixtures": [
+    {
+      "id": "light-1",
+      "name": "主灯",
+      "modelId": "model-hps-high",
+      "position": {
+        "x": 0.8,
+        "y": 0.8,
+        "z": 2.0
+      },
+      "timeSlots": [
+        { "startHour": 6, "endHour": 22 }
+      ]
+    },
+    {
+      "id": "light-2",
+      "name": "重叠灯",
+      "modelId": "model-hps-high",
+      "position": {
+        "x": 0.9,
+        "y": 0.9,
+        "z": 2.0
+      },
+      "timeSlots": [
+        { "startHour": 10, "endHour": 18 }
+      ]
+    },
+    {
+      "id": "light-3",
+      "name": "远处小灯",
+      "modelId": "model-led-small",
+      "position": {
+        "x": 2.5,
+        "y": 1.5,
+        "z": 2.0
+      },
+      "timeSlots": [
+        { "startHour": 8, "endHour": 10 },
+        { "startHour": 9, "endHour": 18 }
+      ]
+    }
+  ],
+
+  "electricity": {
+    "pricePerKwh": 0.6,
+    "dailyBudget": 3.0
+  }
+}

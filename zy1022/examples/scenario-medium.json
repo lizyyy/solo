@@ -1,0 +1,74 @@
+{
+  "id": "medium-scenario-001",
+  "name": "中等方案 - 香草种植",
+  "description": "一个中等方案，覆盖率较好但电费偏高",
+  
+  "room": {
+    "width": 3.0,
+    "depth": 2.0,
+    "height": 2.4,
+    "name": "厨房种植区"
+  },
+
+  "plantTrays": [
+    {
+      "id": "tray-1",
+      "name": "香草托盘 - 罗勒/薄荷",
+      "position": {
+        "x": 0.3,
+        "y": 0.3,
+        "width": 1.2,
+        "depth": 0.8
+      },
+      "height": 0.8,
+      "minLuxRequired": 6000,
+      "plantType": "香草植物"
+    },
+    {
+      "id": "tray-2",
+      "name": "香草托盘 - 迷迭香",
+      "position": {
+        "x": 1.7,
+        "y": 0.3,
+        "width": 1.0,
+        "depth": 0.8
+      },
+      "height": 0.8,
+      "minLuxRequired": 8000,
+      "plantType": "迷迭香 - 需光较多"
+    }
+  ],
+
+  "lightModels": [
+    {
+      "id": "model-led-m",
+      "name": "全光谱 LED 补光灯 M 型",
+      "power": 100,
+      "beamAngle": 120,
+      "baseLux": 25000,
+      "heatLevel": "medium",
+      "description": "中等功率 LED 灯"
+    }
+  ],
+
+  "fixtures": [
+    {
+      "id": "light-1",
+      "name": "主灯",
+      "modelId": "model-led-m",
+      "position": {
+        "x": 1.5,
+        "y": 0.7,
+        "z": 2.2
+      },
+      "timeSlots": [
+        { "startHour": 6, "endHour": 20 }
+      ]
+    }
+  ],
+
+  "electricity": {
+    "pricePerKwh": 0.6,
+    "dailyBudget": 1.0
+  }
+}

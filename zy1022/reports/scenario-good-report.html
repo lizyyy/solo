@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>补光灯方案评估报告 - 优选方案 - 多肉养护间</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      padding: 2rem;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+    }
+    .header h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .header .meta { opacity: 0.9; font-size: 0.9rem; }
+    .content { padding: 2rem; }
+    section { margin-bottom: 2rem; }
+    h2 {
+      font-size: 1.25rem;
+      color: #334155;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .score-card {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      background: #f1f5f9;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .total-score {
+      text-align: center;
+    }
+    .total-score .value {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #334155;
+    }
+    .total-score .max { font-size: 1rem; color: #64748b; }
+    .grade-badge {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #f59e0b;
+      border: 3px solid #f59e0b;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .score-breakdown {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    .score-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .score-item .label { font-weight: 500; }
+    .score-item .value { font-weight: bold; color: #475569; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+    }
+    tr:hover { background: #f8fafc; }
+    .coverage-bar {
+      height: 20px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    .coverage-bar .fill {
+      height: 100%;
+      background: #22c55e;
+      width: 100.0%;
+      transition: width 0.3s ease;
+    }
+    .coverage-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+    .tray-card {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .tray-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .tray-name { font-weight: 600; font-size: 1.1rem; }
+    .tray-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .tray-status.ok { background: #dcfce7; color: #166534; }
+    .tray-status.bad { background: #fee2e2; color: #991b1b; }
+    .tray-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+    .tray-stat .label { color: #64748b; font-size: 0.8rem; }
+    .tray-stat .value { font-weight: 600; }
+    .risk-section { margin-top: 1rem; }
+    .risk-item {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      border-left: 4px solid;
+    }
+    .risk-high { background: #fef2f2; border-color: #ef4444; }
+    .risk-medium { background: #fefce8; border-color: #eab308; }
+    .risk-low { background: #f0fdf4; border-color: #22c55e; }
+    .risk-title { font-weight: 500; margin-bottom: 0.25rem; }
+    .risk-desc { font-size: 0.9rem; color: #475569; }
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌱 补光灯方案评估报告</h1>
+      <div class="meta">
+        方案: 优选方案 - 多肉养护间 | ID: good-scenario-001
+      </div>
+    </div>
+    <div class="content">
+      
+      <section>
+        <h2>📊 综合评分</h2>
+        <div class="score-card">
+          <div class="total-score">
+            <div class="value">100.0<span class="max">/100</span></div>
+          </div>
+          <div class="grade-badge">S</div>
+          <div class="score-breakdown">
+            <div class="score-item">
+              <span class="label">覆盖率</span>
+              <span class="value">40.0</span>
+            </div>
+            <div class="score-item">
+              <span class="label">费用效率</span>
+              <span class="value">25.0</span>
+            </div>
+            <div class="score-item">
+              <span class="label">温升风险</span>
+              <span class="value">20.0</span>
+            </div>
+            <div class="score-item">
+              <span class="label">排程</span>
+              <span class="value">15.0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>💡 光照覆盖率</h2>
+        <div class="coverage-bar">
+          <div class="fill"></div>
+        </div>
+        <div class="coverage-text">
+          <span>整体覆盖率: 100.0%</span>
+          <span>176/176 采样点达标</span>
+        </div>
+        
+        <h3 style="margin-top: 1.5rem; font-size: 1rem; color: #475569;">各托盘详情</h3>
+        
+          <div class="tray-card">
+            <div class="tray-header">
+              <span class="tray-name">多肉托盘 A</span>
+              <span class="tray-status ok">
+                ✅ 达标
+              </span>
+            </div>
+            <div class="tray-stats">
+              <div class="tray-stat">
+                <div class="label">覆盖率</div>
+                <div class="value">100.0%</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">采样点</div>
+                <div class="value">96/96</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">最小照度</div>
+                <div class="value">8762 lux</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">平均照度</div>
+                <div class="value">12421 lux</div>
+              </div>
+            </div>
+            
+          </div>
+          <div class="tray-card">
+            <div class="tray-header">
+              <span class="tray-name">多肉托盘 B</span>
+              <span class="tray-status ok">
+                ✅ 达标
+              </span>
+            </div>
+            <div class="tray-stats">
+              <div class="tray-stat">
+                <div class="label">覆盖率</div>
+                <div class="value">100.0%</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">采样点</div>
+                <div class="value">80/80</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">最小照度</div>
+                <div class="value">9563 lux</div>
+              </div>
+              <div class="tray-stat">
+                <div class="label">平均照度</div>
+                <div class="value">12609 lux</div>
+              </div>
+            </div>
+            
+          </div>
+      </section>
+
+      <section>
+        <h2>⚡ 用电与费用</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem;">
+          <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.85rem; color: #0369a1;">每日用电量</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: #0284c7;">1.00 kWh</div>
+          </div>
+          <div style="background: #fdf4ff; padding: 1rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.85rem; color: #991b1b;">每日电费</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: #a855f7;">¥0.60</div>
+          </div>
+          <div style="background: #f0fdf4; padding: 1rem; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.85rem; color: #166534;">预算状态</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: #16a34a;">
+              ✅ 内
+            </div>
+          </div>
+        </div>
+        
+        
+        <h3 style="margin-top: 1.5rem; font-size: 1rem; color: #475569;">各灯具用电明细</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>灯具</th>
+              <th>功率</th>
+              <th>每日时长</th>
+              <th>用电量</th>
+              <th>电费</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>主灯 A</td>
+                <td>50W</td>
+                <td>10.0h</td>
+                <td>0.50kWh</td>
+                <td>¥0.30</td>
+              </tr>
+              <tr>
+                <td>主灯 B</td>
+                <td>50W</td>
+                <td>10.0h</td>
+                <td>0.50kWh</td>
+                <td>¥0.30</td>
+              </tr>
+          </tbody>
+        </table>
+      </section>
+
+      
+      <section>
+        <h2>⚠️ 风险警告</h2>
+        <div class="risk-section">
+          
+          
+          
+          
+          
+            <div class="risk-item risk-low">
+              <div class="risk-title">🟢 重叠浪费</div>
+              <div class="risk-desc">灯具 "主灯 A" 和 "主灯 B" 照射范围有重叠，且开启时段也有重叠，可能造成电力浪费</div>
+            </div>
+        </div>
+      </section>
+
+    </div>
+    <div class="footer">
+      报告生成时间: 2026/5/2 23:42:06
+    </div>
+  </div>
+</body>
+</html>
