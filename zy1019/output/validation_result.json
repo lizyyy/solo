@@ -1,0 +1,586 @@
+{
+  "summary": {
+    "generated_at": "2026-05-02T17:51:00.644319",
+    "total_rules": 25,
+    "passed_rules": 22,
+    "failed_rules": 3,
+    "pass_rate": 88.0,
+    "total_sessions": 5,
+    "passed_sessions": 2,
+    "failed_sessions_count": 3,
+    "session_pass_rate": 40.0,
+    "parse_errors_count": 0,
+    "failed_rules_ranking": [
+      {
+        "rule": "R001: 支付成功前必须提交订单",
+        "failure_count": 2
+      },
+      {
+        "rule": "R002: 曝光事件不能连续重复超过3次",
+        "failure_count": 1
+      }
+    ]
+  },
+  "statistics": {
+    "session_count": 5,
+    "total_events": 32,
+    "user_count": 5,
+    "avg_events_per_session": 6.4,
+    "avg_duration_seconds": 120.8,
+    "max_events_session": {
+      "session_id": "sess_001",
+      "event_count": 8
+    },
+    "min_events_session": {
+      "session_id": "sess_003",
+      "event_count": 4
+    },
+    "event_type_distribution": {
+      "page_view": 10,
+      "product_impression": 10,
+      "click_product": 5,
+      "click_buy": 2,
+      "submit_order": 1,
+      "payment_success": 3,
+      "add_to_cart": 1
+    }
+  },
+  "parse_errors": [],
+  "failed_sessions_details": [
+    {
+      "session_id": "sess_002",
+      "failed_rules_count": 1,
+      "failed_rules": [
+        {
+          "rule_id": "R002",
+          "rule_name": "曝光事件不能连续重复超过3次",
+          "rule_type": "duplicate",
+          "details": {
+            "message": "存在重复规则验证失败",
+            "failures": [
+              {
+                "start_line": 14,
+                "end_line": 17,
+                "count": 4,
+                "max_count": 3,
+                "event": "product_impression",
+                "page": null,
+                "message": "连续重复 product_impression 事件 4 次，超过限制 3 次"
+              }
+            ],
+            "target_event": "product_impression",
+            "max_count": 3
+          },
+          "related_events": [
+            {
+              "event": "product_impression",
+              "timestamp": "2024-01-15 11:00:16",
+              "page": "detail",
+              "line_number": null
+            },
+            {
+              "event": "product_impression",
+              "timestamp": "2024-01-15 11:00:17",
+              "page": "detail",
+              "line_number": null
+            },
+            {
+              "event": "product_impression",
+              "timestamp": "2024-01-15 11:00:18",
+              "page": "detail",
+              "line_number": null
+            },
+            {
+              "event": "product_impression",
+              "timestamp": "2024-01-15 11:00:19",
+              "page": "detail",
+              "line_number": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "sess_003",
+      "failed_rules_count": 1,
+      "failed_rules": [
+        {
+          "rule_id": "R001",
+          "rule_name": "支付成功前必须提交订单",
+          "rule_type": "sequence",
+          "details": {
+            "message": "存在顺序规则验证失败",
+            "failures": [
+              {
+                "after_line": 22,
+                "after_event": "payment_success",
+                "after_time": "2024-01-15 12:01:00",
+                "message": "在 payment_success 之前未找到必需的事件 submit_order"
+              }
+            ],
+            "before_event": "submit_order",
+            "after_event": "payment_success"
+          },
+          "related_events": [
+            {
+              "event": "payment_success",
+              "timestamp": "2024-01-15 12:01:00",
+              "page": "checkout",
+              "line_number": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "session_id": "sess_005",
+      "failed_rules_count": 1,
+      "failed_rules": [
+        {
+          "rule_id": "R001",
+          "rule_name": "支付成功前必须提交订单",
+          "rule_type": "sequence",
+          "details": {
+            "message": "存在顺序规则验证失败",
+            "failures": [
+              {
+                "after_line": 7,
+                "after_event": "payment_success",
+                "after_time": "2024-01-15 14:02:30",
+                "message": "在 payment_success 之前未找到必需的事件 submit_order"
+              }
+            ],
+            "before_event": "submit_order",
+            "after_event": "payment_success"
+          },
+          "related_events": [
+            {
+              "event": "payment_success",
+              "timestamp": "2024-01-15 14:02:30",
+              "page": "checkout",
+              "line_number": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_results": {
+    "sess_001": [
+      {
+        "rule_id": "R001",
+        "rule_name": "支付成功前必须提交订单",
+        "rule_type": "sequence",
+        "passed": true,
+        "session_id": "sess_001",
+        "details": {
+          "message": "所有顺序规则验证通过",
+          "before_event": "submit_order",
+          "after_event": "payment_success",
+          "strict_mode": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R002",
+        "rule_name": "曝光事件不能连续重复超过3次",
+        "rule_type": "duplicate",
+        "passed": true,
+        "session_id": "sess_001",
+        "details": {
+          "message": "所有重复规则验证通过",
+          "target_event": "product_impression",
+          "max_count": 3,
+          "consecutive": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R003",
+        "rule_name": "每个session必须有page_view",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_001",
+        "details": {
+          "message": "事件 page_view 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "page_view",
+          "must_exist": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R004",
+        "rule_name": "不应出现测试事件",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_001",
+        "details": {
+          "message": "事件 test_event 不存在规则验证通过，未出现",
+          "event": "test_event",
+          "must_exist": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R005",
+        "rule_name": "每个session最多10个product_impression",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_001",
+        "details": {
+          "message": "事件 product_impression 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "product_impression",
+          "must_exist": true
+        },
+        "related_events": []
+      }
+    ],
+    "sess_002": [
+      {
+        "rule_id": "R001",
+        "rule_name": "支付成功前必须提交订单",
+        "rule_type": "sequence",
+        "passed": true,
+        "session_id": "sess_002",
+        "details": {
+          "message": "未找到事件 payment_success，规则不适用",
+          "before_event": "submit_order",
+          "after_event": "payment_success"
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R002",
+        "rule_name": "曝光事件不能连续重复超过3次",
+        "rule_type": "duplicate",
+        "passed": false,
+        "session_id": "sess_002",
+        "details": {
+          "message": "存在重复规则验证失败",
+          "failures": [
+            {
+              "start_line": 14,
+              "end_line": 17,
+              "count": 4,
+              "max_count": 3,
+              "event": "product_impression",
+              "page": null,
+              "message": "连续重复 product_impression 事件 4 次，超过限制 3 次"
+            }
+          ],
+          "target_event": "product_impression",
+          "max_count": 3
+        },
+        "related_events": [
+          {
+            "event": "product_impression",
+            "timestamp": "2024-01-15 11:00:16",
+            "page": "detail",
+            "line_number": null
+          },
+          {
+            "event": "product_impression",
+            "timestamp": "2024-01-15 11:00:17",
+            "page": "detail",
+            "line_number": null
+          },
+          {
+            "event": "product_impression",
+            "timestamp": "2024-01-15 11:00:18",
+            "page": "detail",
+            "line_number": null
+          },
+          {
+            "event": "product_impression",
+            "timestamp": "2024-01-15 11:00:19",
+            "page": "detail",
+            "line_number": null
+          }
+        ]
+      },
+      {
+        "rule_id": "R003",
+        "rule_name": "每个session必须有page_view",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_002",
+        "details": {
+          "message": "事件 page_view 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "page_view",
+          "must_exist": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R004",
+        "rule_name": "不应出现测试事件",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_002",
+        "details": {
+          "message": "事件 test_event 不存在规则验证通过，未出现",
+          "event": "test_event",
+          "must_exist": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R005",
+        "rule_name": "每个session最多10个product_impression",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_002",
+        "details": {
+          "message": "事件 product_impression 存在规则验证通过，出现 5 次",
+          "count": 5,
+          "event": "product_impression",
+          "must_exist": true
+        },
+        "related_events": []
+      }
+    ],
+    "sess_003": [
+      {
+        "rule_id": "R001",
+        "rule_name": "支付成功前必须提交订单",
+        "rule_type": "sequence",
+        "passed": false,
+        "session_id": "sess_003",
+        "details": {
+          "message": "存在顺序规则验证失败",
+          "failures": [
+            {
+              "after_line": 22,
+              "after_event": "payment_success",
+              "after_time": "2024-01-15 12:01:00",
+              "message": "在 payment_success 之前未找到必需的事件 submit_order"
+            }
+          ],
+          "before_event": "submit_order",
+          "after_event": "payment_success"
+        },
+        "related_events": [
+          {
+            "event": "payment_success",
+            "timestamp": "2024-01-15 12:01:00",
+            "page": "checkout",
+            "line_number": null
+          }
+        ]
+      },
+      {
+        "rule_id": "R002",
+        "rule_name": "曝光事件不能连续重复超过3次",
+        "rule_type": "duplicate",
+        "passed": true,
+        "session_id": "sess_003",
+        "details": {
+          "message": "所有重复规则验证通过",
+          "target_event": "product_impression",
+          "max_count": 3,
+          "consecutive": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R003",
+        "rule_name": "每个session必须有page_view",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_003",
+        "details": {
+          "message": "事件 page_view 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "page_view",
+          "must_exist": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R004",
+        "rule_name": "不应出现测试事件",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_003",
+        "details": {
+          "message": "事件 test_event 不存在规则验证通过，未出现",
+          "event": "test_event",
+          "must_exist": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R005",
+        "rule_name": "每个session最多10个product_impression",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_003",
+        "details": {
+          "message": "事件 product_impression 存在规则验证通过，出现 0 次",
+          "count": 0,
+          "event": "product_impression",
+          "must_exist": true
+        },
+        "related_events": []
+      }
+    ],
+    "sess_004": [
+      {
+        "rule_id": "R001",
+        "rule_name": "支付成功前必须提交订单",
+        "rule_type": "sequence",
+        "passed": true,
+        "session_id": "sess_004",
+        "details": {
+          "message": "未找到事件 payment_success，规则不适用",
+          "before_event": "submit_order",
+          "after_event": "payment_success"
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R002",
+        "rule_name": "曝光事件不能连续重复超过3次",
+        "rule_type": "duplicate",
+        "passed": true,
+        "session_id": "sess_004",
+        "details": {
+          "message": "所有重复规则验证通过",
+          "target_event": "product_impression",
+          "max_count": 3,
+          "consecutive": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R003",
+        "rule_name": "每个session必须有page_view",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_004",
+        "details": {
+          "message": "事件 page_view 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "page_view",
+          "must_exist": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R004",
+        "rule_name": "不应出现测试事件",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_004",
+        "details": {
+          "message": "事件 test_event 不存在规则验证通过，未出现",
+          "event": "test_event",
+          "must_exist": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R005",
+        "rule_name": "每个session最多10个product_impression",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_004",
+        "details": {
+          "message": "事件 product_impression 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "product_impression",
+          "must_exist": true
+        },
+        "related_events": []
+      }
+    ],
+    "sess_005": [
+      {
+        "rule_id": "R001",
+        "rule_name": "支付成功前必须提交订单",
+        "rule_type": "sequence",
+        "passed": false,
+        "session_id": "sess_005",
+        "details": {
+          "message": "存在顺序规则验证失败",
+          "failures": [
+            {
+              "after_line": 7,
+              "after_event": "payment_success",
+              "after_time": "2024-01-15 14:02:30",
+              "message": "在 payment_success 之前未找到必需的事件 submit_order"
+            }
+          ],
+          "before_event": "submit_order",
+          "after_event": "payment_success"
+        },
+        "related_events": [
+          {
+            "event": "payment_success",
+            "timestamp": "2024-01-15 14:02:30",
+            "page": "checkout",
+            "line_number": null
+          }
+        ]
+      },
+      {
+        "rule_id": "R002",
+        "rule_name": "曝光事件不能连续重复超过3次",
+        "rule_type": "duplicate",
+        "passed": true,
+        "session_id": "sess_005",
+        "details": {
+          "message": "所有重复规则验证通过",
+          "target_event": "product_impression",
+          "max_count": 3,
+          "consecutive": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R003",
+        "rule_name": "每个session必须有page_view",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_005",
+        "details": {
+          "message": "事件 page_view 存在规则验证通过，出现 2 次",
+          "count": 2,
+          "event": "page_view",
+          "must_exist": true
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R004",
+        "rule_name": "不应出现测试事件",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_005",
+        "details": {
+          "message": "事件 test_event 不存在规则验证通过，未出现",
+          "event": "test_event",
+          "must_exist": false
+        },
+        "related_events": []
+      },
+      {
+        "rule_id": "R005",
+        "rule_name": "每个session最多10个product_impression",
+        "rule_type": "presence",
+        "passed": true,
+        "session_id": "sess_005",
+        "details": {
+          "message": "事件 product_impression 存在规则验证通过，出现 1 次",
+          "count": 1,
+          "event": "product_impression",
+          "must_exist": true
+        },
+        "related_events": []
+      }
+    ]
+  }
+}
