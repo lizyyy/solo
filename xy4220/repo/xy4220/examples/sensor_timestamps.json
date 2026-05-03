@@ -1,0 +1,307 @@
+[
+  {
+    "timestamp": 100.005000,
+    "sensor_id": "lidar_01",
+    "sensor_type": "lidar",
+    "sequence_number": 1,
+    "status": "ok",
+    "data": {
+      "point_cloud_size": 125000,
+      "scan_rate": 10.0,
+      "range": 100.0
+    }
+  },
+  {
+    "timestamp": 100.015000,
+    "sensor_id": "camera_01",
+    "sensor_type": "camera",
+    "sequence_number": 1,
+    "status": "ok",
+    "data": {
+      "frame_width": 1920,
+      "frame_height": 1080,
+      "fps": 30.0,
+      "exposure_time": 0.01
+    }
+  },
+  {
+    "timestamp": 100.025000,
+    "sensor_id": "imu_01",
+    "sensor_type": "imu",
+    "sequence_number": 1,
+    "status": "ok",
+    "data": {
+      "accelerometer": {
+        "x": 0.01,
+        "y": 0.02,
+        "z": 9.81
+      },
+      "gyroscope": {
+        "x": 0.001,
+        "y": 0.002,
+        "z": 0.003
+      },
+      "temperature": 25.5
+    }
+  },
+  {
+    "timestamp": 100.035000,
+    "sensor_id": "gps_01",
+    "sensor_type": "gps",
+    "sequence_number": 1,
+    "status": "ok",
+    "data": {
+      "latitude": 39.9042,
+      "longitude": 116.4074,
+      "altitude": 43.5,
+      "speed": 0.0,
+      "heading": 0.0,
+      "satellites": 8,
+      "fix_quality": "good"
+    }
+  },
+  {
+    "timestamp": 100.105000,
+    "sensor_id": "lidar_01",
+    "sensor_type": "lidar",
+    "sequence_number": 2,
+    "status": "ok",
+    "data": {
+      "point_cloud_size": 124500,
+      "scan_rate": 10.0,
+      "range": 100.0
+    }
+  },
+  {
+    "timestamp": 100.115000,
+    "sensor_id": "camera_01",
+    "sensor_type": "camera",
+    "sequence_number": 2,
+    "status": "ok",
+    "data": {
+      "frame_width": 1920,
+      "frame_height": 1080,
+      "fps": 30.0,
+      "exposure_time": 0.01
+    }
+  },
+  {
+    "timestamp": 100.125000,
+    "sensor_id": "imu_01",
+    "sensor_type": "imu",
+    "sequence_number": 2,
+    "status": "ok",
+    "data": {
+      "accelerometer": {
+        "x": 0.15,
+        "y": 0.03,
+        "z": 9.82
+      },
+      "gyroscope": {
+        "x": 0.002,
+        "y": 0.001,
+        "z": 0.005
+      },
+      "temperature": 25.6
+    }
+  },
+  {
+    "timestamp": 100.135000,
+    "sensor_id": "gps_01",
+    "sensor_type": "gps",
+    "sequence_number": 2,
+    "status": "ok",
+    "data": {
+      "latitude": 39.9043,
+      "longitude": 116.4075,
+      "altitude": 43.5,
+      "speed": 1.2,
+      "heading": 45.0,
+      "satellites": 8,
+      "fix_quality": "good"
+    }
+  },
+  {
+    "timestamp": 100.205000,
+    "sensor_id": "lidar_01",
+    "sensor_type": "lidar",
+    "sequence_number": 3,
+    "status": "ok",
+    "data": {
+      "point_cloud_size": 123000,
+      "scan_rate": 10.0,
+      "range": 98.0
+    }
+  },
+  {
+    "timestamp": 100.215000,
+    "sensor_id": "camera_01",
+    "sensor_type": "camera",
+    "sequence_number": 3,
+    "status": "ok",
+    "data": {
+      "frame_width": 1920,
+      "frame_height": 1080,
+      "fps": 30.0,
+      "exposure_time": 0.01
+    }
+  },
+  {
+    "timestamp": 100.225000,
+    "sensor_id": "imu_01",
+    "sensor_type": "imu",
+    "sequence_number": 3,
+    "status": "ok",
+    "data": {
+      "accelerometer": {
+        "x": 0.25,
+        "y": 0.05,
+        "z": 9.80
+      },
+      "gyroscope": {
+        "x": 0.003,
+        "y": 0.002,
+        "z": 0.008
+      },
+      "temperature": 25.7
+    }
+  },
+  {
+    "timestamp": 100.235000,
+    "sensor_id": "gps_01",
+    "sensor_type": "gps",
+    "sequence_number": 3,
+    "status": "ok",
+    "data": {
+      "latitude": 39.9044,
+      "longitude": 116.4076,
+      "altitude": 43.6,
+      "speed": 2.5,
+      "heading": 50.0,
+      "satellites": 7,
+      "fix_quality": "good"
+    }
+  },
+  {
+    "timestamp": 100.305000,
+    "sensor_id": "lidar_01",
+    "sensor_type": "lidar",
+    "sequence_number": 4,
+    "status": "ok",
+    "data": {
+      "point_cloud_size": 122500,
+      "scan_rate": 10.0,
+      "range": 95.0
+    }
+  },
+  {
+    "timestamp": 100.315000,
+    "sensor_id": "camera_01",
+    "sensor_type": "camera",
+    "sequence_number": 4,
+    "status": "ok",
+    "data": {
+      "frame_width": 1920,
+      "frame_height": 1080,
+      "fps": 30.0,
+      "exposure_time": 0.01
+    }
+  },
+  {
+    "timestamp": 100.325000,
+    "sensor_id": "imu_01",
+    "sensor_type": "imu",
+    "sequence_number": 4,
+    "status": "ok",
+    "data": {
+      "accelerometer": {
+        "x": 0.30,
+        "y": 0.08,
+        "z": 9.78
+      },
+      "gyroscope": {
+        "x": 0.004,
+        "y": 0.003,
+        "z": 0.010
+      },
+      "temperature": 25.8
+    }
+  },
+  {
+    "timestamp": 100.335000,
+    "sensor_id": "gps_01",
+    "sensor_type": "gps",
+    "sequence_number": 4,
+    "status": "ok",
+    "data": {
+      "latitude": 39.9045,
+      "longitude": 116.4077,
+      "altitude": 43.7,
+      "speed": 3.8,
+      "heading": 55.0,
+      "satellites": 8,
+      "fix_quality": "good"
+    }
+  },
+  {
+    "timestamp": 100.405000,
+    "sensor_id": "lidar_01",
+    "sensor_type": "lidar",
+    "sequence_number": 5,
+    "status": "ok",
+    "data": {
+      "point_cloud_size": 121000,
+      "scan_rate": 10.0,
+      "range": 92.0
+    }
+  },
+  {
+    "timestamp": 100.415000,
+    "sensor_id": "camera_01",
+    "sensor_type": "camera",
+    "sequence_number": 5,
+    "status": "ok",
+    "data": {
+      "frame_width": 1920,
+      "frame_height": 1080,
+      "fps": 30.0,
+      "exposure_time": 0.01
+    }
+  },
+  {
+    "timestamp": 100.425000,
+    "sensor_id": "imu_01",
+    "sensor_type": "imu",
+    "sequence_number": 5,
+    "status": "ok",
+    "data": {
+      "accelerometer": {
+        "x": 0.35,
+        "y": 0.10,
+        "z": 9.75
+      },
+      "gyroscope": {
+        "x": 0.005,
+        "y": 0.004,
+        "z": 0.012
+      },
+      "temperature": 25.9
+    }
+  },
+  {
+    "timestamp": 100.435000,
+    "sensor_id": "gps_01",
+    "sensor_type": "gps",
+    "sequence_number": 5,
+    "status": "ok",
+    "data": {
+      "latitude": 39.9046,
+      "longitude": 116.4078,
+      "altitude": 43.8,
+      "speed": 5.0,
+      "heading": 60.0,
+      "satellites": 8,
+      "fix_quality": "good"
+    }
+  }
+]

@@ -1,0 +1,234 @@
+# 无人车控制指令示例
+# 包含导航、动力、转向等控制指令
+
+- timestamp: 100.010000
+  command_id: "nav_001"
+  command_type: "start_navigation"
+  source: "planning_system"
+  destination: "navigation_controller"
+  parameters:
+    destination_lat: 39.9050
+    destination_lon: 116.4080
+    route_id: "route_2024_001"
+    priority: "normal"
+  status: "executed"
+  execution_time: 100.012000
+
+- timestamp: 100.020000
+  command_id: "powertrain_001"
+  command_type: "set_throttle"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    throttle_percent: 20.0
+    gear: "drive"
+    mode: "normal"
+  status: "executed"
+  execution_time: 100.021000
+
+- timestamp: 100.030000
+  command_id: "steering_001"
+  command_type: "set_steering_angle"
+  source: "control_system"
+  destination: "steering_controller"
+  parameters:
+    angle_degrees: 0.0
+    rate_deg_per_sec: 5.0
+    mode: "auto"
+  status: "executed"
+  execution_time: 100.030500
+
+- timestamp: 100.050000
+  command_id: "perception_001"
+  command_type: "activate_sensors"
+  source: "system_manager"
+  destination: "perception_system"
+  parameters:
+    sensors:
+      - "lidar_01"
+      - "camera_01"
+      - "imu_01"
+      - "gps_01"
+    mode: "full"
+    frequency_hz: 10.0
+  status: "executed"
+  execution_time: 100.052000
+
+- timestamp: 100.100000
+  command_id: "powertrain_002"
+  command_type: "set_throttle"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    throttle_percent: 30.0
+    gear: "drive"
+    mode: "normal"
+  status: "executed"
+  execution_time: 100.100800
+
+- timestamp: 100.110000
+  command_id: "steering_002"
+  command_type: "set_steering_angle"
+  source: "control_system"
+  destination: "steering_controller"
+  parameters:
+    angle_degrees: 5.0
+    rate_deg_per_sec: 10.0
+    mode: "auto"
+  status: "executed"
+  execution_time: 100.110500
+
+- timestamp: 100.150000
+  command_id: "nav_002"
+  command_type: "update_route"
+  source: "planning_system"
+  destination: "navigation_controller"
+  parameters:
+    waypoints:
+      - lat: 39.9045
+        lon: 116.4075
+      - lat: 39.9048
+        lon: 116.4077
+    current_segment: 2
+    total_segments: 5
+    estimated_arrival: 300.0
+  status: "executed"
+  execution_time: 100.152000
+
+- timestamp: 100.200000
+  command_id: "powertrain_003"
+  command_type: "set_throttle"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    throttle_percent: 40.0
+    gear: "drive"
+    mode: "sport"
+  status: "executed"
+  execution_time: 100.201000
+
+- timestamp: 100.210000
+  command_id: "steering_003"
+  command_type: "set_steering_angle"
+  source: "control_system"
+  destination: "steering_controller"
+  parameters:
+    angle_degrees: -5.0
+    rate_deg_per_sec: 8.0
+    mode: "auto"
+  status: "executed"
+  execution_time: 100.210500
+
+- timestamp: 100.250000
+  command_id: "safety_001"
+  command_type: "set_safety_params"
+  source: "safety_monitor"
+  destination: "vehicle_controller"
+  parameters:
+    max_speed_kmh: 60.0
+    min_safe_distance_m: 2.0
+    emergency_brake_enabled: true
+    collision_warning_enabled: true
+  status: "executed"
+  execution_time: 100.250800
+
+- timestamp: 100.300000
+  command_id: "powertrain_004"
+  command_type: "set_throttle"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    throttle_percent: 50.0
+    gear: "drive"
+    mode: "sport"
+  status: "executed"
+  execution_time: 100.300500
+
+- timestamp: 100.310000
+  command_id: "steering_004"
+  command_type: "set_steering_angle"
+  source: "control_system"
+  destination: "steering_controller"
+  parameters:
+    angle_degrees: 0.0
+    rate_deg_per_sec: 5.0
+    mode: "auto"
+  status: "executed"
+  execution_time: 100.310300
+
+- timestamp: 100.350000
+  command_id: "nav_003"
+  command_type: "pause_navigation"
+  source: "planning_system"
+  destination: "navigation_controller"
+  parameters:
+    reason: "obstacle_detected"
+    expected_duration_sec: 10.0
+    current_position:
+      lat: 39.9046
+      lon: 116.4076
+  status: "executed"
+  execution_time: 100.351000
+
+- timestamp: 100.400000
+  command_id: "powertrain_005"
+  command_type: "set_brake"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    brake_percent: 30.0
+    reason: "obstacle_ahead"
+    mode: "smooth"
+  status: "executed"
+  execution_time: 100.400500
+
+- timestamp: 100.410000
+  command_id: "steering_005"
+  command_type: "set_steering_angle"
+  source: "control_system"
+  destination: "steering_controller"
+  parameters:
+    angle_degrees: 10.0
+    rate_deg_per_sec: 15.0
+    mode: "emergency"
+  status: "executed"
+  execution_time: 100.410200
+
+- timestamp: 100.450000
+  command_id: "nav_004"
+  command_type: "resume_navigation"
+  source: "planning_system"
+  destination: "navigation_controller"
+  parameters:
+    reason: "obstacle_cleared"
+    resume_from_segment: 2
+    updated_eta: 280.0
+  status: "executed"
+  execution_time: 100.450800
+
+- timestamp: 100.480000
+  command_id: "powertrain_006"
+  command_type: "set_throttle"
+  source: "control_system"
+  destination: "powertrain_controller"
+  parameters:
+    throttle_percent: 35.0
+    gear: "drive"
+    mode: "normal"
+  status: "executed"
+  execution_time: 100.480500
+
+- timestamp: 100.500000
+  command_id: "system_001"
+  command_type: "log_status"
+  source: "system_monitor"
+  destination: "data_logger"
+  parameters:
+    vehicle_speed_kmh: 15.5
+    battery_level_percent: 85.0
+    system_health: "good"
+    active_errors: []
+    warnings:
+      - "low_tire_pressure_rear_left"
+  status: "executed"
+  execution_time: 100.501000

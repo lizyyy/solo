@@ -1,0 +1,52 @@
+timestamp,can_id,dlc,data,is_extended,is_remote,is_error,channel
+100.000000,256,8,01 02 03 04 05 06 07 08,false,false,false,can0
+100.010000,257,4,10 20 30 40,false,false,false,can0
+100.020000,258,2,AA BB,false,false,false,can0
+100.030000,512,8,00 00 00 00 00 00 00 00,false,false,false,can0
+100.040000,256,8,02 03 04 05 06 07 08 09,false,false,false,can0
+100.050000,257,4,11 21 31 41,false,false,false,can0
+100.060000,258,2,CC DD,false,false,false,can0
+100.070000,512,8,01 00 00 00 00 00 00 00,false,false,false,can0
+100.080000,256,8,03 04 05 06 07 08 09 0A,false,false,false,can0
+100.090000,257,4,12 22 32 42,false,false,false,can0
+100.100000,258,2,EE FF,false,false,false,can0
+100.110000,512,8,02 00 00 00 00 00 00 00,false,false,false,can0
+100.120000,256,8,04 05 06 07 08 09 0A 0B,false,false,false,can0
+100.130000,257,4,13 23 33 43,false,false,false,can0
+100.140000,258,2,00 11,false,false,false,can0
+100.150000,512,8,03 00 00 00 00 00 00 00,false,false,false,can0
+100.160000,256,8,05 06 07 08 09 0A 0B 0C,false,false,false,can0
+100.170000,257,4,14 24 34 44,false,false,false,can0
+100.180000,258,2,22 33,false,false,false,can0
+100.190000,512,8,04 00 00 00 00 00 00 00,false,false,false,can0
+100.200000,256,8,06 07 08 09 0A 0B 0C 0D,false,false,false,can0
+100.210000,257,4,15 25 35 45,false,false,false,can0
+100.220000,258,2,44 55,false,false,false,can0
+100.230000,512,8,05 00 00 00 00 00 00 00,false,false,false,can0
+100.240000,256,8,07 08 09 0A 0B 0C 0D 0E,false,false,false,can0
+100.250000,257,4,16 26 36 46,false,false,false,can0
+100.260000,258,2,66 77,false,false,false,can0
+100.270000,512,8,06 00 00 00 00 00 00 00,false,false,false,can0
+100.280000,256,8,08 09 0A 0B 0C 0D 0E 0F,false,false,false,can0
+100.290000,257,4,17 27 37 47,false,false,false,can0
+100.300000,258,2,88 99,false,false,false,can0
+100.310000,512,8,07 00 00 00 00 00 00 00,false,false,false,can0
+100.320000,256,8,09 0A 0B 0C 0D 0E 0F 10,false,false,false,can0
+100.330000,257,4,18 28 38 48,false,false,false,can0
+100.340000,258,2,AA BB,false,false,false,can0
+100.350000,512,8,08 00 00 00 00 00 00 00,false,false,false,can0
+100.360000,256,8,0A 0B 0C 0D 0E 0F 10 11,false,false,false,can0
+100.370000,257,4,19 29 39 49,false,false,false,can0
+100.380000,258,2,CC DD,false,false,false,can0
+100.390000,512,8,09 00 00 00 00 00 00 00,false,false,false,can0
+100.400000,256,8,0B 0C 0D 0E 0F 10 11 12,false,false,false,can0
+100.410000,257,4,1A 2A 3A 4A,false,false,false,can0
+100.420000,258,2,EE FF,false,false,false,can0
+100.430000,512,8,0A 00 00 00 00 00 00 00,false,false,false,can0
+100.440000,256,8,0C 0D 0E 0F 10 11 12 13,false,false,false,can0
+100.450000,257,4,1B 2B 3B 4B,false,false,false,can0
+100.460000,258,2,00 11,false,false,false,can0
+100.470000,512,8,0B 00 00 00 00 00 00 00,false,false,false,can0
+100.480000,256,8,0D 0E 0F 10 11 12 13 14,false,false,false,can0
+100.490000,257,4,1C 2C 3C 4C,false,false,false,can0
+100.500000,258,2,22 33,false,false,false,can0
