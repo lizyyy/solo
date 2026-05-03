@@ -1,0 +1,21 @@
+{
+  "name": "stage-lighting-cue-preview",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "papaparse": "^5.4.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/papaparse": "^5.3.15"
+  }
+}
