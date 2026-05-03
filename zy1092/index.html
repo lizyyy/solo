@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CueDesk - 演出流程管理工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入 Sortable.js 用于拖拽排序 -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="app-header">
+            <div class="logo">
+                <h1>CueDesk</h1>
+                <span class="subtitle">演出流程管理工具</span>
+            </div>
+            <div class="header-actions">
+                <button id="create-project-btn" class="btn btn-primary">新建项目</button>
+                <button id="import-btn" class="btn btn-secondary">导入</button>
+                <button id="export-btn" class="btn btn-secondary">导出</button>
+                <select id="project-selector" class="project-selector">
+                    <option value="">选择项目</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 左侧：流程列表 -->
+            <section class="cue-list-section">
+                <div class="section-header">
+                    <h2>流程列表</h2>
+                    <div class="list-actions">
+                        <select id="status-filter" class="filter-select">
+                            <option value="">所有状态</option>
+                            <option value="pending">待确认</option>
+                            <option value="rehearsed">已彩排</option>
+                            <option value="changed">现场变更</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                        <button id="add-cue-btn" class="btn btn-primary">添加流程</button>
+                    </div>
+                </div>
+                <div class="cue-list" id="cue-list">
+                    <!-- 流程列表将通过 JavaScript 动态生成 -->
+                </div>
+            </section>
+
+            <!-- 中间：编辑区域 -->
+            <section class="edit-section">
+                <div class="section-header">
+                    <h2 id="edit-section-title">选择流程进行编辑</h2>
+                    <div class="edit-actions">
+                        <button id="move-up-btn" class="btn btn-icon" disabled>↑</button>
+                        <button id="move-down-btn" class="btn btn-icon" disabled>↓</button>
+                        <button id="delete-cue-btn" class="btn btn-danger" disabled>删除</button>
+                    </div>
+                </div>
+                <div class="edit-form-container" id="edit-form-container">
+                    <form id="cue-edit-form" class="cue-edit-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cue-name">流程名称</label>
+                                <input type="text" id="cue-name" name="name" required placeholder="例如：开场音乐">
+                            </div>
+                            <div class="form-group">
+                                <label for="cue-order">顺序</label>
+                                <input type="number" id="cue-order" name="order" min="1" disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cue-status">状态</label>
+                                <select id="cue-status" name="status">
+                                    <option value="pending">待确认</option>
+                                    <option value="rehearsed">已彩排</option>
+                                    <option value="changed">现场变更</option>
+                                    <option value="completed">已完成</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cue-responsible">负责人</label>
+                                <input type="text" id="cue-responsible" name="responsible" placeholder="例如：主持人甲">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cue-duration">预估时长 (分钟)</label>
+                                <input type="number" id="cue-duration" name="duration" min="0" step="0.5" placeholder="例如：5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cue-start-time">开始时间</label>
+                                <input type="time" id="cue-start-time" name="startTime">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cue-microphones">麦克风 (逗号分隔)</label>
+                            <input type="text" id="cue-microphones" name="microphones" placeholder="例如：1, 2">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cue-audio-path">音频文件路径</label>
+                            <div class="file-input-container">
+                                <input type="text" id="cue-audio-path" name="audioPath" placeholder="例如：/Users/audio/开场音乐.mp3">
+                                <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                                <button type="button" id="select-audio-btn" class="btn btn-secondary">选择文件</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cue-script">口播卡</label>
+                            <textarea id="cue-script" name="script" rows="4" placeholder="输入口播内容..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cue-notes">现场备注</label>
+                            <textarea id="cue-notes" name="notes" rows="3" placeholder="输入备注信息..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="save-cue-btn" disabled>保存</button>
+                            <button type="button" class="btn btn-secondary" id="cancel-edit-btn" disabled>取消</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 右侧：风险和导出 -->
+            <section class="risk-export-section">
+                <div class="section-header">
+                    <h2>风险检查</h2>
+                    <button id="check-risk-btn" class="btn btn-primary">重新检查</button>
+                </div>
+                <div class="risk-list" id="risk-list">
+                    <!-- 风险列表将通过 JavaScript 动态生成 -->
+                </div>
+
+                <div class="section-header">
+                    <h2>导出</h2>
+                </div>
+                <div class="export-options">
+                    <button id="export-json-btn" class="btn btn-secondary export-btn">
+                        JSON 备份
+                    </button>
+                    <button id="export-md-btn" class="btn btn-secondary export-btn">
+                        Markdown Cue Sheet
+                    </button>
+                    <button id="export-html-btn" class="btn btn-secondary export-btn">
+                        HTML Cue Sheet
+                    </button>
+                    <button id="export-csv-btn" class="btn btn-secondary export-btn">
+                        CSV 物料清单
+                    </button>
+                    <button id="export-checklist-btn" class="btn btn-primary export-btn">
+                        开场前 10 分钟急救清单
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 导入导出模态框 -->
+    <div id="import-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>导入流程</h3>
+                <button class="close-modal" id="close-import-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-options">
+                    <label class="import-option">
+                        <input type="radio" name="import-type" value="json" checked>
+                        JSON 格式
+                    </label>
+                    <label class="import-option">
+                        <input type="radio" name="import-type" value="csv">
+                        CSV 格式
+                    </label>
+                </div>
+                <div class="file-upload-area" id="file-upload-area">
+                    <p>拖放文件到此处，或点击选择文件</p>
+                    <input type="file" id="import-file-input" accept=".json,.csv" style="display: none;">
+                </div>
+                <div id="import-preview" style="display: none;">
+                    <h4>预览</h4>
+                    <div id="import-preview-content"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-import-btn">取消</button>
+                <button class="btn btn-primary" id="confirm-import-btn" disabled>导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-project-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建项目</h3>
+                <button class="close-modal" id="close-create-project-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-project-form">
+                    <div class="form-group">
+                        <label for="project-name">项目名称</label>
+                        <input type="text" id="project-name" name="name" required placeholder="例如：2024年年会">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-description">项目描述</label>
+                        <textarea id="project-description" name="description" rows="3" placeholder="可选：项目描述..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-create-project-btn">取消</button>
+                <button class="btn btn-primary" id="confirm-create-project-btn">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- 脚本 -->
+    <script src="data.js"></script>
+    <script src="risk-check.js"></script>
+    <script src="import-export.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
