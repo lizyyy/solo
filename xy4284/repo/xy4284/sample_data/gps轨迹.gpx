@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="岩芯箱照片归档助手示例数据" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>野外工作GPS轨迹</name>
+    <time>2026-05-03T08:00:00Z</time>
+  </metadata>
+  <wpt lat="39.9042" lon="116.4074">
+    <ele>43.5</ele>
+    <time>2026-05-03T08:30:00Z</time>
+    <name>ZK001钻孔位置</name>
+  </wpt>
+  <wpt lat="39.9050" lon="116.4085">
+    <ele>45.2</ele>
+    <time>2026-05-03T10:15:00Z</time>
+    <name>ZK002钻孔位置</name>
+  </wpt>
+  <trk>
+    <name>野外工作轨迹</name>
+    <trkseg>
+      <trkpt lat="39.9042" lon="116.4074">
+        <ele>43.5</ele>
+        <time>2026-05-03T08:00:00Z</time>
+      </trkpt>
+      <trkpt lat="39.9043" lon="116.4075">
+        <ele>43.8</ele>
+        <time>2026-05-03T08:05:00Z</time>
+      </trkpt>
+      <trkpt lat="39.9045" lon="116.4078">
+        <ele>44.1</ele>
+        <time>2026-05-03T08:10:00Z</time>
+      </trkpt>
+      <trkpt lat="39.9048" lon="116.4082">
+        <ele>44.5</ele>
+        <time>2026-05-03T09:30:00Z</time>
+      </trkpt>
+      <trkpt lat="39.9050" lon="116.4085">
+        <ele>45.2</ele>
+        <time>2026-05-03T10:00:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
