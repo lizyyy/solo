@@ -1,0 +1,12 @@
+{
+  "rp_id": "example.com",
+  "rp_name": "Example Inc.",
+  "origins": [
+    "https://example.com",
+    "https://app.example.com"
+  ],
+  "resident_key_required": true,
+  "user_verification_required": true,
+  "supported_algorithms": [-7, -257],
+  "cross_device_allowed": false
+}

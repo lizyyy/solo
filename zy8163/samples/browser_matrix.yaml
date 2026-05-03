@@ -1,0 +1,64 @@
+browsers:
+  - browser: Chrome
+    version: "120+"
+    platform: Windows
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -8, -257, -37]
+  
+  - browser: Chrome
+    version: "120+"
+    platform: macOS
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -8, -257, -37]
+  
+  - browser: Chrome
+    version: "120+"
+    platform: Android
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -8, -257, -37]
+  
+  - browser: Safari
+    version: "17+"
+    platform: macOS
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -257, -37]
+  
+  - browser: Safari
+    version: "17+"
+    platform: iOS
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -257, -37]
+  
+  - browser: Edge
+    version: "120+"
+    platform: Windows
+    fido2_supported: true
+    resident_key_supported: true
+    user_verification_supported: true
+    supported_algorithms: [-7, -8, -257, -37]
+  
+  - browser: Firefox
+    version: "121+"
+    platform: Windows
+    fido2_supported: true
+    resident_key_supported: false
+    user_verification_supported: true
+    supported_algorithms: [-7, -257]
+  
+  - browser: Firefox
+    version: "121+"
+    platform: macOS
+    fido2_supported: true
+    resident_key_supported: false
+    user_verification_supported: true
+    supported_algorithms: [-7, -257]
