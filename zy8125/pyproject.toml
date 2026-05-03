@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "calibration-checker"
+version = "0.1.0"
+description = "工业相机标定包离线复核工具"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21.0",
+    "opencv-python>=4.5.0",
+    "pyyaml>=5.4.0",
+    "pandas>=1.3.0",
+    "click>=8.0.0",
+    "rich>=10.0.0",
+]
+
+[project.scripts]
+calib-check = "calibration_checker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
