@@ -1,0 +1,68 @@
+{
+  "platforms": [
+    {
+      "name": "TikTok",
+      "code": "tiktok",
+      "requiredLanguages": ["zh", "en", "es"]
+    },
+    {
+      "name": "YouTube",
+      "code": "youtube",
+      "requiredLanguages": ["zh", "en", "es", "pt"]
+    }
+  ],
+  "languages": [
+    {
+      "code": "zh",
+      "name": "Chinese",
+      "readingSpeed": 8,
+      "maxLinesPerCue": 2
+    },
+    {
+      "code": "en",
+      "name": "English",
+      "readingSpeed": 15,
+      "maxLinesPerCue": 2
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "readingSpeed": 13,
+      "maxLinesPerCue": 2
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "readingSpeed": 13,
+      "maxLinesPerCue": 2
+    }
+  ],
+  "timing": {
+    "minGapBetweenCues": 40,
+    "minCueDuration": 300,
+    "maxCueDuration": 7000,
+    "allowOverlap": false
+  },
+  "text": {
+    "allowEmptyLines": false,
+    "maxLineLength": 40,
+    "checkPunctuation": true
+  },
+  "forbiddenWords": {
+    "enabled": true,
+    "words": [
+      "敏感词",
+      "禁止",
+      "违规",
+      "forbidden",
+      "violate",
+      "低俗"
+    ],
+    "caseSensitive": false
+  },
+  "naming": {
+    "pattern": "{platform}_{episode}_{language}.{ext}",
+    "requiredParts": ["platform", "episode", "language"],
+    "separator": "_"
+  }
+}
