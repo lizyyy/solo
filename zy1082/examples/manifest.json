@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "requirements": {
+    "photoTypes": [
+      {
+        "type": "refined_watermark",
+        "name": "精修带水印",
+        "description": "用于客户预览的带水印精修图",
+        "required": true,
+        "watermark": true,
+        "categories": ["refined"],
+        "namingPattern": "{number}_精修_带水印"
+      },
+      {
+        "type": "refined_nowatermark",
+        "name": "精修无水印",
+        "description": "用于最终交付的无水印精修图",
+        "required": true,
+        "watermark": false,
+        "categories": ["refined"],
+        "namingPattern": "{number}_精修_无水印"
+      },
+      {
+        "type": "original",
+        "name": "原片",
+        "description": "原始照片文件",
+        "required": false,
+        "categories": ["original"],
+        "namingPattern": "{number}_原片"
+      },
+      {
+        "type": "grid",
+        "name": "小红书九宫格",
+        "description": "用于社交媒体的九宫格图片",
+        "required": false,
+        "categories": ["grid"],
+        "namingPattern": "{number}_九宫格"
+      },
+      {
+        "type": "print",
+        "name": "打印清单",
+        "description": "用于打印的高清图片",
+        "required": false,
+        "categories": ["print"],
+        "namingPattern": "{number}_打印"
+      }
+    ],
+    "aspectRatioRules": {
+      "enabled": true,
+      "allowedOrientations": ["landscape", "portrait", "square"],
+      "customRules": []
+    },
+    "versionRules": {
+      "enabled": true,
+      "latestVersionOnly": true,
+      "rejectOlderVersions": true
+    }
+  },
+  "naming": {
+    "outputPattern": "{number}_{type}_{version}.{ext}",
+    "versionFormat": "v{number}",
+    "numberPadding": 4
+  }
+}

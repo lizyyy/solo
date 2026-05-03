@@ -1,0 +1,32 @@
+{
+  "name": "photo-delivery-checker",
+  "version": "1.0.0",
+  "description": "旅拍照片交付包整理和校验工具",
+  "main": "src/cli.js",
+  "bin": {
+    "photo-check": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "start": "node src/cli.js"
+  },
+  "keywords": [
+    "photo",
+    "delivery",
+    "checker",
+    "validator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parser": "^3.0.0",
+    "image-size": "^1.0.2",
+    "sharp": "^0.32.6",
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0"
+  },
+  "devDependencies": {
+    "tmp": "^0.2.1"
+  }
+}
