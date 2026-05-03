@@ -1,0 +1,429 @@
+{
+  "summary": {
+    "total_items": 16,
+    "valid_items": 16,
+    "items_with_errors": 0,
+    "items_with_warnings": 12,
+    "error_count": 0,
+    "warning_count": 18,
+    "info_count": 6,
+    "unrecognized_count": 6
+  },
+  "unrecognized_items": [
+    {
+      "id": "todo-0005-cc3f557f",
+      "content": "进行性能测试",
+      "raw_content": "进行性能测试 依赖: 测试环境准备完成",
+      "source_file": "./meetings/2024-05-02-技术评审会.md",
+      "line_number": 20,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    },
+    {
+      "id": "todo-0006-321575e4",
+      "content": "这个待办没有负责人和日期",
+      "raw_content": "这个待办没有负责人和日期",
+      "source_file": "./meetings/2024-05-02-技术评审会.md",
+      "line_number": 25,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    },
+    {
+      "id": "todo-0007-68ba16c6",
+      "content": "这个待办格式有问题 日期是 abc-123",
+      "raw_content": "这个待办格式有问题 日期是 abc-123",
+      "source_file": "./meetings/2024-05-02-技术评审会.md",
+      "line_number": 26,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    },
+    {
+      "id": "todo-0008-99650615",
+      "content": "只有内容，其他信息都没写",
+      "raw_content": "只有内容，其他信息都没写",
+      "source_file": "./meetings/2024-05-02-技术评审会.md",
+      "line_number": 27,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    },
+    {
+      "id": "todo-0014-43b08e98",
+      "content": "安排下周会议时间",
+      "raw_content": "安排下周会议时间",
+      "source_file": "./meetings/2024-05-01-产品周会.md",
+      "line_number": 28,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    },
+    {
+      "id": "todo-0015-db87e2c7",
+      "content": "整理会议录音",
+      "raw_content": "整理会议录音",
+      "source_file": "./meetings/2024-05-01-产品周会.md",
+      "line_number": 29,
+      "reason": "缺少负责人；缺少截止日期",
+      "has_assignee": false,
+      "has_deadline": false,
+      "deadline_str": null,
+      "assignee": null
+    }
+  ],
+  "validation_details": {
+    "errors": [],
+    "warnings": [
+      {
+        "item_id": "todo-0000-77eaf851",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-05-08",
+        "field": "deadline",
+        "raw_value": "2024-05-08",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 10,
+          "raw_content": "优化数据库查询性能 @张工 截止 5月8日"
+        }
+      },
+      {
+        "item_id": "todo-0003-f692af39",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-04-28",
+        "field": "deadline",
+        "raw_value": "2024-04-28",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 16,
+          "raw_content": "修复移动端适配问题 @赵工 截止 2024-04-28"
+        }
+      },
+      {
+        "item_id": "todo-0005-cc3f557f",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 20,
+          "raw_content": "进行性能测试 依赖: 测试环境准备完成"
+        }
+      },
+      {
+        "item_id": "todo-0005-cc3f557f",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 20,
+          "raw_content": "进行性能测试 依赖: 测试环境准备完成"
+        }
+      },
+      {
+        "item_id": "todo-0006-321575e4",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 25,
+          "raw_content": "这个待办没有负责人和日期"
+        }
+      },
+      {
+        "item_id": "todo-0006-321575e4",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 25,
+          "raw_content": "这个待办没有负责人和日期"
+        }
+      },
+      {
+        "item_id": "todo-0007-68ba16c6",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 26,
+          "raw_content": "这个待办格式有问题 日期是 abc-123"
+        }
+      },
+      {
+        "item_id": "todo-0007-68ba16c6",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 26,
+          "raw_content": "这个待办格式有问题 日期是 abc-123"
+        }
+      },
+      {
+        "item_id": "todo-0008-99650615",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 27,
+          "raw_content": "只有内容，其他信息都没写"
+        }
+      },
+      {
+        "item_id": "todo-0008-99650615",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 27,
+          "raw_content": "只有内容，其他信息都没写"
+        }
+      },
+      {
+        "item_id": "todo-0009-d9a9bef8",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-05-03",
+        "field": "deadline",
+        "raw_value": "2024-05-03",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 13,
+          "raw_content": "完成用户调研报告 @张三 截止 2024-05-03"
+        }
+      },
+      {
+        "item_id": "todo-0010-f8ab6e31",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-04-30",
+        "field": "deadline",
+        "raw_value": "2024-04-30",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 15,
+          "raw_content": "更新产品文档 @李四 截止 2024-04-30 (已完成)"
+        }
+      },
+      {
+        "item_id": "todo-0011-e13577ed",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-05-05",
+        "field": "deadline",
+        "raw_value": "2024-05-05",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 18,
+          "raw_content": "修复登录模块Bug 负责人: 王五 截止日期: 2024-05-05"
+        }
+      },
+      {
+        "item_id": "todo-0013-0eb97f0a",
+        "severity": "warning",
+        "error_code": "deadline_too_far_past",
+        "message": "截止日期过于久远：2024-05-10",
+        "field": "deadline",
+        "raw_value": "2024-05-10",
+        "suggestion": "建议检查日期是否正确，最早允许：2025-05-03",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 24,
+          "raw_content": "设计新版首页UI @设计团队 截止 2024/05/10"
+        }
+      },
+      {
+        "item_id": "todo-0014-43b08e98",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 28,
+          "raw_content": "安排下周会议时间"
+        }
+      },
+      {
+        "item_id": "todo-0014-43b08e98",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 28,
+          "raw_content": "安排下周会议时间"
+        }
+      },
+      {
+        "item_id": "todo-0015-db87e2c7",
+        "severity": "warning",
+        "error_code": "assignee_missing",
+        "message": "待办项缺少负责人",
+        "field": "assignee",
+        "raw_value": null,
+        "suggestion": "建议添加 @负责人 或使用 '负责人: 姓名' 格式",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 29,
+          "raw_content": "整理会议录音"
+        }
+      },
+      {
+        "item_id": "todo-0015-db87e2c7",
+        "severity": "warning",
+        "error_code": "deadline_missing",
+        "message": "待办项缺少截止日期",
+        "field": "deadline",
+        "raw_value": null,
+        "suggestion": "建议添加截止日期，如：截止 2024-01-15 或 下周一完成",
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 29,
+          "raw_content": "整理会议录音"
+        }
+      }
+    ],
+    "infos": [
+      {
+        "item_id": "todo-0000-77eaf851",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-05-08",
+        "field": "deadline",
+        "raw_value": "2024-05-08",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 10,
+          "raw_content": "优化数据库查询性能 @张工 截止 5月8日"
+        }
+      },
+      {
+        "item_id": "todo-0003-f692af39",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-04-28",
+        "field": "deadline",
+        "raw_value": "2024-04-28",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-02-技术评审会.md",
+          "line": 16,
+          "raw_content": "修复移动端适配问题 @赵工 截止 2024-04-28"
+        }
+      },
+      {
+        "item_id": "todo-0009-d9a9bef8",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-05-03",
+        "field": "deadline",
+        "raw_value": "2024-05-03",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 13,
+          "raw_content": "完成用户调研报告 @张三 截止 2024-05-03"
+        }
+      },
+      {
+        "item_id": "todo-0010-f8ab6e31",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-04-30",
+        "field": "deadline",
+        "raw_value": "2024-04-30",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 15,
+          "raw_content": "更新产品文档 @李四 截止 2024-04-30 (已完成)"
+        }
+      },
+      {
+        "item_id": "todo-0011-e13577ed",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-05-05",
+        "field": "deadline",
+        "raw_value": "2024-05-05",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 18,
+          "raw_content": "修复登录模块Bug 负责人: 王五 截止日期: 2024-05-05"
+        }
+      },
+      {
+        "item_id": "todo-0013-0eb97f0a",
+        "severity": "info",
+        "error_code": "deadline_overdue",
+        "message": "截止日期已过期：2024-05-10",
+        "field": "deadline",
+        "raw_value": "2024-05-10",
+        "suggestion": null,
+        "source": {
+          "file": "./meetings/2024-05-01-产品周会.md",
+          "line": 24,
+          "raw_content": "设计新版首页UI @设计团队 截止 2024/05/10"
+        }
+      }
+    ]
+  }
+}

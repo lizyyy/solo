@@ -1,0 +1,119 @@
+# 会议纪要待办整理工具配置文件
+
+# 输入目录（相对于脚本执行路径）
+input_dir: ./meetings
+
+# 输出目录
+output_dir: ./reports
+
+# 支持的文件扩展名
+supported_extensions:
+  - .md
+  - .txt
+
+# 解析规则
+parsing:
+  # 待办标记（支持多种格式）
+  todo_markers:
+    - "- [ ]"
+    - "- [x]"  # 已完成也包含，用于记录
+    - "* [ ]"
+    - "* [x]"
+    - "TODO:"
+    - "todo:"
+    - "待办:"
+    - "待办事项:"
+  
+  # 负责人标记
+  assignee_patterns:
+    - "@(\\w+)"  # @张三
+    - "负责人[:：]\\s*(\\S+)"  # 负责人: 张三
+    - "指派给[:：]\\s*(\\S+)"  # 指派给: 张三
+    - "交给[:：]\\s*(\\S+)"  # 交给: 张三
+  
+  # 日期/截止时间标记
+  date_patterns:
+    # ISO 格式
+    - "(\\d{4}-\\d{1,2}-\\d{1,2})"  # 2024-01-15
+    - "(\\d{4}/\\d{1,2}/\\d{1,2})"  # 2024/01/15
+    # 中文格式
+    - "(\\d{4}年\\d{1,2}月\\d{1,2}日)"  # 2024年1月15日
+    - "(\\d{1,2}月\\d{1,2}日)"  # 1月15日 (当年)
+    # 相对日期
+    - "(下周[一|二|三|四|五|六|日])"
+    - "(本周[一|二|三|四|五|六|日])"
+    - "(明天|后天)"
+  
+  # 阻塞项标记
+  blocking_patterns:
+    - "阻塞[:：]\\s*(.+?)(?=\\s*$|\\s*(?:@|\\d{4}|负责人|截止))"
+    - "依赖[:：]\\s*(.+?)(?=\\s*$|\\s*(?:@|\\d{4}|负责人|截止))"
+    - "前提[:：]\\s*(.+?)(?=\\s*$|\\s*(?:@|\\d{4}|负责人|截止))"
+    - "等待[:：]\\s*(.+?)(?=\\s*$|\\s*(?:@|\\d{4}|负责人|截止))"
+  
+  # 截止日期关键字
+  deadline_keywords:
+    - "截止"
+    - "截止到"
+    - "截止日期"
+    - "完成日期"
+    - "需要在"
+    - "于"
+    - "by"
+
+# 日期配置
+date:
+  # 默认日期格式
+  output_format: "%Y-%m-%d"
+  # 当年年份（用于解析不含年份的日期）
+  current_year: 2024
+  # 周一为一周的第一天
+  week_start_monday: true
+
+# 校验规则
+validation:
+  # 必需字段
+  required_fields:
+    - content
+  # 建议字段（缺失时警告）
+  recommended_fields:
+    - assignee
+    - deadline
+  # 日期范围校验
+  date_range:
+    enabled: true
+    # 允许的过去天数（负数表示过去）
+    min_days_past: -365
+    # 允许的未来天数
+    max_days_future: 365
+
+# 报告生成配置
+report:
+  # 按人视图配置
+  by_person:
+    enabled: true
+    title: "按负责人分组"
+    # 排序方式：deadline_asc (按截止日期升序), content (按内容)
+    sort_by: deadline_asc
+    # 显示完成状态
+    show_status: true
+  
+  # 按日期视图配置
+  by_date:
+    enabled: true
+    title: "按截止日期分组"
+    # 排序方式：deadline_asc, deadline_desc, person
+    sort_by: deadline_asc
+    # 显示完成状态
+    show_status: true
+  
+  # 元数据显示
+  metadata:
+    show_source_file: true
+    show_blocking: true
+    show_raw_content: false
+
+# 日志配置
+logging:
+  level: INFO
+  format: "%(asctime)s - %(levelname)s - %(message)s"
