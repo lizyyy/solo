@@ -1,0 +1,123 @@
+template_name: "档案数字化标准模板 v1.0"
+template_version: "1.0.0"
+page_size:
+  width: 2480
+  height: 3508
+  unit: "pixel"
+
+key_fields:
+  - field_name: "姓名"
+    field_type: "text"
+    priority: "high"
+    expected_region:
+      x1: 200
+      y1: 280
+      x2: 450
+      y2: 370
+    confidence_threshold: 0.85
+    layout_tolerance: 50
+    keywords: ["姓名", "名字", "申请人"]
+    validation_rules:
+      min_length: 2
+      max_length: 10
+      pattern: "^[\\u4e00-\\u9fa5]+$"
+
+  - field_name: "日期"
+    field_type: "date"
+    priority: "high"
+    expected_region:
+      x1: 200
+      y1: 380
+      x2: 580
+      y2: 470
+    confidence_threshold: 0.80
+    layout_tolerance: 60
+    keywords: ["日期", "时间", "年月日"]
+    validation_rules:
+      date_format: ["YYYY-MM-DD", "YYYY年MM月DD日", "YYYY/MM/DD"]
+      min_year: 1990
+      max_year: 2030
+
+  - field_name: "编号"
+    field_type: "id_number"
+    priority: "high"
+    expected_region:
+      x1: 200
+      y1: 480
+      x2: 600
+      y2: 570
+    confidence_threshold: 0.80
+    layout_tolerance: 50
+    keywords: ["编号", "档案号", "案卷号", "BH"]
+    validation_rules:
+      min_length: 5
+      max_length: 20
+      pattern: "^[A-Za-z0-9_-]+$"
+
+  - field_name: "印章"
+    field_type: "stamp"
+    priority: "medium"
+    expected_region:
+      x1: 1600
+      y1: 2600
+      x2: 2200
+      y2: 3100
+    confidence_threshold: 0.50
+    layout_tolerance: 100
+    keywords: ["章", "印章", "公章", "专用章", "签章"]
+    validation_rules:
+      min_keyword_match: 1
+
+  - field_name: "经办人"
+    field_type: "text"
+    priority: "medium"
+    expected_region:
+      x1: 200
+      y1: 280
+      x2: 450
+      y2: 370
+    confidence_threshold: 0.80
+    layout_tolerance: 50
+    keywords: ["经办人", "经手人", "负责人"]
+    validation_rules:
+      min_length: 2
+      max_length: 10
+
+  - field_name: "审批意见"
+    field_type: "text"
+    priority: "medium"
+    expected_region:
+      x1: 200
+      y1: 180
+      x2: 500
+      y2: 270
+    confidence_threshold: 0.80
+    layout_tolerance: 60
+    keywords: ["审批", "意见", "同意", "不同意"]
+    validation_rules:
+      min_length: 2
+
+layout_checks:
+  - check_name: "页眉位置"
+    check_type: "region"
+    expected_region:
+      x1: 100
+      y1: 50
+      x2: 2380
+      y2: 150
+    tolerance: 30
+
+  - check_name: "页脚位置"
+    check_type: "region"
+    expected_region:
+      x1: 100
+      y1: 3300
+      x2: 2380
+      y2: 3450
+    tolerance: 30
+
+quality_settings:
+  low_confidence_threshold: 0.70
+  critical_confidence_threshold: 0.50
+  max_layout_drift: 100
+  rotation_angles: [0, 90, 180, 270]
