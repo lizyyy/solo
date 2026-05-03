@@ -1,0 +1,37 @@
+{
+  "contracts": [
+    {
+      "materialId": "DOC_2024_01",
+      "title": "张教授采访授权",
+      "type": "人物采访授权",
+      "startDate": "2024-01-15",
+      "endDate": "2023-12-31",
+      "maxDuration": "00:00:30:00",
+      "usage": "纪录片《城市记忆》全球发行",
+      "territory": "全球",
+      "notes": "已过期的合同 - 用于测试过期检测"
+    },
+    {
+      "materialId": "DOC_2024_02",
+      "title": "城市空镜素材授权",
+      "type": "影像素材授权",
+      "startDate": "2024-03-01",
+      "endDate": "2026-05-15",
+      "maxDuration": "00:00:10:00",
+      "usage": "非商业用途",
+      "territory": "中国大陆",
+      "notes": "时长限制很短，用于测试超时长"
+    },
+    {
+      "materialId": "DOC_2024_06",
+      "title": "未使用素材授权",
+      "type": "测试授权",
+      "startDate": "2024-01-01",
+      "endDate": "2026-12-31",
+      "maxDuration": "00:10:00:00",
+      "usage": "不限",
+      "territory": "全球",
+      "notes": "有授权但素材未在时间线中使用"
+    }
+  ]
+}

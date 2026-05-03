@@ -1,0 +1,36 @@
+{
+  "name": "material-authorization-checker",
+  "version": "1.0.0",
+  "description": "素材授权交付核对器 - 纪录片剪辑助理用CLI工具，用于核对素材清单、授权合同、时间线EDL和交付文件夹",
+  "main": "src/index.js",
+  "bin": {
+    "material-check": "src/index.js"
+  },
+  "scripts": {
+    "test": "node test/test.js",
+    "lint": "eslint src/**/*.js"
+  },
+  "keywords": [
+    "documentary",
+    "editing",
+    "material",
+    "authorization",
+    "checker",
+    "edl",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "chalk": "^4.1.2",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
