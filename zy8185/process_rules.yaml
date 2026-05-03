@@ -1,0 +1,120 @@
+# 厌氧发酵罐工艺规则配置文件
+# 用于定义正常运行参数范围和风险检测阈值
+
+version: "1.0"
+last_updated: "2026-05-01"
+
+# 罐体配置
+digesters:
+  D1:
+    name: "1号厌氧发酵罐"
+    design_volume: 500  # 设计容积，单位：m³
+    design_loading_rate: 4.0  # 设计容积负荷，单位：kg VS/(m³·d)
+    max_daily_feed: 20000  # 最大日投料量，单位：kg
+    nominal_temperature: 35.0  # 标称温度，单位：℃
+    temperature_tolerance: ±1.0  # 温度容差范围
+    
+  D2:
+    name: "2号厌氧发酵罐"
+    design_volume: 500  # 设计容积，单位：m³
+    design_loading_rate: 4.0  # 设计容积负荷，单位：kg VS/(m³·d)
+    max_daily_feed: 20000  # 最大日投料量，单位：kg
+    nominal_temperature: 36.0  # 标称温度，单位：℃
+    temperature_tolerance: ±1.0  # 温度容差范围
+
+# 参数阈值配置
+parameter_thresholds:
+  pH:
+    optimal_range: [7.0, 7.5]
+    warning_low: 6.8
+    critical_low: 6.5
+    warning_high: 7.8
+    critical_high: 8.0
+    unit: ""
+    
+  temperature:
+    nominal_range: [34.0, 38.0]
+    drift_threshold: 2.0  # 温度漂移阈值，单位：℃/小时
+    unit: "℃"
+    
+  VFA:
+    optimal: < 3000
+    warning: 3000
+    critical: 5000
+    unit: "mg/L"
+    
+  gas_production:
+    baseline: 100  # 基准产气量，单位：m³/h
+    sudden_drop_threshold: 0.4  # 骤降比例（40%）
+    unit: "m³/h"
+
+# 风险检测规则
+risk_detection_rules:
+  acidification:
+    name: "酸化风险"
+    description: "pH值持续下降或低于临界值，伴随VFA升高"
+    conditions:
+      - type: "parameter"
+        parameter: "pH"
+        operator: "<"
+        value: 6.8
+        duration_minutes: 60
+      - type: "parameter"
+        parameter: "VFA"
+        operator: ">"
+        value: 3000
+        duration_minutes: 60
+    severity: "critical"
+    action: "立即停止投料，检查碱度，必要时投加NaOH或NaHCO3"
+    
+  temperature_drift:
+    name: "温控漂移"
+    description: "罐温偏离设定范围超过容差，或温度变化速率过快"
+    conditions:
+      - type: "deviation"
+        parameter: "temperature"
+        deviation_threshold: 2.0
+        duration_minutes: 30
+      - type: "rate"
+        parameter: "temperature"
+        rate_threshold: 1.0
+        time_window_hours: 1
+    severity: "warning"
+    action: "检查加热/冷却系统，核对蒸汽流量和循环泵状态"
+    
+  overloading:
+    name: "投料过载"
+    description: "单次投料量超过设计负荷的120%，或日累计投料超过限值"
+    conditions:
+      - type: "single_feed"
+        threshold_percent: 120
+      - type: "daily_cumulative"
+        threshold_percent: 110
+    severity: "warning"
+    action: "减少后续投料量，监测pH和VFA变化，必要时延长停留时间"
+    
+  gas_production_drop:
+    name: "产气骤降"
+    description: "产气量在短时间内下降超过阈值"
+    conditions:
+      - type: "relative_drop"
+        parameter: "gas_production"
+        drop_percent: 40
+        time_window_hours: 2
+    severity: "critical"
+    action: "检查进料成分变化，核对pH和VFA，评估是否发生酸中毒"
+    
+  sensor_failure:
+    name: "传感器断采"
+    description: "传感器数据缺失超过指定时间"
+    conditions:
+      - type: "missing_data"
+        parameter: "any"
+        gap_minutes: 60
+    severity: "warning"
+    action: "检查传感器供电和通讯线路，必要时进行校准或更换"
+
+# 采样配置
+sampling:
+  expected_interval_minutes: 30  # 预期采样间隔
+  max_missing_allowed: 3  # 最大允许连续缺失点数
