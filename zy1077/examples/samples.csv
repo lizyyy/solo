@@ -1,0 +1,8 @@
+name,milk_volume_ml,culture_type,culture_activity,inoculation_ratio,initial_temp_c,target_temp_c,total_duration_h,ambient_temp_c,container_size_ml,preheated,milk_fat_content,notes
+标准方案 - 商用发酵剂,500,yogurt_starter,8,2.0,40,40,8,25,600,true,3.5,使用商用酸奶发酵剂，标准温度和时长
+低温发酵方案 - 市售酸奶,1000,store_bought,5,5.0,32,32,12,20,1200,false,3.5,低温长时间发酵，使用市售酸奶作为菌种
+高温快速方案,500,yogurt_starter,9,3.0,45,45,4,25,550,true,3.5,高温快速发酵，风险较高
+低接种比例测试,500,yogurt_starter,5,0.5,40,40,8,25,600,true,3.5,接种比例过低，预计无法凝固
+长时间发酵 - 可能过酸,500,yogurt_starter,8,2.0,40,40,16,25,600,true,3.5,发酵时间过长，预计会过酸
+容器过满测试,580,yogurt_starter,8,2.0,40,40,8,25,600,true,3.5,容器填充率过高，有溢出风险
+益生菌胶囊方案,500,probiotic,7,0.8,37,37,10,25,600,true,3.5,使用益生菌胶囊作为菌种
