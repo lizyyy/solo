@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>展线拥堵预演台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header id="header">
+            <h1>展线拥堵预演台</h1>
+            <div class="controls">
+                <button id="loadExampleBtn">加载示例</button>
+                <button id="importBtn">导入数据</button>
+                <button id="saveBtn">保存方案</button>
+                <button id="exportReportBtn">导出报告</button>
+                <button id="exportRiskBtn">导出风险点</button>
+                <button id="exportSceneBtn">导出场景</button>
+            </div>
+        </header>
+        
+        <main id="main">
+            <aside id="sidebar">
+                <div class="sidebar-section">
+                    <h2>数据导入</h2>
+                    <div class="import-group">
+                        <label>展厅平面图 (JSON)</label>
+                        <input type="file" id="floorplanInput" accept=".json">
+                    </div>
+                    <div class="import-group">
+                        <label>展品清单 (CSV)</label>
+                        <input type="file" id="exhibitsInput" accept=".csv">
+                    </div>
+                    <div class="import-group">
+                        <label>客流时段表 (CSV)</label>
+                        <input type="file" id="crowdInput" accept=".csv">
+                    </div>
+                    <div class="import-group">
+                        <label>无障碍规则 (JSON)</label>
+                        <input type="file" id="accessibilityInput" accept=".json">
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h2>仿真控制</h2>
+                    <div class="control-group">
+                        <label>时段选择</label>
+                        <select id="timeSlotSelect">
+                            <option value="">请选择时段</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>仿真速度</label>
+                        <input type="range" id="simSpeed" min="0.1" max="5" step="0.1" value="1">
+                        <span id="speedValue">1x</span>
+                    </div>
+                    <div class="control-group">
+                        <button id="startSimBtn">开始模拟</button>
+                        <button id="pauseSimBtn">暂停</button>
+                        <button id="resetSimBtn">重置</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h2>风险检测</h2>
+                    <div id="riskList">
+                        <p>暂无风险点</p>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h2>统计信息</h2>
+                    <div id="statsPanel">
+                        <p>总观众数: <span id="totalVisitors">0</span></p>
+                        <p>当前移动中: <span id="movingVisitors">0</span></p>
+                        <p>拥堵区域: <span id="congestedAreas">0</span></p>
+                        <p>无障碍绕行: <span id="accessDetours">0</span></p>
+                    </div>
+                </div>
+            </aside>
+            
+            <section id="canvas-container">
+                <div id="scene-info">
+                    <span id="hover-info">将鼠标悬停在物体上查看详情</span>
+                </div>
+                <div id="legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #4CAF50;"></span>
+                        <span>正常</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #FF9800;"></span>
+                        <span>拥堵</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #F44336;"></span>
+                        <span>严重拥堵</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #9C27B0;"></span>
+                        <span>无障碍通道</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background-color: #2196F3;"></span>
+                        <span>消防通道</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- 模块 -->
+    <script src="js/dataParser.js"></script>
+    <script src="js/spaceModel.js"></script>
+    <script src="js/simulationEngine.js"></script>
+    <script src="js/renderer3D.js"></script>
+    <script src="js/stateStore.js"></script>
+    <script src="js/importExport.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="sceneInput" accept=".json" style="display: none;">
+</body>
+</html>

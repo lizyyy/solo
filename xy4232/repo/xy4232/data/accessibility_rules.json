@@ -1,0 +1,15 @@
+{
+    "maxDetourDistance": 50,
+    "preferredPathWidth": 1.5,
+    "maxSlope": 0.083,
+    "requiredClearZone": 1.5,
+    "priorityZones": [
+        {
+            "id": "priority_1",
+            "name": "无障碍观展区",
+            "center": { "x": 0, "y": 0 },
+            "radius": 5
+        }
+    ],
+    "avoidZones": []
+}

@@ -1,0 +1,106 @@
+{
+    "id": "example_hall",
+    "name": "示例展厅",
+    "width": 40,
+    "height": 30,
+    "walls": [
+        {
+            "id": "wall_1",
+            "start": { "x": -20, "y": -15 },
+            "end": { "x": 20, "y": -15 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "normal"
+        },
+        {
+            "id": "wall_2",
+            "start": { "x": 20, "y": -15 },
+            "end": { "x": 20, "y": 15 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "normal"
+        },
+        {
+            "id": "wall_3",
+            "start": { "x": 20, "y": 15 },
+            "end": { "x": -20, "y": 15 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "normal"
+        },
+        {
+            "id": "wall_4",
+            "start": { "x": -20, "y": 15 },
+            "end": { "x": -20, "y": -15 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "normal"
+        },
+        {
+            "id": "wall_5",
+            "start": { "x": -10, "y": -5 },
+            "end": { "x": -10, "y": 10 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "partition"
+        },
+        {
+            "id": "wall_6",
+            "start": { "x": 10, "y": -10 },
+            "end": { "x": 10, "y": 5 },
+            "height": 3,
+            "thickness": 0.2,
+            "type": "partition"
+        }
+    ],
+    "entrances": [
+        {
+            "id": "entrance_1",
+            "name": "主入口",
+            "position": { "x": 0, "y": -14 },
+            "width": 3,
+            "capacity": 100
+        }
+    ],
+    "exits": [
+        {
+            "id": "exit_1",
+            "name": "主出口",
+            "position": { "x": 0, "y": 14 },
+            "width": 3
+        },
+        {
+            "id": "exit_2",
+            "name": "侧出口",
+            "position": { "x": 19, "y": 0 },
+            "width": 2
+        }
+    ],
+    "fireExits": [
+        {
+            "id": "fire_1",
+            "name": "消防通道A",
+            "position": { "x": -15, "y": 10 },
+            "width": 1.5,
+            "clearZone": 2
+        },
+        {
+            "id": "fire_2",
+            "name": "消防通道B",
+            "position": { "x": 15, "y": -10 },
+            "width": 1.5,
+            "clearZone": 2
+        }
+    ],
+    "accessibilityPaths": [
+        {
+            "id": "access_1",
+            "name": "无障碍主通道",
+            "start": { "x": 0, "y": -12 },
+            "end": { "x": 0, "y": 12 },
+            "width": 1.8,
+            "hasRamp": false,
+            "slope": 0
+        }
+    ]
+}

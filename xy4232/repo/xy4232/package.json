@@ -1,0 +1,22 @@
+{
+  "name": "exhibition-crowd-simulator",
+  "version": "1.0.0",
+  "description": "展线拥堵预演台 - 展馆布展3D交互可视化工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "exhibition",
+    "3d",
+    "simulation",
+    "crowd",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}
