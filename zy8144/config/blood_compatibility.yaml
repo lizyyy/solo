@@ -1,0 +1,22 @@
+abo_compatibility:
+  donor_to_recipient:
+    O: ["O", "A", "B", "AB"]
+    A: ["A", "AB"]
+    B: ["B", "AB"]
+    AB: ["AB"]
+
+rh_compatibility:
+  positive_to_negative: false
+  notes: >
+    Rh阳性红细胞只能输给Rh阳性患者，
+    Rh阴性红细胞可以输给Rh阳性或Rh阴性患者。
+
+priority_rules:
+  same_abo_rh: 1
+  same_abo_different_rh: 2
+  compatible_abo_same_rh: 3
+  compatible_abo_different_rh: 4
+
+blood_type_groups:
+  rare_types: ["AB-", "B-", "A-", "AB+"]
+  common_types: ["O+", "A+", "B+", "O-"]

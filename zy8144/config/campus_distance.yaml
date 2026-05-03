@@ -1,0 +1,35 @@
+campuses:
+  - id: campus_1
+    name: 总院
+    code: C1
+  - id: campus_2
+    name: 东院
+    code: C2
+  - id: campus_3
+    name: 西院
+    code: C3
+
+distance_matrix:
+  units: minutes
+  max_transfer_time: 30
+  matrix:
+    campus_1:
+      campus_1: 0
+      campus_2: 15
+      campus_3: 20
+    campus_2:
+      campus_1: 15
+      campus_2: 0
+      campus_3: 25
+    campus_3:
+      campus_1: 20
+      campus_2: 25
+      campus_3: 0
+
+transfer_rules:
+  priority:
+    - same_campus
+    - adjacent_campus
+    - remote_campus
+  max_distance_for_emergency: 30
+  max_distance_for_routine: 20
