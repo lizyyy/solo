@@ -1,0 +1,34 @@
+{
+  "recalls": [
+    {
+      "recall_code": "REC-2025-001",
+      "manufacturer": "永安消防器材厂",
+      "recall_reason": "批次Y2023-001干粉灭火器压力表存在缺陷",
+      "affected_batches": ["Y2023-001", "Y2023-002"],
+      "publish_date": "2025-01-10",
+      "deadline_date": "2025-03-10",
+      "priority": "high",
+      "status": "active"
+    },
+    {
+      "recall_code": "REC-2025-002",
+      "manufacturer": "东方消防器材厂",
+      "recall_reason": "批次D2022-008灭火器阀门密封问题",
+      "affected_batches": ["D2022-008", "D2022-009"],
+      "publish_date": "2025-01-15",
+      "deadline_date": "2025-02-15",
+      "priority": "critical",
+      "status": "active"
+    },
+    {
+      "recall_code": "REC-2025-003",
+      "manufacturer": "华南消防设备公司",
+      "recall_reason": "产品追溯性检查",
+      "affected_batches": ["B2022-005"],
+      "publish_date": "2025-01-20",
+      "deadline_date": "2025-04-20",
+      "priority": "medium",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "inspections": [
+    {
+      "equipment_code": "MFE-001",
+      "inspection_date": "2025-01-15",
+      "inspector": "张三",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-002",
+      "inspection_date": "2025-01-15",
+      "inspector": "张三",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-003",
+      "inspection_date": "2025-01-16",
+      "inspector": "李四",
+      "status": "需注意",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": false,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "喷嘴有轻微堵塞，建议清理"
+    },
+    {
+      "equipment_code": "MFE-004",
+      "inspection_date": "2025-01-16",
+      "inspector": "李四",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-005",
+      "inspection_date": "2025-01-17",
+      "inspector": "王五",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-006",
+      "inspection_date": "2025-01-17",
+      "inspector": "王五",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-007",
+      "inspection_date": "2025-01-18",
+      "inspector": "赵六",
+      "status": "需注意",
+      "pressure_normal": false,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "压力不足，需要加压"
+    },
+    {
+      "equipment_code": "MFE-009",
+      "inspection_date": "2025-01-18",
+      "inspector": "赵六",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-010",
+      "inspection_date": "2025-01-19",
+      "inspector": "张三",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    },
+    {
+      "equipment_code": "MFE-011",
+      "inspection_date": "2025-01-19",
+      "inspector": "张三",
+      "status": "正常",
+      "pressure_normal": true,
+      "seal_intact": true,
+      "nozzle_clear": true,
+      "hose_condition": "良好",
+      "expiration_status": "有效",
+      "notes": "一切正常"
+    }
+  ]
+}
