@@ -1,0 +1,60 @@
+{
+  "annotations": [
+    {
+      "index": 1,
+      "start_time": "00:00:02.000",
+      "end_time": "00:00:04.500",
+      "sound_type": "music",
+      "description": "开场背景音乐",
+      "volume": "normal"
+    },
+    {
+      "index": 2,
+      "start_time": "00:00:12.000",
+      "end_time": "00:00:12.500",
+      "sound_type": "effect",
+      "description": "敲门声",
+      "volume": "normal"
+    },
+    {
+      "index": 3,
+      "start_time": "00:00:23.000",
+      "end_time": "00:00:24.000",
+      "sound_type": "effect",
+      "description": "电话铃声",
+      "volume": "loud"
+    },
+    {
+      "index": 4,
+      "start_time": "00:00:33.500",
+      "end_time": "00:00:35.000",
+      "sound_type": "effect",
+      "description": "爆炸声",
+      "volume": "loud"
+    },
+    {
+      "index": 5,
+      "start_time": "00:00:45.500",
+      "end_time": "00:00:47.500",
+      "sound_type": "effect",
+      "description": "掌声",
+      "volume": "normal"
+    },
+    {
+      "index": 6,
+      "start_time": "00:00:49.500",
+      "end_time": "00:00:51.000",
+      "sound_type": "music",
+      "description": "音乐渐弱",
+      "volume": "quiet"
+    },
+    {
+      "index": 7,
+      "start_time": "00:00:20.000",
+      "end_time": "00:00:23.000",
+      "sound_type": "ambient",
+      "description": "房间环境音",
+      "volume": "quiet"
+    }
+  ]
+}
