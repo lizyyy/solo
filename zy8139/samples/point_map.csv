@@ -1,0 +1,20 @@
+old_name,new_name,unit,unit_multiplier,floor,device_id,point_type,description
+RoomTemp_Sensor,AHU1_RT_Zone1_Temp,Celsius,1.0,1,AHU-001,analog,Zone 1 Room Temperature
+RoomTemp_Sensor,AHU2_RT_Zone2_Temp,Celsius,1.0,2,AHU-002,analog,Zone 2 Room Temperature
+RoomTemp_Sensor,AHU3_RT_Zone3_Temp,Celsius,1.0,3,AHU-003,analog,Zone 3 Room Temperature
+SupplyFlow_Air,SF_Flow,cfm,0.471947,1,VFD-001,analog,Supply Air Flow (convert cfm to l/s)
+ReturnFan_Speed,RF_Speed,percent,1.0,1,VFD-002,analog,Return Fan Speed
+Filter_DP,DP_Filter,Pascal,1.0,2,AHU-002,analog,Filter Differential Pressure
+Electric_Power,Elec_Pwr,kW,1.0,1,MTR-001,analog,Electric Power Meter
+Water_Temp,CHW_Supply,Celsius,1.0,2,CHW-001,analog,Chilled Water Supply Temp
+Fan_Status,VFD_Status,boolean,1.0,1,AHU-001,binary,Fan On/Off Status
+OutsideTemp_Sensor,OAT,Celsius,1.0,None,WEATHER-001,analog,Outside Air Temperature
+DuctPressure,SP_Duct,Pascal,1.0,1,AHU-001,analog,Duct Static Pressure
+Humidity_Sensor,RH,percent,1.0,1,AHU-001,analog,Relative Humidity
+Gas_Consumption,Gas_Usage,m3,1.0,1,MTR-002,analog,Natural Gas Consumption
+CO2_Sensor,CO2_Level,ppm,1.0,1,AHU-001,analog,CO2 Level
+Boiler_Temp,BT_Condenser,Celsius,1.0,3,BOIL-001,analog,Boiler Condenser Temp
+Pump_Status,CHWP_Status,boolean,1.0,2,CHW-001,binary,Chilled Water Pump Status
+Valve_Pos,CV_Position,percent,1.0,1,AHU-001,analog,Control Valve Position
+AirFlow_Setpoint,SF_Setpoint,l/s,1.0,1,VFD-001,analog,Air Flow Setpoint
+Temp_Setpoint,RT_Setpoint,Celsius,1.0,1,AHU-001,analog,Room Temp Setpoint

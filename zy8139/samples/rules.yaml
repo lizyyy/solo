@@ -1,0 +1,92 @@
+rules:
+  - type: temperature
+    point_pattern: "Temp|Sensor$"
+    unit: "Celsius"
+    unit_multiplier: 1.0
+    staleness_threshold_seconds: 300
+    high_alarm_threshold: 30.0
+    low_alarm_threshold: 15.0
+    tolerance_pct: 2.0
+    enabled: true
+
+  - type: humidity
+    point_pattern: "Humidity|RH"
+    unit: "percent"
+    staleness_threshold_seconds: 300
+    high_alarm_threshold: 90.0
+    low_alarm_threshold: 20.0
+    tolerance_pct: 5.0
+    enabled: true
+
+  - type: airflow
+    point_pattern: "Flow|Airflow"
+    unit: "cfm"
+    unit_multiplier: 0.471947
+    staleness_threshold_seconds: 120
+    high_alarm_threshold: null
+    low_alarm_threshold: null
+    tolerance_pct: 5.0
+    enabled: true
+
+  - type: fan_speed
+    point_pattern: "Speed|Fan"
+    unit: "percent"
+    staleness_threshold_seconds: 60
+    high_alarm_threshold: 100.0
+    low_alarm_threshold: 0.0
+    tolerance_pct: 2.0
+    enabled: true
+
+  - type: pressure
+    point_pattern: "DP|Pressure|DuctPressure"
+    unit: "Pascal"
+    staleness_threshold_seconds: 120
+    high_alarm_threshold: 300.0
+    low_alarm_threshold: 50.0
+    tolerance_pct: 10.0
+    enabled: true
+
+  - type: power
+    point_pattern: "Power|Elec|kW"
+    unit: "kW"
+    staleness_threshold_seconds: 300
+    high_alarm_threshold: 1000.0
+    low_alarm_threshold: 0.0
+    tolerance_pct: 5.0
+    enabled: true
+
+  - type: co2
+    point_pattern: "CO2|carbon"
+    unit: "ppm"
+    staleness_threshold_seconds: 300
+    high_alarm_threshold: 1000.0
+    low_alarm_threshold: 400.0
+    tolerance_pct: 10.0
+    enabled: true
+
+  - type: boiler_temp
+    point_pattern: "Boiler|Condenser"
+    unit: "Celsius"
+    staleness_threshold_seconds: 120
+    high_alarm_threshold: 90.0
+    low_alarm_threshold: 60.0
+    tolerance_pct: 2.0
+    enabled: true
+
+  - type: valve_position
+    point_pattern: "Valve|Pos|Position"
+    unit: "percent"
+    staleness_threshold_seconds: 60
+    high_alarm_threshold: 100.0
+    low_alarm_threshold: 0.0
+    tolerance_pct: 1.0
+    enabled: true
+
+  - type: status_binary
+    point_pattern: "Status|Fan|Pump"
+    unit: "boolean"
+    staleness_threshold_seconds: 60
+    high_alarm_threshold: null
+    low_alarm_threshold: null
+    tolerance_pct: 0.0
+    enabled: true

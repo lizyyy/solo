@@ -1,0 +1,58 @@
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"RoomTemp_Sensor","floor":"1","device_id":"AHU-001","value":22.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"RoomTemp_Sensor","floor":"1","device_id":"AHU-001","value":22.7,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"RoomTemp_Sensor","floor":"1","device_id":"AHU-001","value":23.1,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:10:00.000Z","point_name":"RoomTemp_Sensor","floor":"1","device_id":"AHU-001","value":23.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"RoomTemp_Sensor","floor":"2","device_id":"AHU-002","value":24.0,"unit":"Fahrenheit","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"RoomTemp_Sensor","floor":"2","device_id":"AHU-002","value":24.2,"unit":"Fahrenheit","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"RoomTemp_Sensor","floor":"2","device_id":"AHU-002","value":24.5,"unit":"Fahrenheit","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"RoomTemp_Sensor","floor":"3","device_id":"AHU-003","value":21.8,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"RoomTemp_Sensor","floor":"3","device_id":"AHU-003","value":22.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"RoomTemp_Sensor","floor":"3","device_id":"AHU-003","value":35.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"SupplyFlow_Air","floor":"1","device_id":"VFD-001","value":1500.0,"unit":"cfm","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"SupplyFlow_Air","floor":"1","device_id":"VFD-001","value":1550.0,"unit":"cfm","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"SupplyFlow_Air","floor":"1","device_id":"VFD-001","value":1600.0,"unit":"cfm","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"ReturnFan_Speed","floor":"1","device_id":"VFD-002","value":75.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"ReturnFan_Speed","floor":"1","device_id":"VFD-002","value":78.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"ReturnFan_Speed","floor":"1","device_id":"VFD-002","value":105.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Filter_DP","floor":"2","device_id":"AHU-002","value":150.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Filter_DP","floor":"2","device_id":"AHU-002","value":180.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Filter_DP","floor":"2","device_id":"AHU-002","value":350.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Electric_Power","floor":"1","device_id":"MTR-001","value":45.2,"unit":"kW","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Electric_Power","floor":"1","device_id":"MTR-001","value":48.5,"unit":"kW","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Electric_Power","floor":"1","device_id":"MTR-001","value":52.3,"unit":"kW","status":"ok"}
+{"timestamp":"2026-05-03 08:00:00","point_name":"Water_Temp","floor":"2","device_id":"CHW-001","value":7.2,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03 08:01:00","point_name":"Water_Temp","floor":"2","device_id":"CHW-001","value":7.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03 08:02:00","point_name":"Water_Temp","floor":"2","device_id":"CHW-001","value":7.8,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Fan_Status","floor":"1","device_id":"AHU-001","value":true,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Fan_Status","floor":"1","device_id":"AHU-001","value":true,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Fan_Status","floor":"1","device_id":"AHU-001","value:false,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"OutsideTemp_Sensor","value":18.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"OutsideTemp_Sensor","value":19.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"OutsideTemp_Sensor","value":19.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"DuctPressure","floor":"1","device_id":"AHU-001","value":120.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"DuctPressure","floor":"1","device_id":"AHU-001","value":135.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"DuctPressure","floor":"1","device_id":"AHU-001","value":140.0,"unit":"Pascal","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Humidity_Sensor","floor":"1","device_id":"AHU-001","value":45.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Humidity_Sensor","floor":"1","device_id":"AHU-001","value":48.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Humidity_Sensor","floor":"1","device_id":"AHU-001","value":95.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Gas_Consumption","floor":"1","device_id":"MTR-002","value":125.5,"unit":"m3","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Gas_Consumption","floor":"1","device_id":"MTR-002","value":126.8,"unit":"m3","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Gas_Consumption","floor":"1","device_id":"MTR-002","value":128.0,"unit":"m3","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"CO2_Sensor","floor":"1","device_id":"AHU-001","value":450.0,"unit":"ppm","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"CO2_Sensor","floor":"1","device_id":"AHU-001","value":520.0,"unit":"ppm","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"CO2_Sensor","floor":"1","device_id":"AHU-001","value":1200.0,"unit":"ppm","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Boiler_Temp","floor":"3","device_id":"BOIL-001","value":80.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Boiler_Temp","floor":"3","device_id":"BOIL-001","value":82.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Boiler_Temp","floor":"3","device_id":"BOIL-001","value":95.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03 08:00:00","point_name":"Pump_Status","floor":"2","device_id":"CHW-001","value":true,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03 08:01:00","point_name":"Pump_Status","floor":"2","device_id":"CHW-001","value":true,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03 08:02:00","point_name":"Pump_Status","floor":"2","device_id":"CHW-001","value:false,"unit":"boolean","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Valve_Pos","floor":"1","device_id":"AHU-001","value":65.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Valve_Pos","floor":"1","device_id":"AHU-001","value":70.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Valve_Pos","floor":"1","device_id":"AHU-001","value":0.0,"unit":"percent","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"AirFlow_Setpoint","floor":"1","device_id":"VFD-001","value":700.0,"unit":"l/s","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"AirFlow_Setpoint","floor":"1","device_id":"VFD-001","value":720.0,"unit":"l/s","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"AirFlow_Setpoint","floor":"1","device_id":"VFD-001","value":750.0,"unit":"l/s","status":"ok"}
+{"timestamp":"2026-05-03T08:00:00.000Z","point_name":"Temp_Setpoint","floor":"1","device_id":"AHU-001","value":22.0,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:01:00.000Z","point_name":"Temp_Setpoint","floor":"1","device_id":"AHU-001","value":22.5,"unit":"Celsius","status":"ok"}
+{"timestamp":"2026-05-03T08:02:00.000Z","point_name":"Temp_Setpoint","floor":"1","device_id":"AHU-001","value":23.0,"unit":"Celsius","status":"ok"}
