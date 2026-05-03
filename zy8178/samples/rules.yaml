@@ -1,0 +1,8 @@
+max_longitudinal_offset: "100mm"
+max_lateral_offset: "50mm"
+min_dangerous_goods_distance: "1000mm"
+axle_weight_tolerance: 0.05
+over_weight_warning_threshold: 0.9
+over_weight_error_threshold: 1.0
+height_limit_tolerance: "0mm"
+width_limit_tolerance: "0mm"

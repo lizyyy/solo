@@ -1,0 +1,57 @@
+[
+  {
+    "id": "cargo_001",
+    "name": "机械设备A",
+    "weight": "5t",
+    "length": "2000mm",
+    "width": "1500mm",
+    "height": "1800mm",
+    "is_dangerous": false
+  },
+  {
+    "id": "cargo_002",
+    "name": "钢材B",
+    "weight": "20000kg",
+    "length": "3000mm",
+    "width": "2000mm",
+    "height": "1500mm",
+    "is_dangerous": false
+  },
+  {
+    "id": "cargo_003",
+    "name": "化工原料C",
+    "weight": "3吨",
+    "length": "1000mm",
+    "width": "1000mm",
+    "height": "1200mm",
+    "is_dangerous": true,
+    "dangerous_category": "易燃液体",
+    "dangerous_class": "3"
+  },
+  {
+    "id": "cargo_004",
+    "name": "氧化剂D",
+    "weight": "2.5t",
+    "length": "800mm",
+    "width": "800mm",
+    "height": "1000mm",
+    "is_dangerous": true,
+    "dangerous_category": "氧化剂",
+    "dangerous_class": "5.1"
+  },
+  {
+    "id": "cargo_005",
+    "name": "无尺寸货物E",
+    "weight": "1000kg",
+    "is_dangerous": false
+  },
+  {
+    "id": "cargo_006",
+    "name": "超重货物F",
+    "weight": "80t",
+    "length": "5000mm",
+    "width": "3000mm",
+    "height": "2500mm",
+    "is_dangerous": false
+  }
+]
