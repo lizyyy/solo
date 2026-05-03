@@ -1,0 +1,25 @@
+{
+  "name": "errand-matcher-api",
+  "version": "1.0.0",
+  "description": "顺路带物后端API服务 - 小范围互助撮合平台",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "init-db": "node scripts/init-db.js",
+    "load-samples": "node scripts/sample-data.js",
+    "test:normal": "bash scripts/test-normal-flow.sh",
+    "test:conflict": "bash scripts/test-conflict-cases.sh",
+    "test:audit": "bash scripts/test-audit-log.sh"
+  },
+  "keywords": ["errand", "matcher", "api", "express", "sqlite"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5"
+  }
+}
