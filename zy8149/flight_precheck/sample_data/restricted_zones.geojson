@@ -1,0 +1,69 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "NFZ001",
+        "name": "Airport No-Fly Zone",
+        "zone_type": "no_fly",
+        "description": "Beijing Capital Airport restricted area"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [116.4100, 39.9070],
+            [116.4120, 39.9070],
+            [116.4120, 39.9090],
+            [116.4100, 39.9090],
+            [116.4100, 39.9070]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "HRZ001",
+        "name": "Power Plant Height Restriction",
+        "zone_type": "restricted_height",
+        "max_altitude": 60,
+        "description": "Height limited to 60m near power plant"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [116.4130, 39.9120],
+            [116.4150, 39.9120],
+            [116.4150, 39.9140],
+            [116.4130, 39.9140],
+            [116.4130, 39.9120]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "WRN001",
+        "name": "Construction Warning Zone",
+        "zone_type": "warning",
+        "description": "Active construction area - exercise caution"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [116.4075, 39.9045],
+            [116.4085, 39.9045],
+            [116.4085, 39.9060],
+            [116.4075, 39.9060],
+            [116.4075, 39.9045]
+          ]
+        ]
+      }
+    }
+  ]
+}

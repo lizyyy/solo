@@ -1,0 +1,25 @@
+aircraft:
+  model: "DJI Matrice 300 RTK"
+  
+  performance:
+    max_speed: 23.0
+    cruise_speed: 15.0
+    max_altitude: 120.0
+    max_flight_time: 40.0
+    range: 15000.0
+    climb_rate: 5.0
+    descent_rate: 3.0
+    battery_capacity: 59.4
+  
+  limits:
+    payload_capacity: 2.7
+    
+    weather_limits:
+      min_wind_speed: 0.0
+      max_wind_speed: 12.0
+      max_crosswind: 8.0
+      max_gust: 15.0
+      min_temperature: -20.0
+      max_temperature: 40.0
+      min_visibility: 1000.0
+      max_precipitation: 0.0
