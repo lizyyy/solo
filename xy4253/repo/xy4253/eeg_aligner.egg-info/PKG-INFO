@@ -1,0 +1,778 @@
+Metadata-Version: 2.4
+Name: eeg_aligner
+Version: 0.1.0
+Summary: 脑电事件码对齐员 - 睡眠实验室事件码对齐和校验工具
+Author: EEG Aligner Team
+License: MIT
+Keywords: EEG,事件码,对齐,睡眠分期,神经科学
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0.0
+Requires-Dist: pandas>=1.3.0
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: pydantic>=1.9.0
+Requires-Dist: scipy>=1.7.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=3.0.0; extra == "dev"
+Requires-Dist: black>=22.0.0; extra == "dev"
+Requires-Dist: ruff>=0.0.200; extra == "dev"
+Dynamic: requires-python
+
+# 脑电事件码对齐员 (EEG Aligner)
+
+睡眠实验室事件码对齐和校验工具，用于处理夜间实验导出的脑电数据、刺激事件、睡眠分期和时钟校准记录。
+
+## 功能特点
+
+- **数据导入**: 支持多种格式的数据文件导入和自动校验
+- **时钟对齐**: 基于同步点估计时钟漂移并对齐事件时间戳
+- **质量检查**: 自动检测漏码、重码、分期冲突和伪迹重叠
+- **报告导出**: 支持 Markdown、CSV、JSON 多种格式的审计报告
+
+## 安装
+
+### 系统要求
+
+- Python 3.8 或更高版本
+- pip 包管理器
+
+### 安装步骤
+
+1. 克隆或下载项目代码
+2. 进入项目目录
+3. 安装依赖包：
+
+```bash
+pip install -e .
+```
+
+或者使用 pip 安装开发依赖：
+
+```bash
+pip install -e ".[dev]"
+```
+
+## 快速开始
+
+### 1. 生成示例数据
+
+使用 `init` 命令生成包含时钟漂移、漏码、重码和伪迹的示例数据，用于测试整个工作流程：
+
+```bash
+eeg-aligner init --output ./my_experiment --seed 42
+```
+
+**参数说明**:
+- `--output, -o`: 示例数据输出目录（默认: `./sample_data`）
+- `--seed, -s`: 随机种子，用于生成可重复的示例数据
+
+**生成的文件**:
+- `eeg_summary.csv`: 脑电通道摘要
+- `events.jsonl`: 刺激事件（含时钟漂移）
+- `sleep_stages.csv`: 人工睡眠分期表
+- `clock_calibration.csv`: 设备时钟校准记录
+
+### 2. 导入实验数据
+
+进入示例数据目录并导入数据：
+
+```bash
+cd ./my_experiment
+
+eeg-aligner import \
+    --eeg eeg_summary.csv \
+    --events events.jsonl \
+    --stages sleep_stages.csv \
+    --calibration clock_calibration.csv
+```
+
+**参数说明**:
+- `--eeg, -e`: EEG 通道摘要 CSV 文件
+- `--events, -E`: 刺激事件 JSONL 文件
+- `--stages, -s`: 睡眠分期表 CSV/TXT 文件
+- `--calibration, -c`: 时钟校准记录 CSV/JSON/JSONL 文件
+- `--validate/--no-validate`: 导入后是否自动校验（默认: 开启）
+
+### 3. 执行时钟对齐
+
+估计设备时钟漂移并对齐所有事件时间戳：
+
+```bash
+eeg-aligner align
+```
+
+**参数说明**:
+- `--force-method, -m`: 强制使用指定的对齐方法
+  - `linear`: 线性回归对齐（需要多个同步点）
+  - `single_point`: 单点偏移对齐
+  - `average`: 平均漂移对齐
+
+**对齐结果示例**:
+```
+┌───────────────────────────────────┐
+│         对齐结果                    │
+├─────────────┬─────────────────────┤
+│ 指标        │ 数值                 │
+├─────────────┼─────────────────────┤
+│ 对齐方法    │ linear               │
+│ 估计漂移    │ 125.50 ms            │
+│ 置信度      │ 92%                  │
+│ 已对齐事件  │ 100                  │
+│ 同步点数    │ 5                    │
+└─────────────┴─────────────────────┘
+```
+
+### 4. 执行数据检查
+
+检查漏码、重码、分期冲突和伪迹重叠：
+
+```bash
+eeg-aligner check --expected-codes 1,2,3,4,5,6,7,8
+```
+
+**参数说明**:
+- `--expected-codes, -c`: 期望的事件码列表（逗号分隔）
+- `--min-interval, -i`: 最小事件间隔（毫秒，默认: 10）
+- `--max-overlap, -o`: 最大允许伪迹重叠比例（0-1，默认: 0.5）
+- `--use-original/--use-aligned`: 使用原始时间戳而非对齐后的
+
+**检查结果示例**:
+```
+┌─────────────────────────────────────┐
+│         检查结果摘要                  │
+├─────────────────┬───────────────────┤
+│ 指标            │ 数量               │
+├─────────────────┼───────────────────┤
+│ 总事件数        │ 100                │
+│ 有效事件数      │ 95                 │
+│ 总分期数        │ 960                │
+│ 🔴 严重问题     │ 2                  │
+│ 🟡 警告问题     │ 3                  │
+│ 🔵 信息提示     │ 5                  │
+└─────────────────┴───────────────────┘
+
+🔴 缺失的事件码: [5, 10]
+🟡 重复的事件码: [3]
+```
+
+### 5. 导出审计报告
+
+导出完整的审计报告包：
+
+```bash
+eeg-aligner report --output ./reports --format all
+```
+
+**参数说明**:
+- `--output, -o`: 输出目录路径（必需）
+- `--format, -f`: 输出格式
+  - `all`: 所有格式
+  - `markdown`: Markdown 报告
+  - `csv`: CSV 格式数据
+  - `json`: JSON 格式数据
+  - `zip`: ZIP 压缩包
+- `--name, -n`: 报告包名称（默认: 自动生成）
+
+**导出的文件**:
+- `audit_report.md`: 完整的 Markdown 审计报告
+- `summary.csv`: 项目摘要
+- `events.csv`: 所有事件列表（含对齐时间戳）
+- `sleep_stages.csv`: 睡眠分期列表
+- `issues.csv`: 所有问题列表
+- `full_data.json`: 完整的项目数据 JSON
+- `eeg_aligner_audit_YYYYMMDD_HHMMSS.zip`: 完整审计包
+
+## 完整工作流程示例
+
+```bash
+# 1. 初始化示例项目
+eeg-aligner init --output ./test_project --seed 123
+cd ./test_project
+
+# 2. 查看项目状态（应该显示无项目）
+eeg-aligner status
+
+# 3. 导入所有数据文件
+eeg-aligner import \
+    --eeg eeg_summary.csv \
+    --events events.jsonl \
+    --stages sleep_stages.csv \
+    --calibration clock_calibration.csv
+
+# 4. 查看项目状态
+eeg-aligner status
+
+# 5. 执行时钟对齐
+eeg-aligner align
+
+# 6. 执行数据检查（指定期望的事件码）
+eeg-aligner check --expected-codes 1,2,3,4,5,6,7,8,9,10,255
+
+# 7. 导出完整审计报告
+eeg-aligner report --output ./audit_report --format all
+
+# 8. 查看最终状态
+eeg-aligner status
+```
+
+## 数据格式说明
+
+### 1. EEG 通道摘要 (CSV)
+
+```csv
+channel_name,sampling_rate,start_time,end_time,total_samples,valid_samples,artifact_percentage,impedance_kohm,snr_db
+F3-M2,256.0,2024-01-01 22:00:00,2024-01-02 06:00:00,7372800,7004160,5.0,5.2,25.5
+C3-M2,256.0,2024-01-01 22:00:00,2024-01-02 06:00:00,7372800,7100000,3.7,4.8,28.3
+O1-M2,256.0,2024-01-01 22:00:00,2024-01-02 06:00:00,7372800,7200000,2.3,5.5,30.1
+```
+
+**字段说明**:
+- `channel_name`: 通道名称
+- `sampling_rate`: 采样率 (Hz)
+- `start_time`: 记录开始时间
+- `end_time`: 记录结束时间
+- `total_samples`: 总采样点数
+- `valid_samples`: 有效采样点数
+- `artifact_percentage`: 伪迹百分比
+- `impedance_kohm` (可选): 阻抗值 (kΩ)
+- `snr_db` (可选): 信噪比 (dB)
+
+### 2. 刺激事件 (JSONL)
+
+每行一个 JSON 对象：
+
+```json
+{"event_id": "evt_001", "event_code": 1, "event_type": "stimulus", "timestamp": "2024-01-01T22:00:05.123000", "duration_ms": 100.0, "description": "声音刺激 A", "is_artifact": false}
+{"event_id": "evt_002", "event_code": 2, "event_type": "stimulus", "timestamp": "2024-01-01T22:00:10.456000", "duration_ms": 100.0, "description": "声音刺激 B", "is_artifact": false}
+{"event_id": "evt_003", "event_code": 255, "event_type": "sync", "timestamp": "2024-01-01T22:05:00.000000", "duration_ms": 50.0, "description": "同步脉冲", "is_artifact": false}
+{"event_id": "art_001", "event_code": 99, "event_type": "artifact", "timestamp": "2024-01-01T22:10:00.000000", "duration_ms": 2000.0, "description": "肌电伪迹", "is_artifact": true}
+```
+
+**字段说明**:
+- `event_id`: 事件唯一标识符
+- `event_code`: 事件码（整数）
+- `event_type`: 事件类型
+  - `stimulus`: 刺激事件
+  - `response`: 反应事件
+  - `artifact`: 伪迹事件
+  - `system`: 系统事件
+  - `sync`: 同步事件
+- `timestamp`: 事件时间戳
+- `duration_ms` (可选): 事件持续时间（毫秒）
+- `description` (可选): 事件描述
+- `is_artifact` (可选): 是否为伪迹
+
+### 3. 睡眠分期表 (CSV/TXT)
+
+CSV 格式：
+```csv
+epoch_number,stage,start_time,end_time,duration_seconds,confidence,is_manual
+1,W,2024-01-01 22:00:00,2024-01-01 22:00:30,30.0,1.0,True
+2,N1,2024-01-01 22:00:30,2024-01-01 22:01:00,30.0,0.95,True
+3,N2,2024-01-01 22:01:00,2024-01-01 22:01:30,30.0,0.98,True
+4,N3,2024-01-01 22:01:30,2024-01-01 22:02:00,30.0,0.9,True
+5,R,2024-01-01 22:30:00,2024-01-01 22:30:30,30.0,0.85,True
+```
+
+**睡眠分期编码**:
+- `W`: 清醒期 (Wake)
+- `N1`: N1 期 (浅睡 1 期)
+- `N2`: N2 期 (浅睡 2 期)
+- `N3`: N3 期 (深睡期)
+- `R`: REM 期 (快速眼动睡眠)
+- `M`: 运动期 (Movement)
+- `?`: 不确定期
+
+### 4. 时钟校准记录 (CSV/JSON/JSONL)
+
+CSV 格式：
+```csv
+calibration_id,calibration_time,eeg_clock_time,stimulus_clock_time,drift_ms,sync_event_code,notes
+cal_001,2024-01-01 22:00:00,2024-01-01 22:00:00.000000,2024-01-01 22:00:00.000000,0.0,255,实验开始校准
+cal_002,2024-01-02 02:00:00,2024-01-02 02:00:00.000000,2024-01-02 02:00:00.250000,250.0,255,中途校准
+cal_003,2024-01-02 06:00:00,2024-01-02 06:00:00.000000,2024-01-02 06:00:00.500000,500.0,255,实验结束校准
+```
+
+**字段说明**:
+- `calibration_id`: 校准记录唯一标识符
+- `calibration_time`: 校准操作时间
+- `eeg_clock_time`: EEG 设备时钟时间
+- `stimulus_clock_time`: 刺激设备时钟时间
+- `drift_ms`: 漂移量（毫秒，stimulus - EEG）
+- `sync_event_code` (可选): 同步事件码
+- `notes` (可选): 备注
+
+## 命令参考
+
+### 全局选项
+
+```bash
+eeg-aligner [OPTIONS] COMMAND [ARGS]...
+```
+
+| 选项 | 说明 |
+|------|------|
+| `--version, -v` | 显示版本号 |
+| `--verbose, -V` | 显示详细日志 |
+| `--help` | 显示帮助信息 |
+
+### 命令列表
+
+| 命令 | 说明 |
+|------|------|
+| `init` | 生成示例数据项目 |
+| `import` | 导入实验数据文件 |
+| `align` | 估计时钟漂移并对齐事件时间戳 |
+| `check` | 检查漏码、重码、分期冲突和伪迹重叠 |
+| `report` | 导出 Markdown、CSV、JSON 审计包 |
+| `status` | 显示当前项目状态 |
+
+## 问题检测规则
+
+### 1. 事件码规则
+
+**漏码检测 (Missing Code)**:
+- 当指定了 `--expected-codes` 参数时
+- 检测期望的事件码序列中缺失的码
+- 严重程度: **CRITICAL**
+
+**重码检测 (Duplicate Code)**:
+- 检测在最小时间间隔内重复出现的事件码
+- 配置: `--min-interval`（默认 10ms）
+- 严重程度: **WARNING**
+
+**无效时间戳 (Invalid Timestamp)**:
+- 检测时间戳递减或异常的事件
+- 严重程度: **WARNING**
+
+### 2. 分期规则
+
+**分期冲突 (Stage Conflict)**:
+- 检测事件发生在不应该出现刺激的睡眠阶段
+- 例如: 深睡期 (N3) 的唤醒刺激
+- 严重程度: **WARNING**
+
+**异常转换 (Abnormal Transition)**:
+- 检测不符合正常睡眠周期的分期转换
+- 例如: N3 → W → N3 的快速转换
+- 严重程度: **INFO**
+
+### 3. 伪迹规则
+
+**伪迹重叠 (Artifact Overlap)**:
+- 检测刺激事件与伪迹事件的时间重叠
+- 配置: `--max-overlap`（默认 50%）
+- 严重程度: **CRITICAL**（重叠 > 阈值）
+
+## 对齐算法
+
+### 同步点收集
+
+对齐算法会从以下来源收集同步点：
+
+1. **时钟校准记录**: 显式的校准记录包含 EEG 时间和刺激时间的对应关系
+2. **同步事件**: 类型为 `sync` 的事件（通常事件码为 255）
+3. **事件 EEG 时间戳**: 事件记录中包含的 `eeg_timestamp` 字段
+
+### 对齐方法
+
+**1. 线性回归对齐 (linear)**
+- 当有 3 个或更多同步点时使用
+- 使用 scipy.linregress 进行线性回归
+- 计算公式: `aligned_time = a * original_time + b`
+- 置信度基于 R² 值
+
+**2. 单点偏移对齐 (single_point)**
+- 当只有 1 个同步点时使用
+- 应用恒定的时间偏移
+- 计算公式: `aligned_time = original_time - drift`
+
+**3. 平均漂移对齐 (average)**
+- 当有 2 个同步点时使用
+- 使用平均漂移率
+- 计算公式: `drift_per_ms = total_drift / total_duration`
+
+**4. 无对齐 (none)**
+- 当没有同步点时
+- 对齐时间戳 = 原始时间戳
+- 漂移估计 = 0
+
+## 项目结构
+
+```
+eeg_aligner/
+├── __init__.py           # 包初始化和版本号
+├── cli.py                # 命令行接口入口
+├── models.py             # 核心数据模型和枚举类型
+├── parsers/              # 数据解析模块
+│   ├── __init__.py
+│   ├── eeg_csv.py        # EEG 摘要 CSV 解析器
+│   ├── events_jsonl.py   # 事件 JSONL 解析器
+│   ├── sleep_stages.py   # 睡眠分期解析器
+│   ├── clock_calibration.py  # 时钟校准解析器
+│   └── validator.py      # 数据校验器
+├── alignment/            # 对齐算法模块
+│   ├── __init__.py
+│   ├── clock_drift.py    # 时钟漂移估计
+│   └── event_aligner.py  # 事件对齐器
+├── rules/                # 规则引擎模块
+│   ├── __init__.py
+│   ├── check_engine.py   # 综合检查引擎
+│   ├── code_rules.py     # 事件码规则
+│   ├── stage_rules.py    # 分期规则
+│   └── artifact_rules.py # 伪迹规则
+├── storage/              # 存储模块
+│   ├── __init__.py
+│   └── project_store.py  # 项目数据持久化
+├── export/               # 导出模块
+│   ├── __init__.py
+│   ├── markdown_exporter.py  # Markdown 报告导出
+│   ├── csv_exporter.py       # CSV 格式导出
+│   ├── json_exporter.py      # JSON 格式导出
+│   └── report_exporter.py    # 综合报告导出
+└── sample_data/          # 示例数据模块
+    ├── __init__.py
+    └── generator.py      # 示例数据生成器
+
+tests/                    # 测试套件
+├── __init__.py
+├── test_models.py        # 数据模型测试
+├── test_parsers.py       # 解析器测试
+├── test_alignment.py     # 对齐算法测试
+├── test_rules.py         # 规则引擎测试
+├── test_storage.py       # 存储模块测试
+└── test_sample_data.py   # 示例数据生成测试
+```
+
+## 测试
+
+运行所有测试：
+
+```bash
+pytest
+```
+
+运行测试并生成覆盖率报告：
+
+```bash
+pytest --cov=eeg_aligner --cov-report=term-missing
+```
+
+运行特定测试文件：
+
+```bash
+pytest tests/test_models.py
+```
+
+运行特定测试用例：
+
+```bash
+pytest tests/test_rules.py::TestCodeRuleEngine::test_detect_missing_codes
+```
+
+## 验证流程
+
+### 自动验证
+
+使用 `init` 命令生成的示例数据包含已知的问题，可以用来验证工具的检测能力：
+
+```bash
+# 1. 生成带种子的示例数据（确保可重复）
+eeg-aligner init --output ./validation_test --seed 42
+cd ./validation_test
+
+# 2. 导入数据
+eeg-aligner import \
+    --eeg eeg_summary.csv \
+    --events events.jsonl \
+    --stages sleep_stages.csv \
+    --calibration clock_calibration.csv
+
+# 3. 执行对齐（应该检测到时钟漂移）
+eeg-aligner align
+
+# 4. 执行检查（应该检测到漏码、重码、伪迹重叠等）
+eeg-aligner check --expected-codes 1,2,3,4,5,6,7,8,9,10
+
+# 5. 导出报告
+eeg-aligner report --output ./validation_report --format all
+
+# 6. 验证报告内容
+# - 检查对齐结果中的漂移估计
+# - 检查问题列表中的漏码、重码
+# - 检查伪迹重叠检测
+```
+
+### 预期验证结果
+
+使用 `--seed 42` 生成的示例数据应该包含：
+
+1. **时钟漂移**: 约 50-200 ms 的漂移
+2. **漏码**: 故意缺失某些事件码
+3. **重码**: 某些事件码在短时间内重复出现
+4. **伪迹**: 包含肌电伪迹事件
+5. **伪迹重叠**: 某些刺激事件与伪迹重叠
+
+### 手动验证步骤
+
+1. **检查生成的文件**:
+   ```bash
+   ls -la ./validation_test
+   ```
+
+2. **查看事件数据**:
+   ```bash
+   head -20 ./validation_test/events.jsonl
+   ```
+
+3. **查看睡眠分期**:
+   ```bash
+   head -20 ./validation_test/sleep_stages.csv
+   ```
+
+4. **查看校准记录**:
+   ```bash
+   cat ./validation_test/clock_calibration.csv
+   ```
+
+5. **查看导出的问题列表**:
+   ```bash
+   cat ./validation_test/validation_report/issues.csv
+   ```
+
+## 故障排除
+
+### 问题 1: 导入时找不到字段
+
+**症状**:
+```
+错误: 无法解析 CSV 文件，缺少必需字段: channel_name
+```
+
+**解决方案**:
+- 检查 CSV 文件的表头是否正确
+- 确保使用逗号分隔符
+- 检查文件编码（建议使用 UTF-8）
+
+### 问题 2: 对齐时没有同步点
+
+**症状**:
+```
+警告: 没有找到足够的同步点，无法进行精确对齐
+对齐方法: none
+```
+
+**解决方案**:
+- 确保导入了时钟校准记录 (`--calibration`)
+- 或者确保事件数据中包含同步事件（`event_type: "sync"`）
+- 或者确保事件包含 `eeg_timestamp` 字段
+
+### 问题 3: 检查时没有检测到漏码
+
+**症状**:
+```
+检查完成，但没有检测到漏码
+```
+
+**解决方案**:
+- 确保使用了 `--expected-codes` 参数指定期望的事件码
+- 检查期望的事件码是否与实际数据匹配
+- 确认事件码是整数类型
+
+### 问题 4: 项目数据损坏
+
+**症状**:
+```
+错误: 无法解析项目数据
+```
+
+**解决方案**:
+- 删除 `.eeg_aligner` 目录重新开始:
+  ```bash
+  rm -rf .eeg_aligner
+  ```
+- 重新运行 `import` 命令
+
+### 问题 5: 依赖安装失败
+
+**症状**:
+```
+ERROR: Could not find a version that satisfies the requirement scipy>=1.7.0
+```
+
+**解决方案**:
+- 升级 pip:
+  ```bash
+  pip install --upgrade pip
+  ```
+- 使用 conda 安装科学计算包:
+  ```bash
+  conda install numpy scipy pandas
+  ```
+- 然后再安装本项目:
+  ```bash
+  pip install -e .
+  ```
+
+## 常见问题
+
+### Q1: 支持哪些数据格式？
+
+**A**: 支持以下格式：
+- **EEG 摘要**: CSV
+- **事件数据**: JSONL (每行一个 JSON 对象)
+- **睡眠分期**: CSV 或 TXT（带或不带表头）
+- **时钟校准**: CSV、JSON 或 JSONL
+
+### Q2: 如何处理多个 EEG 通道？
+
+**A**: 
+- EEG 摘要 CSV 每行代表一个通道
+- 解析器会自动识别所有通道
+- 对齐和检查操作会考虑所有通道的时间范围
+
+### Q3: 什么是同步事件码？
+
+**A**: 同步事件码是用于时钟校准的特殊事件：
+- 通常使用事件码 255 或 0
+- 在实验开始、中间、结束时发送
+- 用于建立 EEG 时钟和刺激时钟的对应关系
+
+### Q4: 如何判断对齐质量？
+
+**A**: 对齐结果中的指标：
+- **漂移估计**: 估计的时钟漂移量（毫秒）
+- **置信度**: 基于同步点数量和线性度的置信度（0-1）
+- **同步点数**: 用于计算的同步点数量
+- **对齐方法**: 实际使用的对齐方法
+
+一般来说：
+- 置信度 > 0.9: 高质量对齐
+- 置信度 0.7-0.9: 中等质量
+- 置信度 < 0.7: 低质量，建议检查校准数据
+
+### Q5: 如何自定义检查规则？
+
+**A**: 可以通过以下方式调整检查规则：
+
+1. **命令行参数**:
+   - `--min-interval`: 调整重码检测的时间间隔
+   - `--max-overlap`: 调整伪迹重叠的阈值比例
+
+2. **期望事件码**:
+   - 使用 `--expected-codes` 指定应该出现的事件码序列
+
+3. **时间戳选择**:
+   - `--use-original`: 使用原始时间戳进行检查
+   - `--use-aligned` (默认): 使用对齐后的时间戳
+
+### Q6: 导出的报告包含哪些内容？
+
+**A**: 完整的审计报告包含：
+
+**Markdown 报告**:
+- 项目基本信息
+- 数据导入摘要
+- 时钟对齐结果
+- 数据检查结果（按严重程度分类）
+- 详细问题列表
+- 建议的下一步操作
+
+**CSV 导出**:
+- `summary.csv`: 项目统计摘要
+- `events.csv`: 所有事件（含原始和对齐时间戳）
+- `sleep_stages.csv`: 睡眠分期列表
+- `issues.csv`: 所有检测到的问题
+
+**JSON 导出**:
+- `full_data.json`: 完整的项目数据结构
+
+**ZIP 包**:
+- 包含以上所有文件的压缩包
+
+## 开发指南
+
+### 添加新的解析器
+
+1. 在 `eeg_aligner/parsers/` 目录下创建新文件
+2. 实现 `parse()` 方法
+3. 在 `__init__.py` 中导出
+
+示例：
+```python
+# eeg_aligner/parsers/my_format.py
+from pathlib import Path
+from typing import List
+from eeg_aligner.models import MyDataType
+
+class MyFormatParser:
+    def __init__(self):
+        self._issues: List = []
+    
+    def parse(self, file_path: Path) -> List[MyDataType]:
+        # 解析逻辑
+        pass
+    
+    def get_issues(self) -> List:
+        return self._issues
+```
+
+### 添加新的检查规则
+
+1. 在 `eeg_aligner/rules/` 目录下修改相应文件
+2. 实现规则检查方法
+3. 在 `CheckEngine` 中集成
+
+示例：
+```python
+# 在 CodeRuleEngine 中添加新规则
+def check_my_custom_rule(self, events: List[StimulusEvent]) -> List[ValidationIssue]:
+    issues = []
+    # 规则逻辑
+    return issues
+```
+
+### 运行代码风格检查
+
+```bash
+# 使用 black 格式化代码
+black eeg_aligner/ tests/
+
+# 使用 ruff 检查代码风格
+ruff check eeg_aligner/ tests/
+```
+
+## 版本历史
+
+### v0.1.0 (当前版本)
+
+- 初始版本发布
+- 完整的 CLI 命令：init, import, align, check, report, status
+- 支持多种数据格式解析
+- 时钟漂移估计算法
+- 事件码、分期、伪迹规则引擎
+- 多种格式的报告导出
+- 完整的测试套件
+
+## 许可证
+
+MIT License
+
+## 联系方式
+
+如有问题或建议，请提交 Issue 或 Pull Request。
+
+---
+
+**注意**: 此工具用于辅助数据分析，不替代专业的人工审核。在发表研究结果前，请务必人工验证所有关键数据点。
