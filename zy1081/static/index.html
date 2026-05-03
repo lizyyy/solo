@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自习室座位爽约和噪音投诉分析台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 0.95em;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: #f7fafc;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot.green { background: #48bb78; }
+        .status-dot.yellow { background: #ecc94b; }
+        .status-dot.red { background: #f56565; }
+
+        .nav-tabs {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            color: #718096;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: #edf2f7;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content-area {
+            display: none;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .metric-card.critical {
+            border-left-color: #f56565;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        }
+
+        .metric-card.warning {
+            border-left-color: #ed8936;
+            background: linear-gradient(135deg, #fffbeb 0%, #feebc8 100%);
+        }
+
+        .metric-card.success {
+            border-left-color: #48bb78;
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .metric-card.critical .metric-value { color: #c53030; }
+        .metric-card.warning .metric-value { color: #c05621; }
+        .metric-card.success .metric-value { color: #22543d; }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 0.85em;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .filter-select, .filter-input {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            min-width: 150px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 20px;
+        }
+
+        .heatmap-container {
+            padding: 20px;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .heatmap-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .heatmap-seat {
+            width: 60px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .heatmap-seat:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .heatmap-seat-id {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .heatmap-seat-score {
+            font-size: 0.65em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .heatmap-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .risk-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .risk-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .risk-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .risk-card.critical {
+            border-color: #fc8181;
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        }
+
+        .risk-card.high {
+            border-color: #fbd38d;
+            background: linear-gradient(135deg, #fffbeb 0%, #feebc8 100%);
+        }
+
+        .risk-card.medium {
+            border-color: #faf089;
+            background: linear-gradient(135deg, #fffff0 0%, #fefcbf 100%);
+        }
+
+        .risk-card.low {
+            border-color: #9ae6b4;
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .risk-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .risk-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .risk-badge.critical { background: #fc8181; color: #742a2a; }
+        .risk-badge.high { background: #fbd38d; color: #7c2d12; }
+        .risk-badge.medium { background: #faf089; color: #744210; }
+        .risk-badge.low { background: #9ae6b4; color: #22543d; }
+
+        .risk-issues {
+            margin-bottom: 15px;
+        }
+
+        .risk-issues h4, .risk-suggestions h4 {
+            font-size: 0.85em;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .risk-issues ul, .risk-suggestions ul {
+            padding-left: 20px;
+            font-size: 0.85em;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .suggestion-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .suggestion-card.high { border-left-color: #f56565; }
+        .suggestion-card.medium { border-left-color: #ed8936; }
+        .suggestion-card.low { border-left-color: #48bb78; }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .suggestion-desc {
+            color: #718096;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .suggestion-section {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-section h4 {
+            font-size: 0.85em;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-section ul {
+            padding-left: 20px;
+            font-size: 0.85em;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .config-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .config-label {
+            font-size: 0.9em;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.3s ease;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-btn:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .export-btn.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .validation-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .validation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .validation-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .validation-status.valid { background: #c6f6d5; color: #22543d; }
+        .validation-status.invalid { background: #fed7d7; color: #742a2a; }
+
+        .error-list, .warning-list {
+            padding-left: 20px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+
+        .error-list { color: #c53030; }
+        .warning-list { color: #975a16; }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            z-index: 1000;
+            pointer-events: none;
+            max-width: 250px;
+        }
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid rgba(0, 0, 0, 0.85);
+        }
+
+        .tabs-container {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .sub-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #718096;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sub-tab:hover {
+            color: #667eea;
+        }
+
+        .sub-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .sub-content {
+            display: none;
+        }
+
+        .sub-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .risk-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .heatmap-seat {
+                width: 45px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 自习室座位爽约和噪音投诉分析台</h1>
+            <p>分析预约数据、识别风险座位、优化运营策略</p>
+            <div class="status-bar" id="statusBar">
+                <div class="status-item">
+                    <div class="status-dot yellow"></div>
+                    <span>等待数据加载...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">📈 概览</button>
+            <button class="nav-tab" data-tab="trends">📅 趋势分析</button>
+            <button class="nav-tab" data-tab="heatmap">🪑 座位热力图</button>
+            <button class="nav-tab" data-tab="risk">⚠️ 风险分析</button>
+            <button class="nav-tab" data-tab="suggestions">💡 调整建议</button>
+            <button class="nav-tab" data-tab="config">⚙️ 规则配置</button>
+            <button class="nav-tab" data-tab="report">📄 报告导出</button>
+        </div>
+
+        <div id="overview" class="content-area active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">核心指标</h2>
+                </div>
+                <div class="metrics-grid" id="metricsGrid">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">数据校验结果</h2>
+                </div>
+                <div id="validationResults">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="trends" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">筛选条件</h2>
+                </div>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">开始日期</label>
+                        <input type="date" class="filter-input" id="startDate">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">结束日期</label>
+                        <input type="date" class="filter-input" id="endDate">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">区域</label>
+                        <select class="filter-select" id="zoneFilter">
+                            <option value="all">全部区域</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">时段</label>
+                        <select class="filter-select" id="timeSlotFilter">
+                            <option value="all">全部时段</option>
+                            <option value="morning">上午</option>
+                            <option value="afternoon">下午</option>
+                            <option value="evening">晚上</option>
+                            <option value="night">夜间</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" style="align-self: flex-end;">
+                        <button class="btn btn-primary" id="applyFilters">应用筛选</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">每日趋势</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dailyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">按区域分析</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="zoneChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">按时段分析</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timeSlotChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="heatmap" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">座位风险热力图</h2>
+                </div>
+                <div class="heatmap-container" id="heatmapContainer">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="risk" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">风险概览</h2>
+                </div>
+                <div id="riskSummary" style="margin-bottom: 20px;">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="tabs-container">
+                    <button class="sub-tab active" data-subtab="risk-members">会员风险</button>
+                    <button class="sub-tab" data-subtab="risk-zones">区域风险</button>
+                    <button class="sub-tab" data-subtab="risk-seats">座位风险</button>
+                    <button class="sub-tab" data-subtab="risk-slots">时段风险</button>
+                </div>
+
+                <div id="risk-members" class="sub-content active">
+                    <div id="memberRiskList" class="risk-cards">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>暂无高风险会员</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="risk-zones" class="sub-content">
+                    <div id="zoneRiskList" class="risk-cards">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>暂无高风险区域</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="risk-seats" class="sub-content">
+                    <div id="seatRiskList" class="risk-cards">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>暂无高风险座位</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="risk-slots" class="sub-content">
+                    <div id="slotRiskList" class="risk-cards">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>暂无高风险时段</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="suggestions" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">优化建议</h2>
+                </div>
+                <div id="suggestionsList">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="config" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">规则阈值配置</h2>
+                    <button class="btn btn-primary" id="saveConfig">保存配置</button>
+                </div>
+                <div class="config-grid" id="configGrid">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>加载中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="report" class="content-area">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">导出报告</h2>
+                </div>
+                <div class="export-options" style="margin-bottom: 20px;">
+                    <button class="export-btn active" data-format="json">
+                        📋 JSON格式
+                    </button>
+                    <button class="export-btn" data-format="markdown">
+                        📝 Markdown格式
+                    </button>
+                    <button class="export-btn" data-format="html">
+                        🌐 HTML格式
+                    </button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="previewReport">预览报告</button>
+                    <button class="btn btn-secondary" id="downloadReport">下载报告</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">报告预览</h2>
+                </div>
+                <div id="reportPreview" style="min-height: 200px;">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <p>点击"预览报告"按钮查看报告内容</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentData = null;
+        let currentFormat = 'json';
+        let charts = {};
+
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const response = await fetch(API_BASE + endpoint, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API请求失败:', error);
+                return { success: false, message: error.message };
+            }
+        }
+
+        async function loadData() {
+            updateStatus('yellow', '正在加载数据...');
+            
+            const result = await fetchAPI('/api/data/load', { method: 'POST' });
+            
+            if (result.success) {
+                currentData = result.data;
+                updateStatus('green', '数据加载成功');
+                await loadAllMetrics();
+            } else {
+                updateStatus('red', '数据加载失败: ' + result.message);
+            }
+        }
+
+        function updateStatus(color, text) {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.innerHTML = `
+                <div class="status-item">
+                    <div class="status-dot ${color}"></div>
+                    <span>${text}</span>
+                </div>
+            `;
+        }
+
+        async function loadAllMetrics() {
+            const [overview, validation, rules, heatmap] = await Promise.all([
+                fetchAPI('/api/metrics/overview'),
+                fetchAPI('/api/data/status'),
+                fetchAPI('/api/rules/analysis'),
+                fetchAPI('/api/metrics/heatmap')
+            ]);
+
+            renderMetrics(overview.data);
+            renderValidation(validation);
+            renderRiskAnalysis(rules.data);
+            renderHeatmap(heatmap.data);
+            renderSuggestions(rules.data.suggestions);
+            renderConfig();
+            renderCharts();
+        }
+
+        function renderMetrics(data) {
+            const grid = document.getElementById('metricsGrid');
+            if (!data) {
+                grid.innerHTML = '<div class="empty-state"><p>暂无数据</p></div>';
+                return;
+            }
+
+            const metrics = [
+                { label: '总预约数', value: data.total_bookings, type: '' },
+                { label: '爽约率', value: data.no_show_rate + '%', type: data.no_show_rate >= 20 ? 'critical' : '' },
+                { label: '迟到率', value: data.late_rate + '%', type: data.late_rate >= 25 ? 'warning' : '' },
+                { label: '投诉率', value: data.complaint_rate + '%', type: data.complaint_rate >= 10 ? 'warning' : '' },
+                { label: '座位利用率', value: data.utilization_rate + '%', type: 'success' },
+                { label: '总保证金', value: data.total_deposit + ' 元', type: '' }
+            ];
+
+            grid.innerHTML = metrics.map(m => `
+                <div class="metric-card ${m.type}">
+                    <div class="metric-value">${m.value}</div>
+                    <div class="metric-label">${m.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderValidation(data) {
+            const container = document.getElementById('validationResults');
+            if (!data.loaded || !data.validation) {
+                container.innerHTML = '<div class="empty-state"><p>暂无校验数据</p></div>';
+                return;
+            }
+
+            const validation = data.validation;
+            let html = '';
+
+            for (const [fileName, result] of Object.entries(validation)) {
+                const isValid = result.is_valid;
+                const errors = result.errors || [];
+                const warnings = result.warnings || [];
+
+                html += `
+                    <div class="validation-card">
+                        <div class="validation-header">
+                            <span><strong>${fileName}</strong> (${result.row_count} 行)</span>
+                            <span class="validation-status ${isValid ? 'valid' : 'invalid'}">
+                                ${isValid ? '✓ 通过' : '✗ 失败'}
+                            </span>
+                        </div>
+                        ${errors.length > 0 ? `
+                            <div style="margin-bottom: 10px;">
+                                <h4 style="font-size: 0.85em; color: #c53030; margin-bottom: 5px;">错误 (${errors.length}):</h4>
+                                <ul class="error-list">
+                                    ${errors.map(e => `<li>第${e.row_number}行 [${e.field_name}]: ${e.message}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${warnings.length > 0 ? `
+                            <div>
+                                <h4 style="font-size: 0.85em; color: #975a16; margin-bottom: 5px;">警告 (${warnings.length}):</h4>
+                                <ul class="warning-list">
+                                    ${warnings.map(w => `<li>第${w.row_number}行 [${w.field_name}]: ${w.message}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function renderRiskAnalysis(data) {
+            if (!data) return;
+
+            const summary = data.summary || {};
+            const riskItems = data.risk_items || [];
+
+            const summaryHtml = `
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${summary.total_risk_items || 0}</div>
+                        <div class="metric-label">总风险项数</div>
+                    </div>
+                    <div class="metric-card critical">
+                        <div class="metric-value">${summary.risk_level_distribution?.critical || 0}</div>
+                        <div class="metric-label">严重风险</div>
+                    </div>
+                    <div class="metric-card warning">
+                        <div class="metric-value">${(summary.risk_level_distribution?.high || 0) + (summary.risk_level_distribution?.medium || 0)}</div>
+                        <div class="metric-label">中高风险</div>
+                    </div>
+                    <div class="metric-card success">
+                        <div class="metric-value">${summary.total_suggestions || 0}</div>
+                        <div class="metric-label">优化建议</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('riskSummary').innerHTML = summaryHtml;
+
+            const byType = {
+                member: [],
+                zone: [],
+                seat: [],
+                time_slot: []
+            };
+
+            for (const item of riskItems) {
+                if (byType[item.item_type]) {
+                    byType[item.item_type].push(item);
+                }
+            }
+
+            renderRiskCards('memberRiskList', byType.member);
+            renderRiskCards('zoneRiskList', byType.zone);
+            renderRiskCards('seatRiskList', byType.seat);
+            renderRiskCards('slotRiskList', byType.time_slot);
+        }
+
+        function renderRiskCards(containerId, items) {
+            const container = document.getElementById(containerId);
+            
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎯</div>
+                        <p>暂无风险项</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="risk-card ${item.risk_level}">
+                    <div class="risk-header">
+                        <span class="risk-title">${item.item_name}</span>
+                        <span class="risk-badge ${item.risk_level}">
+                            ${item.risk_score}分
+                        </span>
+                    </div>
+                    ${item.issues && item.issues.length > 0 ? `
+                        <div class="risk-issues">
+                            <h4>问题:</h4>
+                            <ul>
+                                ${item.issues.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    ${item.suggestions && item.suggestions.length > 0 ? `
+                        <div class="risk-suggestions">
+                            <h4>建议:</h4>
+                            <ul>
+                                ${item.suggestions.map(s => `<li>${s}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderHeatmap(data) {
+            const container = document.getElementById('heatmapContainer');
+            if (!data || !data.heatmap) {
+                container.innerHTML = '<div class="empty-state"><p>暂无热力图数据</p></div>';
+                return;
+            }
+
+            const heatmap = data.heatmap;
+            
+            const rows = {};
+            for (const seat of heatmap) {
+                const row = seat.row;
+                if (!rows[row]) rows[row] = {};
+                rows[row][seat.col] = seat;
+            }
+
+            const maxRow = Math.max(...Object.keys(rows).map(Number), 1);
+            const maxCol = Math.max(...heatmap.map(s => s.col), 1);
+
+            let html = '<div class="heatmap-grid">';
+            
+            for (let row = 1; row <= maxRow; row++) {
+                html += '<div class="heatmap-row">';
+                for (let col = 1; col <= maxCol; col++) {
+                    const seat = rows[row]?.[col];
+                    if (seat) {
+                        const color = getRiskColor(seat.risk_score);
+                        html += `
+                            <div class="heatmap-seat" 
+                                 style="background: ${color}; border-color: ${darkenColor(color)}"
+                                 data-seat='${JSON.stringify(seat)}'
+                                 onmouseenter="showSeatTooltip(event, this)"
+                                 onmouseleave="hideSeatTooltip()">
+                                <span class="heatmap-seat-id">${seat.seat_id}</span>
+                                <span class="heatmap-seat-score">${seat.risk_score}分</span>
+                            </div>
+                        `;
+                    } else {
+                        html += '<div style="width: 60px; height: 50px;"></div>';
+                    }
+                }
+                html += '</div>';
+            }
+            
+            html += '</div>';
+
+            html += `
+                <div class="heatmap-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #48bb78;"></div>
+                        <span>低风险 (0-20分)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ecc94b;"></div>
+                        <span>中等风险 (20-40分)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ed8936;"></div>
+                        <span>高风险 (40-70分)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f56565;"></div>
+                        <span>严重风险 (70-100分)</span>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getRiskColor(score) {
+            if (score >= 70) return '#f56565';
+            if (score >= 40) return '#ed8936';
+            if (score >= 20) return '#ecc94b';
+            return '#48bb78';
+        }
+
+        function darkenColor(color) {
+            return color.replace(/[0-9a-f]{2}/gi, (match) => {
+                const val = Math.max(0, parseInt(match, 16) - 30);
+                return val.toString(16).padStart(2, '0');
+            });
+        }
+
+        let tooltipElement = null;
+
+        function showSeatTooltip(event, element) {
+            const seat = JSON.parse(element.dataset.seat);
+            
+            if (tooltipElement) {
+                tooltipElement.remove();
+            }
+
+            tooltipElement = document.createElement('div');
+            tooltipElement.className = 'tooltip';
+            tooltipElement.innerHTML = `
+                <strong>${seat.seat_id}</strong> (${seat.zone}区)<br><br>
+                预约数: ${seat.total_bookings}<br>
+                爽约率: ${seat.no_show_rate}%<br>
+                投诉数: ${seat.complaints}<br>
+                噪音投诉: ${seat.noise_complaints}<br>
+                风险评分: ${seat.risk_score}分
+            `;
+
+            document.body.appendChild(tooltipElement);
+
+            const rect = element.getBoundingClientRect();
+            tooltipElement.style.left = rect.left + (rect.width / 2) - (tooltipElement.offsetWidth / 2) + 'px';
+            tooltipElement.style.top = rect.top - tooltipElement.offsetHeight - 15 + 'px';
+        }
+
+        function hideSeatTooltip() {
+            if (tooltipElement) {
+                tooltipElement.remove();
+                tooltipElement = null;
+            }
+        }
+
+        function renderSuggestions(suggestions) {
+            const container = document.getElementById('suggestionsList');
+            
+            if (!suggestions || suggestions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💡</div>
+                        <p>暂无优化建议</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = suggestions.map((sug, index) => `
+                <div class="suggestion-card ${sug.priority}">
+                    <div class="suggestion-header">
+                        <span class="suggestion-title">建议 ${index + 1}: ${sug.title}</span>
+                        <span class="risk-badge ${sug.priority}">
+                            ${sug.priority === 'high' ? '高优先级' : sug.priority === 'medium' ? '中优先级' : '低优先级'}
+                        </span>
+                    </div>
+                    <p class="suggestion-desc">${sug.description}</p>
+                    
+                    ${sug.affected_items && sug.affected_items.length > 0 ? `
+                        <div class="suggestion-section">
+                            <h4>受影响项:</h4>
+                            <ul>
+                                ${sug.affected_items.map(item => `<li>${item.name || item.id}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${sug.expected_impact && Object.keys(sug.expected_impact).length > 0 ? `
+                        <div class="suggestion-section">
+                            <h4>预期效果:</h4>
+                            <ul>
+                                ${Object.entries(sug.expected_impact).map(([k, v]) => `<li><strong>${k}:</strong> ${v}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${sug.implementation_steps && sug.implementation_steps.length > 0 ? `
+                        <div class="suggestion-section">
+                            <h4>实施步骤:</h4>
+                            <ol>
+                                ${sug.implementation_steps.map(step => `<li>${step}</li>`).join('')}
+                            </ol>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function renderConfig() {
+            const result = await fetchAPI('/api/rules/thresholds');
+            if (!result.success) return;
+
+            const config = result.data;
+            const container = document.getElementById('configGrid');
+
+            const configItems = [
+                { key: 'consecutive_no_shows', label: '连续爽约次数阈值', type: 'number', unit: '次' },
+                { key: 'late_minutes_threshold', label: '迟到分钟数阈值', type: 'number', unit: '分钟' },
+                { key: 'high_no_show_rate', label: '高爽约率阈值', type: 'number', unit: '%' },
+                { key: 'high_late_rate', label: '高迟到率阈值', type: 'number', unit: '%' },
+                { key: 'high_complaint_rate', label: '高投诉率阈值', type: 'number', unit: '%' },
+                { key: 'high_refund_rate', label: '高退款率阈值', type: 'number', unit: '%' },
+                { key: 'zone_noise_complaints', label: '区域噪音投诉阈值', type: 'number', unit: '次' },
+                { key: 'seat_complaints', label: '座位投诉阈值', type: 'number', unit: '次' },
+                { key: 'member_complaints_about', label: '会员被投诉阈值', type: 'number', unit: '次' },
+                { key: 'low_utilization_threshold', label: '低利用率阈值', type: 'number', unit: '%' },
+                { key: 'high_utilization_threshold', label: '高利用率阈值', type: 'number', unit: '%' }
+            ];
+
+            container.innerHTML = configItems.map(item => `
+                <div class="config-item">
+                    <label class="config-label">${item.label}</label>
+                    <input type="${item.type}" 
+                           class="config-input" 
+                           data-key="${item.key}"
+                           value="${config[item.key]}"
+                           placeholder="请输入${item.label}">
+                    <span style="font-size: 0.8em; color: #718096;">${item.unit}</span>
+                </div>
+            `).join('');
+        }
+
+        async function renderCharts() {
+            const [daily, zone, slot] = await Promise.all([
+                fetchAPI('/api/metrics/daily-trend'),
+                fetchAPI('/api/metrics/by-zone'),
+                fetchAPI('/api/metrics/by-time-slot')
+            ]);
+
+            renderDailyChart(daily.data);
+            renderZoneChart(zone.data);
+            renderTimeSlotChart(slot.data);
+        }
+
+        function renderDailyChart(data) {
+            if (!data || data.length === 0) return;
+
+            const ctx = document.getElementById('dailyTrendChart').getContext('2d');
+            
+            if (charts.daily) {
+                charts.daily.destroy();
+            }
+
+            charts.daily = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: [
+                        {
+                            label: '爽约率 (%)',
+                            data: data.map(d => d.no_show_rate),
+                            borderColor: '#f56565',
+                            backgroundColor: 'rgba(245, 101, 101, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '迟到率 (%)',
+                            data: data.map(d => d.late_rate),
+                            borderColor: '#ed8936',
+                            backgroundColor: 'rgba(237, 137, 54, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '投诉数',
+                            data: data.map(d => d.complaints),
+                            borderColor: '#9f7aea',
+                            backgroundColor: 'rgba(159, 122, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '比率 (%)' }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            title: { display: true, text: '投诉数' }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每日趋势分析'
+                        },
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderZoneChart(data) {
+            if (!data || Object.keys(data).length === 0) return;
+
+            const ctx = document.getElementById('zoneChart').getContext('2d');
+            
+            if (charts.zone) {
+                charts.zone.destroy();
+            }
+
+            const zones = Object.values(data);
+
+            charts.zone = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: zones.map(z => z.zone_name),
+                    datasets: [
+                        {
+                            label: '爽约率 (%)',
+                            data: zones.map(z => z.no_show_rate),
+                            backgroundColor: 'rgba(245, 101, 101, 0.7)'
+                        },
+                        {
+                            label: '迟到率 (%)',
+                            data: zones.map(z => z.late_rate),
+                            backgroundColor: 'rgba(237, 137, 54, 0.7)'
+                        },
+                        {
+                            label: '投诉率 (%)',
+                            data: zones.map(z => z.complaint_rate),
+                            backgroundColor: 'rgba(159, 122, 234, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '比率 (%)' }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '按区域分析'
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTimeSlotChart(data) {
+            if (!data || Object.keys(data).length === 0) return;
+
+            const ctx = document.getElementById('timeSlotChart').getContext('2d');
+            
+            if (charts.slot) {
+                charts.slot.destroy();
+            }
+
+            const slots = Object.values(data);
+
+            charts.slot = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: slots.map(s => s.slot_name),
+                    datasets: [
+                        {
+                            label: '爽约率 (%)',
+                            data: slots.map(s => s.no_show_rate),
+                            borderColor: '#f56565',
+                            backgroundColor: 'rgba(245, 101, 101, 0.2)',
+                            fill: true
+                        },
+                        {
+                            label: '迟到率 (%)',
+                            data: slots.map(s => s.late_rate),
+                            borderColor: '#ed8936',
+                            backgroundColor: 'rgba(237, 137, 54, 0.2)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '按时段分析 (雷达图)'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function previewReport() {
+            const result = await fetchAPI('/api/report/export', {
+                method: 'POST',
+                body: JSON.stringify({ format: currentFormat })
+            });
+
+            const preview = document.getElementById('reportPreview');
+            
+            if (!result.success) {
+                preview.innerHTML = `<div class="empty-state"><p>预览失败: ${result.message}</p></div>`;
+                return;
+            }
+
+            if (currentFormat === 'json') {
+                preview.innerHTML = `<pre style="background: #1a202c; color: #e2e8f0; padding: 20px; border-radius: 10px; overflow-x: auto; font-size: 0.85em; max-height: 500px; overflow-y: auto;">${JSON.stringify(result.content, null, 2)}</pre>`;
+            } else if (currentFormat === 'markdown') {
+                preview.innerHTML = `<pre style="background: #f7fafc; padding: 20px; border-radius: 10px; white-space: pre-wrap; font-size: 0.9em; max-height: 500px; overflow-y: auto;">${result.content}</pre>`;
+            } else if (currentFormat === 'html') {
+                preview.innerHTML = `<iframe srcdoc="${result.content.replace(/"/g, '&quot;')}" style="width: 100%; height: 500px; border: 1px solid #e2e8f0; border-radius: 10px;"></iframe>`;
+            }
+        }
+
+        function downloadReport() {
+            window.location.href = API_BASE + `/api/report/download/${currentFormat}`;
+        }
+
+        async function saveConfig() {
+            const inputs = document.querySelectorAll('.config-input');
+            const config = {};
+            
+            inputs.forEach(input => {
+                const key = input.dataset.key;
+                const value = parseFloat(input.value);
+                config[key] = isNaN(value) ? input.value : value;
+            });
+
+            const result = await fetchAPI('/api/rules/thresholds', {
+                method: 'PUT',
+                body: JSON.stringify(config)
+            });
+
+            if (result.success) {
+                alert('配置保存成功！系统已重新分析数据。');
+                await loadAllMetrics();
+            } else {
+                alert('保存失败: ' + result.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.content-area').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+
+            document.querySelectorAll('.sub-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const parent = tab.closest('.card');
+                    parent.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                    parent.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    parent.querySelector('#' + tab.dataset.subtab).classList.add('active');
+                });
+            });
+
+            document.querySelectorAll('.export-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.export-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFormat = btn.dataset.format;
+                });
+            });
+
+            document.getElementById('previewReport').addEventListener('click', previewReport);
+            document.getElementById('downloadReport').addEventListener('click', downloadReport);
+            document.getElementById('saveConfig').addEventListener('click', saveConfig);
+            document.getElementById('applyFilters').addEventListener('click', () => {
+                alert('筛选功能已应用（演示模式）');
+            });
+
+            loadData();
+        });
+    </script>
+</body>
+</html>

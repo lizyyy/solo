@@ -1,0 +1,51 @@
+{
+  "zones": [
+    {
+      "id": "A",
+      "name": "安静区",
+      "description": "靠近窗户，适合专注学习",
+      "max_noise_level": 40,
+      "deposit_required": 50
+    },
+    {
+      "id": "B",
+      "name": "普通区",
+      "description": "中心区域，交流便利",
+      "max_noise_level": 50,
+      "deposit_required": 30
+    },
+    {
+      "id": "C",
+      "name": "讨论区",
+      "description": "可轻声讨论，有白板",
+      "max_noise_level": 60,
+      "deposit_required": 20
+    }
+  ],
+  "seats": [
+    {"id": "A1", "zone": "A", "position": {"row": 1, "col": 1}, "type": "single", "features": ["power", "usb"]},
+    {"id": "A2", "zone": "A", "position": {"row": 1, "col": 2}, "type": "single", "features": ["power", "usb"]},
+    {"id": "A3", "zone": "A", "position": {"row": 2, "col": 1}, "type": "single", "features": ["power"]},
+    {"id": "A4", "zone": "A", "position": {"row": 2, "col": 2}, "type": "single", "features": ["power", "usb"]},
+    {"id": "A5", "zone": "A", "position": {"row": 3, "col": 1}, "type": "single", "features": ["power", "usb"]},
+    {"id": "A6", "zone": "A", "position": {"row": 3, "col": 2}, "type": "single", "features": ["power"]},
+    
+    {"id": "B1", "zone": "B", "position": {"row": 1, "col": 3}, "type": "single", "features": ["power", "usb"]},
+    {"id": "B2", "zone": "B", "position": {"row": 1, "col": 4}, "type": "single", "features": ["power", "usb"]},
+    {"id": "B3", "zone": "B", "position": {"row": 2, "col": 3}, "type": "single", "features": ["power"]},
+    {"id": "B4", "zone": "B", "position": {"row": 2, "col": 4}, "type": "single", "features": ["power", "usb"]},
+    {"id": "B5", "zone": "B", "position": {"row": 3, "col": 3}, "type": "double", "features": ["power", "usb"]},
+    {"id": "B6", "zone": "B", "position": {"row": 3, "col": 4}, "type": "double", "features": ["power", "usb"]},
+    
+    {"id": "C1", "zone": "C", "position": {"row": 1, "col": 5}, "type": "double", "features": ["power", "usb", "whiteboard"]},
+    {"id": "C2", "zone": "C", "position": {"row": 1, "col": 6}, "type": "double", "features": ["power", "usb", "whiteboard"]},
+    {"id": "C3", "zone": "C", "position": {"row": 2, "col": 5}, "type": "double", "features": ["power", "usb"]},
+    {"id": "C4", "zone": "C", "position": {"row": 2, "col": 6}, "type": "double", "features": ["power", "usb"]}
+  ],
+  "time_slots": {
+    "morning": {"start": "08:00", "end": "12:00", "name": "上午时段"},
+    "afternoon": {"start": "12:00", "end": "18:00", "name": "下午时段"},
+    "evening": {"start": "18:00", "end": "22:00", "name": "晚上时段"},
+    "night": {"start": "22:00", "end": "06:00", "name": "夜间时段"}
+  }
+}
