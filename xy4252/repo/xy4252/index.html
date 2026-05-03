@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄金四分钟调度 - 社区急救培训游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部信息栏 -->
+        <header id="header">
+            <h1>黄金四分钟调度</h1>
+            <div class="info-panel">
+                <div class="info-item">
+                    <span class="label">关卡:</span>
+                    <span id="level-name">第1关</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">时间:</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">分数:</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">最高分:</span>
+                    <span id="high-score">0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主游戏区域 -->
+        <main id="main-content">
+            <!-- 左侧资源面板 -->
+            <aside id="resource-panel">
+                <h2>可用资源</h2>
+                <div class="resource-item" draggable="true" data-type="aed">
+                    <div class="resource-icon">AED</div>
+                    <div class="resource-info">
+                        <div class="resource-name">自动体外除颤器</div>
+                        <div class="resource-desc">除颤时间: 30秒</div>
+                    </div>
+                </div>
+                <div class="resource-item" draggable="true" data-type="volunteer">
+                    <div class="resource-icon">志</div>
+                    <div class="resource-info">
+                        <div class="resource-name">急救志愿者</div>
+                        <div class="resource-desc">移动速度: 快</div>
+                    </div>
+                </div>
+                <div class="resource-item" draggable="true" data-type="ambulance">
+                    <div class="resource-icon">救</div>
+                    <div class="resource-info">
+                        <div class="resource-name">救护车</div>
+                        <div class="resource-desc">响应时间: 30秒</div>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 20px;">事件日志</h2>
+                <div id="event-log">
+                    <div class="log-entry">游戏开始，请调度资源救援</div>
+                </div>
+            </aside>
+
+            <!-- 游戏地图 -->
+            <section id="game-area">
+                <canvas id="game-canvas"></canvas>
+                <div id="overlay" class="hidden">
+                    <div class="overlay-content">
+                        <h2 id="overlay-title">游戏结束</h2>
+                        <p id="overlay-message">最终分数: 0</p>
+                        <div class="overlay-buttons">
+                            <button id="overlay-btn-restart">重新开始</button>
+                            <button id="overlay-btn-export">导出JSON</button>
+                            <button id="overlay-btn-close">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧信息面板 -->
+            <aside id="info-panel-right">
+                <h2>任务状态</h2>
+                <div id="mission-status">
+                    <div class="mission-item" id="mission-fetch">
+                        <div class="mission-name">取机</div>
+                        <div class="mission-time">--:--</div>
+                        <div class="mission-status">等待</div>
+                    </div>
+                    <div class="mission-item" id="mission-arrive">
+                        <div class="mission-name">到场</div>
+                        <div class="mission-time">--:--</div>
+                        <div class="mission-status">等待</div>
+                    </div>
+                    <div class="mission-item" id="mission-defibrillate">
+                        <div class="mission-name">除颤</div>
+                        <div class="mission-time">--:--</div>
+                        <div class="mission-status">等待</div>
+                    </div>
+                    <div class="mission-item" id="mission-handover">
+                        <div class="mission-name">交接</div>
+                        <div class="mission-time">--:--</div>
+                        <div class="mission-status">等待</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px;">评分标准</h2>
+                <div id="scoring-rules">
+                    <div class="rule-item">
+                        <div class="rule-name">取机</div>
+                        <div class="rule-time">限时: 60秒</div>
+                        <div class="rule-points">满分: 25分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-name">到场</div>
+                        <div class="rule-time">限时: 120秒</div>
+                        <div class="rule-points">满分: 25分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-name">除颤</div>
+                        <div class="rule-time">限时: 240秒</div>
+                        <div class="rule-points">满分: 30分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-name">交接</div>
+                        <div class="rule-time">限时: 300秒</div>
+                        <div class="rule-points">满分: 20分</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px;">随机事件</h2>
+                <div id="random-events">
+                    <div class="event-icon event-gate" title="门禁障碍-延误10秒">门</div>
+                    <div class="event-icon event-congestion" title="交通拥堵-延误20秒">堵</div>
+                    <div class="event-icon event-battery" title="电量不足-无法使用">电</div>
+                    <div class="event-icon event-false" title="误报-救援失败">误</div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 底部控制栏 -->
+        <footer id="footer">
+            <div class="controls">
+                <button id="btn-start" class="btn-primary">开始游戏</button>
+                <button id="btn-pause" class="btn-secondary" disabled>暂停</button>
+                <button id="btn-restart" class="btn-secondary">重新开始</button>
+                <button id="btn-export" class="btn-secondary" disabled>导出JSON</button>
+                <select id="level-select">
+                    <option value="level1">第1关 - 简单场景</option>
+                    <option value="level2">第2关 - 中等难度</option>
+                    <option value="level3">第3关 - 复杂场景</option>
+                </select>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/state-machine.js"></script>
+    <script src="js/path.js"></script>
+    <script src="js/timer.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/resource.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
