@@ -1,0 +1,205 @@
+{
+  "device_name": "MacroPad V2",
+  "version": "1.0.0",
+  "macros": {
+    "select_all": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_A"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "copy": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_C"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "paste": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_V"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "undo": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_Z"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "save": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_S"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "screenshot_windows": [
+      {"action": "press", "key": "KC_LGUI"},
+      {"action": "press", "key": "KC_LSFT"},
+      {"action": "tap", "key": "KC_S"},
+      {"action": "release", "key": "KC_LSFT"},
+      {"action": "release", "key": "KC_LGUI"}
+    ],
+    "vscode_format": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "press", "key": "KC_LSFT"},
+      {"action": "tap", "key": "KC_I"},
+      {"action": "release", "key": "KC_LSFT"},
+      {"action": "release", "key": "KC_LCTL"}
+    ],
+    "type_hello": [
+      {"action": "text", "text": "Hello World!"}
+    ]
+  },
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "description": "默认层 - 常用快捷键",
+      "keys": {
+        "0": {
+          "key_code": "KC_F13",
+          "tap_action": "KC_F13",
+          "hold_action": "MO(1)",
+          "layer_toggle": 1,
+          "is_tap": true,
+          "is_hold": true
+        },
+        "1": {
+          "key_code": "KC_F14",
+          "tap_action": "KC_F14",
+          "hold_action": "MO(2)",
+          "layer_toggle": 2,
+          "is_tap": true,
+          "is_hold": true
+        },
+        "2": {
+          "key_code": "KC_MUTE",
+          "tap_action": "KC_MUTE"
+        },
+        "3": {
+          "key_code": "KC_VOLU",
+          "tap_action": "KC_VOLU"
+        },
+        "4": {
+          "key_code": "KC_VOLD",
+          "tap_action": "KC_VOLD"
+        },
+        "5": {
+          "key_code": "KC_MPLY",
+          "tap_action": "KC_MPLY"
+        },
+        "6": {
+          "key_code": "KC_A",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "select_all"
+        },
+        "7": {
+          "key_code": "KC_C",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "copy"
+        },
+        "8": {
+          "key_code": "KC_V",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "paste"
+        },
+        "9": {
+          "key_code": "KC_Z",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "undo"
+        }
+      }
+    },
+    {
+      "layer_id": 1,
+      "layer_name": "Media Layer",
+      "description": "媒体控制层 - 通过 MO(1) 从 Base Layer 临时访问",
+      "keys": {
+        "0": {
+          "key_code": "KC_MPRV",
+          "tap_action": "KC_MPRV"
+        },
+        "1": {
+          "key_code": "KC_MNXT",
+          "tap_action": "KC_MNXT"
+        },
+        "2": {
+          "key_code": "KC_MSTP",
+          "tap_action": "KC_MSTP",
+          "description": "停止播放"
+        },
+        "3": {
+          "key_code": "KC_MPLY",
+          "tap_action": "KC_MPLY"
+        },
+        "4": {
+          "key_code": "KC_MUTE",
+          "tap_action": "KC_MUTE"
+        },
+        "5": {
+          "key_code": "KC_VOLU",
+          "tap_action": "KC_VOLU"
+        },
+        "6": {
+          "key_code": "KC_VOLD",
+          "tap_action": "KC_VOLD"
+        },
+        "7": {
+          "key_code": "KC_BRIGHTNESS_UP",
+          "tap_action": "KC_BRIGHTNESS_UP"
+        },
+        "8": {
+          "key_code": "KC_BRIGHTNESS_DOWN",
+          "tap_action": "KC_BRIGHTNESS_DOWN"
+        }
+      }
+    },
+    {
+      "layer_id": 2,
+      "layer_name": "Dev Layer",
+      "description": "开发工具层 - 通过 MO(2) 从 Base Layer 临时访问",
+      "keys": {
+        "0": {
+          "key_code": "KC_F1",
+          "tap_action": "KC_F1",
+          "description": "帮助"
+        },
+        "1": {
+          "key_code": "KC_S",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "save"
+        },
+        "2": {
+          "key_code": "KC_I",
+          "modifiers": ["KC_LCTL", "KC_LSFT"],
+          "macro_ref": "vscode_format"
+        },
+        "3": {
+          "key_code": "KC_F5",
+          "tap_action": "KC_F5",
+          "description": "调试运行"
+        },
+        "4": {
+          "key_code": "KC_F10",
+          "tap_action": "KC_F10",
+          "description": "单步跳过"
+        },
+        "5": {
+          "key_code": "KC_F11",
+          "tap_action": "KC_F11",
+          "description": "单步进入"
+        },
+        "6": {
+          "key_code": "KC_B",
+          "modifiers": ["KC_LCTL", "KC_LSFT"],
+          "description": "VSCode 断点切换"
+        },
+        "7": {
+          "key_code": "KC_P",
+          "modifiers": ["KC_LCTL", "KC_LSFT"],
+          "description": "VSCode 命令面板"
+        },
+        "8": {
+          "key_code": "KC_GRAVE",
+          "modifiers": ["KC_LCTL", "KC_LSFT"],
+          "description": "VSCode 打开终端"
+        }
+      }
+    }
+  ]
+}

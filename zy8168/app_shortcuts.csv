@@ -1,0 +1,150 @@
+app_name,action,windows_key,macos_key,context
+VS Code,保存,Ctrl+S,Cmd+S,全局
+VS Code,全选,Ctrl+A,Cmd+A,全局
+VS Code,复制,Ctrl+C,Cmd+C,全局
+VS Code,粘贴,Ctrl+V,Cmd+V,全局
+VS Code,撤销,Ctrl+Z,Cmd+Z,全局
+VS Code,重做,Ctrl+Y,Cmd+Shift+Z,全局
+VS Code,格式化代码,Ctrl+Shift+I,Option+Shift+F,编辑器
+VS Code,命令面板,Ctrl+Shift+P,Cmd+Shift+P,全局
+VS Code,快速打开文件,Ctrl+P,Cmd+P,全局
+VS Code,切换终端,Ctrl+`,Cmd+`,全局
+VS Code,添加注释,Ctrl+/,Cmd+/,编辑器
+VS Code,查找,Ctrl+F,Cmd+F,全局
+VS Code,替换,Ctrl+H,Option+Cmd+F,全局
+VS Code,查找文件,Ctrl+Shift+F,Cmd+Shift+F,全局
+Chrome,新建标签页,Ctrl+T,Cmd+T,浏览器
+Chrome,关闭标签页,Ctrl+W,Cmd+W,浏览器
+Chrome,重新打开标签页,Ctrl+Shift+T,Cmd+Shift+T,浏览器
+Chrome,新建窗口,Ctrl+N,Cmd+N,浏览器
+Chrome,隐身窗口,Ctrl+Shift+N,Cmd+Shift+N,浏览器
+Chrome,刷新,Ctrl+R,Cmd+R,浏览器
+Chrome,强制刷新,Ctrl+Shift+R,Cmd+Shift+R,浏览器
+Chrome,地址栏,Ctrl+L,Cmd+L,浏览器
+Chrome,搜索,Ctrl+K,Cmd+K,浏览器
+Chrome,开发者工具,F12,Cmd+Opt+I,浏览器
+Chrome,查看源码,Ctrl+U,Cmd+Opt+U,浏览器
+Chrome,放大,Ctrl++,Cmd++,浏览器
+Chrome,缩小,Ctrl+-,Cmd+-,浏览器
+Chrome,重置缩放,Ctrl+0,Cmd+0,浏览器
+Windows,任务管理器,Ctrl+Shift+Esc,Cmd+Opt+Esc,系统
+Windows,截图,Win+Shift+S,Cmd+Shift+4,系统
+Windows,开始菜单,Win,Cmd,系统
+Windows,运行,Win+R,Cmd+Space,系统
+Windows,搜索,Win+S,Cmd+Space,系统
+Windows,设置,Win+I,Cmd+,系统
+Windows,锁定,Win+L,Cmd+Ctrl+Q,系统
+Windows,显示桌面,Win+D,F11,系统
+Windows,文件资源管理器,Win+E,Cmd+Shift+G,系统
+Photoshop,新建,Ctrl+N,Cmd+N,全局
+Photoshop,打开,Ctrl+O,Cmd+O,全局
+Photoshop,保存,Ctrl+S,Cmd+S,全局
+Photoshop,另存为,Ctrl+Shift+S,Cmd+Shift+S,全局
+Photoshop,导出,Ctrl+Shift+Alt+S,Cmd+Shift+Opt+S,全局
+Photoshop,撤销,Ctrl+Z,Cmd+Z,全局
+Photoshop,重做,Ctrl+Shift+Z,Cmd+Shift+Z,全局
+Photoshop,剪切,Ctrl+X,Cmd+X,全局
+Photoshop,复制,Ctrl+C,Cmd+C,全局
+Photoshop,粘贴,Ctrl+V,Cmd+V,全局
+Photoshop,自由变换,Ctrl+T,Cmd+T,图像
+Photoshop,全选,Ctrl+A,Cmd+A,全局
+Photoshop,取消选择,Ctrl+D,Cmd+D,全局
+Photoshop,反选,Ctrl+Shift+I,Cmd+Shift+I,全局
+Photoshop,画笔工具,B,B,工具
+Photoshop,移动工具,V,V,工具
+Photoshop,选框工具,M,M,工具
+Photoshop,套索工具,L,L,工具
+Photoshop,快速选择,W,W,工具
+Photoshop,裁剪工具,C,C,工具
+Photoshop,文字工具,T,T,工具
+Photoshop,吸管工具,I,I,工具
+Photoshop,抓手工具,H,H,工具
+Photoshop,缩放工具,Z,Z,工具
+Photoshop,前景色/背景色,X,X,工具
+Photoshop,默认颜色,D,D,工具
+Excel,保存,Ctrl+S,Cmd+S,全局
+Excel,撤销,Ctrl+Z,Cmd+Z,全局
+Excel,重做,Ctrl+Y,Cmd+Y,全局
+Excel,剪切,Ctrl+X,Cmd+X,全局
+Excel,复制,Ctrl+C,Cmd+C,全局
+Excel,粘贴,Ctrl+V,Cmd+V,全局
+Excel,全选,Ctrl+A,Cmd+A,全局
+Excel,查找,Ctrl+F,Cmd+F,全局
+Excel,替换,Ctrl+H,Cmd+Option+F,全局
+Excel,插入函数,Shift+F3,Fn+Shift+F3,公式
+Excel,加粗,Ctrl+B,Cmd+B,单元格
+Excel,斜体,Ctrl+I,Cmd+I,单元格
+Excel,下划线,Ctrl+U,Cmd+U,单元格
+Excel,删除单元格,Ctrl+-,Cmd+-,单元格
+Excel,插入单元格,Ctrl+Shift+=,Cmd+Shift+=,单元格
+Word,保存,Ctrl+S,Cmd+S,全局
+Word,撤销,Ctrl+Z,Cmd+Z,全局
+Word,重做,Ctrl+Y,Cmd+Shift+Z,全局
+Word,剪切,Ctrl+X,Cmd+X,全局
+Word,复制,Ctrl+C,Cmd+C,全局
+Word,粘贴,Ctrl+V,Cmd+V,全局
+Word,全选,Ctrl+A,Cmd+A,全局
+Word,查找,Ctrl+F,Cmd+F,全局
+Word,替换,Ctrl+H,Cmd+Option+F,全局
+Word,加粗,Ctrl+B,Cmd+B,文本
+Word,斜体,Ctrl+I,Cmd+I,文本
+Word,下划线,Ctrl+U,Cmd+U,文本
+Word,居中对齐,Ctrl+E,Cmd+E,段落
+Word,左对齐,Ctrl+L,Cmd+L,段落
+Word,右对齐,Ctrl+R,Cmd+R,段落
+Word,两端对齐,Ctrl+J,Cmd+J,段落
+Word,增大字号,Ctrl+],Cmd+],文本
+Word,减小字号,Ctrl+[,Cmd+[,文本
+Outlook,发送邮件,Ctrl+Enter,Cmd+Enter,邮件
+Outlook,回复,Ctrl+R,Cmd+R,邮件
+Outlook,全部回复,Ctrl+Shift+R,Cmd+Shift+R,邮件
+Outlook,转发,Ctrl+F,Cmd+J,邮件
+Outlook,新建邮件,Ctrl+N,Cmd+N,全局
+Outlook,新建约会,Ctrl+Shift+A,Cmd+Shift+A,日历
+Outlook,新建会议,Ctrl+Shift+Q,Cmd+Shift+Q,日历
+Slack,发送消息,Enter,Enter,聊天
+Slack,新建消息,Ctrl+N,Cmd+N,全局
+Slack,搜索,Ctrl+K,Cmd+K,全局
+Slack,标记未读,Ctrl+U,Cmd+Shift+U,消息
+Slack,固定消息,Ctrl+Shift+S,Cmd+Shift+S,消息
+Slack,创建频道,Ctrl+Shift+N,Cmd+Shift+N,全局
+Discord,静音,Ctrl+Shift+M,Cmd+Shift+M,语音
+Discord,静音切换,Ctrl+Shift+D,Cmd+Shift+D,语音
+Discord,切换频道,Ctrl+K,Cmd+K,全局
+Discord,标记已读,Esc,Esc,通知
+Notion,新建页面,Ctrl+N,Cmd+N,全局
+Notion,新建数据库,Ctrl+Shift+N,Cmd+Shift+N,全局
+Notion,搜索,Ctrl+P,Cmd+P,全局
+Notion,斜杠命令,/,/,编辑器
+Notion,待办事项,Ctrl+Enter,Cmd+Enter,编辑器
+Figma,复制,Ctrl+C,Cmd+C,全局
+Figma,粘贴,Ctrl+V,Cmd+V,全局
+Figma,撤销,Ctrl+Z,Cmd+Z,全局
+Figma,重做,Ctrl+Shift+Z,Cmd+Shift+Z,全局
+Figma,选择全部,Ctrl+A,Cmd+A,画布
+Figma,群组,Ctrl+G,Cmd+G,选择
+Figma,解组,Ctrl+Shift+G,Cmd+Shift+G,群组
+Figma,创建组件,Ctrl+Alt+K,Cmd+Opt+K,选择
+Figma,缩放画布,Ctrl++/-,Cmd++/-,全局
+Zoom,静音/取消静音,Alt+A,Cmd+Shift+A,会议
+Zoom,视频开启/关闭,Alt+V,Cmd+Shift+V,会议
+Zoom,共享屏幕,Alt+S,Cmd+Shift+S,会议
+Zoom,聊天,Alt+H,Cmd+Shift+H,会议
+Zoom,录制,Alt+R,Cmd+Shift+R,会议
+Zoom,离开会议,Alt+Q,Cmd+W,会议
+Spotify,播放/暂停,Space,Space,播放器
+Spotify,下一曲,Ctrl+Right,Cmd+Right,播放器
+Spotify,上一曲,Ctrl+Left,Cmd+Left,播放器
+Spotify,音量增大,Ctrl+Up,Cmd+Up,播放器
+Spotify,音量减小,Ctrl+Down,Cmd+Down,播放器
+Spotify,喜欢当前歌曲,Ctrl+B,Cmd+B,播放器
+Terminal,新建标签页,Ctrl+Shift+T,Cmd+T,终端
+Terminal,关闭标签页,Ctrl+Shift+W,Cmd+W,终端
+Terminal,新建窗口,Ctrl+Shift+N,Cmd+N,终端
+Terminal,复制,Ctrl+Shift+C,Cmd+C,选中
+Terminal,粘贴,Ctrl+Shift+V,Cmd+V,全局
+Terminal,清屏,Ctrl+L,Cmd+K,全局
+Terminal,中断命令,Ctrl+C,Ctrl+C,运行中
+Terminal,退出,Ctrl+D,Ctrl+D,全局
+Terminal,历史上翻,Ctrl+P,Ctrl+P,命令行
+Terminal,历史下翻,Ctrl+N,Ctrl+N,命令行

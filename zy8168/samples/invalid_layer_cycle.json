@@ -1,0 +1,75 @@
+{
+  "device_name": "MacroPad V2 - 层循环测试",
+  "version": "1.0.0",
+  "description": "此样例包含层切换循环，用于测试工具的层循环检测能力",
+  "macros": {
+    "select_all": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_A"},
+      {"action": "release", "key": "KC_LCTL"}
+    ]
+  },
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "description": "默认层 - 按住切换到 Layer 1",
+      "keys": {
+        "0": {
+          "key_code": "KC_F13",
+          "tap_action": "KC_F13",
+          "hold_action": "MO(1)",
+          "layer_toggle": 1,
+          "is_tap": true,
+          "is_hold": true,
+          "description": "按住切换到 Layer 1"
+        },
+        "1": {
+          "key_code": "KC_A",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "select_all"
+        }
+      }
+    },
+    {
+      "layer_id": 1,
+      "layer_name": "Layer 1",
+      "description": "按住切换到 Layer 2",
+      "keys": {
+        "0": {
+          "key_code": "KC_F14",
+          "tap_action": "KC_F14",
+          "hold_action": "MO(2)",
+          "layer_toggle": 2,
+          "is_tap": true,
+          "is_hold": true,
+          "description": "按住切换到 Layer 2"
+        },
+        "1": {
+          "key_code": "KC_MUTE",
+          "tap_action": "KC_MUTE"
+        }
+      }
+    },
+    {
+      "layer_id": 2,
+      "layer_name": "Layer 2",
+      "description": "按住切换回 Layer 0 - 形成循环: 0 → 1 → 2 → 0",
+      "keys": {
+        "0": {
+          "key_code": "KC_F15",
+          "tap_action": "KC_F15",
+          "hold_action": "MO(0)",
+          "layer_toggle": 0,
+          "is_tap": true,
+          "is_hold": true,
+          "description": "按住切换回 Layer 0 - 形成循环"
+        },
+        "1": {
+          "key_code": "KC_VOLU",
+          "tap_action": "KC_VOLU"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "device_name": "MacroPad V2 - 内存溢出测试",
+  "version": "1.0.0",
+  "description": "此样例包含超大型宏，用于测试工具的内存限制检测能力",
+  "macros": {
+    "huge_macro_1": [
+      {"action": "tap", "key": "KC_A"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_B"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_C"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_D"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_E"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_F"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_G"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_H"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_I"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_J"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_K"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_L"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_M"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_N"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_O"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_P"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_Q"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_R"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_S"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_T"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_U"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_V"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_W"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_X"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_Y"},
+      {"action": "delay", "duration": 10},
+      {"action": "tap", "key": "KC_Z"},
+      {"action": "delay", "duration": 10},
+      {"action": "text", "text": "This is a very long text that will significantly increase the macro size and possibly exceed the device's memory limits for a single macro."}
+    ],
+    "huge_macro_2": [
+      {"action": "text", "text": "This is another extremely long piece of text designed to consume large amounts of memory in the macro storage system. The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump!"},
+      {"action": "delay", "duration": 200},
+      {"action": "text", "text": "Adding even more text to ensure we hit the total memory limit. This macro alone should be enough to push the total over the edge when combined with the first huge macro."},
+      {"action": "delay", "duration": 200},
+      {"action": "text", "text": "The five boxing wizards jump quickly. Sympathizing would fix Quaker objectives. A wizard's job is to vex chumps quickly in fog."}
+    ],
+    "normal_size_macro": [
+      {"action": "press", "key": "KC_LCTL"},
+      {"action": "tap", "key": "KC_S"},
+      {"action": "release", "key": "KC_LCTL"}
+    ]
+  },
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "keys": {
+        "0": {
+          "key_code": "KC_A",
+          "macro_ref": "huge_macro_1"
+        },
+        "1": {
+          "key_code": "KC_B",
+          "macro_ref": "huge_macro_2"
+        },
+        "2": {
+          "key_code": "KC_S",
+          "modifiers": ["KC_LCTL"],
+          "macro_ref": "normal_size_macro"
+        }
+      }
+    }
+  ]
+}

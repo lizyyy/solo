@@ -1,0 +1,64 @@
+{
+  "device_name": "MacroPad V2 - 跨系统不一致测试",
+  "version": "1.0.0",
+  "description": "此样例包含 Windows/macOS 修饰键不一致问题，用于测试工具的跨系统一致性检测",
+  "macros": {
+    "screenshot_windows": [
+      {"action": "press", "key": "KC_LGUI"},
+      {"action": "press", "key": "KC_LSFT"},
+      {"action": "tap", "key": "KC_S"},
+      {"action": "release", "key": "KC_LSFT"},
+      {"action": "release", "key": "KC_LGUI"}
+    ],
+    "screenshot_macos": [
+      {"action": "press", "key": "KC_LSFT"},
+      {"action": "press", "key": "KC_LGUI"},
+      {"action": "tap", "key": "KC_4"},
+      {"action": "release", "key": "KC_LGUI"},
+      {"action": "release", "key": "KC_LSFT"}
+    ]
+  },
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "keys": {
+        "0": {
+          "key_code": "KC_S",
+          "modifiers": ["KC_LGUI", "KC_LSFT"],
+          "description": "Win+Shift+S (Windows截图) - 在macOS上会变成Option+Shift+S，行为不一致"
+        },
+        "1": {
+          "key_code": "KC_C",
+          "modifiers": ["KC_LCTL"],
+          "description": "Ctrl+C - 在Windows和macOS上都正常（虽然macOS通常用Cmd+C）"
+        },
+        "2": {
+          "key_code": "KC_V",
+          "modifiers": ["KC_LGUI"],
+          "description": "Win+V (Windows剪贴板历史) - 在macOS上会变成Option+V，行为完全不同"
+        },
+        "3": {
+          "key_code": "KC_TAB",
+          "modifiers": ["KC_LALT"],
+          "description": "Alt+Tab (Windows切换窗口) - 在macOS上会变成Cmd+Tab，巧合的是刚好对应macOS的窗口切换"
+        },
+        "4": {
+          "key_code": "KC_SPACE",
+          "modifiers": ["KC_LGUI"],
+          "description": "Win+Space (Windows输入法切换) - 在macOS上会变成Option+Space，行为不同"
+        },
+        "5": {
+          "key_code": "KC_I",
+          "modifiers": ["KC_LCTL", "KC_LSFT"],
+          "description": "Ctrl+Shift+I - 没有使用GUI/ALT修饰键，跨系统一致"
+        },
+        "6": {
+          "key_code": "KC_DELETE",
+          "modifiers": ["KC_LCTL", "KC_LALT"],
+          "description": "Ctrl+Alt+Del - Windows安全界面，此组合会产生跨系统问题"
+        }
+      }
+    }
+  ]
+}

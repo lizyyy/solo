@@ -1,0 +1,45 @@
+device_capabilities:
+  device_name: "MacroPad V2"
+  firmware_version: "2.1.0"
+  max_layers: 4
+  max_keys_per_layer: 12
+  max_macro_size_bytes: 256
+  max_total_macros_size_bytes: 2048
+  max_macro_count: 16
+  encoder_support: true
+  led_support: true
+  supported_modifiers:
+    - "KC_LCTL"
+    - "KC_RCTL"
+    - "KC_LSFT"
+    - "KC_RSFT"
+    - "KC_LALT"
+    - "KC_RALT"
+    - "KC_LGUI"
+    - "KC_RGUI"
+  supported_special_keys:
+    - "KC_ENTER"
+    - "KC_ESC"
+    - "KC_TAB"
+    - "KC_BSPACE"
+    - "KC_DELETE"
+    - "KC_UP"
+    - "KC_DOWN"
+    - "KC_LEFT"
+    - "KC_RIGHT"
+    - "KC_PGUP"
+    - "KC_PGDN"
+    - "KC_HOME"
+    - "KC_END"
+    - "KC_MUTE"
+    - "KC_VOLU"
+    - "KC_VOLD"
+    - "KC_MPLY"
+    - "KC_MNXT"
+    - "KC_MPRV"
+  supported_macros:
+    - "tap"
+    - "press"
+    - "release"
+    - "delay"
+    - "text"

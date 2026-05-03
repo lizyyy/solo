@@ -1,0 +1,265 @@
+{
+  "device_version": "1.0.0",
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "keys": {
+        "0": {
+          "k": "KC_F13",
+          "lt": 1,
+          "h": 1,
+          "t": 1,
+          "ta": "KC_F13",
+          "ha": "MO(1)"
+        },
+        "1": {
+          "k": "KC_F14",
+          "lt": 2,
+          "h": 1,
+          "t": 1,
+          "ta": "KC_F14",
+          "ha": "MO(2)"
+        },
+        "2": {
+          "k": "KC_MUTE",
+          "ta": "KC_MUTE"
+        },
+        "3": {
+          "k": "KC_VOLU",
+          "ta": "KC_VOLU"
+        },
+        "4": {
+          "k": "KC_VOLD",
+          "ta": "KC_VOLD"
+        },
+        "5": {
+          "k": "KC_MPLY",
+          "ta": "KC_MPLY"
+        },
+        "6": {
+          "k": "KC_A",
+          "m": [
+            "KC_LCTL"
+          ],
+          "macro": "M_56a2a68c"
+        },
+        "7": {
+          "k": "KC_C",
+          "m": [
+            "KC_LCTL"
+          ],
+          "macro": "M_950253a7"
+        },
+        "8": {
+          "k": "KC_V",
+          "m": [
+            "KC_LCTL"
+          ],
+          "macro": "M_00bf1e68"
+        },
+        "9": {
+          "k": "KC_Z",
+          "m": [
+            "KC_LCTL"
+          ],
+          "macro": "M_48d4cbb2"
+        }
+      }
+    },
+    {
+      "layer_id": 1,
+      "layer_name": "Media Layer",
+      "keys": {
+        "0": {
+          "k": "KC_MPRV",
+          "ta": "KC_MPRV"
+        },
+        "1": {
+          "k": "KC_MNXT",
+          "ta": "KC_MNXT"
+        },
+        "2": {
+          "k": "KC_MSTP",
+          "ta": "KC_MSTP"
+        },
+        "3": {
+          "k": "KC_MPLY",
+          "ta": "KC_MPLY"
+        },
+        "4": {
+          "k": "KC_MUTE",
+          "ta": "KC_MUTE"
+        },
+        "5": {
+          "k": "KC_VOLU",
+          "ta": "KC_VOLU"
+        },
+        "6": {
+          "k": "KC_VOLD",
+          "ta": "KC_VOLD"
+        },
+        "7": {
+          "k": "KC_BRIGHTNESS_UP",
+          "ta": "KC_BRIGHTNESS_UP"
+        },
+        "8": {
+          "k": "KC_BRIGHTNESS_DOWN",
+          "ta": "KC_BRIGHTNESS_DOWN"
+        }
+      }
+    },
+    {
+      "layer_id": 2,
+      "layer_name": "Dev Layer",
+      "keys": {
+        "0": {
+          "k": "KC_F1",
+          "ta": "KC_F1"
+        },
+        "1": {
+          "k": "KC_S",
+          "m": [
+            "KC_LCTL"
+          ],
+          "macro": "M_603d3ccf"
+        },
+        "2": {
+          "k": "KC_I",
+          "m": [
+            "KC_LCTL",
+            "KC_LSFT"
+          ],
+          "macro": "M_deaed9f1"
+        },
+        "3": {
+          "k": "KC_F5",
+          "ta": "KC_F5"
+        },
+        "4": {
+          "k": "KC_F10",
+          "ta": "KC_F10"
+        },
+        "5": {
+          "k": "KC_F11",
+          "ta": "KC_F11"
+        },
+        "6": {
+          "k": "KC_B",
+          "m": [
+            "KC_LCTL",
+            "KC_LSFT"
+          ]
+        },
+        "7": {
+          "k": "KC_P",
+          "m": [
+            "KC_LCTL",
+            "KC_LSFT"
+          ]
+        },
+        "8": {
+          "k": "KC_GRAVE",
+          "m": [
+            "KC_LCTL",
+            "KC_LSFT"
+          ]
+        }
+      }
+    }
+  ],
+  "macros": {
+    "M_56a2a68c": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "tap",
+        "key": "KC_A"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ],
+    "M_950253a7": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "tap",
+        "key": "KC_C"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ],
+    "M_00bf1e68": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "tap",
+        "key": "KC_V"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ],
+    "M_48d4cbb2": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "tap",
+        "key": "KC_Z"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ],
+    "M_603d3ccf": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "tap",
+        "key": "KC_S"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ],
+    "M_deaed9f1": [
+      {
+        "action": "press",
+        "key": "KC_LCTL"
+      },
+      {
+        "action": "press",
+        "key": "KC_LSFT"
+      },
+      {
+        "action": "tap",
+        "key": "KC_I"
+      },
+      {
+        "action": "release",
+        "key": "KC_LSFT"
+      },
+      {
+        "action": "release",
+        "key": "KC_LCTL"
+      }
+    ]
+  }
+}

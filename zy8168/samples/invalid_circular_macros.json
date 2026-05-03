@@ -1,0 +1,56 @@
+{
+  "device_name": "MacroPad V2 - 循环宏测试",
+  "version": "1.0.0",
+  "description": "此样例包含循环宏调用，用于测试工具的循环检测能力",
+  "macros": {
+    "macro_a": [
+      {"action": "tap", "key": "KC_A"},
+      {"action": "delay", "duration": 100},
+      {"action": "macro_call", "macro_ref": "macro_b"}
+    ],
+    "macro_b": [
+      {"action": "tap", "key": "KC_B"},
+      {"action": "delay", "duration": 100},
+      {"action": "macro_call", "macro_ref": "macro_c"}
+    ],
+    "macro_c": [
+      {"action": "tap", "key": "KC_C"},
+      {"action": "delay", "duration": 100},
+      {"action": "macro_call", "macro_ref": "macro_a"}
+    ],
+    "self_ref_macro": [
+      {"action": "tap", "key": "KC_X"},
+      {"action": "delay", "duration": 50},
+      {"action": "macro_call", "macro_ref": "self_ref_macro"}
+    ],
+    "normal_macro": [
+      {"action": "tap", "key": "KC_Y"},
+      {"action": "delay", "duration": 50},
+      {"action": "tap", "key": "KC_Z"}
+    ]
+  },
+  "layers": [
+    {
+      "layer_id": 0,
+      "layer_name": "Base Layer",
+      "keys": {
+        "0": {
+          "key_code": "KC_A",
+          "macro_ref": "macro_a"
+        },
+        "1": {
+          "key_code": "KC_B",
+          "macro_ref": "macro_b"
+        },
+        "2": {
+          "key_code": "KC_X",
+          "macro_ref": "self_ref_macro"
+        },
+        "3": {
+          "key_code": "KC_Y",
+          "macro_ref": "normal_macro"
+        }
+      }
+    }
+  ]
+}
