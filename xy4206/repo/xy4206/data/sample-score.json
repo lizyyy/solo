@@ -1,0 +1,400 @@
+{
+    "title": "C大调音阶与和弦练习",
+    "composer": "练习曲",
+    "timeSignature": "4/4",
+    "tempo": 120,
+    "measures": [
+        {
+            "number": 1,
+            "timeSignature": "4/4",
+            "tempo": 120,
+            "notes": [
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 64,
+                    "startTime": 0.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 62,
+                    "noteName": "D4",
+                    "velocity": 64,
+                    "startTime": 0.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 64,
+                    "startTime": 1.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 65,
+                    "noteName": "F4",
+                    "velocity": 64,
+                    "startTime": 1.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 64,
+                    "startTime": 2.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 69,
+                    "noteName": "A4",
+                    "velocity": 64,
+                    "startTime": 2.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 71,
+                    "noteName": "B4",
+                    "velocity": 64,
+                    "startTime": 3.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 1
+                },
+                {
+                    "pitch": 72,
+                    "noteName": "C5",
+                    "velocity": 64,
+                    "startTime": 3.50,
+                    "duration": 0.5,
+                    "isSlurred": false,
+                    "slurGroup": 1
+                }
+            ],
+            "pedalEvents": [
+                {
+                    "type": "damper",
+                    "time": 0.0,
+                    "value": 64,
+                    "isPressed": true
+                }
+            ]
+        },
+        {
+            "number": 2,
+            "timeSignature": "4/4",
+            "tempo": 120,
+            "notes": [
+                {
+                    "pitch": 72,
+                    "noteName": "C5",
+                    "velocity": 64,
+                    "startTime": 0.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 71,
+                    "noteName": "B4",
+                    "velocity": 64,
+                    "startTime": 0.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 69,
+                    "noteName": "A4",
+                    "velocity": 64,
+                    "startTime": 1.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 64,
+                    "startTime": 1.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 65,
+                    "noteName": "F4",
+                    "velocity": 64,
+                    "startTime": 2.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 64,
+                    "startTime": 2.50,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 62,
+                    "noteName": "D4",
+                    "velocity": 64,
+                    "startTime": 3.00,
+                    "duration": 0.5,
+                    "isSlurred": true,
+                    "slurGroup": 2
+                },
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 64,
+                    "startTime": 3.50,
+                    "duration": 0.5,
+                    "isSlurred": false,
+                    "slurGroup": 2
+                }
+            ],
+            "pedalEvents": [
+                {
+                    "type": "damper",
+                    "time": 2.0,
+                    "value": 0,
+                    "isPressed": false
+                }
+            ]
+        },
+        {
+            "number": 3,
+            "timeSignature": "4/4",
+            "tempo": 120,
+            "notes": [
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 80,
+                    "startTime": 0.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 80,
+                    "startTime": 0.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 80,
+                    "startTime": 0.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 80,
+                    "startTime": 1.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 80,
+                    "startTime": 1.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 80,
+                    "startTime": 1.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 59,
+                    "noteName": "B3",
+                    "velocity": 80,
+                    "startTime": 2.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 62,
+                    "noteName": "D4",
+                    "velocity": 80,
+                    "startTime": 2.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 66,
+                    "noteName": "F#4",
+                    "velocity": 80,
+                    "startTime": 2.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 80,
+                    "startTime": 3.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 80,
+                    "startTime": 3.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 80,
+                    "startTime": 3.00,
+                    "duration": 1.0,
+                    "isSlurred": false
+                }
+            ],
+            "pedalEvents": [
+                {
+                    "type": "damper",
+                    "time": 0.0,
+                    "value": 64,
+                    "isPressed": true
+                },
+                {
+                    "type": "damper",
+                    "time": 1.0,
+                    "value": 0,
+                    "isPressed": false
+                },
+                {
+                    "type": "damper",
+                    "time": 1.01,
+                    "value": 64,
+                    "isPressed": true
+                },
+                {
+                    "type": "damper",
+                    "time": 2.0,
+                    "value": 0,
+                    "isPressed": false
+                },
+                {
+                    "type": "damper",
+                    "time": 2.01,
+                    "value": 64,
+                    "isPressed": true
+                },
+                {
+                    "type": "damper",
+                    "time": 3.0,
+                    "value": 0,
+                    "isPressed": false
+                },
+                {
+                    "type": "damper",
+                    "time": 3.01,
+                    "value": 64,
+                    "isPressed": true
+                }
+            ]
+        },
+        {
+            "number": 4,
+            "timeSignature": "4/4",
+            "tempo": 120,
+            "notes": [
+                {
+                    "pitch": 60,
+                    "noteName": "C4",
+                    "velocity": 70,
+                    "startTime": 0.00,
+                    "duration": 0.5,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 62,
+                    "noteName": "D4",
+                    "velocity": 70,
+                    "startTime": 0.50,
+                    "duration": 0.5,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 70,
+                    "startTime": 1.00,
+                    "duration": 0.5,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 80,
+                    "startTime": 1.50,
+                    "duration": 1.0,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 69,
+                    "noteName": "A4",
+                    "velocity": 70,
+                    "startTime": 2.50,
+                    "duration": 0.5,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 67,
+                    "noteName": "G4",
+                    "velocity": 70,
+                    "startTime": 3.00,
+                    "duration": 0.5,
+                    "isSlurred": false
+                },
+                {
+                    "pitch": 64,
+                    "noteName": "E4",
+                    "velocity": 70,
+                    "startTime": 3.50,
+                    "duration": 0.5,
+                    "isSlurred": false
+                }
+            ],
+            "pedalEvents": [
+                {
+                    "type": "damper",
+                    "time": 4.0,
+                    "value": 0,
+                    "isPressed": false
+                }
+            ]
+        }
+    ]
+}

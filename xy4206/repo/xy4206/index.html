@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错音回放谱架 - 钢琴陪练分析工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>🎹 错音回放谱架</h1>
+            <p class="subtitle">钢琴陪练老师专用：精准分析每一个音符</p>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <section class="panel">
+                    <h2>📁 数据导入</h2>
+                    <div class="import-section">
+                        <label class="file-label">
+                            <span>目标乐谱 (JSON)</span>
+                            <input type="file" id="score-input" accept=".json">
+                        </label>
+                        <label class="file-label">
+                            <span>演奏记录 (CSV)</span>
+                            <input type="file" id="performance-input" accept=".csv">
+                        </label>
+                        <button id="load-sample" class="btn btn-secondary">加载示例数据</button>
+                    </div>
+                </section>
+
+                <section class="panel" id="analysis-summary" style="display: none;">
+                    <h2>📊 分析摘要</h2>
+                    <div class="summary-content">
+                        <div class="summary-item">
+                            <span class="label">总分</span>
+                            <span class="value" id="total-score">--</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">小节数</span>
+                            <span class="value" id="measure-count">--</span>
+                        </div>
+                        <div class="summary-item error">
+                            <span class="label">错音</span>
+                            <span class="value" id="wrong-notes">--</span>
+                        </div>
+                        <div class="summary-item warning">
+                            <span class="label">节奏问题</span>
+                            <span class="value" id="rhythm-issues">--</span>
+                        </div>
+                        <div class="summary-item warning">
+                            <span class="label">漏音</span>
+                            <span class="value" id="missed-notes">--</span>
+                        </div>
+                        <div class="summary-item warning">
+                            <span class="label">连音断裂</span>
+                            <span class="value" id="slur-breaks">--</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel" id="storage-panel" style="display: none;">
+                    <h2>💾 练习档案</h2>
+                    <div id="archive-list" class="archive-list"></div>
+                    <button id="save-archive" class="btn btn-primary" style="display: none;">保存当前分析</button>
+                </section>
+
+                <section class="panel">
+                    <h2>📤 导出</h2>
+                    <div class="export-buttons">
+                        <button id="export-markdown" class="btn btn-export" disabled>导出讲评 (MD)</button>
+                        <button id="export-csv" class="btn btn-export" disabled>错误明细 (CSV)</button>
+                        <button id="export-json" class="btn btn-export" disabled>审计包 (JSON)</button>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="content">
+                <div class="controls-bar">
+                    <div class="playback-controls">
+                        <button id="play-btn" class="btn btn-play" disabled>▶</button>
+                        <button id="pause-btn" class="btn btn-play" disabled>⏸</button>
+                        <button id="stop-btn" class="btn btn-play" disabled>⏹</button>
+                        <span id="playback-time">00:00 / 00:00</span>
+                    </div>
+                    <div class="playback-options">
+                        <label>
+                            <input type="checkbox" id="play-target" checked> 播放目标音
+                        </label>
+                        <label>
+                            <input type="checkbox" id="play-performance" checked> 播放演奏音
+                        </label>
+                        <label>
+                            速度: <input type="range" id="speed-control" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speed-display">1.0x</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="score-container" id="score-container">
+                    <div class="placeholder" id="placeholder">
+                        <div class="placeholder-icon">🎼</div>
+                        <p>请导入目标乐谱 JSON 和演奏记录 CSV</p>
+                        <p>或点击"加载示例数据"开始体验</p>
+                    </div>
+                    <div class="score-display" id="score-display" style="display: none;"></div>
+                </div>
+
+                <div class="evidence-panel" id="evidence-panel" style="display: none;">
+                    <h3>🔍 小节详情</h3>
+                    <div class="evidence-content" id="evidence-content"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/parser.js"></script>
+    <script src="js/aligner.js"></script>
+    <script src="js/scorer.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/exporter.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
