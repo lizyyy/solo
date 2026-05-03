@@ -1,0 +1,11 @@
+animal_id,tag_id,species,strain,sex,date_of_birth,status,quarantine_end_date,notes
+A001,TAG001,Mouse,C57BL/6,M,2023-01-15,active,,正常健康小鼠
+A002,TAG002,Mouse,C57BL/6,F,2023-01-15,active,,正常健康小鼠
+A003,TAG003,Mouse,BALB/c,M,2023-02-20,active,,正常健康小鼠
+A004,TAG004,Mouse,BALB/c,F,2023-02-20,active,,正常健康小鼠
+A005,TAG005,Rat,SD,M,2022-11-10,in_quarantine,2026-12-31,新到大鼠，正在隔离观察
+A006,TAG006,Rat,SD,F,2022-11-10,active,,已完成隔离
+A007,TAG007,Mouse,C57BL/6,M,2023-03-01,deceased,,实验结束后安乐死
+A008,TAG008,Mouse,C57BL/6,F,2023-03-01,transferred,,已转移到其他实验室
+A009,TAG009,Mouse,ICR,M,2023-04-15,active,,用于行为学实验
+A010,TAG010,Mouse,ICR,F,2023-04-15,active,,用于行为学实验

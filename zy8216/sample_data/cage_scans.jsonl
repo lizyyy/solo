@@ -1,0 +1,14 @@
+{"scan_id": "SCAN001", "tag_id": "TAG001", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:00:00", "scan_type": "check", "operator": "Zhang", "notes": "初始扫码 - A001进入C001"}
+{"scan_id": "SCAN002", "tag_id": "TAG002", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:01:00", "scan_type": "check", "operator": "Zhang", "notes": "A002进入C001"}
+{"scan_id": "SCAN003", "tag_id": "TAG003", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:02:00", "scan_type": "check", "operator": "Zhang", "notes": "A003进入C001"}
+{"scan_id": "SCAN004", "tag_id": "TAG004", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:03:00", "scan_type": "check", "operator": "Zhang", "notes": "A004进入C001 - C001满员(4/5)"}
+{"scan_id": "SCAN005", "tag_id": "TAG009", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:04:00", "scan_type": "check", "operator": "Zhang", "notes": "A009进入C001 - C001满员(5/5)"}
+{"scan_id": "SCAN006", "tag_id": "TAG010", "cage_id": "C001", "scan_timestamp": "2024-01-15 08:05:00", "scan_type": "check", "operator": "Zhang", "notes": "A010试图进入C001 - 【异常1】容量超限(5/5)"}
+{"scan_id": "SCAN007", "tag_id": "TAG006", "cage_id": "C002", "scan_timestamp": "2024-01-15 09:00:00", "scan_type": "check", "operator": "Li", "notes": "A006(非隔离期)进入C002"}
+{"scan_id": "SCAN008", "tag_id": "TAG005", "cage_id": "C002", "scan_timestamp": "2024-01-15 09:01:00", "scan_type": "check", "operator": "Li", "notes": "A005(隔离期)试图混入C002 - 【异常2】隔离混笼"}
+{"scan_id": "SCAN009", "tag_id": "TAG001", "cage_id": "C003", "scan_timestamp": "2024-01-15 10:00:00", "scan_type": "transfer", "operator": "Wang", "notes": "正常换笼: A001从C001转移到C003"}
+{"scan_id": "SCAN010", "tag_id": "TAG001", "cage_id": "C003", "scan_timestamp": "2024-01-15 10:00:30", "scan_type": "check", "operator": "Wang", "notes": "【异常3】重复扫码 - 同一动物同一笼位30秒内"}
+{"scan_id": "SCAN011", "tag_id": "TAG007", "cage_id": "C004", "scan_timestamp": "2024-01-15 11:00:00", "scan_type": "check", "operator": "Zhao", "notes": "【异常4】死亡动物A007仍被扫码"}
+{"scan_id": "SCAN012", "tag_id": "TAG008", "cage_id": "C004", "scan_timestamp": "2024-01-15 11:01:00", "scan_type": "check", "operator": "Zhao", "notes": "【异常5】已转出动物A008仍被扫码"}
+{"scan_id": "SCAN013", "tag_id": "TAG002", "cage_id": "C003", "scan_timestamp": "2024-01-15 14:00:00", "scan_type": "transfer", "operator": "Zhang", "notes": "正常换笼: A002从C001转移到C003"}
+{"scan_id": "SCAN014", "tag_id": "TAG003", "cage_id": "C005", "scan_timestamp": "2024-01-15 15:00:00", "scan_type": "transfer", "operator": "Li", "notes": "正常换笼: A003从C001转移到C005(隔离笼)"}

@@ -1,0 +1,30 @@
+rules:
+  - rule_name: "cage_capacity_check"
+    rule_type: "capacity"
+    description: "检查笼位容量是否超限"
+    is_active: true
+    priority: 1
+
+  - rule_name: "quarantine_mixing_check"
+    rule_type: "quarantine"
+    description: "检查隔离期动物是否与非隔离期动物混笼"
+    is_active: true
+    priority: 2
+
+  - rule_name: "deceased_animal_scan_check"
+    rule_type: "status"
+    description: "检测死亡动物是否被扫码"
+    is_active: true
+    priority: 3
+
+  - rule_name: "transferred_animal_scan_check"
+    rule_type: "status"
+    description: "检测已转出动物是否被扫码"
+    is_active: true
+    priority: 3
+
+  - rule_name: "duplicate_scan_check"
+    rule_type: "scan"
+    description: "检测60秒内重复扫码"
+    is_active: true
+    priority: 1
