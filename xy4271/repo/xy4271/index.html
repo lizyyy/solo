@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地铁夜间检修调度</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>地铁夜间检修调度</h1>
+            <div class="game-info">
+                <div class="level-info">
+                    <span>关卡: <span id="level-name">教程关卡</span></span>
+                    <span>回合: <span id="turn-count">0</span></span>
+                </div>
+                <div class="status-info">
+                    <span>电量: <span id="battery-level">100%</span></span>
+                    <span>剩余时间: <span id="remaining-time">∞</span></span>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="game-container">
+                <div class="sidebar">
+                    <div class="level-selector">
+                        <h3>选择关卡</h3>
+                        <div id="level-list"></div>
+                        <div class="custom-levels">
+                            <h4>自定义关卡</h4>
+                            <div id="custom-level-list"></div>
+                            <button id="import-level" class="btn">导入关卡</button>
+                            <button id="export-level" class="btn">导出当前关卡</button>
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <h3>游戏控制</h3>
+                        <button id="undo-btn" class="btn" disabled>撤销</button>
+                        <button id="redo-btn" class="btn" disabled>重做</button>
+                        <button id="reset-btn" class="btn">重置关卡</button>
+                        <button id="save-progress-btn" class="btn">保存进度</button>
+                        <button id="load-progress-btn" class="btn">加载进度</button>
+                    </div>
+                    
+                    <div class="tools">
+                        <h3>工具</h3>
+                        <div class="tool-item" data-tool="select" id="tool-select">
+                            <span class="tool-icon">👆</span>
+                            <span class="tool-name">选择</span>
+                        </div>
+                        <div class="tool-item" data-tool="maintenance-car" id="tool-maintenance-car">
+                            <span class="tool-icon">🔧</span>
+                            <span class="tool-name">检修车</span>
+                        </div>
+                        <div class="tool-item" data-tool="block" id="tool-block">
+                            <span class="tool-icon">🚧</span>
+                            <span class="tool-name">封锁区</span>
+                        </div>
+                        <div class="tool-item" data-tool="remove" id="tool-remove">
+                            <span class="tool-icon">🗑️</span>
+                            <span class="tool-name">移除</span>
+                        </div>
+                    </div>
+                    
+                    <div class="last-train-schedule">
+                        <h3>末班车时刻</h3>
+                        <div id="last-train-list"></div>
+                    </div>
+                </div>
+                
+                <div class="game-board-container">
+                    <div class="turn-indicator">
+                        <button id="prev-turn" class="btn">上一回合</button>
+                        <span id="current-turn-display">回合 0</span>
+                        <button id="next-turn" class="btn">下一回合</button>
+                    </div>
+                    <canvas id="game-board"></canvas>
+                    <div class="message-area">
+                        <div id="game-message"></div>
+                    </div>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="selected-info">
+                        <h3>选中信息</h3>
+                        <div id="selection-details">点击网格查看详情</div>
+                    </div>
+                    
+                    <div class="game-rules">
+                        <h3>游戏规则</h3>
+                        <ul>
+                            <li>避免列车与检修车冲突</li>
+                            <li>检修车电量耗尽游戏结束</li>
+                            <li>关键轨段超时未修游戏结束</li>
+                            <li>完成所有检修任务通关</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="score-info">
+                        <h3>评分</h3>
+                        <div id="score-display">当前评分: -</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="modal-overlay" class="hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 id="modal-title">提示</h2>
+                    <button id="modal-close" class="btn">&times;</button>
+                </div>
+                <div class="modal-content" id="modal-content"></div>
+                <div class="modal-footer" id="modal-footer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

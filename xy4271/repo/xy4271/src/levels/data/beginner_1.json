@@ -1,0 +1,79 @@
+{
+  "id": "beginner_1",
+  "name": "简单冲突",
+  "description": "学习如何避免与末班车冲突",
+  "grid": [
+    ["E", "E", "E", "E", "E", "E", "E", "E"],
+    ["E", "S-NS", "T-NS", "T-NS", "T-NS", "T-NS", "S-NS", "E"],
+    ["E", "E", "E", "E", "T-NS", "E", "E", "E"],
+    ["E", "E", "E", "E", "J-NS", "T-EW", "S-EW", "E"],
+    ["E", "E", "E", "E", "T-NS", "E", "E", "E"],
+    ["E", "E", "E", "E", "S-NS", "E", "E", "E"],
+    ["E", "E", "E", "E", "E", "E", "E", "E"]
+  ],
+  "maintenanceCars": [
+    {
+      "id": "car_1",
+      "name": "检修车 A",
+      "x": 4,
+      "y": 5,
+      "battery": 100,
+      "maxBattery": 100,
+      "movementCost": 8,
+      "repairCost": 5
+    }
+  ],
+  "lastTrains": [
+    {
+      "id": "train_1",
+      "name": "1号线末班车",
+      "route": [
+        {"x": 1, "y": 1},
+        {"x": 2, "y": 1},
+        {"x": 3, "y": 1},
+        {"x": 4, "y": 1},
+        {"x": 5, "y": 1},
+        {"x": 6, "y": 1}
+      ],
+      "startTime": 2,
+      "speed": 1
+    },
+    {
+      "id": "train_2",
+      "name": "2号线末班车",
+      "route": [
+        {"x": 4, "y": 3},
+        {"x": 5, "y": 3},
+        {"x": 6, "y": 3}
+      ],
+      "startTime": 8,
+      "speed": 1
+    }
+  ],
+  "criticalSegments": [
+    {
+      "id": "seg_1",
+      "x": 4,
+      "y": 1,
+      "repairTime": 2,
+      "deadline": 8,
+      "priority": "high"
+    },
+    {
+      "id": "seg_2",
+      "x": 4,
+      "y": 3,
+      "repairTime": 1,
+      "deadline": 10,
+      "priority": "normal"
+    }
+  ],
+  "winConditions": {
+    "repairAllCritical": true,
+    "avoidAllConflicts": true,
+    "maintainBattery": true,
+    "additionalConditions": []
+  },
+  "timeLimit": 15,
+  "startingTurn": 0
+}

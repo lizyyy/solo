@@ -1,0 +1,17 @@
+{
+  "name": "metro-night-maintenance",
+  "version": "1.0.0",
+  "description": "地铁夜间检修调度小游戏",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx http-server -p 8080",
+    "test": "node tests/run-tests.js",
+    "lint": "eslint src/**/*.js tests/**/*.js"
+  },
+  "keywords": ["game", "puzzle", "simulation", "metro"],
+  "author": "Trae IDE",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

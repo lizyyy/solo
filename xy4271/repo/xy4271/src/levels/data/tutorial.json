@@ -1,0 +1,79 @@
+{
+  "id": "tutorial",
+  "name": "教程关卡",
+  "description": "学习基本操作：移动检修车和封锁区的使用",
+  "grid": [
+    ["E", "E", "E", "E", "E", "E", "E"],
+    ["E", "S-NS", "T-NS", "T-NS", "S-NS", "E", "E"],
+    ["E", "E", "E", "T-NS", "E", "E", "E"],
+    ["E", "S-EW", "T-EW", "J-NS", "T-EW", "S-EW", "E"],
+    ["E", "E", "E", "T-NS", "E", "E", "E"],
+    ["E", "S-NS", "T-NS", "T-NS", "S-NS", "E", "E"],
+    ["E", "E", "E", "E", "E", "E", "E"]
+  ],
+  "maintenanceCars": [
+    {
+      "id": "car_1",
+      "name": "检修车 A",
+      "x": 3,
+      "y": 3,
+      "battery": 100,
+      "maxBattery": 100,
+      "movementCost": 10,
+      "repairCost": 5
+    }
+  ],
+  "lastTrains": [
+    {
+      "id": "train_1",
+      "name": "1号线末班车",
+      "route": [
+        {"x": 1, "y": 1},
+        {"x": 2, "y": 1},
+        {"x": 3, "y": 1},
+        {"x": 4, "y": 1}
+      ],
+      "startTime": 3,
+      "speed": 1
+    },
+    {
+      "id": "train_2",
+      "name": "2号线末班车",
+      "route": [
+        {"x": 1, "y": 3},
+        {"x": 2, "y": 3},
+        {"x": 3, "y": 3},
+        {"x": 4, "y": 3},
+        {"x": 5, "y": 3}
+      ],
+      "startTime": 5,
+      "speed": 1
+    }
+  ],
+  "criticalSegments": [
+    {
+      "id": "seg_1",
+      "x": 3,
+      "y": 1,
+      "repairTime": 2,
+      "deadline": 10,
+      "priority": "high"
+    },
+    {
+      "id": "seg_2",
+      "x": 3,
+      "y": 5,
+      "repairTime": 2,
+      "deadline": 12,
+      "priority": "normal"
+    }
+  ],
+  "winConditions": {
+    "repairAllCritical": true,
+    "avoidAllConflicts": true,
+    "maintainBattery": true,
+    "additionalConditions": []
+  },
+  "timeLimit": 20,
+  "startingTurn": 0
+}
