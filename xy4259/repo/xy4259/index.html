@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无人机救援航线挑战</title>
+    <link rel="stylesheet" href="src/ui/style.css">
+</head>
+<body>
+    <div id="app">
+        <header id="main-header">
+            <h1>无人机救援航线挑战</h1>
+            <div id="header-controls">
+                <button id="btn-main-menu">主菜单</button>
+                <button id="btn-levels">关卡列表</button>
+                <button id="btn-editor">地图编辑</button>
+                <button id="btn-history">战绩记录</button>
+            </div>
+        </header>
+        
+        <main id="main-content">
+            <section id="main-menu" class="screen active">
+                <div class="menu-container">
+                    <h2>欢迎使用无人机救援航线挑战</h2>
+                    <p class="subtitle">航模社训练策略游戏</p>
+                    <div class="menu-buttons">
+                        <button id="btn-start-game">开始游戏</button>
+                        <button id="btn-create-level">创建关卡</button>
+                        <button id="btn-view-history">查看战绩</button>
+                    </div>
+                    <div class="game-info">
+                        <h3>游戏说明</h3>
+                        <ul>
+                            <li>在有限电量内规划救援航线</li>
+                            <li>避开禁飞区、风区和山脊</li>
+                            <li>将药包送到所有求救点</li>
+                            <li>确保返航电量充足</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="level-select" class="screen">
+                <h2>选择关卡</h2>
+                <div id="level-list" class="level-list">
+                    <!-- 关卡列表将动态生成 -->
+                </div>
+                <button id="btn-back-from-levels">返回</button>
+            </section>
+            
+            <section id="game-screen" class="screen">
+                <div class="game-container">
+                    <div class="game-sidebar">
+                        <div class="game-info-panel">
+                            <h3 id="current-level-name">关卡名称</h3>
+                            <div class="info-item">
+                                <span class="label">初始电量:</span>
+                                <span id="initial-battery">100%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">剩余电量:</span>
+                                <span id="remaining-battery">100%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">已规划路径:</span>
+                                <span id="path-length">0 个点</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">预估能耗:</span>
+                                <span id="estimated-energy">0%</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">求救点:</span>
+                                <span id="rescue-points-status">0/0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-controls">
+                            <button id="btn-execute-plan">执行计划</button>
+                            <button id="btn-undo">撤销</button>
+                            <button id="btn-reset">重置</button>
+                            <button id="btn-clear-path">清除路径</button>
+                            <button id="btn-replay">回放</button>
+                            <button id="btn-export-json">导出JSON</button>
+                        </div>
+                        
+                        <div class="game-legend">
+                            <h4>图例说明</h4>
+                            <div class="legend-item">
+                                <div class="legend-color start-point"></div>
+                                <span>起点/终点</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color rescue-point"></div>
+                                <span>求救点</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color no-fly-zone"></div>
+                                <span>禁飞区</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color wind-zone"></div>
+                                <span>风区</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color mountain"></div>
+                                <span>山脊</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color path-line"></div>
+                                <span>规划路径</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-canvas-container">
+                        <canvas id="game-canvas"></canvas>
+                        <div id="status-bar">
+                            <span id="status-message">点击地图规划航线</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="editor-screen" class="screen">
+                <div class="editor-container">
+                    <div class="editor-sidebar">
+                        <div class="editor-tools">
+                            <h3>地图编辑工具</h3>
+                            <div class="tool-group">
+                                <button class="editor-tool active" data-tool="start-point">
+                                    <span class="tool-icon">🏠</span>
+                                    起点/终点
+                                </button>
+                                <button class="editor-tool" data-tool="rescue-point">
+                                    <span class="tool-icon">🆘</span>
+                                    求救点
+                                </button>
+                                <button class="editor-tool" data-tool="no-fly-zone">
+                                    <span class="tool-icon">🚫</span>
+                                    禁飞区
+                                </button>
+                                <button class="editor-tool" data-tool="wind-zone">
+                                    <span class="tool-icon">💨</span>
+                                    风区
+                                </button>
+                                <button class="editor-tool" data-tool="mountain">
+                                    <span class="tool-icon">⛰️</span>
+                                    山脊
+                                </button>
+                            </div>
+                            
+                            <div class="tool-options">
+                                <div id="wind-options" class="tool-options-panel hidden">
+                                    <label>风向角度 (0-360°):</label>
+                                    <input type="number" id="wind-direction" value="0" min="0" max="360">
+                                    <label>风速 (影响系数):</label>
+                                    <input type="number" id="wind-speed" value="1.0" min="0.1" max="3.0" step="0.1">
+                                </div>
+                            </div>
+                            
+                            <div class="level-settings">
+                                <h4>关卡设置</h4>
+                                <label>关卡名称:</label>
+                                <input type="text" id="level-name" placeholder="输入关卡名称">
+                                <label>初始电量 (%):</label>
+                                <input type="number" id="level-battery" value="100" min="10" max="200">
+                                <label>基础能耗 (每单位距离):</label>
+                                <input type="number" id="base-energy" value="0.1" min="0.01" max="1.0" step="0.01">
+                            </div>
+                            
+                            <div class="editor-controls">
+                                <button id="btn-save-level">保存关卡</button>
+                                <button id="btn-load-level">加载关卡</button>
+                                <button id="btn-clear-editor">清空地图</button>
+                                <button id="btn-test-level">测试关卡</button>
+                                <button id="btn-back-from-editor">返回主菜单</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="editor-canvas-container">
+                        <canvas id="editor-canvas"></canvas>
+                        <div id="editor-status-bar">
+                            <span id="editor-status-message">选择工具后点击地图放置元素</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="history-screen" class="screen">
+                <h2>战绩记录</h2>
+                <div id="history-list" class="history-list">
+                    <!-- 战绩列表将动态生成 -->
+                </div>
+                <button id="btn-back-from-history">返回</button>
+            </section>
+            
+            <section id="result-screen" class="screen">
+                <div class="result-container">
+                    <h2 id="result-title">任务完成!</h2>
+                    <div id="result-details">
+                        <div class="result-item">
+                            <span class="label">关卡:</span>
+                            <span id="result-level">关卡名称</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">评分:</span>
+                            <span id="result-score">0</span> 分
+                        </div>
+                        <div class="result-item">
+                            <span class="label">剩余电量:</span>
+                            <span id="result-battery">0%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">路径长度:</span>
+                            <span id="result-distance">0 单位</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="label">完成时间:</span>
+                            <span id="result-time">00:00</span>
+                        </div>
+                    </div>
+                    <div class="result-controls">
+                        <button id="btn-replay-result">回放</button>
+                        <button id="btn-export-result">导出JSON</button>
+                        <button id="btn-retry">重试</button>
+                        <button id="btn-back-to-menu">返回主菜单</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

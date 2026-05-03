@@ -1,0 +1,14 @@
+{
+  "name": "drone-rescue-challenge",
+  "version": "1.0.0",
+  "description": "无人机救援航线挑战 - 航模社训练策略游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "echo 'Open test.html in browser for tests'"
+  },
+  "keywords": ["drone", "game", "rescue", "path-planning", "strategy"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {}
+}
