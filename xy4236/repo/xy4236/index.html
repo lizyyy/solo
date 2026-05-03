@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳绳比赛计分台</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>跳绳比赛计分台</h1>
+            <div class="header-controls">
+                <select id="event-selector">
+                    <option value="">选择项目</option>
+                    <option value="single_rocker">单摇</option>
+                    <option value="double_rocker">双摇</option>
+                    <option value="relay">接力</option>
+                </select>
+                <button id="export-markdown-btn">导出成绩单</button>
+                <button id="clear-data-btn" class="danger">清空数据</button>
+            </div>
+        </header>
+
+        <nav class="app-nav">
+            <button class="nav-tab active" data-tab="checkin">分组检录</button>
+            <button class="nav-tab" data-tab="competition">比赛计时</button>
+            <button class="nav-tab" data-tab="review">成绩复核</button>
+            <button class="nav-tab" data-tab="results">成绩排名</button>
+        </nav>
+
+        <main class="app-content">
+            <!-- 检录页面 -->
+            <section id="checkin-tab" class="tab-content active">
+                <div class="checkin-container">
+                    <div class="checkin-controls">
+                        <div class="import-controls">
+                            <label>导入选手数据:</label>
+                            <input type="file" id="import-csv" accept=".csv">
+                            <input type="file" id="import-json" accept=".json">
+                            <button id="export-json-btn">导出JSON</button>
+                            <button id="export-csv-btn">导出CSV</button>
+                        </div>
+                        <div class="group-controls">
+                            <label>分组:</label>
+                            <input type="text" id="group-name" placeholder="组名">
+                            <button id="create-group-btn">创建分组</button>
+                        </div>
+                    </div>
+
+                    <div class="groups-list">
+                        <h3>分组列表</h3>
+                        <div id="groups-container"></div>
+                    </div>
+
+                    <div class="athletes-table-container">
+                        <h3>选手列表 <span id="selected-group-name"></span></h3>
+                        <div class="athlete-controls">
+                            <input type="text" id="athlete-number" placeholder="号码">
+                            <input type="text" id="athlete-name" placeholder="姓名">
+                            <input type="text" id="athlete-team" placeholder="队伍/班级">
+                            <button id="add-athlete-btn">添加选手</button>
+                        </div>
+                        <table id="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th>号码</th>
+                                    <th>姓名</th>
+                                    <th>队伍</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="athletes-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 比赛计时页面 -->
+            <section id="competition-tab" class="tab-content">
+                <div class="competition-container">
+                    <div class="competition-controls">
+                        <div class="competition-selector">
+                            <label>选择分组:</label>
+                            <select id="competition-group-selector"></select>
+                        </div>
+                        <div class="competition-selector">
+                            <label>选择选手:</label>
+                            <select id="competition-athlete-selector"></select>
+                        </div>
+                        <div class="timer-display">
+                            <div id="timer-value">00:00.00</div>
+                            <div id="timer-status">准备</div>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="timer-start-btn" class="primary">开始</button>
+                            <button id="timer-pause-btn">暂停</button>
+                            <button id="timer-reset-btn">重置</button>
+                            <button id="timer-restart-btn">重赛</button>
+                        </div>
+                    </div>
+
+                    <div class="scoring-panel">
+                        <div class="scoring-display">
+                            <div class="score-item">
+                                <span class="score-label">有效次数</span>
+                                <span id="valid-count" class="score-value">0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">失误</span>
+                                <span id="error-count" class="score-value error">0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">犯规</span>
+                                <span id="foul-count" class="score-value foul">0</span>
+                            </div>
+                        </div>
+
+                        <div class="scoring-buttons">
+                            <button id="add-count-btn" class="large primary">+1 次数 (空格)</button>
+                            <button id="add-error-btn" class="large error">+1 失误 (E)</button>
+                            <button id="add-foul-btn" class="large foul">+1 犯规 (F)</button>
+                            <button id="undo-btn">撤销</button>
+                        </div>
+
+                        <div class="keyboard-hint">
+                            <p>快捷键: 空格=计数 | E=失误 | F=犯规 | Ctrl+Z=撤销 | Enter=开始/暂停</p>
+                        </div>
+                    </div>
+
+                    <div class="current-athlete-info">
+                        <h3>当前选手信息</h3>
+                        <div class="athlete-detail">
+                            <p><strong>号码:</strong> <span id="detail-number">-</span></p>
+                            <p><strong>姓名:</strong> <span id="detail-name">-</span></p>
+                            <p><strong>队伍:</strong> <span id="detail-team">-</span></p>
+                            <p><strong>项目:</strong> <span id="detail-event">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="exception-panel">
+                        <h3>异常记录</h3>
+                        <textarea id="exception-notes" placeholder="记录比赛中的异常情况..."></textarea>
+                        <button id="save-exception-btn">保存记录</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 成绩复核页面 -->
+            <section id="review-tab" class="tab-content">
+                <div class="review-container">
+                    <div class="review-controls">
+                        <div class="review-selector">
+                            <label>选择分组:</label>
+                            <select id="review-group-selector"></select>
+                        </div>
+                        <div class="review-selector">
+                            <label>选择选手:</label>
+                            <select id="review-athlete-selector"></select>
+                        </div>
+                        <button id="load-result-btn">加载成绩</button>
+                    </div>
+
+                    <div class="result-review-panel">
+                        <h3>成绩详情</h3>
+                        <div class="result-detail" id="result-detail">
+                            <p>请选择选手查看成绩详情</p>
+                        </div>
+                        <div class="result-actions">
+                            <button id="confirm-result-btn" class="primary">确认成绩</button>
+                            <button id="modify-result-btn">修改成绩</button>
+                            <button id="delete-result-btn" class="danger">删除成绩</button>
+                        </div>
+                    </div>
+
+                    <div class="group-results-list">
+                        <h3>本组成绩列表</h3>
+                        <table id="group-results-table">
+                            <thead>
+                                <tr>
+                                    <th>号码</th>
+                                    <th>姓名</th>
+                                    <th>队伍</th>
+                                    <th>有效次数</th>
+                                    <th>失误</th>
+                                    <th>犯规</th>
+                                    <th>成绩</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="group-results-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 成绩排名页面 -->
+            <section id="results-tab" class="tab-content">
+                <div class="results-container">
+                    <div class="results-controls">
+                        <div class="results-selector">
+                            <label>项目:</label>
+                            <select id="results-event-selector">
+                                <option value="">全部项目</option>
+                                <option value="single_rocker">单摇</option>
+                                <option value="double_rocker">双摇</option>
+                                <option value="relay">接力</option>
+                            </select>
+                        </div>
+                        <div class="results-selector">
+                            <label>分组:</label>
+                            <select id="results-group-selector">
+                                <option value="">全部分组</option>
+                            </select>
+                        </div>
+                        <button id="calculate-rankings-btn">计算排名</button>
+                    </div>
+
+                    <div class="rankings-table-container">
+                        <h3>个人排名</h3>
+                        <table id="individual-rankings-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>号码</th>
+                                    <th>姓名</th>
+                                    <th>队伍</th>
+                                    <th>项目</th>
+                                    <th>有效次数</th>
+                                    <th>成绩</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="individual-rankings-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="team-rankings-container">
+                        <h3>团队总分排名</h3>
+                        <table id="team-rankings-table">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>队伍</th>
+                                    <th>项目</th>
+                                    <th>人数</th>
+                                    <th>总分</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody id="team-rankings-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>跳绳比赛计分台 v1.0 | 数据自动保存至本地存储</p>
+        </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跳绳比赛计分台 - 测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        h1 { margin-bottom: 1rem; color: #333; }
+        h2 { margin: 1.5rem 0 1rem; color: #555; font-size: 1.2rem; }
+        .test-suite {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.pass {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+        }
+        .test-item.fail {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        .test-name { font-weight: 600; margin-bottom: 0.25rem; }
+        .test-message { font-size: 0.875rem; color: #666; }
+        .summary {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary p { margin: 0.5rem 0; }
+        .pass-count { color: #22c55e; font-weight: 600; }
+        .fail-count { color: #ef4444; font-weight: 600; }
+        button {
+            padding: 0.75rem 1.5rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        button:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <h1>跳绳比赛计分台 - 单元测试</h1>
+    <button id="run-tests-btn">运行所有测试</button>
+    <div id="test-results"></div>
+    <div id="test-summary"></div>
+
+    <script type="module">
+        import RulesEngine, { EVENT_TYPES } from '../js/rulesEngine.js';
+        import TimerState, { TIMER_STATES } from '../js/timerState.js';
+        import ImportExportManager from '../js/importExport.js';
+
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.results = {
+                    passed: 0,
+                    failed: 0,
+                    tests: []
+                };
+            }
+
+            describe(suiteName, fn) {
+                this.currentSuite = suiteName;
+                fn();
+            }
+
+            it(testName, fn) {
+                this.tests.push({
+                    suite: this.currentSuite,
+                    name: testName,
+                    test: fn
+                });
+            }
+
+            assert(condition, message = 'Assertion failed') {
+                if (!condition) {
+                    throw new Error(message);
+                }
+            }
+
+            assertEqual(actual, expected, message = '') {
+                if (actual !== expected) {
+                    throw new Error(`${message} Expected ${expected}, got ${actual}`);
+                }
+            }
+
+            async run() {
+                this.results = {
+                    passed: 0,
+                    failed: 0,
+                    tests: []
+                };
+
+                for (const test of this.tests) {
+                    try {
+                        await test.test();
+                        this.results.passed++;
+                        this.results.tests.push({
+                            suite: test.suite,
+                            name: test.name,
+                            passed: true
+                        });
+                    } catch (e) {
+                        this.results.failed++;
+                        this.results.tests.push({
+                            suite: test.suite,
+                            name: test.name,
+                            passed: false,
+                            error: e.message
+                        });
+                    }
+                }
+
+                return this.results;
+            }
+        }
+
+        const runner = new TestRunner();
+
+        runner.describe('RulesEngine - 规则引擎', function() {
+            const rules = new RulesEngine();
+
+            runner.it('应该正确获取单摇项目配置', function() {
+                const config = rules.getEventConfig(EVENT_TYPES.SINGLE_ROCKER);
+                runner.assert(config !== null, '应该获取到配置');
+                runner.assertEqual(config.name, '单摇');
+                runner.assertEqual(config.duration, 60);
+                runner.assertEqual(config.countPerJump, 1);
+            });
+
+            runner.it('应该正确获取双摇项目配置', function() {
+                const config = rules.getEventConfig(EVENT_TYPES.DOUBLE_ROCKER);
+                runner.assert(config !== null);
+                runner.assertEqual(config.name, '双摇');
+                runner.assertEqual(config.countPerJump, 2);
+                runner.assertEqual(config.errorPenalty, 2);
+            });
+
+            runner.it('应该正确获取接力项目配置', function() {
+                const config = rules.getEventConfig(EVENT_TYPES.RELAY);
+                runner.assert(config !== null);
+                runner.assertEqual(config.name, '接力');
+                runner.assertEqual(config.duration, 180);
+            });
+
+            runner.it('应该正确计算单摇有效成绩', function() {
+                const result = { rawCount: 150, errorCount: 5, foulCount: 1 };
+                const scored = rules.calculateEffectiveScore(result, EVENT_TYPES.SINGLE_ROCKER);
+                
+                runner.assertEqual(scored.valid, true);
+                runner.assertEqual(scored.score, 145);
+            });
+
+            runner.it('应该正确计算双摇有效成绩（失误处罚）', function() {
+                const result = { rawCount: 100, errorCount: 5, foulCount: 0 };
+                const scored = rules.calculateEffectiveScore(result, EVENT_TYPES.DOUBLE_ROCKER);
+                
+                runner.assertEqual(scored.valid, true);
+                runner.assertEqual(scored.score, 190);
+            });
+
+            runner.it('应该对达到犯规阈值的选手取消资格', function() {
+                const result = { rawCount: 100, errorCount: 0, foulCount: 3 };
+                const scored = rules.calculateEffectiveScore(result, EVENT_TYPES.SINGLE_ROCKER);
+                
+                runner.assertEqual(scored.valid, false);
+                runner.assertEqual(scored.disqualified, true);
+            });
+
+            runner.it('应该正确计算个人排名（含并列）', function() {
+                const results = [
+                    { rawCount: 200, errorCount: 0, foulCount: 0 },
+                    { rawCount: 180, errorCount: 0, foulCount: 0 },
+                    { rawCount: 200, errorCount: 0, foulCount: 0 },
+                    { rawCount: 150, errorCount: 0, foulCount: 0 }
+                ];
+
+                const rankings = rules.calculateRankings(results, EVENT_TYPES.SINGLE_ROCKER);
+                
+                runner.assertEqual(rankings[0].rank, 1);
+                runner.assertEqual(rankings[0].isTie, true);
+                runner.assertEqual(rankings[1].rank, 1);
+                runner.assertEqual(rankings[1].isTie, true);
+                runner.assertEqual(rankings[2].rank, 3);
+            });
+
+            runner.it('应该正确验证成绩合法性', function() {
+                const validResult = { rawCount: 100, errorCount: 5, foulCount: 1 };
+                const validation1 = rules.validateResult(validResult, EVENT_TYPES.SINGLE_ROCKER);
+                runner.assertEqual(validation1.valid, true);
+
+                const invalidResult = { rawCount: -1, errorCount: 5, foulCount: 1 };
+                const validation2 = rules.validateResult(invalidResult, EVENT_TYPES.SINGLE_ROCKER);
+                runner.assertEqual(validation2.valid, false);
+            });
+
+            runner.it('应该正确计算团队总分排名', function() {
+                const results = [
+                    { rawCount: 200, errorCount: 0, foulCount: 0, team: '一班', eventType: EVENT_TYPES.SINGLE_ROCKER },
+                    { rawCount: 180, errorCount: 0, foulCount: 0, team: '二班', eventType: EVENT_TYPES.SINGLE_ROCKER },
+                    { rawCount: 190, errorCount: 0, foulCount: 0, team: '一班', eventType: EVENT_TYPES.SINGLE_ROCKER }
+                ];
+
+                const teamRankings = rules.calculateTeamRankings(results, EVENT_TYPES.SINGLE_ROCKER);
+                
+                runner.assertEqual(teamRankings[0].team, '一班');
+                runner.assertEqual(teamRankings[0].totalScore, 390);
+                runner.assertEqual(teamRankings[0].count, 2);
+            });
+        });
+
+        runner.describe('TimerState - 计时状态', function() {
+            const timer = new TimerState(60);
+
+            runner.it('应该初始化为空闲状态', function() {
+                const state = timer.getCurrentState();
+                runner.assertEqual(state.state, TIMER_STATES.IDLE);
+                runner.assertEqual(state.remainingTime, 60000);
+            });
+
+            runner.it('应该正确格式化时间', function() {
+                const formatted = timer.formatTime(125430);
+                runner.assertEqual(formatted, '02:05.43');
+            });
+
+            runner.it('应该正确设置时长', function() {
+                const newTimer = new TimerState(60);
+                newTimer.setDuration(120);
+                const state = newTimer.getCurrentState();
+                runner.assertEqual(state.duration, 120000);
+            });
+
+            runner.it('应该正确检查状态', function() {
+                const t = new TimerState(60);
+                runner.assertEqual(t.isIdle(), true);
+                runner.assertEqual(t.isRunning(), false);
+                runner.assertEqual(t.isPaused(), false);
+                runner.assertEqual(t.isCompleted(), false);
+            });
+        });
+
+        runner.describe('ImportExportManager - 导入导出', function() {
+            const importExport = new ImportExportManager(null);
+
+            runner.it('应该正确解析简单CSV', function() {
+                const csv = `号码,姓名,队伍
+001,张三,一班
+002,李四,二班`;
+                
+                const result = importExport.parseCSV(csv);
+                runner.assertEqual(result.success, true);
+                runner.assertEqual(result.data.length, 2);
+                runner.assertEqual(result.data[0].姓名, '张三');
+            });
+
+            runner.it('应该正确解析带引号的CSV字段', function() {
+                const csv = `号码,姓名,队伍
+001,"张,三",一班
+002,李四,"二,班"`;
+                
+                const result = importExport.parseCSV(csv);
+                runner.assertEqual(result.success, true);
+                runner.assertEqual(result.data[0].姓名, '张,三');
+                runner.assertEqual(result.data[1].队伍, '二,班');
+            });
+
+            runner.it('应该正确解析选手CSV数据', function() {
+                const csv = `号码,姓名,班级
+001,张三,一班
+002,李四,二班`;
+                
+                const result = importExport.parseAthletesFromCSV(csv, 'group_1');
+                runner.assertEqual(result.success, true);
+                runner.assertEqual(result.athletes.length, 2);
+                runner.assertEqual(result.athletes[0].number, '001');
+                runner.assertEqual(result.athletes[0].team, '一班');
+            });
+
+            runner.it('应该正确生成CSV', function() {
+                const data = [
+                    { 号码: '001', 姓名: '张三', 队伍: '一班' },
+                    { 号码: '002', 姓名: '李四', 队伍: '二班' }
+                ];
+
+                const csv = importExport.toCSV(data);
+                runner.assert(csv.includes('001,张三,一班'), '应该包含第一行数据');
+                runner.assert(csv.includes('002,李四,二班'), '应该包含第二行数据');
+            });
+
+            runner.it('应该正确转义CSV特殊字符', function() {
+                const escaped = importExport.escapeCSVField('张,三');
+                runner.assertEqual(escaped, '"张,三"');
+
+                const escapedQuote = importExport.escapeCSVField('张"三');
+                runner.assertEqual(escapedQuote, '"张""三"');
+            });
+
+            runner.it('应该验证选手CSV需要号码列', function() {
+                const csv = `姓名,班级
+张三,一班`;
+                
+                const result = importExport.parseAthletesFromCSV(csv, 'group_1');
+                runner.assertEqual(result.success, false);
+                runner.assert(result.error.includes('号码'), '应该提示缺少号码列');
+            });
+
+            runner.it('应该验证选手CSV需要姓名列', function() {
+                const csv = `号码,班级
+001,一班`;
+                
+                const result = importExport.parseAthletesFromCSV(csv, 'group_1');
+                runner.assertEqual(result.success, false);
+                runner.assert(result.error.includes('姓名'), '应该提示缺少姓名列');
+            });
+        });
+
+        runner.describe('MarkdownExporter - Markdown导出', async function() {
+            const { default: MarkdownExporter } = await import('../js/markdownExporter.js');
+            const rules = new RulesEngine();
+            const exporter = new MarkdownExporter(rules);
+
+            runner.it('应该正确生成报告标题', function() {
+                const title = exporter.generateReportTitle('测试报告', '单摇', '2024-01-01');
+                runner.assert(title.includes('# 测试报告'));
+                runner.assert(title.includes('单摇'));
+                runner.assert(title.includes('2024-01-01'));
+            });
+
+            runner.it('应该正确生成个人排名表格', function() {
+                const rankings = [
+                    { 
+                        rank: 1, isTie: false,
+                        athleteNumber: '001', athleteName: '张三', team: '一班',
+                        rawCount: 200, score: 200, eventType: EVENT_TYPES.SINGLE_ROCKER
+                    }
+                ];
+
+                const md = exporter.generateIndividualRankings(rankings);
+                runner.assert(md.includes('张三'));
+                runner.assert(md.includes('001'));
+                runner.assert(md.includes('一班'));
+                runner.assert(md.includes('200'));
+            });
+
+            runner.it('应该正确标记并列排名', function() {
+                const rankings = [
+                    { rank: 1, isTie: true, athleteName: '张三', athleteNumber: '001', team: '一班', rawCount: 200, score: 200, eventType: EVENT_TYPES.SINGLE_ROCKER },
+                    { rank: 1, isTie: true, athleteName: '李四', athleteNumber: '002', team: '二班', rawCount: 200, score: 200, eventType: EVENT_TYPES.SINGLE_ROCKER }
+                ];
+
+                const md = exporter.generateIndividualRankings(rankings);
+                runner.assert(md.includes('并列'));
+            });
+
+            runner.it('应该正确生成完整报告', function() {
+                const report = exporter.generateFullReport({
+                    title: '跳绳比赛成绩单',
+                    individualRankings: [
+                        { rank: 1, isTie: false, athleteNumber: '001', athleteName: '张三', team: '一班', rawCount: 200, score: 200, eventType: EVENT_TYPES.SINGLE_ROCKER }
+                    ]
+                });
+
+                runner.assert(report.includes('# 跳绳比赛成绩单'));
+                runner.assert(report.includes('张三'));
+                runner.assert(report.includes('生成时间'));
+            });
+        });
+
+        document.getElementById('run-tests-btn').addEventListener('click', async function() {
+            const resultsDiv = document.getElementById('test-results');
+            const summaryDiv = document.getElementById('test-summary');
+            
+            resultsDiv.innerHTML = '<p>正在运行测试...</p>';
+            
+            const results = await runner.run();
+
+            const suites = {};
+            results.tests.forEach(test => {
+                if (!suites[test.suite]) {
+                    suites[test.suite] = [];
+                }
+                suites[test.suite].push(test);
+            });
+
+            let html = '';
+            for (const [suiteName, tests] of Object.entries(suites)) {
+                html += `<div class="test-suite">
+                    <h2>${suiteName}</h2>`;
+                
+                tests.forEach(test => {
+                    const statusClass = test.passed ? 'pass' : 'fail';
+                    const statusIcon = test.passed ? '✓' : '✗';
+                    html += `<div class="test-item ${statusClass}">
+                        <div class="test-name">${statusIcon} ${test.name}</div>
+                        ${test.error ? `<div class="test-message">错误: ${test.error}</div>` : ''}
+                    </div>`;
+                });
+
+                html += '</div>';
+            }
+
+            resultsDiv.innerHTML = html;
+
+            const totalTests = results.passed + results.failed;
+            summaryDiv.innerHTML = `<div class="summary">
+                <h2>测试总结</h2>
+                <p>总共测试: <strong>${totalTests}</strong></p>
+                <p class="pass-count">通过: ${results.passed}</p>
+                <p class="fail-count">失败: ${results.failed}</p>
+                <p>通过率: <strong>${((results.passed / totalTests) * 100).toFixed(1)}%</strong></p>
+            </div>`;
+        });
+    </script>
+</body>
+</html>
