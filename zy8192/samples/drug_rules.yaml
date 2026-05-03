@@ -1,0 +1,72 @@
+drugs:
+  - name: Propofol
+    species: [dog, cat]
+    min_dose_per_kg: 3.0
+    max_dose_per_kg: 8.0
+    dose_unit: mg
+    route: IV
+    notes: 诱导麻醉剂
+  
+  - name: Isoflurane
+    species: [dog, cat]
+    min_dose_per_kg: 0.0
+    max_dose_per_kg: 10.0
+    dose_unit: "%vol"
+    route: inhalation
+    notes: 维持麻醉 按吸入浓度
+  
+  - name: Fentanyl
+    species: [dog, cat]
+    min_dose_per_kg: 0.002
+    max_dose_per_kg: 0.010
+    dose_unit: mg
+    route: IV
+    notes: 镇痛
+  
+  - name: Xylazine
+    species: [dog, cat]
+    min_dose_per_kg: 0.5
+    max_dose_per_kg: 2.0
+    dose_unit: mg
+    route: IM
+    notes: 镇静剂
+  
+  - name: Diazepam
+    species: [dog, cat]
+    min_dose_per_kg: 0.2
+    max_dose_per_kg: 0.5
+    dose_unit: mg
+    route: IV
+    notes: 镇静抗焦虑
+  
+  - name: Ketamine
+    species: [dog, cat]
+    min_dose_per_kg: 5.0
+    max_dose_per_kg: 15.0
+    dose_unit: mg
+    route: IV
+    notes: 分离麻醉剂
+  
+  - name: Atropine
+    species: [dog, cat]
+    min_dose_per_kg: 0.02
+    max_dose_per_kg: 0.04
+    dose_unit: mg
+    route: IM/IV
+    notes: 抗胆碱药
+  
+  - name: Lidocaine
+    species: dog
+    min_dose_per_kg: 1.0
+    max_dose_per_kg: 4.0
+    dose_unit: mg
+    route: IV
+    notes: 抗心律失常
+  
+  - name: Dexmedetomidine
+    species: [dog, cat]
+    min_dose_per_kg: 0.005
+    max_dose_per_kg: 0.015
+    dose_unit: mg
+    route: IM
+    notes: α2受体激动剂 镇静镇痛

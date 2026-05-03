@@ -1,0 +1,28 @@
+administrations:
+  - time: "11:00:00"
+    name: Dexmedetomidine
+    dose: 0.04
+    dose_unit: mg
+    route: IM
+    notes: 术前镇静
+  
+  - time: "11:05:00"
+    name: Propofol
+    dose: 20
+    dose_unit: mg
+    route: IV
+    notes: 诱导麻醉
+  
+  - time: "11:10:00"
+    name: Isoflurane
+    dose: 2.5
+    dose_unit: "%vol"
+    route: inhalation
+    notes: 维持麻醉
+  
+  - time: "11:20:00"
+    name: Fentanyl
+    dose: 0.02
+    dose_unit: mg
+    route: IV
+    notes: 镇痛

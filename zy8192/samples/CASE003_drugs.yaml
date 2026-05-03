@@ -1,0 +1,42 @@
+administrations:
+  - time: "23:30:00"
+    name: Xylazine
+    dose: 45
+    dose_unit: mg
+    route: IM
+    notes: 急诊术前镇静
+  
+  - time: "23:35:00"
+    name: Ketamine
+    dose: 300
+    dose_unit: mg
+    route: IV
+    notes: 诱导麻醉
+  
+  - time: "23:40:00"
+    name: Isoflurane
+    dose: 3.0
+    dose_unit: "%vol"
+    route: inhalation
+    notes: 维持麻醉
+  
+  - time: "00:00:00"
+    name: Fentanyl
+    dose: 0.15
+    dose_unit: mg
+    route: IV
+    notes: 跨午夜追加镇痛
+  
+  - time: "01:00:00"
+    name: Lidocaine
+    dose: 60
+    dose_unit: mg
+    route: IV
+    notes: 抗心律失常
+  
+  - time: "01:30:00"
+    name: Fentanyl
+    dose: 0.08
+    dose_unit: mg
+    route: IV
+    notes: 追加镇痛

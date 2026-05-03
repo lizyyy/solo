@@ -1,0 +1,28 @@
+administrations:
+  - time: "09:00:00"
+    name: Propofol
+    dose: 100
+    dose_unit: mg
+    route: IV
+    notes: 诱导麻醉
+  
+  - time: "09:05:00"
+    name: Isoflurane
+    dose: 2.0
+    dose_unit: "%vol"
+    route: inhalation
+    notes: 维持麻醉
+  
+  - time: "09:15:00"
+    name: Fentanyl
+    dose: 0.1
+    dose_unit: mg
+    route: IV
+    notes: 镇痛
+  
+  - time: "10:00:00"
+    name: Fentanyl
+    dose: 0.05
+    dose_unit: mg
+    route: IV
+    notes: 追加镇痛

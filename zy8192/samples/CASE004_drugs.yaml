@@ -1,0 +1,28 @@
+administrations:
+  - time: "14:00:00"
+    name: Diazepam
+    dose: 1.5
+    dose_unit: mg
+    route: IV
+    notes: 术前镇静
+  
+  - time: "14:05:00"
+    name: Propofol
+    dose: 18
+    dose_unit: mg
+    route: IV
+    notes: 诱导麻醉
+  
+  - time: "14:10:00"
+    name: Isoflurane
+    dose: 2.0
+    dose_unit: "%vol"
+    route: inhalation
+    notes: 维持麻醉
+  
+  - time: "14:30:00"
+    name: Atropine
+    dose: 0.1
+    dose_unit: mg
+    route: IV
+    notes: 心率偏低时使用
