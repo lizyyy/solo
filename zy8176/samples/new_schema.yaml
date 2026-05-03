@@ -1,0 +1,147 @@
+schemaVersion: "1.1.0"
+formId: "site-inspection-form"
+formName: "施工现场巡检表单（v1.1）"
+lastUpdated: "2024-03-20T14:30:00Z"
+groups:
+  - groupId: "basic-info"
+    groupName: "基本信息"
+    fields:
+      - fieldId: "site_name"
+        fieldName: "工地名称"
+        type: "string"
+        required: true
+        validation:
+          minLength: 2
+          maxLength: 100
+        description: "工程项目名称（最小长度改为2）"
+
+      - fieldId: "inspection_date"
+        fieldName: "巡检日期"
+        type: "date"
+        required: true
+        description: "本次巡检的日期"
+
+      - fieldId: "inspector_name"
+        fieldName: "巡检员"
+        type: "string"
+        required: true
+        description: "执行巡检的人员姓名"
+
+      - fieldId: "project_code"
+        fieldName: "项目编号"
+        type: "string"
+        required: true
+        defaultValue: "UNKNOWN"
+        validation:
+          minLength: 6
+          maxLength: 20
+        description: "工程项目编号（新增必填字段，有默认值）"
+
+  - groupId: "safety-check"
+    groupName: "安全检查"
+    fields:
+      - fieldId: "safety_level"
+        fieldName: "安全等级"
+        type: "enum"
+        required: true
+        enumValues:
+          - value: "green"
+            label: "绿色（安全）"
+          - value: "yellow"
+            label: "黄色（警告）"
+          - value: "red"
+            label: "红色（危险）"
+        description: "整体安全评估等级（枚举值已变更）"
+
+      - fieldId: "protective_gear"
+        fieldName: "防护装备佩戴"
+        type: "multiselect"
+        required: false
+        enumValues:
+          - value: "helmet"
+            label: "安全帽"
+          - value: "vest"
+            label: "反光背心"
+          - value: "boots"
+            label: "安全鞋"
+          - value: "mask"
+            label: "防尘口罩"
+          - value: "gloves"
+            label: "防护手套"
+        description: "工人佩戴的防护装备类型（新增手套选项）"
+
+  - groupId: "quality-check"
+    groupName: "质量检查"
+    fields:
+      - fieldId: "concrete_strength_value"
+        fieldName: "混凝土强度值"
+        type: "number"
+        required: true
+        defaultValue: 30
+        validation:
+          min: 10
+          max: 100
+        description: "混凝土强度值（MPa）- 原字符串字段已改为数值型必填字段"
+
+      - fieldId: "rebar_count"
+        fieldName: "钢筋数量"
+        type: "number"
+        required: true
+        validation:
+          min: 0
+        description: "抽检的钢筋数量（改为必填）"
+
+      - fieldId: "inspection_media"
+        fieldName: "检查资料"
+        type: "attachment"
+        required: false
+        isAttachment: true
+        attachmentConfig:
+          maxSize: 10485760
+          allowedTypes:
+            - "image/jpeg"
+            - "image/png"
+            - "image/webp"
+            - "application/pdf"
+          maxCount: 20
+        description: "现场检查的照片和PDF资料（原inspection_photos字段已扩展为支持更多类型）"
+
+  - groupId: "additional-info"
+    groupName: "附加信息"
+    fields:
+      - fieldId: "weather_condition"
+        fieldName: "天气状况"
+        type: "enum"
+        required: false
+        enumValues:
+          - value: "sunny"
+            label: "晴天"
+          - value: "cloudy"
+            label: "多云"
+          - value: "rainy"
+            label: "雨天"
+        description: "巡检时的天气状况"
+
+      - fieldId: "temperature"
+        fieldName: "气温"
+        type: "number"
+        required: false
+        validation:
+          min: -20
+          max: 50
+        description: "现场气温（摄氏度）"
+
+      - fieldId: "status"
+        fieldName: "检查状态"
+        type: "enum"
+        required: true
+        enumValues:
+          - value: "pending"
+            label: "待检查"
+          - value: "in_progress"
+            label: "检查中"
+          - value: "completed"
+            label: "已完成"
+          - value: "needs_review"
+            label: "需要复查"
+        description: "当前检查的状态（从shared-fields移到这里，复用同名字段）"

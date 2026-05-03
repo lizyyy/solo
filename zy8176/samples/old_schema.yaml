@@ -1,0 +1,121 @@
+schemaVersion: "1.0.0"
+formId: "site-inspection-form"
+formName: "施工现场巡检表单"
+lastUpdated: "2024-01-15T10:00:00Z"
+groups:
+  - groupId: "basic-info"
+    groupName: "基本信息"
+    fields:
+      - fieldId: "site_name"
+        fieldName: "工地名称"
+        type: "string"
+        required: true
+        validation:
+          minLength: 1
+          maxLength: 100
+        description: "工程项目名称"
+
+      - fieldId: "inspection_date"
+        fieldName: "巡检日期"
+        type: "date"
+        required: true
+        description: "本次巡检的日期"
+
+      - fieldId: "inspector_name"
+        fieldName: "巡检员"
+        type: "string"
+        required: true
+        description: "执行巡检的人员姓名"
+
+  - groupId: "safety-check"
+    groupName: "安全检查"
+    fields:
+      - fieldId: "safety_level"
+        fieldName: "安全等级"
+        type: "enum"
+        required: true
+        enumValues:
+          - value: "safe"
+            label: "安全"
+          - value: "warning"
+            label: "警告"
+          - value: "danger"
+            label: "危险"
+        description: "整体安全评估等级"
+
+      - fieldId: "protective_gear"
+        fieldName: "防护装备佩戴"
+        type: "multiselect"
+        required: false
+        enumValues:
+          - value: "helmet"
+            label: "安全帽"
+          - value: "vest"
+            label: "反光背心"
+          - value: "boots"
+            label: "安全鞋"
+          - value: "mask"
+            label: "防尘口罩"
+        description: "工人佩戴的防护装备类型"
+
+      - fieldId: "emergency_exit_clear"
+        fieldName: "紧急出口畅通"
+        type: "boolean"
+        required: true
+        defaultValue: true
+        description: "紧急出口是否被杂物堵塞"
+
+  - groupId: "quality-check"
+    groupName: "质量检查"
+    fields:
+      - fieldId: "concrete_strength"
+        fieldName: "混凝土强度"
+        type: "string"
+        required: false
+        description: "混凝土强度等级（即将废弃，改用数值类型）"
+
+      - fieldId: "rebar_count"
+        fieldName: "钢筋数量"
+        type: "number"
+        required: false
+        validation:
+          min: 0
+        description: "抽检的钢筋数量"
+
+      - fieldId: "inspection_photos"
+        fieldName: "检查照片"
+        type: "image"
+        required: false
+        isAttachment: true
+        attachmentConfig:
+          maxSize: 5242880
+          allowedTypes:
+            - "image/jpeg"
+            - "image/png"
+            - "image/webp"
+          maxCount: 10
+        description: "现场检查的照片附件"
+
+      - fieldId: "notes"
+        fieldName: "备注"
+        type: "string"
+        required: false
+        validation:
+          maxLength: 2000
+        description: "其他备注信息"
+
+  - groupId: "shared-fields"
+    groupName: "共享字段"
+    fields:
+      - fieldId: "status"
+        fieldName: "检查状态"
+        type: "enum"
+        required: true
+        enumValues:
+          - value: "pending"
+            label: "待检查"
+          - value: "in_progress"
+            label: "检查中"
+          - value: "completed"
+            label: "已完成"
+        description: "当前检查的状态（跨分组复用）"

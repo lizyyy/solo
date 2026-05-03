@@ -1,0 +1,51 @@
+rules:
+  - ruleId: "rule-001"
+    type: "rename"
+    sourceFieldId: "concrete_strength"
+    targetFieldId: "concrete_strength_value"
+    description: "将混凝土强度字段从字符串重命名为数值型字段"
+    transform:
+      type: "string_to_number"
+      params:
+        stripPrefix: "C"
+
+  - ruleId: "rule-002"
+    type: "transform"
+    sourceFieldId: "inspection_photos"
+    targetFieldId: "inspection_media"
+    description: "将检查照片字段扩展为支持更多类型的检查资料"
+    transform:
+      type: "copy"
+
+  - ruleId: "rule-003"
+    type: "delete"
+    sourceFieldId: "emergency_exit_clear"
+    description: "删除紧急出口畅通字段（该字段已从新schema中移除）"
+    condition:
+      type: "is_null"
+      fieldId: "emergency_exit_clear"
+
+  - ruleId: "rule-004"
+    type: "default_value"
+    targetFieldId: "project_code"
+    description: "为新项目编号字段设置默认值"
+    transform:
+      type: "concat"
+      params:
+        separator: "-"
+        parts:
+          - "SITE"
+          - "current_year"
+          - "sequence"
+
+  - ruleId: "rule-005"
+    type: "transform"
+    sourceFieldId: "rebar_count"
+    targetFieldId: "rebar_count"
+    description: "校验并修复钢筋数量的负值问题"
+    transform:
+      type: "number_to_string"
+    condition:
+      type: "less_than"
+      fieldId: "rebar_count"
+      value: 0

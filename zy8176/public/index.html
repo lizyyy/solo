@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schema Migration Check Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3b82f6;
+            --critical-color: #ef4444;
+            --high-color: #f97316;
+            --medium-color: #eab308;
+            --low-color: #22c55e;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        header .meta {
+            display: flex;
+            gap: 24px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card.critical { border-left-color: var(--critical-color); }
+        .stat-card.high { border-left-color: var(--high-color); }
+        .stat-card.medium { border-left-color: var(--medium-color); }
+        .stat-card.low { border-left-color: var(--low-color); }
+
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .stat-card .change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .stat-card .change.up { color: var(--low-color); }
+        .stat-card .change.down { color: var(--critical-color); }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 16px;
+            background: #f8fafc;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .chart-container {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .severity-legend {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            font-weight: 600;
+            background: #f8fafc;
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .severity-critical { background: #fef2f2; color: var(--critical-color); }
+        .severity-high { background: #fff7ed; color: var(--high-color); }
+        .severity-medium { background: #fefce8; color: var(--medium-color); }
+        .severity-low { background: #f0fdf4; color: var(--low-color); }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-weight: 500;
+        }
+
+        .schema-changes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .schema-changes {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .change-box {
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .change-box.added { background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .change-box.removed { background: #fef2f2; border: 1px solid #fecaca; }
+        .change-box.modified { background: #fefce8; border: 1px solid #fde68a; }
+
+        .change-box .number {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .change-box.added .number { color: var(--low-color); }
+        .change-box.removed .number { color: var(--critical-color); }
+        .change-box.modified .number { color: var(--medium-color); }
+
+        .change-box .label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .plan-step {
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .plan-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .plan-step .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .plan-step .step-id {
+            background: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .plan-step .step-type {
+            font-size: 12px;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .plan-step .step-desc {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .plan-step .step-rules {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .field-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-item .field-name {
+            font-weight: 500;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .field-item .field-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .field-item.added .status {
+            color: var(--low-color);
+            font-size: 12px;
+        }
+
+        .field-item.removed .status {
+            color: var(--critical-color);
+            font-size: 12px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .issue-row.hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .expand-btn:hover {
+            background: #eff6ff;
+        }
+
+        .issue-details {
+            margin-top: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .issue-details.show {
+            display: block;
+        }
+
+        .issue-details .detail-row {
+            margin-bottom: 8px;
+        }
+
+        .issue-details .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .issue-details .detail-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+
+        .values-preview {
+            font-family: monospace;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-top: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+
+        .full-screen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+
+        .full-screen-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Schema Migration Pre-Check Dashboard</h1>
+            <div class="meta">
+                <span id="generatedAt">Loading...</span>
+                <span id="versionInfo">Loading...</span>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Total Drafts</div>
+                <div class="value" id="totalDrafts">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Affected Drafts</div>
+                <div class="value" id="affectedDrafts">-</div>
+            </div>
+            <div class="stat-card critical">
+                <div class="label">Critical Issues</div>
+                <div class="value" id="criticalCount">-</div>
+            </div>
+            <div class="stat-card high">
+                <div class="label">High Issues</div>
+                <div class="value" id="highCount">-</div>
+            </div>
+            <div class="stat-card medium">
+                <div class="label">Medium Issues</div>
+                <div class="value" id="mediumCount">-</div>
+            </div>
+            <div class="stat-card low">
+                <div class="label">Low Issues</div>
+                <div class="value" id="lowCount">-</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">📊 Issues by Severity</div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="severityChart" width="200" height="200"></canvas>
+                    </div>
+                    <div class="severity-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--critical-color)"></span>
+                            <span>Critical</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--high-color)"></span>
+                            <span>High</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--medium-color)"></span>
+                            <span>Medium</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: var(--low-color)"></span>
+                            <span>Low</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">🔄 Schema Changes</div>
+                <div class="card-body">
+                    <div class="schema-changes">
+                        <div class="change-box added">
+                            <div class="number" id="addedCount">-</div>
+                            <div class="label">Fields Added</div>
+                        </div>
+                        <div class="change-box removed">
+                            <div class="number" id="removedCount">-</div>
+                            <div class="label">Fields Removed</div>
+                        </div>
+                        <div class="change-box modified">
+                            <div class="number" id="modifiedCount">-</div>
+                            <div class="label">Fields Modified</div>
+                        </div>
+                    </div>
+
+                    <div class="tabs" id="schemaTabs">
+                        <div class="tab active" data-tab="added">Added Fields</div>
+                        <div class="tab" data-tab="removed">Removed Fields</div>
+                        <div class="tab" data-tab="modified">Modified Fields</div>
+                    </div>
+
+                    <div class="tab-content active" id="tab-added">
+                        <div class="field-list" id="addedFieldsList"></div>
+                    </div>
+                    <div class="tab-content" id="tab-removed">
+                        <div class="field-list" id="removedFieldsList"></div>
+                    </div>
+                    <div class="tab-content" id="tab-modified">
+                        <div class="field-list" id="modifiedFieldsList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">⚠️ Issues Found</div>
+            <div class="card-body">
+                <div class="filter" id="issueFilters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="critical">Critical</button>
+                    <button class="filter-btn" data-filter="high">High</button>
+                    <button class="filter-btn" data-filter="medium">Medium</button>
+                    <button class="filter-btn" data-filter="low">Low</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Issue ID</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Field</th>
+                                <th>Affected Drafts</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">📝 Migration Plan</div>
+            <div class="card-body" id="migrationPlan"></div>
+        </div>
+
+        <footer>
+            Generated by Schema Migration Checker | <a href="javascript:void(0)" id="downloadData">Download JSON Data</a>
+        </footer>
+    </div>
+
+    <button class="full-screen-btn" id="fullScreenBtn">⛶ Toggle Full Screen</button>
+
+    <script>
+        let migrationData = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('/api/data');
+                if (response.ok) {
+                    migrationData = await response.json();
+                    renderDashboard();
+                } else {
+                    document.querySelector('.container').innerHTML = `
+                        <div class="no-data">
+                            <h2>⚠️ No Data Found</h2>
+                            <p>Please run the migration check first to generate data.</p>
+                            <p style="margin-top: 16px; font-size: 14px;">
+                                Run: <code>npm run dev -- sample</code>
+                            </p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to load data:', error);
+            }
+        }
+
+        function renderDashboard() {
+            if (!migrationData) return;
+
+            const { plan, issues, statistics, schemaDiff } = migrationData;
+
+            document.getElementById('generatedAt').textContent = `Generated: ${new Date(plan.generatedAt).toLocaleString('zh-CN')}`;
+            document.getElementById('versionInfo').textContent = `v${plan.sourceSchemaVersion} → v${plan.targetSchemaVersion}`;
+
+            document.getElementById('totalDrafts').textContent = statistics.totalDrafts;
+            document.getElementById('affectedDrafts').textContent = statistics.affectedDrafts;
+            document.getElementById('criticalCount').textContent = statistics.issuesBySeverity.critical || 0;
+            document.getElementById('highCount').textContent = statistics.issuesBySeverity.high || 0;
+            document.getElementById('mediumCount').textContent = statistics.issuesBySeverity.medium || 0;
+            document.getElementById('lowCount').textContent = statistics.issuesBySeverity.low || 0;
+
+            document.getElementById('addedCount').textContent = statistics.fieldsAdded;
+            document.getElementById('removedCount').textContent = statistics.fieldsRemoved;
+            document.getElementById('modifiedCount').textContent = statistics.fieldsModified;
+
+            renderPieChart(statistics.issuesBySeverity);
+            renderFieldLists(schemaDiff);
+            renderIssuesTable(issues);
+            renderMigrationPlan(plan);
+        }
+
+        function renderPieChart(issuesBySeverity) {
+            const canvas = document.getElementById('severityChart');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 80;
+
+            const data = [
+                { value: issuesBySeverity.critical || 0, color: '#ef4444' },
+                { value: issuesBySeverity.high || 0, color: '#f97316' },
+                { value: issuesBySeverity.medium || 0, color: '#eab308' },
+                { value: issuesBySeverity.low || 0, color: '#22c55e' }
+            ];
+
+            const total = data.reduce((sum, d) => sum + d.value, 0);
+            
+            if (total === 0) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fill();
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No Issues', centerX, centerY + 5);
+                return;
+            }
+
+            let startAngle = -Math.PI / 2;
+
+            for (const item of data) {
+                if (item.value === 0) continue;
+                
+                const sliceAngle = (item.value / total) * 2 * Math.PI;
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = item.color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                const midAngle = startAngle + sliceAngle / 2;
+                const labelX = centerX + (radius * 0.6) * Math.cos(midAngle);
+                const labelY = centerY + (radius * 0.6) * Math.sin(midAngle);
+
+                if (item.value > 0) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(item.value.toString(), labelX, labelY + 4);
+                }
+
+                startAngle = endAngle;
+            }
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(total.toString(), centerX, centerY);
+            ctx.font = '11px sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('Total', centerX, centerY + 16);
+        }
+
+        function renderFieldLists(schemaDiff) {
+            const addedList = document.getElementById('addedFieldsList');
+            const removedList = document.getElementById('removedFieldsList');
+            const modifiedList = document.getElementById('modifiedFieldsList');
+
+            if (schemaDiff.addedFields.length === 0) {
+                addedList.innerHTML = '<div class="no-data">No fields added</div>';
+            } else {
+                addedList.innerHTML = schemaDiff.addedFields.map(field => {
+                    const fieldData = field.newValue || {};
+                    return `
+                        <div class="field-item added">
+                            <div>
+                                <div class="field-name">${field.fieldId}</div>
+                                <div class="field-type">${fieldData.type || 'N/A'} in ${field.groupId}</div>
+                            </div>
+                            <div class="status">+ Added</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (schemaDiff.removedFields.length === 0) {
+                removedList.innerHTML = '<div class="no-data">No fields removed</div>';
+            } else {
+                removedList.innerHTML = schemaDiff.removedFields.map(field => {
+                    const fieldData = field.oldValue || {};
+                    return `
+                        <div class="field-item removed">
+                            <div>
+                                <div class="field-name">${field.fieldId}</div>
+                                <div class="field-type">${fieldData.type || 'N/A'} in ${field.groupId}</div>
+                            </div>
+                            <div class="status">- Removed</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (schemaDiff.modifiedFields.length === 0) {
+                modifiedList.innerHTML = '<div class="no-data">No fields modified</div>';
+            } else {
+                modifiedList.innerHTML = schemaDiff.modifiedFields.map(field => {
+                    const changes = field.changes || [];
+                    const changeCount = changes.length;
+                    return `
+                        <div class="field-item">
+                            <div>
+                                <div class="field-name">${field.fieldId}</div>
+                                <div class="field-type">${changeCount} change${changeCount !== 1 ? 's' : ''}</div>
+                            </div>
+                            <div class="status" style="color: var(--medium-color);">~ Modified</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.querySelectorAll('#schemaTabs .tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('#schemaTabs .tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
+                });
+            });
+        }
+
+        function renderIssuesTable(issues) {
+            const tbody = document.getElementById('issuesTable');
+
+            if (issues.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No issues found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = issues.map((issue, index) => `
+                <tr class="issue-row" data-severity="${issue.severity}">
+                    <td><code>${issue.issueId}</code></td>
+                    <td><span class="type-badge">${formatIssueType(issue.type)}</span></td>
+                    <td><span class="severity-badge severity-${issue.severity}">${issue.severity.toUpperCase()}</span></td>
+                    <td><code>${issue.fieldId}</code></td>
+                    <td>${issue.draftIds.length}</td>
+                    <td style="max-width: 300px;">${issue.description}</td>
+                    <td>
+                        <button class="expand-btn" onclick="toggleDetails(${index})">Details</button>
+                    </td>
+                </tr>
+                <tr class="issue-row" data-severity="${issue.severity}">
+                    <td colspan="7" style="padding: 0; border-bottom: none;">
+                        <div class="issue-details" id="details-${index}">
+                            <div class="detail-row">
+                                <span class="detail-label">Suggestion:</span>
+                                <span>${issue.suggestion || 'None'}</span>
+                            </div>
+                            ${issue.affectedValues && issue.affectedValues.length > 0 ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Affected Values (sample):</span>
+                                <div class="values-preview">${JSON.stringify(issue.affectedValues.slice(0, 5), null, 2)}</div>
+                            </div>
+                            ` : ''}
+                            <div class="detail-row">
+                                <span class="detail-label">Affected Draft IDs:</span>
+                                <div class="values-preview">${issue.draftIds.slice(0, 10).join(', ')}${issue.draftIds.length > 10 ? ' ... (' + (issue.draftIds.length - 10) + ' more)' : ''}</div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.querySelectorAll('#issueFilters .filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#issueFilters .filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filter = this.dataset.filter;
+                    document.querySelectorAll('#issuesTable .issue-row').forEach(row => {
+                        if (filter === 'all' || row.dataset.severity === filter) {
+                            row.classList.remove('hidden');
+                        } else {
+                            row.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        }
+
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+
+        function formatIssueType(type) {
+            const types = {
+                'missing_field': 'Missing Field',
+                'enum_value_mismatch': 'Enum Mismatch',
+                'required_field_no_default': 'Missing Default',
+                'attachment_reference_lost': 'Attachment Lost',
+                'field_type_mismatch': 'Type Mismatch',
+                'schema_version_lag': 'Version Lag',
+                'validation_failed': 'Validation Failed'
+            };
+            return types[type] || type;
+        }
+
+        function renderMigrationPlan(plan) {
+            const container = document.getElementById('migrationPlan');
+
+            if (!plan.steps || plan.steps.length === 0) {
+                container.innerHTML = '<div class="no-data">No migration steps required</div>';
+                return;
+            }
+
+            container.innerHTML = plan.steps.map(step => `
+                <div class="plan-step">
+                    <div class="step-header">
+                        <div class="step-id">${step.stepId.split('-')[1]}</div>
+                        <div class="step-type">${step.type.replace(/_/g, ' ')}</div>
+                    </div>
+                    <div class="step-desc">${step.description}</div>
+                    ${step.rulesApplied.length > 0 ? `
+                    <div class="step-rules">
+                        <strong>Rules applied:</strong> ${step.rulesApplied.join(', ')}
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('downloadData').addEventListener('click', function() {
+            if (!migrationData) return;
+            
+            const dataStr = JSON.stringify(migrationData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'migration_data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('fullScreenBtn').addEventListener('click', function() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        loadData();
+    </script>
+</body>
+</html>

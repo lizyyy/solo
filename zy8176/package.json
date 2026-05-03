@@ -1,0 +1,40 @@
+{
+  "name": "schema-migration-checker",
+  "version": "1.0.0",
+  "description": "Offline form schema migration pre-check CLI for mobile teams",
+  "main": "dist/index.js",
+  "bin": {
+    "schema-check": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "lint": "eslint src/**/*.ts",
+    "test": "echo \"No tests yet\" && exit 0",
+    "dashboard": "node dist/server.js",
+    "dashboard:dev": "ts-node src/server.ts"
+  },
+  "keywords": [
+    "schema",
+    "migration",
+    "cli",
+    "typescript",
+    "offline-form"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/yaml": "^1.9.7",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "yaml": "^2.3.4",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "date-fns": "^3.0.0"
+  }
+}
