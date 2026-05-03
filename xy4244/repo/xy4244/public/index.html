@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>签到凭证演练台 - 仪表盘</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>签到凭证演练台</h1>
+      <nav>
+        <a href="/" class="active">仪表盘</a>
+        <a href="/issue.html">签发凭证</a>
+        <a href="/verify.html">入场核验</a>
+        <a href="/review.html">异常复核</a>
+        <a href="/export.html">导出报告</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="number" id="stat-participants">--</div>
+        <div class="label">参与者总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="stat-credentials">--</div>
+        <div class="label">签发凭证数</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="stat-checkedin">--</div>
+        <div class="label">已入场</div>
+      </div>
+      <div class="stat-card">
+        <div class="number" id="stat-revoked">--</div>
+        <div class="label">已撤销</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>最近操作记录</h2>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>操作类型</th>
+              <th>凭证ID</th>
+              <th>结果</th>
+            </tr>
+          </thead>
+          <tbody id="recentLogs">
+            <tr>
+              <td colspan="4" class="loading">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>快速操作</h2>
+      </div>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="/issue.html" class="btn btn-primary">签发新凭证</a>
+        <a href="/verify.html" class="btn btn-success">核验入场</a>
+        <a href="/review.html" class="btn btn-warning">异常复核</a>
+        <a href="/export.html" class="btn btn-secondary">导出数据</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>使用说明</h2>
+      </div>
+      <div style="line-height: 2;">
+        <p><strong>1. 签发凭证</strong>：导入报名CSV或手动添加参与者，为每位参与者签发带有签名的离线二维码凭证。</p>
+        <p><strong>2. 入场核验</strong>：志愿者用浏览器扫码或手动输入凭证令牌，系统验证签名真伪、是否过期、是否重复入场。</p>
+        <p><strong>3. 异常复核</strong>：处理异常情况，如重复入场、过期凭证、撤销凭证等。</p>
+        <p><strong>4. 导出报告</strong>：导出参与者列表、凭证状态、审计日志到 Markdown/CSV/JSON 格式。</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    async function loadStatistics() {
+      try {
+        const response = await fetch('/api/statistics');
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('stat-participants').textContent = data.statistics.participants;
+          document.getElementById('stat-credentials').textContent = data.statistics.credentials;
+          document.getElementById('stat-checkedin').textContent = data.statistics.checkedIn;
+          document.getElementById('stat-revoked').textContent = data.statistics.revoked;
+        }
+      } catch (error) {
+        console.error('加载统计数据失败:', error);
+      }
+    }
+
+    function getActionLabel(action) {
+      const labels = {
+        'issue': '签发凭证',
+        'verify': '核验凭证',
+        'check_in': '入场签到',
+        'revoke': '撤销凭证',
+        'expire': '过期处理',
+        'review': '异常复核'
+      };
+      return labels[action] || action;
+    }
+
+    function getResultClass(result) {
+      return result === 'success' ? 'badge-active' : 'badge-revoked';
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    async function loadRecentLogs() {
+      try {
+        const response = await fetch('/api/audit-logs?limit=10');
+        const data = await response.json();
+        
+        const tbody = document.getElementById('recentLogs');
+        
+        if (data.success && data.logs.length > 0) {
+          tbody.innerHTML = data.logs.map(log => `
+            <tr>
+              <td>${formatDate(log.created_at)}</td>
+              <td>${getActionLabel(log.action)}</td>
+              <td>${log.credential_id ? log.credential_id.substring(0, 12) + '...' : '-'}</td>
+              <td><span class="badge ${getResultClass(log.result)}">${log.result === 'success' ? '成功' : '失败'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6c757d;">暂无操作记录</td></tr>';
+        }
+      } catch (error) {
+        console.error('加载日志失败:', error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStatistics();
+      loadRecentLogs();
+      
+      setInterval(loadStatistics, 30000);
+    });
+  </script>
+</body>
+</html>

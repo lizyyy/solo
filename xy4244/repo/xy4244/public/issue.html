@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>签发凭证 - 签到凭证演练台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>签到凭证演练台</h1>
+      <nav>
+        <a href="/">仪表盘</a>
+        <a href="/issue.html" class="active">签发凭证</a>
+        <a href="/verify.html">入场核验</a>
+        <a href="/review.html">异常复核</a>
+        <a href="/export.html">导出报告</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="tab-import">导入报名数据</div>
+      <div class="tab" data-tab="tab-manual">手动添加参与者</div>
+      <div class="tab" data-tab="tab-participants">参与者列表</div>
+      <div class="tab" data-tab="tab-credentials">已签发凭证</div>
+    </div>
+
+    <div id="tab-import" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <h2>导入报名CSV</h2>
+        </div>
+        <form id="importForm">
+          <div class="form-group">
+            <label for="csvFile">选择CSV文件</label>
+            <input type="file" id="csvFile" accept=".csv" required>
+            <small>CSV格式要求：包含 name（姓名（或 姓名）字段，可选 email（邮箱）、phone（电话）字段</small>
+          </div>
+          <button type="submit" class="btn btn-primary">导入报名数据</button>
+        </form>
+        <div id="importResult" style="margin-top: 1rem; display: none;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>示例CSV格式</h2>
+        </div>
+        <pre class="token-display">name,email,phone
+张三,zhangsan@example.com,13800138001
+李四,lisi@example.com,13800138002
+王五,wangwu@example.com,13800138003</pre>
+        <button id="downloadSample" class="btn btn-outline btn-sm" style="margin-top: 1rem;">下载示例CSV</button>
+      </div>
+    </div>
+
+    <div id="tab-manual" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>添加参与者</h2>
+        </div>
+        <form id="addParticipantForm">
+          <div class="form-group">
+            <label for="participantName">姓名 *</label>
+            <input type="text" id="participantName" required>
+          </div>
+          <div class="form-group">
+            <label for="participantEmail">邮箱</label>
+            <input type="email" id="participantEmail">
+          </div>
+          <div class="form-group">
+            <label for="participantPhone">电话</label>
+            <input type="tel" id="participantPhone">
+          </div>
+          <button type="submit" class="btn btn-primary">添加参与者</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="tab-participants" class="tab-content">
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>参与者列表</h2>
+          <button id="refreshParticipants" class="btn btn-outline btn-sm">刷新</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="participantSearch" placeholder="搜索姓名、邮箱、电话...">
+          <button id="searchParticipants" class="btn btn-secondary">搜索</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>邮箱</th>
+                <th>电话</th>
+                <th>状态</th>
+                <th>注册时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="participantsList">
+              <tr>
+                <td colspan="6" class="loading">加载中...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-credentials" class="tab-content">
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>已签发凭证</h2>
+          <button id="refreshCredentials" class="btn btn-outline btn-sm">刷新</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="credentialSearch" placeholder="搜索凭证ID、姓名...">
+          <select id="credentialStatusFilter">
+            <option value="">全部状态</option>
+            <option value="active">有效</option>
+            <option value="checked_in">已入场</option>
+            <option value="revoked">已撤销</option>
+            <option value="expired">已过期</option>
+          </select>
+          <button id="searchCredentials" class="btn btn-secondary">搜索</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>凭证ID</th>
+                <th>参与者</th>
+                <th>状态</th>
+                <th>签发时间</th>
+                <th>有效期至</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="credentialsList">
+              <tr>
+                <td colspan="6" class="loading">加载中...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let participants = [];
+    let credentials = [];
+
+    async function loadParticipants() {
+      const search = document.getElementById('participantSearch').value;
+      let url = '/api/participants';
+      if (search) {
+        url += `?search=${encodeURIComponent(search)}`;
+      }
+      
+      const data = await apiRequest(url);
+      if (data.success) {
+        participants = data.participants;
+        renderParticipants();
+      }
+    }
+
+    function renderParticipants() {
+      const tbody = document.getElementById('participantsList');
+      
+      if (participants.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6c757d;">暂无参与者</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = participants.map(p => `
+        <tr>
+          <td>${escapeHtml(p.name)}</td>
+          <td>${p.email || '-'}</td>
+          <td>${p.phone || '-'}</td>
+          <td><span class="badge ${getStatusBadgeClass(p.status)}">${getStatusLabel(p.status)}</span></td>
+          <td>${formatDate(p.created_at)}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-success btn-sm" onclick="issueCredentialFor('${p.id}', '${escapeHtml(p.name)}')">签发凭证</button>
+              <button class="btn btn-outline btn-sm" onclick="viewParticipant('${p.id}')">查看</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadCredentials() {
+      const search = document.getElementById('credentialSearch').value;
+      const status = document.getElementById('credentialStatusFilter').value;
+      
+      let url = '/api/credentials';
+      const params = [];
+      if (search) params.push(`search=${encodeURIComponent(search)}`);
+      if (status) params.push(`status=${status}`);
+      if (params.length > 0) url += `?${params.join('&')}`;
+      
+      const data = await apiRequest(url);
+      if (data.success) {
+        credentials = data.credentials;
+        renderCredentials();
+      }
+    }
+
+    function renderCredentials() {
+      const tbody = document.getElementById('credentialsList');
+      
+      if (credentials.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6c757d;">暂无已签发凭证</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = credentials.map(c => `
+        <tr>
+          <td>${c.id.substring(0, 16)}...</td>
+          <td>${c.participant_name || c.participant_id.substring(0, 8)}</td>
+          <td><span class="badge ${getStatusBadgeClass(c.status)}">${getStatusLabel(c.status)}</span></td>
+          <td>${formatDate(c.issued_at)}</td>
+          <td>${formatDate(c.valid_until)}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-outline btn-sm" onclick="viewCredential('${c.id}')">查看详情</button>
+              ${c.status === 'active' ? `<button class="btn btn-danger btn-sm" onclick="revokeCredential('${c.id}')">撤销</button>` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function issueCredentialFor(participantId, participantName) {
+      showModal(`
+        <h4>为 ${escapeHtml(participantName)} 签发凭证</h4>
+        <div class="form-group">
+          <label for="issueValidFrom">生效时间（可选）</label>
+          <input type="datetime-local" id="issueValidFrom">
+        </div>
+        <div class="form-group">
+          <label for="issueValidUntil">过期时间（可选，默认7天后）</label>
+          <input type="datetime-local" id="issueValidUntil">
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-primary" onclick="confirmIssueCredential('${participantId}')">确认签发</button>
+          <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        </div>
+      `, '签发凭证');
+    }
+
+    async function confirmIssueCredential(participantId) {
+      const validFrom = document.getElementById('issueValidFrom').value;
+      const validUntil = document.getElementById('issueValidUntil').value;
+      
+      const body = { participantId };
+      if (validFrom) body.validFrom = new Date(validFrom).getTime();
+      if (validUntil) body.validUntil = new Date(validUntil).getTime();
+      
+      closeModal();
+      showAlert('正在签发凭证...', 'info');
+      
+      const data = await apiRequest('/credentials/issue', { method: 'POST', body });
+      
+      if (data.success) {
+        showAlert('凭证签发成功！', 'success');
+        showCredentialDetails(data.credential);
+        loadCredentials();
+      } else {
+        showAlert('签发失败: ' + data.error, 'danger');
+      }
+    }
+
+    function showCredentialDetails(credential) {
+      showModal(`
+        <div class="qr-code-container">
+          <img src="${credential.qrCode}" alt="QR Code">
+        </div>
+        <h4>凭证详情</h4>
+        <p><strong>凭证ID:</strong> ${credential.id}</p>
+        <p><strong>参与者:</strong> ${escapeHtml(credential.payload.name)}</p>
+        <p><strong>签发时间:</strong> ${formatDate(credential.payload.issued_at)}</p>
+        <p><strong>有效期至:</strong> ${formatDate(credential.payload.valid_until)}</p>
+        
+        <div class="form-group">
+          <label>凭证令牌（用于离线验证）:</label>
+          <div class="token-display" id="credentialTokenDisplay">${credential.token}</div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-primary" onclick="copyToClipboard('${credential.token}')">复制令牌</button>
+          <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+        </div>
+      `, '凭证已签发');
+    }
+
+    async function viewParticipant(participantId) {
+      const data = await apiRequest(`/participants/${participantId}`);
+      
+      if (data.success) {
+        const p = data.participant;
+        const creds = data.credentials || [];
+        
+        showModal(`
+          <h4>参与者详情</h4>
+          <p><strong>姓名:</strong> ${escapeHtml(p.name)}</p>
+          <p><strong>邮箱:</strong> ${p.email || '-'}</p>
+          <p><strong>电话:</strong> ${p.phone || '-'}</p>
+          <p><strong>状态:</strong> <span class="badge ${getStatusBadgeClass(p.status)}">${getStatusLabel(p.status)}</span></p>
+          <p><strong>注册时间:</strong> ${formatDate(p.created_at)}</p>
+          
+          ${creds.length > 0 ? `
+            <hr>
+            <h5>签发的凭证 (${creds.length})</h5>
+            ${creds.map(c => `
+              <div style="border: 1px solid #eee; padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px;">
+                <p><strong>凭证ID:</strong> ${c.id.substring(0, 20)}...</p>
+                <p><strong>状态:</strong> <span class="badge ${getStatusBadgeClass(c.status)}">${getStatusLabel(c.status)}</span></p>
+                <p><strong>签发时间:</strong> ${formatDate(c.issued_at)}</p>
+              </div>
+            `).join('')}
+          ` : '<p style="color: #6c757d;">暂无签发的凭证</p>'}
+          
+          <div style="margin-top: 1rem;">
+            ${p.status === 'registered' ? `
+              <button class="btn btn-success" onclick="closeModal(); issueCredentialFor('${p.id}', '${escapeHtml(p.name)}')">签发凭证</button>
+            ` : ''}
+            <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+          </div>
+        `, '参与者详情');
+      }
+    }
+
+    async function viewCredential(credentialId) {
+      const data = await apiRequest(`/credentials/${credentialId}`);
+      
+      if (data.success) {
+        const c = data.credential;
+        const rev = data.revocation;
+        
+        showModal(`
+          <h4>凭证详情</h4>
+          <p><strong>凭证ID:</strong> ${c.id}</p>
+          <p><strong>参与者:</strong> ${c.participant_name || c.participant_id}</p>
+          <p><strong>状态:</strong> <span class="badge ${getStatusBadgeClass(c.status)}">${getStatusLabel(c.status)}</span></p>
+          <p><strong>签发时间:</strong> ${formatDate(c.issued_at)}</p>
+          <p><strong>有效期至:</strong> ${formatDate(c.valid_until)}</p>
+          <p><strong>最后核验:</strong> ${formatDate(c.last_verified_at)}</p>
+          
+          ${rev ? `
+            <hr>
+            <h5>撤销记录</h5>
+            <p><strong>撤销时间:</strong> ${formatDate(rev.revoked_at)}</p>
+            <p><strong>撤销原因:</strong> ${rev.reason || '-'}</p>
+            <p><strong>操作者:</strong> ${rev.revoked_by || '-'}</p>
+          ` : ''}
+          
+          ${c.qr_code ? `
+            <hr>
+            <div class="qr-code-container">
+              <img src="${c.qr_code}" alt="QR Code">
+            </div>
+          ` : ''}
+          
+          <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            ${c.status === 'active' ? `<button class="btn btn-danger" onclick="closeModal(); revokeCredential('${c.id}')">撤销凭证</button>` : ''}
+            <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+          </div>
+        `, '凭证详情');
+      }
+    }
+
+    async function revokeCredential(credentialId) {
+      showModal(`
+        <h4>撤销凭证</h4>
+        <p style="color: #dc3545;">确定要撤销此凭证吗？撤销后该凭证将无法使用。</p>
+        <div class="form-group">
+          <label for="revokeReason">撤销原因</label>
+          <textarea id="revokeReason" placeholder="请输入撤销原因..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-danger" onclick="confirmRevoke('${credentialId}')">确认撤销</button>
+          <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        </div>
+      `, '撤销凭证');
+    }
+
+    async function confirmRevoke(credentialId) {
+      const reason = document.getElementById('revokeReason').value || '手动撤销';
+      
+      closeModal();
+      
+      const data = await apiRequest('/credentials/revoke', {
+        method: 'POST',
+        body: { credentialId, reason }
+      });
+      
+      if (data.success) {
+        showAlert('凭证已撤销', 'success');
+        loadCredentials();
+      } else {
+        showAlert('撤销失败: ' + data.error, 'danger');
+      }
+    }
+
+    document.getElementById('addParticipantForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const body = {
+        name: document.getElementById('participantName').value,
+        email: document.getElementById('participantEmail').value || null,
+        phone: document.getElementById('participantPhone').value || null
+      };
+      
+      const data = await apiRequest('/participants', { method: 'POST', body });
+      
+      if (data.success) {
+        showAlert('参与者添加成功！', 'success');
+        document.getElementById('addParticipantForm').reset();
+        loadParticipants();
+      } else {
+        showAlert('添加失败: ' + data.error, 'danger');
+      }
+    });
+
+    document.getElementById('importForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('csvFile');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showAlert('请选择文件', 'warning');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      showAlert('正在导入...', 'info');
+      
+      try {
+        const response = await fetch('/api/import/csv', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        const resultDiv = document.getElementById('importResult');
+        resultDiv.style.display = 'block';
+        
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <div class="alert alert-success">
+              导入成功！共导入 ${data.imported} 位参与者
+              ${data.errors > 0 ? `，有 ${data.errors} 条数据导入失败` : ''}
+            </div>
+          `;
+          showAlert(`成功导入 ${data.imported} 位参与者`, 'success');
+          loadParticipants();
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-danger">导入失败: ${data.error}</div>`;
+          showAlert('导入失败: ' + data.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('导入失败: ' + error.message, 'danger');
+      }
+    });
+
+    document.getElementById('downloadSample').addEventListener('click', () => {
+      const sampleCsv = `name,email,phone
+张三,zhangsan@example.com,13800138001
+李四,lisi@example.com,13800138002
+王五,wangwu@example.com,13800138003`;
+      downloadFile(sampleCsv, 'sample_participants.csv', 'text/csv');
+    });
+
+    document.getElementById('refreshParticipants').addEventListener('click', loadParticipants);
+    document.getElementById('searchParticipants').addEventListener('click', loadParticipants);
+    document.getElementById('refreshCredentials').addEventListener('click', loadCredentials);
+    document.getElementById('searchCredentials').addEventListener('click', loadCredentials);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTabs();
+      loadParticipants();
+      loadCredentials();
+    });
+  </script>
+</body>
+</html>

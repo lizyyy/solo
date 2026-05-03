@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导出报告 - 签到凭证演练台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>签到凭证演练台</h1>
+      <nav>
+        <a href="/">仪表盘</a>
+        <a href="/issue.html">签发凭证</a>
+        <a href="/verify.html">入场核验</a>
+        <a href="/review.html">异常复核</a>
+        <a href="/export.html" class="active">导出报告</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>导出统计</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="number" id="stat-participants">--</div>
+          <div class="label">参与者总数</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-credentials">--</div>
+          <div class="label">签发凭证数</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-checkedin">--</div>
+          <div class="label">已入场</div>
+        </div>
+        <div class="stat-card">
+          <div class="number" id="stat-logs">--</div>
+          <div class="label">审计日志数</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>导出格式选择</h2>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-tab="tab-json">JSON格式</div>
+        <div class="tab" data-tab="tab-csv">CSV格式</div>
+        <div class="tab" data-tab="tab-markdown">Markdown报告</div>
+      </div>
+
+      <div id="tab-json" class="tab-content active">
+        <div class="alert alert-info">
+          <strong>JSON格式：</strong> 导出完整的审计数据包，包含所有参与者、凭证状态、审计日志和撤销列表。
+          适用于数据备份和程序导入。
+        </div>
+        <button id="exportJson" class="btn btn-primary">
+          导出完整JSON审计包
+        </button>
+      </div>
+
+      <div id="tab-csv" class="tab-content">
+        <div class="alert alert-info">
+          <strong>CSV格式：</strong> 导出为逗号分隔值文件，适用于Excel、Numbers等表格软件打开查看。
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button id="exportCsvParticipants" class="btn btn-success">
+            导出参与者列表 (CSV)
+          </button>
+          <button id="exportCsvCredentials" class="btn btn-secondary">
+            导出凭证状态 (CSV)
+          </button>
+          <button id="exportCsvLogs" class="btn btn-outline">
+            导出审计日志 (CSV)
+          </button>
+        </div>
+      </div>
+
+      <div id="tab-markdown" class="tab-content">
+        <div class="alert alert-info">
+          <strong>Markdown报告：</strong> 生成格式化的审计报告，包含统计概览、参与者列表、凭证状态和最近操作记录。
+          适用于文档存档和打印。
+        </div>
+        <button id="exportMarkdown" class="btn btn-primary">
+          生成Markdown审计报告
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>导入数据</h2>
+      </div>
+      <div class="alert alert-warning">
+        <strong>注意：</strong> 数据导入仅支持参与者列表。请确保CSV文件包含正确的字段格式。
+      </div>
+      <form id="importForm">
+        <div class="form-group">
+          <label for="importFile">选择CSV文件</label>
+          <input type="file" id="importFile" accept=".csv" required>
+          <small>CSV格式：name, email, phone（支持中文字段名：姓名, 邮箱, 电话）</small>
+        </div>
+        <button type="submit" class="btn btn-primary">导入参与者数据</button>
+      </form>
+      <div id="importResult" style="margin-top: 1rem; display: none;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>最近审计日志</h2>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>操作类型</th>
+              <th>凭证ID</th>
+              <th>状态变化</th>
+              <th>结果</th>
+            </tr>
+          </thead>
+          <tbody id="recentLogs">
+            <tr>
+              <td colspan="5" class="loading">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    async function loadStatistics() {
+      const data = await apiRequest('/statistics');
+      
+      if (data.success) {
+        document.getElementById('stat-participants').textContent = data.statistics.participants;
+        document.getElementById('stat-credentials').textContent = data.statistics.credentials;
+        document.getElementById('stat-checkedin').textContent = data.statistics.checkedIn;
+        document.getElementById('stat-logs').textContent = data.statistics.auditLogs;
+      }
+    }
+
+    async function loadRecentLogs() {
+      const data = await apiRequest('/audit-logs?limit=20');
+      const tbody = document.getElementById('recentLogs');
+      
+      if (data.success && data.logs.length > 0) {
+        tbody.innerHTML = data.logs.map(log => `
+          <tr>
+            <td>${formatDate(log.created_at)}</td>
+            <td>${getActionLabel(log.action)}</td>
+            <td>${log.credential_id ? log.credential_id.substring(0, 12) + '...' : '-'}</td>
+            <td>
+              ${log.status_before ? `${getStatusLabel(log.status_before)} → ` : ''}
+              ${log.status_after ? getStatusLabel(log.status_after) : '-'}
+            </td>
+            <td><span class="badge ${log.result === 'success' ? 'badge-active' : 'badge-revoked'}">${log.result === 'success' ? '成功' : '失败'}</span></td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #6c757d;">暂无审计日志</td></tr>';
+      }
+    }
+
+    function getActionLabel(action) {
+      const labels = {
+        'issue': '签发凭证',
+        'verify': '核验凭证',
+        'check_in': '入场签到',
+        'revoke': '撤销凭证',
+        'expire': '过期处理',
+        'review': '异常复核',
+        'verify_failed': '核验失败'
+      };
+      return labels[action] || action;
+    }
+
+    document.getElementById('exportJson').addEventListener('click', () => {
+      showAlert('正在生成导出文件...', 'info');
+      window.location.href = '/api/export/json';
+    });
+
+    document.getElementById('exportCsvParticipants').addEventListener('click', () => {
+      showAlert('正在导出...', 'info');
+      window.location.href = '/api/export/csv?type=participants';
+    });
+
+    document.getElementById('exportCsvCredentials').addEventListener('click', () => {
+      showAlert('正在导出...', 'info');
+      window.location.href = '/api/export/csv?type=credentials';
+    });
+
+    document.getElementById('exportCsvLogs').addEventListener('click', () => {
+      showAlert('正在导出...', 'info');
+      window.location.href = '/api/export/csv?type=audit-logs';
+    });
+
+    document.getElementById('exportMarkdown').addEventListener('click', () => {
+      showAlert('正在生成报告...', 'info');
+      window.location.href = '/api/export/markdown';
+    });
+
+    document.getElementById('importForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('importFile');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showAlert('请选择文件', 'warning');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      showAlert('正在导入...', 'info');
+      
+      try {
+        const response = await fetch('/api/import/csv', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await response.json();
+        
+        const resultDiv = document.getElementById('importResult');
+        resultDiv.style.display = 'block';
+        
+        if (data.success) {
+          resultDiv.innerHTML = `
+            <div class="alert alert-success">
+              导入成功！共导入 ${data.imported} 位参与者
+              ${data.errors > 0 ? `，有 ${data.errors} 条数据导入失败` : ''}
+            </div>
+          `;
+          showAlert(`成功导入 ${data.imported} 位参与者`, 'success');
+          loadStatistics();
+          loadRecentLogs();
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-danger">导入失败: ${data.error}</div>`;
+          showAlert('导入失败: ' + data.error, 'danger');
+        }
+      } catch (error) {
+        showAlert('导入失败: ' + error.message, 'danger');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTabs();
+      loadStatistics();
+      loadRecentLogs();
+    });
+  </script>
+</body>
+</html>

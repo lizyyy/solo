@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>入场核验 - 签到凭证演练台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>签到凭证演练台</h1>
+      <nav>
+        <a href="/">仪表盘</a>
+        <a href="/issue.html">签发凭证</a>
+        <a href="/verify.html" class="active">入场核验</a>
+        <a href="/review.html">异常复核</a>
+        <a href="/export.html">导出报告</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="tab-scan">扫码核验</div>
+      <div class="tab" data-tab="tab-manual">手动输入</div>
+      <div class="tab" data-tab="tab-history">核验历史</div>
+    </div>
+
+    <div id="tab-scan" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <h2>摄像头扫码核验</h2>
+        </div>
+        <div class="video-container" id="videoContainer" style="display: none;">
+          <video id="video" autoplay playsinline></video>
+          <canvas id="canvas" style="display: none;"></canvas>
+          <div class="scan-overlay">
+            <div class="scan-line"></div>
+          </div>
+        </div>
+        <div id="scanPlaceholder" style="text-align: center; padding: 4rem;">
+          <p style="color: #6c757d; margin-bottom: 1rem;">点击下方按钮启动摄像头进行扫码核验</p>
+          <button id="startCamera" class="btn btn-primary">启动摄像头</button>
+        </div>
+        <div style="margin-top: 1rem; display: flex; gap: 1rem; display: none;" id="scanControls">
+          <button id="stopCamera" class="btn btn-secondary">停止摄像头</button>
+          <button id="manualInput" class="btn btn-outline">手动输入凭证</button>
+        </div>
+      </div>
+
+      <div id="verifyResult" style="display: none;">
+        <div class="card" id="resultCard">
+          <div class="card-header">
+            <h2 id="resultTitle">核验结果</h2>
+          </div>
+          <div id="resultContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-manual" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>手动输入凭证令牌</h2>
+        </div>
+        <div class="form-group">
+          <label for="manualToken">凭证令牌</label>
+          <textarea id="manualToken" placeholder="请输入或粘贴凭证令牌..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button id="verifyManual" class="btn btn-primary">核验凭证</button>
+          <button id="clearManual" class="btn btn-secondary">清空</button>
+        </div>
+      </div>
+
+      <div id="manualVerifyResult" style="display: none;">
+        <div class="card" id="manualResultCard">
+          <div class="card-header">
+            <h2 id="manualResultTitle">核验结果</h2>
+          </div>
+          <div id="manualResultContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-history" class="tab-content">
+      <div class="card">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h2>核验历史</h2>
+          <button id="refreshHistory" class="btn btn-outline btn-sm">刷新</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>操作类型</th>
+                <th>凭证ID</th>
+                <th>参与者</th>
+                <th>结果</th>
+                <th>状态变化</th>
+              </tr>
+            </thead>
+            <tbody id="historyList">
+              <tr>
+                <td colspan="6" class="loading">加载中...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let mediaStream = null;
+    let scanInterval = null;
+
+    async function startCamera() {
+      try {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        
+        video.srcObject = mediaStream;
+        
+        document.getElementById('scanPlaceholder').style.display = 'none';
+        document.getElementById('videoContainer').style.display = 'block';
+        document.getElementById('scanControls').style.display = 'flex';
+        
+        await new Promise(resolve => {
+          video.onloadedmetadata = () => {
+            video.play();
+            resolve();
+          };
+        });
+        
+        startScanning();
+        
+      } catch (error) {
+        console.error('启动摄像头失败:', error);
+        showAlert('无法启动摄像头: ' + error.message, 'danger');
+      }
+    }
+
+    function stopCamera() {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+      
+      if (scanInterval) {
+        clearInterval(scanInterval);
+        scanInterval = null;
+      }
+      
+      document.getElementById('videoContainer').style.display = 'none';
+      document.getElementById('scanPlaceholder').style.display = 'block';
+      document.getElementById('scanControls').style.display = 'none';
+    }
+
+    function startScanning() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      scanInterval = setInterval(() => {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        }
+      }, 500);
+    }
+
+    async function verifyToken(token) {
+      if (!token || token.trim() === '') {
+        showAlert('请输入凭证令牌', 'warning');
+        return;
+      }
+      
+      showAlert('正在核验...', 'info');
+      
+      const verifyData = await apiRequest('/credentials/verify', {
+        method: 'POST',
+        body: { token }
+      });
+      
+      displayVerifyResult(verifyData);
+    }
+
+    function displayVerifyResult(data) {
+      const resultDiv = document.getElementById('verifyResult');
+      const resultCard = document.getElementById('resultCard');
+      const resultTitle = document.getElementById('resultTitle');
+      const resultContent = document.getElementById('resultContent');
+      
+      resultDiv.style.display = 'block';
+      
+      resultCard.className = 'card';
+      
+      if (data.success && data.valid) {
+        resultCard.className += ' alert-success';
+        resultTitle.textContent = '核验通过';
+        
+        const payload = data.payload || {};
+        
+        resultContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <span style="font-size: 3rem; color: #28a745;">✓</span>
+            <p style="font-size: 1.25rem; font-weight: 600; color: #28a745;">凭证有效</p>
+          </div>
+          <p><strong>姓名:</strong> ${escapeHtml(payload.name || '-')}</p>
+          <p><strong>邮箱:</strong> ${payload.email || '-'}</p>
+          <p><strong>电话:</strong> ${payload.phone || '-'}</p>
+          <p><strong>签发时间:</strong> ${formatDate(payload.issued_at)}</p>
+          <p><strong>有效期至:</strong> ${formatDate(payload.valid_until)}</p>
+          <hr>
+          <p><strong>当前状态:</strong> <span class="badge ${getStatusBadgeClass(data.state)}">${getStatusLabel(data.state)}</span></p>
+          ${data.isCheckedIn ? '<p style="color: #ffc107;">注意：该凭证已被使用入场</p>' : ''}
+          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            ${!data.isCheckedIn && data.isActive ? 
+              `<button class="btn btn-success" onclick="checkInById('${payload.id}')">确认入场</button>` : ''}
+            <button class="btn btn-secondary" onclick="clearVerifyResult()">关闭</button>
+          </div>
+        `;
+      } else {
+        resultCard.className += ' alert-danger';
+        resultTitle.textContent = '核验失败';
+        
+        const errorMsg = getErrorCodeMessage(data.errorCode) || data.error || '核验失败';
+        
+        resultContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <span style="font-size: 3rem; color: #dc3545;">✗</span>
+            <p style="font-size: 1.25rem; font-weight: 600; color: #dc3545;">${errorMsg}</p>
+          </div>
+          ${data.payload ? `
+            <p><strong>姓名:</strong> ${escapeHtml(data.payload.name || '-')}</p>
+            <p><strong>邮箱:</strong> ${data.payload.email || '-'}</p>
+            <p><strong>电话:</strong> ${data.payload.phone || '-'}</p>
+          ` : ''}
+          <p style="margin-top: 1rem; color: #6c757d;">
+            错误代码: ${data.errorCode || 'UNKNOWN'}
+          </p>
+          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            <button class="btn btn-warning" onclick="reviewToken()">异常复核</button>
+            <button class="btn btn-secondary" onclick="clearVerifyResult()">关闭</button>
+          </div>
+        `;
+      }
+    }
+
+    function clearVerifyResult() {
+      document.getElementById('verifyResult').style.display = 'none';
+      document.getElementById('manualVerifyResult').style.display = 'none';
+    }
+
+    async function checkInById(credentialId) {
+      showAlert('正在处理入场...', 'info');
+      
+      const data = await apiRequest('/credentials/checkin', {
+        method: 'POST',
+        body: { credentialId }
+      });
+      
+      if (data.success) {
+        showAlert('入场成功！', 'success');
+        clearVerifyResult();
+        loadHistory();
+      } else {
+        showAlert('入场失败: ' + (getErrorCodeMessage(data.errorCode) || data.error), 'danger');
+      }
+    }
+
+    function reviewToken() {
+      document.querySelector('[data-tab="tab-review"]').click();
+      window.location.href = '/review.html';
+    }
+
+    async function loadHistory() {
+      const data = await apiRequest('/audit-logs?limit=50');
+      const tbody = document.getElementById('historyList');
+      
+      if (data.success && data.logs.length > 0) {
+        tbody.innerHTML = data.logs.map(log => `
+          <tr>
+            <td>${formatDate(log.created_at)}</td>
+            <td>${getActionLabel(log.action)}</td>
+            <td>${log.credential_id ? log.credential_id.substring(0, 12) + '...' : '-'}</td>
+            <td>${log.participant_id ? log.participant_id.substring(0, 8) : '-'}</td>
+            <td><span class="badge ${log.result === 'success' ? 'badge-active' : 'badge-revoked'}">${log.result === 'success' ? '成功' : '失败'}</span></td>
+            <td>
+              ${log.status_before ? `${getStatusLabel(log.status_before)} → ` : ''}
+              ${log.status_after ? getStatusLabel(log.status_after) : '-'}
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6c757d;">暂无核验记录</td></tr>';
+      }
+    }
+
+    function getActionLabel(action) {
+      const labels = {
+        'issue': '签发凭证',
+        'verify': '核验凭证',
+        'check_in': '入场签到',
+        'revoke': '撤销凭证',
+        'expire': '过期处理',
+        'review': '异常复核',
+        'verify_failed': '核验失败'
+      };
+      return labels[action] || action;
+    }
+
+    document.getElementById('startCamera').addEventListener('click', startCamera);
+    document.getElementById('stopCamera').addEventListener('click', stopCamera);
+    document.getElementById('manualInput').addEventListener('click', () => {
+      document.querySelector('[data-tab="tab-manual"]').click();
+    });
+
+    document.getElementById('verifyManual').addEventListener('click', async () => {
+      const token = document.getElementById('manualToken').value;
+      
+      if (!token || token.trim() === '') {
+        showAlert('请输入凭证令牌', 'warning');
+        return;
+      }
+      
+      showAlert('正在核验...', 'info');
+      
+      const verifyData = await apiRequest('/credentials/verify', {
+        method: 'POST',
+        body: { token }
+      });
+      
+      const resultDiv = document.getElementById('manualVerifyResult');
+      const resultCard = document.getElementById('manualResultCard');
+      const resultTitle = document.getElementById('manualResultTitle');
+      const resultContent = document.getElementById('manualResultContent');
+      
+      resultDiv.style.display = 'block';
+      
+      resultCard.className = 'card';
+      
+      if (verifyData.success && verifyData.valid) {
+        resultCard.className += ' alert-success';
+        resultTitle.textContent = '核验通过';
+        
+        const payload = verifyData.payload || {};
+        
+        resultContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <span style="font-size: 3rem; color: #28a745;">✓</span>
+            <p style="font-size: 1.25rem; font-weight: 600; color: #28a745;">凭证有效</p>
+          </div>
+          <p><strong>姓名:</strong> ${escapeHtml(payload.name || '-')}</p>
+          <p><strong>邮箱:</strong> ${payload.email || '-'}</p>
+          <p><strong>电话:</strong> ${payload.phone || '-'}</p>
+          <p><strong>签发时间:</strong> ${formatDate(payload.issued_at)}</p>
+          <p><strong>有效期至:</strong> ${formatDate(payload.valid_until)}</p>
+          <hr>
+          <p><strong>当前状态:</strong> <span class="badge ${getStatusBadgeClass(verifyData.state)}">${getStatusLabel(verifyData.state)}</span></p>
+          ${verifyData.isCheckedIn ? '<p style="color: #ffc107;">注意：该凭证已被使用入场</p>' : ''}
+          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            ${!verifyData.isCheckedIn && verifyData.isActive ? 
+              `<button class="btn btn-success" onclick="checkInById('${payload.id}')">确认入场</button>` : ''}
+            <button class="btn btn-secondary" onclick="clearVerifyResult()">关闭</button>
+          </div>
+        `;
+      } else {
+        resultCard.className += ' alert-danger';
+        resultTitle.textContent = '核验失败';
+        
+        const errorMsg = getErrorCodeMessage(verifyData.errorCode) || verifyData.error || '核验失败';
+        
+        resultContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <span style="font-size: 3rem; color: #dc3545;">✗</span>
+            <p style="font-size: 1.25rem; font-weight: 600; color: #dc3545;">${errorMsg}</p>
+          </div>
+          ${verifyData.payload ? `
+            <p><strong>姓名:</strong> ${escapeHtml(verifyData.payload.name || '-')}</p>
+            <p><strong>邮箱:</strong> ${verifyData.payload.email || '-'}</p>
+            <p><strong>电话:</strong> ${verifyData.payload.phone || '-'}</p>
+          ` : ''}
+          <p style="margin-top: 1rem; color: #6c757d;">
+            错误代码: ${verifyData.errorCode || 'UNKNOWN'}
+          </p>
+          <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+            <button class="btn btn-warning" onclick="window.location.href='/review.html'">异常复核</button>
+            <button class="btn btn-secondary" onclick="clearVerifyResult()">关闭</button>
+          </div>
+        `;
+      }
+    });
+
+    document.getElementById('clearManual').addEventListener('click', () => {
+      document.getElementById('manualToken').value = '';
+      clearVerifyResult();
+    });
+
+    document.getElementById('refreshHistory').addEventListener('click', loadHistory);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTabs();
+      loadHistory();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+    });
+  </script>
+</body>
+</html>

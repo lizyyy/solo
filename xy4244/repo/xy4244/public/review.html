@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>异常复核 - 签到凭证演练台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>签到凭证演练台</h1>
+      <nav>
+        <a href="/">仪表盘</a>
+        <a href="/issue.html">签发凭证</a>
+        <a href="/verify.html">入场核验</a>
+        <a href="/review.html" class="active">异常复核</a>
+        <a href="/export.html">导出报告</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>异常凭证列表</h2>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="credentialSearch" placeholder="搜索凭证ID、参与者姓名...">
+        <select id="statusFilter">
+          <option value="">全部状态</option>
+          <option value="checked_in">已入场</option>
+          <option value="revoked">已撤销</option>
+          <option value="expired">已过期</option>
+        </select>
+        <button id="searchCredentials" class="btn btn-secondary">搜索</button>
+        <button id="refreshCredentials" class="btn btn-outline">刷新</button>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>凭证ID</th>
+              <th>参与者</th>
+              <th>当前状态</th>
+              <th>签发时间</th>
+              <th>有效期至</th>
+              <th>最后核验</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="abnormalCredentials">
+            <tr>
+              <td colspan="7" class="loading">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>撤销列表</h2>
+      </div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>撤销时间</th>
+              <th>凭证ID</th>
+              <th>撤销原因</th>
+              <th>操作者</th>
+            </tr>
+          </thead>
+          <tbody id="revocationList">
+            <tr>
+              <td colspan="4" class="loading">加载中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>快速复核</h2>
+      </div>
+      <div class="form-group">
+        <label for="reviewToken">输入凭证令牌或ID进行复核</label>
+        <input type="text" id="reviewToken" placeholder="请输入凭证令牌或ID...">
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button id="lookupCredential" class="btn btn-primary">查询凭证</button>
+        <button id="clearReview" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <div id="reviewResult" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <h2>凭证详情</h2>
+        </div>
+        <div id="reviewResultContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    async function loadAbnormalCredentials() {
+      const search = document.getElementById('credentialSearch').value;
+      const status = document.getElementById('statusFilter').value;
+      
+      let url = '/api/credentials';
+      const params = [];
+      
+      if (status) {
+        params.push(`status=${encodeURIComponent(status)}`);
+      } else {
+        params.push('status=checked_in&status=revoked&status=expired');
+      }
+      
+      if (search) {
+        params.push(`search=${encodeURIComponent(search)}`);
+      }
+      
+      if (params.length > 0) {
+        url += `?${params.join('&')}`;
+      }
+      
+      const data = await apiRequest(url);
+      const tbody = document.getElementById('abnormalCredentials');
+      
+      if (data.success && data.credentials.length > 0) {
+        tbody.innerHTML = data.credentials.map(c => `
+          <tr>
+            <td>${c.id.substring(0, 16)}...</td>
+            <td>${c.participant_name || c.participant_id.substring(0, 8)}</td>
+            <td><span class="badge ${getStatusBadgeClass(c.status)}">${getStatusLabel(c.status)}</span></td>
+            <td>${formatDate(c.issued_at)}</td>
+            <td>${formatDate(c.valid_until)}</td>
+            <td>${formatDate(c.last_verified_at)}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-outline btn-sm" onclick="viewCredentialDetail('${c.id}')">查看详情</button>
+                ${c.status === 'revoked' || c.status === 'expired' ? '' : 
+                  `<button class="btn btn-danger btn-sm" onclick="revokeCredentialModal('${c.id}')">撤销</button>`}
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6c757d;">暂无异常凭证</td></tr>';
+      }
+    }
+
+    async function loadRevocations() {
+      const data = await apiRequest('/audit-logs?action=revoke');
+      const tbody = document.getElementById('revocationList');
+      
+      if (data.success && data.logs.length > 0) {
+        tbody.innerHTML = data.logs.map(log => `
+          <tr>
+            <td>${formatDate(log.created_at)}</td>
+            <td>${log.credential_id ? log.credential_id.substring(0, 16) + '...' : '-'}</td>
+            <td>${log.details && log.details.reason ? escapeHtml(log.details.reason) : '-'}</td>
+            <td>${log.operator || 'system'}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #6c757d;">暂无撤销记录</td></tr>';
+      }
+    }
+
+    async function viewCredentialDetail(credentialId) {
+      showAlert('正在查询...', 'info');
+      
+      const data = await apiRequest(`/credentials/${credentialId}`);
+      
+      if (data.success) {
+        displayCredentialDetail(data);
+      } else {
+        showAlert('查询失败: ' + data.error, 'danger');
+      }
+    }
+
+    function displayCredentialDetail(data) {
+      const resultDiv = document.getElementById('reviewResult');
+      const contentDiv = document.getElementById('reviewResultContent');
+      
+      resultDiv.style.display = 'block';
+      
+      const c = data.credential;
+      const rev = data.revocation;
+      
+      contentDiv.innerHTML = `
+        <p><strong>凭证ID:</strong> ${c.id}</p>
+        <p><strong>参与者:</strong> ${c.participant_name || c.participant_id}</p>
+        <p><strong>邮箱:</strong> ${c.participant_email || '-'}</p>
+        <p><strong>电话:</strong> ${c.participant_phone || '-'}</p>
+        <p><strong>当前状态:</strong> <span class="badge ${getStatusBadgeClass(c.status)}">${getStatusLabel(c.status)}</span></p>
+        <p><strong>签发时间:</strong> ${formatDate(c.issued_at)}</p>
+        <p><strong>有效期至:</strong> ${formatDate(c.valid_until)}</p>
+        <p><strong>最后核验:</strong> ${formatDate(c.last_verified_at)}</p>
+        
+        ${rev ? `
+          <hr>
+          <h4>撤销记录</h4>
+          <p><strong>撤销时间:</strong> ${formatDate(rev.revoked_at)}</p>
+          <p><strong>撤销原因:</strong> ${rev.reason || '-'}</p>
+          <p><strong>操作者:</strong> ${rev.revoked_by || 'system'}</p>
+        ` : ''}
+        
+        ${c.qr_code ? `
+          <hr>
+          <div class="qr-code-container">
+            <img src="${c.qr_code}" alt="QR Code" style="max-width: 200px;">
+          </div>
+        ` : ''}
+        
+        <hr>
+        <h4>复核操作</h4>
+        <div class="form-group">
+          <label for="reviewNotes">复核备注</label>
+          <textarea id="reviewNotes" placeholder="输入复核备注..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="reviewResultSelect">复核结果</label>
+          <select id="reviewResultSelect">
+            <option value="manual_allow">手动放行</option>
+            <option value="manual_deny">手动拒绝</option>
+            <option value="investigate">需进一步调查</option>
+          </select>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn btn-primary" onclick="submitReview('${c.id}')">提交复核</button>
+          ${c.status === 'active' ? `<button class="btn btn-danger" onclick="revokeCredentialModal('${c.id}')">撤销凭证</button>` : ''}
+          <button class="btn btn-secondary" onclick="document.getElementById('reviewResult').style.display = 'none'">关闭</button>
+        </div>
+      `;
+    }
+
+    async function submitReview(credentialId) {
+      const reviewResult = document.getElementById('reviewResultSelect').value;
+      const notes = document.getElementById('reviewNotes').value;
+      
+      showAlert('正在提交...', 'info');
+      
+      const data = await apiRequest('/review', {
+        method: 'POST',
+        body: { credentialId, reviewResult, notes }
+      });
+      
+      if (data.success) {
+        showAlert('复核记录已提交', 'success');
+        loadAbnormalCredentials();
+      } else {
+        showAlert('提交失败: ' + data.error, 'danger');
+      }
+    }
+
+    function revokeCredentialModal(credentialId) {
+      showModal(`
+        <h4>撤销凭证</h4>
+        <p style="color: #dc3545;">确定要撤销此凭证吗？撤销后该凭证将无法使用。</p>
+        <div class="form-group">
+          <label for="revokeReason">撤销原因</label>
+          <textarea id="revokeReason" placeholder="请输入撤销原因..."></textarea>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-danger" onclick="confirmRevoke('${credentialId}')">确认撤销</button>
+          <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        </div>
+      `, '撤销凭证');
+    }
+
+    async function confirmRevoke(credentialId) {
+      const reason = document.getElementById('revokeReason').value || '手动撤销';
+      
+      closeModal();
+      showAlert('正在撤销...', 'info');
+      
+      const data = await apiRequest('/credentials/revoke', {
+        method: 'POST',
+        body: { credentialId, reason }
+      });
+      
+      if (data.success) {
+        showAlert('凭证已撤销', 'success');
+        loadAbnormalCredentials();
+        loadRevocations();
+      } else {
+        showAlert('撤销失败: ' + data.error, 'danger');
+      }
+    }
+
+    document.getElementById('lookupCredential').addEventListener('click', async () => {
+      const input = document.getElementById('reviewToken').value.trim();
+      
+      if (!input) {
+        showAlert('请输入凭证令牌或ID', 'warning');
+        return;
+      }
+      
+      if (input.includes('.') && input.length > 50) {
+        showAlert('正在核验凭证...', 'info');
+        
+        const verifyData = await apiRequest('/credentials/verify', {
+          method: 'POST',
+          body: { token: input }
+        });
+        
+        if (verifyData.payload && verifyData.payload.id) {
+          await viewCredentialDetail(verifyData.payload.id);
+        } else {
+          const resultDiv = document.getElementById('reviewResult');
+          const contentDiv = document.getElementById('reviewResultContent');
+          
+          resultDiv.style.display = 'block';
+          
+          const errorMsg = getErrorCodeMessage(verifyData.errorCode) || verifyData.error || '核验失败';
+          
+          contentDiv.innerHTML = `
+            <div style="text-align: center; margin-bottom: 1rem;">
+              <span style="font-size: 3rem; color: #dc3545;">✗</span>
+              <p style="font-size: 1.25rem; font-weight: 600; color: #dc3545;">${errorMsg}</p>
+            </div>
+            ${verifyData.payload ? `
+              <p><strong>姓名:</strong> ${escapeHtml(verifyData.payload.name || '-')}</p>
+              <p><strong>邮箱:</strong> ${verifyData.payload.email || '-'}</p>
+              <p><strong>电话:</strong> ${verifyData.payload.phone || '-'}</p>
+            ` : ''}
+            <p style="margin-top: 1rem; color: #6c757d;">
+              错误代码: ${verifyData.errorCode || 'UNKNOWN'}
+            </p>
+            <hr>
+            <h4>复核操作</h4>
+            <div class="form-group">
+              <label for="quickReviewNotes">复核备注</label>
+              <textarea id="quickReviewNotes" placeholder="输入复核备注..."></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+              <button class="btn btn-warning" onclick="showAlert('复核功能需要凭证ID，请先查询具体凭证', 'warning')">提交复核</button>
+              <button class="btn btn-secondary" onclick="document.getElementById('reviewResult').style.display = 'none'">关闭</button>
+            </div>
+          `;
+        }
+      } else {
+        await viewCredentialDetail(input);
+      }
+    });
+
+    document.getElementById('clearReview').addEventListener('click', () => {
+      document.getElementById('reviewToken').value = '';
+      document.getElementById('reviewResult').style.display = 'none';
+    });
+
+    document.getElementById('searchCredentials').addEventListener('click', loadAbnormalCredentials);
+    document.getElementById('refreshCredentials').addEventListener('click', loadAbnormalCredentials);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAbnormalCredentials();
+      loadRevocations();
+    });
+  </script>
+</body>
+</html>
