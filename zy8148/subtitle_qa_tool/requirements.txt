@@ -1,0 +1,8 @@
+# 字幕质检工具依赖
+# Python 3.8+ 推荐
+
+# YAML 解析库
+pyyaml>=5.4
+
+# 注意：tkinter 通常随 Python 一起安装
+# 如果在 Linux 上缺少 tkinter，请安装 python3-tk

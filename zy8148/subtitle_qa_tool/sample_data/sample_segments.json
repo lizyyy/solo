@@ -1,0 +1,72 @@
+[
+    {
+        "id": "seg_001",
+        "start": 1.0,
+        "end": 3.5,
+        "speaker": "张三",
+        "content": "欢迎大家收看今天的节目"
+    },
+    {
+        "id": "seg_002",
+        "start": 3.0,
+        "end": 5.0,
+        "speaker": "李四",
+        "content": "今天我们来讨论一个重要的话题"
+    },
+    {
+        "id": "seg_003",
+        "start": 5.5,
+        "end": 6.0,
+        "speaker": "王五",
+        "content": "这是一段非常长的文本"
+    },
+    {
+        "id": "seg_004",
+        "start": 6.5,
+        "end": 7.0,
+        "speaker": "张三",
+        "content": ""
+    },
+    {
+        "id": "seg_005",
+        "start": 7.5,
+        "end": 9.0,
+        "speaker": "李四",
+        "content": "这段字幕没有说话人标签"
+    },
+    {
+        "id": "seg_006",
+        "start": 9.5,
+        "end": 11.0,
+        "speaker": "王五",
+        "content": "这个说话人不在配置列表中"
+    },
+    {
+        "id": "seg_007",
+        "start": 11.5,
+        "end": 13.0,
+        "speaker": "张三",
+        "content": "这里包含一些敏感词测试"
+    },
+    {
+        "id": "seg_008",
+        "start": 13.5,
+        "end": 13.6,
+        "speaker": "李四",
+        "content": "这是一个非常短的字幕"
+    },
+    {
+        "id": "seg_009",
+        "start": 14.0,
+        "end": 16.0,
+        "speaker": "王五",
+        "content": "正常的字幕，没有问题"
+    },
+    {
+        "id": "seg_010",
+        "start": 3723.456,
+        "end": 3725.678,
+        "speaker": "张三",
+        "content": "这是一个跨小时的时间格式测试"
+    }
+]
