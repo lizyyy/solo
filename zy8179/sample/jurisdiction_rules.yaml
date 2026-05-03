@@ -1,0 +1,154 @@
+jurisdictions:
+  CN:
+    name: 中国
+    default_timezone: Asia/Shanghai
+    holiday_calendar_key: CN
+    deadlines:
+      opposition:
+        method: months
+        duration: 3
+        description: 商标初审公告后3个月异议期
+        requires_documents:
+          - 异议申请书
+          - 证据材料
+          - 委托书
+      
+      opposition_response:
+        method: days
+        duration: 30
+        description: 收到异议通知后30天答辩期
+        requires_documents:
+          - 答辩书
+          - 证据材料
+          - 委托书
+      
+      examination_amendment:
+        method: days
+        duration: 15
+        description: 审查意见补正期限15天
+        requires_documents:
+          - 补正意见陈述书
+          - 修改后的商标图样
+      
+      renewal:
+        method: years
+        duration: 10
+        description: 商标有效期10年，到期需续展
+        requires_documents:
+          - 续展申请书
+          - 主体资格证明
+      
+      widening:
+        method: months
+        duration: 6
+        description: 注册后6个月宽展期
+      
+      use_evidence:
+        method: months
+        duration: 3
+        description: 提供使用证据期限3个月
+      
+      office_action_response:
+        method: days
+        duration: 60
+        description: 审查意见答复期限60天
+
+  US:
+    name: 美国
+    default_timezone: America/New_York
+    holiday_calendar_key: US
+    deadlines:
+      opposition:
+        method: days
+        duration: 30
+        description: 商标公告后30天异议期
+      
+      opposition_response:
+        method: days
+        duration: 40
+        description: 收到异议通知后40天答辩期
+      
+      examination_amendment:
+        method: months
+        duration: 6
+        description: 审查意见答复期限6个月
+      
+      renewal:
+        method: years
+        duration: 10
+        description: 商标有效期10年
+      
+      use_evidence:
+        method: years
+        duration: 5
+        description: 注册后第5-6年需提交使用证据
+      
+      office_action_response:
+        method: months
+        duration: 6
+        description: OA答复期限6个月
+
+  EU:
+    name: 欧盟
+    default_timezone: Europe/London
+    holiday_calendar_key: EU
+    deadlines:
+      opposition:
+        method: months
+        duration: 3
+        description: 公告后3个月异议期
+      
+      opposition_response:
+        method: months
+        duration: 2
+        description: 收到异议通知后2个月答辩期
+      
+      examination_amendment:
+        method: months
+        duration: 2
+        description: 审查意见补正期限2个月
+      
+      renewal:
+        method: years
+        duration: 10
+        description: 商标有效期10年
+      
+      widening:
+        method: months
+        duration: 6
+        description: 续展宽展期6个月
+      
+      office_action_response:
+        method: months
+        duration: 2
+        description: OA答复期限2个月
+
+  JP:
+    name: 日本
+    default_timezone: Asia/Tokyo
+    holiday_calendar_key: JP
+    deadlines:
+      opposition:
+        method: months
+        duration: 2
+        description: 公告后2个月异议期
+      
+      renewal:
+        method: years
+        duration: 10
+        description: 商标有效期10年
+
+  GB:
+    name: 英国
+    default_timezone: Europe/London
+    holiday_calendar_key: EU
+    deadlines:
+      opposition:
+        method: months
+        duration: 2
+        description: 公告后2个月异议期
+      
+      renewal:
+        method: years
+        duration: 10
+        description: 商标有效期10年

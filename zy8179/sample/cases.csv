@@ -1,0 +1,9 @@
+case_id,trademark,jurisdiction,application_number,registration_number,application_date,registration_date,status,classes,applicant,filing_timezone
+CASE-001,创新科技,CN,CN2023001,CN1234567,2023-01-15,2023-07-20,active,9,35,42,创新科技有限公司,Asia/Shanghai
+CASE-002,创新科技,US,US8888999,,2022-11-20,,active,9,35,Innovate Tech Inc,America/New_York
+CASE-003,绿源食品,CN,CN2024002,,2024-03-10,,active,29,30,绿源食品集团,Asia/Shanghai
+CASE-004,蓝天科技,EU,,EU001234,2023-06-01,2024-01-15,active,9,42,蓝天科技(欧洲)有限公司,Europe/London
+CASE-005,已放弃商标,CN,CN2022099,,2022-05-01,,abandoned,25,旧申请人公司,Asia/Shanghai
+CASE-006,无申请日商标,CN,CN2024999,,,,active,16,测试公司,Asia/Shanghai
+CASE-007,即将到期,CN,CN2021010,CN7777777,2021-04-01,2021-10-01,active,35,到期测试公司,Asia/Shanghai
+CASE-008,已逾期案例,CN,CN2020050,CN5555555,2020-02-01,2020-08-01,active,9,逾期测试公司,Asia/Shanghai
