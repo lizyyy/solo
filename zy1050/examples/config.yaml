@@ -1,0 +1,47 @@
+# SQLite 迁移体检配置文件示例
+
+# Seed 数据 (SQL 文件或直接数据)
+seed:
+  - "seed.sql"
+
+# 断言规则
+assertions:
+  # 检查表是否存在
+  - type: table_exists
+    table: users
+    shouldExist: true
+  
+  - type: table_exists
+    table: user_profiles
+    shouldExist: true
+  
+  - type: table_exists
+    table: posts
+    shouldExist: true
+  
+  # 检查字段是否存在
+  - type: column_exists
+    table: users
+    column: email
+  
+  - type: column_exists
+    table: users
+    column: status
+  
+  # 检查表行数
+  - type: row_count
+    table: users
+    count: 0
+    operator: ">="
+
+# 需要监控数据变化的表
+watchTables:
+  - users
+  - user_profiles
+  - posts
+
+# 输出配置
+output:
+  markdown: true
+  json: true
+  html: true
