@@ -1,0 +1,98 @@
+batches:
+  - batch_id: TYPE_IV_2026_A
+    fluid_type: TYPE_IV
+    manufacturer: Clariant
+    concentration: 100.0
+    production_date: 2026-01-15 00:00:00
+    expiry_date: 2026-12-31 23:59:59
+    hold_time:
+      -20:
+        min: 45
+        max: 60
+      -15:
+        min: 60
+        max: 80
+      -10:
+        min: 80
+        max: 110
+      -5:
+        min: 100
+        max: 130
+      0:
+        min: 130
+        max: 160
+      5:
+        min: 160
+        max: 180
+      10:
+        min: 180
+        max: 200
+
+  - batch_id: TYPE_II_2026_B
+    fluid_type: TYPE_II
+    manufacturer: Dow
+    concentration: 100.0
+    production_date: 2026-02-01 00:00:00
+    expiry_date: 2026-11-30 23:59:59
+    hold_time:
+      -20:
+        min: 30
+        max: 40
+      -15:
+        min: 40
+        max: 50
+      -10:
+        min: 50
+        max: 60
+      -5:
+        min: 60
+        max: 80
+      0:
+        min: 80
+        max: 100
+      5:
+        min: 100
+        max: 120
+      10:
+        min: 120
+        max: 140
+
+  - batch_id: TYPE_I_2026_C
+    fluid_type: TYPE_I
+    manufacturer: Kilfrost
+    concentration: 80.0
+    production_date: 2026-03-01 00:00:00
+    expiry_date: 2026-10-31 23:59:59
+    hold_time:
+      -20:
+        min: 10
+        max: 15
+      -15:
+        min: 12
+        max: 18
+      -10:
+        min: 15
+        max: 20
+      -5:
+        min: 20
+        max: 25
+      0:
+        min: 25
+        max: 30
+      5:
+        min: 30
+        max: 35
+      10:
+        min: 35
+        max: 40
+
+  - batch_id: EXPIRED_OLD
+    fluid_type: TYPE_IV
+    manufacturer: Clariant
+    concentration: 100.0
+    production_date: 2025-01-01 00:00:00
+    expiry_date: 2025-12-31 23:59:59
+    hold_time:
+      0:
+        min: 100
+        max: 130
