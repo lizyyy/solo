@@ -1,0 +1,8 @@
+windows:
+- window_id: WINDOW-TEST
+  start_time: '2026-01-01T00:00:00'
+  end_time: '2026-12-31T23:59:59'
+  allowed_hardware_batches:
+  - '*'
+  max_devices: 200
+  priority: 1

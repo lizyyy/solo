@@ -1,0 +1,13 @@
+{
+  "version": "v2.2.0",
+  "hardware_compatible": [
+    "BATCH-2024-A",
+    "BATCH-2024-B",
+    "BATCH-2024-C"
+  ],
+  "signature_hash": "SHA256:abc123def4567890fedcba9876543210fedcba9876543210fedcba98765432",
+  "file_path": "/firmware/padpro_v2.2.0_update.img",
+  "checksum_sha256": "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef",
+  "release_notes": "修复蓝牙连接问题，优化电池管理，新增巡检数据加密功能",
+  "rollback_version": "v2.1.0"
+}

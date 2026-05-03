@@ -1,0 +1,23 @@
+{
+  "strategy": {
+    "canary_percentage": 5.0,
+    "phase_1_percentage": 15.0,
+    "phase_2_percentage": 30.0,
+    "phase_3_percentage": 50.0,
+    "canary_max_failures": 0,
+    "phase_max_failures_ratio": 0.05,
+    "delay_between_batches_hours": 24.0,
+    "group_by_hardware_batch": true,
+    "prioritize_low_battery": false,
+    "prioritize_recent_checkin": true,
+    "minimum_batch_size": 1,
+    "maximum_batch_size": 100
+  },
+  "validation": {
+    "min_battery_threshold": 20.0
+  },
+  "storage": {
+    "use_sqlite": true,
+    "backup_on_import": true
+  }
+}

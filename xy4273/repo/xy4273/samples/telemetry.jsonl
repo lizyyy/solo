@@ -1,0 +1,6 @@
+{"device_id": "PAD-001", "timestamp": "2026-05-01T19:43:32.282476", "event_type": "telemetry_report", "firmware_version": "v2.1.0", "details": {"battery_level": 90, "crash_count": 0, "network_status": "wifi"}}
+{"device_id": "PAD-002", "timestamp": "2026-05-02T07:43:32.282478", "event_type": "upgrade_start", "firmware_version": "v2.1.0", "details": {"target_version": "v2.1.5"}}
+{"device_id": "PAD-002", "timestamp": "2026-05-02T07:48:32.282480", "event_type": "upgrade_success", "firmware_version": "v2.1.5", "details": {"duration_seconds": 300}}
+{"device_id": "PAD-003", "timestamp": "2026-05-03T13:43:32.282482", "event_type": "upgrade_start", "firmware_version": "v2.0.5", "details": {"target_version": "v2.1.0"}}
+{"device_id": "PAD-003", "timestamp": "2026-05-03T13:58:32.282483", "event_type": "upgrade_failed", "firmware_version": "v2.0.5", "details": {"error_code": "E_DOWNLOAD_FAIL", "error_message": "网络连接中断"}}
+{"device_id": "PAD-005", "timestamp": "2026-05-03T18:58:32.282485", "event_type": "telemetry_report", "firmware_version": "v2.1.0", "details": {"battery_level": 78, "crash_count": 0, "network_status": "4g"}}
