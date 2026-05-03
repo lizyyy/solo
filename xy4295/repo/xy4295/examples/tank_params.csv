@@ -1,0 +1,15 @@
+parameter,value,unit
+tank_name,示例海水缸,
+tank_id,tank_001,
+total_volume,200,L
+display_volume,150,L
+sump_volume,50,L
+target_kh_min,7.0,dKH
+target_kh_max,9.0,dKH
+target_ca_min,400.0,ppm
+target_ca_max,450.0,ppm
+target_mg_min,1250.0,ppm
+target_mg_max,1350.0,ppm
+target_salinity_min,1.024,sg
+target_salinity_max,1.026,sg
+daily_evaporation_rate,5.0,L/day
