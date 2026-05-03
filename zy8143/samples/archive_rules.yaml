@@ -1,0 +1,188 @@
+# 电子卷宗归档规则配置
+# version: 1.0
+# updatedAt: 2024-05-03
+
+# 通用配置
+general:
+  courtName: "北京市东城区人民法院"
+  rulesVersion: "1.0"
+  effectiveDate: "2024-01-01"
+
+# 必备材料清单（按案件类型分类）
+documentRequirements:
+  # 民事一审案件必备材料
+  民事一审:
+    required:
+      - name: "起诉状"
+        type: "起诉状"
+        description: "原告提交的起诉状"
+        mandatory: true
+      - name: "应诉通知书"
+        type: "通知书"
+        description: "法院向被告发出的应诉通知"
+        mandatory: true
+      - name: "举证通知书"
+        type: "通知书"
+        description: "举证期限通知"
+        mandatory: true
+      - name: "庭审笔录"
+        type: "庭审笔录"
+        description: "法庭审理记录"
+        mandatory: true
+      - name: "判决书/裁定书/调解书"
+        type: "判决书"
+        description: "裁判文书"
+        mandatory: true
+      - name: "送达回证"
+        type: "送达回证"
+        description: "文书送达凭证"
+        mandatory: true
+    optional:
+      - name: "证据材料"
+        type: "证据材料"
+        description: "双方提交的证据"
+      - name: "当事人身份证明"
+        type: "身份证明"
+        description: "当事人身份证复印件等"
+
+  # 民事二审案件必备材料
+  民事二审:
+    required:
+      - name: "上诉状"
+        type: "上诉状"
+        description: "上诉人提交的上诉状"
+        mandatory: true
+      - name: "庭审笔录"
+        type: "庭审笔录"
+        description: "法庭审理记录"
+        mandatory: true
+      - name: "判决书/裁定书"
+        type: "判决书"
+        description: "裁判文书"
+        mandatory: true
+      - name: "送达回证"
+        type: "送达回证"
+        description: "文书送达凭证"
+        mandatory: true
+
+  # 刑事一审案件必备材料
+  刑事一审:
+    required:
+      - name: "起诉书"
+        type: "起诉书"
+        description: "检察院起诉书"
+        mandatory: true
+      - name: "庭审笔录"
+        type: "庭审笔录"
+        description: "法庭审理记录"
+        mandatory: true
+      - name: "判决书/裁定书"
+        type: "判决书"
+        description: "裁判文书"
+        mandatory: true
+      - name: "送达回证"
+        type: "送达回证"
+        description: "文书送达凭证"
+        mandatory: true
+
+  # 行政一审案件必备材料
+  行政一审:
+    required:
+      - name: "起诉状"
+        type: "起诉状"
+        description: "原告提交的起诉状"
+        mandatory: true
+      - name: "庭审笔录"
+        type: "庭审笔录"
+        description: "法庭审理记录"
+        mandatory: true
+      - name: "判决书/裁定书"
+        type: "判决书"
+        description: "裁判文书"
+        mandatory: true
+      - name: "送达回证"
+        type: "送达回证"
+        description: "文书送达凭证"
+        mandatory: true
+
+# 密级管理规则
+classificationRules:
+  validClassifications:
+    - "绝密"
+    - "机密"
+    - "秘密"
+    - "内部"
+    - "普通"
+    - "公开"
+  
+  sensitiveInfoTypes:
+    - name: "身份证号"
+      pattern: "\\d{17}[\\dXx]"
+      description: "18位身份证号码"
+      masking: "将中间8位替换为********"
+    - name: "手机号"
+      pattern: "1[3-9]\\d{9}"
+      description: "11位手机号码"
+      masking: "将中间4位替换为****"
+    - name: "银行卡号"
+      pattern: "\\d{16,19}"
+      description: "16-19位银行卡号"
+      masking: "将中间部分替换为****"
+    - name: "电子邮箱"
+      pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+      description: "电子邮箱地址"
+      masking: "适当脱敏处理"
+
+# 电子签名规则
+signatureRules:
+  requiredSignatureTypes:
+    - "判决书"
+    - "裁定书"
+    - "调解书"
+    - "决定书"
+    - "通知书"
+    - "起诉状"
+    - "答辩状"
+    - "上诉状"
+    - "申请书"
+    - "庭审笔录"
+    - "合议庭评议笔录"
+    - "审判委员会讨论记录"
+  
+  signatureValidity:
+    minimumValidityMonths: 3  # 归档时签名有效期剩余最少月数
+    checkExpiry: true
+
+# 页码规则
+pageNumberRules:
+  checkContinuity: true
+  checkOverlap: true
+  checkGaps: true
+  allowMissingPages: false
+
+# 案号格式规则
+caseNumberRules:
+  formatPattern: "^[(\\[【]\\d{4}[)\\]】][\\u4e00-\\u9fa5]+?\\d*?[\\u4e00-\\u9fa5]{2,}?\\d+?[号字]?$"
+  exampleFormats:
+    - "(2024)京0101民初1001号"
+    - "(2024)京01民终500号"
+    - "[2024]京0101刑初200号"
+  
+  # 案件类型标识映射
+  typeKeywords:
+    "民初": "民事一审"
+    "民终": "民事二审"
+    "民申": "民事再审"
+    "刑初": "刑事一审"
+    "刑终": "刑事二审"
+    "行初": "行政一审"
+    "行终": "行政二审"
+    "执": "执行"
+    "民特": "民事特别程序"
+    "民监": "民事监督"
+
+# 跨年度归档规则
+crossYearRules:
+  allowCrossYear: true
+  maxYearsAgo: 3  # 最多允许归档几年前的案件
+  requireSpecialApproval: false  # 是否需要特殊审批

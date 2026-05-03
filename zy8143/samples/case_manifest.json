@@ -1,0 +1,34 @@
+{
+  "court": "北京市东城区人民法院",
+  "manifestVersion": "1.0",
+  "createdAt": "2024-05-03T10:00:00Z",
+  "cases": [
+    {
+      "caseNumber": "(2024)京0101民初1001号",
+      "caseType": "民事一审",
+      "year": "2024",
+      "court": "北京市东城区人民法院",
+      "startPage": 1,
+      "endPage": 50,
+      "totalPages": 50,
+      "parties": {
+        "plaintiff": "张三",
+        "defendant": "李四"
+      }
+    },
+    {
+      "caseNumber": "(2022)京0101民初2002号",
+      "caseType": "民事一审",
+      "year": "2022",
+      "court": "北京市东城区人民法院",
+      "startPage": 51,
+      "endPage": 80,
+      "totalPages": 30,
+      "parties": {
+        "plaintiff": "王五",
+        "defendant": "赵六"
+      },
+      "note": "跨年度案件示例"
+    }
+  ]
+}

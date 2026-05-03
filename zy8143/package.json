@@ -1,0 +1,26 @@
+{
+  "name": "e-archive-validation-workbench",
+  "version": "1.0.0",
+  "description": "本地电子卷宗归档验收工作台",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "nodemon backend/server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd frontend && npm install"
+  },
+  "keywords": ["电子卷宗", "归档", "验收", "法院"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.4.3",
+    "moment": "^2.30.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.0.3",
+    "yaml": "^2.3.4"
+  }
+}
