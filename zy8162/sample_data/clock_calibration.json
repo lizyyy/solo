@@ -1,0 +1,42 @@
+{
+  "device_id": "DEV-001",
+  "calibrations": [
+    {
+      "calibration_time": "2024-05-01T08:00:00",
+      "device_time": "2024-05-01T08:00:02",
+      "reference_time": "2024-05-01T08:00:00",
+      "drift_seconds": 2.0,
+      "calibration_type": "gps",
+      "source": "GPS_time_sync"
+    },
+    {
+      "calibration_time": "2024-05-01T12:00:00",
+      "device_time": "2024-05-01T12:00:08",
+      "reference_time": "2024-05-01T12:00:00",
+      "drift_seconds": 8.0,
+      "calibration_type": "gps",
+      "source": "GPS_time_sync"
+    },
+    {
+      "calibration_time": "2024-05-01T18:00:00",
+      "device_time": "2024-05-01T18:00:15",
+      "reference_time": "2024-05-01T18:00:00",
+      "drift_seconds": 15.0,
+      "calibration_type": "network",
+      "source": "NTP_sync"
+    },
+    {
+      "calibration_time": "2024-05-02T00:00:00",
+      "device_time": "2024-05-02T00:00:25",
+      "reference_time": "2024-05-02T00:00:00",
+      "drift_seconds": 25.0,
+      "calibration_type": "gps",
+      "source": "GPS_time_sync"
+    }
+  ],
+  "metadata": {
+    "device_model": "BodyCam-X1",
+    "firmware_version": "v2.3.1",
+    "calibration_frequency_hours": 6
+  }
+}
