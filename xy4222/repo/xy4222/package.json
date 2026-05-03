@@ -1,0 +1,41 @@
+{
+  "name": "photo-collage-annotation-desktop",
+  "version": "1.0.0",
+  "description": "修复照片拼版批注台 - 文物修复照片管理与批注工具",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "uuid": "^9.0.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "pinia": "^2.1.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "concurrently": "^8.2.0",
+    "electron": "^26.2.1",
+    "electron-builder": "^24.6.4",
+    "vite": "^4.4.9",
+    "wait-on": "^7.0.1"
+  },
+  "build": {
+    "appId": "com.photo-collage-annotation.app",
+    "productName": "修复照片拼版批注台",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "mac": {
+      "category": "public.app-category.graphics-design"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
