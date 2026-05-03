@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>叉车盲区冲突复盘工具</title>
+  <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>叉车盲区冲突复盘工具</h1>
+      <div class="header-actions">
+        <button id="loadSampleBtn" class="btn btn-secondary">加载示例数据</button>
+        <button id="exportReportBtn" class="btn btn-primary" disabled>导出报告</button>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>数据导入</h3>
+          
+          <div class="file-upload-group">
+            <label class="file-label">
+              <span>仓库布局 (JSON)</span>
+              <input type="file" id="warehouseLayoutInput" accept=".json" class="file-input">
+              <span class="file-status" id="warehouseStatus">未选择</span>
+            </label>
+          </div>
+
+          <div class="file-upload-group">
+            <label class="file-label">
+              <span>叉车轨迹 (CSV)</span>
+              <input type="file" id="trajectoryInput" accept=".csv" class="file-input">
+              <span class="file-status" id="trajectoryStatus">未选择</span>
+            </label>
+          </div>
+
+          <div class="file-upload-group">
+            <label class="file-label">
+              <span>行人事件 (JSONL)</span>
+              <input type="file" id="pedestrianInput" accept=".jsonl,.json" class="file-input">
+              <span class="file-status" id="pedestrianStatus">未选择</span>
+            </label>
+          </div>
+
+          <div class="file-upload-group">
+            <label class="file-label">
+              <span>安全规则 (YAML)</span>
+              <input type="file" id="rulesInput" accept=".yaml,.yml" class="file-input">
+              <span class="file-status" id="rulesStatus">未选择</span>
+            </label>
+          </div>
+
+          <button id="analyzeBtn" class="btn btn-primary btn-full" disabled>开始分析</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>风险统计</h3>
+          <div class="stats-container" id="statsContainer">
+            <div class="stat-item">
+              <span class="stat-label">总风险数</span>
+              <span class="stat-value" id="totalRisks">0</span>
+            </div>
+            <div class="stat-item critical">
+              <span class="stat-label">严重风险</span>
+              <span class="stat-value" id="criticalRisks">0</span>
+            </div>
+            <div class="stat-item warning">
+              <span class="stat-label">警告风险</span>
+              <span class="stat-value" id="warningRisks">0</span>
+            </div>
+          </div>
+
+          <div class="risk-type-stats" id="riskTypeStats">
+            <div class="risk-type-item">
+              <span class="risk-type-dot blind-spot"></span>
+              <span class="risk-type-label">货架盲区</span>
+              <span class="risk-type-count" id="blindSpotCount">0</span>
+            </div>
+            <div class="risk-type-item">
+              <span class="risk-type-dot near-miss"></span>
+              <span class="risk-type-label">近失事件</span>
+              <span class="risk-type-count" id="nearMissCount">0</span>
+            </div>
+            <div class="risk-type-item">
+              <span class="risk-type-dot wrong-way"></span>
+              <span class="risk-type-label">逆行违规</span>
+              <span class="risk-type-count" id="wrongWayCount">0</span>
+            </div>
+            <div class="risk-type-item">
+              <span class="risk-type-dot turning"></span>
+              <span class="risk-type-label">转弯盲区</span>
+              <span class="risk-type-count" id="turningCount">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>当前风险</h3>
+          <div class="current-risk-panel" id="currentRiskPanel">
+            <p class="no-risk-text">播放时间轴以查看当前风险</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="canvas-container">
+          <div id="threeContainer"></div>
+        </div>
+
+        <div class="timeline-container">
+          <div class="timeline-controls">
+            <button id="playPauseBtn" class="control-btn" title="播放/暂停">
+              <span id="playIcon">▶</span>
+            </button>
+            <button id="stepBackBtn" class="control-btn" title="后退">
+              <span>◀◀</span>
+            </button>
+            <button id="stepForwardBtn" class="control-btn" title="前进">
+              <span>▶▶</span>
+            </button>
+            <select id="speedSelect" class="speed-select">
+              <option value="0.5">0.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="2">2x</option>
+              <option value="5">5x</option>
+              <option value="10">10x</option>
+            </select>
+            <span class="time-display" id="timeDisplay">00:00:00 / 00:00:00</span>
+          </div>
+          
+          <div class="timeline-slider-container">
+            <input type="range" id="timelineSlider" class="timeline-slider" min="0" max="100" value="0" step="1">
+            <div class="risk-markers" id="riskMarkers"></div>
+          </div>
+        </div>
+
+        <div class="warnings-panel" id="warningsPanel">
+          <h4>数据警告</h4>
+          <div class="warnings-list" id="warningsList"></div>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal" id="exportModal">
+      <div class="modal-content">
+        <h3>导出风险报告</h3>
+        <div class="export-options">
+          <button id="exportMarkdownBtn" class="btn btn-secondary">导出 Markdown</button>
+          <button id="exportJsonBtn" class="btn btn-secondary">导出 JSON</button>
+        </div>
+        <button id="closeModalBtn" class="btn btn-link">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

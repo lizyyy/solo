@@ -1,0 +1,128 @@
+{
+  "name": "示例仓库A区",
+  "dimensions": {
+    "width": 40,
+    "height": 8,
+    "depth": 50
+  },
+  "racks": [
+    {
+      "id": "RACK-001",
+      "name": "A区货架1",
+      "position": { "x": 5, "z": 10 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#74b9ff"
+    },
+    {
+      "id": "RACK-002",
+      "name": "A区货架2",
+      "position": { "x": 5, "z": 20 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#74b9ff"
+    },
+    {
+      "id": "RACK-003",
+      "name": "A区货架3",
+      "position": { "x": 5, "z": 30 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#74b9ff"
+    },
+    {
+      "id": "RACK-004",
+      "name": "B区货架1",
+      "position": { "x": 15, "z": 10 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#a29bfe"
+    },
+    {
+      "id": "RACK-005",
+      "name": "B区货架2",
+      "position": { "x": 15, "z": 20 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#a29bfe"
+    },
+    {
+      "id": "RACK-006",
+      "name": "B区货架3",
+      "position": { "x": 15, "z": 30 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#a29bfe"
+    },
+    {
+      "id": "RACK-007",
+      "name": "C区货架1",
+      "position": { "x": 25, "z": 10 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#fd79a8"
+    },
+    {
+      "id": "RACK-008",
+      "name": "C区货架2",
+      "position": { "x": 25, "z": 20 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#fd79a8"
+    },
+    {
+      "id": "RACK-009",
+      "name": "C区货架3",
+      "position": { "x": 25, "z": 30 },
+      "dimensions": { "width": 4, "height": 5, "depth": 1 },
+      "rotation": 90,
+      "levels": 4,
+      "color": "#fd79a8"
+    }
+  ],
+  "aisles": [
+    {
+      "id": "AISLE-001",
+      "name": "主通道1",
+      "bounds": { "minX": 8, "maxX": 12, "minZ": 5, "maxZ": 40 },
+      "allowedDirection": "forward",
+      "direction": 0
+    },
+    {
+      "id": "AISLE-002",
+      "name": "主通道2",
+      "bounds": { "minX": 18, "maxX": 22, "minZ": 5, "maxZ": 40 },
+      "allowedDirection": "both",
+      "direction": 0
+    },
+    {
+      "id": "AISLE-003",
+      "name": "横通道",
+      "bounds": { "minX": 3, "maxX": 35, "minZ": 15, "maxZ": 17 },
+      "allowedDirection": "both",
+      "direction": 90
+    }
+  ],
+  "zones": [
+    {
+      "id": "ZONE-A",
+      "name": "收货区",
+      "bounds": { "minX": 30, "maxX": 38, "minZ": 5, "maxZ": 15 },
+      "type": "loading"
+    },
+    {
+      "id": "ZONE-B",
+      "name": "行人通道",
+      "bounds": { "minX": 35, "maxX": 38, "minZ": 5, "maxZ": 40 },
+      "type": "pedestrian"
+    }
+  ]
+}

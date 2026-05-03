@@ -1,0 +1,55 @@
+# 叉车安全规则配置
+# 此配置定义了盲区检测、近失事件、逆行检测和转弯盲区的参数
+
+blindSpot:
+  # 是否启用货架盲区检测
+  enabled: true
+  # 检测角度（度）- 叉车前方的扇形检测区域角度
+  detectionAngle: 120
+  # 检测距离（米）- 超出此距离的货架不纳入盲区计算
+  detectionDistance: 5.0
+  # 警告距离（米）- 小于此距离触发警告级别的盲区风险
+  warningDistance: 3.0
+
+nearMiss:
+  # 是否启用近失事件检测
+  enabled: true
+  # 警告距离（米）- 叉车与行人距离小于此值触发警告
+  warningDistance: 2.0
+  # 临界距离（米）- 叉车与行人距离小于此值触发严重警告
+  criticalDistance: 1.0
+
+wrongWay:
+  # 是否启用逆行检测
+  enabled: true
+  # 默认允许方向（forward/backward/both）
+  # 可在通道配置中覆盖此设置
+  allowedDirection: both
+  # 违规判定角度阈值（度）
+  # 当行驶方向与通道允许方向差异超过此角度时判定为逆行
+  violationThreshold: 30.0
+
+turningBlindSpot:
+  # 是否启用转弯盲区检测
+  enabled: true
+  # 转弯角度阈值（度）
+  # 当方向变化超过此角度时判定为转弯
+  turningAngleThreshold: 30
+  # 转弯时额外盲区距离（米）
+  # 转弯时会增加此额外的盲区检测距离
+  extraBlindDistance: 2.0
+
+# 风险等级定义
+riskLevels:
+  critical:
+    color: "#e74c3c"
+    label: "严重"
+    priority: 1
+  warning:
+    color: "#f39c12"
+    label: "警告"
+    priority: 2
+  info:
+    color: "#3498db"
+    label: "信息"
+    priority: 3
