@@ -1,0 +1,117 @@
+{
+  "show_name": "测试演出",
+  "cues": [
+    {
+      "cue_id": "Q1",
+      "cue_name": "开场",
+      "start_time": 0.0,
+      "transition_time": 5.0,
+      "batten_positions": {
+        "B1": { "height": 7.0 },
+        "B2": { "height": 7.0 },
+        "B3": { "height": 7.0 },
+        "B4": { "height": 7.0 },
+        "B5": { "height": 5.0 },
+        "B6": { "height": 5.0 }
+      }
+    },
+    {
+      "cue_id": "Q2",
+      "cue_name": "主屏下降",
+      "start_time": 5.0,
+      "transition_time": 10.0,
+      "batten_positions": {
+        "B1": { "height": 7.0 },
+        "B2": { "height": 3.0 },
+        "B3": { "height": 3.5 },
+        "B4": { "height": 7.0 },
+        "B5": { "height": 5.0 },
+        "B6": { "height": 5.0 }
+      }
+    },
+    {
+      "cue_id": "Q3",
+      "cue_name": "景片下降",
+      "start_time": 15.0,
+      "transition_time": 8.0,
+      "batten_positions": {
+        "B1": { "height": 3.5 },
+        "B2": { "height": 3.0 },
+        "B3": { "height": 3.0 },
+        "B4": { "height": 7.0 },
+        "B5": { "height": 4.5 },
+        "B6": { "height": 4.5 }
+      }
+    },
+    {
+      "cue_id": "Q4",
+      "cue_name": "背景下降",
+      "start_time": 23.0,
+      "transition_time": 12.0,
+      "batten_positions": {
+        "B1": { "height": 3.5 },
+        "B2": { "height": 3.0 },
+        "B3": { "height": 3.0 },
+        "B4": { "height": 2.5 },
+        "B5": { "height": 4.5 },
+        "B6": { "height": 4.5 }
+      }
+    },
+    {
+      "cue_id": "Q5",
+      "cue_name": "灯光调整",
+      "start_time": 35.0,
+      "transition_time": 5.0,
+      "batten_positions": {
+        "B1": { "height": 3.5 },
+        "B2": { "height": 3.0 },
+        "B3": { "height": 3.0 },
+        "B4": { "height": 2.5 },
+        "B5": { "height": 3.5 },
+        "B6": { "height": 3.5 }
+      }
+    },
+    {
+      "cue_id": "Q6",
+      "cue_name": "越界测试",
+      "start_time": 40.0,
+      "transition_time": 8.0,
+      "batten_positions": {
+        "B1": { "height": 0.2 },
+        "B2": { "height": 3.0 },
+        "B3": { "height": 3.0 },
+        "B4": { "height": 8.0 },
+        "B5": { "height": 0.5 },
+        "B6": { "height": 3.5 }
+      }
+    },
+    {
+      "cue_id": "Q7",
+      "cue_name": "时间倒序测试",
+      "start_time": 30.0,
+      "transition_time": 5.0,
+      "batten_positions": {
+        "B1": { "height": 5.0 },
+        "B2": { "height": 5.0 },
+        "B3": { "height": 5.0 },
+        "B4": { "height": 5.0 },
+        "B5": { "height": 5.0 },
+        "B6": { "height": 5.0 }
+      }
+    },
+    {
+      "cue_id": "Q8",
+      "cue_name": "结束",
+      "start_time": 48.0,
+      "transition_time": 10.0,
+      "batten_positions": {
+        "B1": { "height": 7.0 },
+        "B2": { "height": 7.0 },
+        "B3": { "height": 7.0 },
+        "B4": { "height": 7.0 },
+        "B5": { "height": 6.0 },
+        "B6": { "height": 6.0 }
+      }
+    }
+  ]
+}

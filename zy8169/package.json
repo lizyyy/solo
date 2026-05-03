@@ -1,0 +1,27 @@
+{
+  "name": "stage-batten-simulator",
+  "version": "1.0.0",
+  "description": "3D舞台吊杆防撞预演工具",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -p 8080",
+    "dev": "npx serve -p 8080"
+  },
+  "keywords": [
+    "stage",
+    "batten",
+    "collision",
+    "threejs",
+    "simulation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0",
+    "yaml": "^2.3.4",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

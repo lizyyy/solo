@@ -1,0 +1,2419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D舞台吊杆防撞预演工具</title>
+    <script src="./node_modules/papaparse/papaparse.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./node_modules/three/build/three.module.js",
+            "three/": "./node_modules/three/",
+            "yaml": "./node_modules/yaml/browser/index.js"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .header {
+            background-color: #16213e;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #0f3460;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: #e94560;
+            font-weight: 600;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: #e94560;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #d63850;
+        }
+        
+        .btn-secondary {
+            background-color: #0f3460;
+            color: #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #1a4a7a;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 380px;
+            background-color: #16213e;
+            border-right: 1px solid #0f3460;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .sidebar-tabs {
+            display: flex;
+            background-color: #0f3460;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: #a0a0a0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn.active {
+            background-color: #16213e;
+            color: #e94560;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            color: #e0e0e0;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .file-upload-section {
+            margin-bottom: 20px;
+        }
+        
+        .file-upload-section h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+        
+        .file-upload {
+            border: 2px dashed #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background-color: rgba(15, 52, 96, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .file-upload.drag-over {
+            border-color: #e94560;
+            background-color: rgba(233, 69, 96, 0.1);
+        }
+        
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        
+        .file-upload-label {
+            cursor: pointer;
+            color: #a0a0a0;
+            font-size: 13px;
+        }
+        
+        .file-upload-label:hover {
+            color: #e0e0e0;
+        }
+        
+        .file-uploaded {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background-color: rgba(15, 52, 96, 0.5);
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        
+        .file-uploaded .status {
+            color: #4caf50;
+        }
+        
+        .file-uploaded .status.error {
+            color: #f44336;
+        }
+        
+        .risk-item {
+            background-color: rgba(15, 52, 96, 0.5);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+        
+        .risk-item.collision {
+            border-left-color: #f44336;
+        }
+        
+        .risk-item.overweight {
+            border-left-color: #ff9800;
+        }
+        
+        .risk-item.out-of-bounds {
+            border-left-color: #9c27b0;
+        }
+        
+        .risk-item.safety-gap {
+            border-left-color: #ff5722;
+        }
+        
+        .risk-item h4 {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+        
+        .risk-item .risk-meta {
+            font-size: 12px;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+        
+        .risk-item .risk-description {
+            font-size: 13px;
+            color: #c0c0c0;
+            line-height: 1.5;
+        }
+        
+        .risk-item .risk-time {
+            font-size: 11px;
+            color: #808080;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .no-risks {
+            text-align: center;
+            color: #a0a0a0;
+            padding: 30px;
+            font-size: 14px;
+        }
+        
+        .playback-controls {
+            background-color: #0f3460;
+            padding: 15px;
+            border-top: 1px solid #16213e;
+        }
+        
+        .playback-controls h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+        
+        .playback-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .playback-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background-color: #16213e;
+            color: #e0e0e0;
+            transition: all 0.2s ease;
+        }
+        
+        .playback-btn:hover {
+            background-color: #1a4a7a;
+        }
+        
+        .playback-btn.active {
+            background-color: #e94560;
+            color: white;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+        
+        .time-slider {
+            width: 100%;
+            height: 6px;
+            background-color: #16213e;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background-color: #e94560;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .time-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background-color: #e94560;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .cue-list {
+            margin-top: 15px;
+        }
+        
+        .cue-list h4 {
+            font-size: 13px;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+        
+        .cue-item {
+            padding: 8px 12px;
+            background-color: rgba(15, 52, 96, 0.3);
+            border-radius: 4px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .cue-item:hover {
+            background-color: rgba(15, 52, 96, 0.6);
+        }
+        
+        .cue-item.active {
+            background-color: rgba(233, 69, 96, 0.3);
+            border-left: 3px solid #e94560;
+        }
+        
+        .viewport {
+            flex: 1;
+            position: relative;
+            background-color: #0a0a14;
+        }
+        
+        #three-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .viewport-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .viewport-info {
+            background-color: rgba(22, 33, 62, 0.9);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #e0e0e0;
+            pointer-events: auto;
+        }
+        
+        .viewport-info .cue-name {
+            color: #e94560;
+            font-weight: 600;
+        }
+        
+        .viewport-info .time {
+            color: #a0a0a0;
+            margin-left: 10px;
+        }
+        
+        .view-controls {
+            display: flex;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        
+        .view-btn {
+            background-color: rgba(22, 33, 62, 0.9);
+            border: none;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .view-btn:hover {
+            background-color: rgba(233, 69, 96, 0.9);
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(10, 10, 20, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .loading-overlay.hidden {
+            display: none;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #0f3460;
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 16px;
+            color: #e0e0e0;
+        }
+        
+        .export-controls {
+            padding: 15px;
+            background-color: #0f3460;
+            border-top: 1px solid #16213e;
+        }
+        
+        .export-controls h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #a0a0a0;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .stats-panel {
+            background-color: rgba(15, 52, 96, 0.3);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-panel h4 {
+            font-size: 13px;
+            color: #a0a0a0;
+            margin-bottom: 10px;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .stats-row .label {
+            color: #a0a0a0;
+        }
+        
+        .stats-row .value {
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        .stats-row .value.critical {
+            color: #f44336;
+        }
+        
+        .stats-row .value.warning {
+            color: #ff9800;
+        }
+        
+        .stats-row .value.info {
+            color: #2196f3;
+        }
+        
+        .validation-errors {
+            margin-top: 10px;
+        }
+        
+        .validation-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            border-left: 3px solid #f44336;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #ff6b6b;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .validation-warning {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 3px solid #ff9800;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #ffb74d;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>🎭 3D舞台吊杆防撞预演工具</h1>
+            <div class="header-controls">
+                <button class="btn btn-secondary" id="load-sample-btn">加载示例数据</button>
+                <button class="btn btn-primary" id="analyze-btn" disabled>分析风险</button>
+            </div>
+        </header>
+        
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="files">文件</button>
+                    <button class="tab-btn" data-tab="risks">风险</button>
+                    <button class="tab-btn" data-tab="controls">控制</button>
+                </div>
+                
+                <div class="sidebar-content">
+                    <div class="tab-content active" id="tab-files">
+                        <div class="stats-panel" id="stats-panel">
+                            <h4>数据统计</h4>
+                            <div class="stats-row">
+                                <span class="label">舞台吊杆数</span>
+                                <span class="value" id="stat-battens">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">灯具/布景数</span>
+                                <span class="value" id="stat-fixtures">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">Cue数量</span>
+                                <span class="value" id="stat-cues">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">总时长</span>
+                                <span class="value" id="stat-duration">--</span>
+                            </div>
+                        </div>
+                        
+                        <div class="file-upload-section">
+                            <h3>📄 stage.yaml - 舞台配置</h3>
+                            <div class="file-upload" data-type="stage">
+                                <input type="file" id="stage-file" accept=".yaml,.yml">
+                                <label for="stage-file" class="file-upload-label">
+                                    点击或拖拽 stage.yaml 文件到此处
+                                </label>
+                            </div>
+                            <div id="stage-status"></div>
+                        </div>
+                        
+                        <div class="file-upload-section">
+                            <h3>💡 fixtures.csv - 灯具/布景</h3>
+                            <div class="file-upload" data-type="fixtures">
+                                <input type="file" id="fixtures-file" accept=".csv">
+                                <label for="fixtures-file" class="file-upload-label">
+                                    点击或拖拽 fixtures.csv 文件到此处
+                                </label>
+                            </div>
+                            <div id="fixtures-status"></div>
+                        </div>
+                        
+                        <div class="file-upload-section">
+                            <h3>🎬 cue_plan.json - Cue计划</h3>
+                            <div class="file-upload" data-type="cue">
+                                <input type="file" id="cue-file" accept=".json">
+                                <label for="cue-file" class="file-upload-label">
+                                    点击或拖拽 cue_plan.json 文件到此处
+                                </label>
+                            </div>
+                            <div id="cue-status"></div>
+                        </div>
+                        
+                        <div id="validation-errors" class="validation-errors"></div>
+                    </div>
+                    
+                    <div class="tab-content" id="tab-risks">
+                        <div class="stats-panel">
+                            <h4>风险统计</h4>
+                            <div class="stats-row">
+                                <span class="label">碰撞风险</span>
+                                <span class="value critical" id="risk-collisions">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">超重风险</span>
+                                <span class="value warning" id="risk-overweight">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">越界风险</span>
+                                <span class="value warning" id="risk-out-of-bounds">--</span>
+                            </div>
+                            <div class="stats-row">
+                                <span class="label">安全距离不足</span>
+                                <span class="value warning" id="risk-safety-gap">--</span>
+                            </div>
+                        </div>
+                        
+                        <div id="risks-list">
+                            <div class="no-risks">
+                                暂无风险检测<br>
+                                <small>请先加载数据并点击"分析风险"</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="tab-controls">
+                        <div class="playback-controls" style="background: none; padding: 0;">
+                            <h3>回放控制</h3>
+                            <div class="playback-buttons">
+                                <button class="playback-btn" id="play-btn" disabled>▶ 播放</button>
+                                <button class="playback-btn" id="pause-btn" disabled>⏸ 暂停</button>
+                                <button class="playback-btn" id="reset-btn" disabled>⏮ 重置</button>
+                                <button class="playback-btn" id="step-back-btn" disabled>◀◀</button>
+                                <button class="playback-btn" id="step-forward-btn" disabled>▶▶</button>
+                            </div>
+                            
+                            <div class="time-info">
+                                <span id="current-time">00:00.0</span>
+                                <span id="total-time">00:00.0</span>
+                            </div>
+                            <input type="range" class="time-slider" id="time-slider" min="0" max="100" value="0" disabled>
+                            
+                            <div class="cue-list">
+                                <h4>Cue列表</h4>
+                                <div id="cue-list-items">
+                                    <div class="no-risks">
+                                        暂无Cue数据
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="export-controls">
+                    <h3>导出报告</h3>
+                    <div class="export-buttons">
+                        <button class="btn btn-secondary" id="export-issues-btn" disabled>导出 issues.csv</button>
+                        <button class="btn btn-secondary" id="export-report-btn" disabled>导出 replay_report.md</button>
+                    </div>
+                </div>
+            </aside>
+            
+            <main class="viewport">
+                <div class="viewport-overlay">
+                    <div class="viewport-info">
+                        <span class="cue-name" id="current-cue-name">等待加载数据...</span>
+                        <span class="time" id="overlay-time"></span>
+                    </div>
+                    <div class="view-controls">
+                        <button class="view-btn" id="view-top">俯视图</button>
+                        <button class="view-btn" id="view-front">正视图</button>
+                        <button class="view-btn" id="view-side">侧视图</button>
+                        <button class="view-btn" id="view-free">自由视角</button>
+                    </div>
+                </div>
+                
+                <canvas id="three-canvas"></canvas>
+                
+                <div class="loading-overlay hidden" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loading-text">加载中...</div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+        import YAML from 'yaml';
+        
+        const Papa = window.Papa;
+        
+        // ==================== 状态管理 ====================
+        const AppState = {
+            stageData: null,
+            fixturesData: null,
+            cueData: null,
+            parsedData: null,
+            risks: [],
+            isPlaying: false,
+            currentTime: 0,
+            totalDuration: 0,
+            currentCueIndex: 0,
+            scene: null,
+            camera: null,
+            renderer: null,
+            controls: null,
+            battenMeshes: {},
+            fixtureMeshes: {},
+            groundPlane: null,
+            animationId: null,
+            lastFrameTime: 0
+        };
+        
+        // ==================== DOM元素引用 ====================
+        const DOM = {
+            loadSampleBtn: document.getElementById('load-sample-btn'),
+            analyzeBtn: document.getElementById('analyze-btn'),
+            playBtn: document.getElementById('play-btn'),
+            pauseBtn: document.getElementById('pause-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            stepBackBtn: document.getElementById('step-back-btn'),
+            stepForwardBtn: document.getElementById('step-forward-btn'),
+            timeSlider: document.getElementById('time-slider'),
+            currentTime: document.getElementById('current-time'),
+            totalTime: document.getElementById('total-time'),
+            overlayTime: document.getElementById('overlay-time'),
+            currentCueName: document.getElementById('current-cue-name'),
+            risksList: document.getElementById('risks-list'),
+            cueListItems: document.getElementById('cue-list-items'),
+            exportIssuesBtn: document.getElementById('export-issues-btn'),
+            exportReportBtn: document.getElementById('export-report-btn'),
+            loadingOverlay: document.getElementById('loading-overlay'),
+            loadingText: document.getElementById('loading-text'),
+            validationErrors: document.getElementById('validation-errors'),
+            stageStatus: document.getElementById('stage-status'),
+            fixturesStatus: document.getElementById('fixtures-status'),
+            cueStatus: document.getElementById('cue-status'),
+            stageFile: document.getElementById('stage-file'),
+            fixturesFile: document.getElementById('fixtures-file'),
+            cueFile: document.getElementById('cue-file')
+        };
+        
+        // ==================== 工具函数 ====================
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = (seconds % 60).toFixed(1);
+            return `${mins.toString().padStart(2, '0')}:${secs.padStart(4, '0')}`;
+        }
+        
+        function showLoading(text = '加载中...') {
+            DOM.loadingText.textContent = text;
+            DOM.loadingOverlay.classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            DOM.loadingOverlay.classList.add('hidden');
+        }
+        
+        function downloadFile(content, filename, type = 'text/plain') {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // ==================== 数据解析模块 ====================
+        const DataParser = {
+            async parseYAML(text) {
+                try {
+                    return YAML.parse(text);
+                } catch (error) {
+                    throw new Error(`YAML解析错误: ${error.message}`);
+                }
+            },
+            
+            async parseCSV(text) {
+                return new Promise((resolve, reject) => {
+                    Papa.parse(text, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: (results) => {
+                            if (results.errors.length > 0) {
+                                reject(new Error(`CSV解析错误: ${results.errors.map(e => e.message).join(', ')}`));
+                            } else {
+                                resolve(results.data);
+                            }
+                        },
+                        error: (error) => {
+                            reject(new Error(`CSV解析错误: ${error.message}`));
+                        }
+                    });
+                });
+            },
+            
+            async parseJSON(text) {
+                try {
+                    return JSON.parse(text);
+                } catch (error) {
+                    throw new Error(`JSON解析错误: ${error.message}`);
+                }
+            },
+            
+            async loadFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error(`文件读取错误: ${e.target.error}`));
+                    reader.readAsText(file);
+                });
+            },
+            
+            async loadSampleData() {
+                showLoading('加载示例数据...');
+                try {
+                    const [stageText, fixturesText, cueText] = await Promise.all([
+                        this.loadFileViaFetch('./data/stage.yaml'),
+                        this.loadFileViaFetch('./data/fixtures.csv'),
+                        this.loadFileViaFetch('./data/cue_plan.json')
+                    ]);
+                    
+                    AppState.stageData = await this.parseYAML(stageText);
+                    AppState.fixturesData = await this.parseCSV(fixturesText);
+                    AppState.cueData = await this.parseJSON(cueText);
+                    
+                    this.updateFileStatus('stage', true, 'stage.yaml');
+                    this.updateFileStatus('fixtures', true, 'fixtures.csv');
+                    this.updateFileStatus('cue', true, 'cue_plan.json');
+                    
+                    hideLoading();
+                    return true;
+                } catch (error) {
+                    hideLoading();
+                    console.error('加载示例数据失败:', error);
+                    alert(`加载示例数据失败: ${error.message}`);
+                    return false;
+                }
+            },
+            
+            async loadFileViaFetch(url) {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`无法加载文件: ${url}`);
+                }
+                return response.text();
+            },
+            
+            updateFileStatus(type, success, filename) {
+                const statusEl = type === 'stage' ? DOM.stageStatus : 
+                               type === 'fixtures' ? DOM.fixturesStatus : DOM.cueStatus;
+                
+                if (success) {
+                    statusEl.innerHTML = `<div class="file-uploaded"><span>✓ ${filename}</span><span class="status">已加载</span></div>`;
+                } else {
+                    statusEl.innerHTML = `<div class="file-uploaded"><span>✗ ${filename}</span><span class="status error">加载失败</span></div>`;
+                }
+                
+                this.checkAllFilesLoaded();
+            },
+            
+            checkAllFilesLoaded() {
+                const allLoaded = AppState.stageData && AppState.fixturesData && AppState.cueData;
+                DOM.analyzeBtn.disabled = !allLoaded;
+                DOM.loadSampleBtn.disabled = allLoaded;
+                
+                if (allLoaded) {
+                    this.updateStats();
+                }
+            },
+            
+            updateStats() {
+                const statBattens = document.getElementById('stat-battens');
+                const statFixtures = document.getElementById('stat-fixtures');
+                const statCues = document.getElementById('stat-cues');
+                const statDuration = document.getElementById('stat-duration');
+                
+                if (AppState.stageData && AppState.stageData.battens) {
+                    statBattens.textContent = AppState.stageData.battens.length;
+                }
+                
+                if (AppState.fixturesData) {
+                    statFixtures.textContent = AppState.fixturesData.length;
+                }
+                
+                if (AppState.cueData && AppState.cueData.cues) {
+                    statCues.textContent = AppState.cueData.cues.length;
+                    
+                    const cues = AppState.cueData.cues;
+                    if (cues.length > 0) {
+                        const lastCue = cues[cues.length - 1];
+                        const totalTime = lastCue.start_time + lastCue.transition_time;
+                        statDuration.textContent = formatTime(totalTime);
+                    }
+                }
+            }
+        };
+        
+        // ==================== 数据验证和脏数据处理 ====================
+        const DataValidator = {
+            validateAll() {
+                const errors = [];
+                const warnings = [];
+                
+                if (!AppState.stageData) {
+                    errors.push({ type: 'error', message: '缺少舞台配置数据 (stage.yaml)' });
+                } else {
+                    const stageErrors = this.validateStageData(AppState.stageData);
+                    errors.push(...stageErrors.errors);
+                    warnings.push(...stageErrors.warnings);
+                }
+                
+                if (!AppState.fixturesData) {
+                    errors.push({ type: 'error', message: '缺少灯具/布景数据 (fixtures.csv)' });
+                } else {
+                    const fixtureErrors = this.validateFixturesData(AppState.fixturesData, AppState.stageData);
+                    errors.push(...fixtureErrors.errors);
+                    warnings.push(...fixtureErrors.warnings);
+                }
+                
+                if (!AppState.cueData) {
+                    errors.push({ type: 'error', message: '缺少Cue计划数据 (cue_plan.json)' });
+                } else {
+                    const cueErrors = this.validateCueData(AppState.cueData);
+                    errors.push(...cueErrors.errors);
+                    warnings.push(...cueErrors.warnings);
+                }
+                
+                this.displayValidationErrors(errors, warnings);
+                
+                return {
+                    hasErrors: errors.length > 0,
+                    errors,
+                    warnings
+                };
+            },
+            
+            validateStageData(stageData) {
+                const errors = [];
+                const warnings = [];
+                
+                if (!stageData.stage || !stageData.stage.dimensions) {
+                    errors.push({ type: 'error', message: '舞台配置缺少尺寸定义' });
+                }
+                
+                if (!stageData.battens || !Array.isArray(stageData.battens) || stageData.battens.length === 0) {
+                    errors.push({ type: 'error', message: '舞台配置缺少吊杆定义' });
+                } else {
+                    const battenIds = new Set();
+                    stageData.battens.forEach((batten, index) => {
+                        if (!batten.id) {
+                            errors.push({ type: 'error', message: `吊杆 #${index + 1} 缺少ID` });
+                        } else if (battenIds.has(batten.id)) {
+                            errors.push({ type: 'error', message: `吊杆ID重复: ${batten.id}` });
+                        } else {
+                            battenIds.add(batten.id);
+                        }
+                        
+                        if (batten.track) {
+                            if (batten.track.min_height >= batten.track.max_height) {
+                                errors.push({ type: 'error', message: `吊杆 ${batten.id} 的轨道范围无效: min >= max` });
+                            }
+                        }
+                        
+                        if (batten.max_load !== undefined && batten.max_load <= 0) {
+                            warnings.push({ type: 'warning', message: `吊杆 ${batten.id} 的最大载荷设置异常: ${batten.max_load} kg` });
+                        }
+                        
+                        if (batten.speed !== undefined && batten.speed <= 0) {
+                            warnings.push({ type: 'warning', message: `吊杆 ${batten.id} 的速度设置异常: ${batten.speed} m/s` });
+                        }
+                    });
+                }
+                
+                return { errors, warnings };
+            },
+            
+            validateFixturesData(fixturesData, stageData) {
+                const errors = [];
+                const warnings = [];
+                
+                const validBattenIds = stageData && stageData.battens ? 
+                    new Set(stageData.battens.map(b => b.id)) : new Set();
+                
+                fixturesData.forEach((fixture, index) => {
+                    if (!fixture.id) {
+                        errors.push({ type: 'error', message: `灯具/布景 #${index + 1} 缺少ID` });
+                    }
+                    
+                    if (!fixture.batten_id) {
+                        warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id || '#' + (index + 1)} 未指定吊杆，将被忽略` });
+                    } else if (validBattenIds.size > 0 && !validBattenIds.has(fixture.batten_id)) {
+                        warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id} 指定的吊杆 ${fixture.batten_id} 不存在` });
+                    }
+                    
+                    const hasDimensions = fixture.width !== undefined && fixture.height !== undefined && fixture.depth !== undefined;
+                    if (!hasDimensions) {
+                        warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id || '#' + (index + 1)} 缺少完整尺寸信息，将使用默认尺寸` });
+                    } else {
+                        if (fixture.width <= 0 || fixture.height <= 0 || fixture.depth <= 0) {
+                            warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id} 尺寸值无效，将使用默认尺寸` });
+                        }
+                    }
+                    
+                    if (fixture.weight === undefined || fixture.weight === null || fixture.weight === '') {
+                        warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id || '#' + (index + 1)} 缺少重量信息，假设为0kg` });
+                    } else if (fixture.weight < 0) {
+                        warnings.push({ type: 'warning', message: `灯具/布景 ${fixture.id} 重量值为负，将视为0kg` });
+                    }
+                });
+                
+                return { errors, warnings };
+            },
+            
+            validateCueData(cueData) {
+                const errors = [];
+                const warnings = [];
+                
+                if (!cueData.cues || !Array.isArray(cueData.cues) || cueData.cues.length === 0) {
+                    errors.push({ type: 'error', message: 'Cue计划为空' });
+                    return { errors, warnings };
+                }
+                
+                const cues = cueData.cues;
+                
+                for (let i = 0; i < cues.length; i++) {
+                    const cue = cues[i];
+                    
+                    if (!cue.cue_id) {
+                        errors.push({ type: 'error', message: `Cue #${i + 1} 缺少ID` });
+                    }
+                    
+                    if (cue.start_time === undefined || cue.start_time === null) {
+                        errors.push({ type: 'error', message: `Cue ${cue.cue_id || '#' + (i + 1)} 缺少开始时间` });
+                    }
+                    
+                    if (cue.transition_time === undefined || cue.transition_time === null || cue.transition_time <= 0) {
+                        warnings.push({ type: 'warning', message: `Cue ${cue.cue_id || '#' + (i + 1)} 过渡时间无效，将使用默认值5秒` });
+                    }
+                    
+                    if (!cue.batten_positions || Object.keys(cue.batten_positions).length === 0) {
+                        warnings.push({ type: 'warning', message: `Cue ${cue.cue_id || '#' + (i + 1)} 没有定义任何吊杆位置` });
+                    }
+                }
+                
+                for (let i = 1; i < cues.length; i++) {
+                    const prevCue = cues[i - 1];
+                    const currCue = cues[i];
+                    
+                    if (currCue.start_time < prevCue.start_time) {
+                        warnings.push({ type: 'warning', message: `Cue ${currCue.cue_id} 开始时间 (${currCue.start_time}s) 早于前一个Cue ${prevCue.cue_id} (${prevCue.start_time}s)，将重新排序` });
+                    }
+                    
+                    const prevEndTime = prevCue.start_time + (prevCue.transition_time || 0);
+                    if (currCue.start_time < prevEndTime) {
+                        warnings.push({ type: 'warning', message: `Cue ${currCue.cue_id} 与前一个Cue ${prevCue.cue_id} 时间重叠，将处理为连续移动` });
+                    }
+                }
+                
+                return { errors, warnings };
+            },
+            
+            displayValidationErrors(errors, warnings) {
+                const allIssues = [...errors, ...warnings];
+                
+                if (allIssues.length === 0) {
+                    DOM.validationErrors.innerHTML = '';
+                    return;
+                }
+                
+                let html = '';
+                allIssues.forEach(issue => {
+                    const className = issue.type === 'error' ? 'validation-error' : 'validation-warning';
+                    const icon = issue.type === 'error' ? '✗' : '⚠';
+                    html += `<div class="${className}">${icon} ${issue.message}</div>`;
+                });
+                
+                DOM.validationErrors.innerHTML = html;
+            },
+            
+            processAndNormalizeData() {
+                let stageData = AppState.stageData;
+                let fixturesData = AppState.fixturesData;
+                let cueData = AppState.cueData;
+                
+                stageData = this.normalizeStageData(stageData);
+                fixturesData = this.normalizeFixturesData(fixturesData, stageData);
+                cueData = this.normalizeCueData(cueData, stageData);
+                
+                AppState.parsedData = {
+                    stage: stageData,
+                    fixtures: fixturesData,
+                    cues: cueData
+                };
+                
+                return AppState.parsedData;
+            },
+            
+            normalizeStageData(stageData) {
+                const normalized = { ...stageData };
+                
+                if (!normalized.stage) {
+                    normalized.stage = {
+                        name: '未命名舞台',
+                        dimensions: { width: 16, depth: 12, height: 8 },
+                        unit: 'meter'
+                    };
+                }
+                
+                if (!normalized.stage.dimensions) {
+                    normalized.stage.dimensions = { width: 16, depth: 12, height: 8 };
+                }
+                
+                if (!normalized.battens) {
+                    normalized.battens = [];
+                }
+                
+                normalized.battens = normalized.battens.map(batten => ({
+                    ...batten,
+                    track: {
+                        min_height: batten.track?.min_height ?? 0.5,
+                        max_height: batten.track?.max_height ?? normalized.stage.dimensions.height - 0.5
+                    },
+                    max_load: batten.max_load ?? 500,
+                    speed: batten.speed ?? 0.3
+                }));
+                
+                if (!normalized.safety) {
+                    normalized.safety = {
+                        minimum_gap: 0.3,
+                        maximum_speed: 0.5
+                    };
+                }
+                
+                return normalized;
+            },
+            
+            normalizeFixturesData(fixturesData, stageData) {
+                const validBattenIds = new Set(stageData.battens.map(b => b.id));
+                
+                return fixturesData
+                    .filter(fixture => fixture.batten_id && validBattenIds.has(fixture.batten_id))
+                    .map(fixture => ({
+                        ...fixture,
+                        width: (fixture.width > 0 ? fixture.width : 0.5),
+                        height: (fixture.height > 0 ? fixture.height : 0.5),
+                        depth: (fixture.depth > 0 ? fixture.depth : 0.5),
+                        weight: (fixture.weight > 0 ? fixture.weight : 0),
+                        x_offset: fixture.x_offset ?? 0,
+                        y_offset: fixture.y_offset ?? 0,
+                        z_offset: fixture.z_offset ?? 0
+                    }));
+            },
+            
+            normalizeCueData(cueData, stageData) {
+                if (!cueData.cues || cueData.cues.length === 0) {
+                    return { ...cueData, cues: [] };
+                }
+                
+                const validBattenIds = new Set(stageData.battens.map(b => b.id));
+                
+                let cues = [...cueData.cues].map(cue => ({
+                    ...cue,
+                    transition_time: (cue.transition_time > 0 ? cue.transition_time : 5),
+                    batten_positions: Object.fromEntries(
+                        Object.entries(cue.batten_positions || {})
+                            .filter(([battenId]) => validBattenIds.has(battenId))
+                    )
+                }));
+                
+                cues.sort((a, b) => a.start_time - b.start_time);
+                
+                const processedCues = [];
+                for (let i = 0; i < cues.length; i++) {
+                    const cue = cues[i];
+                    const processedCue = { ...cue };
+                    
+                    if (i > 0) {
+                        const prevCue = processedCues[i - 1];
+                        const prevEndTime = prevCue.start_time + prevCue.transition_time;
+                        
+                        if (cue.start_time < prevEndTime) {
+                            processedCue.start_time = prevEndTime;
+                        }
+                    }
+                    
+                    if (i < cues.length - 1) {
+                        const nextCue = cues[i + 1];
+                        const thisEndTime = processedCue.start_time + processedCue.transition_time;
+                        
+                        if (nextCue.start_time > thisEndTime) {
+                            processedCue._gapUntilNext = nextCue.start_time - thisEndTime;
+                        }
+                    }
+                    
+                    processedCues.push(processedCue);
+                }
+                
+                if (processedCues.length > 0) {
+                    const lastCue = processedCues[processedCues.length - 1];
+                    AppState.totalDuration = lastCue.start_time + lastCue.transition_time;
+                }
+                
+                return {
+                    ...cueData,
+                    cues: processedCues
+                };
+            }
+        };
+        
+        // ==================== Three.js 3D场景渲染 ====================
+        const SceneRenderer = {
+            init() {
+                const canvas = document.getElementById('three-canvas');
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                
+                AppState.scene = new THREE.Scene();
+                AppState.scene.background = new THREE.Color(0x0a0a14);
+                
+                AppState.camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+                AppState.camera.position.set(20, 15, 20);
+                
+                AppState.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+                AppState.renderer.setSize(width, height);
+                AppState.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                AppState.renderer.shadowMap.enabled = true;
+                AppState.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                
+                AppState.controls = new OrbitControls(AppState.camera, AppState.renderer.domElement);
+                AppState.controls.enableDamping = true;
+                AppState.controls.dampingFactor = 0.05;
+                AppState.controls.screenSpacePanning = false;
+                AppState.controls.minDistance = 5;
+                AppState.controls.maxDistance = 100;
+                
+                this.addLights();
+                
+                window.addEventListener('resize', () => this.onWindowResize());
+                
+                this.animate();
+            },
+            
+            addLights() {
+                const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+                AppState.scene.add(ambientLight);
+                
+                const mainLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                mainLight.position.set(10, 20, 10);
+                mainLight.castShadow = true;
+                mainLight.shadow.mapSize.width = 2048;
+                mainLight.shadow.mapSize.height = 2048;
+                mainLight.shadow.camera.near = 0.5;
+                mainLight.shadow.camera.far = 100;
+                mainLight.shadow.camera.left = -30;
+                mainLight.shadow.camera.right = 30;
+                mainLight.shadow.camera.top = 30;
+                mainLight.shadow.camera.bottom = -30;
+                AppState.scene.add(mainLight);
+                
+                const fillLight = new THREE.DirectionalLight(0x606080, 0.3);
+                fillLight.position.set(-10, 10, -10);
+                AppState.scene.add(fillLight);
+                
+                const bottomLight = new THREE.DirectionalLight(0x404060, 0.2);
+                bottomLight.position.set(0, -10, 0);
+                AppState.scene.add(bottomLight);
+            },
+            
+            createStage(stageData) {
+                this.clearScene();
+                
+                const { dimensions } = stageData.stage;
+                const battens = stageData.battens;
+                
+                const groundGeometry = new THREE.PlaneGeometry(dimensions.width + 4, dimensions.depth + 4);
+                const groundMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x1a1a2e,
+                    roughness: 0.9,
+                    metalness: 0.1
+                });
+                const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+                ground.rotation.x = -Math.PI / 2;
+                ground.position.y = 0;
+                ground.receiveShadow = true;
+                AppState.scene.add(ground);
+                AppState.groundPlane = ground;
+                
+                const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x4a4a6a, linewidth: 1 });
+                const edgePoints = [
+                    new THREE.Vector3(-dimensions.width / 2, 0.01, -dimensions.depth / 2),
+                    new THREE.Vector3(dimensions.width / 2, 0.01, -dimensions.depth / 2),
+                    new THREE.Vector3(dimensions.width / 2, 0.01, dimensions.depth / 2),
+                    new THREE.Vector3(-dimensions.width / 2, 0.01, dimensions.depth / 2),
+                    new THREE.Vector3(-dimensions.width / 2, 0.01, -dimensions.depth / 2)
+                ];
+                const edgeGeometry = new THREE.BufferGeometry().setFromPoints(edgePoints);
+                const stageEdge = new THREE.Line(edgeGeometry, edgeMaterial);
+                AppState.scene.add(stageEdge);
+                
+                const gridHelper = new THREE.GridHelper(
+                    Math.max(dimensions.width, dimensions.depth) + 10,
+                    50,
+                    0x2a2a4a,
+                    0x1a1a3a
+                );
+                gridHelper.position.y = 0.005;
+                AppState.scene.add(gridHelper);
+                
+                battens.forEach(batten => {
+                    this.createBatten(batten, dimensions);
+                });
+                
+                this.setView('free');
+            },
+            
+            createBatten(batten, stageDimensions) {
+                const battenGroup = new THREE.Group();
+                
+                const barGeometry = new THREE.BoxGeometry(stageDimensions.width * 1.2, 0.1, 0.1);
+                const barMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x555577,
+                    roughness: 0.6,
+                    metalness: 0.3
+                });
+                const bar = new THREE.Mesh(barGeometry, barMaterial);
+                bar.castShadow = true;
+                bar.receiveShadow = true;
+                battenGroup.add(bar);
+                
+                const cableMaterial = new THREE.MeshStandardMaterial({ 
+                    color: 0x777777,
+                    roughness: 0.8,
+                    metalness: 0.2
+                });
+                const cableRadius = 0.02;
+                const cableHeight = batten.track.max_height;
+                
+                const leftCableGeometry = new THREE.CylinderGeometry(cableRadius, cableRadius, cableHeight, 8);
+                const leftCable = new THREE.Mesh(leftCableGeometry, cableMaterial);
+                leftCable.position.set(-stageDimensions.width / 2, cableHeight / 2, 0);
+                leftCable.castShadow = true;
+                battenGroup.add(leftCable);
+                
+                const rightCableGeometry = new THREE.CylinderGeometry(cableRadius, cableRadius, cableHeight, 8);
+                const rightCable = new THREE.Mesh(rightCableGeometry, cableMaterial);
+                rightCable.position.set(stageDimensions.width / 2, cableHeight / 2, 0);
+                rightCable.castShadow = true;
+                battenGroup.add(rightCable);
+                
+                battenGroup.position.set(
+                    batten.position?.x || 0,
+                    batten.track.max_height,
+                    batten.position?.y || 0
+                );
+                
+                AppState.scene.add(battenGroup);
+                AppState.battenMeshes[batten.id] = {
+                    group: battenGroup,
+                    bar: bar,
+                    leftCable: leftCable,
+                    rightCable: rightCable,
+                    originalY: batten.track.max_height,
+                    track: batten.track,
+                    position: batten.position || { x: 0, y: 0 }
+                };
+            },
+            
+            createFixtures(fixturesData) {
+                Object.values(AppState.fixtureMeshes).forEach(mesh => {
+                    AppState.scene.remove(mesh.group);
+                });
+                AppState.fixtureMeshes = {};
+                
+                fixturesData.forEach(fixture => {
+                    if (!fixture.batten_id) return;
+                    
+                    const battenMesh = AppState.battenMeshes[fixture.batten_id];
+                    if (!battenMesh) return;
+                    
+                    const fixtureGroup = new THREE.Group();
+                    
+                    let color;
+                    switch (fixture.type) {
+                        case 'screen':
+                            color = 0x3366cc;
+                            break;
+                        case 'set':
+                            color = 0x8b4513;
+                            break;
+                        case 'light':
+                            color = 0xffff00;
+                            break;
+                        default:
+                            color = 0x888888;
+                    }
+                    
+                    const geometry = new THREE.BoxGeometry(fixture.width, fixture.height, fixture.depth);
+                    const material = new THREE.MeshStandardMaterial({ 
+                        color,
+                        roughness: 0.5,
+                        metalness: 0.2,
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+                    fixtureGroup.add(mesh);
+                    
+                    const edges = new THREE.EdgesGeometry(geometry);
+                    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.5, transparent: true });
+                    const wireframe = new THREE.LineSegments(edges, lineMaterial);
+                    fixtureGroup.add(wireframe);
+                    
+                    const baseX = fixture.x_offset;
+                    const baseY = -fixture.height / 2 - 0.05;
+                    const baseZ = fixture.z_offset;
+                    
+                    fixtureGroup.position.set(baseX, baseY, baseZ);
+                    fixtureGroup._fixtureData = fixture;
+                    
+                    if (battenMesh.group) {
+                        battenMesh.group.add(fixtureGroup);
+                    }
+                    
+                    if (!AppState.fixtureMeshes[fixture.batten_id]) {
+                        AppState.fixtureMeshes[fixture.batten_id] = [];
+                    }
+                    AppState.fixtureMeshes[fixture.batten_id].push({
+                        group: fixtureGroup,
+                        mesh: mesh,
+                        fixture: fixture
+                    });
+                });
+            },
+            
+            clearScene() {
+                Object.values(AppState.battenMeshes).forEach(mesh => {
+                    if (mesh.group) {
+                        AppState.scene.remove(mesh.group);
+                    }
+                });
+                AppState.battenMeshes = {};
+                AppState.fixtureMeshes = {};
+            },
+            
+            updateBattenPosition(battenId, height) {
+                const battenMesh = AppState.battenMeshes[battenId];
+                if (!battenMesh) return;
+                
+                const { group, leftCable, rightCable, track, originalY } = battenMesh;
+                
+                const clampedHeight = Math.max(track.min_height, Math.min(track.max_height, height));
+                group.position.y = clampedHeight;
+                
+                if (leftCable) {
+                    leftCable.scale.y = (originalY - clampedHeight) / originalY;
+                    leftCable.position.y = clampedHeight + (originalY - clampedHeight) / 2;
+                }
+                if (rightCable) {
+                    rightCable.scale.y = (originalY - clampedHeight) / originalY;
+                    rightCable.position.y = clampedHeight + (originalY - clampedHeight) / 2;
+                }
+            },
+            
+            highlightBatten(battenId, highlight = true) {
+                const battenMesh = AppState.battenMeshes[battenId];
+                if (!battenMesh || !battenMesh.bar) return;
+                
+                if (highlight) {
+                    battenMesh.bar.material.emissive = new THREE.Color(0xff0000);
+                    battenMesh.bar.material.emissiveIntensity = 0.5;
+                } else {
+                    battenMesh.bar.material.emissive = new THREE.Color(0x000000);
+                    battenMesh.bar.material.emissiveIntensity = 0;
+                }
+            },
+            
+            setView(viewType) {
+                const stageData = AppState.parsedData?.stage;
+                if (!stageData) return;
+                
+                const { dimensions } = stageData.stage;
+                const centerX = 0;
+                const centerY = dimensions.height / 2;
+                const centerZ = dimensions.depth / 2;
+                
+                AppState.controls.target.set(centerX, centerY, centerZ);
+                
+                switch (viewType) {
+                    case 'top':
+                        AppState.camera.position.set(centerX, dimensions.height + 15, centerZ);
+                        break;
+                    case 'front':
+                        AppState.camera.position.set(centerX, centerY, dimensions.depth + 15);
+                        break;
+                    case 'side':
+                        AppState.camera.position.set(dimensions.width + 15, centerY, centerZ);
+                        break;
+                    case 'free':
+                    default:
+                        AppState.camera.position.set(20, 15, 20);
+                        break;
+                }
+                
+                AppState.controls.update();
+            },
+            
+            onWindowResize() {
+                const canvas = document.getElementById('three-canvas');
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                
+                AppState.camera.aspect = width / height;
+                AppState.camera.updateProjectionMatrix();
+                AppState.renderer.setSize(width, height);
+            },
+            
+            animate() {
+                AppState.animationId = requestAnimationFrame(() => this.animate());
+                
+                if (AppState.isPlaying && AppState.parsedData) {
+                    this.updatePlayback();
+                }
+                
+                AppState.controls.update();
+                AppState.renderer.render(AppState.scene, AppState.camera);
+            },
+            
+            updatePlayback() {
+                const now = performance.now();
+                const deltaTime = (now - AppState.lastFrameTime) / 1000;
+                AppState.lastFrameTime = now;
+                
+                AppState.currentTime += deltaTime;
+                
+                if (AppState.currentTime >= AppState.totalDuration) {
+                    AppState.currentTime = AppState.totalDuration;
+                    AppState.isPlaying = false;
+                    DOM.playBtn.classList.remove('active');
+                }
+                
+                this.updateSceneForTime(AppState.currentTime);
+                this.updatePlaybackUI();
+            },
+            
+            updateSceneForTime(time) {
+                if (!AppState.parsedData) return;
+                
+                const { cues } = AppState.parsedData.cues;
+                const { battens } = AppState.parsedData.stage;
+                
+                let currentCue = null;
+                let previousCue = null;
+                let progress = 0;
+                
+                for (let i = 0; i < cues.length; i++) {
+                    const cue = cues[i];
+                    const cueStartTime = cue.start_time;
+                    const cueEndTime = cue.start_time + cue.transition_time;
+                    
+                    if (time >= cueStartTime && time <= cueEndTime) {
+                        currentCue = cue;
+                        if (i > 0) {
+                            previousCue = cues[i - 1];
+                        }
+                        progress = (time - cueStartTime) / cue.transition_time;
+                        AppState.currentCueIndex = i;
+                        break;
+                    } else if (time > cueEndTime && i === cues.length - 1) {
+                        currentCue = cue;
+                        AppState.currentCueIndex = i;
+                        progress = 1;
+                    }
+                }
+                
+                if (!currentCue) {
+                    if (cues.length > 0) {
+                        currentCue = cues[0];
+                        AppState.currentCueIndex = 0;
+                        progress = 0;
+                    } else {
+                        return;
+                    }
+                }
+                
+                if (currentCue) {
+                    DOM.currentCueName.textContent = `${currentCue.cue_id}: ${currentCue.cue_name}`;
+                    
+                    battens.forEach(batten => {
+                        let targetHeight = batten.track.max_height;
+                        
+                        if (currentCue.batten_positions && currentCue.batten_positions[batten.id]) {
+                            targetHeight = currentCue.batten_positions[batten.id].height;
+                        }
+                        
+                        if (previousCue && progress < 1) {
+                            let prevHeight = targetHeight;
+                            if (previousCue.batten_positions && previousCue.batten_positions[batten.id]) {
+                                prevHeight = previousCue.batten_positions[batten.id].height;
+                            }
+                            
+                            targetHeight = prevHeight + (targetHeight - prevHeight) * progress;
+                        }
+                        
+                        this.updateBattenPosition(batten.id, targetHeight);
+                    });
+                    
+                    this.updateCueListHighlight();
+                }
+            },
+            
+            updatePlaybackUI() {
+                DOM.currentTime.textContent = formatTime(AppState.currentTime);
+                DOM.totalTime.textContent = formatTime(AppState.totalDuration);
+                DOM.overlayTime.textContent = formatTime(AppState.currentTime);
+                
+                const sliderValue = AppState.totalDuration > 0 ? 
+                    (AppState.currentTime / AppState.totalDuration) * 100 : 0;
+                DOM.timeSlider.value = sliderValue;
+            },
+            
+            updateCueListHighlight() {
+                const cueItems = DOM.cueListItems.querySelectorAll('.cue-item');
+                cueItems.forEach((item, index) => {
+                    if (index === AppState.currentCueIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+        };
+        
+        // ==================== 风险检测模块 ====================
+        const RiskDetector = {
+            detectAllRisks() {
+                AppState.risks = [];
+                
+                if (!AppState.parsedData) return [];
+                
+                const { stage, fixtures, cues: cuesData } = AppState.parsedData;
+                const cues = cuesData.cues || [];
+                
+                this.detectOverweightRisks(stage, fixtures);
+                this.detectOutOfBoundsRisks(stage, cues);
+                this.detectCollisionRisks(stage, fixtures, cues);
+                this.detectSafetyGapRisks(stage, cues);
+                
+                this.updateRiskUI();
+                
+                return AppState.risks;
+            },
+            
+            detectOverweightRisks(stage, fixtures) {
+                const battenLoads = {};
+                
+                fixtures.forEach(fixture => {
+                    if (!battenLoads[fixture.batten_id]) {
+                        battenLoads[fixture.batten_id] = 0;
+                    }
+                    battenLoads[fixture.batten_id] += fixture.weight || 0;
+                });
+                
+                stage.battens.forEach(batten => {
+                    const load = battenLoads[batten.id] || 0;
+                    const maxLoad = batten.max_load || 500;
+                    
+                    if (load > maxLoad) {
+                        AppState.risks.push({
+                            id: `overweight_${batten.id}`,
+                            type: 'overweight',
+                            severity: 'warning',
+                            battenId: batten.id,
+                            battenName: batten.name,
+                            currentLoad: load,
+                            maxLoad: maxLoad,
+                            description: `吊杆 "${batten.name}" (${batten.id}) 超重: 当前 ${load.toFixed(1)}kg / 最大 ${maxLoad}kg`,
+                            time: null
+                        });
+                    }
+                });
+            },
+            
+            detectOutOfBoundsRisks(stage, cues) {
+                cues.forEach((cue, cueIndex) => {
+                    if (!cue.batten_positions) return;
+                    
+                    Object.entries(cue.batten_positions).forEach(([battenId, position]) => {
+                        const batten = stage.battens.find(b => b.id === battenId);
+                        if (!batten) return;
+                        
+                        const height = position.height;
+                        const minHeight = batten.track.min_height;
+                        const maxHeight = batten.track.max_height;
+                        
+                        if (height < minHeight) {
+                            AppState.risks.push({
+                                id: `outofbounds_low_${battenId}_${cue.cue_id}`,
+                                type: 'out-of-bounds',
+                                severity: 'warning',
+                                battenId: battenId,
+                                battenName: batten.name,
+                                cueId: cue.cue_id,
+                                cueName: cue.cue_name,
+                                height: height,
+                                minHeight: minHeight,
+                                description: `Cue "${cue.cue_name}" (${cue.cue_id}) 中吊杆 "${batten.name}" 高度 (${height}m) 低于最低限制 (${minHeight}m)`,
+                                time: cue.start_time
+                            });
+                        }
+                        
+                        if (height > maxHeight) {
+                            AppState.risks.push({
+                                id: `outofbounds_high_${battenId}_${cue.cue_id}`,
+                                type: 'out-of-bounds',
+                                severity: 'warning',
+                                battenId: battenId,
+                                battenName: batten.name,
+                                cueId: cue.cue_id,
+                                cueName: cue.cue_name,
+                                height: height,
+                                maxHeight: maxHeight,
+                                description: `Cue "${cue.cue_name}" (${cue.cue_id}) 中吊杆 "${batten.name}" 高度 (${height}m) 高于最高限制 (${maxHeight}m)`,
+                                time: cue.start_time
+                            });
+                        }
+                    });
+                });
+            },
+            
+            detectCollisionRisks(stage, fixtures, cues) {
+                const battenFixtures = {};
+                fixtures.forEach(fixture => {
+                    if (!battenFixtures[fixture.batten_id]) {
+                        battenFixtures[fixture.batten_id] = [];
+                    }
+                    battenFixtures[fixture.batten_id].push(fixture);
+                });
+                
+                for (let i = 0; i < cues.length; i++) {
+                    const cue = cues[i];
+                    const prevCue = i > 0 ? cues[i - 1] : null;
+                    
+                    if (!cue.batten_positions) continue;
+                    
+                    const battenPositions = {};
+                    
+                    Object.entries(cue.batten_positions).forEach(([battenId, position]) => {
+                        const batten = stage.battens.find(b => b.id === battenId);
+                        if (!batten) return;
+                        
+                        let startHeight = position.height;
+                        if (prevCue && prevCue.batten_positions && prevCue.batten_positions[battenId]) {
+                            startHeight = prevCue.batten_positions[battenId].height;
+                        }
+                        
+                        battenPositions[battenId] = {
+                            startHeight: startHeight,
+                            endHeight: position.height,
+                            batten: batten,
+                            fixtures: battenFixtures[battenId] || []
+                        };
+                    });
+                    
+                    const steps = 20;
+                    for (let step = 0; step <= steps; step++) {
+                        const progress = step / steps;
+                        
+                        const positionsAtTime = {};
+                        Object.entries(battenPositions).forEach(([battenId, pos]) => {
+                            const height = pos.startHeight + (pos.endHeight - pos.startHeight) * progress;
+                            positionsAtTime[battenId] = {
+                                height: height,
+                                batten: pos.batten,
+                                fixtures: pos.fixtures
+                            };
+                        });
+                        
+                        const battenIds = Object.keys(positionsAtTime);
+                        for (let j = 0; j < battenIds.length; j++) {
+                            for (let k = j + 1; k < battenIds.length; k++) {
+                                const battenId1 = battenIds[j];
+                                const battenId2 = battenIds[k];
+                                
+                                const pos1 = positionsAtTime[battenId1];
+                                const pos2 = positionsAtTime[battenId2];
+                                
+                                if (this.checkCollision(pos1, pos2, stage.stage.dimensions)) {
+                                    const riskId = `collision_${battenId1}_${battenId2}_${cue.cue_id}_${step}`;
+                                    const existingRisk = AppState.risks.find(r => 
+                                        r.type === 'collision' && 
+                                        r.battenId1 === battenId1 && 
+                                        r.battenId2 === battenId2 &&
+                                        r.cueId === cue.cue_id
+                                    );
+                                    
+                                    if (!existingRisk) {
+                                        AppState.risks.push({
+                                            id: riskId,
+                                            type: 'collision',
+                                            severity: 'critical',
+                                            battenId1: battenId1,
+                                            battenId2: battenId2,
+                                            battenName1: pos1.batten.name,
+                                            battenName2: pos2.batten.name,
+                                            cueId: cue.cue_id,
+                                            cueName: cue.cue_name,
+                                            progress: progress,
+                                            description: `Cue "${cue.cue_name}" (${cue.cue_id}) 中吊杆 "${pos1.batten.name}" (${battenId1}) 与吊杆 "${pos2.batten.name}" (${battenId2}) 发生碰撞`,
+                                            time: cue.start_time + cue.transition_time * progress
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            
+            checkCollision(pos1, pos2, stageDimensions) {
+                const yDistance = Math.abs(pos1.batten.position.y - pos2.batten.position.y);
+                
+                if (yDistance > 0.5) return false;
+                
+                const heightDiff = Math.abs(pos1.height - pos2.height);
+                
+                const fixtures1 = pos1.fixtures;
+                const fixtures2 = pos2.fixtures;
+                
+                if (fixtures1.length === 0 && fixtures2.length === 0) {
+                    return heightDiff < 0.2;
+                }
+                
+                for (const f1 of fixtures1) {
+                    for (const f2 of fixtures2) {
+                        const f1Bottom = pos1.height - f1.height - 0.05;
+                        const f1Top = pos1.height - 0.05;
+                        const f1Left = f1.x_offset - f1.width / 2;
+                        const f1Right = f1.x_offset + f1.width / 2;
+                        
+                        const f2Bottom = pos2.height - f2.height - 0.05;
+                        const f2Top = pos2.height - 0.05;
+                        const f2Left = f2.x_offset - f2.width / 2;
+                        const f2Right = f2.x_offset + f2.width / 2;
+                        
+                        const overlapX = !(f1Right < f2Left || f2Right < f1Left);
+                        const overlapY = !(f1Top < f2Bottom || f2Top < f1Bottom);
+                        
+                        if (overlapX && overlapY) {
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            },
+            
+            detectSafetyGapRisks(stage, cues) {
+                const minimumGap = stage.safety?.minimum_gap || 0.3;
+                
+                const battensByY = [...stage.battens].sort((a, b) => a.position.y - b.position.y);
+                
+                for (let i = 0; i < cues.length; i++) {
+                    const cue = cues[i];
+                    const prevCue = i > 0 ? cues[i - 1] : null;
+                    
+                    if (!cue.batten_positions) continue;
+                    
+                    const steps = 10;
+                    for (let step = 0; step <= steps; step++) {
+                        const progress = step / steps;
+                        
+                        const positionsAtTime = {};
+                        battensByY.forEach(batten => {
+                            if (!cue.batten_positions[batten.id]) return;
+                            
+                            let startHeight = cue.batten_positions[batten.id].height;
+                            if (prevCue && prevCue.batten_positions && prevCue.batten_positions[batten.id]) {
+                                startHeight = prevCue.batten_positions[batten.id].height;
+                            }
+                            
+                            const endHeight = cue.batten_positions[batten.id].height;
+                            positionsAtTime[batten.id] = {
+                                height: startHeight + (endHeight - startHeight) * progress,
+                                batten: batten
+                            };
+                        });
+                        
+                        for (let j = 0; j < battensByY.length - 1; j++) {
+                            const batten1 = battensByY[j];
+                            const batten2 = battensByY[j + 1];
+                            
+                            const pos1 = positionsAtTime[batten1.id];
+                            const pos2 = positionsAtTime[batten2.id];
+                            
+                            if (!pos1 || !pos2) continue;
+                            
+                            const yDistance = Math.abs(batten1.position.y - batten2.position.y);
+                            
+                            if (yDistance > 2.0) continue;
+                            
+                            const heightGap = Math.abs(pos1.height - pos2.height);
+                            
+                            if (heightGap < minimumGap) {
+                                const riskId = `safetygap_${batten1.id}_${batten2.id}_${cue.cue_id}`;
+                                const existingRisk = AppState.risks.find(r => 
+                                    r.type === 'safety-gap' && 
+                                    r.battenId1 === batten1.id && 
+                                    r.battenId2 === batten2.id &&
+                                    r.cueId === cue.cue_id
+                                );
+                                
+                                if (!existingRisk) {
+                                    AppState.risks.push({
+                                        id: riskId,
+                                        type: 'safety-gap',
+                                        severity: 'warning',
+                                        battenId1: batten1.id,
+                                        battenId2: batten2.id,
+                                        battenName1: batten1.name,
+                                        battenName2: batten2.name,
+                                        cueId: cue.cue_id,
+                                        cueName: cue.cue_name,
+                                        currentGap: heightGap,
+                                        minimumGap: minimumGap,
+                                        description: `Cue "${cue.cue_name}" (${cue.cue_id}) 中吊杆 "${batten1.name}" 与 "${batten2.name}" 安全距离不足: 当前 ${heightGap.toFixed(2)}m / 最小 ${minimumGap}m`,
+                                        time: cue.start_time + cue.transition_time * progress
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            
+            updateRiskUI() {
+                const collisions = AppState.risks.filter(r => r.type === 'collision').length;
+                const overweight = AppState.risks.filter(r => r.type === 'overweight').length;
+                const outOfBounds = AppState.risks.filter(r => r.type === 'out-of-bounds').length;
+                const safetyGap = AppState.risks.filter(r => r.type === 'safety-gap').length;
+                
+                document.getElementById('risk-collisions').textContent = collisions;
+                document.getElementById('risk-overweight').textContent = overweight;
+                document.getElementById('risk-out-of-bounds').textContent = outOfBounds;
+                document.getElementById('risk-safety-gap').textContent = safetyGap;
+                
+                if (AppState.risks.length === 0) {
+                    DOM.risksList.innerHTML = `
+                        <div class="no-risks">
+                            ✓ 未检测到风险<br>
+                            <small>所有吊杆运行状态正常</small>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                const sortedRisks = [...AppState.risks].sort((a, b) => {
+                    const severityOrder = { critical: 0, warning: 1 };
+                    const severityDiff = (severityOrder[a.severity] || 1) - (severityOrder[b.severity] || 1);
+                    if (severityDiff !== 0) return severityDiff;
+                    return (a.time ?? 0) - (b.time ?? 0);
+                });
+                
+                sortedRisks.forEach(risk => {
+                    let metaInfo = '';
+                    if (risk.cueId) {
+                        metaInfo += `Cue: ${risk.cueId}`;
+                    }
+                    if (risk.time !== null && risk.time !== undefined) {
+                        metaInfo += metaInfo ? ' | ' : '';
+                        metaInfo += `时间: ${formatTime(risk.time)}`;
+                    }
+                    
+                    html += `
+                        <div class="risk-item ${risk.type}" data-risk-id="${risk.id}">
+                            <h4>${this.getRiskTypeLabel(risk.type)}</h4>
+                            ${metaInfo ? `<div class="risk-meta">${metaInfo}</div>` : ''}
+                            <div class="risk-description">${risk.description}</div>
+                        </div>
+                    `;
+                });
+                
+                DOM.risksList.innerHTML = html;
+            },
+            
+            getRiskTypeLabel(type) {
+                const labels = {
+                    'collision': '⚠️ 碰撞风险',
+                    'overweight': '⚖️ 超重风险',
+                    'out-of-bounds': '🚫 越界风险',
+                    'safety-gap': '⚠️ 安全距离不足'
+                };
+                return labels[type] || type;
+            }
+        };
+        
+        // ==================== 导出模块 ====================
+        const Exporter = {
+            exportIssuesCSV() {
+                if (AppState.risks.length === 0) {
+                    alert('没有检测到风险，无法导出');
+                    return;
+                }
+                
+                const headers = ['ID', '类型', '严重程度', '描述', 'Cue', '时间(s)', '相关吊杆1', '相关吊杆2'];
+                const rows = [headers];
+                
+                AppState.risks.forEach(risk => {
+                    rows.push([
+                        risk.id,
+                        risk.type,
+                        risk.severity,
+                        risk.description,
+                        risk.cueId || '-',
+                        risk.time !== null && risk.time !== undefined ? risk.time.toFixed(2) : '-',
+                        risk.battenId || risk.battenId1 || '-',
+                        risk.battenId2 || '-'
+                    ]);
+                });
+                
+                const csvContent = rows.map(row => 
+                    row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+                ).join('\n');
+                
+                const BOM = '\uFEFF';
+                downloadFile(BOM + csvContent, 'issues.csv', 'text/csv;charset=utf-8');
+            },
+            
+            exportReportMD() {
+                const { stage, fixtures, cues } = AppState.parsedData || {};
+                
+                let md = `# 舞台吊杆防撞预演报告\n\n`;
+                md += `**生成时间**: ${new Date().toLocaleString('zh-CN')}\n\n`;
+                md += `---\n\n`;
+                
+                md += `## 一、项目概览\n\n`;
+                md += `- **舞台名称**: ${stage?.stage?.name || '未命名'}\n`;
+                md += `- **舞台尺寸**: ${stage?.stage?.dimensions?.width || '-'}m × ${stage?.stage?.dimensions?.depth || '-'}m × ${stage?.stage?.dimensions?.height || '-'}m\n`;
+                md += `- **吊杆数量**: ${stage?.battens?.length || 0}\n`;
+                md += `- **灯具/布景数量**: ${fixtures?.length || 0}\n`;
+                md += `- **Cue数量**: ${cues?.cues?.length || 0}\n`;
+                md += `- **总时长**: ${formatTime(AppState.totalDuration || 0)}\n\n`;
+                
+                md += `## 二、风险统计\n\n`;
+                const collisions = AppState.risks.filter(r => r.type === 'collision').length;
+                const overweight = AppState.risks.filter(r => r.type === 'overweight').length;
+                const outOfBounds = AppState.risks.filter(r => r.type === 'out-of-bounds').length;
+                const safetyGap = AppState.risks.filter(r => r.type === 'safety-gap').length;
+                const total = collisions + overweight + outOfBounds + safetyGap;
+                
+                md += `- **总风险数**: ${total}\n`;
+                md += `  - 🔴 碰撞风险: ${collisions}\n`;
+                md += `  - 🟠 超重风险: ${overweight}\n`;
+                md += `  - 🟣 越界风险: ${outOfBounds}\n`;
+                md += `  - 🟡 安全距离不足: ${safetyGap}\n\n`;
+                
+                if (total > 0) {
+                    md += `## 三、风险详情\n\n`;
+                    
+                    if (collisions > 0) {
+                        md += `### 3.1 碰撞风险 (${collisions}个)\n\n`;
+                        AppState.risks.filter(r => r.type === 'collision').forEach((risk, i) => {
+                            md += `**${i + 1}. ${risk.cueName || '未知Cue'} (${risk.cueId || '-'})**\n\n`;
+                            md += `- **时间**: ${risk.time !== null && risk.time !== undefined ? formatTime(risk.time) : '-'}\n`;
+                            md += `- **涉及吊杆**: ${risk.battenName1} (${risk.battenId1}) ↔ ${risk.battenName2} (${risk.battenId2})\n`;
+                            md += `- **描述**: ${risk.description}\n\n`;
+                        });
+                    }
+                    
+                    if (overweight > 0) {
+                        md += `### 3.2 超重风险 (${overweight}个)\n\n`;
+                        AppState.risks.filter(r => r.type === 'overweight').forEach((risk, i) => {
+                            md += `**${i + 1}. ${risk.battenName} (${risk.battenId})**\n\n`;
+                            md += `- **当前载荷**: ${risk.currentLoad?.toFixed(1) || '-'} kg\n`;
+                            md += `- **最大载荷**: ${risk.maxLoad || '-'} kg\n`;
+                            md += `- **描述**: ${risk.description}\n\n`;
+                        });
+                    }
+                    
+                    if (outOfBounds > 0) {
+                        md += `### 3.3 越界风险 (${outOfBounds}个)\n\n`;
+                        AppState.risks.filter(r => r.type === 'out-of-bounds').forEach((risk, i) => {
+                            md += `**${i + 1}. ${risk.cueName || '未知Cue'} (${risk.cueId || '-'})**\n\n`;
+                            md += `- **吊杆**: ${risk.battenName} (${risk.battenId})\n`;
+                            md += `- **设置高度**: ${risk.height} m\n`;
+                            md += `- **限制范围**: ${risk.minHeight || '-'} m ~ ${risk.maxHeight || '-'} m\n`;
+                            md += `- **描述**: ${risk.description}\n\n`;
+                        });
+                    }
+                    
+                    if (safetyGap > 0) {
+                        md += `### 3.4 安全距离不足 (${safetyGap}个)\n\n`;
+                        AppState.risks.filter(r => r.type === 'safety-gap').forEach((risk, i) => {
+                            md += `**${i + 1}. ${risk.cueName || '未知Cue'} (${risk.cueId || '-'})**\n\n`;
+                            md += `- **时间**: ${risk.time !== null && risk.time !== undefined ? formatTime(risk.time) : '-'}\n`;
+                            md += `- **涉及吊杆**: ${risk.battenName1} (${risk.battenId1}) ↔ ${risk.battenName2} (${risk.battenId2})\n`;
+                            md += `- **当前距离**: ${risk.currentGap?.toFixed(2) || '-'} m\n`;
+                            md += `- **最小安全距离**: ${risk.minimumGap || '-'} m\n`;
+                            md += `- **描述**: ${risk.description}\n\n`;
+                        });
+                    }
+                }
+                
+                md += `## 四、Cue列表\n\n`;
+                if (cues?.cues?.length > 0) {
+                    md += `| Cue ID | Cue名称 | 开始时间 | 过渡时间 | 结束时间 |\n`;
+                    md += `|--------|---------|----------|----------|----------|\n`;
+                    cues.cues.forEach(cue => {
+                        const endTime = cue.start_time + cue.transition_time;
+                        md += `| ${cue.cue_id} | ${cue.cue_name} | ${formatTime(cue.start_time)} | ${formatTime(cue.transition_time)} | ${formatTime(endTime)} |\n`;
+                    });
+                    md += '\n';
+                }
+                
+                md += `---\n\n`;
+                md += `*报告由 3D舞台吊杆防撞预演工具 生成*\n`;
+                
+                downloadFile(md, 'replay_report.md', 'text/markdown;charset=utf-8');
+            }
+        };
+        
+        // ==================== 事件绑定 ====================
+        function bindEvents() {
+            DOM.loadSampleBtn.addEventListener('click', async () => {
+                const success = await DataParser.loadSampleData();
+                if (success) {
+                    DataValidator.validateAll();
+                }
+            });
+            
+            DOM.stageFile.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await DataParser.loadFile(file);
+                    AppState.stageData = await DataParser.parseYAML(text);
+                    DataParser.updateFileStatus('stage', true, file.name);
+                    DataValidator.validateAll();
+                } catch (error) {
+                    DataParser.updateFileStatus('stage', false, file.name);
+                    alert(`加载失败: ${error.message}`);
+                }
+            });
+            
+            DOM.fixturesFile.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await DataParser.loadFile(file);
+                    AppState.fixturesData = await DataParser.parseCSV(text);
+                    DataParser.updateFileStatus('fixtures', true, file.name);
+                    DataValidator.validateAll();
+                } catch (error) {
+                    DataParser.updateFileStatus('fixtures', false, file.name);
+                    alert(`加载失败: ${error.message}`);
+                }
+            });
+            
+            DOM.cueFile.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await DataParser.loadFile(file);
+                    AppState.cueData = await DataParser.parseJSON(text);
+                    DataParser.updateFileStatus('cue', true, file.name);
+                    DataValidator.validateAll();
+                } catch (error) {
+                    DataParser.updateFileStatus('cue', false, file.name);
+                    alert(`加载失败: ${error.message}`);
+                }
+            });
+            
+            document.querySelectorAll('.file-upload').forEach(upload => {
+                upload.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    upload.classList.add('drag-over');
+                });
+                
+                upload.addEventListener('dragleave', () => {
+                    upload.classList.remove('drag-over');
+                });
+                
+                upload.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    upload.classList.remove('drag-over');
+                    
+                    const file = e.dataTransfer.files[0];
+                    if (!file) return;
+                    
+                    const type = upload.dataset.type;
+                    const inputId = type === 'stage' ? 'stage-file' : 
+                                   type === 'fixtures' ? 'fixtures-file' : 'cue-file';
+                    const input = document.getElementById(inputId);
+                    
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    input.files = dataTransfer.files;
+                    input.dispatchEvent(new Event('change'));
+                });
+            });
+            
+            DOM.analyzeBtn.addEventListener('click', () => {
+                showLoading('分析数据中...');
+                
+                setTimeout(() => {
+                    try {
+                        DataValidator.processAndNormalizeData();
+                        
+                        if (AppState.parsedData) {
+                            SceneRenderer.createStage(AppState.parsedData.stage);
+                            SceneRenderer.createFixtures(AppState.parsedData.fixtures);
+                            
+                            RiskDetector.detectAllRisks();
+                            
+                            updateCueList();
+                            
+                            enablePlaybackControls();
+                            
+                            DOM.exportIssuesBtn.disabled = false;
+                            DOM.exportReportBtn.disabled = false;
+                            
+                            hideLoading();
+                        }
+                    } catch (error) {
+                        hideLoading();
+                        console.error('分析失败:', error);
+                        alert(`分析失败: ${error.message}`);
+                    }
+                }, 100);
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(`tab-${tabId}`).classList.add('active');
+                });
+            });
+            
+            DOM.playBtn.addEventListener('click', () => {
+                if (!AppState.parsedData) return;
+                
+                if (AppState.isPlaying) {
+                    AppState.isPlaying = false;
+                    DOM.playBtn.classList.remove('active');
+                } else {
+                    if (AppState.currentTime >= AppState.totalDuration) {
+                        AppState.currentTime = 0;
+                    }
+                    AppState.isPlaying = true;
+                    AppState.lastFrameTime = performance.now();
+                    DOM.playBtn.classList.add('active');
+                }
+            });
+            
+            DOM.pauseBtn.addEventListener('click', () => {
+                AppState.isPlaying = false;
+                DOM.playBtn.classList.remove('active');
+            });
+            
+            DOM.resetBtn.addEventListener('click', () => {
+                AppState.isPlaying = false;
+                AppState.currentTime = 0;
+                AppState.currentCueIndex = 0;
+                DOM.playBtn.classList.remove('active');
+                
+                if (AppState.parsedData) {
+                    SceneRenderer.updateSceneForTime(0);
+                    SceneRenderer.updatePlaybackUI();
+                }
+            });
+            
+            DOM.stepBackBtn.addEventListener('click', () => {
+                if (!AppState.parsedData) return;
+                AppState.isPlaying = false;
+                DOM.playBtn.classList.remove('active');
+                
+                AppState.currentTime = Math.max(0, AppState.currentTime - 1);
+                SceneRenderer.updateSceneForTime(AppState.currentTime);
+                SceneRenderer.updatePlaybackUI();
+            });
+            
+            DOM.stepForwardBtn.addEventListener('click', () => {
+                if (!AppState.parsedData) return;
+                AppState.isPlaying = false;
+                DOM.playBtn.classList.remove('active');
+                
+                AppState.currentTime = Math.min(AppState.totalDuration, AppState.currentTime + 1);
+                SceneRenderer.updateSceneForTime(AppState.currentTime);
+                SceneRenderer.updatePlaybackUI();
+            });
+            
+            DOM.timeSlider.addEventListener('input', (e) => {
+                if (!AppState.parsedData) return;
+                
+                const value = parseFloat(e.target.value);
+                AppState.currentTime = (value / 100) * AppState.totalDuration;
+                
+                SceneRenderer.updateSceneForTime(AppState.currentTime);
+                SceneRenderer.updatePlaybackUI();
+            });
+            
+            document.getElementById('view-top').addEventListener('click', () => SceneRenderer.setView('top'));
+            document.getElementById('view-front').addEventListener('click', () => SceneRenderer.setView('front'));
+            document.getElementById('view-side').addEventListener('click', () => SceneRenderer.setView('side'));
+            document.getElementById('view-free').addEventListener('click', () => SceneRenderer.setView('free'));
+            
+            DOM.exportIssuesBtn.addEventListener('click', () => Exporter.exportIssuesCSV());
+            DOM.exportReportBtn.addEventListener('click', () => Exporter.exportReportMD());
+        }
+        
+        function updateCueList() {
+            if (!AppState.parsedData || !AppState.parsedData.cues) return;
+            
+            const cues = AppState.parsedData.cues.cues;
+            
+            if (cues.length === 0) {
+                DOM.cueListItems.innerHTML = `<div class="no-risks">暂无Cue数据</div>`;
+                return;
+            }
+            
+            let html = '';
+            cues.forEach((cue, index) => {
+                const endTime = cue.start_time + cue.transition_time;
+                html += `
+                    <div class="cue-item" data-cue-index="${index}" data-cue-id="${cue.cue_id}">
+                        <span>${cue.cue_id}: ${cue.cue_name}</span>
+                        <span>${formatTime(cue.start_time)}</span>
+                    </div>
+                `;
+            });
+            
+            DOM.cueListItems.innerHTML = html;
+            
+            DOM.cueListItems.querySelectorAll('.cue-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const cueIndex = parseInt(item.dataset.cueIndex);
+                    const cue = cues[cueIndex];
+                    
+                    AppState.isPlaying = false;
+                    DOM.playBtn.classList.remove('active');
+                    
+                    AppState.currentTime = cue.start_time;
+                    AppState.currentCueIndex = cueIndex;
+                    
+                    SceneRenderer.updateSceneForTime(AppState.currentTime);
+                    SceneRenderer.updatePlaybackUI();
+                });
+            });
+        }
+        
+        function enablePlaybackControls() {
+            DOM.playBtn.disabled = false;
+            DOM.pauseBtn.disabled = false;
+            DOM.resetBtn.disabled = false;
+            DOM.stepBackBtn.disabled = false;
+            DOM.stepForwardBtn.disabled = false;
+            DOM.timeSlider.disabled = false;
+        }
+        
+        // ==================== 初始化 ====================
+        function init() {
+            SceneRenderer.init();
+            bindEvents();
+            
+            console.log('3D舞台吊杆防撞预演工具已初始化');
+        }
+        
+        init();
+    </script>
+</body>
+</html>

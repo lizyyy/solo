@@ -1,0 +1,78 @@
+stage:
+  name: "主舞台"
+  dimensions:
+    width: 16.0
+    depth: 12.0
+    height: 8.0
+  unit: "meter"
+
+battens:
+  - id: "B1"
+    name: "前檐景杆"
+    position:
+      x: 0.0
+      y: 2.5
+    track:
+      min_height: 0.5
+      max_height: 7.5
+    max_load: 500.0
+    speed: 0.3
+
+  - id: "B2"
+    name: "主屏吊杆"
+    position:
+      x: 0.0
+      y: 4.0
+    track:
+      min_height: 0.5
+      max_height: 7.5
+    max_load: 800.0
+    speed: 0.25
+
+  - id: "B3"
+    name: "侧屏吊杆"
+    position:
+      x: 0.0
+      y: 5.5
+    track:
+      min_height: 0.5
+      max_height: 7.5
+    max_load: 600.0
+    speed: 0.3
+
+  - id: "B4"
+    name: "背景吊杆"
+    position:
+      x: 0.0
+      y: 7.0
+    track:
+      min_height: 0.5
+      max_height: 7.5
+    max_load: 400.0
+    speed: 0.35
+
+  - id: "B5"
+    name: "灯光杆1"
+    position:
+      x: 0.0
+      y: 1.5
+    track:
+      min_height: 1.0
+      max_height: 7.5
+    max_load: 300.0
+    speed: 0.4
+
+  - id: "B6"
+    name: "灯光杆2"
+    position:
+      x: 0.0
+      y: 3.0
+    track:
+      min_height: 1.0
+      max_height: 7.5
+    max_load: 300.0
+    speed: 0.4
+
+safety:
+  minimum_gap: 0.3
+  maximum_speed: 0.5
