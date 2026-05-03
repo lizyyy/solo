@@ -1,0 +1,64 @@
+# 泳池水质投药复盘规则配置
+
+# 余氯衰减规则
+chlorine_decay:
+  # 每小时最大正常衰减率 (mg/L/hour)
+  max_decay_rate_per_hour: 0.3
+  # 临界衰减阈值 - 超过此值标记为严重问题
+  critical_decay_threshold: 0.5
+  # 衰减分析窗口 (分钟)
+  decay_window_minutes: 60
+
+# 超窗检测规则
+out_of_window:
+  # pH正常范围
+  ph_min: 7.2
+  ph_max: 7.6
+  # ORP正常范围 (mV)
+  orp_min: 650
+  orp_max: 850
+  # 超窗持续时间阈值 (分钟) - 超过此时间标记为警告
+  out_of_window_duration_minutes: 15
+  # 临界超窗时间 (分钟) - 超过此时间标记为严重问题
+  critical_outage_duration_minutes: 30
+
+# 客流后补测规则
+post_visitor_check:
+  # 客流结束后延迟检查时间 (分钟)
+  check_delay_minutes: 30
+  # 检查窗口时长 (分钟)
+  check_window_minutes: 60
+  # 需要的有效读数数量
+  required_readings: 3
+
+# 投药冷却窗口规则
+dosing_cooling:
+  # 投药后冷却时间 (分钟) - 在此期间不建议投加禁忌化学品
+  cooling_minutes: 30
+  # 冷却期间禁忌投加的化学品
+  forbidden_chemicals:
+    - chlorine
+    - ph_minus
+    - ph_plus
+
+# 传感器监控规则
+sensor_monitoring:
+  # 最大允许数据间隔 (分钟)
+  max_gap_minutes: 5
+  # 临界断采时间 (分钟)
+  critical_gap_minutes: 30
+
+# 严重级别阈值配置
+severity:
+  # 余氯衰减严重程度
+  chlorine_decay:
+    warning_threshold: 0.3
+    critical_threshold: 0.5
+  # 超窗严重程度
+  out_of_window:
+    warning_minutes: 15
+    critical_minutes: 30
+  # 传感器断采严重程度
+  sensor_gap:
+    warning_minutes: 5
+    critical_minutes: 30

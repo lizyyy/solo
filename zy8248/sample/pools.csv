@@ -1,0 +1,5 @@
+pool_id,pool_name,volume_cubic_meters,target_free_chlorine_min,target_free_chlorine_max,target_ph_min,target_ph_max,target_orp_min,target_orp_max,daily_open_time,daily_close_time
+pool_001,竞赛池,500.0,0.3,1.0,7.2,7.6,650,850,06:00,22:00
+pool_002,训练池,300.0,0.4,1.2,7.2,7.6,650,850,08:00,23:00
+pool_003,戏水池,150.0,0.3,0.8,7.4,7.8,650,800,09:00,21:00
+pool_004,夜间池,200.0,0.3,1.0,7.2,7.6,650,850,22:00,06:00
