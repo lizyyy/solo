@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>救援调度夜班</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 游戏标题 -->
+    <header class="game-header">
+      <h1>救援调度夜班</h1>
+      <div class="game-info">
+        <span id="turn-display">回合: 1</span>
+        <span id="reputation-display">信誉: 100</span>
+        <span id="active-events-display">当前事件: 0</span>
+      </div>
+    </header>
+
+    <!-- 主游戏区域 -->
+    <main class="game-container">
+      <!-- 左侧：地图区域 -->
+      <section class="map-section">
+        <div id="game-map" class="grid-map"></div>
+        <div class="map-legend">
+          <div class="legend-item"><span class="legend-color road"></span> 道路</div>
+          <div class="legend-item"><span class="legend-color building"></span> 建筑</div>
+          <div class="legend-item"><span class="legend-color blocked"></span> 堵塞</div>
+          <div class="legend-item"><span class="legend-color ambulance"></span> 救护车</div>
+          <div class="legend-item"><span class="legend-color repair"></span> 维修车</div>
+          <div class="legend-item"><span class="legend-color volunteer"></span> 志愿者</div>
+        </div>
+      </section>
+
+      <!-- 右侧：控制面板 -->
+      <section class="control-section">
+        <!-- 单位面板 -->
+        <div class="panel units-panel">
+          <h2>可用单位</h2>
+          <div id="units-list" class="units-list"></div>
+        </div>
+
+        <!-- 事件面板 -->
+        <div class="panel events-panel">
+          <h2>当前事件</h2>
+          <div id="events-list" class="events-list"></div>
+        </div>
+
+        <!-- 事件牌堆 -->
+        <div class="panel deck-panel">
+          <h2>事件牌堆</h2>
+          <div id="deck-info" class="deck-info">
+            <span>剩余: <span id="deck-count">0</span> 张</span>
+            <button id="draw-event-btn" class="btn btn-primary">抽取事件</button>
+          </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="panel actions-panel">
+          <h2>游戏操作</h2>
+          <div class="action-buttons">
+            <button id="next-turn-btn" class="btn btn-success">下一回合</button>
+            <button id="save-btn" class="btn btn-warning">保存游戏</button>
+            <button id="load-btn" class="btn btn-warning">加载存档</button>
+            <button id="replay-btn" class="btn btn-info">查看回放</button>
+            <button id="restart-btn" class="btn btn-danger">重新开始</button>
+          </div>
+        </div>
+
+        <!-- 游戏日志 -->
+        <div class="panel log-panel">
+          <h2>游戏日志</h2>
+          <div id="game-log" class="game-log"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 游戏结束模态框 -->
+    <div id="game-over-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="game-result-title">游戏结束</h2>
+        <p id="game-result-message"></p>
+        <div id="game-stats"></div>
+        <button id="play-again-btn" class="btn btn-primary">再玩一局</button>
+      </div>
+    </div>
+
+    <!-- 回放模态框 -->
+    <div id="replay-modal" class="modal hidden">
+      <div class="modal-content modal-large">
+        <h2>游戏回放</h2>
+        <div class="replay-controls">
+          <button id="replay-start-btn" class="btn btn-primary">开始回放</button>
+          <button id="replay-pause-btn" class="btn btn-warning">暂停</button>
+          <button id="replay-next-btn" class="btn btn-info">下一步</button>
+          <span id="replay-step">步骤: 0/0</span>
+        </div>
+        <div id="replay-map" class="grid-map"></div>
+        <div id="replay-log" class="game-log"></div>
+        <button id="close-replay-btn" class="btn btn-danger">关闭回放</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "rescue-dispatch-night-shift",
+  "version": "1.0.0",
+  "description": "救援调度夜班 - 桌游社活动热场策略小游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "keywords": ["game", "strategy", "board-game", "rescue"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

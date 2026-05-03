@@ -1,0 +1,502 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 头部样式 */
+.game-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.game-header h1 {
+  color: #e94560;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.game-info {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  font-size: 1.1rem;
+}
+
+.game-info span {
+  background-color: rgba(233, 69, 96, 0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #e94560;
+}
+
+/* 主游戏区域 */
+.game-container {
+  display: flex;
+  gap: 20px;
+}
+
+.map-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.control-section {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 地图样式 */
+.grid-map {
+  display: grid;
+  gap: 2px;
+  background-color: #0f3460;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.grid-cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.grid-cell:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
+.grid-cell.selected {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  border: 2px solid gold;
+}
+
+.grid-cell.path {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+}
+
+.cell-road {
+  background-color: #555;
+}
+
+.cell-building {
+  background-color: #2d4059;
+}
+
+.cell-blocked {
+  background-color: #333;
+  position: relative;
+}
+
+.cell-blocked::after {
+  content: '🚧';
+  font-size: 1.2rem;
+}
+
+/* 单位图标 */
+.unit-ambulance::before {
+  content: '🚑';
+}
+
+.unit-repair::before {
+  content: '🔧';
+}
+
+.unit-volunteer::before {
+  content: '🧑‍🤝‍🧑';
+}
+
+/* 事件图标 */
+.event-injury::after {
+  content: '🩸';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+}
+
+.event-power::after {
+  content: '⚡';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+}
+
+.event-blockage::after {
+  content: '🚧';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+}
+
+.event-shortage::after {
+  content: '📦';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+}
+
+/* 地图图例 */
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 10px;
+  background-color: #16213e;
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.legend-color.road {
+  background-color: #555;
+}
+
+.legend-color.building {
+  background-color: #2d4059;
+}
+
+.legend-color.blocked {
+  background-color: #333;
+  position: relative;
+}
+
+.legend-color.blocked::after {
+  content: '🚧';
+  font-size: 0.8rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.legend-color.ambulance::before {
+  content: '🚑';
+  font-size: 1.2rem;
+}
+
+.legend-color.repair::before {
+  content: '🔧';
+  font-size: 1.2rem;
+}
+
+.legend-color.volunteer::before {
+  content: '🧑‍🤝‍🧑';
+  font-size: 1.2rem;
+}
+
+/* 面板样式 */
+.panel {
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.panel h2 {
+  color: #e94560;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  border-bottom: 1px solid #e94560;
+  padding-bottom: 5px;
+}
+
+/* 单位列表 */
+.units-list, .events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.unit-item, .event-item {
+  background-color: rgba(233, 69, 96, 0.1);
+  border: 1px solid #e94560;
+  border-radius: 6px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.unit-item:hover, .event-item:hover {
+  background-color: rgba(233, 69, 96, 0.2);
+}
+
+.unit-item.selected {
+  background-color: rgba(255, 215, 0, 0.2);
+  border-color: gold;
+}
+
+.unit-item .unit-name {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.unit-item .unit-status {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-top: 5px;
+}
+
+.event-item .event-type {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.event-item .event-time {
+  font-size: 0.85rem;
+  color: #ff6b6b;
+  margin-top: 5px;
+}
+
+.event-item.urgent {
+  border-color: #ff0000;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* 牌堆信息 */
+.deck-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 按钮样式 */
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background-color: #e94560;
+  color: white;
+}
+
+.btn-success {
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-warning {
+  background-color: #ff9800;
+  color: white;
+}
+
+.btn-info {
+  background-color: #2196f3;
+  color: white;
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: white;
+}
+
+/* 游戏日志 */
+.game-log {
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.game-log .log-entry {
+  padding: 5px;
+  border-bottom: 1px solid rgba(233, 69, 96, 0.2);
+}
+
+.game-log .log-entry.log-turn {
+  color: #e94560;
+  font-weight: bold;
+}
+
+.game-log .log-entry.log-event {
+  color: #ff9800;
+}
+
+.game-log .log-entry.log-action {
+  color: #4caf50;
+}
+
+.game-log .log-entry.log-warning {
+  color: #ff0000;
+}
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #16213e, #0f3460);
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content.modal-large {
+  max-width: 900px;
+}
+
+.modal-content h2 {
+  color: #e94560;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.modal-content p {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+#game-stats {
+  margin: 20px 0;
+  text-align: left;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#game-stats div {
+  margin-bottom: 8px;
+}
+
+/* 回放控制 */
+.replay-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+#replay-step {
+  font-size: 1rem;
+  color: #e94560;
+  font-weight: bold;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .game-container {
+    flex-direction: column;
+  }
+
+  .control-section {
+    width: 100%;
+    order: -1;
+  }
+
+  .grid-cell {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16213e;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e94560;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff6b81;
+}
