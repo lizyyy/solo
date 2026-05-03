@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闭馆前7分钟 - 博物馆志愿者培训</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Microsoft YaHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 2px solid #4a4a6a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        #game-canvas {
+            display: block;
+            background-color: #2a2a4a;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .ui-element {
+            pointer-events: auto;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        
+        #timer {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        #score {
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        
+        #level-info {
+            color: #ffeaa7;
+            font-weight: bold;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 26, 46, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        .screen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ffeaa7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .screen h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #74b9ff;
+        }
+        
+        .screen p {
+            font-size: 18px;
+            margin-bottom: 15px;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background-color: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s, transform 0.2s;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        .btn:hover {
+            background-color: #a29bfe;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background-color: #4a4a6a;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #636383;
+        }
+        
+        .stats-container {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #4a4a6a;
+            font-size: 18px;
+        }
+        
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            text-align: left;
+        }
+        
+        .stat-value {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #00b894;
+        }
+        
+        .error {
+            color: #ff6b6b;
+        }
+        
+        .warning {
+            color: #fdcb6e;
+        }
+        
+        #controls-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        #instructions-list {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 40px;
+            max-width: 500px;
+        }
+        
+        #instructions-list li {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        #event-log {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 280px;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid #4a4a6a;
+        }
+        
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        
+        #high-scores {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        
+        #result-message {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        #result-message.success {
+            background-color: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+        }
+        
+        #result-message.error {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        
+        <div id="ui-overlay">
+            <div id="hud">
+                <div id="level-info">关卡: 1</div>
+                <div id="timer">时间: 07:00</div>
+                <div id="score">分数: 0</div>
+            </div>
+            
+            <div id="controls-info">
+                WASD/方向键 移动 | 空格键 互动
+            </div>
+            
+            <div id="event-log"></div>
+        </div>
+        
+        <!-- 开始界面 -->
+        <div id="start-screen" class="screen active">
+            <h1>闭馆前 7 分钟</h1>
+            <h2>博物馆志愿者培训</h2>
+            <p>
+                你是一名博物馆志愿者，现在距离闭馆还有7分钟。
+                在这段时间里，你需要巡查展厅，处理各种异常情况，
+                确保博物馆能够顺利闭馆。
+            </p>
+            
+            <div id="instructions-list">
+                <li>🚶 使用 <strong>WASD</strong> 或 <strong>方向键</strong> 移动角色</li>
+                <li>🔧 按 <strong>空格键</strong> 与物体互动或处理事件</li>
+                <li>💡 关闭高温灯 - 节约能源，保护展品</li>
+                <li>📋 扶正倾斜的展牌 - 保持展厅整洁</li>
+                <li>👥 疏导拥堵的游客 - 避免安全隐患</li>
+                <li>🔍 发现未登记的展品移动 - 防止展品丢失</li>
+                <li>⚠️ 注意：不要触发误报，否则会扣分！</li>
+            </div>
+            
+            <button id="start-btn" class="btn ui-element">开始游戏</button>
+            <button id="help-btn" class="btn btn-secondary ui-element">查看最高分</button>
+        </div>
+        
+        <!-- 暂停界面 -->
+        <div id="pause-screen" class="screen">
+            <h2>游戏暂停</h2>
+            <p>按 ESC 键继续游戏</p>
+            <button id="resume-btn" class="btn ui-element">继续游戏</button>
+            <button id="quit-btn" class="btn btn-secondary ui-element">退出游戏</button>
+        </div>
+        
+        <!-- 关卡选择界面 -->
+        <div id="level-select-screen" class="screen">
+            <h2>选择关卡</h2>
+            <p>选择你想要挑战的关卡难度</p>
+            <div id="level-buttons"></div>
+            <button id="back-btn" class="btn btn-secondary ui-element">返回</button>
+        </div>
+        
+        <!-- 结算界面 -->
+        <div id="result-screen" class="screen">
+            <h2>游戏结束</h2>
+            <div id="result-message"></div>
+            
+            <div class="stats-container">
+                <div class="stat-row">
+                    <span class="stat-label">最终得分</span>
+                    <span id="final-score" class="stat-value success">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">关卡完成</span>
+                    <span id="level-completed" class="stat-value">1</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">剩余时间</span>
+                    <span id="time-remaining" class="stat-value">00:00</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">处理事件数</span>
+                    <span id="events-handled" class="stat-value success">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">误报次数</span>
+                    <span id="false-alarms" class="stat-value error">0</span>
+                </div>
+            </div>
+            
+            <div id="high-scores">
+                <h3>最高分记录</h3>
+                <div id="scores-list"></div>
+            </div>
+            
+            <button id="restart-btn" class="btn ui-element">重新开始</button>
+            <button id="main-menu-btn" class="btn btn-secondary ui-element">返回主菜单</button>
+        </div>
+    </div>
+    
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/level.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
