@@ -1,0 +1,154 @@
+{
+  "radar_data": [
+    {
+      "id": "RD001",
+      "time": "2026-05-03 14:00:00",
+      "location": "县城东北方向",
+      "latitude": 34.85,
+      "longitude": 113.75,
+      "reflectivity": 45,
+      "storm_type": "对流云",
+      "movement_direction": 90,
+      "movement_speed": 35,
+      "risk_level": "high"
+    },
+    {
+      "id": "RD002",
+      "time": "2026-05-03 14:15:00",
+      "location": "县城正东方向",
+      "latitude": 34.80,
+      "longitude": 113.80,
+      "reflectivity": 38,
+      "storm_type": "层状云",
+      "movement_direction": 85,
+      "movement_speed": 25,
+      "risk_level": "medium"
+    },
+    {
+      "id": "RD003",
+      "time": "2026-05-03 14:30:00",
+      "location": "县城西南方向",
+      "latitude": 34.70,
+      "longitude": 113.65,
+      "reflectivity": 52,
+      "storm_type": "强对流",
+      "movement_direction": 180,
+      "movement_speed": 40,
+      "risk_level": "critical"
+    }
+  ],
+  "airspace_approvals": [
+    {
+      "id": "AP001",
+      "approval_number": "KY20260503001",
+      "operation_point": "作业点A",
+      "start_time": "2026-05-03 14:00:00",
+      "end_time": "2026-05-03 16:00:00",
+      "altitude_min": 0,
+      "altitude_max": 5000,
+      "operation_type": "火箭弹",
+      "status": "approved"
+    },
+    {
+      "id": "AP002",
+      "approval_number": "KY20260503002",
+      "operation_point": "作业点B",
+      "start_time": "2026-05-03 15:00:00",
+      "end_time": "2026-05-03 17:00:00",
+      "altitude_min": 0,
+      "altitude_max": 4500,
+      "operation_type": "高炮",
+      "status": "approved"
+    }
+  ],
+  "operation_points": [
+    {
+      "id": "OP001",
+      "name": "作业点A",
+      "code": "POINT-A",
+      "latitude": 34.78,
+      "longitude": 113.72,
+      "altitude": 150,
+      "equipment_type": "WR-98火箭",
+      "equipment_status": "normal",
+      "contact_person": "张三",
+      "contact_phone": "13800138001"
+    },
+    {
+      "id": "OP002",
+      "name": "作业点B",
+      "code": "POINT-B",
+      "latitude": 34.75,
+      "longitude": 113.78,
+      "altitude": 180,
+      "equipment_type": "37高炮",
+      "equipment_status": "normal",
+      "contact_person": "李四",
+      "contact_phone": "13800138002"
+    }
+  ],
+  "ammunition_inventory": [
+    {
+      "id": "AM001",
+      "batch_number": "BATCH-2024-001",
+      "type": "WR-98火箭弹",
+      "quantity": 50,
+      "storage_location": "一号库房",
+      "production_date": "2024-01-15",
+      "expiry_date": "2025-01-14",
+      "status": "normal"
+    },
+    {
+      "id": "AM002",
+      "batch_number": "BATCH-2024-002",
+      "type": "37高炮炮弹",
+      "quantity": 120,
+      "storage_location": "二号库房",
+      "production_date": "2024-03-20",
+      "expiry_date": "2026-03-19",
+      "status": "normal"
+    },
+    {
+      "id": "AM003",
+      "batch_number": "BATCH-2023-001",
+      "type": "WR-98火箭弹",
+      "quantity": 30,
+      "storage_location": "一号库房",
+      "production_date": "2023-05-10",
+      "expiry_date": "2024-05-09",
+      "status": "expired"
+    }
+  ],
+  "personnel_qualifications": [
+    {
+      "id": "PQ001",
+      "name": "张三",
+      "position": "作业班长",
+      "qualification_type": "人工增雨作业资质",
+      "qualification_number": "QZ-2023-001",
+      "issue_date": "2023-06-15",
+      "expiry_date": "2026-06-14",
+      "status": "valid"
+    },
+    {
+      "id": "PQ002",
+      "name": "李四",
+      "position": "作业员",
+      "qualification_type": "人工增雨作业资质",
+      "qualification_number": "QZ-2023-002",
+      "issue_date": "2023-08-20",
+      "expiry_date": "2026-08-19",
+      "status": "valid"
+    },
+    {
+      "id": "PQ003",
+      "name": "王五",
+      "position": "作业员",
+      "qualification_type": "人工增雨作业资质",
+      "qualification_number": "QZ-2022-001",
+      "issue_date": "2022-05-10",
+      "expiry_date": "2025-05-09",
+      "status": "expired"
+    }
+  ]
+}
