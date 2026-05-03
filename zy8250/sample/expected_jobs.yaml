@@ -1,0 +1,57 @@
+- name: com.example.backup
+  type: launchagent
+  schedule: 每 3600 秒
+  command: /usr/local/bin/backup.sh --daily
+  enabled: true
+  owner: zhangsan
+  sla: 7200
+  environment:
+    PATH: /usr/local/bin:/usr/bin:/bin
+    TZ: Asia/Shanghai
+  description: 每日备份任务
+
+- name: com.example.cleanup
+  type: launchagent
+  schedule: "小时: 2, 分钟: 0"
+  command: /usr/local/bin/cleanup.sh --temp
+  enabled: true
+  owner: lisi
+  sla: 86400
+  environment:
+    PATH: /usr/local/bin:/usr/bin:/bin
+    TZ: Asia/Shanghai
+  description: 临时文件清理任务
+
+- name: com.example.monitor
+  type: launchagent
+  schedule: 每 60 秒
+  command: /usr/local/bin/monitor.sh --check
+  enabled: true
+  owner: wangwu
+  sla: 120
+  environment:
+    PATH: /usr/local/bin:/usr/bin:/bin
+    TZ: Asia/Shanghai
+  description: 系统监控任务
+
+- name: cron_report_generator
+  type: cron
+  schedule: 0 8 * * *
+  command: /usr/local/bin/generate_report.sh
+  enabled: true
+  owner: zhaoliu
+  sla: 86400
+  environment:
+    PATH: /usr/local/bin:/usr/bin:/bin
+  description: 每日报告生成任务
+
+- name: com.example.disabled_job
+  type: launchagent
+  schedule: 每 1800 秒
+  command: /usr/local/bin/disabled_script.sh
+  enabled: false
+  owner: zhangsan
+  sla: 3600
+  environment:
+    PATH: /usr/local/bin:/usr/bin:/bin
+  description: 已禁用的测试任务

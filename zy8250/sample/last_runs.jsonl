@@ -1,0 +1,9 @@
+{"jobName":"com.example.backup","timestamp":1746348000000,"exitCode":0,"duration":120,"output":"Backup completed successfully"}
+{"jobName":"com.example.backup","timestamp":1746344400000,"exitCode":0,"duration":115}
+{"jobName":"com.example.cleanup","timestamp":1746261600000,"exitCode":0,"duration":45,"output":"Cleanup finished"}
+{"jobName":"com.example.monitor","timestamp":1746351540000,"exitCode":0,"duration":5}
+{"jobName":"com.example.monitor","timestamp":1746351480000,"exitCode":1,"duration":3,"error":"Connection failed"}
+{"jobName":"com.example.monitor","timestamp":1746351420000,"exitCode":0,"duration":4}
+{"jobName":"cron_report_generator","timestamp":1746268800000,"exitCode":0,"duration":300,"output":"Report generated: report_20260503.pdf"}
+{"jobName":"cron_rotate_logs_sh","timestamp":1746348000000,"exitCode":0,"duration":60}
+{"jobName":"com.example.unexpected","timestamp":1746348000000,"exitCode":0,"duration":20}

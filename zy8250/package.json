@@ -1,0 +1,46 @@
+{
+  "name": "scheduler-audit-cli",
+  "version": "1.0.0",
+  "description": "A TypeScript CLI for auditing macOS LaunchAgents and cron jobs before handover",
+  "main": "dist/index.js",
+  "bin": {
+    "scheduler-audit": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "test": "echo \"No test specified\" && exit 0",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "cli",
+    "typescript",
+    "macos",
+    "launchagent",
+    "cron",
+    "audit",
+    "scheduler"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0",
+    "plist": "^3.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/plist": "^3.0.5",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0"
+  }
+}

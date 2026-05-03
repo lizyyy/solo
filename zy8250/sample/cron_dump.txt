@@ -1,0 +1,19 @@
+# Cron tasks for user admin
+# Generated at 2026-05-04 10:00:00
+
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+HOME=/Users/admin
+
+# Daily report generation
+0 8 * * * /usr/local/bin/generate_report.sh
+
+# Log rotation - every hour
+0 * * * * /usr/local/bin/rotate_logs.sh
+
+# Health check every 5 minutes
+*/5 * * * * /usr/local/bin/health_check.sh
+
+# This is a comment
+# Another cron job that runs daily at midnight
+0 0 * * * /usr/local/bin/nightly_cleanup.sh

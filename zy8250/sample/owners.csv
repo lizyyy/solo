@@ -1,0 +1,7 @@
+jobName,owner,email,department
+com.example.backup,zhangsan,zhangsan@example.com,运维部
+com.example.cleanup,lisi,lisi@example.com,运维部
+com.example.monitor,wrong_owner,wrong@example.com,测试部
+cron_report_generator,zhaoliu,zhaoliu@example.com,开发部
+com.example.disabled_job,zhangsan,zhangsan@example.com,运维部
+com.example.unexpected,unknown,unknown@example.com,未知部门
