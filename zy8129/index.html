@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内河船闸调度员</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 头部信息栏 -->
+        <header id="header">
+            <div class="game-info">
+                <h1>内河船闸调度员</h1>
+                <div class="level-info">
+                    <span id="current-level">关卡：新手教程</span>
+                    <span id="current-time">时间：00:00</span>
+                </div>
+            </div>
+            <div class="score-info">
+                <span id="current-score">得分：0</span>
+                <button id="save-btn">保存进度</button>
+                <button id="load-btn">读取进度</button>
+                <button id="level-select-btn">选择关卡</button>
+            </div>
+        </header>
+
+        <!-- 潮汐水位窗口显示 -->
+        <div id="tidal-window">
+            <h2>潮汐水位窗口</h2>
+            <div id="tidal-timeline">
+                <!-- 动态生成潮汐时间轴 -->
+            </div>
+        </div>
+
+        <!-- 主游戏区域 -->
+        <main id="game-area">
+            <!-- 等待区域 -->
+            <section id="waiting-area">
+                <h2>等待区域</h2>
+                <div id="waiting-ships" class="ship-container">
+                    <!-- 动态生成等待的船只 -->
+                </div>
+            </section>
+
+            <!-- 闸室区域 -->
+            <section id="lock-area">
+                <h2>闸室区域</h2>
+                <div id="lock-chamber" class="ship-container">
+                    <!-- 动态生成闸室中的船只 -->
+                </div>
+                <div class="lock-controls">
+                    <button id="lock-up-btn">↑ 开闸上行</button>
+                    <button id="lock-down-btn">↓ 开闸下行</button>
+                    <button id="clear-lock-btn">清空闸室</button>
+                </div>
+            </section>
+
+            <!-- 已完成区域 -->
+            <section id="completed-area">
+                <h2>已完成过闸</h2>
+                <div id="completed-ships" class="ship-container">
+                    <!-- 动态生成已完成的船只 -->
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部信息栏 -->
+        <footer id="footer">
+            <div id="violations-list">
+                <h3>违规记录</h3>
+                <ul id="violations">
+                    <!-- 动态生成违规记录 -->
+                </ul>
+            </div>
+            <div id="ship-details">
+                <h3>船只详情</h3>
+                <div id="ship-info">
+                    <!-- 动态显示选中船只的详情 -->
+                </div>
+            </div>
+        </footer>
+
+        <!-- 关卡选择模态框 -->
+        <div id="level-select-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>选择关卡</h2>
+                <div id="level-list">
+                    <!-- 动态生成关卡列表 -->
+                </div>
+                <button id="close-level-modal">关闭</button>
+            </div>
+        </div>
+
+        <!-- 结算复盘模态框 -->
+        <div id="result-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>关卡结算</h2>
+                <div id="result-details">
+                    <!-- 动态生成结算详情 -->
+                </div>
+                <div id="result-score">
+                    <h3>最终得分</h3>
+                    <span id="final-score">0</span>
+                </div>
+                <div id="result-violations">
+                    <h3>违规原因</h3>
+                    <ul id="result-violations-list">
+                        <!-- 动态生成违规原因 -->
+                    </ul>
+                </div>
+                <button id="restart-btn">重新开始</button>
+                <button id="back-to-menu-btn">返回菜单</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/levelData.js"></script>
+    <script src="js/rulesEngine.js"></script>
+    <script src="js/dragState.js"></script>
+    <script src="js/saveLoad.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
