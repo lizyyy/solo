@@ -1,0 +1,6 @@
+hole_position,tube_type_id,sample_volume_ml,sample_density_gml,label
+# 孔位编号(整数),管型ID,样品体积(ml),样品密度(g/ml,可选,默认1.0),标签(可选)
+1,tube_15ml_pp,10.0,1.0,示例样本1
+7,tube_15ml_pp,10.0,1.0,示例样本2(对称孔)
+2,tube_15ml_pp,5.0,,示例样本3(使用默认密度)
+8,tube_15ml_pp,5.0,1.0,示例样本4

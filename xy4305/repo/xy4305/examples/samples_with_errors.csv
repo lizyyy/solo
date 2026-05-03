@@ -1,0 +1,5 @@
+hole_position,tube_type_id,sample_volume_ml,sample_density_gml,label
+1,tube_15ml_pp,10.0,1.0,正常样
+2,unknown_tube,5.0,1.0,不存在的管型
+3,tube_15ml_pp,-2.0,1.0,负体积
+4,tube_15ml_pp,20.0,1.0,超过管型最大容量
