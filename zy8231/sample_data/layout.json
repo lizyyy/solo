@@ -1,0 +1,96 @@
+{
+  "pool_width": 25.0,
+  "pool_length": 50.0,
+  "zones": [
+    {
+      "id": "lane_1",
+      "name": "泳道1",
+      "zone_type": "swimming_lane",
+      "position": {"x": 3.0, "y": 10.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "lane_2",
+      "name": "泳道2",
+      "zone_type": "swimming_lane",
+      "position": {"x": 8.0, "y": 10.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "lane_3",
+      "name": "泳道3",
+      "zone_type": "swimming_lane",
+      "position": {"x": 13.0, "y": 10.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "lane_4",
+      "name": "泳道4",
+      "zone_type": "swimming_lane",
+      "position": {"x": 18.0, "y": 10.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "lane_5",
+      "name": "泳道5",
+      "zone_type": "swimming_lane",
+      "position": {"x": 23.0, "y": 10.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "deep_zone",
+      "name": "深水区",
+      "zone_type": "deep_zone",
+      "position": {"x": 12.5, "y": 40.0},
+      "coverage_radius": 8.0,
+      "is_high_risk": true,
+      "min_lifeguards": 2
+    },
+    {
+      "id": "shallow_zone",
+      "name": "浅水区",
+      "zone_type": "shallow_zone",
+      "position": {"x": 12.5, "y": 5.0},
+      "coverage_radius": 8.0,
+      "is_high_risk": false,
+      "min_lifeguards": 1
+    },
+    {
+      "id": "children_area",
+      "name": "儿童戏水区",
+      "zone_type": "children_area",
+      "position": {"x": 5.0, "y": 45.0},
+      "coverage_radius": 6.0,
+      "is_high_risk": true,
+      "min_lifeguards": 2
+    },
+    {
+      "id": "diving_area",
+      "name": "跳水区",
+      "zone_type": "diving_area",
+      "position": {"x": 20.0, "y": 45.0},
+      "coverage_radius": 5.0,
+      "is_high_risk": true,
+      "min_lifeguards": 2
+    },
+    {
+      "id": "rest_area",
+      "name": "休息区",
+      "zone_type": "rest_area",
+      "position": {"x": 30.0, "y": 25.0},
+      "coverage_radius": 3.0,
+      "is_high_risk": false,
+      "min_lifeguards": 0
+    }
+  ]
+}
