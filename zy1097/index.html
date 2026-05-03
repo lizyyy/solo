@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仓库拣货路线预演工具</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>📦 仓库拣货路线预演工具</h1>
+            <div class="header-actions">
+                <button id="loadSamples" class="btn btn-primary">📂 加载示例数据</button>
+                <button id="saveDraft" class="btn btn-secondary">💾 保存草稿</button>
+                <button id="loadDraft" class="btn btn-secondary">📂 加载草稿</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- 左侧面板 - 数据管理 -->
+            <aside class="left-panel">
+                <div class="panel-section">
+                    <h3>📥 数据导入</h3>
+                    <div class="import-section">
+                        <div class="import-item">
+                            <label>仓库布局 (warehouse.json)</label>
+                            <input type="file" id="warehouseFile" accept=".json">
+                            <div id="warehouseStatus" class="status-message"></div>
+                        </div>
+                        <div class="import-item">
+                            <label>SKU 货位 (sku-locations.csv)</label>
+                            <input type="file" id="skuFile" accept=".csv,.xlsx,.xls">
+                            <div id="skuStatus" class="status-message"></div>
+                        </div>
+                        <div class="import-item">
+                            <label>订单数据 (orders.csv)</label>
+                            <input type="file" id="ordersFile" accept=".csv,.xlsx,.xls">
+                            <div id="ordersStatus" class="status-message"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🛒 订单选择</h3>
+                    <div id="ordersList" class="orders-list">
+                        <p class="no-data">请先导入订单数据</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>⚙️ 拣货设置</h3>
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label>拣货员数量</label>
+                            <select id="pickerCount">
+                                <option value="1">1 人</option>
+                                <option value="2">2 人</option>
+                                <option value="3">3 人</option>
+                                <option value="4">4 人</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>路线算法</label>
+                            <select id="routeAlgorithm">
+                                <option value="nearest">最近邻算法</option>
+                                <option value="cluster">聚类分区</option>
+                                <option value="s-shape">S型路线</option>
+                            </select>
+                        </div>
+                        <button id="startSimulation" class="btn btn-primary btn-full">🚀 开始路线模拟</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>⚠️ 库存预警</h3>
+                    <div id="inventoryAlerts" class="alerts-list">
+                        <p class="no-data">暂无预警</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 中间 - 仓库视图 -->
+            <main class="center-panel">
+                <div class="view-controls">
+                    <button id="view2D" class="btn btn-tab active">🗺️ 2D 平面图</button>
+                    <button id="view3D" class="btn btn-tab">🏠 3D 立体图</button>
+                    <div class="view-actions">
+                        <button id="editMode" class="btn btn-secondary">✏️ 编辑模式</button>
+                        <button id="zoomIn" class="btn btn-icon">🔍+</button>
+                        <button id="zoomOut" class="btn btn-icon">🔍-</button>
+                        <button id="resetView" class="btn btn-icon">🔄</button>
+                    </div>
+                </div>
+
+                <div class="warehouse-container">
+                    <canvas id="warehouseCanvas2D" class="warehouse-canvas"></canvas>
+                    <div id="warehouseView3D" class="warehouse-view-3d hidden">
+                        <div id="view3DContent"></div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-color shelf"></span> 货架
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color aisle"></span> 通道
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color packing"></span> 打包台
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color route"></span> 拣货路线
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color hotspot"></span> 堵点
+                    </div>
+                </div>
+            </main>
+
+            <!-- 右侧面板 - 分析结果 -->
+            <aside class="right-panel">
+                <div class="panel-section">
+                    <h3>📊 路线分析结果</h3>
+                    <div id="routeAnalysis" class="analysis-content">
+                        <p class="no-data">请先运行路线模拟</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🚦 堵点分析</h3>
+                    <div id="hotspotAnalysis" class="analysis-content">
+                        <p class="no-data">请先运行路线模拟</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>💡 货位调整建议</h3>
+                    <div id="optimizationSuggestions" class="analysis-content">
+                        <p class="no-data">请先运行路线模拟</p>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📄 优化报告</h3>
+                    <div class="export-buttons">
+                        <button id="exportMarkdown" class="btn btn-secondary">📝 导出 Markdown</button>
+                        <button id="exportHTML" class="btn btn-secondary">🌐 导出 HTML</button>
+                        <button id="previewReport" class="btn btn-primary">👁️ 预览报告</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- 报告预览模态框 -->
+        <div id="reportModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>📄 拣货优化报告</h2>
+                    <button id="closeModal" class="btn btn-icon">✕</button>
+                </div>
+                <div id="reportContent" class="report-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

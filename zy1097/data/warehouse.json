@@ -1,0 +1,224 @@
+{
+  "name": "示例仓库 - 小网店临时仓库",
+  "dimensions": {
+    "width": 12,
+    "height": 8,
+    "unit": "米"
+  },
+  "shelves": [
+    {
+      "id": "shelf-1",
+      "name": "A区货架1",
+      "x": 1,
+      "y": 1,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "A"
+    },
+    {
+      "id": "shelf-2",
+      "name": "A区货架2",
+      "x": 1,
+      "y": 3,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "A"
+    },
+    {
+      "id": "shelf-3",
+      "name": "B区货架1",
+      "x": 5,
+      "y": 1,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "B"
+    },
+    {
+      "id": "shelf-4",
+      "name": "B区货架2",
+      "x": 5,
+      "y": 3,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "B"
+    },
+    {
+      "id": "shelf-5",
+      "name": "B区货架3",
+      "x": 5,
+      "y": 5,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "B"
+    },
+    {
+      "id": "shelf-6",
+      "name": "C区货架1",
+      "x": 9,
+      "y": 1,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "C"
+    },
+    {
+      "id": "shelf-7",
+      "name": "C区货架2",
+      "x": 9,
+      "y": 3,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "C"
+    },
+    {
+      "id": "shelf-8",
+      "name": "C区货架3",
+      "x": 9,
+      "y": 5,
+      "width": 2,
+      "depth": 0.8,
+      "levels": 4,
+      "orientation": "horizontal",
+      "zone": "C"
+    }
+  ],
+  "aisles": [
+    {
+      "id": "aisle-1",
+      "name": "主通道",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "depth": 0.8,
+      "type": "main"
+    },
+    {
+      "id": "aisle-2",
+      "name": "A-B通道",
+      "x": 3.5,
+      "y": 0.8,
+      "width": 1,
+      "depth": 7.2,
+      "type": "cross"
+    },
+    {
+      "id": "aisle-3",
+      "name": "B-C通道",
+      "x": 7.5,
+      "y": 0.8,
+      "width": 1,
+      "depth": 7.2,
+      "type": "cross"
+    },
+    {
+      "id": "aisle-4",
+      "name": "A区通道1",
+      "x": 1,
+      "y": 2,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-5",
+      "name": "A区通道2",
+      "x": 1,
+      "y": 4,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-6",
+      "name": "B区通道1",
+      "x": 5,
+      "y": 2,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-7",
+      "name": "B区通道2",
+      "x": 5,
+      "y": 4,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-8",
+      "name": "B区通道3",
+      "x": 5,
+      "y": 6,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-9",
+      "name": "C区通道1",
+      "x": 9,
+      "y": 2,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-10",
+      "name": "C区通道2",
+      "x": 9,
+      "y": 4,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    },
+    {
+      "id": "aisle-11",
+      "name": "C区通道3",
+      "x": 9,
+      "y": 6,
+      "width": 2,
+      "depth": 0.8,
+      "type": "shelf"
+    }
+  ],
+  "packingStations": [
+    {
+      "id": "packing-1",
+      "name": "主打包台",
+      "x": 0.2,
+      "y": 6.5,
+      "width": 1.5,
+      "depth": 1,
+      "isPrimary": true
+    },
+    {
+      "id": "packing-2",
+      "name": "辅助打包台",
+      "x": 10.3,
+      "y": 6.5,
+      "width": 1.5,
+      "depth": 1,
+      "isPrimary": false
+    }
+  ],
+  "pickStart": {
+    "x": 0.5,
+    "y": 7,
+    "description": "拣货起点（仓库入口）"
+  }
+}

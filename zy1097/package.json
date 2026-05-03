@@ -1,0 +1,19 @@
+{
+  "name": "warehouse-picker-route",
+  "version": "1.0.0",
+  "description": "仓库拣货路线预演工具 - 用于小网店和工作室的仓库布局优化",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "start:node": "npx http-server -p 8080"
+  },
+  "keywords": [
+    "warehouse",
+    "picking",
+    "route-optimization",
+    "inventory",
+    "e-commerce"
+  ],
+  "author": "Warehouse Picker Team",
+  "license": "MIT"
+}
