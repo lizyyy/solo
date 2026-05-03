@@ -1,0 +1,26 @@
+vitals:
+  gapThresholdMinutes: 5
+
+medications:
+  dosageLimits:
+    丙泊酚:
+      maxDosePerKg: 6.0
+      minDosePerKg: 2.0
+    芬太尼:
+      maxDosePerKg: 0.005
+      minDosePerKg: 0.002
+    阿曲库铵:
+      maxDosePerKg: 0.6
+      minDosePerKg: 0.2
+    异氟烷:
+      maxDosePerKg: 5.0
+      minDosePerKg: 0.5
+    新斯的明:
+      maxDosePerKg: 0.05
+      minDosePerKg: 0.02
+    头孢唑林:
+      maxDosePerKg: 30.0
+      minDosePerKg: 10.0
+
+anesthesia:
+  standardRecoveryTimeMinutes: 30
