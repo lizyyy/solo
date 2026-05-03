@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>风电场巡检可视化工具</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="header-left">
+        <h1>🌬️ 风电场叶片无人机巡检可视化</h1>
+        <span class="version">v1.0.0</span>
+      </div>
+      <div class="header-right">
+        <div id="turbine-info" class="turbine-info">
+          <span class="turbine-id">风机: --</span>
+          <span class="location">位置: --</span>
+          <span class="date">日期: --</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <aside class="sidebar left-sidebar">
+        <div class="sidebar-section">
+          <h3>📊 综合评估</h3>
+          <div id="summary-card" class="summary-card">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>⚙️ 显示控制</h3>
+          <div class="controls">
+            <label class="control-item">
+              <input type="checkbox" id="toggle-flight-path" checked>
+              <span>显示航线</span>
+            </label>
+            <label class="control-item">
+              <input type="checkbox" id="toggle-defects" checked>
+              <span>显示缺陷</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📁 导出报告</h3>
+          <div class="export-buttons">
+            <button id="export-md" class="btn btn-primary">
+              📄 导出 Markdown
+            </button>
+            <button id="export-csv" class="btn btn-secondary">
+              📊 导出 CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>⚠️ 问题警告</h3>
+          <div id="issues-list" class="issues-list">
+            <div class="loading">分析中...</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="canvas-area">
+        <div id="canvas-container" class="canvas-container"></div>
+        <div class="canvas-overlay">
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background: #4ecdc4;"></span>
+              <span>叶片1</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #ff6b6b;"></span>
+              <span>叶片2</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #ffd93d;"></span>
+              <span>叶片3</span>
+            </div>
+            <div class="legend-divider"></div>
+            <div class="legend-item">
+              <span class="legend-marker" style="background: #ff0000;"></span>
+              <span>高危缺陷</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-marker" style="background: #ffaa00;"></span>
+              <span>中危缺陷</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-marker" style="background: #00ff00;"></span>
+              <span>低危缺陷</span>
+            </div>
+            <div class="legend-divider"></div>
+            <div class="legend-item">
+              <span class="legend-line" style="background: linear-gradient(to right, #00ff88, #ff0000);"></span>
+              <span>航线 (绿→红: 风速增加)</span>
+            </div>
+          </div>
+          <div class="instructions">
+            <small>🖱️ 左键旋转 | 滚轮缩放 | 右键平移</small>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar right-sidebar">
+        <div class="sidebar-section">
+          <h3>🔍 缺陷列表</h3>
+          <div class="filter-tabs">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="high">高危</button>
+            <button class="filter-btn" data-filter="medium">中危</button>
+            <button class="filter-btn" data-filter="low">低危</button>
+          </div>
+          <div id="defects-list" class="defects-list">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📋 缺陷详情</h3>
+          <div id="defect-detail" class="defect-detail">
+            <div class="empty-state">
+              <p>点击列表中的缺陷查看详情</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🌬️ 风速统计</h3>
+          <div id="wind-stats" class="wind-stats">
+            <div class="loading">加载中...</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <div id="loading-overlay" class="loading-overlay">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>正在初始化可视化工具...</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+defectId,bladeId,segmentId,position,distanceFromRoot,size,type,severity,description,detectedTime,photoUrl,reviewStatus
+D-001,BL-001,S1-02,pressure_side,8.5,15.2,crack,high,叶中段表面裂纹,2026-04-28T08:16:15Z,/photos/D-001.jpg,unreviewed
+D-002,BL-001,S1-03,suction_side,18.2,8.5,pitting,medium,表面点蚀,2026-04-28T08:17:15Z,/photos/D-002.jpg,unreviewed
+D-003,BL-001,S1-05,leading_edge,40.0,22.8,erosion,high,前缘侵蚀严重,2026-04-28T08:19:20Z,/photos/D-003.jpg,unreviewed
+D-004,BL-001,S1-06,trailing_edge,48.5,5.2,scratch,low,表面划痕,2026-04-28T08:20:15Z,/photos/D-004.jpg,unreviewed
+D-005,BL-002,S2-01,pressure_side,2.5,10.8,bonding_issue,medium,粘接层问题,2026-04-28T08:25:15Z,/photos/D-005.jpg,unreviewed
+D-006,BL-002,S2-04,suction_side,28.3,18.6,delamination,high,分层缺陷,2026-04-28T08:27:45Z,/photos/D-006.jpg,unreviewed
+D-007,BL-002,S2-07,leading_edge,58.2,25.4,erosion,high,叶尖前缘侵蚀,2026-04-28T08:30:20Z,/photos/D-007.jpg,unreviewed
+D-008,BL-003,S3-02,pressure_side,12.0,7.5,pitting,medium,表面点蚀,2026-04-28T08:35:45Z,/photos/D-008.jpg,unreviewed
+D-009,BL-003,S3-05,trailing_edge,42.8,12.3,crack,high,后缘裂纹,2026-04-28T08:38:45Z,/photos/D-009.jpg,unreviewed
+D-010,BL-003,S3-06,suction_side,52.1,6.8,scratch,low,表面划痕,2026-04-28T08:39:45Z,/photos/D-010.jpg,unreviewed

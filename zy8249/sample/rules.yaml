@@ -1,0 +1,47 @@
+inspection:
+  coverage:
+    minPhotoPerSegment: 2
+    requiredCoverage: 0.95
+    maxOverlap: 0.3
+  
+  windSpeed:
+    maxAllowable: 6.0
+    warningThreshold: 5.0
+    unit: m/s
+
+defect:
+  severity:
+    high:
+      threshold: 20.0
+      types:
+        - crack
+        - delamination
+        - erosion
+      priority: 1
+      action: 立即安排维修
+    medium:
+      threshold: 10.0
+      types:
+        - pitting
+        - bonding_issue
+      priority: 2
+      action: 计划内维修
+    low:
+      threshold: 5.0
+      types:
+        - scratch
+      priority: 3
+      action: 持续监测
+  
+  position:
+    pressure_side: 压力面
+    suction_side: 吸力面
+    leading_edge: 前缘
+    trailing_edge: 后缘
+
+report:
+  template:
+    includeCoverage: true
+    includeDefects: true
+    includeRisk: true
+    includeRecommendations: true

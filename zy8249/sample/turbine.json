@@ -1,0 +1,65 @@
+{
+  "turbineId": "WT-001",
+  "location": "华能风电场A1区",
+  "inspectionDate": "2026-04-28",
+  "blades": [
+    {
+      "bladeId": "BL-001",
+      "name": "叶片1",
+      "length": 61.5,
+      "chordRoot": 4.5,
+      "chordTip": 1.2,
+      "segments": [
+        { "segmentId": "S1-01", "start": 0, "end": 5, "name": "叶根段1", "position": "root" },
+        { "segmentId": "S1-02", "start": 5, "end": 15, "name": "叶根段2", "position": "root" },
+        { "segmentId": "S1-03", "start": 15, "end": 25, "name": "叶中段1", "position": "middle" },
+        { "segmentId": "S1-04", "start": 25, "end": 35, "name": "叶中段2", "position": "middle" },
+        { "segmentId": "S1-05", "start": 35, "end": 45, "name": "叶中段3", "position": "middle" },
+        { "segmentId": "S1-06", "start": 45, "end": 55, "name": "叶尖段1", "position": "tip" },
+        { "segmentId": "S1-07", "start": 55, "end": 61.5, "name": "叶尖段2", "position": "tip" }
+      ]
+    },
+    {
+      "bladeId": "BL-002",
+      "name": "叶片2",
+      "length": 61.5,
+      "chordRoot": 4.5,
+      "chordTip": 1.2,
+      "segments": [
+        { "segmentId": "S2-01", "start": 0, "end": 5, "name": "叶根段1", "position": "root" },
+        { "segmentId": "S2-02", "start": 5, "end": 15, "name": "叶根段2", "position": "root" },
+        { "segmentId": "S2-03", "start": 15, "end": 25, "name": "叶中段1", "position": "middle" },
+        { "segmentId": "S2-04", "start": 25, "end": 35, "name": "叶中段2", "position": "middle" },
+        { "segmentId": "S2-05", "start": 35, "end": 45, "name": "叶中段3", "position": "middle" },
+        { "segmentId": "S2-06", "start": 45, "end": 55, "name": "叶尖段1", "position": "tip" },
+        { "segmentId": "S2-07", "start": 55, "end": 61.5, "name": "叶尖段2", "position": "tip" }
+      ]
+    },
+    {
+      "bladeId": "BL-003",
+      "name": "叶片3",
+      "length": 61.5,
+      "chordRoot": 4.5,
+      "chordTip": 1.2,
+      "segments": [
+        { "segmentId": "S3-01", "start": 0, "end": 5, "name": "叶根段1", "position": "root" },
+        { "segmentId": "S3-02", "start": 5, "end": 15, "name": "叶根段2", "position": "root" },
+        { "segmentId": "S3-03", "start": 15, "end": 25, "name": "叶中段1", "position": "middle" },
+        { "segmentId": "S3-04", "start": 25, "end": 35, "name": "叶中段2", "position": "middle" },
+        { "segmentId": "S3-05", "start": 35, "end": 45, "name": "叶中段3", "position": "middle" },
+        { "segmentId": "S3-06", "start": 45, "end": 55, "name": "叶尖段1", "position": "tip" },
+        { "segmentId": "S3-07", "start": 55, "end": 61.5, "name": "叶尖段2", "position": "tip" }
+      ]
+    }
+  ],
+  "hubHeight": 100,
+  "nacelle": {
+    "length": 12,
+    "width": 6,
+    "height": 5
+  },
+  "tower": {
+    "baseDiameter": 4.2,
+    "topDiameter": 2.8
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "wind-turbine-inspection-visualizer",
+  "version": "1.0.0",
+  "description": "风电场运维叶片无人机巡检3D交互可视化工具",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -c-1",
+    "dev": "npx http-server -p 8080 -c-1"
+  },
+  "keywords": [
+    "wind-turbine",
+    "3d-visualization",
+    "inspection",
+    "drone"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}
