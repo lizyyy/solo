@@ -1,0 +1,57 @@
+defaultTTL: 3600
+
+entities:
+  User:
+    name: User
+    ttl: 7200
+    tags:
+      - "users"
+    keyFields:
+      - id
+    dependencies:
+      - Post
+
+  Post:
+    name: Post
+    ttl: 1800
+    tags:
+      - "posts"
+    keyFields:
+      - id
+    dependencies:
+      - Comment
+
+  Comment:
+    name: Comment
+    ttl: 900
+    tags:
+      - "comments"
+    keyFields:
+      - id
+    dependencies:
+      - User
+
+  Profile:
+    name: Profile
+    ttl: 7200
+    tags:
+      - "profile"
+    keyFields:
+      - userId
+    dependencies:
+      - User
+      - Post
+
+tagRules:
+  - tag: "users"
+    invalidates:
+      - User
+      - Post
+      - Comment
+
+queryOverrides:
+  GetUserWithPosts:
+    ttl: 86400
+    tags:
+      - "users"
+      - "posts"

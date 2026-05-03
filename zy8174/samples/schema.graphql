@@ -1,0 +1,128 @@
+type Query {
+  user(id: ID!): User
+  users: [User!]!
+  post(id: ID!): Post
+  posts: [Post!]!
+  comments(postId: ID!): [Comment!]!
+  profile(userId: ID!): Profile
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  createPost(input: CreatePostInput!): Post!
+  updatePost(id: ID!, input: UpdatePostInput!): Post!
+  deletePost(id: ID!): Boolean!
+  createComment(input: CreateCommentInput!): Comment!
+  updateComment(id: ID!, input: UpdateCommentInput!): Comment!
+  deleteComment(id: ID!): Boolean!
+  updateProfile(userId: ID!, input: UpdateProfileInput!): Profile!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  avatar: String
+  posts: [Post!]!
+  comments: [Comment!]!
+  profile: Profile
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  author: User!
+  comments: [Comment!]!
+  tags: [String!]
+  status: PostStatus!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Comment {
+  id: ID!
+  content: String!
+  author: User!
+  post: Post!
+  parentComment: Comment
+  replies: [Comment!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Profile {
+  id: ID!
+  userId: ID!
+  bio: String
+  location: String
+  website: String
+  socialLinks: SocialLinks
+  createdAt: String!
+  updatedAt: String!
+}
+
+type SocialLinks {
+  twitter: String
+  github: String
+  linkedin: String
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  avatar: String
+}
+
+input UpdateUserInput {
+  name: String
+  avatar: String
+}
+
+input CreatePostInput {
+  title: String!
+  content: String!
+  authorId: ID!
+  tags: [String!]
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  status: PostStatus
+  tags: [String!]
+}
+
+input CreateCommentInput {
+  content: String!
+  authorId: ID!
+  postId: ID!
+  parentCommentId: ID
+}
+
+input UpdateCommentInput {
+  content: String!
+}
+
+input UpdateProfileInput {
+  bio: String
+  location: String
+  website: String
+  socialLinks: SocialLinksInput
+}
+
+input SocialLinksInput {
+  twitter: String
+  github: String
+  linkedin: String
+}

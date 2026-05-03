@@ -1,0 +1,92 @@
+defaultTTL: 3600
+
+entities:
+  User:
+    name: User
+    ttl: 7200
+    tags:
+      - "users"
+      - "profile"
+    keyFields:
+      - id
+    dependencies:
+      - Profile
+
+  Post:
+    name: Post
+    ttl: 1800
+    tags:
+      - "posts"
+      - "content"
+    keyFields:
+      - id
+    dependencies:
+      - User
+
+  Comment:
+    name: Comment
+    ttl: 900
+    tags:
+      - "comments"
+      - "content"
+    keyFields:
+      - id
+    dependencies:
+      - Post
+      - User
+
+  Profile:
+    name: Profile
+    ttl: 7200
+    tags:
+      - "profile"
+      - "users"
+    keyFields:
+      - userId
+    dependencies:
+      - User
+
+tagRules:
+  - tag: "content"
+    invalidates:
+      - Post
+      - Comment
+
+  - tag: "users"
+    invalidates:
+      - User
+      - Profile
+
+  - tag: "posts"
+    invalidates:
+      - Post
+
+  - tag: "comments"
+    invalidates:
+      - Comment
+
+  - tag: "profile"
+    invalidates:
+      - User
+      - Profile
+
+queryOverrides:
+  GetUserWithPosts:
+    ttl: 86400
+    tags:
+      - "users"
+      - "posts"
+      - "content"
+
+  GetPostWithComments:
+    ttl: 3600
+    tags:
+      - "posts"
+      - "comments"
+      - "content"
+
+  ListPosts:
+    ttl: 600
+
+  GetProfile:
+    ttl: 86400
