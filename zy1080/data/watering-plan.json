@@ -1,0 +1,42 @@
+{
+  "planId": "PLAN001",
+  "planName": "标准浇水计划",
+  "description": "根据天气情况制定的标准浇水计划，晴天2天浇一次，雨天不浇",
+  "wateringEvents": [
+    {
+      "date": "2024-06-02",
+      "time": "morning",
+      "amount": 25,
+      "fertilizerAmount": 0,
+      "fertilizerType": ""
+    },
+    {
+      "date": "2024-06-04",
+      "time": "morning",
+      "amount": 30,
+      "fertilizerAmount": 2,
+      "fertilizerType": "复合肥"
+    },
+    {
+      "date": "2024-06-08",
+      "time": "morning",
+      "amount": 25,
+      "fertilizerAmount": 0,
+      "fertilizerType": ""
+    },
+    {
+      "date": "2024-06-10",
+      "time": "morning",
+      "amount": 35,
+      "fertilizerAmount": 0,
+      "fertilizerType": ""
+    },
+    {
+      "date": "2024-06-12",
+      "time": "morning",
+      "amount": 40,
+      "fertilizerAmount": 3,
+      "fertilizerType": "液体肥"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "garden-watering-simulator",
+  "version": "1.0.0",
+  "description": "阳台种菜浇水预演工具 - 科学计算CLI工具",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "garden-sim": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "dev": "ts-node src/cli/index.ts",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "gardening",
+    "watering",
+    "simulation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "csv-parse": "^5.5.0"
+  }
+}

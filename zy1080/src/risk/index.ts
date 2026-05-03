@@ -1,0 +1,1 @@
+export { RiskAssessor } from './riskAssessor';

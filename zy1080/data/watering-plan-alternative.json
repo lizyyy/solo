@@ -1,0 +1,21 @@
+{
+  "planId": "PLAN002",
+  "planName": "省事浇水计划",
+  "description": "为了省事，每周只浇两次大水，可能导致积水或缺水",
+  "wateringEvents": [
+    {
+      "date": "2024-06-02",
+      "time": "morning",
+      "amount": 60,
+      "fertilizerAmount": 5,
+      "fertilizerType": "缓释肥"
+    },
+    {
+      "date": "2024-06-09",
+      "time": "morning",
+      "amount": 70,
+      "fertilizerAmount": 0,
+      "fertilizerType": ""
+    }
+  ]
+}

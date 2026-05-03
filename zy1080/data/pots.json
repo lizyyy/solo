@@ -1,0 +1,43 @@
+{
+  "pots": [
+    {
+      "id": "PO001",
+      "name": "大陶盆1号",
+      "plantId": "P001",
+      "volume": 15.0,
+      "drainHoles": 4,
+      "drainageRate": 15.0,
+      "surfaceArea": 314.16,
+      "soilType": "园土+泥炭+珍珠岩",
+      "soilWaterRetention": 0.65,
+      "soilFieldCapacity": 85.0,
+      "soilPermanentWiltingPoint": 15.0
+    },
+    {
+      "id": "PO002",
+      "name": "中塑料盆1号",
+      "plantId": "P002",
+      "volume": 8.0,
+      "drainHoles": 2,
+      "drainageRate": 10.0,
+      "surfaceArea": 201.06,
+      "soilType": "营养土",
+      "soilWaterRetention": 0.75,
+      "soilFieldCapacity": 88.0,
+      "soilPermanentWiltingPoint": 12.0
+    },
+    {
+      "id": "PO003",
+      "name": "小花盆1号",
+      "plantId": "P003",
+      "volume": 5.0,
+      "drainHoles": 1,
+      "drainageRate": 8.0,
+      "surfaceArea": 153.94,
+      "soilType": "园土+椰糠",
+      "soilWaterRetention": 0.60,
+      "soilFieldCapacity": 80.0,
+      "soilPermanentWiltingPoint": 18.0
+    }
+  ]
+}
