@@ -1,0 +1,249 @@
+{
+  "version": "1.0",
+  "exported_at": "2026-05-03T10:00:00",
+  "ingredients": [
+    {
+      "id": "ing_butter001",
+      "name": "无盐黄油",
+      "unit": "kg",
+      "current_price": 85.00,
+      "supplier": "新西兰乳制品公司",
+      "allergens": ["乳制品"],
+      "dietary_labels": [],
+      "is_substitutable": true,
+      "substitute_ids": ["ing_margarine001"],
+      "notes": "安佳黄油 - 可使用植物黄油替代"
+    },
+    {
+      "id": "ing_margarine001",
+      "name": "植物黄油",
+      "unit": "kg",
+      "current_price": 45.00,
+      "supplier": "国内食品厂",
+      "allergens": [],
+      "dietary_labels": ["纯素"],
+      "is_substitutable": true,
+      "substitute_ids": [],
+      "notes": "不含乳制品 - 素食可用"
+    },
+    {
+      "id": "ing_ap_flour001",
+      "name": "中筋面粉",
+      "unit": "kg",
+      "current_price": 12.50,
+      "supplier": "本地粮商",
+      "allergens": ["小麦"],
+      "dietary_labels": [],
+      "is_substitutable": true,
+      "substitute_ids": [],
+      "notes": "常用蛋糕粉"
+    },
+    {
+      "id": "ing_cake_flour001",
+      "name": "低筋面粉",
+      "unit": "kg",
+      "current_price": 14.00,
+      "supplier": "本地粮商",
+      "allergens": ["小麦"],
+      "dietary_labels": [],
+      "is_substitutable": true,
+      "substitute_ids": ["ing_ap_flour001"],
+      "notes": "饼干专用粉"
+    },
+    {
+      "id": "ing_almond001",
+      "name": "杏仁粉",
+      "unit": "kg",
+      "current_price": 120.00,
+      "supplier": "进口坚果供应商",
+      "allergens": ["坚果"],
+      "dietary_labels": ["无麸质"],
+      "is_substitutable": true,
+      "substitute_ids": ["ing_hazelnut001"],
+      "notes": "美国进口 - 价格较高"
+    },
+    {
+      "id": "ing_hazelnut001",
+      "name": "榛子粉",
+      "unit": "kg",
+      "current_price": 95.00,
+      "supplier": "进口坚果供应商",
+      "allergens": ["坚果"],
+      "dietary_labels": ["无麸质"],
+      "is_substitutable": true,
+      "substitute_ids": [],
+      "notes": "意大利进口"
+    },
+    {
+      "id": "ing_egg001",
+      "name": "鸡蛋",
+      "unit": "个",
+      "current_price": 1.20,
+      "supplier": "本地农场",
+      "allergens": ["鸡蛋"],
+      "dietary_labels": [],
+      "is_substitutable": false,
+      "substitute_ids": [],
+      "notes": "每盒30个"
+    },
+    {
+      "id": "ing_cream001",
+      "name": "淡奶油",
+      "unit": "L",
+      "current_price": 38.00,
+      "supplier": "新西兰乳制品公司",
+      "allergens": ["乳制品"],
+      "dietary_labels": [],
+      "is_substitutable": true,
+      "substitute_ids": ["ing_coconut001"],
+      "notes": "安佳淡奶油 35%脂肪"
+    },
+    {
+      "id": "ing_coconut001",
+      "name": "椰浆",
+      "unit": "L",
+      "current_price": 18.00,
+      "supplier": "东南亚进口",
+      "allergens": [],
+      "dietary_labels": ["纯素"],
+      "is_substitutable": true,
+      "substitute_ids": [],
+      "notes": "罐装椰奶 - 可替代淡奶油"
+    },
+    {
+      "id": "ing_sugar001",
+      "name": "细砂糖",
+      "unit": "kg",
+      "current_price": 8.50,
+      "supplier": "本地糖厂",
+      "allergens": [],
+      "dietary_labels": [],
+      "is_substitutable": true,
+      "substitute_ids": [],
+      "notes": "白砂糖"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "recipe_vanilla_cake",
+      "sku": "CAKE001",
+      "name": "经典香草蛋糕",
+      "description": "8寸圆形海绵蛋糕，适合生日和聚会",
+      "yield_quantity": 1,
+      "yield_unit": "个",
+      "target_price": 168.00,
+      "ingredients": [
+        {
+          "ingredient_id": "ing_butter001",
+          "quantity": 0.25,
+          "waste_rate": 0.05,
+          "notes": "室温软化"
+        },
+        {
+          "ingredient_id": "ing_ap_flour001",
+          "quantity": 0.20,
+          "waste_rate": 0.02,
+          "notes": "过筛"
+        },
+        {
+          "ingredient_id": "ing_egg001",
+          "quantity": 4,
+          "waste_rate": 0.0,
+          "notes": "常温"
+        },
+        {
+          "ingredient_id": "ing_sugar001",
+          "quantity": 0.15,
+          "waste_rate": 0.01,
+          "notes": ""
+        },
+        {
+          "ingredient_id": "ing_cream001",
+          "quantity": 0.3,
+          "waste_rate": 0.05,
+          "notes": "装饰用"
+        }
+      ],
+      "notes": "最畅销款，可添加不同水果装饰"
+    },
+    {
+      "id": "recipe_choc_cookie",
+      "sku": "COOKIE001",
+      "name": "巧克力豆曲奇",
+      "description": "美式巧克力豆大曲奇，每包6个",
+      "yield_quantity": 6,
+      "yield_unit": "个",
+      "target_price": 48.00,
+      "ingredients": [
+        {
+          "ingredient_id": "ing_butter001",
+          "quantity": 0.12,
+          "waste_rate": 0.03,
+          "notes": "冷藏"
+        },
+        {
+          "ingredient_id": "ing_cake_flour001",
+          "quantity": 0.15,
+          "waste_rate": 0.02,
+          "notes": ""
+        },
+        {
+          "ingredient_id": "ing_egg001",
+          "quantity": 1,
+          "waste_rate": 0.0,
+          "notes": ""
+        },
+        {
+          "ingredient_id": "ing_sugar001",
+          "quantity": 0.08,
+          "waste_rate": 0.01,
+          "notes": ""
+        }
+      ],
+      "notes": "可批量生产，冷冻保存1个月"
+    },
+    {
+      "id": "recipe_almond_tart",
+      "sku": "TART001",
+      "name": "杏仁挞",
+      "description": "法式杏仁奶油挞，4寸单人份",
+      "yield_quantity": 1,
+      "yield_unit": "个",
+      "target_price": 38.00,
+      "ingredients": [
+        {
+          "ingredient_id": "ing_butter001",
+          "quantity": 0.08,
+          "waste_rate": 0.03,
+          "notes": "挞皮用"
+        },
+        {
+          "ingredient_id": "ing_ap_flour001",
+          "quantity": 0.10,
+          "waste_rate": 0.02,
+          "notes": "挞皮用"
+        },
+        {
+          "ingredient_id": "ing_almond001",
+          "quantity": 0.06,
+          "waste_rate": 0.05,
+          "notes": "杏仁奶油馅"
+        },
+        {
+          "ingredient_id": "ing_egg001",
+          "quantity": 1,
+          "waste_rate": 0.0,
+          "notes": ""
+        },
+        {
+          "ingredient_id": "ing_sugar001",
+          "quantity": 0.04,
+          "waste_rate": 0.01,
+          "notes": ""
+        }
+      ],
+      "notes": "高端产品，使用进口杏仁粉"
+    }
+  ],
+  "replacement_history": []
+}
