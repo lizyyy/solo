@@ -1,0 +1,5 @@
+payment_number,vendor_id,vendor_name,amount,tax_amount,total_amount,currency,date,invoice_number,payment_method,bank_account,is_cross_month
+PAY-2024-001,V001,华为技术有限公司,10000.00,1300.00,11300.00,CNY,2024-01-20,INV-2024-001,电汇,ACC-001,false
+PAY-2024-002,V001,华为技术有限公司,8000.00,1040.00,9040.00,CNY,2024-02-05,INV-2024-002,电汇,ACC-001,true
+PAY-2024-003,V002,中兴通讯股份有限公司,5000.00,650.00,5650.00,CNY,2024-01-25,INV-2024-003,承兑汇票,ACC-002,false
+PAY-2024-004,V004,腾讯科技,15000.00,900.00,15900.00,CNY,2024-01-28,INV-2024-005,银行转账,ACC-001,false

@@ -1,0 +1,7 @@
+invoice_number,vendor_id,vendor_name,amount,tax_amount,total_amount,currency,tax_rate,date,po_number,is_split,is_merged,split_from,merged_invoices
+INV-2024-001,V001,华为技术有限公司,10000.00,1300.00,11300.00,CNY,0.13,2024-01-15,PO-2024-001,false,false,,
+INV-2024-002,V001,华为技术有限公司,8000.00,1040.00,9040.00,CNY,0.13,2024-01-18,PO-2024-002,false,false,,
+INV-2024-003,V002,中兴通讯股份有限公司,5000.00,650.00,5650.00,CNY,0.13,2024-01-20,PO-2024-003,true,false,INV-2024-003-ORIG,
+INV-2024-004,V003,阿里巴巴集团,,1200.00,10200.00,CNY,,2024-01-22,PO-2024-004,false,false,,
+INV-2024-005,V004,腾讯科技,15000.00,900.00,15900.00,CNY,0.06,2024-01-25,PO-2024-005,false,false,,
+INV-2024-006,V001,华为技术有限公司,20000.00,2600.00,22600.00,USD,0.13,2024-01-28,PO-2024-006,false,false,,

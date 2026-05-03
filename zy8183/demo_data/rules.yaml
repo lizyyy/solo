@@ -1,0 +1,61 @@
+rules:
+  - rule_id: R001
+    rule_name: 金额一致性校验
+    rule_type: amount
+    description: 校验发票、采购订单、收货单、付款单的金额是否一致
+    severity: critical
+    enabled: true
+    conditions:
+      tolerance: 0.01
+      check_tax: true
+
+  - rule_id: R002
+    rule_name: 供应商一致性校验
+    rule_type: vendor
+    description: 校验发票、采购订单、收货单的供应商是否一致
+    severity: critical
+    enabled: true
+    conditions: {}
+
+  - rule_id: R003
+    rule_name: 数量一致性校验
+    rule_type: quantity
+    description: 校验发票明细、采购订单、收货单的数量是否一致
+    severity: warning
+    enabled: true
+    conditions:
+      tolerance: 0
+
+  - rule_id: R004
+    rule_name: 税率一致性校验
+    rule_type: tax_rate
+    description: 校验发票、采购订单的税率是否一致
+    severity: warning
+    enabled: true
+    conditions: {}
+
+  - rule_id: R005
+    rule_name: 币种一致性校验
+    rule_type: currency
+    description: 校验所有单据的币种是否一致
+    severity: warning
+    enabled: true
+    conditions: {}
+
+  - rule_id: R006
+    rule_name: 日期逻辑校验
+    rule_type: date
+    description: 校验单据日期的逻辑顺序（订单->收货->发票->付款）
+    severity: info
+    enabled: true
+    conditions:
+      allow_cross_month: true
+
+  - rule_id: R007
+    rule_name: 必填字段校验
+    rule_type: required
+    description: 校验币种、税率等必填字段是否缺失
+    severity: warning
+    enabled: true
+    conditions:
+      fields: ["currency", "tax_rate"]
