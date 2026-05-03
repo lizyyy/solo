@@ -1,0 +1,25 @@
+# 对照配置文件
+
+# 阳性对照样本ID列表
+positive_controls:
+  - PC1
+
+# 阴性对照样本ID列表
+negative_controls:
+  - NC1
+
+# NTC (无模板对照) 样本ID列表
+ntc_controls:
+  - NTC
+
+# Ct 阳性阈值 (默认 38.0)
+# Ct 值 <= 此值视为阳性
+ct_cutoff: 38.0
+
+# 重复孔容差 (默认 1.0)
+# 超过此值的孔被视为离群孔
+replicate_tolerance: 1.0
+
+# 最小 NTC 数量 (默认 1)
+# 至少需要多少个 NTC 孔
+min_ntc_count: 1

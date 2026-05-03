@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qpcr-reviewer"
+version = "0.1.0"
+description = "qPCR 96孔板结果复核工具"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1.0",
+    "click>=8.0.0",
+]
+
+[project.scripts]
+qpcr-reviewer = "qpcr_reviewer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["qpcr_reviewer"]
