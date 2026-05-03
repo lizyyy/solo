@@ -1,0 +1,1 @@
+"""Skill normalization module"""

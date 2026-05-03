@@ -1,0 +1,11 @@
+candidate_id,job_id,interview_date,interviewer,overall_rating,technical_rating,behavioral_rating,final_outcome,rejection_reason,interview_notes
+CAND001,JOB001,2024-01-15,张三,4.8,4.9,4.7,pass,,技术扎实，项目经验丰富，沟通能力强
+CAND002,JOB001,2024-01-15,李四,4.2,4.0,4.4,pass,,技能匹配，表达清晰，可培养
+CAND003,JOB001,2024-01-16,王五,2.0,1.5,2.5,fail,Python 基础薄弱，项目经验造假嫌疑,面试中发现候选人对 Django 框架理解不深，无法回答基础问题
+CAND004,JOB001,2024-01-16,赵六,3.5,3.2,3.8,fail,经验不足，未达岗位要求,工作年限较短，项目复杂度不够
+CAND005,JOB001,2024-01-17,张三,4.0,4.2,3.8,pass,,全栈背景，技术视野好
+CAND006,JOB001,2024-01-17,李四,4.5,4.6,4.4,pass,,资深背景，架构设计能力强
+CAND007,JOB001,2024-01-18,王五,2.5,2.0,3.0,fail,要求薪资过高，与能力不匹配,面试表现一般，但薪资期望超出预算
+CAND008,JOB001,2024-01-18,赵六,3.8,4.0,3.6,pass,,经验丰富，稳定性好
+CAND009,JOB001,2024-01-19,张三,2.0,1.8,2.2,fail,技能不匹配，Java 背景不符合 Python 岗位要求,候选人主要使用 Java，对 Python 不熟悉
+CAND010,JOB001,2024-01-19,李四,3.0,2.8,3.2,fail,前端背景不符合后端岗位要求,候选人主要做前端开发，后端经验不足
