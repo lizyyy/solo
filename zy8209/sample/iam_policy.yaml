@@ -1,0 +1,54 @@
+- Version: '2012-10-17'
+  Statement:
+    - Sid: AllowFullAccess
+      Effect: Allow
+      Action: '*'
+      Resource: '*'
+      Principal:
+        AWS: arn:aws:iam::123456789012:user/admin
+
+- Version: '2012-10-17'
+  Statement:
+    - Sid: AllowCrossAccount
+      Effect: Allow
+      Action:
+        - sts:AssumeRole
+      Principal:
+        AWS:
+          - arn:aws:iam::999999999999:root
+          - arn:aws:iam::888888888888:user/external-user
+
+- Version: '2012-10-17'
+  Statement:
+    - Sid: MixedPrincipalTypes
+      Effect: Allow
+      Action: s3:GetObject
+      Resource: arn:aws:s3:::my-bucket/*
+      Principal:
+        AWS: arn:aws:iam::123456789012:user/internal-user
+        Service: lambda.amazonaws.com
+        Federated: arn:aws:iam::123456789012:saml-provider/okta
+
+- Version: '2012-10-17'
+  Statement:
+    - Sid: WildcardPrincipal
+      Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:ListBucket
+      Resource:
+        - arn:aws:s3:::public-bucket
+        - arn:aws:s3:::public-bucket/*
+      Principal: '*'
+
+- Version: '2012-10-17'
+  Statement:
+    - Sid: RestrictedAccess
+      Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource: arn:aws:s3:::private-bucket/*
+      Principal:
+        AWS:
+          - arn:aws:iam::123456789012:role/developer-role

@@ -1,0 +1,6 @@
+resource_type,resource_name,owner,email,department
+aws_s3_bucket,private_bucket,Zhang San,zhangsan@example.com,Data Engineering
+aws_iam_role,admin_role,Li Si,lisi@example.com,Security
+aws_iam_policy,restricted_policy,Wang Wu,wangwu@example.com,Platform
+aws_s3_bucket_policy,public_bucket_policy,Zhao Liu,zhaoliu@example.com,Web Team
+aws_iam_policy,wildcard_policy,"Test User",test@example.com,DevOps

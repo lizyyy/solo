@@ -1,0 +1,14 @@
+[
+  {
+    "resource": "aws_s3_bucket.public_bucket",
+    "issue_type": "public_bucket",
+    "reason": "这是一个公开的文档存储桶，需要公开访问权限",
+    "valid_until": "2025-12-31"
+  },
+  {
+    "resource": "aws_iam_policy.wildcard_policy",
+    "issue_type": "wildcard_permission",
+    "reason": "管理员策略，仅用于紧急维护",
+    "valid_until": "2025-06-30"
+  }
+]
