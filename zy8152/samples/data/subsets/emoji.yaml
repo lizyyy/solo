@@ -1,0 +1,27 @@
+name: Emoji
+description: Emoji 和符号字符集
+unicodeRanges:
+  - start: 0x1F600
+    end: 0x1F64F
+    name: Emoticons
+  - start: 0x1F300
+    end: 0x1F5FF
+    name: Miscellaneous Symbols and Pictographs
+  - start: 0x1F680
+    end: 0x1F6FF
+    name: Transport and Map Symbols
+  - start: 0x1F1E0
+    end: 0x1F1FF
+    name: Regional Indicator Symbols
+  - start: 0x2600
+    end: 0x26FF
+    name: Miscellaneous Symbols
+  - start: 0x2700
+    end: 0x27BF
+    name: Dingbats
+  - start: 0x1F900
+    end: 0x1F9FF
+    name: Supplemental Symbols and Pictographs
+  - start: 0x1FA70
+    end: 0x1FAFF
+    name: Symbols and Pictographs Extended-A

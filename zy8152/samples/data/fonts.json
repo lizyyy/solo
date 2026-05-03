@@ -1,0 +1,68 @@
+{
+  "fonts": [
+    {
+      "name": "NotoSansCJKsc",
+      "family": "Noto Sans CJK SC",
+      "path": "fonts/NotoSansCJKsc-Regular.otf",
+      "supportedScripts": ["Hani", "Hira", "Kana"],
+      "weight": 400,
+      "style": "normal"
+    },
+    {
+      "name": "NotoSansArabic",
+      "family": "Noto Sans Arabic",
+      "path": "fonts/NotoSansArabic-Regular.ttf",
+      "supportedScripts": ["Arab"],
+      "weight": 400,
+      "style": "normal"
+    },
+    {
+      "name": "NotoSans",
+      "family": "Noto Sans",
+      "path": "fonts/NotoSans-Regular.ttf",
+      "supportedScripts": ["Latn", "Grek", "Cyrl"],
+      "isVariable": true,
+      "variableAxes": [
+        {
+          "tag": "wght",
+          "name": "Weight",
+          "min": 100,
+          "max": 900,
+          "default": 400
+        },
+        {
+          "tag": "wdth",
+          "name": "Width",
+          "min": 62.5,
+          "max": 100,
+          "default": 100
+        }
+      ],
+      "weight": 400,
+      "style": "normal"
+    },
+    {
+      "name": "NotoColorEmoji",
+      "family": "Noto Color Emoji",
+      "path": "fonts/NotoColorEmoji.ttf",
+      "weight": 400,
+      "style": "normal"
+    },
+    {
+      "name": "NotoSansDevanagari",
+      "family": "Noto Sans Devanagari",
+      "path": "fonts/NotoSansDevanagari-Regular.ttf",
+      "supportedScripts": ["Deva"],
+      "weight": 400,
+      "style": "normal"
+    },
+    {
+      "name": "NotoSansHebrew",
+      "family": "Noto Sans Hebrew",
+      "path": "fonts/NotoSansHebrew-Regular.ttf",
+      "supportedScripts": ["Hebr"],
+      "weight": 400,
+      "style": "normal"
+    }
+  ]
+}

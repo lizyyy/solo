@@ -1,0 +1,21 @@
+id,language,script,text,description
+sample-001,zh-CN,Hani,你好世界，这是一个中文字符测试。,简体中文基本测试
+sample-002,zh-TW,Hani,你好世界，這是繁體中文字符測試。,繁体中文基本测试
+sample-003,en,Latn,Hello World! This is an English text test.,英文基本测试
+sample-004,ja,Jpan,こんにちは世界、日本語のテストです。,日文测试（包含平假名和汉字）
+sample-005,ko,Hang,안녕하세요 세계 한국어 테스트입니다.,韩文测试
+sample-006,ar,Arab,مرحبا بالعالم,阿拉伯文基本测试
+sample-007,ar,Arab,النسخة 123 من التطبيق متاحة الآن,阿拉伯文包含数字（方向性风险）
+sample-008,ar,Arab,😊 مرحبا بالعالم 😊,阿拉伯文包含Emoji（方向性风险）
+sample-009,he,Hebr,שלום עולם,希伯来文测试
+sample-010,hi,Deva,नमस्ते दुनिया,印地语测试
+sample-011,th,Thai,สวัสดีโลก,泰语测试
+sample-012,ru,Cyrl,Привет мир,俄语测试
+sample-013,el,Grek,Γεια σου κόσμε,希腊语测试
+sample-014,en,Latn,Hello 🌍 World 🎉,英文包含Emoji
+sample-015,zh-CN,Hani,中文测试 🇨🇳 带国旗Emoji,中文带国旗Emoji
+sample-016,en,Latn,The quick brown fox jumps over the lazy dog 12345.,英文全字母测试
+sample-017,zh-CN,Hani,天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。,千字文节选
+sample-018,ja,Jpan,吾輩は猫である。名前はまだ無い。,日文名著节选
+sample-019,ar,Arab,قصة الحروف العربية: أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن هـ و ي,阿拉伯文字母表
+sample-020,multi,Multi,Hello 你好 مرحبا שלום नमस्ते Привет Γεια,多语言混合测试

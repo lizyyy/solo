@@ -1,0 +1,15 @@
+name: Basic Latin
+description: 基本拉丁字符集 (ASCII)
+unicodeRanges:
+  - start: 0x0000
+    end: 0x007F
+    name: Basic Latin
+  - start: 0x0080
+    end: 0x00FF
+    name: Latin-1 Supplement
+  - start: 0x0100
+    end: 0x017F
+    name: Latin Extended-A
+  - start: 0x0180
+    end: 0x024F
+    name: Latin Extended-B

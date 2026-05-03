@@ -1,0 +1,27 @@
+name: CJK Unified Ideographs
+description: 中日韩统一表意文字集
+unicodeRanges:
+  - start: 0x4E00
+    end: 0x9FFF
+    name: CJK Unified Ideographs
+  - start: 0x3400
+    end: 0x4DBF
+    name: CJK Unified Ideographs Extension A
+  - start: 0x20000
+    end: 0x2A6DF
+    name: CJK Unified Ideographs Extension B
+  - start: 0x2A700
+    end: 0x2B73F
+    name: CJK Unified Ideographs Extension C
+  - start: 0x3040
+    end: 0x309F
+    name: Hiragana
+  - start: 0x30A0
+    end: 0x30FF
+    name: Katakana
+  - start: 0x1100
+    end: 0x11FF
+    name: Hangul Jamo
+  - start: 0xAC00
+    end: 0xD7AF
+    name: Hangul Syllables

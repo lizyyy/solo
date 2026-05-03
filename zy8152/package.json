@@ -1,0 +1,36 @@
+{
+  "name": "font-fallback-checker",
+  "version": "1.0.0",
+  "description": "国际化字体回退链路预检 CLI 工具",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "font-check": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli/index.ts",
+    "demo": "npm run build && node dist/cli/index.js --data-dir samples/data --output-dir samples/output",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "fonts",
+    "i18n",
+    "glyphs",
+    "preflight",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/yaml": "^1.9.7",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.2",
+    "csv-stringify": "^6.4.4",
+    "yaml": "^2.3.4"
+  }
+}

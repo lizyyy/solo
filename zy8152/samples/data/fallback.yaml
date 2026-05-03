@@ -1,0 +1,77 @@
+defaults:
+  baseFonts:
+    - NotoSans
+    - NotoSansCJKsc
+  emojiFont: NotoColorEmoji
+
+chains:
+  - language: zh-CN
+    script: Hani
+    fonts:
+      - NotoSansCJKsc
+      - NotoSans
+
+  - language: zh-TW
+    script: Hani
+    fonts:
+      - NotoSansCJKsc
+      - NotoSans
+
+  - language: en
+    script: Latn
+    fonts:
+      - NotoSans
+
+  - language: ja
+    script: Jpan
+    fonts:
+      - NotoSansCJKsc
+      - NotoSans
+
+  - language: ko
+    script: Hang
+    fonts:
+      - NotoSansCJKsc
+      - NotoSans
+
+  - language: ar
+    script: Arab
+    fonts:
+      - NotoSansArabic
+      - NotoSans
+
+  - language: he
+    script: Hebr
+    fonts:
+      - NotoSansHebrew
+      - NotoSans
+
+  - language: hi
+    script: Deva
+    fonts:
+      - NotoSansDevanagari
+      - NotoSans
+
+  - language: th
+    script: Thai
+    fonts:
+      - NotoSans
+
+  - language: ru
+    script: Cyrl
+    fonts:
+      - NotoSans
+
+  - language: el
+    script: Grek
+    fonts:
+      - NotoSans
+
+  - language: multi
+    script: Multi
+    fonts:
+      - NotoSans
+      - NotoSansCJKsc
+      - NotoSansArabic
+      - NotoSansHebrew
+      - NotoSansDevanagari
