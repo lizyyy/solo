@@ -1,0 +1,62 @@
+[
+    {
+        "batch_number": "BATCH001",
+        "drug_name": "紫杉醇",
+        "drug_id": "DRUG001",
+        "spec": "30mg/瓶",
+        "total_amount": 300,
+        "unit": "mg",
+        "used_amount": 100,
+        "remaining_amount": 100,
+        "expire_date": "2026-12-31",
+        "receive_time": "2025-04-15 09:00:00",
+        "storage_location": "冷藏冰箱01-A层",
+        "supplier": "某制药有限公司",
+        "status": "active"
+    },
+    {
+        "batch_number": "BATCH002",
+        "drug_name": "顺铂",
+        "drug_id": "DRUG002",
+        "spec": "10mg/瓶",
+        "total_amount": 200,
+        "unit": "mg",
+        "used_amount": 0,
+        "remaining_amount": 200,
+        "expire_date": "2026-10-31",
+        "receive_time": "2025-04-10 14:30:00",
+        "storage_location": "冷藏冰箱01-B层",
+        "supplier": "某制药有限公司",
+        "status": "active"
+    },
+    {
+        "batch_number": "BATCH003",
+        "drug_name": "奥沙利铂",
+        "drug_id": "DRUG003",
+        "spec": "50mg/瓶",
+        "total_amount": 100,
+        "unit": "mg",
+        "used_amount": 0,
+        "remaining_amount": 100,
+        "expire_date": "2026-08-31",
+        "receive_time": "2025-04-20 10:00:00",
+        "storage_location": "冷藏冰箱01-A层",
+        "supplier": "某制药有限公司",
+        "status": "active"
+    },
+    {
+        "batch_number": "BATCH004",
+        "drug_name": "氟尿嘧啶",
+        "drug_id": "DRUG004",
+        "spec": "250mg/瓶",
+        "total_amount": 1000,
+        "unit": "mg",
+        "used_amount": 0,
+        "remaining_amount": 1000,
+        "expire_date": "2026-11-30",
+        "receive_time": "2025-04-25 11:00:00",
+        "storage_location": "冷藏冰箱02-A层",
+        "supplier": "某制药有限公司",
+        "status": "active"
+    }
+]
