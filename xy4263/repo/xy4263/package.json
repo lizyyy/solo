@@ -1,0 +1,37 @@
+{
+  "name": "webhook-delivery-observer",
+  "version": "1.0.0",
+  "description": "Webhook 投递观察站 - 支持创建订阅端点、接收模拟事件、HMAC签名投递、失败重试、死信队列、幂等键去重和投递日志查询",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest --verbose",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "webhook",
+    "api",
+    "webhook-testing",
+    "http-callback",
+    "hmac",
+    "retry",
+    "dead-letter-queue"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
