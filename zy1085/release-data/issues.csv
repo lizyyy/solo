@@ -1,0 +1,7 @@
+id,title,description,status,author,assignee,module,priority,affected_customers,related_commits,has_rollback_plan,rollback_plan,labels
+issue-1,"用户登录功能需求","实现用户登录认证功能，包括用户名密码登录和第三方登录",in_progress,产品经理,张三,auth,high,"客户A,客户B,客户C","commit-1,commit-4",true,"1. 回滚到上一个稳定版本
+2. 验证登录功能是否恢复正常","feature,auth"
+issue-2,"支付系统优化","优化支付流程，减少支付失败率",closed,产品经理,李四,payment,high,"客户A,客户D",commit-2,true,"1. 检查支付配置
+2. 回滚支付相关代码","feature,payment"
+issue-3,"用户API重构","重构用户相关的API接口，统一响应格式",in_progress,技术负责人,王五,api,medium,,commit-3,false,,"refactor,api"
+issue-4,"数据库性能优化","优化慢查询，添加索引",open,DBA,赵六,database,low,,,,,"performance,database"

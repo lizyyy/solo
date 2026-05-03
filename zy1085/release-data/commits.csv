@@ -1,0 +1,8 @@
+id,hash,message,author,date,module,related_issues,is_breaking,breaking_description
+commit-1,a1b2c3d,"feat(auth): 添加用户登录功能 - Fixes #1",张三,2026-05-01,auth,issue-1,false,
+commit-2,e4f5g6h,"feat(payment): 新增支付接口 - 关联 issue-2",李四,2026-05-02,payment,issue-2,false,
+commit-3,i7j8k9l,"refactor(api): 重构用户API
+
+BREAKING CHANGE: 修改了用户信息接口的响应格式，移除了 deprecated 字段",王五,2026-05-03,api,issue-3,true,"修改了用户信息接口的响应格式，移除了 deprecated 字段"
+commit-4,m1n2o3p,"fix(auth): 修复登录超时问题",张三,2026-05-03,auth,issue-1,false,
+commit-5,q4r5s6t,"chore: 更新依赖版本",赵六,2026-05-04,unknown,,false,

@@ -1,0 +1,61 @@
+{
+  "version": "1.2.0",
+  "date": "2026-05-15",
+  "environment": "production",
+  "description": "本次发布包含用户登录功能、支付系统优化和API重构",
+  "moduleOwners": {
+    "auth": "张三",
+    "payment": "李四",
+    "api": "王五",
+    "database": "赵六",
+    "frontend": "钱七"
+  },
+  "configChanges": [
+    {
+      "key": "auth.session.timeout",
+      "oldValue": "3600",
+      "newValue": "7200",
+      "environment": "production",
+      "description": "延长登录会话超时时间",
+      "isRequired": true,
+      "rollbackAction": "恢复为 3600"
+    },
+    {
+      "key": "payment.max.retry",
+      "oldValue": "3",
+      "newValue": "5",
+      "environment": "production",
+      "description": "增加支付重试次数",
+      "isRequired": false,
+      "rollbackAction": "恢复为 3"
+    },
+    {
+      "key": "api.feature.enabled",
+      "oldValue": "false",
+      "newValue": "true",
+      "environment": "production",
+      "description": "启用新API功能开关",
+      "isRequired": true,
+      "rollbackAction": "设置为 false"
+    }
+  ],
+  "dependencies": [
+    "user-service >= 2.0.0",
+    "payment-service >= 1.5.0",
+    "database: postgresql 14"
+  ],
+  "preDeploySteps": [
+    "备份数据库",
+    "检查依赖服务状态",
+    "更新配置文件",
+    "关闭自动扩缩容"
+  ],
+  "postDeploySteps": [
+    "执行数据库迁移",
+    "重启相关服务",
+    "验证核心功能",
+    "开启自动扩缩容",
+    "通知相关人员"
+  ],
+  "rollbackStrategy": "1. 停止新服务实例\n2. 恢复旧版本代码\n3. 回滚数据库迁移（如有）\n4. 恢复配置值\n5. 验证功能正常"
+}
