@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表格导入前哨站</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>📋 表格导入前哨站</h1>
+            <p class="subtitle">CSV/JSON 数据预检、标准化与校验工具</p>
+            <div class="header-actions">
+                <button id="loadExampleBtn" class="btn btn-secondary">加载示例数据</button>
+                <button id="clearAllBtn" class="btn btn-danger">清空所有</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- 左侧面板：数据输入和模板管理 -->
+            <aside class="sidebar">
+                <!-- 数据输入区域 -->
+                <section class="panel" id="inputPanel">
+                    <h2>📥 数据输入</h2>
+                    <div class="input-tabs">
+                        <button class="tab-btn active" data-tab="upload">上传文件</button>
+                        <button class="tab-btn" data-tab="paste">粘贴数据</button>
+                    </div>
+                    
+                    <div id="upload-tab" class="tab-content active">
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-icon">📁</div>
+                            <p>拖拽 CSV/JSON 文件到此处</p>
+                            <p class="small-text">或</p>
+                            <input type="file" id="fileInput" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" id="browseBtn">选择文件</button>
+                        </div>
+                        <div id="fileInfo" class="file-info hidden">
+                            <span id="fileName"></span>
+                            <button class="btn-remove" id="removeFile">✕</button>
+                        </div>
+                    </div>
+                    
+                    <div id="paste-tab" class="tab-content">
+                        <textarea id="pasteArea" placeholder="粘贴 CSV 或 JSON 数据..."></textarea>
+                        <button class="btn btn-primary" id="parsePasteBtn">解析数据</button>
+                    </div>
+                </section>
+
+                <!-- 模板管理区域 -->
+                <section class="panel" id="templatePanel">
+                    <h2>📑 导入模板</h2>
+                    <div class="template-selector">
+                        <label for="templateSelect">选择模板：</label>
+                        <div class="select-row">
+                            <select id="templateSelect">
+                                <option value="">-- 新建模板 --</option>
+                            </select>
+                            <button class="btn btn-secondary" id="editTemplateBtn">✏️</button>
+                            <button class="btn btn-secondary" id="saveTemplateBtn">💾</button>
+                            <button class="btn btn-danger" id="deleteTemplateBtn">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div id="templateEditor" class="template-editor hidden">
+                        <div class="form-row">
+                            <label for="templateName">模板名称：</label>
+                            <input type="text" id="templateName" placeholder="输入模板名称">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="templateDesc">描述：</label>
+                            <input type="text" id="templateDesc" placeholder="模板描述">
+                        </div>
+                        
+                        <h3>字段配置</h3>
+                        <div id="fieldList" class="field-list"></div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="addFieldBtn">+ 添加字段</button>
+                        </div>
+                        
+                        <div id="fieldEditor" class="field-editor hidden">
+                            <h4>编辑字段</h4>
+                            <div class="form-row">
+                                <label>字段名称：</label>
+                                <input type="text" id="fieldName" placeholder="目标字段名">
+                            </div>
+                            <div class="form-row">
+                                <label>字段别名（逗号分隔）：</label>
+                                <input type="text" id="fieldAliases" placeholder="别名1,别名2">
+                            </div>
+                            <div class="form-row">
+                                <label>字段类型：</label>
+                                <select id="fieldType">
+                                    <option value="string">字符串</option>
+                                    <option value="number">数字</option>
+                                    <option value="date">日期</option>
+                                    <option value="boolean">布尔值</option>
+                                    <option value="amount">金额</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>是否必填：</label>
+                                <input type="checkbox" id="fieldRequired">
+                            </div>
+                            <div class="form-row">
+                                <label>是否唯一键：</label>
+                                <input type="checkbox" id="fieldUnique">
+                            </div>
+                            <div class="form-row">
+                                <label>枚举值（逗号分隔）：</label>
+                                <input type="text" id="fieldEnums" placeholder="值1,值2,值3">
+                            </div>
+                            <div class="form-row" id="dateFormatRow">
+                                <label>日期格式：</label>
+                                <select id="fieldDateFormat">
+                                    <option value="auto">自动检测</option>
+                                    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                    <option value="YYYY/MM/DD">YYYY/MM/DD</option>
+                                    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                    <option value="YYYY-MM-DD HH:mm:ss">YYYY-MM-DD HH:mm:ss</option>
+                                    <option value="YYYY/MM/DD HH:mm:ss">YYYY/MM/DD HH:mm:ss</option>
+                                </select>
+                            </div>
+                            <div class="form-row" id="amountFormatRow">
+                                <label>金额单位：</label>
+                                <select id="fieldAmountUnit">
+                                    <option value="auto">自动检测</option>
+                                    <option value="yuan">元</option>
+                                    <option value="wanyuan">万元</option>
+                                    <option value="cent">分</option>
+                                    <option value="thousand">千元</option>
+                                </select>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-primary" id="saveFieldBtn">保存字段</button>
+                                <button class="btn btn-secondary" id="cancelFieldBtn">取消</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 跨列规则区域 -->
+                <section class="panel" id="rulesPanel">
+                    <h2>⚖️ 跨列校验规则</h2>
+                    <div id="crossFieldRules" class="rules-list"></div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="addRuleBtn">+ 添加规则</button>
+                    </div>
+                    
+                    <div id="ruleEditor" class="rule-editor hidden">
+                        <h4>编辑规则</h4>
+                        <div class="form-row">
+                            <label>规则类型：</label>
+                            <select id="ruleType">
+                                <option value="date_order">日期顺序</option>
+                                <option value="amount_check">金额校验</option>
+                                <option value="custom">自定义公式</option>
+                            </select>
+                        </div>
+                        <div class="form-row" id="dateRuleFields">
+                            <label>开始字段：</label>
+                            <select id="ruleStartField"></select>
+                            <label>结束字段：</label>
+                            <select id="ruleEndField"></select>
+                        </div>
+                        <div class="form-row" id="amountRuleFields">
+                            <label>总金额字段：</label>
+                            <select id="ruleTotalField"></select>
+                            <label>单价字段：</label>
+                            <select id="rulePriceField"></select>
+                            <label>数量字段：</label>
+                            <select id="ruleQuantityField"></select>
+                        </div>
+                        <div class="form-row" id="customRuleField">
+                            <label>自定义公式：</label>
+                            <input type="text" id="ruleFormula" placeholder="使用 {字段名} 引用字段">
+                        </div>
+                        <div class="form-row">
+                            <label>错误消息：</label>
+                            <input type="text" id="ruleErrorMessage" placeholder="校验失败时显示的消息">
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="saveRuleBtn">保存规则</button>
+                            <button class="btn btn-secondary" id="cancelRuleBtn">取消</button>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+
+            <!-- 主内容区：多视图展示 -->
+            <main class="content">
+                <!-- 进度条 -->
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="progressText">等待导入数据...</span>
+                        <span id="progressStats"></span>
+                    </div>
+                </div>
+
+                <!-- 视图切换标签 -->
+                <div class="view-tabs">
+                    <button class="view-tab active" data-view="raw">原始表格</button>
+                    <button class="view-tab" data-view="standardized">标准化预览</button>
+                    <button class="view-tab" data-view="errors">错误分组</button>
+                    <button class="view-tab" data-view="fixes">修复队列</button>
+                </div>
+
+                <!-- 原始表格视图 -->
+                <div id="raw-view" class="view-content active">
+                    <div class="view-header">
+                        <h3>原始数据</h3>
+                        <div class="view-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">行数：</span>
+                                <span id="rawRowCount">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">列数：</span>
+                                <span id="rawColCount">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="rawTable" class="data-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 标准化预览视图 -->
+                <div id="standardized-view" class="view-content">
+                    <div class="view-header">
+                        <h3>标准化预览</h3>
+                        <div class="view-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">有效行：</span>
+                                <span id="validRowCount" class="valid">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">问题行：</span>
+                                <span id="invalidRowCount" class="invalid">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="standardizedTable" class="data-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 错误分组视图 -->
+                <div id="errors-view" class="view-content">
+                    <div class="view-header">
+                        <h3>错误分组</h3>
+                        <div class="view-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">错误类型：</span>
+                                <span id="errorTypeCount">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">总错误数：</span>
+                                <span id="totalErrorCount" class="invalid">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="errorGroups" class="error-groups"></div>
+                </div>
+
+                <!-- 修复队列视图 -->
+                <div id="fixes-view" class="view-content">
+                    <div class="view-header">
+                        <h3>修复队列</h3>
+                        <div class="view-stats">
+                            <span class="stat-item">
+                                <span class="stat-label">待处理：</span>
+                                <span id="pendingFixCount" class="warning">0</span>
+                            </span>
+                            <span class="stat-item">
+                                <span class="stat-label">已处理：</span>
+                                <span id="processedFixCount" class="valid">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="fix-queue-toolbar">
+                        <button class="btn btn-secondary" id="selectAllFixesBtn">全选</button>
+                        <button class="btn btn-secondary" id="deselectAllFixesBtn">取消全选</button>
+                        <button class="btn btn-primary" id="applySelectedFixesBtn">应用选中修复</button>
+                        <button class="btn btn-secondary" id="ignoreSelectedFixesBtn">忽略选中</button>
+                    </div>
+                    <div id="fixQueue" class="fix-queue"></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 底部导出区域 -->
+        <footer class="footer">
+            <div class="export-section">
+                <h3>📤 导出结果</h3>
+                <div class="export-buttons">
+                    <button class="btn btn-primary export-btn" data-export="cleaned">
+                        <span class="btn-icon">✅</span>
+                        <span class="btn-text">cleaned.csv</span>
+                    </button>
+                    <button class="btn btn-warning export-btn" data-export="rejects">
+                        <span class="btn-icon">❌</span>
+                        <span class="btn-text">rejects.csv</span>
+                    </button>
+                    <button class="btn btn-secondary export-btn" data-export="rules">
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">rules.json</span>
+                    </button>
+                    <button class="btn btn-secondary export-btn" data-export="report">
+                        <span class="btn-icon">📄</span>
+                        <span class="btn-text">导入报告</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>
