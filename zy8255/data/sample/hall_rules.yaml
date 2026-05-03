@@ -1,0 +1,69 @@
+# 影厅规则配置
+# 定义各影厅的设备时间规则和限制
+
+halls:
+  - hall_id: H1
+    hall_name: 1号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 200
+    projector_id: PRJ-001
+    audio_system: Dolby Atmos
+
+  - hall_id: H2
+    hall_name: 2号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 150
+    projector_id: PRJ-002
+    audio_system: Dolby Digital
+
+  - hall_id: H3
+    hall_name: 3号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 100
+    projector_id: PRJ-003
+    audio_system: Dolby Digital
+
+  - hall_id: H4
+    hall_name: 4号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 300
+    projector_id: PRJ-004
+    audio_system: IMAX
+
+  - hall_id: H5
+    hall_name: 5号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 120
+    projector_id: PRJ-005
+    audio_system: Dolby Digital
+
+  - hall_id: H6
+    hall_name: 6号厅
+    warmup_minutes: 15
+    cooldown_minutes: 5
+    cleanup_minutes: 10
+    max_lamp_hours: 2000.0
+    lamp_warning_threshold: 1800.0
+    capacity: 80
+    projector_id: PRJ-006
+    audio_system: Dolby Digital
