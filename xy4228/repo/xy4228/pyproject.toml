@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fits-quality-checker"
+version = "0.1.0"
+authors = [
+  { name="Amateur Observatory Team", email="team@example.com" }
+]
+description = "A local Python CLI for amateur observatory FITS image quality inspection"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "astropy>=5.0",
+    "click>=8.0",
+    "pandas>=1.3",
+    "numpy>=1.20",
+    "scipy>=1.7",
+    "photutils>=1.0",
+    "pydantic>=1.8",
+    "rich>=10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "black>=21.0",
+    "isort>=5.0",
+]
+
+[project.scripts]
+fitsqc = "fits_quality_checker.cli.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fits_quality_checker*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
