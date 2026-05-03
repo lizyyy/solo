@@ -1,0 +1,11 @@
+{
+  "name": "crash-timeout-plugin",
+  "version": "1.0.0",
+  "description": "崩溃和超时测试插件",
+  "author": "Sandbox Demo",
+  "main": "index.js",
+  "permissions": [
+    "fs:read"
+  ],
+  "timeout": 2000
+}

@@ -1,0 +1,14 @@
+{
+  "name": "normal-plugin",
+  "version": "1.0.0",
+  "description": "正常插件示例 - 声明了所需权限并正确使用",
+  "author": "Sandbox Demo",
+  "main": "index.js",
+  "permissions": [
+    "fs:read",
+    "fs:write",
+    "event:subscribe",
+    "event:publish"
+  ],
+  "timeout": 5000
+}

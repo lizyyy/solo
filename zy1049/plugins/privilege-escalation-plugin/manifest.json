@@ -1,0 +1,11 @@
+{
+  "name": "privilege-escalation-plugin",
+  "version": "1.0.0",
+  "description": "越权插件示例 - 尝试使用未声明的权限",
+  "author": "Sandbox Demo",
+  "main": "index.js",
+  "permissions": [
+    "fs:read"
+  ],
+  "timeout": 5000
+}

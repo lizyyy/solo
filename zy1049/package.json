@@ -1,0 +1,35 @@
+{
+  "name": "plugin-sandbox-auditor",
+  "version": "1.0.0",
+  "description": "本地插件沙盒权限演练器 - 在将第三方插件接入内部工具平台前的安全审计工具",
+  "main": "dist/cli.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/cli.ts",
+    "dev": "tsx src/cli.ts",
+    "test": "tsx src/cli.ts run",
+    "report": "tsx src/cli.ts run --serve",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "plugin",
+    "sandbox",
+    "security",
+    "audit",
+    "permission"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
