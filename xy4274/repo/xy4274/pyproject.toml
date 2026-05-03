@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "interview-sanitizer"
+version = "0.1.0"
+description = "访谈脱敏打包员 - 处理口述史访谈的本地 CLI 工具"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "click>=8.0.0",
+  "pysrt>=1.1.2",
+  "pandas>=2.0.0",
+  "rich>=13.0.0",
+]
+
+[project.scripts]
+sanitizer = "interview_sanitizer.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/interview_sanitizer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
