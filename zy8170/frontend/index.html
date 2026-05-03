@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反兴奋剂样本交接链管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #2c5282;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1e3a5f;
+        }
+        
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #2f855a;
+        }
+        
+        .btn-warning {
+            background: #dd6b20;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #c05621;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .import-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .import-card {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .import-card:hover {
+            border-color: #2c5282;
+            background: #f7fafc;
+        }
+        
+        .import-card h3 {
+            margin-bottom: 0.5rem;
+            color: #2c5282;
+        }
+        
+        .import-card p {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-warning {
+            background: #feebc8;
+            color: #744210;
+        }
+        
+        .badge-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .badge-info {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+        
+        .badge-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.25rem;
+            color: #1e3a5f;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            padding: 0.25rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #2c5282;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #2c5282;
+        }
+        
+        .timeline-item.sampling::before { background: #e53e3e; box-shadow: 0 0 0 2px #e53e3e; }
+        .timeline-item.aliquoting::before { background: #dd6b20; box-shadow: 0 0 0 2px #dd6b20; }
+        .timeline-item.storage::before { background: #38a169; box-shadow: 0 0 0 2px #38a169; }
+        .timeline-item.transport::before { background: #3182ce; box-shadow: 0 0 0 2px #3182ce; }
+        .timeline-item.receipt::before { background: #805ad5; box-shadow: 0 0 0 2px #805ad5; }
+        
+        .timeline-time {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-details {
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+        
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .issues-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .issue-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .issue-item.critical { border-left: 4px solid #e53e3e; }
+        .issue-item.error { border-left: 4px solid #dd6b20; }
+        .issue-item.warning { border-left: 4px solid #ed8936; }
+        
+        .issue-content {
+            flex: 1;
+        }
+        
+        .issue-type {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .issue-description {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .review-section {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .review-section h4 {
+            margin-bottom: 0.75rem;
+            color: #2d3748;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .batch-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-box {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .info-box .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c5282;
+        }
+        
+        .info-box .label {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.success { background: #38a169; }
+        .toast.error { background: #e53e3e; }
+        .toast.info { background: #3182ce; }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2c5282;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+        
+        .sample-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sample-card:hover {
+            border-color: #2c5282;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .sample-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sample-id {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: #1e3a5f;
+        }
+        
+        .sample-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .sample-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #718096;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #2c5282;
+        }
+        
+        .tab.active {
+            color: #2c5282;
+            border-bottom-color: #2c5282;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>反兴奋剂样本交接链管理系统</h1>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">数据导入</h2>
+            </div>
+            <div class="import-section">
+                <div class="import-card">
+                    <h3>📋 采样登记 CSV</h3>
+                    <p>导入采样和分装信息</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-primary">选择文件</button>
+                        <input type="file" id="csvFile" accept=".csv">
+                    </div>
+                    <div id="csvStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
+                </div>
+                
+                <div class="import-card">
+                    <h3>🧊 冰箱库位 YAML</h3>
+                    <p>导入存储位置配置</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-primary">选择文件</button>
+                        <input type="file" id="yamlFile" accept=".yaml,.yml">
+                    </div>
+                    <div id="yamlStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
+                </div>
+                
+                <div class="import-card">
+                    <h3>📱 转运扫码 JSONL</h3>
+                    <p>导入入库、转运、接收记录</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-primary">选择文件</button>
+                        <input type="file" id="jsonlFile" accept=".jsonl,.json">
+                    </div>
+                    <div id="jsonlStatus" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; text-align: center;">
+                <p style="font-size: 0.85rem; color: #718096; margin-bottom: 0.75rem;">
+                    当前批次ID: <span id="currentBatchId" style="font-weight: 600; color: #2c5282;">未创建</span>
+                </p>
+                <div class="btn-group" style="justify-content: center;">
+                    <button class="btn btn-success" id="validateBtn" onclick="validateBatch()" disabled>
+                        ✓ 校验交接链
+                    </button>
+                    <button class="btn btn-warning" id="exportIssuesBtn" onclick="exportIssues()" disabled>
+                        📊 导出问题列表
+                    </button>
+                    <button class="btn btn-warning" id="exportReportBtn" onclick="exportReport()" disabled>
+                        📄 导出交接报告
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">批次列表</h2>
+                <button class="btn btn-secondary" onclick="loadBatches()">🔄 刷新</button>
+            </div>
+            <div class="table-wrapper">
+                <table id="batchesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>批次名称</th>
+                            <th>导入时间</th>
+                            <th>状态</th>
+                            <th>样本数</th>
+                            <th>问题数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batchesBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="batchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="batchModalTitle">批次详情</h2>
+                <button class="modal-close" onclick="closeBatchModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="batch-info">
+                    <div class="info-box">
+                        <div class="number" id="detailSampleCount">0</div>
+                        <div class="label">样本总数</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="number" id="detailIssueCount">0</div>
+                        <div class="label">问题数量</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="number" id="detailStatus">-</div>
+                        <div class="label">状态</div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('samples')">样本列表</div>
+                    <div class="tab" onclick="switchTab('issues')">问题列表</div>
+                </div>
+                
+                <div class="tab-content active" id="samplesTab">
+                    <div class="filter-section">
+                        <div class="filter-group">
+                            <label>样本ID:</label>
+                            <input type="text" id="filterSampleId" placeholder="输入样本ID搜索..." oninput="filterSamples()">
+                        </div>
+                        <div class="filter-group">
+                            <label>样本类型:</label>
+                            <select id="filterSampleType" onchange="filterSamples()">
+                                <option value="">全部</option>
+                                <option value="blood">血液</option>
+                                <option value="urine">尿液</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>复核状态:</label>
+                            <select id="filterReviewStatus" onchange="filterSamples()">
+                                <option value="">全部</option>
+                                <option value="pending">待复核</option>
+                                <option value="reviewing">复核中</option>
+                                <option value="approved">已通过</option>
+                                <option value="rejected">已拒绝</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>问题状态:</label>
+                            <select id="filterIssueStatus" onchange="filterSamples()">
+                                <option value="">全部</option>
+                                <option value="has">有问题</option>
+                                <option value="none">无问题</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="samplesContainer" class="samples-grid">
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="issuesTab">
+                    <div class="filter-section">
+                        <div class="filter-group">
+                            <label>严重程度:</label>
+                            <select id="filterSeverity" onchange="filterIssues()">
+                                <option value="">全部</option>
+                                <option value="critical">Critical</option>
+                                <option value="error">Error</option>
+                                <option value="warning">Warning</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>问题类型:</label>
+                            <select id="filterIssueType" onchange="filterIssues()">
+                                <option value="">全部</option>
+                                <option value="duplicate_scan">重复扫码</option>
+                                <option value="chain_break">交接链断点</option>
+                                <option value="midnight_transport">跨午夜转运</option>
+                                <option value="zone_mismatch">温区不匹配</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>解决状态:</label>
+                            <select id="filterResolved" onchange="filterIssues()">
+                                <option value="">全部</option>
+                                <option value="false">待解决</option>
+                                <option value="true">已解决</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="issuesContainer" class="issues-list">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBatchModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="sampleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="sampleModalTitle">样本详情</h2>
+                <button class="modal-close" onclick="closeSampleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="batch-info">
+                    <div class="info-box">
+                        <div class="number" id="detailSampleType">-</div>
+                        <div class="label">样本类型</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="number" id="detailAthlete">-</div>
+                        <div class="label">运动员ID</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="number" id="detailCompetition">-</div>
+                        <div class="label">赛事</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 1rem; color: #2d3748;">交接时间线</h3>
+                <div id="timelineContainer" class="timeline">
+                </div>
+                
+                <h3 style="margin: 1.5rem 0 1rem; color: #2d3748;">检测到的问题</h3>
+                <div id="sampleIssuesContainer" class="issues-list">
+                </div>
+                
+                <div class="review-section">
+                    <h4>人工复核</h4>
+                    <div class="form-group">
+                        <label>复核状态</label>
+                        <select id="reviewStatusSelect">
+                            <option value="pending">待复核</option>
+                            <option value="reviewing">复核中</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已拒绝</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>复核备注</label>
+                        <textarea id="reviewComment" placeholder="输入复核备注..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveReview()">保存复核</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSampleModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        let currentBatchId = null;
+        let currentBatchData = null;
+        let currentSampleId = null;
+        let allSamples = [];
+        let allIssues = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBatches();
+            setupFileInputs();
+        });
+        
+        function setupFileInputs() {
+            document.getElementById('csvFile').addEventListener('change', handleCsvUpload);
+            document.getElementById('yamlFile').addEventListener('change', handleYamlUpload);
+            document.getElementById('jsonlFile').addEventListener('change', handleJsonlUpload);
+        }
+        
+        async function handleCsvUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('csvStatus');
+            statusEl.innerHTML = '<span class="loading"></span> 上传中...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('batch_name', `Batch_${new Date().toISOString().slice(0, 10)}`);
+            
+            try {
+                const response = await fetch(`${API_BASE}/import/csv`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentBatchId = data.batch_id;
+                    document.getElementById('currentBatchId').textContent = currentBatchId;
+                    statusEl.innerHTML = `<span style="color: #38a169;">✓ 成功导入 ${data.samples_imported} 个样本</span>`;
+                    document.getElementById('validateBtn').disabled = false;
+                    showToast('CSV导入成功', 'success');
+                    loadBatches();
+                } else {
+                    statusEl.innerHTML = `<span style="color: #e53e3e;">✗ ${data.error}</span>`;
+                    showToast('导入失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                statusEl.innerHTML = `<span style="color: #e53e3e;">✗ 上传失败</span>`;
+                showToast('上传失败', 'error');
+            }
+        }
+        
+        async function handleYamlUpload(event) {
+            if (!currentBatchId) {
+                showToast('请先导入CSV创建批次', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('yamlStatus');
+            statusEl.innerHTML = '<span class="loading"></span> 上传中...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('batch_id', currentBatchId);
+            
+            try {
+                const response = await fetch(`${API_BASE}/import/yaml`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.innerHTML = `<span style="color: #38a169;">✓ 成功导入 ${data.locations_imported} 个库位</span>`;
+                    showToast('YAML导入成功', 'success');
+                } else {
+                    statusEl.innerHTML = `<span style="color: #e53e3e;">✗ ${data.error}</span>`;
+                    showToast('导入失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                statusEl.innerHTML = `<span style="color: #e53e3e;">✗ 上传失败</span>`;
+                showToast('上传失败', 'error');
+            }
+        }
+        
+        async function handleJsonlUpload(event) {
+            if (!currentBatchId) {
+                showToast('请先导入CSV创建批次', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusEl = document.getElementById('jsonlStatus');
+            statusEl.innerHTML = '<span class="loading"></span> 上传中...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('batch_id', currentBatchId);
+            
+            try {
+                const response = await fetch(`${API_BASE}/import/jsonl`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.innerHTML = `<span style="color: #38a169;">✓ 成功导入 ${data.events_imported} 条记录</span>`;
+                    showToast('JSONL导入成功', 'success');
+                } else {
+                    statusEl.innerHTML = `<span style="color: #e53e3e;">✗ ${data.error}</span>`;
+                    showToast('导入失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                statusEl.innerHTML = `<span style="color: #e53e3e;">✗ 上传失败</span>`;
+                showToast('上传失败', 'error');
+            }
+        }
+        
+        async function validateBatch() {
+            if (!currentBatchId) {
+                showToast('请先导入数据', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('validateBtn');
+            btn.innerHTML = '<span class="loading"></span> 校验中...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE}/batches/${currentBatchId}/validate`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(`校验完成，发现 ${data.issues_found} 个问题`, 'info');
+                    document.getElementById('exportIssuesBtn').disabled = false;
+                    document.getElementById('exportReportBtn').disabled = false;
+                    loadBatches();
+                } else {
+                    showToast('校验失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('校验失败', 'error');
+            }
+            
+            btn.innerHTML = '✓ 校验交接链';
+        }
+        
+        async function loadBatches() {
+            try {
+                const response = await fetch(`${API_BASE}/batches`);
+                const batches = await response.json();
+                
+                const tbody = document.getElementById('batchesBody');
+                
+                if (batches.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <h3>暂无批次</h3>
+                                    <p>请先导入采样登记CSV创建批次</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = batches.map(batch => `
+                    <tr>
+                        <td>${batch.id}</td>
+                        <td><strong>${batch.name}</strong></td>
+                        <td>${formatDate(batch.import_time)}</td>
+                        <td><span class="badge ${getStatusBadge(batch.status)}">${batch.status}</span></td>
+                        <td>${batch.sample_count}</td>
+                        <td>
+                            <span class="badge ${batch.issue_count > 0 ? 'badge-danger' : 'badge-success'}">
+                                ${batch.issue_count}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" 
+                                    onclick="openBatchDetail(${batch.id})">查看</button>
+                                <button class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" 
+                                    onclick="deleteBatch(${batch.id})">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+            } catch (err) {
+                console.error('Failed to load batches:', err);
+            }
+        }
+        
+        async function openBatchDetail(batchId) {
+            currentBatchId = batchId;
+            document.getElementById('currentBatchId').textContent = batchId;
+            
+            try {
+                const response = await fetch(`${API_BASE}/batches/${batchId}`);
+                currentBatchData = await response.json();
+                
+                document.getElementById('batchModalTitle').textContent = `批次详情: ${currentBatchData.batch.name}`;
+                document.getElementById('detailSampleCount').textContent = currentBatchData.batch.sample_count;
+                document.getElementById('detailIssueCount').textContent = currentBatchData.batch.issue_count;
+                document.getElementById('detailStatus').textContent = currentBatchData.batch.status;
+                
+                allSamples = currentBatchData.samples;
+                allIssues = currentBatchData.issues;
+                
+                renderSamples();
+                renderIssues();
+                
+                document.getElementById('batchModal').classList.add('active');
+            } catch (err) {
+                showToast('加载批次详情失败', 'error');
+            }
+        }
+        
+        function closeBatchModal() {
+            document.getElementById('batchModal').classList.remove('active');
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+        
+        function renderSamples() {
+            const container = document.getElementById('samplesContainer');
+            
+            if (allSamples.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <h3>暂无样本</h3>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = allSamples.map(sample => `
+                <div class="sample-card" onclick="openSampleDetail(${sample.id})">
+                    <div class="sample-header">
+                        <span class="sample-id">${sample.sample_id}</span>
+                        <span class="badge ${sample.issues_count > 0 ? 'badge-danger' : 'badge-success'}">
+                            ${sample.issues_count > 0 ? sample.issues_count + ' 问题' : '正常'}
+                        </span>
+                    </div>
+                    <div class="sample-meta">
+                        <span class="badge ${sample.sample_type === 'blood' ? 'badge-info' : 'badge-warning'}">
+                            ${sample.sample_type === 'blood' ? '血液' : sample.sample_type === 'urine' ? '尿液' : sample.sample_type}
+                        </span>
+                        <span class="badge ${getReviewBadge(sample.review_status)}">
+                            ${getReviewStatusText(sample.review_status)}
+                        </span>
+                    </div>
+                    <div class="sample-footer">
+                        <span style="font-size: 0.85rem; color: #718096;">
+                            ${sample.athlete_id || '未知运动员'} | ${sample.competition || '未知赛事'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterSamples() {
+            const sampleIdFilter = document.getElementById('filterSampleId').value.toLowerCase();
+            const typeFilter = document.getElementById('filterSampleType').value;
+            const reviewFilter = document.getElementById('filterReviewStatus').value;
+            const issueFilter = document.getElementById('filterIssueStatus').value;
+            
+            let filtered = [...allSamples];
+            
+            if (sampleIdFilter) {
+                filtered = filtered.filter(s => s.sample_id.toLowerCase().includes(sampleIdFilter));
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(s => s.sample_type === typeFilter);
+            }
+            
+            if (reviewFilter) {
+                filtered = filtered.filter(s => s.review_status === reviewFilter);
+            }
+            
+            if (issueFilter === 'has') {
+                filtered = filtered.filter(s => s.issues_count > 0);
+            } else if (issueFilter === 'none') {
+                filtered = filtered.filter(s => s.issues_count === 0);
+            }
+            
+            const temp = allSamples;
+            allSamples = filtered;
+            renderSamples();
+            allSamples = temp;
+        }
+        
+        function renderIssues() {
+            const container = document.getElementById('issuesContainer');
+            
+            if (allIssues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>暂无问题</h3>
+                        <p>所有样本交接链正常</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = allIssues.map(issue => `
+                <div class="issue-item ${issue.severity}">
+                    <div class="issue-content">
+                        <div class="issue-type">
+                            <span class="badge ${issue.resolved ? 'badge-success' : getSeverityBadge(issue.severity)}">
+                                ${issue.resolved ? '已解决' : getSeverityText(issue.severity)}
+                            </span>
+                            <span style="margin-left: 0.5rem; color: #2d3748;">
+                                ${getIssueTypeText(issue.issue_type)}
+                            </span>
+                            <span style="margin-left: 0.5rem; font-size: 0.85rem; color: #718096;">
+                                样本: ${issue.sample_id}
+                            </span>
+                        </div>
+                        <div class="issue-description">${issue.description}</div>
+                        ${issue.resolution_note ? `<div style="margin-top: 0.5rem; font-size: 0.85rem; color: #38a169;">解决说明: ${issue.resolution_note}</div>` : ''}
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn ${issue.resolved ? 'btn-secondary' : 'btn-success'}" 
+                            style="padding: 0.3rem 0.6rem; font-size: 0.8rem;"
+                            onclick="toggleIssueResolved(${issue.id}, ${!issue.resolved})">
+                            ${issue.resolved ? '撤销解决' : '标记解决'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function filterIssues() {
+            const severityFilter = document.getElementById('filterSeverity').value;
+            const typeFilter = document.getElementById('filterIssueType').value;
+            const resolvedFilter = document.getElementById('filterResolved').value;
+            
+            let filtered = [...allIssues];
+            
+            if (severityFilter) {
+                filtered = filtered.filter(i => i.severity === severityFilter);
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(i => i.issue_type === typeFilter);
+            }
+            
+            if (resolvedFilter) {
+                filtered = filtered.filter(i => String(i.resolved) === resolvedFilter);
+            }
+            
+            const temp = allIssues;
+            allIssues = filtered;
+            renderIssues();
+            allIssues = temp;
+        }
+        
+        async function toggleIssueResolved(issueId, resolved) {
+            try {
+                const response = await fetch(`${API_BASE}/issues/${issueId}/resolve`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resolved: resolved })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(resolved ? '问题已标记为已解决' : '问题已撤销解决', 'success');
+                    openBatchDetail(currentBatchId);
+                } else {
+                    showToast('操作失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('操作失败', 'error');
+            }
+        }
+        
+        async function openSampleDetail(sampleId) {
+            currentSampleId = sampleId;
+            
+            try {
+                const response = await fetch(`${API_BASE}/samples/${sampleId}`);
+                const data = await response.json();
+                
+                document.getElementById('sampleModalTitle').textContent = `样本详情: ${data.sample.sample_id}`;
+                document.getElementById('detailSampleType').textContent = 
+                    data.sample.sample_type === 'blood' ? '血液' : 
+                    data.sample.sample_type === 'urine' ? '尿液' : data.sample.sample_type || '-';
+                document.getElementById('detailAthlete').textContent = data.sample.athlete_id || '-';
+                document.getElementById('detailCompetition').textContent = data.sample.competition || '-';
+                
+                document.getElementById('reviewStatusSelect').value = data.sample.review_status || 'pending';
+                document.getElementById('reviewComment').value = data.sample.review_comment || '';
+                
+                const timelineEl = document.getElementById('timelineContainer');
+                if (data.timeline.length === 0) {
+                    timelineEl.innerHTML = '<p style="color: #718096;">暂无交接记录</p>';
+                } else {
+                    timelineEl.innerHTML = data.timeline.map(event => `
+                        <div class="timeline-item ${event.event_type}">
+                            <div class="timeline-time">${formatDate(event.event_time)}</div>
+                            <div class="timeline-title">${getEventTypeText(event.event_type)}</div>
+                            <div class="timeline-details">
+                                ${event.operator ? '操作人: ' + event.operator : ''}
+                                ${event.location ? ' | 位置: ' + event.location : ''}
+                                ${event.storage_zone ? ' | 温区: ' + event.storage_zone : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                const issuesEl = document.getElementById('sampleIssuesContainer');
+                if (data.issues.length === 0) {
+                    issuesEl.innerHTML = `
+                        <div class="empty-state" style="padding: 1.5rem;">
+                            <h3 style="color: #38a169;">✓ 无问题</h3>
+                        </div>
+                    `;
+                } else {
+                    issuesEl.innerHTML = data.issues.map(issue => `
+                        <div class="issue-item ${issue.severity}">
+                            <div class="issue-content">
+                                <div class="issue-type">
+                                    <span class="badge ${issue.resolved ? 'badge-success' : getSeverityBadge(issue.severity)}">
+                                        ${issue.resolved ? '已解决' : getSeverityText(issue.severity)}
+                                    </span>
+                                    <span style="margin-left: 0.5rem;">${getIssueTypeText(issue.issue_type)}</span>
+                                </div>
+                                <div class="issue-description">${issue.description}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                document.getElementById('sampleModal').classList.add('active');
+            } catch (err) {
+                showToast('加载样本详情失败', 'error');
+            }
+        }
+        
+        function closeSampleModal() {
+            document.getElementById('sampleModal').classList.remove('active');
+        }
+        
+        async function saveReview() {
+            if (!currentSampleId) return;
+            
+            const status = document.getElementById('reviewStatusSelect').value;
+            const comment = document.getElementById('reviewComment').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/samples/${currentSampleId}/review`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        review_status: status,
+                        review_comment: comment
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('复核保存成功', 'success');
+                    openSampleDetail(currentSampleId);
+                    openBatchDetail(currentBatchId);
+                } else {
+                    showToast('保存失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('保存失败', 'error');
+            }
+        }
+        
+        async function deleteBatch(batchId) {
+            if (!confirm('确定要删除这个批次吗？此操作不可撤销。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/batches/${batchId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('批次已删除', 'success');
+                    if (currentBatchId === batchId) {
+                        currentBatchId = null;
+                        document.getElementById('currentBatchId').textContent = '未创建';
+                    }
+                    loadBatches();
+                } else {
+                    showToast('删除失败: ' + data.error, 'error');
+                }
+            } catch (err) {
+                showToast('删除失败', 'error');
+            }
+        }
+        
+        function exportIssues() {
+            if (!currentBatchId) {
+                showToast('请先选择批次', 'error');
+                return;
+            }
+            window.open(`${API_BASE}/export/${currentBatchId}/issues.csv`, '_blank');
+        }
+        
+        function exportReport() {
+            if (!currentBatchId) {
+                showToast('请先选择批次', 'error');
+                return;
+            }
+            window.open(`${API_BASE}/export/${currentBatchId}/handoff_report.md`, '_blank');
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function getStatusBadge(status) {
+            switch (status) {
+                case 'imported': return 'badge-info';
+                case 'validated': return 'badge-success';
+                default: return 'badge-secondary';
+            }
+        }
+        
+        function getReviewBadge(status) {
+            switch (status) {
+                case 'pending': return 'badge-secondary';
+                case 'reviewing': return 'badge-warning';
+                case 'approved': return 'badge-success';
+                case 'rejected': return 'badge-danger';
+                default: return 'badge-secondary';
+            }
+        }
+        
+        function getReviewStatusText(status) {
+            switch (status) {
+                case 'pending': return '待复核';
+                case 'reviewing': return '复核中';
+                case 'approved': return '已通过';
+                case 'rejected': return '已拒绝';
+                default: return status || '待复核';
+            }
+        }
+        
+        function getSeverityBadge(severity) {
+            switch (severity) {
+                case 'critical': return 'badge-danger';
+                case 'error': return 'badge-warning';
+                case 'warning': return 'badge-info';
+                default: return 'badge-secondary';
+            }
+        }
+        
+        function getSeverityText(severity) {
+            switch (severity) {
+                case 'critical': return '严重';
+                case 'error': return '错误';
+                case 'warning': return '警告';
+                default: return severity;
+            }
+        }
+        
+        function getIssueTypeText(type) {
+            switch (type) {
+                case 'duplicate_scan': return '重复扫码';
+                case 'chain_break': return '交接链断点';
+                case 'midnight_transport': return '跨午夜转运';
+                case 'zone_mismatch': return '温区不匹配';
+                default: return type;
+            }
+        }
+        
+        function getEventTypeText(type) {
+            switch (type) {
+                case 'sampling': return '采样';
+                case 'aliquoting': return '分装';
+                case 'storage': return '入库存储';
+                case 'transport': return '转运';
+                case 'receipt': return '接收';
+                default: return type;
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

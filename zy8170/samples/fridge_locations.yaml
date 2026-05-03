@@ -1,0 +1,25 @@
+locations:
+  - code: FRIDGE-01-A1
+    zone: frozen
+    description: 冷冻冰箱1层A区
+    temperature: -20°C
+    
+  - code: FRIDGE-01-A2
+    zone: frozen
+    description: 冷冻冰箱1层A区
+    temperature: -20°C
+    
+  - code: FRIDGE-02-B1
+    zone: refrigerated
+    description: 冷藏冰箱2层B区
+    temperature: 4°C
+    
+  - code: FRIDGE-02-B2
+    zone: refrigerated
+    description: 冷藏冰箱2层B区
+    temperature: 4°C
+    
+  - code: FRIDGE-03-C1
+    zone: room_temperature
+    description: 常温存储区
+    temperature: 22°C

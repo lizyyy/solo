@@ -1,0 +1,14 @@
+{"sample_id": "S001", "event_type": "storage", "event_time": "2024-12-20 14:00:00", "location": "FRIDGE-01-A1", "operator": "仓管员A", "storage_zone": "frozen"}
+{"sample_id": "S002", "event_type": "storage", "event_time": "2024-12-20 14:15:00", "location": "FRIDGE-02-B1", "operator": "仓管员B", "storage_zone": "refrigerated"}
+{"sample_id": "S003", "event_type": "storage", "event_time": "2024-12-20 14:30:00", "location": "FRIDGE-02-B2", "operator": "仓管员A", "storage_zone": "refrigerated"}
+{"sample_id": "S004", "event_type": "storage", "event_time": "2024-12-20 14:45:00", "location": "FRIDGE-01-A2", "operator": "仓管员B", "storage_zone": "frozen"}
+{"sample_id": "S005", "event_type": "storage", "event_time": "2024-12-20 15:00:00", "location": "FRIDGE-01-A1", "operator": "仓管员A", "storage_zone": "frozen"}
+{"sample_id": "S001", "event_type": "transport", "event_time": "2024-12-21 18:30:00", "location": "出库口", "operator": "转运员X"}
+{"sample_id": "S002", "event_type": "transport", "event_time": "2024-12-21 02:15:00", "location": "出库口", "operator": "转运员Y"}
+{"sample_id": "S003", "event_type": "transport", "event_time": "2024-12-21 19:00:00", "location": "出库口", "operator": "转运员X"}
+{"sample_id": "S004", "event_type": "transport", "event_time": "2024-12-21 19:15:00", "location": "出库口", "operator": "转运员Y"}
+{"sample_id": "S005", "event_type": "transport", "event_time": "2024-12-21 19:30:00", "location": "出库口", "operator": "转运员X"}
+{"sample_id": "S001", "event_type": "receipt", "event_time": "2024-12-22 08:00:00", "location": "实验室接收处", "operator": "接收员P"}
+{"sample_id": "S001", "event_type": "receipt", "event_time": "2024-12-22 08:05:00", "location": "实验室接收处", "operator": "接收员P"}
+{"sample_id": "S003", "event_type": "receipt", "event_time": "2024-12-22 08:30:00", "location": "实验室接收处", "operator": "接收员Q"}
+{"sample_id": "S004", "event_type": "receipt", "event_time": "2024-12-22 08:45:00", "location": "实验室接收处", "operator": "接收员P"}
