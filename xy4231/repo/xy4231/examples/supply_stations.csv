@@ -1,0 +1,7 @@
+id,name,latitude,longitude,distance_from_start,elevation,criticality,required_coverage,contact_person
+S001,起点/起点补给站,40.123456,116.789012,0.0,450,critical,true,张主任
+S002,CP1-5km补给站,40.128900,116.795000,5.2,520,high,true,李部长
+S003,CP2-10km补给站,40.135000,116.802000,10.5,580,critical,true,王队长
+S004,CP3-15km补给站,40.142000,116.808000,15.1,620,normal,true,赵组长
+S005,CP4-20km补给站,40.150000,116.815000,20.3,700,high,true,刘队长
+S006,终点/终点补给站,40.158000,116.822000,25.0,680,critical,true,陈主任

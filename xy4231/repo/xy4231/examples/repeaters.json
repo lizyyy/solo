@@ -1,0 +1,43 @@
+{
+  "repeaters": [
+    {
+      "id": "R001",
+      "name": "起点中继台",
+      "latitude": 40.123456,
+      "longitude": 116.789012,
+      "elevation": 480,
+      "tx_frequency": 145.525,
+      "rx_frequency": 144.925,
+      "power": 25,
+      "antenna_gain": 5.5,
+      "coverage_radius_km": 8.0,
+      "height_agl": 20
+    },
+    {
+      "id": "R002",
+      "name": "主峰中继台",
+      "latitude": 40.138000,
+      "longitude": 116.805000,
+      "elevation": 720,
+      "tx_frequency": 145.550,
+      "rx_frequency": 144.950,
+      "power": 40,
+      "antenna_gain": 8.0,
+      "coverage_radius_km": 12.0,
+      "height_agl": 35
+    },
+    {
+      "id": "R003",
+      "name": "终点中继台",
+      "latitude": 40.158000,
+      "longitude": 116.822000,
+      "elevation": 700,
+      "tx_frequency": 145.575,
+      "rx_frequency": 144.975,
+      "power": 25,
+      "antenna_gain": 5.5,
+      "coverage_radius_km": 8.0,
+      "height_agl": 20
+    }
+  ]
+}
