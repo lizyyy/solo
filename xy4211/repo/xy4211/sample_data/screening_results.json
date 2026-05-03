@@ -1,0 +1,203 @@
+[
+    {
+        "screening_id": "SR001",
+        "student_id": "S001",
+        "device_id": "AUD001",
+        "screening_date": "2025-04-15 09:30:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 15,
+            "1000": 10,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "right_ear": {
+            "500": 10,
+            "1000": 15,
+            "2000": 10,
+            "4000": 15,
+            "8000": 20
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "李医生",
+        "location": "流动筛查车A"
+    },
+    {
+        "screening_id": "SR002",
+        "student_id": "S002",
+        "device_id": "AUD001",
+        "screening_date": "2025-04-15 09:45:00",
+        "status": "refer",
+        "left_ear": {
+            "500": 35,
+            "1000": 40,
+            "2000": 45,
+            "4000": 50,
+            "8000": 45
+        },
+        "right_ear": {
+            "500": 15,
+            "1000": 10,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "left_ear_status": "refer",
+        "right_ear_status": "normal",
+        "tester": "李医生",
+        "location": "流动筛查车A"
+    },
+    {
+        "screening_id": "SR003",
+        "student_id": "S003",
+        "device_id": "AUD001",
+        "screening_date": "2025-04-15 10:00:00",
+        "status": "refer",
+        "left_ear": {
+            "500": 15,
+            "1000": 20,
+            "2000": 15,
+            "4000": 55,
+            "8000": 60
+        },
+        "right_ear": {
+            "500": 10,
+            "1000": 15,
+            "2000": 20,
+            "4000": 50,
+            "8000": 55
+        },
+        "left_ear_status": "refer",
+        "right_ear_status": "refer",
+        "tester": "李医生",
+        "location": "流动筛查车A"
+    },
+    {
+        "screening_id": "SR004",
+        "student_id": "S004",
+        "device_id": "AUD002",
+        "screening_date": "2025-04-15 10:15:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 20,
+            "1000": 15,
+            "2000": 20,
+            "4000": 15,
+            "8000": 20
+        },
+        "right_ear": {
+            "500": 15,
+            "1000": 20,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "王医生",
+        "location": "流动筛查车B"
+    },
+    {
+        "screening_id": "SR005",
+        "student_id": "S005",
+        "device_id": "AUD002",
+        "screening_date": "2025-04-15 10:30:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 95,
+            "1000": 90,
+            "2000": 85,
+            "4000": 80,
+            "8000": 75
+        },
+        "right_ear": {
+            "500": 10,
+            "1000": 15,
+            "2000": 10,
+            "4000": 15,
+            "8000": 20
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "王医生",
+        "location": "流动筛查车B"
+    },
+    {
+        "screening_id": "SR006",
+        "student_id": "S006",
+        "device_id": "AUD001",
+        "screening_date": "2025-04-15 10:45:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 10,
+            "1000": 15,
+            "2000": 10,
+            "4000": 15,
+            "8000": 20
+        },
+        "right_ear": {
+            "500": 15,
+            "1000": 10,
+            "2000": 15,
+            "4000": 10,
+            "8000": 15
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "李医生",
+        "location": "流动筛查车A"
+    },
+    {
+        "screening_id": "SR007",
+        "student_id": "S007",
+        "device_id": "AUD002",
+        "screening_date": "2025-04-15 11:00:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 45,
+            "1000": 10,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "right_ear": {
+            "500": 10,
+            "1000": 45,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "王医生",
+        "location": "流动筛查车B"
+    },
+    {
+        "screening_id": "SR008",
+        "student_id": "S001",
+        "device_id": "AUD001",
+        "screening_date": "2025-04-16 09:00:00",
+        "status": "normal",
+        "left_ear": {
+            "500": 15,
+            "1000": 10,
+            "2000": 15,
+            "4000": 20,
+            "8000": 15
+        },
+        "right_ear": {
+            "500": 10,
+            "1000": 15,
+            "2000": 10,
+            "4000": 15,
+            "8000": 20
+        },
+        "left_ear_status": "normal",
+        "right_ear_status": "normal",
+        "tester": "李医生",
+        "location": "流动筛查车A",
+        "notes": "复测"
+    }
+]

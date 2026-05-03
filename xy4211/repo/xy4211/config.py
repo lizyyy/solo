@@ -1,0 +1,40 @@
+import os
+from pathlib import Path
+
+APP_NAME = "耳机校准与筛查包核验台"
+APP_VERSION = "1.0.0"
+
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+STORAGE_DIR = BASE_DIR / "storage"
+SAMPLE_DATA_DIR = BASE_DIR / "sample_data"
+TEST_DIR = BASE_DIR / "tests"
+
+for dir_path in [DATA_DIR, STORAGE_DIR, SAMPLE_DATA_DIR, TEST_DIR]:
+    dir_path.mkdir(exist_ok=True)
+
+STORAGE_FILE = STORAGE_DIR / "review_state.json"
+
+CALIBRATION_VALIDITY_DAYS = 365
+
+THRESHOLD_NORMAL_MIN = 0
+THRESHOLD_NORMAL_MAX = 25
+THRESHOLD_MILD_MIN = 26
+THRESHOLD_MILD_MAX = 40
+THRESHOLD_MODERATE_MIN = 41
+THRESHOLD_MODERATE_MAX = 55
+THRESHOLD_SEVERE_MIN = 56
+THRESHOLD_SEVERE_MAX = 70
+THRESHOLD_PROFOUND_MIN = 71
+THRESHOLD_EXTREME_MIN = 0
+THRESHOLD_EXTREME_MAX = 120
+
+LOG_TIME_DRIFT_THRESHOLD_SECONDS = 300
+
+SUPPORTED_EXTENSIONS = {
+    "csv": [".csv"],
+    "json": [".json"],
+    "certificate": [".json", ".txt"]
+}
+
+FREQUENCIES = [500, 1000, 2000, 4000, 8000]

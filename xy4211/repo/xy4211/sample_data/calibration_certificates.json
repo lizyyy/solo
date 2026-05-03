@@ -1,0 +1,52 @@
+[
+    {
+        "certificate_id": "CAL2024001",
+        "device_id": "AUD001",
+        "calibration_date": "2024-03-15",
+        "valid_until": "2025-03-14",
+        "issued_by": "国家计量科学研究院",
+        "certificate_number": "JL2024-0315-001",
+        "calibration_standard": "GB/T 16403-1996",
+        "technician": "张工",
+        "left_ear": {
+            "500": 0.5,
+            "1000": 0.3,
+            "2000": 0.2,
+            "4000": 0.4,
+            "8000": 0.6
+        },
+        "right_ear": {
+            "500": 0.4,
+            "1000": 0.2,
+            "2000": 0.3,
+            "4000": 0.5,
+            "8000": 0.4
+        },
+        "notes": "校准合格"
+    },
+    {
+        "certificate_id": "CAL2025002",
+        "device_id": "AUD002",
+        "calibration_date": "2025-01-20",
+        "valid_until": "2026-01-19",
+        "issued_by": "国家计量科学研究院",
+        "certificate_number": "JL2025-0120-002",
+        "calibration_standard": "GB/T 16403-1996",
+        "technician": "李工",
+        "left_ear": {
+            "500": 0.3,
+            "1000": 0.2,
+            "2000": 0.4,
+            "4000": 0.3,
+            "8000": 0.5
+        },
+        "right_ear": {
+            "500": 0.2,
+            "1000": 0.3,
+            "2000": 0.2,
+            "4000": 0.4,
+            "8000": 0.3
+        },
+        "notes": "校准合格"
+    }
+]

@@ -1,0 +1,116 @@
+[
+    {
+        "log_id": "LOG001",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 08:00:00",
+        "level": "info",
+        "event_type": "device_start",
+        "message": "设备启动完成",
+        "details": {
+            "firmware_version": "2.1.0",
+            "battery_level": 95
+        }
+    },
+    {
+        "log_id": "LOG002",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 09:30:00",
+        "level": "info",
+        "event_type": "screening_start",
+        "message": "开始筛查",
+        "screening_id": "SR001",
+        "student_id": "S001",
+        "details": {
+            "ear": "both"
+        }
+    },
+    {
+        "log_id": "LOG003",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 09:35:00",
+        "level": "info",
+        "event_type": "screening_complete",
+        "message": "筛查完成",
+        "screening_id": "SR001",
+        "student_id": "S001",
+        "details": {
+            "left_result": "normal",
+            "right_result": "normal"
+        }
+    },
+    {
+        "log_id": "LOG004",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 09:45:00",
+        "level": "info",
+        "event_type": "screening_start",
+        "message": "开始筛查",
+        "screening_id": "SR002",
+        "student_id": "S002",
+        "details": {
+            "ear": "both"
+        }
+    },
+    {
+        "log_id": "LOG005",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 09:50:00",
+        "level": "info",
+        "event_type": "screening_complete",
+        "message": "筛查完成",
+        "screening_id": "SR002",
+        "student_id": "S002",
+        "details": {
+            "left_result": "refer",
+            "right_result": "normal"
+        }
+    },
+    {
+        "log_id": "LOG006",
+        "device_id": "AUD002",
+        "timestamp": "2025-04-15 08:30:00",
+        "level": "info",
+        "event_type": "device_start",
+        "message": "设备启动完成",
+        "details": {
+            "firmware_version": "2.1.0",
+            "battery_level": 88
+        }
+    },
+    {
+        "log_id": "LOG007",
+        "device_id": "AUD002",
+        "timestamp": "2025-04-15 10:30:00",
+        "level": "warning",
+        "event_type": "calibration_check",
+        "message": "校准检查 - 建议重新校准",
+        "details": {
+            "left_channel_deviation": 3.5,
+            "right_channel_deviation": 2.8
+        }
+    },
+    {
+        "log_id": "LOG008",
+        "device_id": "AUD002",
+        "timestamp": "2025-04-15 11:00:00",
+        "level": "error",
+        "event_type": "error_occurred",
+        "message": "通道通信错误",
+        "details": {
+            "error_code": "E0042",
+            "error_message": "USB通信中断"
+        }
+    },
+    {
+        "log_id": "LOG009",
+        "device_id": "AUD001",
+        "timestamp": "2025-04-15 17:00:00",
+        "level": "info",
+        "event_type": "device_stop",
+        "message": "设备关机",
+        "details": {
+            "total_screenings": 8,
+            "battery_level": 45
+        }
+    }
+]
