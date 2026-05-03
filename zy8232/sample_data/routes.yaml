@@ -1,0 +1,64 @@
+routes:
+  - route_id: R001
+    route_name: 1号线（早班/晚班）
+    vehicle_id: V001
+    teacher_name: 王老师
+    teacher_phone: 13900139001
+    is_night_route: false
+    stops:
+      - stop_name: 阳光花园东门
+        stop_order: 1
+      - stop_name: 幸福小区北门
+        stop_order: 2
+      - stop_name: 阳光花园西门
+        stop_order: 3
+      - stop_name: 幼儿园正门
+        stop_order: 4
+
+  - route_id: R002
+    route_name: 2号线（早班/晚班）
+    vehicle_id: V002
+    teacher_name: 李老师
+    teacher_phone: 13900139002
+    is_night_route: false
+    stops:
+      - stop_name: 星光家园南门
+        stop_order: 1
+      - stop_name: 明月社区西门
+        stop_order: 2
+      - stop_name: 星光家园北门
+        stop_order: 3
+      - stop_name: 幼儿园东门
+        stop_order: 4
+
+  - route_id: R003
+    route_name: 3号线（早班/晚班）
+    vehicle_id: V003
+    teacher_name: 张老师
+    teacher_phone: 13900139003
+    is_night_route: false
+    stops:
+      - stop_name: 丽景苑北门
+        stop_order: 1
+      - stop_name: 翠湖小区东门
+        stop_order: 2
+      - stop_name: 丽景苑东门
+        stop_order: 3
+      - stop_name: 翠湖小区西门
+        stop_order: 4
+      - stop_name: 幼儿园正门
+        stop_order: 5
+
+  - route_id: R004
+    route_name: 4号线（晚托专用，跨午夜）
+    vehicle_id: V004
+    teacher_name: 刘老师
+    teacher_phone: 13900139004
+    is_night_route: true
+    stops:
+      - stop_name: 晚托小区A座
+        stop_order: 1
+      - stop_name: 晚托小区B座
+        stop_order: 2
+      - stop_name: 幼儿园正门
+        stop_order: 3
