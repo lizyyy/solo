@@ -1,0 +1,36 @@
+events:
+  - id: event_001
+    date: "2023-01-10"
+    title: "借款协商"
+    description: "张三与李四就借款事宜进行协商"
+    role: "备忘"
+  
+  - id: event_002
+    date: "2023-01-15"
+    title: "签订借款合同"
+    description: "张三与李四签订正式借款合同（E001）"
+    role: "备忘"
+  
+  - id: event_003
+    date: "2023-01-16"
+    title: "银行转账"
+    description: "张三向李四转账50万元（E002）"
+    role: "备忘"
+  
+  - id: event_004
+    date: "2023-03-20"
+    title: "出具还款承诺书"
+    description: "李四出具还款承诺书（E004）"
+    role: "备忘"
+  
+  - id: event_005
+    date: "2023-06-01"
+    title: "第一次催告"
+    description: "张三第一次向李四催告还款"
+    role: "原告"
+  
+  - id: event_006
+    date: "2023-06-15"
+    title: "提起诉讼"
+    description: "张三向法院提起诉讼"
+    role: "原告"
