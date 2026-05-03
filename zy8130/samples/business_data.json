@@ -1,0 +1,56 @@
+[
+  {
+    "id": "CONTRACT-2026-001",
+    "fields": {
+      "contract_no": "HT-2026-0001",
+      "contract_date": "2026-05-03",
+      "buyer_name": "北京科技有限公司",
+      "buyer_address": "北京市海淀区中关村大街1号",
+      "seller_name": "上海贸易有限公司",
+      "total_amount": "¥128,500.00",
+      "amount_in_words": "人民币壹拾贰万捌仟伍佰元整",
+      "qr_code": "https://example.com/contract/HT-2026-0001",
+      "out_of_bounds_field": "越界测试",
+      "overlap_field": "重叠测试",
+      "customer_name": "张三",
+      "customer_phone": "13800138000",
+      "remark": "这是第一笔合同"
+    }
+  },
+  {
+    "id": "CONTRACT-2026-002",
+    "fields": {
+      "contract_no": "HT-2026-0002",
+      "contract_date": "2026-05-04",
+      "buyer_name": "广州电子科技有限公司",
+      "buyer_address": "",
+      "seller_name": "深圳进出口有限公司",
+      "total_amount": "¥56,800.00",
+      "amount_in_words": "人民币伍万陆仟捌佰元整",
+      "qr_code": "https://example.com/contract/HT-2026-0002",
+      "out_of_bounds_field": "越界测试2",
+      "overlap_field": "重叠测试2",
+      "customer_name": "李四",
+      "customer_phone": "",
+      "remark": ""
+    }
+  },
+  {
+    "id": "CONTRACT-2026-003",
+    "fields": {
+      "contract_no": "HT-2026-0003",
+      "contract_date": "",
+      "buyer_name": "",
+      "buyer_address": "杭州市西湖区文三路100号",
+      "seller_name": "南京制造业有限公司",
+      "total_amount": "",
+      "amount_in_words": "",
+      "qr_code": "https://example.com/contract/HT-2026-0003",
+      "out_of_bounds_field": "越界测试3",
+      "overlap_field": "重叠测试3",
+      "customer_name": "",
+      "customer_phone": "13900139000",
+      "remark": "缺少必填字段测试"
+    }
+  }
+]

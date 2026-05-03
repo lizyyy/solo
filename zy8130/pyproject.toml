@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-aligner"
+version = "1.0.0"
+authors = [
+  { name = "PDF Aligner Team" }
+]
+description = "PDF 表单套打校准器 - 本地命令行工具"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business",
+    "Topic :: Printing",
+]
+
+dependencies = [
+    "reportlab>=3.6.0",
+    "Pillow>=9.0.0",
+    "PyPDF2>=3.0.0",
+    "click>=8.0.0",
+    "rich>=12.0.0",
+]
+
+[project.scripts]
+pdf-aligner = "pdf_aligner.cli:cli"
+
+[project.urls]
+"Homepage" = "https://github.com/example/pdf-aligner"
+"Bug Tracker" = "https://github.com/example/pdf-aligner/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pdf_aligner*"]
+
+[tool.setuptools.package-data]
+pdf_aligner = ["samples/*"]
+
+[tool.setuptools]
+include-package-data = true

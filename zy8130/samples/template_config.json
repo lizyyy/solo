@@ -1,0 +1,123 @@
+{
+  "name": "销售合同模板",
+  "page_size": "A4",
+  "orientation": "portrait",
+  "margins": {
+    "top": 30,
+    "bottom": 30,
+    "left": 30,
+    "right": 30
+  },
+  "fields": [
+    {
+      "name": "contract_no",
+      "description": "合同编号",
+      "x": 400,
+      "y": 50,
+      "width": 150,
+      "height": 20,
+      "unit": "pt",
+      "font_size": 12,
+      "required": true
+    },
+    {
+      "name": "contract_date",
+      "description": "合同日期",
+      "x": 400,
+      "y": 80,
+      "width": 150,
+      "height": 20,
+      "unit": "pt",
+      "font_size": 12,
+      "required": true
+    },
+    {
+      "name": "buyer_name",
+      "description": "买方名称",
+      "x": 100,
+      "y": 150,
+      "width": 400,
+      "height": 25,
+      "unit": "pt",
+      "font_size": 14,
+      "required": true
+    },
+    {
+      "name": "buyer_address",
+      "description": "买方地址",
+      "x": 100,
+      "y": 190,
+      "width": 400,
+      "height": 20,
+      "unit": "pt",
+      "font_size": 11,
+      "required": false
+    },
+    {
+      "name": "seller_name",
+      "description": "卖方名称",
+      "x": 100,
+      "y": 250,
+      "width": 400,
+      "height": 25,
+      "unit": "pt",
+      "font_size": 14,
+      "required": true
+    },
+    {
+      "name": "total_amount",
+      "description": "合同总金额",
+      "x": 400,
+      "y": 350,
+      "width": 150,
+      "height": 30,
+      "unit": "pt",
+      "font_size": 16,
+      "required": true
+    },
+    {
+      "name": "amount_in_words",
+      "description": "金额大写",
+      "x": 100,
+      "y": 400,
+      "width": 450,
+      "height": 25,
+      "unit": "pt",
+      "font_size": 12,
+      "required": false
+    },
+    {
+      "name": "qr_code",
+      "description": "二维码",
+      "x": 450,
+      "y": 500,
+      "width": 100,
+      "height": 100,
+      "unit": "pt",
+      "is_qr_code": true,
+      "required": true
+    },
+    {
+      "name": "out_of_bounds_field",
+      "description": "越界字段（故意设置）",
+      "x": 550,
+      "y": 100,
+      "width": 100,
+      "height": 20,
+      "unit": "pt",
+      "font_size": 10,
+      "required": false
+    },
+    {
+      "name": "overlap_field",
+      "description": "重叠字段（故意与二维码重叠）",
+      "x": 480,
+      "y": 530,
+      "width": 80,
+      "height": 40,
+      "unit": "pt",
+      "font_size": 10,
+      "required": false
+    }
+  ]
+}

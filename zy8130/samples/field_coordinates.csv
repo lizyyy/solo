@@ -1,0 +1,5 @@
+name,x,y,width,height,unit,font_size,required,is_qr_code,description
+customer_name,70,260,280,20,pt,14,true,false,客户名称（CSV定义）
+customer_phone,70,290,180,18,pt,12,false,false,客户电话
+remark,70,320,350,18,pt,11,false,false,备注
+mm_field,50,100,100,30,mm,12,false,false,毫米单位示例
