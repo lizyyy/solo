@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服聊天意图聚类和质检台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+            gap: 8px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .step:hover { background: #f8f9fa; }
+        .step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .step.completed { border-color: #52c41a; }
+        
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .step.active .step-number { background: rgba(255,255,255,0.3); }
+        .step.completed .step-number { background: #52c41a; color: white; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .btn-secondary { background: #f0f0f0; color: #333; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #389e0d; }
+        
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #d9363e; }
+        
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+        
+        .upload-area {
+            border: 2px dashed #d0d0d0;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .upload-area:hover { border-color: #667eea; background: #f5f5ff; }
+        .upload-area.dragover { border-color: #667eea; background: #f0f0ff; }
+        
+        .upload-icon { font-size: 3rem; margin-bottom: 12px; }
+        .upload-text { color: #666; margin-bottom: 8px; }
+        .upload-hint { color: #999; font-size: 0.85rem; }
+        
+        #fileInput { display: none; }
+        
+        .project-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        
+        .project-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .project-card:hover { border-color: #667eea; transform: translateY(-2px); }
+        
+        .project-card .name { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+        .project-card .meta { color: #888; font-size: 0.85rem; margin-bottom: 12px; }
+        .project-card .status-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-success { background: #f6ffed; color: #52c41a; }
+        .badge-info { background: #e6f7ff; color: #1890ff; }
+        .badge-warning { background: #fffbe6; color: #faad14; }
+        .badge-danger { background: #fff2f0; color: #ff4d4f; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .stat-card.blue { background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); }
+        .stat-card.green { background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); }
+        .stat-card.orange { background: linear-gradient(135deg, #faad14 0%, #d48806 100%); }
+        .stat-card.red { background: linear-gradient(135deg, #ff4d4f 0%, #d9363e 100%); }
+        
+        .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+        
+        .cluster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        
+        .cluster-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .cluster-card:hover { border-color: #667eea; transform: translateY(-2px); }
+        .cluster-card.selected { border-color: #667eea; background: #f5f5ff; }
+        
+        .cluster-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .cluster-name { font-size: 1rem; font-weight: 600; flex: 1; }
+        .cluster-size {
+            background: #f0f0f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .cluster-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .keyword-tag {
+            background: #e6f7ff;
+            color: #1890ff;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .cluster-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content.large { width: 1200px; }
+        .modal-content.medium { width: 800px; }
+        .modal-content.small { width: 500px; }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title { font-size: 1.2rem; font-weight: 600; }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close:hover { background: #e0e0e0; }
+        
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; gap: 12px; justify-content: flex-end; }
+        
+        .session-list { max-height: 600px; overflow-y: auto; }
+        
+        .session-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        
+        .session-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .session-header:hover { background: #f5f5f5; }
+        
+        .session-id { font-weight: 600; color: #333; }
+        .session-meta { color: #888; font-size: 0.85rem; }
+        
+        .session-messages { padding: 16px; background: white; }
+        
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .message.user { justify-content: flex-end; }
+        .message.agent { justify-content: flex-start; }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.agent .message-bubble {
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-role {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        
+        .quality-issue {
+            background: #fff2f0;
+            border-left: 4px solid #ff4d4f;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .quality-issue.warning { background: #fffbe6; border-left-color: #faad14; }
+        .quality-issue.success { background: #f6ffed; border-left-color: #52c41a; }
+        
+        .issue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .issue-title { font-weight: 600; }
+        .issue-severity { font-size: 0.8rem; padding: 2px 8px; border-radius: 4px; }
+        .issue-severity.high { background: #ff4d4f; color: white; }
+        .issue-severity.medium { background: #faad14; color: white; }
+        .issue-severity.low { background: #52c41a; color: white; }
+        
+        .issue-message { color: #666; font-size: 0.9rem; }
+        
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: #667eea; }
+        .tab.active { color: #667eea; border-bottom-color: #667eea; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 6px; color: #333; }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .alert-error { background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; }
+        .alert-success { background: #f6ffed; border: 1px solid #b7eb8f; color: #52c41a; }
+        .alert-warning { background: #fffbe6; border: 1px solid #ffe58f; color: #d48806; }
+        .alert-info { background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; }
+        
+        .hidden { display: none !important; }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+        .empty-title { font-size: 1.1rem; margin-bottom: 8px; color: #666; }
+        .empty-desc { font-size: 0.9rem; }
+        
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .checkbox-item:hover { border-color: #667eea; }
+        .checkbox-item.selected { border-color: #667eea; background: #f5f5ff; }
+        
+        .split-view { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        @media (max-width: 1000px) { .split-view { grid-template-columns: 1fr; } }
+        
+        .sidebar { background: white; border-radius: 12px; padding: 16px; max-height: 70vh; overflow-y: auto; }
+        .main-content { background: white; border-radius: 12px; padding: 20px; }
+        
+        .rule-item {
+            padding: 16px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .rule-item:hover { border-color: #ddd; }
+        
+        .rule-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .rule-name { font-weight: 600; }
+        .rule-category {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .rule-desc { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
+        .rule-keywords { display: flex; flex-wrap: wrap; gap: 6px; }
+        .rule-keyword-tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .toggle-switch.active { background: #667eea; }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: left 0.2s;
+        }
+        .toggle-switch.active::after { left: 22px; }
+        
+        .chart-container { position: relative; height: 300px; }
+        
+        .action-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        
+        .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; color: #888; font-size: 0.9rem; }
+        .breadcrumb-item { cursor: pointer; }
+        .breadcrumb-item:hover { color: #667eea; }
+        .breadcrumb-separator { color: #ccc; }
+        
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toast.success { border-left: 4px solid #52c41a; }
+        .toast.error { border-left: 4px solid #ff4d4f; }
+        .toast.info { border-left: 4px solid #1890ff; }
+        .toast.warning { border-left: 4px solid #faad14; }
+        
+        .sample-data-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #e6f7ff;
+            color: #1890ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .sample-data-btn:hover { background: #bae7ff; }
+        
+        .progress-container {
+            margin-top: 12px;
+            display: none;
+        }
+        .progress-container.active { display: block; }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text { text-align: center; margin-top: 8px; color: #888; font-size: 0.85rem; }
+        
+        .merge-toolbar {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .cluster-size-large { font-size: 1.5rem; font-weight: 700; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💬 客服聊天意图聚类和质检台</h1>
+        <div class="subtitle">本地运行 · 无需API Key · 小团队专用</div>
+    </div>
+    
+    <div class="container">
+        <div class="step-indicator">
+            <div class="step active" data-step="projects">
+                <div class="step-number">1</div>
+                <span>项目管理</span>
+            </div>
+            <div class="step" data-step="import">
+                <div class="step-number">2</div>
+                <span>导入数据</span>
+            </div>
+            <div class="step" data-step="cluster">
+                <div class="step-number">3</div>
+                <span>聚类分析</span>
+            </div>
+            <div class="step" data-step="quality">
+                <div class="step-number">4</div>
+                <span>质检分析</span>
+            </div>
+            <div class="step" data-step="export">
+                <div class="step-number">5</div>
+                <span>导出报告</span>
+            </div>
+        </div>
+        
+        <div id="page-projects" class="page">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="card-title">📁 项目列表</h2>
+                    <button class="btn btn-primary" onclick="createProject()">
+                        <span>+</span> 新建项目
+                    </button>
+                </div>
+                
+                <div id="project-list" class="project-list">
+                </div>
+                
+                <div id="empty-projects" class="empty-state hidden">
+                    <div class="empty-icon">📂</div>
+                    <div class="empty-title">还没有项目</div>
+                    <div class="empty-desc">点击上方"新建项目"按钮开始分析</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-import" class="page hidden">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="goToStep('projects')">项目列表</span>
+                <span class="breadcrumb-separator">/</span>
+                <span id="current-project-name">导入数据</span>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">📥 导入聊天数据</h2>
+                
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📤</div>
+                            <div class="upload-text">点击或拖拽 CSV 文件到这里</div>
+                            <div class="upload-hint">支持 UTF-8/GBK 编码的 CSV 或 Excel 文件</div>
+                            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+                        </div>
+                        
+                        <div class="progress-container" id="uploadProgress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">正在处理...</div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 300px;">
+                        <div class="card" style="margin: 0; background: #fafafa;">
+                            <h3 style="margin-bottom: 12px; font-size: 1rem;">📋 CSV 字段要求</h3>
+                            <div style="font-size: 0.9rem; line-height: 1.8;">
+                                <p><strong>必需字段：</strong></p>
+                                <ul style="margin-left: 20px; color: #666;">
+                                    <li><code>session_id</code> - 会话ID/订单号</li>
+                                    <li><code>user_message</code> - 用户消息</li>
+                                    <li><code>agent_message</code> - 客服回复</li>
+                                </ul>
+                                <p><strong>可选字段：</strong></p>
+                                <ul style="margin-left: 20px; color: #666;">
+                                    <li><code>time</code> - 时间</li>
+                                    <li><code>tags</code> - 标签</li>
+                                    <li><code>satisfaction</code> - 满意度</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 16px;">
+                            <button class="sample-data-btn" onclick="loadSampleData()">
+                                📊 使用示例数据体验
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="importResult" class="hidden">
+                    <div class="alert alert-success" id="importSuccess">
+                        <strong>✅ 数据导入成功！</strong>
+                        <span id="importStats"></span>
+                    </div>
+                    
+                    <div class="alert alert-error hidden" id="importError"></div>
+                </div>
+                
+                <div style="margin-top: 20px; display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="goToStep('projects')">← 返回项目列表</button>
+                    <button class="btn btn-primary" id="nextToClusterBtn" disabled onclick="goToStep('cluster')">下一步：聚类分析 →</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-cluster" class="page hidden">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="goToStep('projects')">项目列表</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item" onclick="goToStep('import')">导入数据</span>
+                <span class="breadcrumb-separator">/</span>
+                <span>聚类分析</span>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <h2 class="card-title" style="margin: 0;">🎯 意图聚类分析</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label style="font-size: 0.9rem;">聚类数量：</label>
+                            <input type="number" id="clusterCount" class="form-input" style="width: 80px;" value="8" min="2" max="20">
+                        </div>
+                        <button class="btn btn-primary" id="runClusterBtn" onclick="runClustering()">
+                            🔄 运行聚类
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="clusterStats" class="stats-grid hidden"></div>
+            
+            <div id="mergeToolbar" class="merge-toolbar hidden">
+                <div>
+                    <strong>✂️ 合并模式</strong> - 已选择 <span id="selectedMergeCount">0</span> 个簇
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-success btn-sm" onclick="confirmMerge()" id="confirmMergeBtn" disabled>
+                        ✅ 合并选中的簇
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="exitMergeMode()">取消</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div class="action-bar" style="margin: 0;">
+                        <button class="btn btn-secondary btn-sm" onclick="enterMergeMode()" id="mergeModeBtn">
+                            ✂️ 合并簇
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="clusterGrid" class="cluster-grid"></div>
+                
+                <div id="empty-clusters" class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <div class="empty-title">还没有聚类结果</div>
+                    <div class="empty-desc">点击上方"运行聚类"按钮开始分析用户意图</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="goToStep('import')">← 返回导入数据</button>
+                <button class="btn btn-primary" id="nextToQualityBtn" disabled onclick="goToStep('quality')">下一步：质检分析 →</button>
+            </div>
+        </div>
+        
+        <div id="page-quality" class="page hidden">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="goToStep('projects')">项目列表</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item" onclick="goToStep('cluster')">聚类分析</span>
+                <span class="breadcrumb-separator">/</span>
+                <span>质检分析</span>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <h2 class="card-title" style="margin: 0;">✅ 质检分析</h2>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="openRulesModal()">
+                            ⚙️ 管理质检规则
+                        </button>
+                        <button class="btn btn-primary" id="runQualityBtn" onclick="runQualityCheck()">
+                            🔍 运行质检
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="qualityStats" class="stats-grid hidden"></div>
+            
+            <div class="card">
+                <div class="tabs">
+                    <div class="tab active" data-tab="all-issues">全部问题</div>
+                    <div class="tab" data-tab="unresolved-issues">待处理</div>
+                    <div class="tab" data-tab="by-cluster">按簇查看</div>
+                </div>
+                
+                <div id="tab-all-issues" class="tab-content"></div>
+                <div id="tab-unresolved-issues" class="tab-content hidden"></div>
+                <div id="tab-by-cluster" class="tab-content hidden"></div>
+                
+                <div id="empty-quality" class="empty-state">
+                    <div class="empty-icon">✅</div>
+                    <div class="empty-title">暂无质检问题</div>
+                    <div class="empty-desc">点击"运行质检"按钮开始检查回复质量</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="goToStep('cluster')">← 返回聚类分析</button>
+                <button class="btn btn-primary" id="nextToExportBtn" onclick="goToStep('export')">下一步：导出报告 →</button>
+            </div>
+        </div>
+        
+        <div id="page-export" class="page hidden">
+            <div class="breadcrumb">
+                <span class="breadcrumb-item" onclick="goToStep('projects')">项目列表</span>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-item" onclick="goToStep('quality')">质检分析</span>
+                <span class="breadcrumb-separator">/</span>
+                <span>导出报告</span>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">📄 导出分析报告</h2>
+                
+                <div class="stats-grid" style="margin-top: 0;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="exportSessions">-</div>
+                        <div class="stat-label">总会话数</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-value" id="exportClusters">-</div>
+                        <div class="stat-label">意图簇数</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-value" id="exportIssues">-</div>
+                        <div class="stat-label">质检问题</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px; font-size: 1rem;">选择导出格式</h3>
+                    
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <div class="card" style="margin: 0; cursor: pointer; text-align: center; border: 2px solid #eee;" 
+                                 onclick="exportReport('markdown')">
+                                <div style="font-size: 2.5rem; margin-bottom: 12px;">📝</div>
+                                <div style="font-weight: 600; margin-bottom: 8px;">Markdown 格式</div>
+                                <div style="font-size: 0.85rem; color: #888;">
+                                    适合编辑、分享到知识库
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 200px;">
+                            <div class="card" style="margin: 0; cursor: pointer; text-align: center; border: 2px solid #eee;"
+                                 onclick="exportReport('html')">
+                                <div style="font-size: 2.5rem; margin-bottom: 12px;">🌐</div>
+                                <div style="font-weight: 600; margin-bottom: 8px;">HTML 格式</div>
+                                <div style="font-size: 0.85rem; color: #888;">
+                                    适合浏览器查看、打印
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="exportPreview" class="hidden" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px; font-size: 1rem;">报告预览</h3>
+                    <div id="previewContent" style="background: #fafafa; padding: 20px; border-radius: 8px; max-height: 500px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="goToStep('quality')">← 返回质检分析</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <div class="modal" id="sessionModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <div class="modal-title" id="sessionModalTitle">会话详情</div>
+                <button class="modal-close" onclick="closeModal('sessionModal')">×</button>
+            </div>
+            <div class="modal-body" id="sessionModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('sessionModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="renameModal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <div class="modal-title">重命名簇</div>
+                <button class="modal-close" onclick="closeModal('renameModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">簇名称</label>
+                    <input type="text" class="form-input" id="renameInput" placeholder="输入新的簇名称">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('renameModal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmRename()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="rulesModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <div class="modal-title">⚙️ 质检规则管理</div>
+                <button class="modal-close" onclick="closeModal('rulesModal')">×</button>
+            </div>
+            <div class="modal-body" id="rulesModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rulesModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveRules()">保存规则</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="resolveModal">
+        <div class="modal-content medium">
+            <div class="modal-header">
+                <div class="modal-title">处理质检问题</div>
+                <button class="modal-close" onclick="closeModal('resolveModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="resolveIssuePreview" style="margin-bottom: 16px;"></div>
+                <div class="form-group">
+                    <label class="form-label">处理说明</label>
+                    <textarea class="form-textarea" id="resolveInput" placeholder="输入处理说明或备注..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('resolveModal')">取消</button>
+                <button class="btn btn-success" onclick="confirmResolve()">标记为已解决</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="newProjectModal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <div class="modal-title">📁 新建项目</div>
+                <button class="modal-close" onclick="closeModal('newProjectModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">项目名称</label>
+                    <input type="text" class="form-input" id="newProjectName" placeholder="例如：2024年第5周客服数据分析">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">描述（可选）</label>
+                    <textarea class="form-textarea" id="newProjectDesc" placeholder="简要描述这个项目的用途..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newProjectModal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmCreateProject()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentProject = null;
+        let currentStep = 'projects';
+        let mergeMode = false;
+        let selectedForMerge = new Set();
+        let currentClusterToRename = null;
+        let currentIssueToResolve = null;
+        let qualityRules = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+            
+            document.querySelectorAll('.step').forEach(step => {
+                step.addEventListener('click', () => {
+                    const targetStep = step.dataset.step;
+                    if (canNavigateTo(targetStep)) {
+                        goToStep(targetStep);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+        }
+        
+        function canNavigateTo(step) {
+            if (!currentProject) return step === 'projects';
+            const stepOrder = ['projects', 'import', 'cluster', 'quality', 'export'];
+            const currentIdx = stepOrder.indexOf(currentStep);
+            const targetIdx = stepOrder.indexOf(step);
+            
+            if (targetIdx <= currentIdx) return true;
+            if (step === 'import' && currentProject) return true;
+            if (step === 'cluster' && currentProject?.data) return true;
+            if (step === 'quality' && currentProject?.clusters?.length > 0) return true;
+            if (step === 'export' && currentProject?.clusters?.length > 0) return true;
+            
+            return false;
+        }
+        
+        function goToStep(step) {
+            currentStep = step;
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`page-${step}`).classList.remove('hidden');
+            
+            const stepOrder = ['projects', 'import', 'cluster', 'quality', 'export'];
+            const currentIdx = stepOrder.indexOf(step);
+            
+            document.querySelectorAll('.step').forEach((s, idx) => {
+                s.classList.remove('active', 'completed');
+                if (idx < currentIdx) s.classList.add('completed');
+                if (idx === currentIdx) s.classList.add('active');
+            });
+            
+            if (step === 'projects') {
+                loadProjects();
+            } else if (step === 'cluster') {
+                renderClusters();
+            } else if (step === 'quality') {
+                renderQualityIssues();
+            } else if (step === 'export') {
+                renderExportPage();
+            }
+        }
+        
+        async function apiCall(endpoint, options = {}) {
+            const url = `${API_BASE}/api${endpoint}`;
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            try {
+                const response = await fetch(url, { ...defaultOptions, ...options });
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+            toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        async function loadProjects() {
+            const result = await apiCall('/projects');
+            const listEl = document.getElementById('project-list');
+            const emptyEl = document.getElementById('empty-projects');
+            
+            if (result.success && result.projects.length > 0) {
+                listEl.innerHTML = result.projects.map(p => `
+                    <div class="project-card" onclick="openProject('${p.id}')">
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        <div class="meta">
+                            ${p.description ? escapeHtml(p.description).substring(0, 50) + '...' : '创建于 ' + formatDate(p.created_at)}
+                        </div>
+                        <div class="status-badges">
+                            ${p.has_data ? '<span class="badge badge-info">📊 已导入数据</span>' : ''}
+                            ${p.has_clusters ? '<span class="badge badge-success">🎯 已聚类</span>' : ''}
+                            ${p.original_filename ? `<span class="badge badge-warning">📄 ${escapeHtml(p.original_filename)}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                listEl.classList.remove('hidden');
+                emptyEl.classList.add('hidden');
+            } else {
+                listEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+            }
+        }
+        
+        function createProject() {
+            document.getElementById('newProjectName').value = `项目_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
+            document.getElementById('newProjectDesc').value = '';
+            openModal('newProjectModal');
+        }
+        
+        async function confirmCreateProject() {
+            const name = document.getElementById('newProjectName').value.trim();
+            const desc = document.getElementById('newProjectDesc').value.trim();
+            
+            if (!name) {
+                showToast('请输入项目名称', 'error');
+                return;
+            }
+            
+            const result = await apiCall('/projects', {
+                method: 'POST',
+                body: JSON.stringify({ name, description: desc })
+            });
+            
+            if (result.success) {
+                closeModal('newProjectModal');
+                showToast('项目创建成功', 'success');
+                openProject(result.project.id);
+            } else {
+                showToast(result.error || '创建失败', 'error');
+            }
+        }
+        
+        async function openProject(projectId) {
+            const result = await apiCall(`/projects/${projectId}`);
+            if (result.success) {
+                currentProject = result.project;
+                document.getElementById('current-project-name').textContent = currentProject.name;
+                
+                if (currentProject.clusters?.length > 0) {
+                    goToStep('cluster');
+                } else if (currentProject.data) {
+                    goToStep('import');
+                    updateImportUI();
+                } else {
+                    goToStep('import');
+                }
+            } else {
+                showToast('加载项目失败', 'error');
+            }
+        }
+        
+        async function handleFileUpload(file) {
+            if (!currentProject) {
+                showToast('请先创建或打开一个项目', 'warning');
+                return;
+            }
+            
+            const progressContainer = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressContainer.classList.add('active');
+            progressFill.style.width = '30%';
+            progressText.textContent = '正在上传文件...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                progressFill.style.width = '50%';
+                progressText.textContent = '正在解析数据...';
+                
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                progressFill.style.width = '100%';
+                
+                if (result.success) {
+                    progressText.textContent = '导入成功！';
+                    currentProject = result.project;
+                    
+                    document.getElementById('importSuccess').classList.remove('hidden');
+                    document.getElementById('importError').classList.add('hidden');
+                    document.getElementById('importStats').textContent = 
+                        `共 ${result.stats.total_sessions} 个会话，${result.stats.total_messages} 条消息`;
+                    document.getElementById('importResult').classList.remove('hidden');
+                    document.getElementById('nextToClusterBtn').disabled = false;
+                    
+                    showToast('数据导入成功', 'success');
+                } else {
+                    progressText.textContent = '导入失败';
+                    document.getElementById('importError').textContent = result.error || '导入失败';
+                    document.getElementById('importError').classList.remove('hidden');
+                    document.getElementById('importSuccess').classList.add('hidden');
+                    document.getElementById('importResult').classList.remove('hidden');
+                    
+                    showToast(result.error || '导入失败', 'error');
+                }
+                
+                setTimeout(() => {
+                    progressContainer.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 2000);
+                
+            } catch (error) {
+                progressText.textContent = '上传出错';
+                showToast('上传失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function loadSampleData() {
+            if (!currentProject) {
+                showToast('请先创建或打开一个项目', 'warning');
+                return;
+            }
+            
+            const result = await apiCall('/sample-data');
+            if (result.success && result.samples.length > 0) {
+                const sampleFile = result.samples[0].name;
+                const loadResult = await apiCall(`/sample-data/${sampleFile}?project_id=${currentProject.id}`, {
+                    method: 'POST'
+                });
+                
+                if (loadResult.success) {
+                    currentProject = loadResult.project;
+                    
+                    document.getElementById('importSuccess').classList.remove('hidden');
+                    document.getElementById('importError').classList.add('hidden');
+                    document.getElementById('importStats').textContent = 
+                        `共 ${loadResult.stats.total_sessions} 个会话，${loadResult.stats.total_messages} 条消息（示例数据）`;
+                    document.getElementById('importResult').classList.remove('hidden');
+                    document.getElementById('nextToClusterBtn').disabled = false;
+                    
+                    showToast('示例数据加载成功', 'success');
+                } else {
+                    showToast(loadResult.error || '加载失败', 'error');
+                }
+            } else {
+                showToast('没有找到示例数据', 'warning');
+            }
+        }
+        
+        function updateImportUI() {
+            if (currentProject?.data) {
+                const sessions = currentProject.data.sessions || [];
+                const totalMessages = sessions.reduce((sum, s) => sum + (s.messages?.length || 0), 0);
+                
+                document.getElementById('importSuccess').classList.remove('hidden');
+                document.getElementById('importError').classList.add('hidden');
+                document.getElementById('importStats').textContent = 
+                    `共 ${sessions.length} 个会话，${totalMessages} 条消息`;
+                document.getElementById('importResult').classList.remove('hidden');
+                document.getElementById('nextToClusterBtn').disabled = false;
+            }
+        }
+        
+        async function runClustering() {
+            if (!currentProject) return;
+            
+            const clusterCount = parseInt(document.getElementById('clusterCount').value) || 8;
+            const btn = document.getElementById('runClusterBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> 分析中...';
+            
+            const result = await apiCall(`/projects/${currentProject.id}/cluster`, {
+                method: 'POST',
+                body: JSON.stringify({ n_clusters: clusterCount })
+            });
+            
+            btn.disabled = false;
+            btn.innerHTML = '🔄 运行聚类';
+            
+            if (result.success) {
+                currentProject = result.project;
+                document.getElementById('nextToQualityBtn').disabled = false;
+                renderClusters();
+                showToast(`聚类完成，共 ${result.cluster_stats.total_clusters} 个簇`, 'success');
+            } else {
+                showToast(result.error || '聚类失败', 'error');
+            }
+        }
+        
+        function renderClusters() {
+            const clusters = currentProject?.clusters || [];
+            const gridEl = document.getElementById('clusterGrid');
+            const emptyEl = document.getElementById('empty-clusters');
+            const statsEl = document.getElementById('clusterStats');
+            const mergeBtn = document.getElementById('mergeModeBtn');
+            
+            if (clusters.length === 0) {
+                gridEl.innerHTML = '';
+                gridEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+                statsEl.classList.add('hidden');
+                mergeBtn.classList.add('hidden');
+                return;
+            }
+            
+            gridEl.classList.remove('hidden');
+            emptyEl.classList.add('hidden');
+            statsEl.classList.remove('hidden');
+            mergeBtn.classList.remove('hidden');
+            
+            const totalSessions = clusters.reduce((sum, c) => sum + c.size, 0);
+            const avgSatisfaction = calculateAvgSatisfaction(clusters);
+            const totalIssues = clusters.reduce((sum, c) => sum + (c.quality_issues?.length || 0), 0);
+            
+            statsEl.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${clusters.length}</div>
+                    <div class="stat-label">意图簇数</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-value">${totalSessions}</div>
+                    <div class="stat-label">总会话数</div>
+                </div>
+                ${avgSatisfaction !== null ? `
+                <div class="stat-card green">
+                    <div class="stat-value">${avgSatisfaction}</div>
+                    <div class="stat-label">平均满意度</div>
+                </div>
+                ` : ''}
+                <div class="stat-card ${totalIssues > 0 ? 'orange' : 'green'}">
+                    <div class="stat-value">${totalIssues}</div>
+                    <div class="stat-label">质检问题</div>
+                </div>
+            `;
+            
+            gridEl.innerHTML = clusters.map((cluster, idx) => {
+                const isSelected = selectedForMerge.has(cluster.id);
+                const satStats = cluster.satisfaction_stats || {};
+                const issues = cluster.quality_issues || [];
+                const unresolvedIssues = issues.filter(i => !i.resolved);
+                
+                return `
+                    <div class="cluster-card ${isSelected ? 'selected' : ''}" 
+                         onclick="handleClusterClick(${cluster.id}, event)"
+                         data-cluster-id="${cluster.id}">
+                        ${mergeMode ? `
+                            <div style="position: absolute; top: 10px; left: 10px;">
+                                <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                       onclick="event.stopPropagation(); toggleMergeSelect(${cluster.id})">
+                            </div>
+                        ` : ''}
+                        <div class="cluster-header">
+                            <div class="cluster-name" ondblclick="event.stopPropagation(); startRenameCluster(${cluster.id})">
+                                ${escapeHtml(cluster.name)}
+                            </div>
+                            <div class="cluster-size">${cluster.size}</div>
+                        </div>
+                        <div class="cluster-keywords">
+                            ${cluster.keywords.slice(0, 5).map(kw => 
+                                `<span class="keyword-tag">${escapeHtml(kw)}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="cluster-footer">
+                            ${satStats.mean !== null && satStats.mean !== undefined ? `
+                                <span class="badge ${satStats.mean >= 4 ? 'badge-success' : satStats.mean >= 3 ? 'badge-info' : 'badge-warning'}">
+                                    ⭐ ${satStats.mean}
+                                </span>
+                            ` : ''}
+                            ${unresolvedIssues.length > 0 ? `
+                                <span class="badge badge-danger">⚠️ ${unresolvedIssues.length} 问题</span>
+                            ` : ''}
+                            ${cluster.merged_from?.length > 0 ? `
+                                <span class="badge badge-info">🔀 已合并</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function calculateAvgSatisfaction(clusters) {
+            let totalScore = 0;
+            let totalCount = 0;
+            
+            clusters.forEach(c => {
+                const stats = c.satisfaction_stats || {};
+                if (stats.mean !== null && stats.mean !== undefined && stats.count > 0) {
+                    totalScore += stats.mean * stats.count;
+                    totalCount += stats.count;
+                }
+            });
+            
+            return totalCount > 0 ? (totalScore / totalCount).toFixed(1) : null;
+        }
+        
+        function handleClusterClick(clusterId, event) {
+            if (mergeMode) {
+                toggleMergeSelect(clusterId);
+            } else {
+                showClusterDetail(clusterId);
+            }
+        }
+        
+        function showClusterDetail(clusterId) {
+            const cluster = currentProject.clusters.find(c => c.id === clusterId);
+            if (!cluster) return;
+            
+            document.getElementById('sessionModalTitle').textContent = cluster.name;
+            
+            const sessions = cluster.sessions || [];
+            const issues = cluster.quality_issues || [];
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                        <div class="stat-card" style="margin: 0; padding: 16px;">
+                            <div class="stat-value" style="font-size: 1.5rem;">${cluster.size}</div>
+                            <div class="stat-label" style="font-size: 0.8rem;">会话数</div>
+                        </div>
+                        ${cluster.satisfaction_stats?.mean ? `
+                        <div class="stat-card green" style="margin: 0; padding: 16px;">
+                            <div class="stat-value" style="font-size: 1.5rem;">${cluster.satisfaction_stats.mean}</div>
+                            <div class="stat-label" style="font-size: 0.8rem;">平均满意度</div>
+                        </div>
+                        ` : ''}
+                        <div class="stat-card orange" style="margin: 0; padding: 16px;">
+                            <div class="stat-value" style="font-size: 1.5rem;">${issues.filter(i => !i.resolved).length}</div>
+                            <div class="stat-label" style="font-size: 0.8rem;">待处理问题</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <strong>关键词：</strong>
+                    ${cluster.keywords.map(kw => `<span class="keyword-tag">${escapeHtml(kw)}</span>`).join(' ')}
+                </div>
+                
+                ${issues.length > 0 ? `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 12px;">⚠️ 质检问题</h4>
+                    ${issues.map(issue => `
+                        <div class="quality-issue ${issue.resolved ? 'success' : issue.severity === 'high' ? '' : 'warning'}">
+                            <div class="issue-header">
+                                <span class="issue-title">${escapeHtml(issue.rule_name)}</span>
+                                <span class="issue-severity ${issue.severity}">${
+                                    issue.severity === 'high' ? '高优先级' : 
+                                    issue.severity === 'medium' ? '中优先级' : '低优先级'
+                                }</span>
+                            </div>
+                            <div class="issue-message">${escapeHtml(issue.message)}</div>
+                            ${!issue.resolved ? `
+                                <button class="btn btn-success btn-sm" style="margin-top: 8px;" 
+                                        onclick="openResolveModal('${issue.id}')">
+                                    标记已解决
+                                </button>
+                            ` : `<div style="margin-top: 8px; color: #52c41a; font-size: 0.85rem;">✅ 已解决</div>`}
+                        </div>
+                    `).join('')}
+                </div>
+                ` : ''}
+                
+                <h4 style="margin-bottom: 12px;">📋 会话列表 (共 ${sessions.length} 个)</h4>
+                <div class="session-list">
+                    ${sessions.slice(0, 20).map((session, idx) => {
+                        const userMsgs = session.messages?.filter(m => m.role === 'user') || [];
+                        const agentMsgs = session.messages?.filter(m => m.role === 'agent') || [];
+                        const preview = userMsgs.length > 0 ? userMsgs[0].content.substring(0, 50) : '';
+                        
+                        return \`
+                            <div class="session-item">
+                                <div class="session-header" onclick="toggleSession(this)">
+                                    <div>
+                                        <span class="session-id">会话 \${session.session_id}</span>
+                                        <span class="session-meta"> (\${session.messages?.length || 0} 条消息)</span>
+                                    </div>
+                                    <span>▼</span>
+                                </div>
+                                <div class="session-messages hidden">
+                                    \${(session.messages || []).map(msg => \`
+                                        <div class="message \${msg.role}">
+                                            <div class="message-bubble">
+                                                <div class="message-role">\${msg.role === 'user' ? '用户' : '客服'}</div>
+                                                \${escapeHtml(msg.content)}
+                                            </div>
+                                        </div>
+                                    \`).join('')}
+                                </div>
+                            </div>
+                        \`;
+                    }).join('')}
+                </div>
+            `;
+            
+            document.getElementById('sessionModalBody').innerHTML = html;
+            openModal('sessionModal');
+        }
+        
+        function toggleSession(header) {
+            const messages = header.nextElementSibling;
+            const arrow = header.querySelector('span:last-child');
+            
+            if (messages.classList.contains('hidden')) {
+                messages.classList.remove('hidden');
+                arrow.textContent = '▲';
+            } else {
+                messages.classList.add('hidden');
+                arrow.textContent = '▼';
+            }
+        }
+        
+        function enterMergeMode() {
+            mergeMode = true;
+            selectedForMerge.clear();
+            document.getElementById('mergeToolbar').classList.remove('hidden');
+            document.getElementById('mergeModeBtn').classList.add('hidden');
+            renderClusters();
+        }
+        
+        function exitMergeMode() {
+            mergeMode = false;
+            selectedForMerge.clear();
+            document.getElementById('mergeToolbar').classList.add('hidden');
+            document.getElementById('mergeModeBtn').classList.remove('hidden');
+            renderClusters();
+        }
+        
+        function toggleMergeSelect(clusterId) {
+            if (selectedForMerge.has(clusterId)) {
+                selectedForMerge.delete(clusterId);
+            } else {
+                selectedForMerge.add(clusterId);
+            }
+            
+            document.getElementById('selectedMergeCount').textContent = selectedForMerge.size;
+            document.getElementById('confirmMergeBtn').disabled = selectedForMerge.size < 2;
+            renderClusters();
+        }
+        
+        async function confirmMerge() {
+            if (selectedForMerge.size < 2) return;
+            
+            const ids = Array.from(selectedForMerge);
+            const targetId = ids[0];
+            const sourceIds = ids.slice(1);
+            
+            const targetCluster = currentProject.clusters.find(c => c.id === targetId);
+            const newName = prompt('合并后的簇名称（可选）：', targetCluster?.name);
+            
+            const result = await apiCall(`/projects/${currentProject.id}/clusters/merge`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    source_ids: sourceIds,
+                    target_id: targetId,
+                    name: newName || null
+                })
+            });
+            
+            if (result.success) {
+                currentProject = result.project;
+                exitMergeMode();
+                showToast('合并成功', 'success');
+            } else {
+                showToast(result.error || '合并失败', 'error');
+            }
+        }
+        
+        function startRenameCluster(clusterId) {
+            currentClusterToRename = clusterId;
+            const cluster = currentProject.clusters.find(c => c.id === clusterId);
+            if (cluster) {
+                document.getElementById('renameInput').value = cluster.name;
+                openModal('renameModal');
+            }
+        }
+        
+        async function confirmRename() {
+            const newName = document.getElementById('renameInput').value.trim();
+            if (!newName) {
+                showToast('请输入簇名称', 'error');
+                return;
+            }
+            
+            const result = await apiCall(`/projects/${currentProject.id}/clusters/${currentClusterToRename}/rename`, {
+                method: 'POST',
+                body: JSON.stringify({ name: newName })
+            });
+            
+            if (result.success) {
+                const cluster = currentProject.clusters.find(c => c.id === currentClusterToRename);
+                if (cluster) cluster.name = newName;
+                closeModal('renameModal');
+                renderClusters();
+                showToast('重命名成功', 'success');
+            } else {
+                showToast(result.error || '重命名失败', 'error');
+            }
+        }
+        
+        async function runQualityCheck() {
+            if (!currentProject) return;
+            
+            const btn = document.getElementById('runQualityBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> 检查中...';
+            
+            const result = await apiCall(`/projects/${currentProject.id}/quality-check`, {
+                method: 'POST'
+            });
+            
+            btn.disabled = false;
+            btn.innerHTML = '🔍 运行质检';
+            
+            if (result.success) {
+                currentProject = result.project;
+                renderQualityIssues();
+                showToast(`质检完成，发现 ${result.stats.total_issues} 个问题`, 'success');
+            } else {
+                showToast(result.error || '质检失败', 'error');
+            }
+        }
+        
+        function renderQualityIssues() {
+            const issues = currentProject?.quality_issues || [];
+            const statsEl = document.getElementById('qualityStats');
+            const emptyEl = document.getElementById('empty-quality');
+            
+            if (issues.length === 0) {
+                statsEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                return;
+            }
+            
+            statsEl.classList.remove('hidden');
+            emptyEl.classList.add('hidden');
+            
+            const highCount = issues.filter(i => i.severity === 'high' && !i.resolved).length;
+            const mediumCount = issues.filter(i => i.severity === 'medium' && !i.resolved).length;
+            const unresolvedCount = issues.filter(i => !i.resolved).length;
+            const resolvedCount = issues.filter(i => i.resolved).length;
+            
+            statsEl.innerHTML = `
+                <div class="stat-card ${highCount > 0 ? 'red' : ''}">
+                    <div class="stat-value">${highCount}</div>
+                    <div class="stat-label">高优先级问题</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value">${mediumCount}</div>
+                    <div class="stat-label">中优先级问题</div>
+                </div>
+                <div class="stat-card ${unresolvedCount > 0 ? 'orange' : 'green'}">
+                    <div class="stat-value">${unresolvedCount}</div>
+                    <div class="stat-label">待处理</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value">${resolvedCount}</div>
+                    <div class="stat-label">已解决</div>
+                </div>
+            `;
+            
+            document.getElementById('tab-all-issues').innerHTML = renderIssuesList(issues);
+            document.getElementById('tab-unresolved-issues').innerHTML = renderIssuesList(issues.filter(i => !i.resolved));
+            document.getElementById('tab-by-cluster').innerHTML = renderIssuesByCluster(issues);
+        }
+        
+        function renderIssuesList(issues) {
+            if (issues.length === 0) {
+                return '<div class="empty-state" style="padding: 40px;"><div class="empty-icon">✅</div><div class="empty-title">暂无问题</div></div>';
+            }
+            
+            return issues.map(issue => `
+                <div class="quality-issue ${issue.resolved ? 'success' : issue.severity === 'high' ? '' : 'warning'}">
+                    <div class="issue-header">
+                        <div>
+                            <span class="issue-title">${escapeHtml(issue.rule_name)}</span>
+                            <span style="font-size: 0.8rem; color: #888; margin-left: 8px;">
+                                会话: ${escapeHtml(issue.session_id || 'N/A')} | 
+                                簇: ${escapeHtml(issue.cluster_name || 'N/A')}
+                            </span>
+                        </div>
+                        <span class="issue-severity ${issue.severity}">${
+                            issue.severity === 'high' ? '高' : 
+                            issue.severity === 'medium' ? '中' : '低'
+                        }</span>
+                    </div>
+                    <div class="issue-message">${escapeHtml(issue.message)}</div>
+                    ${issue.user_text_preview ? `<div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+                        <strong>用户:</strong> ${escapeHtml(issue.user_text_preview)}
+                    </div>` : ''}
+                    ${issue.agent_text_preview ? `<div style="margin-top: 4px; font-size: 0.85rem; color: #666;">
+                        <strong>客服:</strong> ${escapeHtml(issue.agent_text_preview)}
+                    </div>` : ''}
+                    <div style="margin-top: 12px;">
+                        ${!issue.resolved ? `
+                            <button class="btn btn-success btn-sm" onclick="openResolveModal('${issue.id}')">
+                                标记已解决
+                            </button>
+                        ` : `
+                            <span style="color: #52c41a; font-size: 0.85rem;">
+                                ✅ 已解决 ${issue.resolution ? `- ${escapeHtml(issue.resolution)}` : ''}
+                            </span>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderIssuesByCluster(issues) {
+            const clusters = currentProject?.clusters || [];
+            if (clusters.length === 0) return '';
+            
+            return clusters.map(cluster => {
+                const clusterIssues = issues.filter(i => i.cluster_id === cluster.id);
+                if (clusterIssues.length === 0) return '';
+                
+                const unresolved = clusterIssues.filter(i => !i.resolved).length;
+                
+                return `
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee;">
+                            ${escapeHtml(cluster.name)} 
+                            <span class="badge ${unresolved > 0 ? 'badge-warning' : 'badge-success'}">
+                                ${unresolved} 待处理
+                            </span>
+                        </h4>
+                        ${renderIssuesList(clusterIssues)}
+                    </div>
+                `;
+            }).join('') || '<div class="empty-state" style="padding: 40px;"><div class="empty-icon">✅</div><div class="empty-title">各簇均无问题</div></div>';
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.add('hidden');
+            });
+            const tabContent = document.getElementById(`tab-${tabName}`);
+            if (tabContent) tabContent.classList.remove('hidden');
+        }
+        
+        function openResolveModal(issueId) {
+            currentIssueToResolve = issueId;
+            const issue = currentProject.quality_issues?.find(i => i.id === issueId);
+            
+            if (issue) {
+                document.getElementById('resolveIssuePreview').innerHTML = `
+                    <div class="quality-issue ${issue.severity === 'high' ? '' : 'warning'}">
+                        <div class="issue-header">
+                            <span class="issue-title">${escapeHtml(issue.rule_name)}</span>
+                            <span class="issue-severity ${issue.severity}">${
+                                issue.severity === 'high' ? '高优先级' : 
+                                issue.severity === 'medium' ? '中优先级' : '低优先级'
+                            }</span>
+                        </div>
+                        <div class="issue-message">${escapeHtml(issue.message)}</div>
+                    </div>
+                `;
+                document.getElementById('resolveInput').value = '';
+                openModal('resolveModal');
+            }
+        }
+        
+        async function confirmResolve() {
+            const resolution = document.getElementById('resolveInput').value.trim();
+            
+            const result = await apiCall(`/projects/${currentProject.id}/quality-issues/${currentIssueToResolve}/resolve`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    resolution: resolution,
+                    resolved: true
+                })
+            });
+            
+            if (result.success) {
+                const issue = currentProject.quality_issues?.find(i => i.id === currentIssueToResolve);
+                if (issue) {
+                    issue.resolved = true;
+                    issue.resolution = resolution;
+                }
+                closeModal('resolveModal');
+                closeModal('sessionModal');
+                renderQualityIssues();
+                renderClusters();
+                showToast('已标记为已解决', 'success');
+            } else {
+                showToast(result.error || '操作失败', 'error');
+            }
+        }
+        
+        async function openRulesModal() {
+            const result = await apiCall(`/projects/${currentProject.id}/quality-rules`);
+            if (result.success) {
+                qualityRules = result.rules;
+                renderRulesModal();
+                openModal('rulesModal');
+            }
+        }
+        
+        function renderRulesModal() {
+            const body = document.getElementById('rulesModalBody');
+            
+            body.innerHTML = qualityRules.map((rule, idx) => `
+                <div class="rule-item">
+                    <div class="rule-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="toggle-switch ${rule.enabled ? 'active' : ''}" 
+                                 onclick="toggleRule(${idx})"></div>
+                            <div>
+                                <div class="rule-name">${escapeHtml(rule.name)}</div>
+                                <span class="rule-category">${escapeHtml(rule.category || '未分类')}</span>
+                            </div>
+                        </div>
+                        <span class="issue-severity ${rule.severity}" style="font-size: 0.75rem;">${
+                            rule.severity === 'high' ? '高' : 
+                            rule.severity === 'medium' ? '中' : '低'
+                        }</span>
+                    </div>
+                    <div class="rule-desc">${escapeHtml(rule.description || '')}</div>
+                    ${rule.trigger_keywords?.length > 0 ? `
+                        <div style="margin-bottom: 8px;">
+                            <span style="font-size: 0.8rem; color: #888;">触发关键词：</span>
+                            <div class="rule-keywords" style="margin-top: 4px;">
+                                ${rule.trigger_keywords.slice(0, 8).map(kw => 
+                                    `<span class="rule-keyword-tag">${escapeHtml(kw)}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function toggleRule(idx) {
+            if (qualityRules[idx]) {
+                qualityRules[idx].enabled = !qualityRules[idx].enabled;
+                renderRulesModal();
+            }
+        }
+        
+        async function saveRules() {
+            const result = await apiCall(`/projects/${currentProject.id}/quality-rules`, {
+                method: 'POST',
+                body: JSON.stringify({ rules: qualityRules })
+            });
+            
+            if (result.success) {
+                closeModal('rulesModal');
+                showToast('规则已保存', 'success');
+            } else {
+                showToast(result.error || '保存失败', 'error');
+            }
+        }
+        
+        function renderExportPage() {
+            const sessions = currentProject?.data?.sessions || [];
+            const clusters = currentProject?.clusters || [];
+            const issues = currentProject?.quality_issues || [];
+            
+            document.getElementById('exportSessions').textContent = sessions.length;
+            document.getElementById('exportClusters').textContent = clusters.length;
+            document.getElementById('exportIssues').textContent = issues.length;
+        }
+        
+        async function exportReport(format) {
+            const result = await apiCall(`/projects/${currentProject.id}/export/${format}`);
+            
+            if (result.success) {
+                const previewEl = document.getElementById('exportPreview');
+                const contentEl = document.getElementById('previewContent');
+                
+                previewEl.classList.remove('hidden');
+                
+                if (format === 'markdown') {
+                    contentEl.innerHTML = `<pre style="white-space: pre-wrap; font-family: monospace; font-size: 0.85rem;">${escapeHtml(result.content)}</pre>`;
+                } else {
+                    contentEl.innerHTML = result.content;
+                }
+                
+                downloadFile(result.content, result.filename, format === 'html' ? 'text/html' : 'text/markdown');
+                showToast('报告生成成功', 'success');
+            } else {
+                showToast(result.error || '导出失败', 'error');
+            }
+        }
+        
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatDate(isoString) {
+            if (!isoString) return '';
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch {
+                return isoString;
+            }
+        }
+    </script>
+</body>
+</html>
