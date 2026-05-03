@@ -1,0 +1,104 @@
+{
+  "carts": [
+    {
+      "name": "测试购物车1 - 小额订单",
+      "membership_level": "regular",
+      "items": [
+        {
+          "product_id": 1,
+          "sku": "PROD001",
+          "quantity": 2,
+          "unit_price": 99.00
+        }
+      ],
+      "applied_coupons": [],
+      "notes": "购买2件白色T恤，测试小额订单"
+    },
+    {
+      "name": "测试购物车2 - 服装组合",
+      "membership_level": "gold",
+      "items": [
+        {
+          "product_id": 1,
+          "sku": "PROD001",
+          "quantity": 1,
+          "unit_price": 99.00
+        },
+        {
+          "product_id": 2,
+          "sku": "PROD002",
+          "quantity": 1,
+          "unit_price": 299.00
+        }
+      ],
+      "applied_coupons": [],
+      "notes": "金卡会员购买T恤+牛仔裤，测试满减+会员折扣叠加"
+    },
+    {
+      "name": "测试购物车3 - 高风险电子产品",
+      "membership_level": "platinum",
+      "items": [
+        {
+          "product_id": 3,
+          "sku": "PROD003",
+          "quantity": 1,
+          "unit_price": 1299.00
+        },
+        {
+          "product_id": 4,
+          "sku": "PROD004",
+          "quantity": 1,
+          "unit_price": 399.00
+        }
+      ],
+      "applied_coupons": [],
+      "notes": "白金会员购买智能手表+耳机，测试高风险折扣叠加"
+    },
+    {
+      "name": "测试购物车4 - 美妆套餐",
+      "membership_level": "silver",
+      "items": [
+        {
+          "product_id": 5,
+          "sku": "PROD005",
+          "quantity": 2,
+          "unit_price": 168.00
+        },
+        {
+          "product_id": 6,
+          "sku": "PROD006",
+          "quantity": 1,
+          "unit_price": 258.00
+        }
+      ],
+      "applied_coupons": [],
+      "notes": "银卡会员购买美妆产品，测试品类专属优惠"
+    },
+    {
+      "name": "测试购物车5 - 大额混合订单",
+      "membership_level": "gold",
+      "items": [
+        {
+          "product_id": 1,
+          "sku": "PROD001",
+          "quantity": 3,
+          "unit_price": 99.00
+        },
+        {
+          "product_id": 3,
+          "sku": "PROD003",
+          "quantity": 1,
+          "unit_price": 1299.00
+        },
+        {
+          "product_id": 5,
+          "sku": "PROD005",
+          "quantity": 1,
+          "unit_price": 168.00
+        }
+      ],
+      "applied_coupons": [],
+      "notes": "金卡会员混合购买多品类，测试复杂优惠组合"
+    }
+  ]
+}

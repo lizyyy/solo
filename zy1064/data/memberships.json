@@ -1,0 +1,32 @@
+{
+  "memberships": [
+    {
+      "level": "regular",
+      "name": "普通会员",
+      "discount_rate": 0,
+      "free_shipping_threshold": 0,
+      "description": "普通会员，无额外折扣"
+    },
+    {
+      "level": "silver",
+      "name": "银卡会员",
+      "discount_rate": 0.05,
+      "free_shipping_threshold": 199.00,
+      "description": "银卡会员，享受95折优惠，满199元免邮"
+    },
+    {
+      "level": "gold",
+      "name": "金卡会员",
+      "discount_rate": 0.10,
+      "free_shipping_threshold": 99.00,
+      "description": "金卡会员，享受9折优惠，满99元免邮"
+    },
+    {
+      "level": "platinum",
+      "name": "白金会员",
+      "discount_rate": 0.15,
+      "free_shipping_threshold": 0,
+      "description": "白金会员，享受85折优惠，全场免邮"
+    }
+  ]
+}

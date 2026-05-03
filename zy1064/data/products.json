@@ -1,0 +1,58 @@
+{
+  "products": [
+    {
+      "sku": "PROD001",
+      "name": "经典白色T恤",
+      "original_price": 99.00,
+      "cost_price": 35.00,
+      "category": "服装",
+      "inventory": 100,
+      "description": "100%纯棉白色基础款T恤"
+    },
+    {
+      "sku": "PROD002",
+      "name": "蓝色牛仔裤",
+      "original_price": 299.00,
+      "cost_price": 120.00,
+      "category": "服装",
+      "inventory": 50,
+      "description": "修身款蓝色牛仔裤"
+    },
+    {
+      "sku": "PROD003",
+      "name": "智能手表",
+      "original_price": 1299.00,
+      "cost_price": 580.00,
+      "category": "电子产品",
+      "inventory": 20,
+      "description": "多功能运动智能手表"
+    },
+    {
+      "sku": "PROD004",
+      "name": "无线蓝牙耳机",
+      "original_price": 399.00,
+      "cost_price": 150.00,
+      "category": "电子产品",
+      "inventory": 80,
+      "description": "主动降噪无线蓝牙耳机"
+    },
+    {
+      "sku": "PROD005",
+      "name": "保湿面霜",
+      "original_price": 168.00,
+      "cost_price": 45.00,
+      "category": "美妆",
+      "inventory": 120,
+      "description": "深层保湿滋养面霜"
+    },
+    {
+      "sku": "PROD006",
+      "name": "口红套装",
+      "original_price": 258.00,
+      "cost_price": 68.00,
+      "category": "美妆",
+      "inventory": 60,
+      "description": "3支装热门色号口红套装"
+    }
+  ]
+}
