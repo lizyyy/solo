@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D叉车盲区复盘器</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航栏 -->
+    <header class="header">
+      <h1>3D叉车盲区复盘器</h1>
+      <div class="header-actions">
+        <button id="loadSampleBtn" class="btn btn-secondary">加载示例数据</button>
+        <button id="exportMarkdownBtn" class="btn btn-primary">导出Markdown复盘</button>
+        <button id="exportJsonBtn" class="btn btn-primary">导出JSON风险清单</button>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 左侧面板 - 数据导入和检测 -->
+      <aside class="left-panel">
+        <div class="panel-section">
+          <h3>数据导入</h3>
+          <div class="import-section">
+            <label class="import-label">
+              <span>叉车轨迹CSV</span>
+              <input type="file" id="forkliftCsvInput" accept=".csv">
+            </label>
+            <label class="import-label">
+              <span>行人定位JSON</span>
+              <input type="file" id="pedestrianJsonInput" accept=".json">
+            </label>
+            <label class="import-label">
+              <span>仓库货架平面图</span>
+              <input type="file" id="warehouseJsonInput" accept=".json">
+            </label>
+          </div>
+          <button id="validateBtn" class="btn btn-primary btn-full">校验数据</button>
+        </div>
+
+        <div class="panel-section validation-results">
+          <h3>校验结果</h3>
+          <div id="validationStatus" class="status-indicator">
+            <span class="status-icon">⏳</span>
+            <span class="status-text">等待数据导入</span>
+          </div>
+          <div id="validationDetails"></div>
+        </div>
+
+        <div class="panel-section risk-points">
+          <h3>风险点列表</h3>
+          <div id="riskPointsList" class="risk-list"></div>
+        </div>
+      </aside>
+
+      <!-- 中间 - 3D视图 -->
+      <section class="canvas-container">
+        <div id="threeCanvas" class="three-canvas"></div>
+      </section>
+
+      <!-- 右侧面板 - 视角控制和详情 -->
+      <aside class="right-panel">
+        <div class="panel-section">
+          <h3>视角切换</h3>
+          <div class="view-buttons">
+            <button class="view-btn" data-view="top">俯视图</button>
+            <button class="view-btn" data-view="side">侧视图</button>
+            <button class="view-btn" data-view="front">前视图</button>
+            <button class="view-btn active" data-view="free">自由视角</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>当前帧信息</h3>
+          <div id="frameInfo" class="info-panel">
+            <p><strong>时间:</strong> <span id="frameTime">0.00s</span></p>
+            <p><strong>叉车位置:</strong> <span id="forkliftPos">--</span></p>
+            <p><strong>行人位置:</strong> <span id="pedestrianPos">--</span></p>
+            <p><strong>距离:</strong> <span id="distance">--</span></p>
+          </div>
+        </div>
+
+        <div class="panel-section risk-detail">
+          <h3>风险点详情</h3>
+          <div id="riskDetail" class="detail-panel">
+            <p class="no-selection">点击风险点查看详情</p>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- 底部控制栏 -->
+    <footer class="control-bar">
+      <div class="playback-controls">
+        <button id="rewindBtn" class="control-btn">⏮</button>
+        <button id="prevFrameBtn" class="control-btn">⏪</button>
+        <button id="playPauseBtn" class="control-btn control-btn-primary">▶</button>
+        <button id="nextFrameBtn" class="control-btn">⏩</button>
+        <button id="forwardBtn" class="control-btn">⏭</button>
+      </div>
+
+      <div class="time-control">
+        <span id="currentTime">00:00</span>
+        <input type="range" id="timeline" min="0" max="100" value="0" class="timeline-slider">
+        <span id="totalTime">00:00</span>
+      </div>
+
+      <div class="speed-control">
+        <label>倍速:</label>
+        <select id="speedSelect">
+          <option value="0.25">0.25x</option>
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="2">2x</option>
+          <option value="4">4x</option>
+        </select>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

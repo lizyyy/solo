@@ -1,0 +1,27 @@
+{
+  "name": "forklift-blind-spot-reviewer",
+  "version": "1.0.0",
+  "description": "3D叉车盲区复盘器 - 用于工厂安全员复盘差点碰撞事故",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "forklift",
+    "3d",
+    "visualization",
+    "reviewer",
+    "safety"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0",
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
