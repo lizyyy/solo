@@ -1,0 +1,11 @@
+name,location,floor,type,is_exit,is_meeting_point
+正门出口,1F 大厅南侧,1,exit,TRUE,FALSE
+后门出口,1F 北侧,1,exit,TRUE,FALSE
+东侧楼梯-2F,2F 东侧,2,stairwell,FALSE,FALSE
+东侧楼梯-3F,3F 东侧,3,stairwell,FALSE,FALSE
+东侧楼梯-4F,4F 东侧,4,stairwell,FALSE,FALSE
+西侧楼梯-2F,2F 西侧,2,stairwell,FALSE,FALSE
+西侧楼梯-3F,3F 西侧,3,stairwell,FALSE,FALSE
+西侧楼梯-4F,4F 西侧,4,stairwell,FALSE,FALSE
+南广场集合点,室外南广场,0,meeting_point,FALSE,TRUE
+北广场集合点,室外北广场,0,meeting_point,FALSE,TRUE

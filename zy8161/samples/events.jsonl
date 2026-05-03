@@ -1,0 +1,65 @@
+{"timestamp": "2026-05-03 14:30:00", "badge_id": "E001", "location": "CAM-3F-01 3F 研发中心入口", "event_type": "camera", "direction": "enter", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:30:02", "badge_id": "E007", "location": "CAM-3F-02 3F 东侧", "event_type": "camera", "direction": "enter", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:30:05", "badge_id": "E004", "location": "CAM-4F-01 4F 会议室", "event_type": "camera", "direction": "enter", "details": {"floor": 4}}
+{"timestamp": "2026-05-03 14:30:08", "badge_id": "E002", "location": "CAM-2F-01 2F 行政", "event_type": "camera", "direction": "enter", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:30:10", "badge_id": "E008", "location": "CAM-4F-01 4F 会议室", "event_type": "camera", "direction": "enter", "details": {"floor": 4}}
+{"timestamp": "2026-05-03 14:30:15", "badge_id": "E005", "location": "CAM-1F-01 1F 大堂", "event_type": "camera", "direction": "enter", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:30:20", "badge_id": "E010", "location": "CAM-1F-02 1F 前台", "event_type": "camera", "direction": "enter", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:30:25", "badge_id": "E006", "location": "CAM-2F-02 2F 西侧", "event_type": "camera", "direction": "enter", "details": {"floor": 2}}
+
+{"timestamp": "2026-05-03 14:30:30", "badge_id": "E004", "location": "东侧楼梯-4F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 4}}
+{"timestamp": "2026-05-03 14:30:33", "badge_id": "E008", "location": "东侧楼梯-4F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 4}}
+
+{"timestamp": "2026-05-03 14:30:40", "badge_id": "E001", "location": "东侧楼梯-3F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:30:43", "badge_id": "E007", "location": "东侧楼梯-3F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 3}}
+
+{"timestamp": "2026-05-03 14:30:50", "badge_id": "E002", "location": "西侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:30:53", "badge_id": "E006", "location": "西侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+
+{"timestamp": "2026-05-03 14:31:00", "badge_id": "E004", "location": "东侧楼梯-3F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:31:02", "badge_id": "E008", "location": "东侧楼梯-3F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 3}}
+
+{"timestamp": "2026-05-03 14:31:15", "badge_id": "E004", "location": "东侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:31:17", "badge_id": "E008", "location": "东侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:31:20", "badge_id": "E001", "location": "东侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:31:23", "badge_id": "E007", "location": "东侧楼梯-2F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 2}}
+
+{"timestamp": "2026-05-03 14:31:30", "badge_id": "E002", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:31:31", "badge_id": "E002", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:31:35", "badge_id": "E006", "location": "后门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:31:40", "badge_id": "E005", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:31:45", "badge_id": "E010", "location": "后门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:31:50", "badge_id": "E004", "location": "CAM-1F-01 1F 大堂", "event_type": "camera", "direction": "walk", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:31:53", "badge_id": "E008", "location": "CAM-1F-01 1F 大堂", "event_type": "camera", "direction": "walk", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:31:56", "badge_id": "E001", "location": "CAM-1F-01 1F 大堂", "event_type": "camera", "direction": "walk", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:31:59", "badge_id": "E007", "location": "CAM-1F-01 1F 大堂", "event_type": "camera", "direction": "walk", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:32:00", "badge_id": "E005", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+{"timestamp": "2026-05-03 14:32:05", "badge_id": "E010", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+{"timestamp": "2026-05-03 14:32:10", "badge_id": "E006", "location": "北广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+
+{"timestamp": "2026-05-03 14:32:15", "badge_id": "E004", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:32:18", "badge_id": "E008", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:32:21", "badge_id": "E001", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:32:24", "badge_id": "E007", "location": "正门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:32:30", "badge_id": "E004", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+{"timestamp": "2026-05-03 14:32:33", "badge_id": "E001", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+{"timestamp": "2026-05-03 14:32:36", "badge_id": "E007", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+
+{"timestamp": "2026-05-03 14:32:40", "badge_id": "E002", "location": "东侧楼梯-1F", "event_type": "badge_swipe", "direction": "up", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:32:50", "badge_id": "E002", "location": "东侧楼梯-2F", "event_type": "badge_swipe", "direction": "up", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:33:00", "badge_id": "E002", "location": "CAM-2F-01 2F 行政", "event_type": "camera", "direction": "enter", "details": {"floor": 2}}
+
+{"timestamp": "2026-05-03 14:33:10", "badge_id": "E008", "location": "南广场集合点", "event_type": "checkin", "direction": "", "details": {"floor": 0, "is_meeting_point": true}}
+
+{"timestamp": "2026-05-03 14:33:20", "badge_id": "E003", "location": "CAM-3F-03 3F 西侧", "event_type": "camera", "direction": "walk", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:33:30", "badge_id": "E003", "location": "西侧楼梯-3F", "event_type": "badge_swipe", "direction": "down", "details": {"floor": 3}}
+{"timestamp": "2026-05-03 14:33:40", "badge_id": "E003", "location": "CAM-2F-02 2F 西侧", "event_type": "camera", "direction": "walk", "details": {"floor": 2}}
+{"timestamp": "2026-05-03 14:34:00", "badge_id": "E003", "location": "CAM-1F-03 1F 北侧", "event_type": "camera", "direction": "walk", "details": {"floor": 1}}
+{"timestamp": "2026-05-03 14:34:10", "badge_id": "E003", "location": "后门出口", "event_type": "badge_swipe", "direction": "exit", "details": {"floor": 1}}
+
+{"timestamp": "2026-05-03 14:34:20", "badge_id": "E009", "location": "CAM-3F-01 3F 研发中心入口", "event_type": "camera", "direction": "standing", "details": {"floor": 3}}

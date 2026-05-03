@@ -1,0 +1,47 @@
+floors:
+  - number: 1
+    name: 1F 大堂
+    exits:
+      - "正门出口"
+      - "后门出口"
+    stairwells:
+      - "东侧楼梯"
+      - "西侧楼梯"
+    cameras:
+      - "CAM-1F-01"
+      - "CAM-1F-02"
+      - "CAM-1F-03"
+
+  - number: 2
+    name: 2F 行政办公
+    exits:
+      - "东侧疏散门"
+    stairwells:
+      - "东侧楼梯"
+      - "西侧楼梯"
+    cameras:
+      - "CAM-2F-01"
+      - "CAM-2F-02"
+
+  - number: 3
+    name: 3F 研发中心
+    exits:
+      - "东侧疏散门"
+      - "西侧疏散门"
+    stairwells:
+      - "东侧楼梯"
+      - "西侧楼梯"
+    cameras:
+      - "CAM-3F-01"
+      - "CAM-3F-02"
+      - "CAM-3F-03"
+
+  - number: 4
+    name: 4F 会议室
+    exits:
+      - "东侧疏散门"
+    stairwells:
+      - "东侧楼梯"
+      - "西侧楼梯"
+    cameras:
+      - "CAM-4F-01"
