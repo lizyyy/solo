@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仓库车辆轨迹安全复盘系统</title>
+    <link rel="stylesheet" href="./src/css/style.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./node_modules/three/build/three.module.js",
+            "three/": "./node_modules/three/",
+            "three/examples/jsm/": "./node_modules/three/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>仓库车辆轨迹安全复盘系统</h1>
+            <div class="header-actions">
+                <button id="btn-import-trajectory" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+                    </svg>
+                    导入轨迹
+                </button>
+                <button id="btn-import-map" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+                    </svg>
+                    导入地图
+                </button>
+                <button id="btn-export-report" class="btn btn-success">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    导出报告
+                </button>
+                <button id="btn-export-risks" class="btn btn-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                    导出风险
+                </button>
+            </div>
+        </header>
+
+        <div class="app-container">
+            <aside id="sidebar" class="sidebar">
+                <div class="sidebar-tabs">
+                    <button class="tab-btn active" data-tab="overview">概览</button>
+                    <button class="tab-btn" data-tab="vehicles">车辆</button>
+                    <button class="tab-btn" data-tab="risks">风险</button>
+                    <button class="tab-btn" data-tab="data">数据</button>
+                </div>
+
+                <div class="sidebar-content">
+                    <div id="tab-overview" class="tab-panel active">
+                        <div class="stats-card">
+                            <h3>统计概览</h3>
+                            <div class="stat-item">
+                                <span class="stat-label">数据点数:</span>
+                                <span id="stat-data-points" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">车辆数:</span>
+                                <span id="stat-vehicles" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">风险数:</span>
+                                <span id="stat-risks" class="stat-value">0</span>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <h3>风险分布</h3>
+                            <div class="risk-distribution">
+                                <div class="risk-item high">
+                                    <span class="risk-label">高风险</span>
+                                    <span id="risk-high" class="risk-count">0</span>
+                                </div>
+                                <div class="risk-item medium">
+                                    <span class="risk-label">中风险</span>
+                                    <span id="risk-medium" class="risk-count">0</span>
+                                </div>
+                                <div class="risk-item low">
+                                    <span class="risk-label">低风险</span>
+                                    <span id="risk-low" class="risk-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card">
+                            <h3>风险类型</h3>
+                            <div class="risk-types">
+                                <div class="risk-type-item">
+                                    <span class="type-label">会车风险:</span>
+                                    <span id="risk-collisions" class="type-count">0</span>
+                                </div>
+                                <div class="risk-type-item">
+                                    <span class="type-label">急停风险:</span>
+                                    <span id="risk-suddenStops" class="type-count">0</span>
+                                </div>
+                                <div class="risk-type-item">
+                                    <span class="type-label">禁行区靠近:</span>
+                                    <span id="risk-restricted" class="type-count">0</span>
+                                </div>
+                                <div class="risk-type-item">
+                                    <span class="type-label">超速风险:</span>
+                                    <span id="risk-speeding" class="type-count">0</span>
+                                </div>
+                                <div class="risk-type-item">
+                                    <span class="type-label">险兆事件:</span>
+                                    <span id="risk-nearMisses" class="type-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-vehicles" class="tab-panel">
+                        <div class="filter-section">
+                            <h3>车辆筛选</h3>
+                            <div class="filter-actions">
+                                <button id="btn-select-all-vehicles" class="btn btn-sm btn-secondary">全选</button>
+                                <button id="btn-deselect-all-vehicles" class="btn btn-sm btn-secondary">全不选</button>
+                            </div>
+                            <div id="vehicle-list" class="vehicle-list">
+                                <p class="no-data">暂无车辆数据</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-risks" class="tab-panel">
+                        <div class="filter-section">
+                            <h3>风险筛选</h3>
+                            <div class="severity-filter">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="filter-high" checked>
+                                    <span class="checkmark high"></span>
+                                    高风险
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="filter-medium" checked>
+                                    <span class="checkmark medium"></span>
+                                    中风险
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="filter-low" checked>
+                                    <span class="checkmark low"></span>
+                                    低风险
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="risk-list-container">
+                            <h3>风险列表</h3>
+                            <div id="risk-list" class="risk-list">
+                                <p class="no-data">暂无风险数据</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-data" class="tab-panel">
+                        <div class="data-info">
+                            <h3>数据质量</h3>
+                            <div class="data-stats">
+                                <div class="data-stat-item">
+                                    <span class="data-label">总行数:</span>
+                                    <span id="data-total" class="data-value">0</span>
+                                </div>
+                                <div class="data-stat-item valid">
+                                    <span class="data-label">有效行数:</span>
+                                    <span id="data-valid" class="data-value">0</span>
+                                </div>
+                                <div class="data-stat-item invalid">
+                                    <span class="data-label">无效行数:</span>
+                                    <span id="data-invalid" class="data-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="invalid-rows-section">
+                            <h3>问题数据</h3>
+                            <div id="invalid-rows-list" class="invalid-rows-list">
+                                <p class="no-data">无问题数据</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div id="scene-container" class="scene-container"></div>
+                <div id="timeline-container" class="timeline-container-wrapper"></div>
+            </main>
+
+            <aside id="risk-detail-panel" class="risk-detail-panel hidden">
+                <div class="panel-header">
+                    <h3>风险详情</h3>
+                    <button id="btn-close-risk-detail" class="close-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="panel-content">
+                    <div id="risk-detail-content">
+                        <p class="no-data">请点击风险点查看详情</p>
+                    </div>
+                    <div class="panel-actions">
+                        <button id="btn-jump-to-risk" class="btn btn-primary">跳转到时间点</button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <input type="file" id="file-input-trajectory" accept=".csv" style="display: none;">
+        <input type="file" id="file-input-map" accept=".json" style="display: none;">
+    </div>
+
+    <script type="module" src="./src/js/main.js"></script>
+</body>
+</html>

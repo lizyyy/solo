@@ -1,0 +1,22 @@
+{
+  "name": "warehouse-trace-replayer",
+  "version": "1.0.0",
+  "description": "3D warehouse trajectory replay and analysis tool for safety officers",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "dev": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "warehouse",
+    "trajectory",
+    "3d",
+    "visualization",
+    "safety"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0"
+  }
+}

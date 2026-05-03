@@ -1,0 +1,404 @@
+{
+    "id": "demo_warehouse",
+    "name": "示例仓库",
+    "version": "1.0",
+    "description": "用于演示的示例仓库地图数据",
+    "createdAt": "2025-01-01T00:00:00Z",
+    "bounds": {
+        "minX": 0,
+        "maxX": 100,
+        "minY": 0,
+        "maxY": 80,
+        "minZ": 0,
+        "maxZ": 5
+    },
+    "zones": [
+        {
+            "id": "zone_receiving",
+            "name": "收货区",
+            "type": "receiving",
+            "bounds": {
+                "minX": 0,
+                "maxX": 20,
+                "minY": 0,
+                "maxY": 80
+            },
+            "speedLimit": 5
+        },
+        {
+            "id": "zone_storage_a",
+            "name": "存储区A",
+            "type": "storage",
+            "bounds": {
+                "minX": 20,
+                "maxX": 60,
+                "minY": 0,
+                "maxY": 40
+            },
+            "speedLimit": 8
+        },
+        {
+            "id": "zone_storage_b",
+            "name": "存储区B",
+            "type": "storage",
+            "bounds": {
+                "minX": 20,
+                "maxX": 60,
+                "minY": 40,
+                "maxY": 80
+            },
+            "speedLimit": 8
+        },
+        {
+            "id": "zone_shipping",
+            "name": "发货区",
+            "type": "shipping",
+            "bounds": {
+                "minX": 80,
+                "maxX": 100,
+                "minY": 0,
+                "maxY": 80
+            },
+            "speedLimit": 6
+        }
+    ],
+    "aisles": [
+        {
+            "id": "aisle_main_1",
+            "name": "主通道1",
+            "type": "main",
+            "width": 6,
+            "bounds": {
+                "minX": 60,
+                "maxX": 80,
+                "minY": 0,
+                "maxY": 80
+            },
+            "speedLimit": 10
+        },
+        {
+            "id": "aisle_cross_1",
+            "name": "横通道1",
+            "type": "cross",
+            "width": 4,
+            "bounds": {
+                "minX": 20,
+                "maxX": 60,
+                "minY": 20,
+                "maxY": 24
+            },
+            "speedLimit": 6
+        },
+        {
+            "id": "aisle_cross_2",
+            "name": "横通道2",
+            "type": "cross",
+            "width": 4,
+            "bounds": {
+                "minX": 20,
+                "maxX": 60,
+                "minY": 56,
+                "maxY": 60
+            },
+            "speedLimit": 6
+        },
+        {
+            "id": "aisle_storage_1",
+            "name": "存储通道1",
+            "type": "storage",
+            "width": 3,
+            "bounds": {
+                "minX": 28,
+                "maxX": 32,
+                "minY": 5,
+                "maxY": 35
+            },
+            "speedLimit": 5
+        },
+        {
+            "id": "aisle_storage_2",
+            "name": "存储通道2",
+            "type": "storage",
+            "width": 3,
+            "bounds": {
+                "minX": 28,
+                "maxX": 32,
+                "minY": 45,
+                "maxY": 75
+            },
+            "speedLimit": 5
+        }
+    ],
+    "racks": [
+        {
+            "id": "rack_1_1",
+            "name": "货架A1-1",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 25,
+                "maxX": 28,
+                "minY": 5,
+                "maxY": 15
+            }
+        },
+        {
+            "id": "rack_1_2",
+            "name": "货架A1-2",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 32,
+                "maxX": 35,
+                "minY": 5,
+                "maxY": 15
+            }
+        },
+        {
+            "id": "rack_2_1",
+            "name": "货架A2-1",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 25,
+                "maxX": 28,
+                "minY": 25,
+                "maxY": 35
+            }
+        },
+        {
+            "id": "rack_2_2",
+            "name": "货架A2-2",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 32,
+                "maxX": 35,
+                "minY": 25,
+                "maxY": 35
+            }
+        },
+        {
+            "id": "rack_3_1",
+            "name": "货架B1-1",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 25,
+                "maxX": 28,
+                "minY": 45,
+                "maxY": 55
+            }
+        },
+        {
+            "id": "rack_3_2",
+            "name": "货架B1-2",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 32,
+                "maxX": 35,
+                "minY": 45,
+                "maxY": 55
+            }
+        },
+        {
+            "id": "rack_4_1",
+            "name": "货架B2-1",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 25,
+                "maxX": 28,
+                "minY": 65,
+                "maxY": 75
+            }
+        },
+        {
+            "id": "rack_4_2",
+            "name": "货架B2-2",
+            "type": "standard",
+            "levels": 5,
+            "height": 5,
+            "capacity": 100,
+            "bounds": {
+                "minX": 32,
+                "maxX": 35,
+                "minY": 65,
+                "maxY": 75
+            }
+        }
+    ],
+    "restrictedAreas": [
+        {
+            "id": "restricted_office",
+            "name": "办公区",
+            "type": "no_vehicle",
+            "restriction": "no_vehicle",
+            "description": "禁止车辆进入的办公区域",
+            "bounds": {
+                "minX": 85,
+                "maxX": 95,
+                "minY": 10,
+                "maxY": 30
+            },
+            "dangerLevel": "high"
+        },
+        {
+            "id": "restricted_charging",
+            "name": "充电区",
+            "type": "speed_limit",
+            "restriction": "speed_limit",
+            "speedLimit": 3,
+            "description": "AGV充电区域，需减速慢行",
+            "bounds": {
+                "minX": 85,
+                "maxX": 95,
+                "minY": 50,
+                "maxY": 70
+            },
+            "dangerLevel": "medium"
+        },
+        {
+            "id": "restricted_staging",
+            "name": "暂存区",
+            "type": "no_parking",
+            "restriction": "no_parking",
+            "description": "禁止长时间停车的区域",
+            "bounds": {
+                "minX": 70,
+                "maxX": 75,
+                "minY": 35,
+                "maxY": 45
+            },
+            "dangerLevel": "low"
+        }
+    ],
+    "obstacles": [
+        {
+            "id": "pillar_1",
+            "name": "柱子1",
+            "type": "pillar",
+            "bounds": {
+                "minX": 50,
+                "maxX": 52,
+                "minY": 20,
+                "maxY": 22
+            }
+        },
+        {
+            "id": "pillar_2",
+            "name": "柱子2",
+            "type": "pillar",
+            "bounds": {
+                "minX": 50,
+                "maxX": 52,
+                "minY": 60,
+                "maxY": 62
+            }
+        }
+    ],
+    "landmarks": [
+        {
+            "id": "lm_dock_a",
+            "name": "装卸口A",
+            "type": "dock",
+            "position": {
+                "x": 2,
+                "y": 20,
+                "z": 0
+            }
+        },
+        {
+            "id": "lm_dock_b",
+            "name": "装卸口B",
+            "type": "dock",
+            "position": {
+                "x": 2,
+                "y": 60,
+                "z": 0
+            }
+        },
+        {
+            "id": "lm_exit_1",
+            "name": "出口1",
+            "type": "exit",
+            "position": {
+                "x": 98,
+                "y": 40,
+                "z": 0
+            }
+        }
+    ],
+    "waypoints": [
+        {
+            "id": "wp_001",
+            "name": "起点",
+            "position": {
+                "x": 10,
+                "y": 40,
+                "z": 0
+            }
+        },
+        {
+            "id": "wp_002",
+            "name": "主通道入口",
+            "position": {
+                "x": 70,
+                "y": 40,
+                "z": 0
+            }
+        },
+        {
+            "id": "wp_003",
+            "name": "存储区A入口",
+            "position": {
+                "x": 30,
+                "y": 10,
+                "z": 0
+            }
+        },
+        {
+            "id": "wp_004",
+            "name": "存储区B入口",
+            "position": {
+                "x": 30,
+                "y": 70,
+                "z": 0
+            }
+        },
+        {
+            "id": "wp_005",
+            "name": "发货区入口",
+            "position": {
+                "x": 90,
+                "y": 40,
+                "z": 0
+            }
+        }
+    ],
+    "meta": {
+        "coordinateSystem": "right-handed",
+        "unit": "meters",
+        "gridSize": 1,
+        "origin": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    }
+}
