@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D仓库拣货路线规划工具</title>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "/node_modules/three/build/three.module.js",
+            "three/addons/": "/node_modules/three/examples/jsm/"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #eee;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #app {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* 左侧边栏 - 对象管理 */
+        .sidebar-left {
+            width: 280px;
+            background-color: #16213e;
+            border-right: 1px solid #0f3460;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 右侧边栏 - 属性面板 */
+        .sidebar-right {
+            width: 300px;
+            background-color: #16213e;
+            border-left: 1px solid #0f3460;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 主视图区域 */
+        .main-view {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部工具栏 */
+        .toolbar {
+            height: 50px;
+            background-color: #0f3460;
+            border-bottom: 1px solid #0f3460;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+        }
+        
+        .toolbar-btn {
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            color: #eee;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-btn:hover {
+            background-color: #0f3460;
+        }
+        
+        .toolbar-btn.active {
+            background-color: #e94560;
+            border-color: #e94560;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background-color: #0f3460;
+            margin: 0 8px;
+        }
+        
+        /* 3D 视口 */
+        #viewport {
+            flex: 1;
+            position: relative;
+        }
+        
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 侧边栏标题 */
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #0f3460;
+            background-color: #0f3460;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        /* 对象列表 */
+        .object-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        
+        .object-group {
+            margin-bottom: 16px;
+        }
+        
+        .object-group-title {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            padding: 0 8px;
+        }
+        
+        .object-item {
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        
+        .object-item:hover {
+            background-color: #1a1a2e;
+        }
+        
+        .object-item.selected {
+            background-color: #e94560;
+        }
+        
+        .object-item.has-conflict {
+            border-left: 3px solid #ff6b6b;
+        }
+        
+        .object-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .object-name {
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        /* 新增对象按钮 */
+        .add-object-btn {
+            padding: 12px;
+            border-top: 1px solid #0f3460;
+        }
+        
+        .add-object-btn button {
+            width: 100%;
+            padding: 10px;
+            background-color: #e94560;
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .add-object-btn button:hover {
+            background-color: #c73e54;
+        }
+        
+        /* 属性面板 */
+        .properties-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        
+        .property-section {
+            margin-bottom: 24px;
+        }
+        
+        .property-section-title {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        
+        .property-row {
+            margin-bottom: 12px;
+        }
+        
+        .property-label {
+            display: block;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+        
+        .property-input {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .property-input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        
+        .property-input[type="number"] {
+            padding-right: 32px;
+        }
+        
+        .property-row-row {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .property-row-row .property-row {
+            flex: 1;
+        }
+        
+        /* 颜色选择器 */
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .color-input-wrapper input[type="color"] {
+            width: 40px;
+            height: 32px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+        
+        .color-input-wrapper .property-input {
+            flex: 1;
+        }
+        
+        /* 拣货单面板 */
+        .picking-panel {
+            border-top: 1px solid #0f3460;
+            padding: 16px;
+            background-color: #0f3460;
+        }
+        
+        .picking-panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .picking-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .picking-actions button {
+            flex: 1;
+            padding: 8px;
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .picking-actions button:hover {
+            background-color: #1a1a2e;
+            border-color: #e94560;
+        }
+        
+        /* 路线信息 */
+        .route-info {
+            background-color: #1a1a2e;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        
+        .route-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .route-info-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .route-info-label {
+            color: #888;
+        }
+        
+        .route-info-value {
+            font-weight: 500;
+        }
+        
+        .route-info-value.optimized {
+            color: #4ade80;
+        }
+        
+        .route-info-value.manual {
+            color: #fbbf24;
+        }
+        
+        /* 冲突警告面板 */
+        .conflicts-panel {
+            position: absolute;
+            top: 70px;
+            right: 320px;
+            width: 280px;
+            max-height: 400px;
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        
+        .conflicts-header {
+            padding: 12px 16px;
+            background-color: #ff6b6b;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .conflicts-count {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .conflicts-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .conflict-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #0f3460;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .conflict-item:hover {
+            background-color: #1a1a2e;
+        }
+        
+        .conflict-type {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-bottom: 4px;
+        }
+        
+        .conflict-description {
+            font-size: 14px;
+            color: #fff;
+        }
+        
+        .conflict-objects {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        /* 状态栏 */
+        .status-bar {
+            height: 32px;
+            background-color: #0f3460;
+            border-top: 1px solid #0f3460;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 13px;
+            color: #888;
+            justify-content: space-between;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.ok { background-color: #4ade80; }
+        .status-dot.warning { background-color: #fbbf24; }
+        .status-dot.error { background-color: #ff6b6b; }
+        
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #0f3460;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
+        .modal-close:hover {
+            color: #fff;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #0f3460;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .modal-btn.secondary {
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            color: #fff;
+        }
+        
+        .modal-btn.primary {
+            background-color: #e94560;
+            color: #fff;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: #aaa;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: #1a1a2e;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        /* 文件上传区域 */
+        .file-drop-area {
+            border: 2px dashed #0f3460;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-drop-area:hover, .file-drop-area.drag-over {
+            border-color: #e94560;
+            background-color: rgba(233, 69, 96, 0.1);
+        }
+        
+        .file-drop-area p {
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .file-drop-area .hint {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 错误提示 */
+        .error-message {
+            background-color: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        
+        .error-title {
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .error-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .error-list li {
+            color: #ff8888;
+            font-size: 13px;
+            padding: 4px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .error-list li::before {
+            content: "•";
+            color: #ff6b6b;
+        }
+        
+        /* 隐藏 */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 路线播放控制 */
+        .route-controls {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .route-control-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background-color: #e94560;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .route-control-btn:hover {
+            background-color: #c73e54;
+        }
+        
+        .route-progress {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .route-progress-bar {
+            height: 4px;
+            background-color: #1a1a2e;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .route-progress-fill {
+            height: 100%;
+            background-color: #4ade80;
+            width: 0%;
+            transition: width 0.2s;
+        }
+        
+        .route-progress-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+            text-align: center;
+        }
+        
+        /* 视图切换按钮 */
+        .view-controls {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 50;
+        }
+        
+        .view-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #0f3460;
+            background-color: #16213e;
+            color: #aaa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        
+        .view-btn:hover {
+            background-color: #0f3460;
+            color: #fff;
+        }
+        
+        .view-btn.active {
+            background-color: #e94560;
+            border-color: #e94560;
+            color: #fff;
+        }
+        
+        /* 提示框 */
+        .tooltip {
+            position: absolute;
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        /* 拣货路线列表 */
+        .route-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #1a1a2e;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+        
+        .route-list-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #0f3460;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .route-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .route-item-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #e94560;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .route-item-info {
+            flex: 1;
+        }
+        
+        .route-item-name {
+            font-size: 14px;
+        }
+        
+        .route-item-details {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .route-item-distance {
+            font-size: 12px;
+            color: #4ade80;
+        }
+        
+        /* 拖拽排序手柄 */
+        .drag-handle {
+            cursor: grab;
+            color: #666;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-state-text {
+            font-size: 14px;
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #0f3460;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e94560;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 左侧边栏 -->
+        <div class="sidebar-left">
+            <div class="sidebar-header">
+                <h2>仓库对象</h2>
+            </div>
+            <div class="object-list" id="objectList">
+                <!-- 动态生成 -->
+            </div>
+            <div class="add-object-btn">
+                <button id="addObjectBtn">+ 添加对象</button>
+            </div>
+        </div>
+        
+        <!-- 主视图区域 -->
+        <div class="main-view">
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <button class="toolbar-btn active" id="toolSelect" title="选择">
+                    🔍 选择
+                </button>
+                <button class="toolbar-btn" id="toolPan" title="平移">
+                    ✋ 平移
+                </button>
+                <button class="toolbar-btn" id="toolRotate" title="旋转">
+                    🔄 旋转
+                </button>
+                <button class="toolbar-btn" id="toolMove" title="移动">
+                    ↔️ 移动
+                </button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="btnImport">
+                    📥 导入方案
+                </button>
+                <button class="toolbar-btn" id="btnExport">
+                    📤 导出方案
+                </button>
+                <button class="toolbar-btn" id="btnReport">
+                    📋 生成报告
+                </button>
+                <button class="toolbar-btn" id="btnSave">
+                    💾 保存
+                </button>
+            </div>
+            
+            <!-- 3D 视口 -->
+            <div id="viewport">
+                <div id="canvas-container"></div>
+                
+                <!-- 视图控制 -->
+                <div class="view-controls">
+                    <button class="view-btn active" id="viewPerspective" title="透视视图">👁️</button>
+                    <button class="view-btn" id="viewTop" title="俯视图">⬇️</button>
+                    <button class="view-btn" id="viewFront" title="正视图">➡️</button>
+                    <button class="view-btn" id="viewLeft" title="左视图">⬅️</button>
+                    <button class="view-btn" id="viewReset" title="重置视图">🔄</button>
+                </div>
+                
+                <!-- 冲突警告面板 -->
+                <div class="conflicts-panel hidden" id="conflictsPanel">
+                    <div class="conflicts-header">
+                        <span>布局问题</span>
+                        <span class="conflicts-count" id="conflictsCount">0</span>
+                    </div>
+                    <div class="conflicts-list" id="conflictsList">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 路线播放控制 -->
+                <div class="route-controls hidden" id="routeControls">
+                    <button class="route-control-btn" id="routePlay">▶</button>
+                    <button class="route-control-btn" id="routePause">⏸</button>
+                    <button class="route-control-btn" id="routeStop">⏹</button>
+                    <div class="route-progress">
+                        <div class="route-progress-bar">
+                            <div class="route-progress-fill" id="routeProgressFill"></div>
+                        </div>
+                        <div class="route-progress-text" id="routeProgressText">0 / 0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 状态栏 -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-dot ok" id="statusDot"></span>
+                    <span id="statusText">就绪</span>
+                </div>
+                <div class="status-item">
+                    <span id="objectCount">对象: 0</span>
+                    <span style="margin: 0 12px;">|</span>
+                    <span id="pickingCount">拣货单: 0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧边栏 -->
+        <div class="sidebar-right">
+            <!-- 属性面板 -->
+            <div class="sidebar-header">
+                <h2>属性</h2>
+            </div>
+            <div class="properties-panel" id="propertiesPanel">
+                <div class="empty-state" id="emptyProperties">
+                    <div class="empty-state-icon">📦</div>
+                    <div class="empty-state-text">选择一个对象查看属性</div>
+                </div>
+                <!-- 动态生成的属性表单 -->
+                <div id="propertyForm" class="hidden"></div>
+            </div>
+            
+            <!-- 拣货单面板 -->
+            <div class="picking-panel" id="pickingPanel">
+                <div class="picking-panel-title">拣货单管理</div>
+                <div class="picking-actions">
+                    <button id="btnImportPicking">导入</button>
+                    <button id="btnGenerateRoute">生成路线</button>
+                    <button id="btnClearPicking">清空</button>
+                </div>
+                
+                <!-- 路线信息对比 -->
+                <div class="route-info" id="routeInfoPanel">
+                    <div class="route-info-row">
+                        <span class="route-info-label">推荐路线距离:</span>
+                        <span class="route-info-value optimized" id="optimizedDistance">--</span>
+                    </div>
+                    <div class="route-info-row">
+                        <span class="route-info-label">手动路线距离:</span>
+                        <span class="route-info-value manual" id="manualDistance">--</span>
+                    </div>
+                    <div class="route-info-row">
+                        <span class="route-info-label">差异:</span>
+                        <span class="route-info-value" id="routeDifference">--</span>
+                    </div>
+                </div>
+                
+                <!-- 路线列表 -->
+                <div class="route-list hidden" id="routeList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加对象模态框 -->
+    <div class="modal-overlay" id="addObjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">添加新对象</h3>
+                <button class="modal-close" id="closeAddObject">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">对象类型</label>
+                    <select class="form-select" id="objectTypeSelect">
+                        <option value="shelf">货架</option>
+                        <option value="zone">货区</option>
+                        <option value="entrance">出入口</option>
+                        <option value="forbidden">禁放区</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">名称</label>
+                    <input type="text" class="form-input" id="objectNameInput" placeholder="例如: 货架 A-01">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">长度 (m)</label>
+                        <input type="number" class="form-input" id="objectLengthInput" value="2" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">宽度 (m)</label>
+                        <input type="number" class="form-input" id="objectWidthInput" value="1" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">高度 (m)</label>
+                        <input type="number" class="form-input" id="objectHeightInput" value="2.5" step="0.1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">X 坐标 (m)</label>
+                        <input type="number" class="form-input" id="objectXInput" value="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Z 坐标 (m)</label>
+                        <input type="number" class="form-input" id="objectZInput" value="0" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">旋转角度 (°)</label>
+                        <input type="number" class="form-input" id="objectRotationInput" value="0" step="5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">颜色</label>
+                    <div class="color-input-wrapper">
+                        <input type="color" id="objectColorInput" value="#3b82f6">
+                        <input type="text" class="form-input" id="objectColorText" value="#3b82f6">
+                    </div>
+                </div>
+                <div class="form-group" id="shelfSlotsGroup">
+                    <label class="form-label">货架位配置 (SKU 位置)</label>
+                    <textarea class="form-textarea" id="shelfSlotsText" placeholder='[{"slot": "A1", "sku": "SKU001"}, {"slot": "A2", "sku": "SKU002"}]'>[]</textarea>
+                    <p style="font-size: 12px; color: #666; margin-top: 6px;">JSON 格式: [{"slot": "A1", "sku": "SKU001"}, ...]</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelAddObject">取消</button>
+                <button class="modal-btn primary" id="confirmAddObject">添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导入拣货单模态框 -->
+    <div class="modal-overlay" id="importPickingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">导入拣货单</h3>
+                <button class="modal-close" id="closeImportPicking">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">数据格式</label>
+                    <select class="form-select" id="pickingFormatSelect">
+                        <option value="json">JSON</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">粘贴数据</label>
+                    <textarea class="form-textarea" id="pickingDataText" placeholder='[{"orderNo": "ORD001", "sku": "SKU001", "quantity": 10, "shelfSlot": "A-01-A1"}, ...]'></textarea>
+                    <p style="font-size: 12px; color: #666; margin-top: 6px;">
+                        JSON 格式: 订单号、SKU、件数、货架位<br>
+                        CSV 格式: 第一行为表头，列包括: orderNo, sku, quantity, shelfSlot
+                    </p>
+                </div>
+                <div class="file-drop-area" id="fileDropArea">
+                    <p>📁 拖拽文件到此处或点击选择</p>
+                    <p class="hint">支持 .json, .csv 文件</p>
+                </div>
+                <input type="file" id="fileInput" accept=".json,.csv" class="hidden">
+                <div class="error-message hidden" id="pickingErrors">
+                    <div class="error-title">数据验证错误</div>
+                    <ul class="error-list" id="pickingErrorList">
+                        <!-- 动态生成 -->
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelImportPicking">取消</button>
+                <button class="modal-btn primary" id="confirmImportPicking">导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 报告导出模态框 -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">仓库方案报告</h3>
+                <button class="modal-close" id="closeReport">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">报告格式</label>
+                    <select class="form-select" id="reportFormatSelect">
+                        <option value="markdown">Markdown</option>
+                        <option value="html">HTML</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">报告预览</label>
+                    <textarea class="form-textarea" id="reportPreview" style="min-height: 300px;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelReport">关闭</button>
+                <button class="modal-btn primary" id="exportReport">导出报告</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导入方案模态框 -->
+    <div class="modal-overlay" id="importProjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">导入仓库方案</h3>
+                <button class="modal-close" id="closeImportProject">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">粘贴 JSON 数据</label>
+                    <textarea class="form-textarea" id="projectJsonText" placeholder='{"warehouse": {...}, "objects": [...]}'></textarea>
+                </div>
+                <div class="file-drop-area" id="projectFileDropArea">
+                    <p>📁 拖拽 JSON 文件到此处</p>
+                    <p class="hint">支持 .json 方案文件</p>
+                </div>
+                <input type="file" id="projectFileInput" accept=".json" class="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" id="cancelImportProject">取消</button>
+                <button class="modal-btn primary" id="confirmImportProject">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入 Three.js 模块 -->
+    <script type="module" src="js/core/init.js"></script>
+
+    <!-- 核心模块 -->
+    <script src="js/core/Constants.js"></script>
+    <script src="js/core/Utils.js"></script>
+    <script src="js/core/EventEmitter.js"></script>
+    
+    <!-- 数据模型 -->
+    <script src="js/models/Warehouse.js"></script>
+    <script src="js/models/WarehouseObject.js"></script>
+    <script src="js/models/Shelf.js"></script>
+    <script src="js/models/Zone.js"></script>
+    <script src="js/models/Entrance.js"></script>
+    <script src="js/models/ForbiddenZone.js"></script>
+    <script src="js/models/PickingOrder.js"></script>
+    
+    <!-- 业务逻辑 -->
+    <script src="js/logic/ConflictDetector.js"></script>
+    <script src="js/logic/RouteOptimizer.js"></script>
+    <script src="js/logic/DataValidator.js"></script>
+    
+    <!-- 3D 渲染 -->
+    <script src="js/renderer/SceneManager.js"></script>
+    <script src="js/renderer/ObjectRenderer.js"></script>
+    <script src="js/renderer/RouteRenderer.js"></script>
+    <script src="js/renderer/RoutePlayer.js"></script>
+    <script src="js/renderer/InteractionController.js"></script>
+    
+    <!-- 数据持久化 -->
+    <script src="js/storage/LocalStorage.js"></script>
+    <script src="js/storage/ProjectIO.js"></script>
+    <script src="js/storage/ReportGenerator.js"></script>
+    
+    <!-- UI 控制器 -->
+    <script src="js/ui/UIManager.js"></script>
+    <script src="js/ui/ObjectListUI.js"></script>
+    <script src="js/ui/PropertiesUI.js"></script>
+    <script src="js/ui/PickingUI.js"></script>
+    <script src="js/ui/ModalUI.js"></script>
+    
+    <!-- 应用入口 -->
+    <script src="js/App.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

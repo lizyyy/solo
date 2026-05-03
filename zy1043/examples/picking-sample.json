@@ -1,0 +1,44 @@
+[
+  {
+    "orderNo": "ORD20240115001",
+    "sku": "SKU001",
+    "quantity": 10,
+    "shelfSlot": "A-01-A1",
+    "notes": "加急订单"
+  },
+  {
+    "orderNo": "ORD20240115001",
+    "sku": "SKU003",
+    "quantity": 5,
+    "shelfSlot": "A-01-B1",
+    "notes": "加急订单"
+  },
+  {
+    "orderNo": "ORD20240115002",
+    "sku": "SKU005",
+    "quantity": 20,
+    "shelfSlot": "A-02-A1",
+    "notes": "普通订单"
+  },
+  {
+    "orderNo": "ORD20240115002",
+    "sku": "SKU007",
+    "quantity": 8,
+    "shelfSlot": "B-01-A1",
+    "notes": "普通订单"
+  },
+  {
+    "orderNo": "ORD20240115003",
+    "sku": "SKU009",
+    "quantity": 15,
+    "shelfSlot": "B-02-A1",
+    "notes": "预约订单"
+  },
+  {
+    "orderNo": "ORD20240115003",
+    "sku": "SKU002",
+    "quantity": 12,
+    "shelfSlot": "A-01-A2",
+    "notes": "预约订单"
+  }
+]
