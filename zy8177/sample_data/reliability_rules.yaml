@@ -1,0 +1,58 @@
+version: "1.0"
+device: "Humphrey Field Analyzer 3"
+strategy: "SITA-Standard"
+
+thresholds:
+  fixation_loss_rate:
+    warning: 0.15
+    critical: 0.25
+    weight: 3.0
+  false_positive_rate:
+    warning: 0.15
+    critical: 0.25
+    weight: 2.0
+  false_negative_rate:
+    warning: 0.20
+    critical: 0.30
+    weight: 2.0
+  test_time:
+    max_minutes: 10
+    warning_minutes: 8
+    weight: 1.0
+
+grades:
+  excellent:
+    min_score: 90
+    color: "green"
+    label: "优秀"
+  good:
+    min_score: 75
+    color: "blue"
+    label: "良好"
+  fair:
+    min_score: 60
+    color: "yellow"
+    label: "一般"
+  poor:
+    min_score: 40
+    color: "orange"
+    label: "较差"
+  critical:
+    min_score: 0
+    color: "red"
+    label: "不合格"
+
+data_quality_checks:
+  minimum_points: 52
+  allow_missing_points: true
+  max_missing_points: 3
+  detect_eye_mismatch: true
+  detect_outlier_values: true
+  outlier_threshold: 3.0
+
+progression_detection:
+  significant_td_change: -5.0
+  significant_pd_change: -4.0
+  significant_p_value: 0.05
+  clustering_distance: 6.0
+  min_cluster_size: 3
