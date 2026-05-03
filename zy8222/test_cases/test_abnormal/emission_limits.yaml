@@ -1,0 +1,12 @@
+nox:
+  limit_mg_m3: 100
+  unit: mg/m3
+co:
+  limit_mg_m3: 4000
+  unit: mg/m3
+o2:
+  target_min_pct: 3.0
+  target_max_pct: 5.0
+excess_air_ratio:
+  target_min: 1.05
+  target_max: 1.2

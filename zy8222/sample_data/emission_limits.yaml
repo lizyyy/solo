@@ -1,0 +1,17 @@
+nox:
+  limit_mg_m3: 100
+  unit: mg/m3
+  description: 氮氧化物排放限值
+co:
+  limit_mg_m3: 4000
+  unit: mg/m3
+  description: 一氧化碳排放限值
+o2:
+  target_min_pct: 3.0
+  target_max_pct: 5.0
+  unit: "%"
+  description: 烟气含氧量目标范围
+excess_air_ratio:
+  target_min: 1.05
+  target_max: 1.2
+  description: 过量空气系数目标范围
