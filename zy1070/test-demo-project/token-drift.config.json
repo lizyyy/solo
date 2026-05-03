@@ -1,0 +1,25 @@
+{
+  "tokenFiles": [
+    "design-tokens/tokens.json"
+  ],
+  "sourceDirs": [
+    "src"
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".git/**",
+    "**/*.test.{ts,tsx,js,jsx}"
+  ],
+  "allowedHardcoded": [
+    "transparent",
+    "inherit",
+    "currentColor"
+  ],
+  "themeNames": [
+    "light",
+    "dark"
+  ],
+  "outputDir": "./token-drift-report"
+}
