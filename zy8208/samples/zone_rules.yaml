@@ -1,0 +1,88 @@
+# 海区压载水排放规则
+# 基于IMO BWM公约和区域特定规定
+
+zones:
+  - zone_id: "ZONE-001"
+    zone_name: "新加坡港内及近岸"
+    description: "新加坡港及近岸50海里范围内，禁止排放压载水"
+    latitude_min: 1.0
+    latitude_max: 2.0
+    longitude_min: 103.5
+    longitude_max: 104.2
+    max_discharge_volume: 0.0
+    is_prohibited: true
+    effective_from: "2020-01-01T00:00:00"
+    effective_to: null
+
+  - zone_id: "ZONE-002"
+    zone_name: "南海国际水域"
+    description: "南海南部国际水域，允许排放但限制单次排放量"
+    latitude_min: 2.0
+    latitude_max: 10.0
+    longitude_min: 104.0
+    longitude_max: 115.0
+    max_discharge_volume: 3000.0
+    is_prohibited: false
+    effective_from: "2020-01-01T00:00:00"
+    effective_to: null
+
+  - zone_id: "ZONE-003"
+    zone_name: "越南近岸敏感区"
+    description: "越南近岸50海里内生态敏感区，严格限制排放"
+    latitude_min: 8.0
+    latitude_max: 15.0
+    longitude_min: 108.0
+    longitude_max: 112.0
+    max_discharge_volume: 500.0
+    is_prohibited: false
+    effective_from: "2022-06-01T00:00:00"
+    effective_to: null
+
+  - zone_id: "ZONE-004"
+    zone_name: "台湾海峡航行区"
+    description: "台湾海峡繁忙航道，排放需特别注意"
+    latitude_min: 22.0
+    latitude_max: 26.0
+    longitude_min: 117.0
+    longitude_max: 121.0
+    max_discharge_volume: 2000.0
+    is_prohibited: false
+    effective_from: "2020-01-01T00:00:00"
+    effective_to: null
+
+  - zone_id: "ZONE-005"
+    zone_name: "中国东海近岸"
+    description: "中国东海近岸50海里内，禁止排放未经处理的压载水"
+    latitude_min: 25.0
+    latitude_max: 32.0
+    longitude_min: 119.0
+    longitude_max: 125.0
+    max_discharge_volume: 0.0
+    is_prohibited: true
+    effective_from: "2024-01-01T00:00:00"
+    effective_to: null
+
+  - zone_id: "ZONE-006"
+    zone_name: "上海港及长江口"
+    description: "上海港及长江口，严格禁止任何压载水排放"
+    latitude_min: 30.5
+    latitude_max: 32.0
+    longitude_min: 121.0
+    longitude_max: 122.5
+    max_discharge_volume: 0.0
+    is_prohibited: true
+    effective_from: "2023-01-01T00:00:00"
+    effective_to: null
+
+rules:
+  general:
+    minimum_distance_from_coast: 50.0
+    minimum_depth: 200.0
+    required_exchange_rate: 0.95
+    max_discharge_per_hour: 5000.0
+  
+  special_areas:
+    - "ZONE-001"
+    - "ZONE-003"
+    - "ZONE-005"
+    - "ZONE-006"
