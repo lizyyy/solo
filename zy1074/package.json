@@ -1,0 +1,38 @@
+{
+  "name": "subtitle-health-check",
+  "version": "1.0.0",
+  "description": "播客字幕章节校对 CLI 工具 - 字幕交付体检",
+  "main": "dist/index.js",
+  "bin": {
+    "subtitle-health-check": "dist/cli/index.js",
+    "shc": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "start": "node dist/cli/index.js",
+    "test": "node --test dist/"
+  },
+  "keywords": [
+    "subtitle",
+    "srt",
+    "vtt",
+    "podcast",
+    "validation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.2.0",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.5",
+    "@types/fs-extra": "^11.0.4"
+  }
+}
