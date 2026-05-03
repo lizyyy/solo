@@ -1,0 +1,6 @@
+work_order_id,bike_id,created_at,completed_at,status,issue_type,latitude,longitude,description
+WO001,BK051,2026-05-02 14:30:00,,pending,flat_tire,31.2353,121.4786,车辆轮胎漏气，需要更换
+WO002,BK052,2026-05-02 15:15:00,,pending,battery_low,31.2354,121.4787,车辆电池电量低，需要更换电池
+WO003,BK053,2026-05-02 16:00:00,2026-05-02 18:30:00,completed,broken_lock,31.2352,121.4785,车锁损坏，已更换新锁
+WO004,BK054,2026-05-02 16:45:00,,pending,damaged_frame,31.2355,121.4788,车架有明显损坏，需要检修
+WO005,BK055,2026-05-02 17:30:00,,pending,no_signal,31.2351,121.4784,车辆GPS信号丢失，无法定位
