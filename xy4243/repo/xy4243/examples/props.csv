@@ -1,0 +1,11 @@
+prop_id,name,description,category,danger_level,is_dangerous,danger_description,requires_verification,location,owner,total_quantity,available_quantity,notes
+prop_001,罗密欧之剑,金属道具剑,武器,MEDIUM,True,舞台用仿真钢剑,True,道具室A-01,道具组,2,2,需要演出前检查
+prop_002,毒药瓶,仿真毒药玻璃瓶,容器,HIGH,True,含红色染色剂的仿真液体,True,道具室B-03,道具组,1,1,危险品，需双人复核
+prop_003,朱丽叶的面纱,白色丝绸面纱,服饰,SAFE,False,,False,服装室C-02,服装组,3,3,
+prop_004,修士十字架,木质十字架,道具,SAFE,False,,False,道具室A-05,道具组,1,1,
+prop_005,匕首,舞台用匕首,武器,HIGH,True,仿真金属匕首,True,道具室A-02,道具组,4,4,每场演出前后必须清点
+prop_006,火把道具,LED仿真火把,道具,SAFE,False,,False,道具室D-01,灯光组,6,6,使用充电电池
+prop_007,书信卷轴,羊皮纸卷轴,道具,SAFE,False,,False,道具室A-03,道具组,2,2,
+prop_008,毒药杯,陶瓷酒杯,容器,CRITICAL,True,含仿真毒药,True,道具室B-05,道具组,2,2,极危道具，每次使用必须记录
+prop_009,花环道具,新鲜玫瑰花环,服饰,SAFE,False,,False,服装室C-10,服装组,5,5,每日更换
+prop_010,烛台道具,黄铜烛台,道具,LOW,False,使用无焰蜡烛,False,道具室D-02,灯光组,8,8,
