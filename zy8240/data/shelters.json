@@ -1,0 +1,53 @@
+[
+    {
+        "id": "shelter_001",
+        "name": "阳光社区避难点",
+        "capacity": 50,
+        "location": "阳光路123号",
+        "contact_person": "张主任",
+        "contact_phone": "13800138001",
+        "initial_supplies": {
+            "milk_powder": 20,
+            "diapers": 50,
+            "walking_aid": 10,
+            "medical_kit": 15,
+            "blanket": 60,
+            "water": 100,
+            "food": 80
+        }
+    },
+    {
+        "id": "shelter_002",
+        "name": "幸福小区避难点",
+        "capacity": 30,
+        "location": "幸福街456号",
+        "contact_person": "李主任",
+        "contact_phone": "13800138002",
+        "initial_supplies": {
+            "milk_powder": 10,
+            "diapers": 30,
+            "walking_aid": 5,
+            "medical_kit": 8,
+            "blanket": 35,
+            "water": 60,
+            "food": 50
+        }
+    },
+    {
+        "id": "shelter_003",
+        "name": "和平广场避难点",
+        "capacity": 100,
+        "location": "和平路789号",
+        "contact_person": "王主任",
+        "contact_phone": "13800138003",
+        "initial_supplies": {
+            "milk_powder": 30,
+            "diapers": 80,
+            "walking_aid": 20,
+            "medical_kit": 25,
+            "blanket": 120,
+            "water": 200,
+            "food": 150
+        }
+    }
+]

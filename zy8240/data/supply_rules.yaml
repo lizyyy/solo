@@ -1,0 +1,122 @@
+supply_types:
+  - id: milk_powder
+    name: 奶粉
+    unit: 罐
+    description: 婴幼儿配方奶粉
+    priority: high
+  - id: diapers
+    name: 尿布
+    unit: 包
+    description: 婴幼儿纸尿裤
+    priority: high
+  - id: walking_aid
+    name: 助行器
+    unit: 个
+    description: 老年人助行器具
+    priority: medium
+  - id: medical_kit
+    name: 医疗包
+    unit: 个
+    description: 基础医疗急救包
+    priority: high
+  - id: blanket
+    name: 毛毯
+    unit: 条
+    description: 保暖毛毯
+    priority: medium
+  - id: water
+    name: 饮用水
+    unit: 瓶
+    description: 瓶装饮用水
+    priority: high
+  - id: food
+    name: 食品
+    unit: 份
+    description: 应急食品
+    priority: high
+
+rules:
+  - id: rule_infant_milk
+    name: 婴幼儿奶粉分配
+    description: 为3岁以下婴幼儿分配奶粉
+    condition:
+      age_range:
+        min: 0
+        max: 2
+    action:
+      supply_type: milk_powder
+      quantity: 1
+      priority: high
+  
+  - id: rule_infant_diapers
+    name: 婴幼儿尿布分配
+    description: 为3岁以下婴幼儿分配尿布
+    condition:
+      age_range:
+        min: 0
+        max: 2
+    action:
+      supply_type: diapers
+      quantity: 2
+      priority: high
+  
+  - id: rule_elderly_walking_aid
+    name: 老年人助行器分配
+    description: 为65岁以上老年人分配助行器
+    condition:
+      age_range:
+        min: 65
+    action:
+      supply_type: walking_aid
+      quantity: 1
+      priority: medium
+  
+  - id: rule_elderly_medical_kit
+    name: 老年人医疗包分配
+    description: 为65岁以上老年人分配医疗包
+    condition:
+      age_range:
+        min: 65
+    action:
+      supply_type: medical_kit
+      quantity: 1
+      priority: high
+  
+  - id: rule_special_needs_medical
+    name: 特殊需求医疗包
+    description: 为有特殊医疗需求的人员分配医疗包
+    condition:
+      special_needs:
+        - 残疾
+        - 慢性病
+        - disabled
+        - chronic
+    action:
+      supply_type: medical_kit
+      quantity: 1
+      priority: high
+  
+  - id: rule_pregnant_medical
+    name: 孕妇医疗包分配
+    description: 为孕妇分配医疗包
+    condition:
+      special_needs:
+        - 孕妇
+        - pregnant
+    action:
+      supply_type: medical_kit
+      quantity: 2
+      priority: high
+
+allocation_priority:
+  - special_needs
+  - infants
+  - elderly
+  - pregnant
+  - adults
+
+report_settings:
+  include_demographics: true
+  include_supply_analysis: true
+  include_issue_details: true
+  include_improvement_suggestions: true
