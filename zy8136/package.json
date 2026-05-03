@@ -1,0 +1,48 @@
+{
+  "name": "canary-replay-cli",
+  "version": "1.0.0",
+  "description": "TypeScript CLI for offline replay of gateway canary policies",
+  "main": "dist/index.js",
+  "bin": {
+    "canary-replay": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "replay": "npm run dev -- replay",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "canary",
+    "gateway",
+    "replay",
+    "cli",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "path-to-regexp": "^6.2.1"
+  },
+  "devDependencies": {
+    "@types/commander": "^2.12.2",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "@types/jest": "^29.5.11",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1"
+  }
+}

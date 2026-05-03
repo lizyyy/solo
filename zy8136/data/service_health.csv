@@ -1,0 +1,9 @@
+service,version,healthy,lastCheck,errorRate,latencyP99
+user-service,stable,true,2026-05-03T09:55:00.000Z,0.1,120
+user-service,v2.0,false,2026-05-03T09:55:00.000Z,15.2,850
+order-service,stable,true,2026-05-03T09:55:00.000Z,0.05,85
+order-service,v1.5,true,2026-05-03T09:55:00.000Z,0.3,95
+payment-service,stable,true,2026-05-03T09:55:00.000Z,0.2,150
+health-service,stable,true,2026-05-03T09:55:00.000Z,0.0,50
+health-service,v1.0,true,2026-05-03T09:55:00.000Z,0.0,45
+internal-service,stable,true,2026-05-03T09:55:00.000Z,0.1,60

@@ -1,0 +1,47 @@
+name: "Q2 Feature Release - User Service v2"
+description: "Canary release policy for user-service v2.0, targeting premium users and beta testers."
+
+rules:
+  - service: user-service
+    condition:
+      headerMatch:
+        name: "X-User-Type"
+        value: "premium"
+      userBucket:
+        percentage: 50
+        seed: "canary-v2"
+    weight: 30
+    version: "v2.0"
+
+  - service: user-service
+    condition:
+      headerMatch:
+        name: "X-Canary-Enable"
+        value: "1"
+    weight: 100
+    version: "v2.0"
+
+  - service: order-service
+    condition:
+      headerMatch:
+        name: "X-Canary"
+        value: "true"
+    weight: 50
+    version: "v1.5"
+
+  - service: payment-service
+    condition:
+      headerMatch:
+        name: "X-User-Type"
+        value: "beta"
+      pathMatch: "/api/v1/payments/*"
+    weight: 20
+    version: "v3.0"
+
+  - service: health-service
+    condition:
+      pathMatch: "/health"
+    weight: 100
+    version: "v1.0"
+
+defaultWeight: 0

@@ -1,0 +1,50 @@
+routes:
+  - path: /api/v1/users/:id
+    method: GET
+    service: user-service
+    priority: 100
+
+  - path: /api/v1/users
+    method: GET
+    service: user-service
+    priority: 90
+
+  - path: /api/v1/orders/:orderId
+    method: GET
+    service: order-service
+    priority: 100
+
+  - path: /api/v1/orders
+    method: POST
+    service: order-service
+    priority: 90
+
+  - path: /api/v1/payments
+    method: GET
+    service: payment-service
+    priority: 100
+
+  - path: /api/v1/payments/:id
+    method: POST
+    service: payment-service
+    priority: 90
+
+  - path: /api/v2/users/:id
+    method: GET
+    service: user-service
+    priority: 100
+
+  - path: /api/internal/*
+    method: GET
+    service: internal-service
+    priority: 50
+
+  - path: /api/internal/health
+    method: GET
+    service: health-service
+    priority: 100
+
+  - path: /health
+    method: GET
+    service: health-service
+    priority: 100
