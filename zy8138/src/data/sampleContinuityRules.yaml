@@ -1,0 +1,42 @@
+rules:
+  - id: rule-001
+    ruleType: prop_disappearance
+    name: 道具突然消失检测
+    description: 检测在场景时间线中，道具在首次出现和最后出现之间突然消失的情况
+    severity: critical
+    enabled: true
+
+  - id: rule-002
+    ruleType: state_regression
+    name: 道具状态倒退检测
+    description: 检测道具状态出现不合理倒退的情况（如从损坏变回完好）
+    severity: critical
+    enabled: true
+
+  - id: rule-003
+    ruleType: duplicate_prop_number
+    name: 重复道具编号检测
+    description: 检测多个道具使用相同道具编号的情况
+    severity: critical
+    enabled: true
+
+  - id: rule-004
+    ruleType: reshoot_date_issue
+    name: 补拍日期问题检测
+    description: 检测补拍日期早于计划拍摄日期或实际拍摄日期的情况
+    severity: critical
+    enabled: true
+
+  - id: rule-005
+    ruleType: missing_responsibility
+    name: 缺少负责人检测
+    description: 检测没有指定负责人的道具
+    severity: warning
+    enabled: true
+
+  - id: rule-006
+    ruleType: unverified_condition
+    name: 未验证状态检测
+    description: 检测道具状态标记为未知或未验证的情况
+    severity: warning
+    enabled: true
