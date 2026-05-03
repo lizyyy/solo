@@ -1,0 +1,8 @@
+{"type": "flag_update", "flag_key": "dark_mode", "version": 1, "timestamp": "2024-01-15T10:00:00Z", "data": {"rollout_percent": 50}}
+{"type": "flag_update", "flag_key": "dark_mode", "version": 2, "timestamp": "2024-01-15T12:00:00Z", "data": {"rollout_percent": 75}}
+{"type": "kill_switch_activate", "flag_key": "dark_mode", "version": 3, "timestamp": "2024-01-15T14:00:00Z", "data": {"kill_switch_value": false}}
+{"type": "kill_switch_deactivate", "flag_key": "dark_mode", "version": 4, "timestamp": "2024-01-15T16:00:00Z", "data": {}}
+{"type": "flag_delete", "flag_key": "experimental_feature", "version": 2, "timestamp": "2024-01-14T09:00:00Z", "data": {}}
+{"type": "flag_update", "flag_key": "experimental_feature", "version": 1, "timestamp": "2024-01-13T08:00:00Z", "data": {"default_value": true}}
+{"type": "flag_update", "flag_key": "new_checkout_flow", "version": 2, "timestamp": "2024-01-15T11:00:00Z", "data": {"targeting_rules": [{"type": "percentage", "percentage": 20, "value": true}]}}
+{"type": "segment_update", "segment_key": "beta_testers", "version": 2, "timestamp": "2024-01-15T09:00:00Z", "data": {"user_keys": ["user_001", "user_002", "user_003", "user_010"]}}
