@@ -1,0 +1,154 @@
+{
+  "name": "中级关卡",
+  "description": "包含更多复杂病例，需要综合判断生命体征和症状。",
+  "timeLimit": 480,
+  "patients": [
+    {
+      "id": "p001",
+      "name": "陈一",
+      "age": 55,
+      "gender": "男",
+      "chiefComplaint": "车祸外伤1小时，胸痛、呼吸困难",
+      "vitalSigns": {
+        "temperature": 36.5,
+        "pulse": 120,
+        "respiration": 30,
+        "bloodPressure": {
+          "systolic": 85,
+          "diastolic": 50
+        },
+        "oxygenSaturation": 85
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["外伤伴低血压", "呼吸困难伴低氧"],
+      "notes": "车祸外伤，血气胸可能，休克状态"
+    },
+    {
+      "id": "p002",
+      "name": "林二",
+      "age": 35,
+      "gender": "女",
+      "chiefComplaint": "发热、头痛3天，呕吐2次，精神萎靡",
+      "vitalSigns": {
+        "temperature": 39.2,
+        "pulse": 105,
+        "respiration": 20,
+        "bloodPressure": {
+          "systolic": 105,
+          "diastolic": 65
+        },
+        "oxygenSaturation": 97
+      },
+      "allergies": ["头孢类"],
+      "correctTriage": "yellow",
+      "riskFactors": ["意识改变伴发热"],
+      "notes": "中枢神经系统感染可能，需进一步检查"
+    },
+    {
+      "id": "p003",
+      "name": "王三",
+      "age": 28,
+      "gender": "男",
+      "chiefComplaint": "咽痛2天，轻微咳嗽，无发热",
+      "vitalSigns": {
+        "temperature": 36.9,
+        "pulse": 75,
+        "respiration": 14,
+        "bloodPressure": {
+          "systolic": 115,
+          "diastolic": 75
+        },
+        "oxygenSaturation": 98
+      },
+      "allergies": [],
+      "correctTriage": "green",
+      "riskFactors": [],
+      "notes": "上呼吸道感染，病情较轻"
+    },
+    {
+      "id": "p004",
+      "name": "张四",
+      "age": 72,
+      "gender": "女",
+      "chiefComplaint": "突发左侧肢体无力2小时，言语不清",
+      "vitalSigns": {
+        "temperature": 37.0,
+        "pulse": 90,
+        "respiration": 18,
+        "bloodPressure": {
+          "systolic": 160,
+          "diastolic": 95
+        },
+        "oxygenSaturation": 95
+      },
+      "allergies": ["阿司匹林"],
+      "correctTriage": "red",
+      "riskFactors": ["高龄", "急性脑卒中"],
+      "notes": "急性脑卒中，发病时间窗内，需紧急评估"
+    },
+    {
+      "id": "p005",
+      "name": "李五",
+      "age": 42,
+      "gender": "男",
+      "chiefComplaint": "上腹部疼痛1天，加重6小时，伴恶心呕吐",
+      "vitalSigns": {
+        "temperature": 37.8,
+        "pulse": 95,
+        "respiration": 20,
+        "bloodPressure": {
+          "systolic": 120,
+          "diastolic": 80
+        },
+        "oxygenSaturation": 98
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": [],
+      "notes": "急性胰腺炎或胆囊炎可能，需进一步检查"
+    },
+    {
+      "id": "p006",
+      "name": "赵六",
+      "age": 3,
+      "gender": "男",
+      "chiefComplaint": "发热2小时，体温40.1℃，突发抽搐1次",
+      "vitalSigns": {
+        "temperature": 40.1,
+        "pulse": 150,
+        "respiration": 32,
+        "bloodPressure": {
+          "systolic": 90,
+          "diastolic": 55
+        },
+        "oxygenSaturation": 92
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["儿童高热", "抽搐"],
+      "notes": "高热惊厥，需紧急处理和降温"
+    },
+    {
+      "id": "p007",
+      "name": "孙七",
+      "age": 50,
+      "gender": "男",
+      "chiefComplaint": "胸闷、心悸30分钟，有冠心病史",
+      "vitalSigns": {
+        "temperature": 36.7,
+        "pulse": 100,
+        "respiration": 20,
+        "bloodPressure": {
+          "systolic": 130,
+          "diastolic": 85
+        },
+        "oxygenSaturation": 96
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": [],
+      "notes": "冠心病患者，胸闷心悸，需排除心肌缺血"
+    }
+  ]
+}

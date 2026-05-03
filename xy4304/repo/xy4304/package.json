@@ -1,0 +1,26 @@
+{
+  "name": "triage-training-game",
+  "version": "1.0.0",
+  "description": "急诊科分诊训练系统 - 为新护士设计的分诊练习小游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx live-server --port=8080 --open=/index.html",
+    "dev": "npx live-server --port=8080",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "triage",
+    "training",
+    "game",
+    "medical",
+    "emergency"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

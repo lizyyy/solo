@@ -1,0 +1,217 @@
+{
+  "name": "高级关卡",
+  "description": "高难度关卡，包含罕见病例和紧急情况，考验应急处理能力。",
+  "timeLimit": 600,
+  "patients": [
+    {
+      "id": "p001",
+      "name": "周八",
+      "age": 60,
+      "gender": "男",
+      "chiefComplaint": "突发剧烈胸痛30分钟，伴面色苍白、大汗淋漓",
+      "vitalSigns": {
+        "temperature": 36.3,
+        "pulse": 130,
+        "respiration": 28,
+        "bloodPressure": {
+          "systolic": 80,
+          "diastolic": 50
+        },
+        "oxygenSaturation": 88
+      },
+      "allergies": ["青霉素", "链霉素"],
+      "correctTriage": "red",
+      "riskFactors": ["胸痛伴低血压", "高龄"],
+      "notes": "急性心肌梗死或主动脉夹层可能，心源性休克"
+    },
+    {
+      "id": "p002",
+      "name": "吴九",
+      "age": 25,
+      "gender": "女",
+      "chiefComplaint": "服药过量2小时，家属发现服用安眠药约20片，意识模糊",
+      "vitalSigns": {
+        "temperature": 35.5,
+        "pulse": 55,
+        "respiration": 8,
+        "bloodPressure": {
+          "systolic": 95,
+          "diastolic": 60
+        },
+        "oxygenSaturation": 90
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["药物过量伴意识障碍", "呼吸抑制"],
+      "notes": "药物过量，呼吸抑制，需紧急处理"
+    },
+    {
+      "id": "p003",
+      "name": "郑十",
+      "age": 82,
+      "gender": "女",
+      "chiefComplaint": "家属发现呼之不应1小时，既往有高血压、糖尿病史",
+      "vitalSigns": {
+        "temperature": 35.8,
+        "pulse": 45,
+        "respiration": 6,
+        "bloodPressure": {
+          "systolic": 70,
+          "diastolic": 40
+        },
+        "oxygenSaturation": 75
+      },
+      "allergies": ["磺胺类"],
+      "correctTriage": "black",
+      "riskFactors": [],
+      "notes": "生命体征极不稳定，无有效呼吸循环，考虑死亡"
+    },
+    {
+      "id": "p004",
+      "name": "王十一",
+      "age": 35,
+      "gender": "男",
+      "chiefComplaint": "高处坠落20分钟，头部着地，外耳道流血，意识不清",
+      "vitalSigns": {
+        "temperature": 36.0,
+        "pulse": 50,
+        "respiration": 12,
+        "bloodPressure": {
+          "systolic": 150,
+          "diastolic": 100
+        },
+        "oxygenSaturation": 88
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["外伤伴意识障碍", "颅内压增高表现"],
+      "notes": "严重颅脑外伤，库欣反应，需紧急处理"
+    },
+    {
+      "id": "p005",
+      "name": "李十二",
+      "age": 28,
+      "gender": "女",
+      "chiefComplaint": "咽痛3天，加重伴呼吸困难1天，声音嘶哑",
+      "vitalSigns": {
+        "temperature": 38.0,
+        "pulse": 100,
+        "respiration": 22,
+        "bloodPressure": {
+          "systolic": 110,
+          "diastolic": 70
+        },
+        "oxygenSaturation": 96
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": [],
+      "notes": "急性会厌炎可能，需警惕气道梗阻"
+    },
+    {
+      "id": "p006",
+      "name": "张十三",
+      "age": 40,
+      "gender": "男",
+      "chiefComplaint": "突发右侧腰痛2小时，伴恶心呕吐，既往有肾结石史",
+      "vitalSigns": {
+        "temperature": 37.0,
+        "pulse": 90,
+        "respiration": 18,
+        "bloodPressure": {
+          "systolic": 130,
+          "diastolic": 85
+        },
+        "oxygenSaturation": 98
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": [],
+      "notes": "肾绞痛，需止痛和进一步检查"
+    },
+    {
+      "id": "p007",
+      "name": "刘十四",
+      "age": 5,
+      "gender": "男",
+      "chiefComplaint": "发热、皮疹1天，精神差，近1周有麻疹接触史",
+      "vitalSigns": {
+        "temperature": 39.8,
+        "pulse": 140,
+        "respiration": 30,
+        "bloodPressure": {
+          "systolic": 95,
+          "diastolic": 60
+        },
+        "oxygenSaturation": 94
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": ["儿童高热"],
+      "notes": "麻疹疑似病例，需隔离和进一步检查"
+    },
+    {
+      "id": "p008",
+      "name": "陈十五",
+      "age": 45,
+      "gender": "男",
+      "chiefComplaint": "呕血1小时，量约500ml，既往有肝硬化史",
+      "vitalSigns": {
+        "temperature": 36.5,
+        "pulse": 120,
+        "respiration": 24,
+        "bloodPressure": {
+          "systolic": 85,
+          "diastolic": 50
+        },
+        "oxygenSaturation": 92
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["低血压", "消化道大出血"],
+      "notes": "食管胃底静脉曲张破裂出血，失血性休克"
+    },
+    {
+      "id": "p009",
+      "name": "杨十六",
+      "age": 32,
+      "gender": "女",
+      "chiefComplaint": "停经40天，突发下腹剧痛2小时，伴头晕、面色苍白",
+      "vitalSigns": {
+        "temperature": 36.8,
+        "pulse": 130,
+        "respiration": 24,
+        "bloodPressure": {
+          "systolic": 80,
+          "diastolic": 50
+        },
+        "oxygenSaturation": 95
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["低血压", "急腹症"],
+      "notes": "异位妊娠破裂可能，失血性休克"
+    },
+    {
+      "id": "p010",
+      "name": "黄十七",
+      "age": 22,
+      "gender": "男",
+      "chiefComplaint": "咳嗽、流涕1天，无发热，要求开药",
+      "vitalSigns": {
+        "temperature": 36.7,
+        "pulse": 70,
+        "respiration": 16,
+        "bloodPressure": {
+          "systolic": 120,
+          "diastolic": 80
+        },
+        "oxygenSaturation": 99
+      },
+      "allergies": [],
+      "correctTriage": "green",
+      "riskFactors": [],
+      "notes": "普通上呼吸道感染，病情稳定"
+    }
+  ]
+}

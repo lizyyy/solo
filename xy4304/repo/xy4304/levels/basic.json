@@ -1,0 +1,112 @@
+{
+  "name": "基础关卡",
+  "description": "适合初学者，包含常见的急诊病例，帮助掌握基本分诊规则。",
+  "timeLimit": 300,
+  "patients": [
+    {
+      "id": "p001",
+      "name": "张三",
+      "age": 65,
+      "gender": "男",
+      "chiefComplaint": "胸痛2小时，伴胸闷",
+      "vitalSigns": {
+        "temperature": 36.8,
+        "pulse": 110,
+        "respiration": 22,
+        "bloodPressure": {
+          "systolic": 90,
+          "diastolic": 60
+        },
+        "oxygenSaturation": 92
+      },
+      "allergies": ["青霉素"],
+      "correctTriage": "red",
+      "riskFactors": ["胸痛伴低血压"],
+      "notes": "急性冠脉综合征可能，低血压提示病情严重"
+    },
+    {
+      "id": "p002",
+      "name": "李四",
+      "age": 5,
+      "gender": "女",
+      "chiefComplaint": "发热1天，体温39.5℃，伴哭闹",
+      "vitalSigns": {
+        "temperature": 39.5,
+        "pulse": 130,
+        "respiration": 28,
+        "bloodPressure": {
+          "systolic": 100,
+          "diastolic": 60
+        },
+        "oxygenSaturation": 98
+      },
+      "allergies": [],
+      "correctTriage": "yellow",
+      "riskFactors": ["儿童高热"],
+      "notes": "儿童高热，需警惕热性惊厥"
+    },
+    {
+      "id": "p003",
+      "name": "王五",
+      "age": 30,
+      "gender": "男",
+      "chiefComplaint": "咳嗽、流涕3天，伴轻微头痛",
+      "vitalSigns": {
+        "temperature": 37.2,
+        "pulse": 80,
+        "respiration": 16,
+        "bloodPressure": {
+          "systolic": 120,
+          "diastolic": 80
+        },
+        "oxygenSaturation": 99
+      },
+      "allergies": [],
+      "correctTriage": "green",
+      "riskFactors": [],
+      "notes": "普通感冒症状，生命体征稳定"
+    },
+    {
+      "id": "p004",
+      "name": "赵六",
+      "age": 45,
+      "gender": "女",
+      "chiefComplaint": "腹痛8小时，转移性右下腹痛",
+      "vitalSigns": {
+        "temperature": 38.5,
+        "pulse": 95,
+        "respiration": 18,
+        "bloodPressure": {
+          "systolic": 110,
+          "diastolic": 70
+        },
+        "oxygenSaturation": 98
+      },
+      "allergies": ["磺胺类"],
+      "correctTriage": "yellow",
+      "riskFactors": [],
+      "notes": "急性阑尾炎可能，需优先处理"
+    },
+    {
+      "id": "p005",
+      "name": "孙七",
+      "age": 78,
+      "gender": "男",
+      "chiefComplaint": "突发意识不清2小时，家属发现倒地",
+      "vitalSigns": {
+        "temperature": 37.5,
+        "pulse": 50,
+        "respiration": 10,
+        "bloodPressure": {
+          "systolic": 180,
+          "diastolic": 100
+        },
+        "oxygenSaturation": 88
+      },
+      "allergies": [],
+      "correctTriage": "red",
+      "riskFactors": ["意识改变", "高龄", "低氧血症"],
+      "notes": "急性脑卒中可能，呼吸缓慢，血氧低"
+    }
+  ]
+}

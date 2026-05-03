@@ -1,0 +1,994 @@
+/* 急诊科分诊训练系统 - 样式文件 */
+
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 全局样式 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 游戏头部 */
+.game-header {
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.game-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.game-controls button {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.game-controls button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.game-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.game-info {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1rem;
+}
+
+.game-info > div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timer {
+  font-weight: bold;
+  min-width: 100px;
+}
+
+.timer.time-warning {
+  color: #ff6b6b;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.score, .combo {
+  font-weight: 600;
+}
+
+/* 游戏主体 */
+.game-main {
+  flex: 1;
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  max-width: 1800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* 患者队列区 */
+.patient-queue {
+  width: 320px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.queue-header {
+  background-color: #f8fafc;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #1e293b;
+}
+
+.queue-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.queue-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.queue-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.queue-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.queue-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 患者卡片 */
+.patient-card {
+  background-color: #fefefe;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  cursor: grab;
+}
+
+.patient-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.patient-card.active {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.patient-card.active:hover {
+  border-color: #2563eb;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+}
+
+.patient-card.dragging {
+  opacity: 0.7;
+  cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.patient-basic-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.patient-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.patient-details {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.patient-complaint {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+}
+
+.patient-vital-signs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.vital-sign {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  background-color: #f8fafc;
+  border-radius: 4px;
+}
+
+.vital-label {
+  color: #64748b;
+}
+
+.vital-value {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 高亮显示异常生命体征 */
+.vital-sign[data-abnormal="true"] {
+  background-color: #fef2f2;
+}
+
+.vital-sign[data-abnormal="true"] .vital-value {
+  color: #dc2626;
+}
+
+.patient-allergies {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background-color: #fef3c7;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border-left: 3px solid #f59e0b;
+}
+
+/* 分诊区域 */
+.triage-areas {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.triage-area {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.triage-area.red {
+  border-top: 4px solid #dc2626;
+}
+
+.triage-area.yellow {
+  border-top: 4px solid #f59e0b;
+}
+
+.triage-area.green {
+  border-top: 4px solid #16a34a;
+}
+
+.triage-area.black {
+  border-top: 4px solid #1f2937;
+}
+
+.triage-area.drag-over {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  transform: scale(1.01);
+}
+
+.triage-area.red.drag-over {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5);
+}
+
+.triage-area.yellow.drag-over {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5);
+}
+
+.triage-area.green.drag-over {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.5);
+}
+
+.triage-area.black.drag-over {
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.5);
+}
+
+.zone-header {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.triage-area.red .zone-header {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.triage-area.yellow .zone-header {
+  background-color: #fffbeb;
+  color: #92400e;
+}
+
+.triage-area.green .zone-header {
+  background-color: #f0fdf4;
+  color: #166534;
+}
+
+.triage-area.black .zone-header {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.zone-patients {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.zone-patients::-webkit-scrollbar {
+  width: 4px;
+}
+
+.zone-patients::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.zone-patients::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+/* 反馈信息区 */
+.feedback {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1.5rem;
+  max-width: 500px;
+  width: 90%;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.feedback.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.feedback-success {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background-color: #f0fdf4;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #16a34a;
+}
+
+.feedback-success strong {
+  color: #166534;
+  font-size: 1.05rem;
+}
+
+.feedback-error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background-color: #fef2f2;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #dc2626;
+}
+
+.feedback-error strong {
+  color: #991b1b;
+  font-size: 1.05rem;
+}
+
+.feedback-details {
+  padding: 0.5rem;
+  background-color: #fefce8;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #854d0e;
+  border-left: 3px solid #eab308;
+}
+
+.feedback-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.warning-item {
+  padding: 0.4rem 0.75rem;
+  background-color: #fff7ed;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #9a3412;
+  border-left: 2px solid #f97316;
+}
+
+.feedback-hints {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hint-item {
+  padding: 0.4rem 0.75rem;
+  background-color: #eff6ff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #1e40af;
+  border-left: 2px solid #3b82f6;
+}
+
+.score-change {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-left: auto;
+}
+
+.score-change.positive {
+  color: #16a34a;
+}
+
+.score-change.negative {
+  color: #dc2626;
+}
+
+/* 弹窗样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-content h2 {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 1.3rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.modal-content button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin: 1rem 1.5rem 1.5rem;
+}
+
+.modal-content button:hover {
+  background-color: #2563eb;
+}
+
+.modal-content button.secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  margin-left: 0.75rem;
+}
+
+.modal-content button.secondary:hover {
+  background-color: #e2e8f0;
+}
+
+/* 关卡列表 */
+.level-list {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.level-item {
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.level-item:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.level-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.level-description {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.level-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* 历史记录 */
+.history-list {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.history-item {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #fafafa;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.history-level {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.history-date {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.history-stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.no-history {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+/* 游戏结果 */
+.result {
+  padding: 1rem 1.5rem;
+}
+
+.result-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.result-item {
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.result-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.result-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.result-details {
+  margin-bottom: 1.5rem;
+}
+
+.result-details h3 {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.stat-card {
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-card.red-zone {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.stat-card.yellow-zone {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.stat-card.green-zone {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.stat-card.black-zone {
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+}
+
+.stat-title {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+/* 错误案例 */
+.result-errors {
+  margin-top: 1.5rem;
+}
+
+.result-errors h3 {
+  font-size: 1.1rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.error-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.error-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.error-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 2px;
+}
+
+.error-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.error-item {
+  padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+}
+
+.error-patient {
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 0.5rem;
+}
+
+.error-complaint {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.error-details {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.selected-zone {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.correct-zone {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.error-reason {
+  font-size: 0.85rem;
+  color: #7c2d12;
+  background-color: #fed7d7;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* 暂停摘要 */
+.pause-summary {
+  padding: 1rem 1.5rem;
+}
+
+.pause-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pause-stat {
+  padding: 0.75rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.pause-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.pause-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.pause-accuracy {
+  text-align: center;
+  padding: 1rem;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #1e40af;
+}
+
+/* 按钮组 */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem;
+  gap: 0.75rem;
+}
+
+.button-group button {
+  margin: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .game-main {
+    flex-direction: column;
+  }
+  
+  .patient-queue {
+    width: 100%;
+    max-height: 300px;
+  }
+  
+  .queue-container {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  
+  .patient-card {
+    min-width: 280px;
+    flex-shrink: 0;
+  }
+  
+  .triage-areas {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .game-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .game-info {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .triage-areas {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .triage-area {
+    min-height: 200px;
+  }
+  
+  .result-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-main {
+    padding: 1rem;
+  }
+  
+  .patient-queue {
+    max-height: 250px;
+  }
+  
+  .patient-card {
+    min-width: 260px;
+    padding: 0.75rem;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
+  
+  .feedback {
+    width: 95%;
+    top: 100px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .game-header,
+  .game-controls,
+  .feedback,
+  .modal,
+  .button-group {
+    display: none !important;
+  }
+  
+  .game-main {
+    display: block;
+  }
+  
+  .patient-queue,
+  .triage-areas {
+    page-break-inside: avoid;
+  }
+}

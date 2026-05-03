@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>急诊科分诊训练系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 游戏头部 -->
+        <header class="game-header">
+            <div class="logo">急诊科分诊训练</div>
+            <div class="game-controls">
+                <button id="start-btn">开始游戏</button>
+                <button id="pause-btn" disabled>暂停</button>
+                <button id="level-select-btn">选择关卡</button>
+                <button id="history-btn">历史记录</button>
+            </div>
+            <div class="game-info">
+                <div class="timer">时间: <span id="time">00:00</span></div>
+                <div class="score">分数: <span id="score">0</span></div>
+                <div class="combo">连击: <span id="combo">0</span></div>
+            </div>
+        </header>
+
+        <!-- 游戏主体 -->
+        <main class="game-main">
+            <!-- 患者队列区 -->
+            <div class="patient-queue" id="patient-queue">
+                <div class="queue-header">等待队列</div>
+                <div class="queue-container" id="queue-container">
+                    <!-- 患者卡片将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 分诊区域 -->
+            <div class="triage-areas">
+                <div class="triage-area red" id="red-zone" data-zone="red">
+                    <div class="zone-header">红区 (紧急)</div>
+                    <div class="zone-patients" id="red-patients"></div>
+                </div>
+                <div class="triage-area yellow" id="yellow-zone" data-zone="yellow">
+                    <div class="zone-header">黄区 (较重)</div>
+                    <div class="zone-patients" id="yellow-patients"></div>
+                </div>
+                <div class="triage-area green" id="green-zone" data-zone="green">
+                    <div class="zone-header">绿区 (普通)</div>
+                    <div class="zone-patients" id="green-patients"></div>
+                </div>
+                <div class="triage-area black" id="black-zone" data-zone="black">
+                    <div class="zone-header">黑区 (死亡/濒死)</div>
+                    <div class="zone-patients" id="black-patients"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 提示信息区 -->
+        <div class="feedback" id="feedback"></div>
+
+        <!-- 关卡选择弹窗 -->
+        <div class="modal" id="level-modal">
+            <div class="modal-content">
+                <h2>选择关卡</h2>
+                <div class="level-list" id="level-list">
+                    <!-- 关卡列表将在这里动态生成 -->
+                </div>
+                <button id="close-level-modal">关闭</button>
+            </div>
+        </div>
+
+        <!-- 历史记录弹窗 -->
+        <div class="modal" id="history-modal">
+            <div class="modal-content">
+                <h2>历史成绩</h2>
+                <div class="history-list" id="history-list">
+                    <!-- 历史记录将在这里动态生成 -->
+                </div>
+                <button id="close-history-modal">关闭</button>
+            </div>
+        </div>
+
+        <!-- 游戏结束弹窗 -->
+        <div class="modal" id="game-over-modal">
+            <div class="modal-content">
+                <h2>游戏结束</h2>
+                <div class="result" id="game-result"></div>
+                <button id="export-report">导出报告</button>
+                <button id="replay-btn">重新开始</button>
+                <button id="close-game-over">关闭</button>
+            </div>
+        </div>
+
+        <!-- 暂停复盘弹窗 -->
+        <div class="modal" id="pause-modal">
+            <div class="modal-content">
+                <h2>游戏暂停</h2>
+                <div class="pause-summary" id="pause-summary"></div>
+                <button id="resume-btn">继续游戏</button>
+                <button id="end-game-btn">结束游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
