@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜班分诊风暴 - 急诊科护士训练游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 游戏标题和状态 -->
+        <header>
+            <h1>夜班分诊风暴</h1>
+            <div id="game-status">
+                <div id="timer">剩余时间: 00:00</div>
+                <div id="score">分数: 0</div>
+                <div id="warnings">预警: 0</div>
+            </div>
+        </header>
+
+        <!-- 游戏开始界面 -->
+        <div id="start-screen">
+            <div class="screen-content">
+                <h2>急诊科新护士训练</h2>
+                <p>在倒计时内正确分诊病人，根据生命体征和主诉决定：</p>
+                <ul>
+                    <li><strong>抢救区</strong> - 紧急生命危险情况</li>
+                    <li><strong>留观区</strong> - 需要进一步观察治疗</li>
+                    <li><strong>转诊区</strong> - 需要转往其他科室</li>
+                    <li><strong>等待区</strong> - 病情稳定，可以等待</li>
+                </ul>
+                <button id="start-button">开始游戏</button>
+                <button id="show-saves-button">查看存档</button>
+            </div>
+        </div>
+
+        <!-- 游戏主界面 -->
+        <div id="game-screen" style="display: none;">
+            <!-- 病人队列 -->
+            <div id="patient-queue" class="zone">
+                <h3>待分诊病人</h3>
+                <div id="patients-list"></div>
+            </div>
+
+            <!-- 分诊区域 -->
+            <div id="triage-zones">
+                <div id="emergency-zone" class="zone triage-zone" data-zone="emergency">
+                    <h3>抢救区 (1级)</h3>
+                    <div class="zone-info">
+                        <div>床位: <span id="emergency-beds">0</span>/<span id="emergency-total-beds">0</span></div>
+                        <div>医生: <span id="emergency-doctors">0</span>人</div>
+                    </div>
+                    <div id="emergency-patients" class="patients-container"></div>
+                </div>
+
+                <div id="observation-zone" class="zone triage-zone" data-zone="observation">
+                    <h3>留观区 (2级)</h3>
+                    <div class="zone-info">
+                        <div>床位: <span id="observation-beds">0</span>/<span id="observation-total-beds">0</span></div>
+                        <div>医生: <span id="observation-doctors">0</span>人</div>
+                    </div>
+                    <div id="observation-patients" class="patients-container"></div>
+                </div>
+
+                <div id="transfer-zone" class="zone triage-zone" data-zone="transfer">
+                    <h3>转诊区 (3级)</h3>
+                    <div class="zone-info">
+                        <div>床位: <span id="transfer-beds">0</span>/<span id="transfer-total-beds">0</span></div>
+                        <div>医生: <span id="transfer-doctors">0</span>人</div>
+                    </div>
+                    <div id="transfer-patients" class="patients-container"></div>
+                </div>
+
+                <div id="waiting-zone" class="zone triage-zone" data-zone="waiting">
+                    <h3>等待区 (4级)</h3>
+                    <div class="zone-info">
+                        <div>床位: <span id="waiting-beds">0</span>/<span id="waiting-total-beds">0</span></div>
+                        <div>医生: <span id="waiting-doctors">0</span>人</div>
+                    </div>
+                    <div id="waiting-patients" class="patients-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="end-screen" style="display: none;">
+            <div class="screen-content">
+                <h2>游戏结束</h2>
+                <div id="results-summary">
+                    <h3>成绩总结</h3>
+                    <div id="final-score">最终分数: 0</div>
+                    <div id="accuracy">准确率: 0%</div>
+                    <div id="warnings-count">预警次数: 0</div>
+                    <div id="time-used">用时: 00:00</div>
+                </div>
+                <div id="result-buttons">
+                    <button id="play-again-button">再玩一次</button>
+                    <button id="replay-button">回放决策</button>
+                    <button id="export-md-button">导出Markdown复盘</button>
+                    <button id="export-csv-button">导出CSV错分清单</button>
+                    <button id="save-game-button">保存游戏记录</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 存档列表界面 -->
+        <div id="saves-screen" style="display: none;">
+            <div class="screen-content">
+                <h2>游戏存档</h2>
+                <div id="saves-list"></div>
+                <div id="saves-buttons">
+                    <button id="back-button">返回</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 回放界面 -->
+        <div id="replay-screen" style="display: none;">
+            <div class="screen-content">
+                <h2>决策回放</h2>
+                <div id="replay-controls">
+                    <button id="replay-prev">上一步</button>
+                    <button id="replay-play">播放</button>
+                    <button id="replay-next">下一步</button>
+                    <button id="replay-exit">退出回放</button>
+                </div>
+                <div id="replay-info">
+                    <div>步骤: <span id="replay-step">0</span>/<span id="replay-total">0</span></div>
+                    <div>时间: <span id="replay-time">00:00</span></div>
+                </div>
+                <div id="replay-content"></div>
+            </div>
+        </div>
+
+        <!-- 消息提示 -->
+        <div id="message-container"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

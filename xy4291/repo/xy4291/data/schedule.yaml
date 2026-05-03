@@ -1,0 +1,88 @@
+# 夜班分诊风暴 - 床位和医生排班配置
+# 日期: 2026-05-03 夜班 (00:00-08:00)
+
+zones:
+  # 抢救区 (1级 - 紧急生命危险)
+  emergency:
+    beds: 5
+    doctors: 2
+    nurses: 4
+    description: "抢救区 - 用于处理紧急生命危险情况"
+
+  # 留观区 (2级 - 需要进一步观察治疗)
+  observation:
+    beds: 10
+    doctors: 3
+    nurses: 6
+    description: "留观区 - 用于需要进一步观察和治疗的病人"
+
+  # 转诊区 (3级 - 需要转往其他科室)
+  transfer:
+    beds: 5
+    doctors: 1
+    nurses: 2
+    description: "转诊区 - 用于需要转往其他专科科室的病人"
+
+  # 等待区 (4级 - 病情稳定，可以等待)
+  waiting:
+    beds: 20
+    doctors: 1
+    nurses: 3
+    description: "等待区 - 用于病情稳定、可以等待的病人"
+
+# 值班医生信息
+onCallDoctors:
+  - id: D001
+    name: 张医生
+    specialty: 急诊科
+    zone: emergency
+    fatigueLevel: 0
+
+  - id: D002
+    name: 李医生
+    specialty: 急诊科
+    zone: emergency
+    fatigueLevel: 0
+
+  - id: D003
+    name: 王医生
+    specialty: 急诊科
+    zone: observation
+    fatigueLevel: 0
+
+  - id: D004
+    name: 赵医生
+    specialty: 急诊科
+    zone: observation
+    fatigueLevel: 0
+
+  - id: D005
+    name: 刘医生
+    specialty: 急诊科
+    zone: observation
+    fatigueLevel: 0
+
+  - id: D006
+    name: 陈医生
+    specialty: 骨科
+    zone: transfer
+    fatigueLevel: 0
+
+  - id: D007
+    name: 周医生
+    specialty: 神经内科
+    zone: waiting
+    fatigueLevel: 0
+
+# 可用科室
+availableDepartments:
+  - 急诊科
+  - 心内科
+  - 神经内科
+  - 呼吸内科
+  - 消化内科
+  - 骨科
+  - 妇产科
+  - 眼科
+  - 耳鼻喉科
+  - 精神科

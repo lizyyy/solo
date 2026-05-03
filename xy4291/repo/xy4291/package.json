@@ -1,0 +1,22 @@
+{
+  "name": "emergency-triage-storm",
+  "version": "1.0.0",
+  "description": "夜班分诊风暴 - 急诊科新护士训练小游戏",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "emergency",
+    "triage",
+    "training",
+    "game"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0"
+  }
+}
