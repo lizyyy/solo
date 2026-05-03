@@ -1,0 +1,259 @@
+name: 设备巡检状态机
+description: 设备定期巡检和异常处理流程状态机
+initialState: idle
+states:
+  idle:
+    name: 空闲
+    description: 设备正常运行，等待巡检周期
+    type: initial
+    on:
+      schedule_inspection:
+        - target: pending_inspection
+          description: 定期巡检计划触发
+          actions:
+            - create_inspection_task
+            - notify_inspector
+      detect_anomaly:
+        - target: anomaly_detected
+          description: 设备异常自动检测
+          actions:
+            - log_anomaly
+            - notify_maintenance_team
+  
+  pending_inspection:
+    name: 待巡检
+    description: 巡检任务已创建，等待巡检员执行
+    on:
+      start_inspection:
+        - target: in_inspection
+          description: 巡检员开始巡检
+          actions:
+            - record_inspection_start
+            - update_task_status
+      timeout:
+        - target: idle
+          description: 巡检超时，任务自动取消
+          guard:
+            condition: timeout_count < 2
+            description: 超时次数未超过2次
+          actions:
+            - cancel_inspection_task
+            - notify_inspector_reminder
+        - target: overdue
+          description: 巡检超时2次，标记为逾期
+          guard:
+            condition: timeout_count >= 2
+            description: 超时次数已达2次
+          actions:
+            - mark_as_overdue
+            - notify_manager
+  
+  in_inspection:
+    name: 巡检中
+    description: 巡检员正在执行设备检查
+    on:
+      submit_normal:
+        - target: inspection_complete
+          description: 提交正常巡检结果
+          actions:
+            - record_inspection_result
+            - mark_task_complete
+      submit_issue:
+        - target: issue_reported
+          description: 提交巡检发现的问题
+          actions:
+            - record_issue_details
+            - create_maintenance_request
+            - notify_maintenance_team
+      cancel_inspection:
+        - target: pending_inspection
+          description: 取消巡检，返回待巡检
+          actions:
+            - reset_task_status
+  
+  inspection_complete:
+    name: 巡检完成
+    description: 巡检任务正常完成
+    on:
+      confirm_close:
+        - target: idle
+          description: 确认关闭巡检任务
+          actions:
+            - close_inspection_task
+            - archive_inspection_record
+      review_required:
+        - target: pending_review
+          description: 需要主管复核
+          guard:
+            condition: has_special_flag
+            description: 有特殊标记需要复核
+          actions:
+            - request_manager_review
+            - notify_manager
+  
+  issue_reported:
+    name: 问题上报
+    description: 巡检发现问题，等待处理
+    on:
+      accept_issue:
+        - target: maintenance_scheduled
+          description: 维护团队接受问题
+          actions:
+            - assign_maintenance_person
+            - schedule_maintenance
+            - notify_inspector_acknowledged
+      reject_issue:
+        - target: inspection_complete
+          description: 问题被驳回（误报）
+          guard:
+            condition: is_false_alarm
+            description: 确认为误报
+          actions:
+            - mark_as_false_alarm
+            - close_issue
+            - notify_inspector
+  
+  maintenance_scheduled:
+    name: 维护排期
+    description: 维护任务已排期，等待执行
+    on:
+      start_maintenance:
+        - target: in_maintenance
+          description: 维护人员开始工作
+          actions:
+            - record_maintenance_start
+      reschedule:
+        - target: maintenance_scheduled
+          description: 重新排期
+          actions:
+            - update_maintenance_schedule
+            - notify_relevant_persons
+      timeout:
+        - target: overdue
+          description: 维护超时
+          guard:
+            condition: maintenance_delay_hours > 48
+            description: 延迟超过48小时
+          actions:
+            - escalate_to_manager
+            - mark_as_overdue
+  
+  in_maintenance:
+    name: 维护中
+    description: 维护人员正在处理设备问题
+    on:
+      complete_maintenance:
+        - target: pending_verification
+          description: 维护完成，等待验证
+          actions:
+            - record_maintenance_result
+            - update_issue_status
+            - request_verification
+      need_parts:
+        - target: waiting_parts
+          description: 需要备件
+          actions:
+            - request_parts
+            - notify_purchasing
+  
+  waiting_parts:
+    name: 等待备件
+    description: 维护暂停，等待备件送达
+    on:
+      parts_arrived:
+        - target: in_maintenance
+          description: 备件已到，继续维护
+          actions:
+            - record_parts_arrival
+            - notify_maintenance_person
+      parts_delay:
+        - target: overdue
+          description: 备件延迟超时
+          guard:
+            condition: parts_delay_days > 3
+            description: 延迟超过3天
+          actions:
+            - escalate_parts_issue
+            - mark_as_overdue
+  
+  pending_verification:
+    name: 待验证
+    description: 维护完成，等待巡检员验证
+    on:
+      verify_pass:
+        - target: idle
+          description: 验证通过，恢复正常
+          actions:
+            - close_issue
+            - close_inspection_task
+            - notify_all_completed
+      verify_fail:
+        - target: maintenance_scheduled
+          description: 验证不通过，重新维护
+          actions:
+            - record_verification_failure
+            - reopen_maintenance_request
+            - notify_maintenance_team
+  
+  pending_review:
+    name: 待复核
+    description: 需要主管复核的特殊情况
+    on:
+      review_approve:
+        - target: idle
+          description: 复核通过
+          actions:
+            - close_tasks
+            - archive_records
+      review_reject:
+        - target: issue_reported
+          description: 复核发现问题
+          actions:
+            - reopen_issue
+            - notify_inspector
+  
+  anomaly_detected:
+    name: 异常检测
+    description: 自动检测到设备异常
+    on:
+      investigate:
+        - target: pending_inspection
+          description: 安排人工检查
+          actions:
+            - create_urgent_inspection
+            - assign_inspector
+      false_alarm:
+        - target: idle
+          description: 确认为误报
+          guard:
+            condition: is_sensor_glitch
+            description: 传感器故障导致
+          actions:
+            - mark_false_alarm
+            - log_incident
+  
+  overdue:
+    name: 逾期
+    description: 任务已逾期，需要升级处理
+    on:
+      manager_handle:
+        - target: pending_inspection
+          description: 经理介入，重新安排
+          actions:
+            - reassign_inspector
+            - set_new_deadline
+      escalate:
+        - target: overdue
+          description: 继续升级
+          guard:
+            condition: overdue_days > 7
+            description: 逾期超过7天
+          actions:
+            - notify_department_head
+            - create_escalation_record
+      resolve:
+        - target: idle
+          description: 问题已解决
+          actions:
+            - close_overdue_record
+            - document_lessons_learned

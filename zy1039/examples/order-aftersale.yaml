@@ -1,0 +1,204 @@
+name: 订单售后状态机
+description: 电商订单售后流程状态机定义，包含申请、审核、处理、关闭等状态
+initialState: pending_apply
+states:
+  pending_apply:
+    name: 待申请
+    description: 用户尚未发起售后申请
+    type: initial
+    on:
+      apply_return:
+        - target: pending_review
+          description: 用户发起退货申请
+          actions:
+            - create_aftersale_record
+            - notify_customer_service
+      apply_refund:
+        - target: pending_review
+          description: 用户发起仅退款申请
+          actions:
+            - create_aftersale_record
+            - notify_customer_service
+      apply_exchange:
+        - target: pending_review
+          description: 用户发起换货申请
+          actions:
+            - create_aftersale_record
+            - notify_customer_service
+  
+  pending_review:
+    name: 待审核
+    description: 售后申请等待客服审核
+    on:
+      approve:
+        - target: processing
+          description: 客服审核通过
+          guard:
+            condition: has_valid_evidence
+            description: 用户已提供有效凭证
+          actions:
+            - approve_aftersale
+            - notify_user_approved
+        - target: processing
+          description: 客服直接通过（无需凭证）
+          guard:
+            condition: is_vip_user || order_amount < 100
+            description: VIP用户或小额订单免审核
+          actions:
+            - approve_aftersale
+            - notify_user_approved
+      reject:
+        - target: closed
+          description: 客服审核拒绝
+          actions:
+            - reject_aftersale
+            - notify_user_rejected
+      request_supplement:
+        - target: pending_supplement
+          description: 客服要求用户补充材料
+          actions:
+            - send_supplement_request
+            - notify_user_supplement
+      timeout:
+        - target: pending_review
+          description: 审核超时，自动提醒
+          guard:
+            condition: review_timeout_count < 3
+            description: 提醒次数未超过3次
+          actions:
+            - remind_customer_service
+            - increment_timeout_count
+        - target: closed
+          description: 审核超时3次，自动关闭
+          guard:
+            condition: review_timeout_count >= 3
+            description: 提醒次数已达3次
+          actions:
+            - auto_close_aftersale
+            - notify_user_timeout
+  
+  pending_supplement:
+    name: 待补充材料
+    description: 等待用户补充售后相关材料
+    on:
+      submit_supplement:
+        - target: pending_review
+          description: 用户提交补充材料
+          actions:
+            - attach_evidence
+            - notify_customer_service_review
+      timeout:
+        - target: closed
+          description: 补充材料超时，自动关闭
+          actions:
+            - auto_close_supplement_timeout
+            - notify_user_supplement_timeout
+  
+  processing:
+    name: 处理中
+    description: 售后申请正在处理
+    on:
+      user_send_back:
+        - target: pending_warehouse_check
+          description: 用户已寄回商品
+          guard:
+            condition: aftersale_type == 'return'
+            description: 退货类型售后
+          actions:
+            - record_shipment
+            - notify_warehouse_check
+      warehouse_receive:
+        - target: pending_warehouse_check
+          description: 仓库收到退回商品
+          guard:
+            condition: aftersale_type == 'return'
+            description: 退货类型售后
+          actions:
+            - record_warehouse_receipt
+      confirm_refund:
+        - target: closed
+          description: 确认退款完成
+          guard:
+            condition: aftersale_type == 'refund'
+            description: 仅退款类型
+          actions:
+            - process_refund
+            - notify_user_refunded
+            - close_aftersale
+      confirm_exchange:
+        - target: closed
+          description: 确认换货完成
+          guard:
+            condition: aftersale_type == 'exchange'
+            description: 换货类型
+          actions:
+            - process_exchange
+            - notify_user_exchanged
+            - close_aftersale
+  
+  pending_warehouse_check:
+    name: 待仓库验货
+    description: 等待仓库检查退回商品
+    on:
+      warehouse_approve:
+        - target: closed
+          description: 仓库验货通过
+          actions:
+            - process_refund_or_exchange
+            - notify_user_completed
+            - close_aftersale
+      warehouse_reject:
+        - target: pending_customer_review
+          description: 仓库验货不通过，需人工复核
+          actions:
+            - record_warehouse_reject
+            - notify_customer_service_review
+  
+  pending_customer_review:
+    name: 待人工复核
+    description: 仓库验货不通过，等待人工复核
+    on:
+      customer_approve:
+        - target: closed
+          description: 人工复核通过
+          actions:
+            - process_refund_or_exchange
+            - notify_user_completed
+            - close_aftersale
+      customer_reject:
+        - target: closed
+          description: 人工复核拒绝
+          actions:
+            - reject_aftersale
+            - notify_user_rejected
+            - close_aftersale
+      return_to_user:
+        - target: closed
+          description: 商品退回用户
+          actions:
+            - arrange_return_shipment
+            - notify_user_return_shipment
+            - close_aftersale
+  
+  closed:
+    name: 已关闭
+    description: 售后流程已结束
+    type: final
+    on:
+      submit_supplement:
+        - target: closed
+          description: 已关闭状态下收到补充材料（忽略）
+          guard:
+            condition: 'true'
+            description: 已关闭，不处理
+          actions:
+            - log_supplement_ignored
+      reopen:
+        - target: pending_review
+          description: 特殊情况重新开启（管理员权限）
+          guard:
+            condition: is_admin && within_30_days
+            description: 管理员且在30天内
+          actions:
+            - reopen_aftersale
+            - notify_customer_service

@@ -1,0 +1,27 @@
+{
+  "name": "stateflow-rehearsal",
+  "version": "1.0.0",
+  "description": "状态机交互可视化工具 - 支持导入、可视化、回放、检查和报告导出",
+  "main": "backend/src/app.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run serve",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "check": "node scripts/self-check.js",
+    "start": "cd backend && npm start"
+  },
+  "keywords": [
+    "state-machine",
+    "stateflow",
+    "visualization",
+    "rehearsal",
+    "fsm"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
