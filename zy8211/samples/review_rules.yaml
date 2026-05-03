@@ -1,0 +1,34 @@
+rules:
+  - rule_id: moisture_threshold
+    name: 含水率阈值检查
+    type: moisture_threshold
+    threshold: 80.0
+    priority: 1
+    enabled: true
+  
+  - rule_id: dosage_rate
+    name: 投加率偏差检查
+    type: dosage_rate
+    threshold: 10.0
+    priority: 2
+    enabled: true
+  
+  - rule_id: feed_sludge_range
+    name: 进泥量范围检查
+    type: feed_sludge_range
+    min: 50.0
+    max: 200.0
+    priority: 3
+    enabled: true
+  
+  - rule_id: cross_shift_check
+    name: 跨班次批次检查
+    type: cross_shift_batch
+    priority: 4
+    enabled: true
+  
+  - rule_id: missing_batch_check
+    name: 缺失批次检查
+    type: missing_batch
+    priority: 5
+    enabled: true
