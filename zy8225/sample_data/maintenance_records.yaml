@@ -1,0 +1,15 @@
+maintenance_records:
+  - pump_id: PUMP-004
+    maintenance_date: "2024-01-03"
+    maintenance_type: "预防性维护"
+    description: "常规检查，润滑脂补充，振动检测"
+    technician: "李四"
+    status: "completed"
+    next_maintenance_date: "2024-07-03"
+  - pump_id: PUMP-002
+    maintenance_date: "2024-01-05"
+    maintenance_type: "纠正性维护"
+    description: "轴承更换，密封检查，联轴器对中"
+    technician: "王五"
+    status: "completed"
+    next_maintenance_date: "2024-07-05"
