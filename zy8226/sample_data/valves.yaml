@@ -1,0 +1,91 @@
+valves:
+  - valve_id: V000
+    unit_id: HEAT_STATION
+    current_open_rate: 85.0
+    min_open_rate: 20.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V001
+    unit_id: BUILDING_1
+    current_open_rate: 75.0
+    min_open_rate: 10.0
+    max_open_rate: 90.0
+    is_enabled: true
+
+  - valve_id: V002
+    unit_id: BUILDING_2
+    current_open_rate: 60.0
+    min_open_rate: 10.0
+    max_open_rate: 90.0
+    is_enabled: true
+
+  - valve_id: V003
+    unit_id: BUILDING_3
+    current_open_rate: 98.0
+    min_open_rate: 10.0
+    max_open_rate: 90.0
+    is_enabled: true
+
+  - valve_id: V101
+    unit_id: APART_101
+    current_open_rate: 50.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V102
+    unit_id: APART_102
+    current_open_rate: 30.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V103
+    unit_id: APART_103
+    current_open_rate: 70.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V201
+    unit_id: APART_201
+    current_open_rate: 55.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V202
+    unit_id: APART_202
+    current_open_rate: 2.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V203
+    unit_id: APART_203
+    current_open_rate: 65.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V301
+    unit_id: APART_301
+    current_open_rate: 45.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V302
+    unit_id: APART_302
+    current_open_rate: 55.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true
+
+  - valve_id: V303
+    unit_id: APART_303
+    current_open_rate: 60.0
+    min_open_rate: 5.0
+    max_open_rate: 95.0
+    is_enabled: true

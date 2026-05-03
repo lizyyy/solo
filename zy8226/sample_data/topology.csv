@@ -1,0 +1,14 @@
+unit_id,name,parent_id,unit_type,design_flow,design_heat_load,valve_id
+HEAT_STATION,阳光小区换热站,,station,200.0,1500.0,V000
+BUILDING_1,1号楼,HEAT_STATION,building,60.0,450.0,V001
+BUILDING_2,2号楼,HEAT_STATION,building,55.0,400.0,V002
+BUILDING_3,3号楼,HEAT_STATION,building,50.0,380.0,V003
+APART_101,1号楼1单元,BUILDING_1,apartment,20.0,150.0,V101
+APART_102,1号楼2单元,BUILDING_1,apartment,20.0,150.0,V102
+APART_103,1号楼3单元,BUILDING_1,apartment,20.0,150.0,V103
+APART_201,2号楼1单元,BUILDING_2,apartment,18.0,130.0,V201
+APART_202,2号楼2单元,BUILDING_2,apartment,19.0,135.0,V202
+APART_203,2号楼3单元,BUILDING_2,apartment,18.0,135.0,V203
+APART_301,3号楼1单元,BUILDING_3,apartment,17.0,125.0,V301
+APART_302,3号楼2单元,BUILDING_3,apartment,16.5,130.0,V302
+APART_303,3号楼3单元,BUILDING_3,apartment,16.5,125.0,V303
