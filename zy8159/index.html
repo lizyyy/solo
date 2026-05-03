@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>博物馆夜间撤展 - 策略小游戏</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="game-header">
+        <h1>🏛️ 博物馆夜间临时撤展</h1>
+        <div class="game-status">
+          <span id="turn-counter">回合: 1 / 20</span>
+          <span id="power-status">电力: 正常</span>
+          <span id="collected-arts">已撤展: 0 / 5</span>
+        </div>
+      </header>
+      
+      <main class="game-container">
+        <aside class="game-info">
+          <div class="info-panel">
+            <h3>📋 任务简报</h3>
+            <p>博物馆收到威胁情报，需要在安保人员巡逻到前将所有高价值文物转移到安全出口。</p>
+          </div>
+          
+          <div class="controls-panel">
+            <h3>🎮 操作指南</h3>
+            <ul>
+              <li>点击保管员选中</li>
+              <li>点击相邻格子移动</li>
+              <li>到达展柜后可解锁并取走文物</li>
+              <li>到达安全出口后可放置文物</li>
+            </ul>
+          </div>
+          
+          <div class="action-buttons">
+            <button id="end-turn-btn" class="btn primary">结束回合</button>
+            <button id="restart-btn" class="btn secondary">重新开始</button>
+          </div>
+        </aside>
+        
+        <section class="game-area">
+          <div id="game-map" class="map-grid"></div>
+          <div id="message-log" class="message-log"></div>
+        </section>
+        
+        <aside class="game-details">
+          <div class="custodian-panel">
+            <h3>👤 保管员状态</h3>
+            <div id="custodian-info">
+              <p>选择一名保管员查看详情</p>
+            </div>
+          </div>
+          
+          <div class="events-panel">
+            <h3>🎴 当前事件卡</h3>
+            <div id="event-card">
+              <p>无活跃事件</p>
+            </div>
+          </div>
+          
+          <div class="risks-panel">
+            <h3>⚠️ 风险警告</h3>
+            <div id="risks-list">
+              <p>暂无风险</p>
+            </div>
+          </div>
+        </aside>
+      </main>
+      
+      <footer class="game-footer">
+        <p>💡 提示：注意安保人员的巡逻路线，避开他们的视野！小心随机停电事件！</p>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
