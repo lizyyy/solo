@@ -1,0 +1,40 @@
+{
+  "modifications": [
+    {
+      "id": "MOD_001",
+      "cue_number": "CUE_001",
+      "modified_at": "2026-01-15T10:30:00",
+      "modified_by": "李舞台",
+      "changes": [
+        {
+          "channel": 1,
+          "old_value": 180,
+          "new_value": 200,
+          "reason": "导演要求更亮"
+        },
+        {
+          "channel": 2,
+          "old_value": 120,
+          "new_value": 150,
+          "reason": "调整色温"
+        }
+      ],
+      "confirmed": true
+    },
+    {
+      "id": "MOD_002",
+      "cue_number": "CUE_005",
+      "modified_at": "2026-01-15T14:20:00",
+      "modified_by": "王灯光",
+      "changes": [
+        {
+          "channel": 1,
+          "old_value": 200,
+          "new_value": 255,
+          "reason": "高潮场景全亮"
+        }
+      ],
+      "confirmed": false
+    }
+  ]
+}

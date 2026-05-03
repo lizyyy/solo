@@ -1,0 +1,55 @@
+{
+  "fixtures": [
+    {
+      "id": "SPOT_001",
+      "name": "聚光灯1 - 舞台左",
+      "type": "spot",
+      "start_channel": 1,
+      "channel_count": 3,
+      "channels": {
+        "dimmer": 1,
+        "pan": 2,
+        "tilt": 3
+      },
+      "requires_confirmation": false
+    },
+    {
+      "id": "WASH_001",
+      "name": "染色灯1 - 舞台右",
+      "type": "wash",
+      "start_channel": 4,
+      "channel_count": 5,
+      "channels": {
+        "dimmer": 4,
+        "r": 5,
+        "g": 6,
+        "b": 7,
+        "w": 8
+      },
+      "requires_confirmation": false
+    },
+    {
+      "id": "HAZER_001",
+      "name": "烟机1 - 后舞台",
+      "type": "hazer",
+      "start_channel": 20,
+      "channel_count": 2,
+      "channels": {
+        "output": 20,
+        "fan": 21
+      },
+      "requires_confirmation": true
+    },
+    {
+      "id": "LIFT_001",
+      "name": "升降台1 - 主舞台",
+      "type": "lift",
+      "start_channel": 30,
+      "channel_count": 1,
+      "channels": {
+        "position": 30
+      },
+      "requires_confirmation": true
+    }
+  ]
+}
