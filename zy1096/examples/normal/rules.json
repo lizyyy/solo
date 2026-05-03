@@ -1,0 +1,20 @@
+{
+  "passport_min_validity_months": 6,
+  "employment_cert_max_age_days": 30,
+  "insurance_buffer_days": 2,
+  "required_documents": [
+    "passport",
+    "photo",
+    "employment_cert",
+    "bank_statement",
+    "flight_itinerary",
+    "hotel_booking",
+    "insurance"
+  ],
+  "photo_requirements": {
+    "size": "35x45mm",
+    "background": "white",
+    "max_age_months": 6
+  },
+  "document_naming_pattern": "{applicant_id}_{document_type}.{ext}"
+}
