@@ -1,0 +1,626 @@
+{
+  "metadata": {
+    "warehouse": "冷链仓库一号库",
+    "date": "2026-05-03"
+  },
+  "racks": [
+    {
+      "id": "A1",
+      "name": "A区货架1",
+      "area": "A区",
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": [
+        {
+          "id": "A1-L1-P1",
+          "level": 1,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 50
+          }
+        },
+        {
+          "id": "A1-L1-P2",
+          "level": 1,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 30
+          }
+        },
+        {
+          "id": "A1-L1-P3",
+          "level": 1,
+          "position": 3,
+          "occupied": false
+        },
+        {
+          "id": "A1-L1-P4",
+          "level": 1,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "冰淇淋",
+            "sku": "SKU003",
+            "quantity": 80
+          }
+        },
+        {
+          "id": "A1-L1-P5",
+          "level": 1,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "速冻饺子",
+            "sku": "SKU004",
+            "quantity": 45
+          }
+        },
+        {
+          "id": "A1-L2-P1",
+          "level": 2,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "冷冻鸡肉",
+            "sku": "SKU005",
+            "quantity": 60
+          }
+        },
+        {
+          "id": "A1-L2-P2",
+          "level": 2,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "海鲜礼包",
+            "sku": "SKU006",
+            "quantity": 25
+          }
+        },
+        {
+          "id": "A1-L2-P3",
+          "level": 2,
+          "position": 3,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 40
+          }
+        },
+        {
+          "id": "A1-L2-P4",
+          "level": 2,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 35
+          }
+        },
+        {
+          "id": "A1-L2-P5",
+          "level": 2,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "冰淇淋",
+            "sku": "SKU003",
+            "quantity": 70
+          }
+        },
+        {
+          "id": "A1-L3-P1",
+          "level": 3,
+          "position": 1,
+          "occupied": false
+        },
+        {
+          "id": "A1-L3-P2",
+          "level": 3,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "速冻饺子",
+            "sku": "SKU004",
+            "quantity": 55
+          }
+        },
+        {
+          "id": "A1-L3-P3",
+          "level": 3,
+          "position": 3,
+          "occupied": true,
+          "product": {
+            "name": "冷冻鸡肉",
+            "sku": "SKU005",
+            "quantity": 50
+          }
+        },
+        {
+          "id": "A1-L3-P4",
+          "level": 3,
+          "position": 4,
+          "occupied": false
+        },
+        {
+          "id": "A1-L3-P5",
+          "level": 3,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "海鲜礼包",
+            "sku": "SKU006",
+            "quantity": 30
+          }
+        },
+        {
+          "id": "A1-L4-P1",
+          "level": 4,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 45
+          }
+        },
+        {
+          "id": "A1-L4-P2",
+          "level": 4,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 40
+          }
+        },
+        {
+          "id": "A1-L4-P3",
+          "level": 4,
+          "position": 3,
+          "occupied": false
+        },
+        {
+          "id": "A1-L4-P4",
+          "level": 4,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "冰淇淋",
+            "sku": "SKU003",
+            "quantity": 65
+          }
+        },
+        {
+          "id": "A1-L4-P5",
+          "level": 4,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "速冻饺子",
+            "sku": "SKU004",
+            "quantity": 50
+          }
+        }
+      ]
+    },
+    {
+      "id": "A2",
+      "name": "A区货架2",
+      "area": "A区",
+      "position": {
+        "x": 2.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": [
+        {
+          "id": "A2-L1-P1",
+          "level": 1,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "冷冻鸡肉",
+            "sku": "SKU005",
+            "quantity": 55
+          }
+        },
+        {
+          "id": "A2-L1-P2",
+          "level": 1,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "海鲜礼包",
+            "sku": "SKU006",
+            "quantity": 35
+          }
+        },
+        {
+          "id": "A2-L1-P3",
+          "level": 1,
+          "position": 3,
+          "occupied": false
+        },
+        {
+          "id": "A2-L1-P4",
+          "level": 1,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 48
+          }
+        },
+        {
+          "id": "A2-L1-P5",
+          "level": 1,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 42
+          }
+        },
+        {
+          "id": "A2-L2-P1",
+          "level": 2,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "冰淇淋",
+            "sku": "SKU003",
+            "quantity": 75
+          }
+        },
+        {
+          "id": "A2-L2-P2",
+          "level": 2,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "速冻饺子",
+            "sku": "SKU004",
+            "quantity": 52
+          }
+        },
+        {
+          "id": "A2-L2-P3",
+          "level": 2,
+          "position": 3,
+          "occupied": true,
+          "product": {
+            "name": "冷冻鸡肉",
+            "sku": "SKU005",
+            "quantity": 58
+          }
+        },
+        {
+          "id": "A2-L2-P4",
+          "level": 2,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "海鲜礼包",
+            "sku": "SKU006",
+            "quantity": 28
+          }
+        },
+        {
+          "id": "A2-L2-P5",
+          "level": 2,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 45
+          }
+        },
+        {
+          "id": "A2-L3-P1",
+          "level": 3,
+          "position": 1,
+          "occupied": false
+        },
+        {
+          "id": "A2-L3-P2",
+          "level": 3,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 38
+          }
+        },
+        {
+          "id": "A2-L3-P3",
+          "level": 3,
+          "position": 3,
+          "occupied": true,
+          "product": {
+            "name": "冰淇淋",
+            "sku": "SKU003",
+            "quantity": 72
+          }
+        },
+        {
+          "id": "A2-L3-P4",
+          "level": 3,
+          "position": 4,
+          "occupied": false
+        },
+        {
+          "id": "A2-L3-P5",
+          "level": 3,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "速冻饺子",
+            "sku": "SKU004",
+            "quantity": 48
+          }
+        },
+        {
+          "id": "A2-L4-P1",
+          "level": 4,
+          "position": 1,
+          "occupied": true,
+          "product": {
+            "name": "冷冻鸡肉",
+            "sku": "SKU005",
+            "quantity": 62
+          }
+        },
+        {
+          "id": "A2-L4-P2",
+          "level": 4,
+          "position": 2,
+          "occupied": true,
+          "product": {
+            "name": "海鲜礼包",
+            "sku": "SKU006",
+            "quantity": 32
+          }
+        },
+        {
+          "id": "A2-L4-P3",
+          "level": 4,
+          "position": 3,
+          "occupied": false
+        },
+        {
+          "id": "A2-L4-P4",
+          "level": 4,
+          "position": 4,
+          "occupied": true,
+          "product": {
+            "name": "进口牛排",
+            "sku": "SKU001",
+            "quantity": 42
+          }
+        },
+        {
+          "id": "A2-L4-P5",
+          "level": 4,
+          "position": 5,
+          "occupied": true,
+          "product": {
+            "name": "冷冻虾仁",
+            "sku": "SKU002",
+            "quantity": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "A3",
+      "name": "A区货架3",
+      "area": "A区",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "A4",
+      "name": "A区货架4",
+      "area": "A区",
+      "position": {
+        "x": 7.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "B1",
+      "name": "B区货架1",
+      "area": "B区",
+      "position": {
+        "x": 10,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "B2",
+      "name": "B区货架2",
+      "area": "B区",
+      "position": {
+        "x": 12.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "B3",
+      "name": "B区货架3",
+      "area": "B区",
+      "position": {
+        "x": 15,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "B4",
+      "name": "B区货架4",
+      "area": "B区",
+      "position": {
+        "x": 17.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "C1",
+      "name": "C区货架1",
+      "area": "C区",
+      "position": {
+        "x": 20,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "C2",
+      "name": "C区货架2",
+      "area": "C区",
+      "position": {
+        "x": 22.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "C3",
+      "name": "C区货架3",
+      "area": "C区",
+      "position": {
+        "x": 25,
+        "y": 0,
+        "z": -6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    },
+    {
+      "id": "C4",
+      "name": "C区货架4",
+      "area": "C区",
+      "position": {
+        "x": 27.5,
+        "y": 0,
+        "z": 6
+      },
+      "dimensions": {
+        "width": 2,
+        "height": 4,
+        "depth": 1
+      },
+      "levels": 4,
+      "slotsPerLevel": 5,
+      "slots": []
+    }
+  ]
+}
