@@ -1,0 +1,11 @@
+# 音频元数据处理
+mutagen==1.47.0
+
+# 命令行界面
+click==8.1.7
+
+# 测试
+pytest==8.1.1
+
+# 时间处理
+python-dateutil==2.9.0.post0
