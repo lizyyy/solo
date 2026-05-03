@@ -1,0 +1,87 @@
+- rule_id: "rule_001"
+  category: "付款条款"
+  description: "付款期限过短风险"
+  keywords:
+    - "工作日内"
+    - "十五个工作日"
+    - "15个工作日"
+    - "十日内"
+  risk_level: "critical"
+  is_mandatory: true
+  remediation: "建议延长付款期限至30个工作日，或增加宽限期条款"
+  priority: 1
+
+- rule_id: "rule_002"
+  category: "付款条款"
+  description: "违约金比例风险"
+  keywords:
+    - "万分之五"
+    - "0.05%"
+    - "万分之三"
+    - "0.03%"
+  risk_level: "high"
+  is_mandatory: false
+  remediation: "建议提高违约金比例至万分之八或千分之一"
+  priority: 2
+
+- rule_id: "rule_003"
+  category: "保密条款"
+  description: "保密期限过长风险"
+  keywords:
+    - "五年"
+    - "5年"
+    - "终止后五年"
+  risk_level: "medium"
+  is_mandatory: false
+  remediation: "建议缩短保密期限至2-3年"
+  priority: 3
+
+- rule_id: "rule_004"
+  category: "知识产权"
+  description: "知识产权归属风险"
+  keywords:
+    - "独家所有"
+    - "甲方所有"
+    - "不得擅自使用"
+  risk_level: "medium"
+  is_mandatory: false
+  remediation: "确认知识产权归属是否符合双方实际合作情况"
+  priority: 4
+
+- rule_id: "rule_005"
+  category: "争议解决"
+  description: "争议解决管辖风险"
+  keywords:
+    - "甲方所在地"
+    - "乙方所在地"
+    - "有管辖权的人民法院"
+  risk_level: "high"
+  is_mandatory: true
+  remediation: "建议约定为原告所在地或合同签订地法院，体现公平原则"
+  priority: 1
+
+- rule_id: "rule_006"
+  category: "违约条款"
+  description: "违约责任过高风险"
+  keywords:
+    - "10%"
+    - "百分之十"
+    - "全部损失"
+    - "间接损失"
+  risk_level: "medium"
+  is_mandatory: false
+  remediation: "评估违约责任是否过高，考虑设置违约金上限"
+  priority: 5
+
+- rule_id: "rule_007"
+  category: "保密条款"
+  description: "商业秘密保护风险"
+  keywords:
+    - "商业秘密"
+    - "技术信息"
+    - "客户数据"
+    - "技术秘密"
+  risk_level: "high"
+  is_mandatory: false
+  remediation: "确认保密范围是否完整，建议增加保密措施条款"
+  priority: 2

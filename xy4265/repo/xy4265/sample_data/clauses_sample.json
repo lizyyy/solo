@@ -1,0 +1,82 @@
+[
+    {
+        "clause_id": "clause_001",
+        "title": "第一条 合作内容",
+        "content": "甲方同意按照本协议约定向乙方提供技术咨询服务，乙方同意按照本协议约定支付服务费。本协议项下的服务范围见附件一。",
+        "order": 1,
+        "parent_id": null,
+        "metadata": {"chapter": "合作内容"}
+    },
+    {
+        "clause_id": "clause_002",
+        "title": "第二条 服务费与支付",
+        "content": "本协议项下服务费总额为人民币壹佰万元整（¥1,000,000.00）。乙方应于协议签订后十五个工作日内支付首期款项的20%，即人民币贰拾万元整（¥200,000.00）。",
+        "order": 2,
+        "parent_id": null,
+        "metadata": {"chapter": "费用"}
+    },
+    {
+        "clause_id": "clause_003",
+        "title": "2.1 支付方式",
+        "content": "所有款项应通过银行转账方式支付至甲方指定的以下银行账户：开户行：中国工商银行北京分行，账户名称：甲方有限公司，银行账号：6222020000000000000。",
+        "order": 1,
+        "parent_id": "clause_002",
+        "metadata": {"chapter": "费用"}
+    },
+    {
+        "clause_id": "clause_004",
+        "title": "2.2 逾期付款",
+        "content": "如乙方未按本协议约定支付款项，每逾期一日，应按逾期金额的万分之五向甲方支付违约金。逾期超过三十日的，甲方有权单方解除本协议，并要求乙方承担合同总额10%的违约责任。",
+        "order": 2,
+        "parent_id": "clause_002",
+        "metadata": {"chapter": "费用"}
+    },
+    {
+        "clause_id": "clause_005",
+        "title": "第三条 保密条款",
+        "content": "双方应对本协议内容及在合作过程中获悉的对方商业秘密、技术信息、客户数据等承担保密义务。未经对方书面同意，不得向任何第三方披露。",
+        "order": 3,
+        "parent_id": null,
+        "metadata": {"chapter": "保密"}
+    },
+    {
+        "clause_id": "clause_006",
+        "title": "3.1 保密期限",
+        "content": "本保密义务在本协议有效期内及协议终止后五年内持续有效。",
+        "order": 1,
+        "parent_id": "clause_005",
+        "metadata": {"chapter": "保密"}
+    },
+    {
+        "clause_id": "clause_007",
+        "title": "第四条 知识产权",
+        "content": "甲方在履行本协议过程中所产生的所有知识产权（包括但不限于专利、商标、著作权、技术秘密等）均归甲方独家所有。乙方不得擅自使用、复制或转让。",
+        "order": 4,
+        "parent_id": null,
+        "metadata": {"chapter": "知识产权"}
+    },
+    {
+        "clause_id": "clause_008",
+        "title": "第五条 违约责任",
+        "content": "任何一方违反本协议约定，应向对方支付违约金，并赔偿因此给对方造成的全部损失（包括但不限于直接损失、间接损失、律师费、诉讼费等）。",
+        "order": 5,
+        "parent_id": null,
+        "metadata": {"chapter": "违约"}
+    },
+    {
+        "clause_id": "clause_009",
+        "title": "第六条 法律适用与争议解决",
+        "content": "本协议的订立、效力、解释、履行及争议解决均适用中华人民共和国法律。因本协议引起的或与本协议有关的任何争议，双方应首先通过友好协商解决；协商不成的，任何一方均可向甲方所在地有管辖权的人民法院提起诉讼。",
+        "order": 6,
+        "parent_id": null,
+        "metadata": {"chapter": "争议解决"}
+    },
+    {
+        "clause_id": "clause_010",
+        "title": "第七条 协议的生效与终止",
+        "content": "本协议自双方签字盖章之日起生效，有效期为三年。协议期满前三个月，如双方均未提出书面终止通知，则本协议自动延续一年。",
+        "order": 7,
+        "parent_id": null,
+        "metadata": {"chapter": "生效终止"}
+    }
+]
