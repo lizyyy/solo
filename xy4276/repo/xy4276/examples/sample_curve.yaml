@@ -1,0 +1,42 @@
+name: "标准氧化烧成曲线"
+description: "适用于中温釉陶瓷的标准氧化烧成曲线，最高温度1240°C"
+
+phases:
+  - name: "低温升温"
+    type: "heating"
+    start_temp: 25
+    end_temp: 600
+    duration: "30m"
+    rate: 19.2
+    notes: "室温到600°C，慢速升温排除水分和结晶水"
+
+  - name: "中温升温"
+    type: "heating"
+    start_temp: 600
+    end_temp: 1000
+    duration: "30m"
+    rate: 13.3
+    notes: "600°C到1000°C，氧化阶段"
+
+  - name: "高温升温"
+    type: "heating"
+    start_temp: 1000
+    end_temp: 1240
+    duration: "1h"
+    rate: 4.0
+    notes: "1000°C到1240°C，慢速升温到达最高温"
+
+  - name: "高温保温"
+    type: "holding"
+    start_temp: 1240
+    end_temp: 1240
+    duration: "1h"
+    notes: "1240°C保温60分钟，使釉面充分熔融"
+
+  - name: "冷却阶段"
+    type: "cooling"
+    start_temp: 1240
+    end_temp: 850
+    duration: "2h"
+    rate: -3.25
+    notes: "从1240°C冷却到850°C，注意控制冷却速率防止釉裂"

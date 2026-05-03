@@ -1,0 +1,33 @@
+{
+  "batch_id": "BATCH_20260503_001",
+  "load_date": "2026-05-03T08:00:00",
+  "kiln_model": "KS-1200 电窑",
+  "total_pieces": 45,
+  "notes": "本次装载包含多种釉色试验品，主要测试新配方釉料在不同层位的表现",
+  "layers": [
+    {
+      "layer_name": "top",
+      "position": "top",
+      "load_type": "试验釉茶碗",
+      "piece_count": 15,
+      "expected_temp_offset": 5.0,
+      "thermocouple": "TC1"
+    },
+    {
+      "layer_name": "middle",
+      "position": "middle",
+      "load_type": "常规釉茶具",
+      "piece_count": 20,
+      "expected_temp_offset": 0.0,
+      "thermocouple": "TC2"
+    },
+    {
+      "layer_name": "bottom",
+      "position": "bottom",
+      "load_type": "雕塑作品",
+      "piece_count": 10,
+      "expected_temp_offset": -5.0,
+      "thermocouple": "TC3"
+    }
+  ]
+}

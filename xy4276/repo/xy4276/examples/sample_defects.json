@@ -1,0 +1,46 @@
+[
+  {
+    "batch_id": "BATCH_20260503_001",
+    "piece_id": "TOP-003",
+    "layer_name": "top",
+    "defect_type": "釉裂",
+    "severity": "轻微",
+    "description": "碗口边缘有细微裂纹，约2-3mm长",
+    "suspect_phase": "cooling",
+    "location_x": 0.5,
+    "location_y": 0.8
+  },
+  {
+    "batch_id": "BATCH_20260503_001",
+    "piece_id": "TOP-007",
+    "layer_name": "top",
+    "defect_type": "气泡",
+    "severity": "中等",
+    "description": "釉面有多处小气泡，直径约1-2mm",
+    "suspect_phase": "holding",
+    "location_x": 0.3,
+    "location_y": 0.4
+  },
+  {
+    "batch_id": "BATCH_20260503_001",
+    "piece_id": "BOT-002",
+    "layer_name": "bottom",
+    "defect_type": "针孔",
+    "severity": "轻微",
+    "description": "底部有少量针孔",
+    "suspect_phase": "heating",
+    "location_x": 0.5,
+    "location_y": 0.1
+  },
+  {
+    "batch_id": "BATCH_20260503_001",
+    "piece_id": "BOT-005",
+    "layer_name": "bottom",
+    "defect_type": "釉裂",
+    "severity": "严重",
+    "description": "雕塑作品底部有明显裂纹，贯穿整个底部",
+    "suspect_phase": "cooling",
+    "location_x": 0.5,
+    "location_y": 0.0
+  }
+]
