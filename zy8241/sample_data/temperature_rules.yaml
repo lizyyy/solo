@@ -1,0 +1,18 @@
+rules:
+  - rule_name: "常规冷链药品"
+    drug_category: "常规冷链"
+    min_temp: 2.0
+    max_temp: 8.0
+    allowed_exceed_duration_minutes: 15
+
+  - rule_name: "特殊生物制品"
+    drug_category: "生物制品"
+    min_temp: 2.0
+    max_temp: 8.0
+    allowed_exceed_duration_minutes: 5
+
+  - rule_name: "冷冻药品"
+    drug_category: "冷冻"
+    min_temp: -25.0
+    max_temp: -15.0
+    allowed_exceed_duration_minutes: 10
