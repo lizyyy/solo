@@ -1,0 +1,40 @@
+- rule_code: RULE-001
+  rule_name: 默认涂装作业通用规则
+  min_air_changes_per_hour: 30.0
+  voc_threshold_ppm: 500.0
+  voc_threshold_mg_m3: 1500.0
+  is_active: true
+  priority: 0
+  description: 所有涂装作业的默认通风规则
+
+- rule_code: RULE-002
+  rule_name: 高风险舱室特殊规则
+  cabin_code: CAB-003
+  operation_type: 夜间涂装
+  min_air_changes_per_hour: 40.0
+  voc_threshold_ppm: 300.0
+  voc_threshold_mg_m3: 1000.0
+  is_active: true
+  priority: 10
+  description: 上层甲板舱室夜间涂装需要更高通风标准
+
+- rule_code: RULE-003
+  rule_name: 机舱区域规则
+  cabin_code: CAB-004
+  operation_type: 底漆喷涂
+  min_air_changes_per_hour: 50.0
+  voc_threshold_ppm: 400.0
+  voc_threshold_mg_m3: 1200.0
+  is_active: true
+  priority: 5
+  description: 机舱区域需要更高的通风要求
+
+- rule_code: RULE-004
+  rule_name: 环氧底漆专用规则
+  paint_type: 环氧底漆
+  min_air_changes_per_hour: 35.0
+  voc_threshold_ppm: 450.0
+  voc_threshold_mg_m3: 1350.0
+  is_active: true
+  priority: 3
+  description: 环氧底漆涂装的特殊要求
