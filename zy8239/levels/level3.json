@@ -1,0 +1,139 @@
+{
+    "id": "level_3",
+    "name": "复杂调度",
+    "description": "三个机器人协同工作，多个花期窗口重叠，需要严格消毒流程，避免交叉污染。",
+    "timeLimit": 720,
+    "grid": [
+        [
+            {"type": "pollination", "zoneId": "p1", "zoneName": "番茄棚A", "requiresDisinfection": true},
+            {"type": "path", "zoneId": null},
+            {"type": "pollination", "zoneId": "p2", "zoneName": "番茄棚B", "requiresDisinfection": true},
+            {"type": "path", "zoneId": null},
+            {"type": "pollination", "zoneId": "p3", "zoneName": "黄瓜棚", "requiresDisinfection": false},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "charging", "zoneId": "c1", "zoneName": "充电站A"},
+            {"type": "path", "zoneId": null},
+            {"type": "humidity", "zoneId": "h1", "zoneName": "高湿区1"},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "disinfection", "zoneId": "d1", "zoneName": "消毒站A"},
+            {"type": "path", "zoneId": null},
+            {"type": "charging", "zoneId": "c2", "zoneName": "充电站B"},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "pollination", "zoneId": "p4", "zoneName": "草莓棚", "requiresDisinfection": true},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "disinfection", "zoneId": "d2", "zoneName": "消毒站B"},
+            {"type": "path", "zoneId": null},
+            {"type": "pollination", "zoneId": "p5", "zoneName": "西瓜棚", "requiresDisinfection": false}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "humidity", "zoneId": "h2", "zoneName": "高湿区2"},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "charging", "zoneId": "c3", "zoneName": "充电站C"},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ]
+    ],
+    "robots": [
+        {
+            "id": "R1",
+            "name": "授粉机器人1号",
+            "startPosition": {"row": 1, "col": 1},
+            "battery": 100,
+            "maxBattery": 100,
+            "chargeRate": 5.0
+        },
+        {
+            "id": "R2",
+            "name": "授粉机器人2号",
+            "startPosition": {"row": 2, "col": 4},
+            "battery": 95,
+            "maxBattery": 100,
+            "chargeRate": 5.0
+        },
+        {
+            "id": "R3",
+            "name": "授粉机器人3号",
+            "startPosition": {"row": 4, "col": 4},
+            "battery": 85,
+            "maxBattery": 100,
+            "chargeRate": 5.0
+        }
+    ],
+    "objectives": [
+        {
+            "id": "obj1",
+            "description": "完成番茄棚A授粉",
+            "zoneId": "p1",
+            "minPollinationTime": 45,
+            "floweringWindow": {
+                "start": "08:00",
+                "end": "10:00"
+            },
+            "points": 200
+        },
+        {
+            "id": "obj2",
+            "description": "完成番茄棚B授粉",
+            "zoneId": "p2",
+            "minPollinationTime": 45,
+            "floweringWindow": {
+                "start": "09:00",
+                "end": "11:00"
+            },
+            "points": 200
+        },
+        {
+            "id": "obj3",
+            "description": "完成黄瓜棚授粉",
+            "zoneId": "p3",
+            "minPollinationTime": 30,
+            "floweringWindow": {
+                "start": "10:00",
+                "end": "14:00"
+            },
+            "points": 150
+        },
+        {
+            "id": "obj4",
+            "description": "完成草莓棚授粉",
+            "zoneId": "p4",
+            "minPollinationTime": 60,
+            "floweringWindow": {
+                "start": "13:00",
+                "end": "17:00"
+            },
+            "points": 250
+        },
+        {
+            "id": "obj5",
+            "description": "完成西瓜棚授粉",
+            "zoneId": "p5",
+            "minPollinationTime": 50,
+            "floweringWindow": {
+                "start": "15:00",
+                "end": "19:00"
+            },
+            "points": 200
+        }
+    ]
+}

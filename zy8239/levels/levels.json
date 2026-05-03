@@ -1,0 +1,17 @@
+[
+    {
+        "name": "新手教学",
+        "description": "简单入门，1个机器人，2个授粉目标",
+        "file": "level1.json"
+    },
+    {
+        "name": "双机协作",
+        "description": "2个机器人，需要协调避免冲突",
+        "file": "level2.json"
+    },
+    {
+        "name": "复杂调度",
+        "description": "3个机器人，多个花期窗口，需要消毒",
+        "file": "level3.json"
+    }
+]

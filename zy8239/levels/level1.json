@@ -1,0 +1,77 @@
+{
+    "id": "level_1",
+    "name": "新手教学",
+    "description": "简单入门关卡，学习基本的机器人调度。需要在指定时间内完成两个授粉任务，并注意充电。",
+    "timeLimit": 480,
+    "grid": [
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "pollination", "zoneId": "p1", "zoneName": "番茄棚", "requiresDisinfection": false},
+            {"type": "path", "zoneId": null},
+            {"type": "pollination", "zoneId": "p2", "zoneName": "草莓棚", "requiresDisinfection": false},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "charging", "zoneId": "c1", "zoneName": "充电站"},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ],
+        [
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null},
+            {"type": "path", "zoneId": null}
+        ]
+    ],
+    "robots": [
+        {
+            "id": "R1",
+            "name": "授粉机器人1号",
+            "startPosition": {"row": 2, "col": 2},
+            "battery": 100,
+            "maxBattery": 100,
+            "chargeRate": 5.0
+        }
+    ],
+    "objectives": [
+        {
+            "id": "obj1",
+            "description": "完成番茄棚授粉",
+            "zoneId": "p1",
+            "minPollinationTime": 30,
+            "floweringWindow": {
+                "start": "08:00",
+                "end": "12:00"
+            },
+            "points": 100
+        },
+        {
+            "id": "obj2",
+            "description": "完成草莓棚授粉",
+            "zoneId": "p2",
+            "minPollinationTime": 30,
+            "floweringWindow": {
+                "start": "14:00",
+                "end": "18:00"
+            },
+            "points": 100
+        }
+    ]
+}

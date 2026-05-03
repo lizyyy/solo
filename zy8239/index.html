@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温室授粉机器人调度员</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>温室授粉机器人调度员</h1>
+            <div class="header-controls">
+                <select id="level-select">
+                    <option value="">选择关卡</option>
+                </select>
+                <button id="load-level-btn">加载关卡</button>
+                <button id="reset-btn">重置</button>
+                <button id="run-btn">运行</button>
+                <button id="export-replay-btn">导出复盘</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="game-container">
+                <section class="greenhouse-view">
+                    <h2>温室地图</h2>
+                    <div id="greenhouse-grid"></div>
+                    <div class="legend">
+                        <div class="legend-item"><span class="zone pollination">■</span> 授粉区</div>
+                        <div class="legend-item"><span class="zone charging">■</span> 充电区</div>
+                        <div class="legend-item"><span class="zone disinfection">■</span> 消毒区</div>
+                        <div class="legend-item"><span class="zone humidity">■</span> 高湿禁入区</div>
+                        <div class="legend-item"><span class="robot">●</span> 机器人</div>
+                    </div>
+                </section>
+
+                <aside class="info-panel">
+                    <div class="panel-section">
+                        <h3>关卡信息</h3>
+                        <div id="level-info"></div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>机器人状态</h3>
+                        <div id="robots-status"></div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>当前时间</h3>
+                        <div id="current-time">00:00</div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>最佳成绩</h3>
+                        <div id="best-score">--</div>
+                    </div>
+                </aside>
+            </div>
+
+            <section class="timeline-section">
+                <h2>时间轴编排器</h2>
+                <div class="timeline-controls">
+                    <div class="action-selector">
+                        <label>选择动作：</label>
+                        <select id="action-type">
+                            <option value="pollination">授粉</option>
+                            <option value="charging">充电</option>
+                            <option value="disinfection">消毒</option>
+                            <option value="move">移动/绕行</option>
+                        </select>
+                        <label>机器人：</label>
+                        <select id="robot-select"></select>
+                        <label>目标棚区：</label>
+                        <select id="zone-select"></select>
+                        <label>开始时间：</label>
+                        <input type="time" id="start-time" value="00:00">
+                        <label>时长（分钟）：</label>
+                        <input type="number" id="duration" value="30" min="5" max="180">
+                        <button id="add-action-btn">添加动作</button>
+                    </div>
+                </div>
+                
+                <div class="timeline-container">
+                    <div class="timeline-header">
+                        <div class="timeline-robots">机器人</div>
+                        <div class="timeline-scale" id="timeline-scale"></div>
+                    </div>
+                    <div class="timeline-body" id="timeline-body"></div>
+                </div>
+            </section>
+
+            <section class="conflict-section" id="conflict-section" style="display: none;">
+                <h2>冲突警告</h2>
+                <div id="conflict-list"></div>
+            </section>
+
+            <section class="result-section" id="result-section" style="display: none;">
+                <h2>结算结果</h2>
+                <div id="result-content"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>温室授粉机器人调度员 - 本地浏览器游戏</p>
+        </footer>
+    </div>
+
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
