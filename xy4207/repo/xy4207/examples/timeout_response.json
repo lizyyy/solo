@@ -1,0 +1,75 @@
+{
+  "conversation_id": "conv_timeout_001",
+  "agent_name": "周小丽",
+  "customer_name": "吴先生",
+  "conversation_time": "2024-01-19 11:00:00",
+  "description": "超时回复的对话示例 - 坐席回复延迟超过阈值",
+  "messages": [
+    {
+      "index": 0,
+      "speaker": "agent",
+      "content": "您好，这里是客服中心，我是周小丽，有什么可以帮助您的？",
+      "timestamp": "2024-01-19 11:00:00"
+    },
+    {
+      "index": 1,
+      "speaker": "customer",
+      "content": "你好，我想咨询一下会员权益。",
+      "timestamp": "2024-01-19 11:00:15"
+    },
+    {
+      "index": 2,
+      "speaker": "agent",
+      "content": "非常抱歉让您久等了，我帮您查询一下会员权益...",
+      "timestamp": "2024-01-19 11:08:00"
+    },
+    {
+      "index": 3,
+      "speaker": "customer",
+      "content": "你们怎么这么慢？我等了快十分钟了！",
+      "timestamp": "2024-01-19 11:08:15"
+    },
+    {
+      "index": 4,
+      "speaker": "agent",
+      "content": "非常抱歉，系统查询有些慢。您的会员等级是黄金会员，可以享受...",
+      "timestamp": "2024-01-19 11:15:00"
+    },
+    {
+      "index": 5,
+      "speaker": "customer",
+      "content": "请快一点，我还有事。",
+      "timestamp": "2024-01-19 11:15:15"
+    },
+    {
+      "index": 6,
+      "speaker": "agent",
+      "content": "好的，您的黄金会员权益包括：1. 购物9折优惠；2. 专属客服通道；3. 生日礼包；4. 积分双倍累积。",
+      "timestamp": "2024-01-19 11:25:00"
+    },
+    {
+      "index": 7,
+      "speaker": "customer",
+      "content": "等一下，我记得还有免费退换货的权益，怎么没有提到？",
+      "timestamp": "2024-01-19 11:25:15"
+    },
+    {
+      "index": 8,
+      "speaker": "agent",
+      "content": "让我再确认一下... 是的，黄金会员确实有免费退换货的权益，非常抱歉刚才遗漏了。",
+      "timestamp": "2024-01-19 11:30:00"
+    },
+    {
+      "index": 9,
+      "speaker": "customer",
+      "content": "好的，我知道了。你们的服务真的需要改进一下效率。",
+      "timestamp": "2024-01-19 11:30:15"
+    },
+    {
+      "index": 10,
+      "speaker": "agent",
+      "content": "非常感谢您的反馈，我们一定会改进的。还有其他问题吗？",
+      "timestamp": "2024-01-19 11:30:30"
+    }
+  ]
+}

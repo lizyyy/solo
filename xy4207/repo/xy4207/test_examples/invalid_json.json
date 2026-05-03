@@ -1,0 +1,15 @@
+{
+  "conversation_id": "test_invalid",
+  "agent_name": "测试坐席",
+  "customer_name": "测试客户",
+  "conversation_time": "2024-01-01 10:00:00",
+  "messages": [
+    {
+      "index": 0,
+      "speaker": "agent",
+      "content": "这是一条测试消息",
+      // 这里缺少逗号，故意制造JSON语法错误
+      "timestamp": "2024-01-01 10:00:00"
+    }
+  ]
+}

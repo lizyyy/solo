@@ -1,0 +1,51 @@
+{
+  "conversation_id": "conv_normal_001",
+  "agent_name": "张小明",
+  "customer_name": "李女士",
+  "conversation_time": "2024-01-15 09:30:00",
+  "description": "正常客服对话示例 - 无违规",
+  "messages": [
+    {
+      "index": 0,
+      "speaker": "agent",
+      "content": "您好，这里是客服中心，我是张小明，有什么可以帮助您的？",
+      "timestamp": "2024-01-15 09:30:00"
+    },
+    {
+      "index": 1,
+      "speaker": "customer",
+      "content": "你好，我想咨询一下我的订单物流情况。",
+      "timestamp": "2024-01-15 09:30:15"
+    },
+    {
+      "index": 2,
+      "speaker": "agent",
+      "content": "好的，请您提供一下订单号，我帮您查询。",
+      "timestamp": "2024-01-15 09:30:30"
+    },
+    {
+      "index": 3,
+      "speaker": "customer",
+      "content": "订单号是ORD20240115001。",
+      "timestamp": "2024-01-15 09:30:45"
+    },
+    {
+      "index": 4,
+      "speaker": "agent",
+      "content": "好的，我帮您查询一下... 您的订单已于今天早上8:30派送，预计今天下午可以送达。",
+      "timestamp": "2024-01-15 09:31:00"
+    },
+    {
+      "index": 5,
+      "speaker": "customer",
+      "content": "好的，谢谢，我知道了。",
+      "timestamp": "2024-01-15 09:31:15"
+    },
+    {
+      "index": 6,
+      "speaker": "agent",
+      "content": "不客气，如有其他问题欢迎随时联系我们。祝您生活愉快！",
+      "timestamp": "2024-01-15 09:31:30"
+    }
+  ]
+}

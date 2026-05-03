@@ -1,0 +1,187 @@
+# 客服回访质检工具配置文件
+# 可以通过修改此文件来自定义质检规则
+
+# 通用配置
+general:
+  # 默认超时回复时间（秒）
+  default_timeout_seconds: 300
+  
+  # 是否严格模式（严格模式下任何字段缺失都会导致错误）
+  strict_mode: false
+  
+  # 默认输出目录
+  output_dir: "./output"
+
+# 敏感词检测配置
+sensitive_words:
+  # 第一级敏感词（严重违规）
+  level1:
+    - 投诉
+    - 举报
+    - 退款
+    - 赔偿
+    - 起诉
+    - 曝光
+    - 媒体
+    - 维权
+    - 欺诈
+    - 虚假
+  
+  # 第二级敏感词（一般违规）
+  level2:
+    - 抱歉
+    - 对不起
+    - 不好意思
+    - 失误
+    - 错误
+    - 遗漏
+    - 延迟
+    - 等待
+    - 抱歉
+    - 遗憾
+  
+  # 第三级敏感词（轻微违规）
+  level3:
+    - 可能
+    - 大概
+    - 也许
+    - 不确定
+    - 考虑
+    - 研究
+    - 稍后
+    - 再看
+
+# 承诺检测配置
+promise_detection:
+  # 承诺关键词
+  promise_keywords:
+    - 保证
+    - 承诺
+    - 一定会
+    - 肯定会
+    - 确保
+    - 一定
+    - 肯定
+    - 保证
+    - 承诺
+    - 将会
+    - 会
+    - 将
+    - 要
+    - 打算
+    - 计划
+  
+  # 兑现关键词
+  fulfillment_keywords:
+    - 已经
+    - 已完成
+    - 完成了
+    - 处理好了
+    - 解决了
+    - 搞定了
+    - 做好了
+    - 完成
+    - 处理
+    - 解决
+    - 搞定
+    - 做好
+  
+  # 未兑现关键词
+  unfulfilled_keywords:
+    - 还没
+    - 还没有
+    - 尚未
+    - 未完成
+    - 没处理
+    - 没解决
+    - 没搞定
+    - 没做好
+    - 延迟
+    - 推后
+    - 延期
+
+# 情绪检测配置
+emotion_detection:
+  # 负面情绪关键词
+  negative_emotions:
+    - 生气
+    - 愤怒
+    - 不满
+    - 不高兴
+    - 郁闷
+    - 烦躁
+    - 着急
+    - 焦虑
+    - 担心
+    - 害怕
+    - 失望
+    - 绝望
+    - 伤心
+    - 难过
+    - 委屈
+    - 无奈
+  
+  # 情绪升级关键词
+  escalation_keywords:
+    - 越来越
+    - 更加
+    - 更
+    - 越来越严重
+    - 越来越差
+    - 越来越不满意
+    - 变本加厉
+    - 愈演愈烈
+  
+  # 情绪缓和关键词
+  deescalation_keywords:
+    - 理解
+    - 明白
+    - 知道了
+    - 好的
+    - 没问题
+    - 可以
+    - 行
+    - 同意
+    - 接受
+    - 原谅
+    - 谅解
+    - 谢谢
+    - 感谢
+
+# 超时检测配置
+timeout_detection:
+  # 默认超时时间（秒）
+  default_timeout: 300
+  
+  # 坐席回复超时时间（秒）
+  agent_reply_timeout: 300
+  
+  # 客户回复超时时间（秒）
+  customer_reply_timeout: 600
+  
+  # 严重超时间隔（秒）
+  severe_timeout: 600
+
+# 报告配置
+report:
+  # 报告标题
+  title: "客服回访录音质检报告"
+  
+  # 是否包含详细对话
+  include_detailed_conversations: true
+  
+  # 是否包含统计图表
+  include_statistics: true
+  
+  # 异常样本导出字段
+  exception_export_fields:
+    - conversation_id
+    - agent_name
+    - customer_name
+    - conversation_time
+    - violation_type
+    - violation_description
+    - severity
+    - message_index
+    - message_content
+    - message_time

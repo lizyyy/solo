@@ -1,0 +1,51 @@
+{
+  "conversation_id": "conv_003",
+  "agent_name": "刘小刚",
+  "customer_name": "赵女士",
+  "conversation_time": "2024-01-17 10:15:00",
+  "messages": [
+    {
+      "index": 0,
+      "speaker": "agent",
+      "content": "您好，这里是客服中心，我是刘小刚，有什么可以帮助您的？",
+      "timestamp": "2024-01-17 10:15:00"
+    },
+    {
+      "index": 1,
+      "speaker": "customer",
+      "content": "你好，我上周申请的退款还没到账。",
+      "timestamp": "2024-01-17 10:15:15"
+    },
+    {
+      "index": 2,
+      "speaker": "agent",
+      "content": "非常抱歉让您久等了，我帮您查询一下... 您的退款申请正在处理中，我保证今天下午一定会处理完成。",
+      "timestamp": "2024-01-17 10:15:30"
+    },
+    {
+      "index": 3,
+      "speaker": "customer",
+      "content": "好的，那我再等等。",
+      "timestamp": "2024-01-17 10:15:45"
+    },
+    {
+      "index": 4,
+      "speaker": "agent",
+      "content": "感谢您的理解，处理完成后会有短信通知您。",
+      "timestamp": "2024-01-17 10:16:00"
+    },
+    {
+      "index": 5,
+      "speaker": "customer",
+      "content": "你好，我是赵女士，今天上午你说下午会处理我的退款，现在还没消息。",
+      "timestamp": "2024-01-17 16:30:00"
+    },
+    {
+      "index": 6,
+      "speaker": "agent",
+      "content": "非常抱歉，系统今天有些延迟，退款还没处理好。",
+      "timestamp": "2024-01-17 16:30:15"
+    }
+  ],
+  "description": "坐席承诺当天处理但后续表示还没处理好（承诺未兑现）"
+}
