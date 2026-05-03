@@ -1,0 +1,32 @@
+ticket_no: "SP-2024-06-001"
+title: "220kV线路保护间隔定值修改审批票"
+status: "pending"
+
+signatures:
+  - role: "工作负责人"
+    signatory: "张工"
+    signed: true
+    signed_at: "2024-06-15 09:00"
+    comment: "定值核对无误，申请执行"
+    sequence: 1
+  
+  - role: "继保班长"
+    signatory: "李工"
+    signed: true
+    signed_at: "2024-06-15 09:30"
+    comment: "审核通过"
+    sequence: 2
+  
+  - role: "值长"
+    signatory: "王值长"
+    signed: true
+    signed_at: "2024-06-15 10:00"
+    comment: "同意执行"
+    sequence: 3
+  
+  - role: "运行值班员"
+    signatory: "赵工"
+    signed: false
+    signed_at: null
+    comment: null
+    sequence: 4

@@ -1,0 +1,76 @@
+name: "220kV线路保护间隔压板状态表"
+bay_id: "BAY-2201"
+bay_name: "220kV线路保护间隔"
+
+plates:
+  - plate_id: "PLT-001"
+    plate_name: "距离保护功能压板"
+    plate_type: "保护功能压板"
+    current_state: "投入"
+    target_state: "投入"
+    sequence: 1
+    description: "距离保护功能投入/退出"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-002"
+    plate_name: "零序保护功能压板"
+    plate_type: "保护功能压板"
+    current_state: "投入"
+    target_state: "投入"
+    sequence: 2
+    description: "零序保护功能投入/退出"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-003"
+    plate_name: "纵联保护功能压板"
+    plate_type: "保护功能压板"
+    current_state: "退出"
+    target_state: "投入"
+    sequence: 3
+    description: "纵联保护功能投入/退出"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-004"
+    plate_name: "过流保护功能压板"
+    plate_type: "保护功能压板"
+    current_state: "投入"
+    target_state: "投入"
+    sequence: 4
+    description: "过流保护功能投入/退出"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-005"
+    plate_name: "跳闸出口压板1"
+    plate_type: "出口压板"
+    current_state: "退出"
+    target_state: "投入"
+    sequence: 5
+    description: "保护跳闸出口压板1"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-006"
+    plate_name: "跳闸出口压板2"
+    plate_type: "出口压板"
+    current_state: "退出"
+    target_state: "投入"
+    sequence: 6
+    description: "保护跳闸出口压板2"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-007"
+    plate_name: "重合闸出口压板"
+    plate_type: "出口压板"
+    current_state: "退出"
+    target_state: "投入"
+    sequence: 7
+    description: "重合闸出口压板"
+    bay_id: "BAY-2201"
+  
+  - plate_id: "PLT-008"
+    plate_name: "检修压板"
+    plate_type: "检修压板"
+    current_state: "退出"
+    target_state: "退出"
+    sequence: 8
+    description: "装置检修压板"
+    bay_id: "BAY-2201"

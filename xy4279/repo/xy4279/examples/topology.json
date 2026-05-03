@@ -1,0 +1,70 @@
+{
+  "name": "220kV变电站一次接线拓扑",
+  "description": "220kV变电站A间隔一次设备连接关系",
+  "nodes": [
+    {
+      "id": "BAY-2201",
+      "node_id": "BAY-2201",
+      "node_type": "间隔",
+      "name": "220kV线路保护间隔",
+      "parent_id": "BUS-220A",
+      "properties": {
+        "breaker_state": "分闸",
+        "disconnector_state": "分闸",
+        "ground_switch_state": "分闸",
+        "voltage_level": "220kV"
+      }
+    },
+    {
+      "id": "BUS-220A",
+      "node_id": "BUS-220A",
+      "node_type": "母线",
+      "name": "220kV A段母线",
+      "parent_id": null,
+      "properties": {
+        "voltage_level": "220kV",
+        "status": "正常"
+      }
+    },
+    {
+      "id": "BUS-220B",
+      "node_id": "BUS-220B",
+      "node_type": "母线",
+      "name": "220kV B段母线",
+      "parent_id": null,
+      "properties": {
+        "voltage_level": "220kV",
+        "status": "正常"
+      }
+    },
+    {
+      "id": "LINE-2201",
+      "node_id": "LINE-2201",
+      "node_type": "线路",
+      "name": "220kV 线1",
+      "parent_id": "BAY-2201",
+      "properties": {
+        "length_km": 25.5,
+        "voltage_level": "220kV"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "from_node": "BUS-220A",
+      "to_node": "BAY-2201",
+      "relation_type": "连接",
+      "properties": {
+        "connection_type": "隔离开关"
+      }
+    },
+    {
+      "from_node": "BAY-2201",
+      "to_node": "LINE-2201",
+      "relation_type": "连接",
+      "properties": {
+        "connection_type": "断路器"
+      }
+    }
+  ]
+}
