@@ -1,0 +1,70 @@
+{
+  "bookings": [
+    {
+      "id": "B001",
+      "instrument_id": "INST001",
+      "instrument_name": "高效液相色谱仪",
+      "user_id": "U001",
+      "user_name": "张三",
+      "start_time": "2026-05-04 09:00:00",
+      "end_time": "2026-05-04 12:00:00",
+      "purpose": "样品分析",
+      "notes": "药物代谢动力学研究"
+    },
+    {
+      "id": "B002",
+      "instrument_id": "INST001",
+      "instrument_name": "高效液相色谱仪",
+      "user_id": "U002",
+      "user_name": "李四",
+      "start_time": "2026-05-04 13:00:00",
+      "end_time": "2026-05-04 16:00:00",
+      "purpose": "含量测定",
+      "notes": ""
+    },
+    {
+      "id": "B003",
+      "instrument_id": "INST002",
+      "instrument_name": "气相色谱仪",
+      "user_id": "U003",
+      "user_name": "王五",
+      "start_time": "2026-05-04 08:30:00",
+      "end_time": "2026-05-04 11:30:00",
+      "purpose": "残留溶剂检测",
+      "notes": "ICH Q3C方法验证"
+    },
+    {
+      "id": "B004",
+      "instrument_id": "INST002",
+      "instrument_name": "气相色谱仪",
+      "user_id": "U001",
+      "user_name": "张三",
+      "start_time": "2026-05-04 14:00:00",
+      "end_time": "2026-05-04 17:00:00",
+      "purpose": "杂质分析",
+      "notes": ""
+    },
+    {
+      "id": "B005",
+      "instrument_id": "INST003",
+      "instrument_name": "紫外分光光度计",
+      "user_id": "U004",
+      "user_name": "赵六",
+      "start_time": "2026-05-05 10:00:00",
+      "end_time": "2026-05-05 12:00:00",
+      "purpose": "溶出度测定",
+      "notes": ""
+    },
+    {
+      "id": "B006",
+      "instrument_id": "INST003",
+      "instrument_name": "紫外分光光度计",
+      "user_id": "U002",
+      "user_name": "李四",
+      "start_time": "2026-05-05 14:00:00",
+      "end_time": "2026-05-05 16:30:00",
+      "purpose": "含量均匀度",
+      "notes": ""
+    }
+  ]
+}

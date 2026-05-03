@@ -1,0 +1,6 @@
+"""lab-scheduler 命令行工具入口"""
+
+from .cli import main
+
+if __name__ == "__main__":
+    main()

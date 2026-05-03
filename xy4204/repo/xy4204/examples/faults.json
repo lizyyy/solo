@@ -1,0 +1,24 @@
+{
+  "faults": [
+    {
+      "id": "F001",
+      "instrument_id": "INST006",
+      "instrument_name": "溶出度仪",
+      "start_time": "2026-05-04 08:00:00",
+      "end_time": "2026-05-04 18:00:00",
+      "description": "搅拌桨故障，需要维修",
+      "reported_by": "王五",
+      "severity": "高"
+    },
+    {
+      "id": "F002",
+      "instrument_id": "INST007",
+      "instrument_name": "pH计",
+      "start_time": "2026-05-05 09:00:00",
+      "end_time": "2026-05-05 12:00:00",
+      "description": "校准偏差，需要重新校准",
+      "reported_by": "赵六",
+      "severity": "中"
+    }
+  ]
+}
