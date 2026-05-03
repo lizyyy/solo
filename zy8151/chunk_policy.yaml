@@ -1,0 +1,24 @@
+policies:
+  - name: "旧策略 (保守)"
+    max_chunk_size: 2000
+    min_chunk_size: 20
+    split_on_headings: true
+    heading_levels: [1, 2, 3]
+    keep_section_context: true
+    paragraph_separator: '\n\n'
+
+  - name: "新策略 (激进)"
+    max_chunk_size: 500
+    min_chunk_size: 100
+    split_on_headings: true
+    heading_levels: [1, 2, 3]
+    keep_section_context: true
+    paragraph_separator: '\n\n'
+
+  - name: "纯文本切片 (不按标题)"
+    max_chunk_size: 800
+    min_chunk_size: 50
+    split_on_headings: false
+    heading_levels: [1, 2, 3]
+    keep_section_context: false
+    paragraph_separator: '\n\n'

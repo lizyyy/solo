@@ -1,0 +1,6 @@
+{"id": "qa_001", "question": "如何克隆仓库？", "expected_answers": ["git clone", "cd rag-project"], "expected_file_paths": ["docs/installation.md"]}
+{"id": "qa_002", "question": "怎样创建虚拟环境？", "expected_answers": ["python3 -m venv", "source venv/bin/activate"], "expected_file_paths": ["docs/installation.md"]}
+{"id": "qa_003", "question": "pip 安装速度慢怎么办？", "expected_answers": ["pypi.tuna.tsinghua.edu.cn", "国内镜像源"], "expected_file_paths": ["docs/installation.md"]}
+{"id": "qa_004", "question": "RAG 系统的效果依赖什么？", "expected_answers": ["文档切片的质量", "切片策略"], "expected_file_paths": ["docs/very_long_doc.md"]}
+{"id": "qa_005", "question": "性能评估需要关注哪些指标？", "expected_answers": ["命中率", "引用覆盖度", "空切片", "重复标题"], "expected_file_paths": ["docs/very_long_doc.md"]}
+{"id": "qa_006", "question": "文档处理工具的主要功能有哪些？", "expected_answers": ["文档解析", "内容切片", "相似度检索", "质量评估"], "expected_file_paths": ["docs/duplicate_headings.md"]}
