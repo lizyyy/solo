@@ -1,0 +1,77 @@
+rules:
+  - id: rule-001
+    name: 温度过高告警
+    description: 当温度超过阈值时触发告警
+    condition:
+      type: threshold
+      parameters:
+        field: temperature
+        operator: gt
+        value: 35
+    severity: critical
+    enabled: true
+    topicPattern: gateway/+/telemetry
+
+  - id: rule-002
+    name: 电池电量低告警
+    description: 电池电量低于20%时触发告警
+    condition:
+      type: threshold
+      parameters:
+        field: battery
+        operator: lt
+        value: 20
+    severity: warning
+    enabled: true
+    topicPattern: $aws/things/+/shadow/update
+
+  - id: rule-003
+    name: 设备离线超时
+    description: 设备超过30分钟未上报数据
+    condition:
+      type: timeout
+      parameters:
+        timeoutMinutes: 30
+    severity: warning
+    enabled: true
+    topicPattern: "#"
+
+  - id: rule-004
+    name: 通信故障告警
+    description: 检测到设备通信故障代码
+    condition:
+      type: state_change
+      parameters:
+        field: status
+        from: online
+        to: offline
+    severity: critical
+    enabled: true
+    topicPattern: alert/+/fault
+
+  - id: rule-005
+    name: 电压异常告警
+    description: 电压超出正常范围
+    condition:
+      type: threshold
+      parameters:
+        field: voltage
+        operator: not_between
+        min: 180
+        max: 250
+    severity: critical
+    enabled: true
+    topicPattern: gateway/+/telemetry
+
+  - id: rule-006
+    name: 烟雾浓度超标
+    description: 烟雾浓度超过安全阈值
+    condition:
+      type: threshold
+      parameters:
+        field: smoke
+        operator: gt
+        value: 0.8
+    severity: critical
+    enabled: true
+    topicPattern: "events/+/alert"

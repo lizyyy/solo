@@ -1,0 +1,58 @@
+devices:
+  - deviceId: device-001
+    name: 温度传感器-A区
+    type: temperature-sensor
+    shadowVersion: 3
+    desiredConfig:
+      setpoint: 24
+      interval: 60
+      alertThreshold: 35
+    lastSeen: 1746317340000
+    status: online
+
+  - deviceId: device-002
+    name: 湿度控制器-B区
+    type: humidity-controller
+    shadowVersion: 5
+    desiredConfig:
+      targetHumidity: 55
+      mode: auto
+      fanSpeed: medium
+    lastSeen: 1746317580000
+    status: online
+
+  - deviceId: device-003
+    name: 消防报警器-C区
+    type: fire-alarm
+    shadowVersion: 1
+    desiredConfig:
+      smokeThreshold: 0.8
+      temperatureThreshold: 55
+      buzzerEnabled: true
+    lastSeen: 1746317280000
+    status: offline
+
+  - deviceId: device-004
+    name: 智能电表-D区
+    type: smart-meter
+    shadowVersion: 10
+    desiredConfig:
+      reportInterval: 300
+      voltageThreshold:
+        min: 180
+        max: 250
+      currentThreshold: 100
+    lastSeen: 1746317460000
+    status: online
+
+  - deviceId: device-005
+    name: 门禁控制器-E区
+    type: access-controller
+    shadowVersion: 1
+    desiredConfig:
+      accessHours:
+        start: "08:00"
+        end: "20:00"
+      holidayMode: false
+    lastSeen: 1746317580000
+    status: online
