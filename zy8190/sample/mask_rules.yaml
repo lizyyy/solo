@@ -1,0 +1,35 @@
+mask_rules:
+  - station: station_entrance
+    mask_type: privacy
+    x_min: 0.1
+    x_max: 0.4
+    y_min: 0.2
+    y_max: 0.6
+
+  - station: station_worker_1
+    mask_type: privacy
+    x_min: 0.5
+    x_max: 0.9
+    y_min: 0.1
+    y_max: 0.5
+
+  - station: station_inspection
+    mask_type: privacy
+    x_min: -0.1
+    x_max: 1.05
+    y_min: 0.3
+    y_max: 0.7
+
+  - station: station_worker_2
+    mask_type: privacy
+    x_min: 0.2
+    x_max: 0.8
+    y_min: 0.6
+    y_max: 0.3
+
+  - station: station_packing
+    mask_type: privacy
+    x_min: 0.3
+    x_max: 0.7
+    y_min: 0.4
+    y_max: 0.8

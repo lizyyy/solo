@@ -1,0 +1,60 @@
+{
+  "version": "v1",
+  "cameras": [
+    {
+      "camera_id": "cam_001",
+      "masks": [
+        {
+          "station": "station_entrance",
+          "mask_type": "privacy",
+          "x_min": 0.15,
+          "x_max": 0.35,
+          "y_min": 0.25,
+          "y_max": 0.55
+        }
+      ]
+    },
+    {
+      "camera_id": "cam_002",
+      "masks": [
+        {
+          "station": "station_inspection",
+          "mask_type": "privacy",
+          "x_min": 0.0,
+          "x_max": 1.0,
+          "y_min": 0.3,
+          "y_max": 0.7
+        },
+        {
+          "station": "station_worker_2",
+          "mask_type": "privacy",
+          "x_min": 0.2,
+          "x_max": 0.8,
+          "y_min": 0.3,
+          "y_max": 0.6
+        }
+      ]
+    },
+    {
+      "camera_id": "cam_003",
+      "masks": [
+        {
+          "station": "station_packing",
+          "mask_type": "privacy",
+          "x_min": 0.3,
+          "x_max": 0.7,
+          "y_min": 0.4,
+          "y_max": 0.8
+        },
+        {
+          "station": "station_quality_check",
+          "mask_type": "privacy",
+          "x_min": 0.1,
+          "x_max": 0.25,
+          "y_min": 0.1,
+          "y_max": 0.3
+        }
+      ]
+    }
+  ]
+}

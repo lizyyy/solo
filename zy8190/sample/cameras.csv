@@ -1,0 +1,5 @@
+camera_id,name,location,width,height,stations
+cam_001,组装线入口,车间A线,1920,1080,station_entrance,station_worker_1
+cam_002,检测工位,车间A线,1920,1080,station_inspection,station_worker_2
+cam_003,包装工位,车间B线,1280,720,station_packing
+cam_004,仓储入口,车间C区,1920,1080,storage_entrance
