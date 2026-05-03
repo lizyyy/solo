@@ -1,0 +1,249 @@
+openapi: "3.0.3"
+info:
+  title: 用户管理 API
+  version: "2.0.0"
+  description: 用户管理系统的 REST API 接口 (v2)
+servers:
+  - url: https://api.example.com/v2
+
+paths:
+  /users:
+    get:
+      summary: 获取用户列表
+      description: 分页获取用户列表
+      operationId: listUsers
+      parameters:
+        - name: page
+          in: query
+          description: 页码
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          description: 用户状态筛选
+          schema:
+            type: string
+            enum: [active, inactive]
+      responses:
+        "200":
+          description: 成功返回用户列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "400":
+          description: 请求参数错误
+
+    post:
+      summary: 创建用户
+      description: 创建一个新用户
+      operationId: createUser
+      requestBody:
+        description: 用户信息
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: 用户创建成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 请求参数错误
+
+  /users/{userId}:
+    get:
+      summary: 获取用户详情
+      description: 根据用户 ID 获取用户详细信息
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 用户 ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回用户详情
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+    put:
+      summary: 更新用户
+      description: 更新用户信息
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 用户 ID
+          schema:
+            type: string
+      requestBody:
+        description: 用户更新信息
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: 用户更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: 用户不存在
+
+  /users/{userId}/profile:
+    get:
+      summary: 获取用户个人资料
+      description: 获取用户的个人详细资料 (新端点)
+      operationId: getUserProfile
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: 用户 ID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功返回用户资料
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+components:
+  schemas:
+    User:
+      type: object
+      description: 用户信息
+      properties:
+        id:
+          type: string
+          description: 用户唯一标识
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        fullName:
+          type: string
+          description: 全名
+        age:
+          type: number
+          description: 年龄
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 用户状态
+        createdAt:
+          type: string
+          format: date-time
+          description: 创建时间
+      required:
+        - id
+        - email
+        - fullName
+        - status
+
+    CreateUserRequest:
+      type: object
+      description: 创建用户请求
+      properties:
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        fullName:
+          type: string
+          description: 全名
+        age:
+          type: number
+          description: 年龄
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 用户状态
+        phone:
+          type: string
+          description: 手机号
+      required:
+        - email
+        - fullName
+        - phone
+
+    UpdateUserRequest:
+      type: object
+      description: 更新用户请求
+      properties:
+        fullName:
+          type: string
+          description: 全名
+        age:
+          type: number
+          description: 年龄
+        status:
+          type: string
+          enum: [active, inactive]
+          description: 用户状态
+      required:
+        - fullName
+
+    Pagination:
+      type: object
+      description: 分页信息
+      properties:
+        page:
+          type: integer
+          description: 当前页码
+        limit:
+          type: integer
+          description: 每页数量
+        total:
+          type: integer
+          description: 总记录数
+        totalPages:
+          type: integer
+          description: 总页数
+
+    UserProfile:
+      type: object
+      description: 用户个人资料
+      properties:
+        userId:
+          type: string
+          description: 用户 ID
+        bio:
+          type: string
+          description: 个人简介
+        avatarUrl:
+          type: string
+          description: 头像 URL
+        location:
+          type: string
+          description: 所在地

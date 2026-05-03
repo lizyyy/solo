@@ -1,0 +1,32 @@
+{
+  "name": "api-contract-doctor",
+  "version": "1.0.0",
+  "description": "OpenAPI 3 兼容性检查工具 - 检查 API 变更对客户端的影响",
+  "main": "src/index.js",
+  "bin": {
+    "api-contract-doctor": "src/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "scan": "node src/cli.js scan",
+    "test": "node src/cli.js scan --old examples/old.yaml --new examples/new.yaml --samples examples/requests.json --out reports/check.md"
+  },
+  "keywords": [
+    "openapi",
+    "api",
+    "compatibility",
+    "contract",
+    "testing",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

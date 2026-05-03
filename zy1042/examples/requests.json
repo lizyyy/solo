@@ -1,0 +1,75 @@
+[
+  {
+    "method": "GET",
+    "path": "/users",
+    "queryParams": {
+      "page": 1,
+      "limit": 10,
+      "status": "pending"
+    },
+    "description": "获取用户列表 - 包含旧版枚举值 pending"
+  },
+  {
+    "method": "POST",
+    "path": "/users",
+    "body": {
+      "email": "john@example.com",
+      "name": "John Doe",
+      "age": 30,
+      "status": "active"
+    },
+    "description": "创建用户 - 使用旧版字段名 name，缺少新版必填字段 phone"
+  },
+  {
+    "method": "GET",
+    "path": "/users/123",
+    "pathParams": {
+      "userId": "123"
+    },
+    "description": "获取用户详情 - 正确的请求"
+  },
+  {
+    "method": "PUT",
+    "path": "/users/456",
+    "pathParams": {
+      "userId": "456"
+    },
+    "body": {
+      "name": "Jane Smith",
+      "age": "25",
+      "status": "active"
+    },
+    "description": "更新用户 - 字段名错误，类型错误"
+  },
+  {
+    "method": "DELETE",
+    "path": "/users/789",
+    "pathParams": {
+      "userId": "789"
+    },
+    "description": "删除用户 - 该接口在新版已移除"
+  },
+  {
+    "method": "GET",
+    "path": "/users/123/orders",
+    "pathParams": {
+      "userId": "123"
+    },
+    "queryParams": {
+      "status": "cancelled"
+    },
+    "description": "获取用户订单 - 该路径在新版已移除"
+  },
+  {
+    "method": "POST",
+    "path": "/users",
+    "body": {
+      "email": "test@example.com",
+      "fullName": "Test User",
+      "phone": "13800138000",
+      "age": 28,
+      "extraField": "this should not be here"
+    },
+    "description": "创建用户 - 包含额外字段"
+  }
+]
