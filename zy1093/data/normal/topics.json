@@ -1,0 +1,86 @@
+{
+  "topics": [
+    {
+      "id": "t1",
+      "name": "Python入门教程",
+      "tags": ["Python", "入门", "教程"],
+      "planned_posts": 3,
+      "actual_posts": 2,
+      "status": "active",
+      "priority": "high",
+      "notes": "0基础系列，持续更新中"
+    },
+    {
+      "id": "t2",
+      "name": "Python副业接单",
+      "tags": ["Python", "副业", "接单"],
+      "planned_posts": 2,
+      "actual_posts": 1,
+      "status": "active",
+      "priority": "high",
+      "notes": "真实经历分享系列"
+    },
+    {
+      "id": "t3",
+      "name": "Python效率技巧",
+      "tags": ["Python", "效率", "技巧"],
+      "planned_posts": 4,
+      "actual_posts": 3,
+      "status": "active",
+      "priority": "medium",
+      "notes": "实用技巧系列"
+    },
+    {
+      "id": "t4",
+      "name": "Python实战项目",
+      "tags": ["Python", "实战", "项目"],
+      "planned_posts": 5,
+      "actual_posts": 4,
+      "status": "active",
+      "priority": "high",
+      "notes": "爬虫、数据分析、游戏开发等"
+    },
+    {
+      "id": "t5",
+      "name": "程序员经验分享",
+      "tags": ["程序员", "经验", "分享"],
+      "planned_posts": 3,
+      "actual_posts": 2,
+      "status": "active",
+      "priority": "medium",
+      "notes": "日常、学习方法、职业规划"
+    }
+  ],
+  "next_week_plans": [
+    {
+      "topic_id": "t1",
+      "planned_date": "2026-05-01",
+      "title": "Python变量和数据类型详解",
+      "status": "draft"
+    },
+    {
+      "topic_id": "t2",
+      "planned_date": "2026-05-02",
+      "title": "Python接单平台推荐和避坑指南",
+      "status": "planned"
+    },
+    {
+      "topic_id": "t3",
+      "planned_date": "2026-05-03",
+      "title": "10个Python装饰器让代码更优雅",
+      "status": "planned"
+    },
+    {
+      "topic_id": "t4",
+      "planned_date": "2026-05-04",
+      "title": "Python Flask Web开发入门",
+      "status": "idea"
+    },
+    {
+      "topic_id": "t5",
+      "planned_date": "2026-05-05",
+      "title": "程序员如何管理时间和精力",
+      "status": "idea"
+    }
+  ]
+}

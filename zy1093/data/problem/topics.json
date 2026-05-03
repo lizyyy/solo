@@ -1,0 +1,60 @@
+{
+  "topics": [
+    {
+      "id": "t1",
+      "name": "暴利赚钱秘籍",
+      "tags": ["赚钱", "副业", "秘籍"],
+      "planned_posts": 3,
+      "actual_posts": 3,
+      "status": "risky",
+      "priority": "low",
+      "notes": "标题党严重，完播率极低，负面评论多"
+    },
+    {
+      "id": "t2",
+      "name": "Python入门教程",
+      "tags": ["Python", "入门", "教程"],
+      "planned_posts": 5,
+      "actual_posts": 5,
+      "status": "active",
+      "priority": "medium",
+      "notes": "连续5天发同题材，用户可能审美疲劳"
+    },
+    {
+      "id": "t3",
+      "name": "吐槽踩坑",
+      "tags": ["吐槽", "踩坑", "避雷"],
+      "planned_posts": 2,
+      "actual_posts": 2,
+      "status": "risky",
+      "priority": "low",
+      "notes": "负面情绪太重，不利于账号健康发展"
+    }
+  ],
+  "next_week_plans": [
+    {
+      "topic_id": "t1",
+      "planned_date": "2026-05-01",
+      "title": "又一个暴利项目，月入5万不是梦",
+      "status": "idea"
+    },
+    {
+      "topic_id": "t2",
+      "planned_date": "2026-05-02",
+      "title": "Python入门第六课｜函数定义",
+      "status": "planned"
+    },
+    {
+      "topic_id": "t2",
+      "planned_date": "2026-05-03",
+      "title": "Python入门第七课｜列表操作",
+      "status": "planned"
+    },
+    {
+      "topic_id": "t2",
+      "planned_date": "2026-05-04",
+      "title": "Python入门第八课｜字典操作",
+      "status": "planned"
+    }
+  ]
+}

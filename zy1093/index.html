@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短视频选题复盘分析台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>📊 短视频选题复盘分析台</h1>
+                <span class="subtitle">小红书 · 抖音 · 视频号 · 单人运营专用</span>
+            </div>
+            <div class="header-right">
+                <button id="loadSampleBtn" class="btn btn-secondary">📁 加载示例数据</button>
+                <button id="saveDraftBtn" class="btn btn-secondary">💾 保存草稿</button>
+                <button id="loadDraftBtn" class="btn btn-secondary">📂 加载草稿</button>
+                <button id="clearBtn" class="btn btn-danger">🗑️ 清空</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-tab="import">📥 数据导入</button>
+                    <button class="nav-item" data-tab="overview">📈 数据概览</button>
+                    <button class="nav-item" data-tab="funnel">🔄 漏斗分析</button>
+                    <button class="nav-item" data-tab="issues">⚠️ 问题检测</button>
+                    <button class="nav-item" data-tab="charts">📊 图表分析</button>
+                    <button class="nav-item" data-tab="priority">📋 选题优先级</button>
+                    <button class="nav-item" data-tab="export">📤 导出报告</button>
+                </nav>
+
+                <div class="sidebar-info">
+                    <div class="info-item">
+                        <span class="info-label">当前状态:</span>
+                        <span id="statusIndicator" class="status-badge status-empty">未加载数据</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">作品数:</span>
+                        <span id="postCount" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">评论数:</span>
+                        <span id="commentCount" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">选题数:</span>
+                        <span id="topicCount" class="info-value">-</span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <section id="tab-import" class="tab-content active">
+                    <div class="import-section">
+                        <h2>📥 数据导入</h2>
+                        <p class="import-hint">请上传以下三个数据文件，或点击"加载示例数据"体验功能</p>
+                        
+                        <div class="upload-grid">
+                            <div class="upload-card">
+                                <div class="upload-icon">📋</div>
+                                <h3>posts.csv</h3>
+                                <p class="upload-desc">作品数据：播放、完播、互动等指标</p>
+                                <input type="file" id="postsFile" accept=".csv" class="file-input">
+                                <div class="file-status" id="postsStatus">未选择文件</div>
+                            </div>
+
+                            <div class="upload-card">
+                                <div class="upload-icon">💬</div>
+                                <h3>comments.csv</h3>
+                                <p class="upload-desc">评论数据：情感分析、负面检测</p>
+                                <input type="file" id="commentsFile" accept=".csv" class="file-input">
+                                <div class="file-status" id="commentsStatus">未选择文件</div>
+                            </div>
+
+                            <div class="upload-card">
+                                <div class="upload-icon">🏷️</div>
+                                <h3>topics.json</h3>
+                                <p class="upload-desc">选题数据：标签、优先级、计划</p>
+                                <input type="file" id="topicsFile" accept=".json" class="file-input">
+                                <div class="file-status" id="topicsStatus">未选择文件</div>
+                            </div>
+                        </div>
+
+                        <div class="thresholds-section">
+                            <h3>⚙️ 阈值规则配置</h3>
+                            <div class="thresholds-actions">
+                                <input type="file" id="thresholdsFile" accept=".json" class="file-input">
+                                <label for="thresholdsFile" class="btn btn-secondary">📁 导入阈值配置</label>
+                                <button id="resetThresholdsBtn" class="btn btn-secondary">🔄 重置为默认</button>
+                            </div>
+                            <div class="file-status" id="thresholdsStatus">使用默认配置</div>
+                        </div>
+
+                        <div class="import-actions">
+                            <button id="importBtn" class="btn btn-primary btn-large">🚀 开始分析</button>
+                        </div>
+
+                        <div class="validation-results" id="validationResults" style="display: none;">
+                            <h3>✅ 校验结果</h3>
+                            <div id="validationContent"></div>
+                        </div>
+                    </div>
+
+                    <div class="data-format-section">
+                        <h3>📝 数据格式说明</h3>
+                        <div class="format-tabs">
+                            <button class="format-tab active" data-format="posts">posts.csv</button>
+                            <button class="format-tab" data-format="comments">comments.csv</button>
+                            <button class="format-tab" data-format="topics">topics.json</button>
+                        </div>
+                        <div class="format-content">
+                            <div id="format-posts" class="format-detail active">
+                                <pre><code>post_id,platform,publish_date,publish_hour,title,title_promise_type,cover_type,tags,exposure,plays,completions,likes,comments,shares,favorites,clicks,conversions,status
+1,xiaohongshu,2026-04-24,19,教程标题,知识承诺,文字图文,编程|Python,50000,42000,35000,3200,850,420,1500,280,45,published</code></pre>
+                            </div>
+                            <div id="format-comments" class="format-detail">
+                                <pre><code>comment_id,post_id,user_name,content,sentiment,likes,created_at
+1,1,用户名,评论内容,positive,25,2026-04-24 20:15</code></pre>
+                            </div>
+                            <div id="format-topics" class="format-detail">
+                                <pre><code>{
+  "topics": [{
+    "id": "t1",
+    "name": "Python入门教程",
+    "tags": ["Python", "入门"],
+    "planned_posts": 3,
+    "actual_posts": 2,
+    "status": "active",
+    "priority": "high"
+  }],
+  "next_week_plans": [...]
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-overview" class="tab-content">
+                    <div class="overview-section">
+                        <h2>📈 数据概览</h2>
+                        
+                        <div class="filter-bar">
+                            <div class="filter-item">
+                                <label>平台:</label>
+                                <select id="filterPlatform" class="filter-select">
+                                    <option value="all">全部平台</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>日期范围:</label>
+                                <input type="date" id="filterStartDate" class="filter-input">
+                                <span>至</span>
+                                <input type="date" id="filterEndDate" class="filter-input">
+                            </div>
+                            <div class="filter-item">
+                                <label>排序:</label>
+                                <select id="sortBy" class="filter-select">
+                                    <option value="exposure_desc">曝光量 ↓</option>
+                                    <option value="plays_desc">播放量 ↓</option>
+                                    <option value="completion_rate_desc">完播率 ↓</option>
+                                    <option value="engagement_rate_desc">互动率 ↓</option>
+                                    <option value="publish_date_desc">发布时间 ↓</option>
+                                </select>
+                            </div>
+                            <button id="applyFilterBtn" class="btn btn-secondary">应用筛选</button>
+                        </div>
+
+                        <div class="stats-cards">
+                            <div class="stat-card">
+                                <div class="stat-icon">👁️</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalExposure">-</div>
+                                    <div class="stat-label">总曝光量</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">▶️</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalPlays">-</div>
+                                    <div class="stat-label">总播放量</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="avgCompletionRate">-</div>
+                                    <div class="stat-label">平均完播率</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">💬</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="avgEngagementRate">-</div>
+                                    <div class="stat-label">平均互动率</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⭐</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalFavorites">-</div>
+                                    <div class="stat-label">总收藏数</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalConversions">-</div>
+                                    <div class="stat-label">总转化数</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="posts-table-container">
+                            <h3>📋 作品列表</h3>
+                            <table class="data-table" id="postsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>平台</th>
+                                        <th>标题</th>
+                                        <th>发布时间</th>
+                                        <th>曝光</th>
+                                        <th>播放</th>
+                                        <th>完播率</th>
+                                        <th>互动率</th>
+                                        <th>收藏</th>
+                                        <th>转化</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="postsTableBody">
+                                    <tr><td colspan="11" class="empty-cell">暂无数据</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-funnel" class="tab-content">
+                    <div class="funnel-section">
+                        <h2>🔄 漏斗分析</h2>
+                        <p class="section-desc">分析曝光→播放→完播→互动→收藏→转化的全链路转化情况</p>
+                        
+                        <div class="funnel-compare">
+                            <div class="funnel-chart-container">
+                                <h3>📊 整体漏斗</h3>
+                                <canvas id="funnelChart"></canvas>
+                            </div>
+                            <div class="funnel-stats">
+                                <h3>📈 漏斗指标</h3>
+                                <div class="funnel-metrics" id="funnelMetrics">
+                                    <div class="metric-item">
+                                        <span class="metric-label">曝光→播放</span>
+                                        <span class="metric-value" id="metricPlayRate">-</span>
+                                        <span class="metric-trend" id="trendPlayRate">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">播放→完播</span>
+                                        <span class="metric-value" id="metricCompletionRate">-</span>
+                                        <span class="metric-trend" id="trendCompletionRate">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">完播→互动</span>
+                                        <span class="metric-value" id="metricEngagementRate">-</span>
+                                        <span class="metric-trend" id="trendEngagementRate">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">互动→收藏</span>
+                                        <span class="metric-value" id="metricFavoriteRate">-</span>
+                                        <span class="metric-trend" id="trendFavoriteRate">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">收藏→转化</span>
+                                        <span class="metric-value" id="metricConversionRate">-</span>
+                                        <span class="metric-trend" id="trendConversionRate">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="funnel-breakdown">
+                            <h3>📊 分维度对比</h3>
+                            <div class="breakdown-tabs">
+                                <button class="breakdown-tab active" data-breakdown="platform">按平台</button>
+                                <button class="breakdown-tab" data-breakdown="hour">按发布时段</button>
+                                <button class="breakdown-tab" data-breakdown="tag">按选题标签</button>
+                                <button class="breakdown-tab" data-breakdown="promise">按标题承诺</button>
+                                <button class="breakdown-tab" data-breakdown="cover">按封面类型</button>
+                            </div>
+                            <div class="breakdown-chart">
+                                <canvas id="breakdownChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="funnel-insights">
+                            <h3>💡 漏斗洞察</h3>
+                            <div id="funnelInsightsList">
+                                <p class="empty-text">暂无数据，先导入数据进行分析</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-issues" class="tab-content">
+                    <div class="issues-section">
+                        <h2>⚠️ 问题检测</h2>
+                        <p class="section-desc">自动检测标题党、负面评论、题材密度等问题</p>
+                        
+                        <div class="issues-summary">
+                            <div class="issue-count-card critical">
+                                <div class="count" id="criticalIssues">0</div>
+                                <div class="label">严重问题</div>
+                            </div>
+                            <div class="issue-count-card warning">
+                                <div class="count" id="warningIssues">0</div>
+                                <div class="label">警告问题</div>
+                            </div>
+                            <div class="issue-count-card info">
+                                <div class="count" id="infoIssues">0</div>
+                                <div class="label">优化建议</div>
+                            </div>
+                        </div>
+
+                        <div class="issues-list" id="issuesList">
+                            <p class="empty-text">暂无数据，先导入数据进行分析</p>
+                        </div>
+
+                        <div class="issue-detail-modal" id="issueDetailModal" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="modalIssueTitle">问题详情</h3>
+                                    <button class="modal-close" id="modalCloseBtn">&times;</button>
+                                </div>
+                                <div class="modal-body" id="modalIssueBody"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-charts" class="tab-content">
+                    <div class="charts-section">
+                        <h2>📊 图表分析</h2>
+                        
+                        <div class="chart-grid">
+                            <div class="chart-card">
+                                <h3>🔥 爆款 vs 扑街 对比</h3>
+                                <canvas id="viralFlopChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>🕐 发布时段效果</h3>
+                                <canvas id="publishHourChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>🏷️ 选题标签表现</h3>
+                                <canvas id="tagPerformanceChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>📈 平台对比</h3>
+                                <canvas id="platformCompareChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>💬 评论情感分布</h3>
+                                <canvas id="sentimentChart"></canvas>
+                            </div>
+                            <div class="chart-card">
+                                <h3>📊 封面类型效果</h3>
+                                <canvas id="coverTypeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-priority" class="tab-content">
+                    <div class="priority-section">
+                        <h2>📋 下周选题优先级</h2>
+                        <p class="section-desc">基于历史数据和规则，智能排序下周选题</p>
+                        
+                        <div class="priority-config">
+                            <h3>⚙️ 优先级规则权重</h3>
+                            <div class="weight-sliders">
+                                <div class="slider-item">
+                                    <label>标签匹配权重</label>
+                                    <input type="range" id="weightTag" min="0" max="10" value="2">
+                                    <span class="slider-value" id="weightTagValue">2</span>
+                                </div>
+                                <div class="slider-item">
+                                    <label>历史表现权重</label>
+                                    <input type="range" id="weightHistory" min="0" max="10" value="3">
+                                    <span class="slider-value" id="weightHistoryValue">3</span>
+                                </div>
+                                <div class="slider-item">
+                                    <label>互动质量权重</label>
+                                    <input type="range" id="weightEngagement" min="0" max="10" value="2">
+                                    <span class="slider-value" id="weightEngagementValue">2</span>
+                                </div>
+                                <div class="slider-item">
+                                    <label>平台适配权重</label>
+                                    <input type="range" id="weightPlatform" min="0" max="10" value="1">
+                                    <span class="slider-value" id="weightPlatformValue">1</span>
+                                </div>
+                            </div>
+                            <button id="recalculatePriorityBtn" class="btn btn-secondary">🔄 重新计算</button>
+                        </div>
+
+                        <div class="priority-list" id="priorityList">
+                            <p class="empty-text">暂无选题计划，请导入 topics.json</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-export" class="tab-content">
+                    <div class="export-section">
+                        <h2>📤 导出报告</h2>
+                        <p class="section-desc">导出三种格式的复盘报告：Markdown、HTML、JSON</p>
+                        
+                        <div class="export-options">
+                            <div class="export-option-card">
+                                <div class="export-icon">📝</div>
+                                <h3>Markdown</h3>
+                                <p>简洁的文本格式，适合笔记软件、邮件分享</p>
+                                <button id="exportMarkdownBtn" class="btn btn-primary">导出 .md</button>
+                            </div>
+                            
+                            <div class="export-option-card">
+                                <div class="export-icon">🌐</div>
+                                <h3>HTML</h3>
+                                <p>交互式网页格式，保留图表，适合浏览器查看</p>
+                                <button id="exportHtmlBtn" class="btn btn-primary">导出 .html</button>
+                            </div>
+                            
+                            <div class="export-option-card">
+                                <div class="export-icon">📋</div>
+                                <h3>JSON</h3>
+                                <p>结构化数据格式，适合二次处理、存档备份</p>
+                                <button id="exportJsonBtn" class="btn btn-primary">导出 .json</button>
+                            </div>
+                        </div>
+
+                        <div class="report-preview">
+                            <h3>👁️ 报告预览</h3>
+                            <div class="preview-tabs">
+                                <button class="preview-tab active" data-preview="summary">📊 核心摘要</button>
+                                <button class="preview-tab" data-preview="funnel">🔄 漏斗分析</button>
+                                <button class="preview-tab" data-preview="issues">⚠️ 问题清单</button>
+                                <button class="preview-tab" data-preview="priority">📋 选题优先级</button>
+                            </div>
+                            <div class="preview-content" id="reportPreview">
+                                <p class="empty-text">暂无数据，先导入数据进行分析</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script>
+    <script src="js/data-import.js"></script>
+    <script src="js/funnel.js"></script>
+    <script src="js/issues.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/priority.js"></script>
+    <script src="js/export.js"></script>
+</body>
+</html>
