@@ -1,0 +1,10 @@
+{
+  "name": "晴天露营方案",
+  "description": "假设是晴朗天气，太阳能补电充足",
+  "weather": {
+    "condition": "sunny",
+    "factor_percent": 100.0
+  },
+  "simulation_start_hour": 0,
+  "simulation_duration_hours": 48
+}

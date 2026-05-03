@@ -1,0 +1,10 @@
+{
+  "name": "阴天露营方案",
+  "description": "假设是阴天，太阳能补电不足",
+  "weather": {
+    "condition": "cloudy",
+    "factor_percent": 40.0
+  },
+  "simulation_start_hour": 0,
+  "simulation_duration_hours": 48
+}
