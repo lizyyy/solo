@@ -1,0 +1,42 @@
+rules:
+  - rule_name: "default_rule"
+    machine_type: null
+    base_price_per_mu: 50.0
+    night_surcharge_rate: 0.3
+    night_start_hour: 22
+    night_end_hour: 6
+    empty_driving_deduction_rate: 0.5
+    empty_driving_speed_threshold: 15.0
+    minimum_working_speed: 2.0
+    maximum_working_speed: 12.0
+    work_session_gap_minutes: 30
+    overlap_detection_distance: 5.0
+    is_active: true
+
+  - rule_name: "tractor_rule"
+    machine_type: "tractor"
+    base_price_per_mu: 45.0
+    night_surcharge_rate: 0.25
+    night_start_hour: 22
+    night_end_hour: 6
+    empty_driving_deduction_rate: 0.4
+    empty_driving_speed_threshold: 18.0
+    minimum_working_speed: 3.0
+    maximum_working_speed: 10.0
+    work_session_gap_minutes: 30
+    overlap_detection_distance: 5.0
+    is_active: true
+
+  - rule_name: "harvester_rule"
+    machine_type: "harvester"
+    base_price_per_mu: 80.0
+    night_surcharge_rate: 0.35
+    night_start_hour: 20
+    night_end_hour: 6
+    empty_driving_deduction_rate: 0.3
+    empty_driving_speed_threshold: 12.0
+    minimum_working_speed: 2.0
+    maximum_working_speed: 6.0
+    work_session_gap_minutes: 45
+    overlap_detection_distance: 3.0
+    is_active: true
