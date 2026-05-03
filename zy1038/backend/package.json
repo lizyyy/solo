@@ -1,0 +1,23 @@
+{
+  "name": "feature-flag-simulator-backend",
+  "version": "1.0.0",
+  "description": "Feature Flag 灰度规则演练台 - 后端",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": ["feature-flag", "ab-testing", "gray-release"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "murmurhash": "^2.0.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

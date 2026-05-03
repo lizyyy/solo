@@ -1,0 +1,96 @@
+[
+  {
+    "id": "b14c0524-beb2-400c-9bce-a84104fde300",
+    "name": "中国用户",
+    "description": "所有位于中国地区的用户",
+    "conditions": [
+      {
+        "field": "region",
+        "operator": "equals",
+        "value": "CN"
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "b35a215b-d97e-4ec0-b10b-10fb6ed8f32a",
+    "name": "付费用户",
+    "description": "所有 Pro 和 Enterprise 级别的用户",
+    "conditions": [
+      {
+        "field": "accountType",
+        "operator": "in",
+        "value": [
+          "pro",
+          "enterprise"
+        ]
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "1cbc7509-4b94-4ced-b4e0-c03ac0b94d74",
+    "name": "新用户 (7天内)",
+    "description": "注册时间不超过7天的新用户",
+    "conditions": [
+      {
+        "field": "registerDays",
+        "operator": "less_than_or_equals",
+        "value": 7
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "9460eda4-2a59-41c9-b025-3caf02371a13",
+    "name": "老用户 (90天+)",
+    "description": "注册超过90天的老用户",
+    "conditions": [
+      {
+        "field": "registerDays",
+        "operator": "greater_than_or_equals",
+        "value": 90
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "a39af3d7-c2ed-41c8-b4a4-37c3624ce838",
+    "name": "Beta 测试用户",
+    "description": "带有 beta_tester 标签的用户",
+    "conditions": [
+      {
+        "field": "tags",
+        "operator": "has_tag",
+        "value": "beta_tester"
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "d2577e89-ec35-4a0c-8f62-4c54962f6d28",
+    "name": "中国付费老用户",
+    "description": "中国地区的付费老用户组合条件",
+    "conditions": [
+      {
+        "field": "region",
+        "operator": "equals",
+        "value": "CN"
+      },
+      {
+        "field": "accountType",
+        "operator": "in",
+        "value": [
+          "pro",
+          "enterprise"
+        ]
+      },
+      {
+        "field": "registerDays",
+        "operator": "greater_than_or_equals",
+        "value": 30
+      }
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  }
+]

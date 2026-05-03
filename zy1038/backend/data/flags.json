@@ -1,0 +1,96 @@
+[
+  {
+    "id": "29e6829d-62e6-47a6-9f86-9be9f512dda8",
+    "key": "new_dashboard_v2",
+    "name": "新版仪表盘 v2",
+    "description": "全新设计的仪表盘界面，包含更多数据可视化组件",
+    "enabled": true,
+    "killSwitch": false,
+    "segments": [],
+    "percentage": 50,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "7e69e678-84a4-468a-9b83-14bc977f4d26",
+    "key": "dark_mode_support",
+    "name": "深色模式支持",
+    "description": "为应用添加深色模式切换功能",
+    "enabled": true,
+    "killSwitch": false,
+    "segments": [
+      "b35a215b-d97e-4ec0-b10b-10fb6ed8f32a"
+    ],
+    "percentage": null,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "0bf4fb4a-5b38-43e6-9936-f40e0816a2ca",
+    "key": "ai_smart_search",
+    "name": "AI 智能搜索",
+    "description": "基于 AI 的智能搜索功能，支持自然语言查询",
+    "enabled": true,
+    "killSwitch": false,
+    "segments": [
+      "a39af3d7-c2ed-41c8-b4a4-37c3624ce838"
+    ],
+    "percentage": 10,
+    "dependsOn": [
+      "dark_mode_support"
+    ],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "d5f5522c-d949-42fa-a0cc-ac00cbe6c3d9",
+    "key": "onboarding_redesign",
+    "name": "新手引导重设计",
+    "description": "重新设计的新手引导流程，帮助新用户更快上手",
+    "enabled": true,
+    "killSwitch": false,
+    "segments": [
+      "1cbc7509-4b94-4ced-b4e0-c03ac0b94d74"
+    ],
+    "percentage": null,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "831dd0ff-435d-4f7a-a6cc-f0cca1f66f06",
+    "key": "china_region_exclusive",
+    "name": "中国区专属功能",
+    "description": "仅对中国区域用户开放的功能",
+    "enabled": true,
+    "killSwitch": false,
+    "segments": [
+      "b14c0524-beb2-400c-9bce-a84104fde300"
+    ],
+    "percentage": null,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "8b47a94e-a513-4275-b7fd-0c5515753059",
+    "key": "emergency_feature",
+    "name": "紧急功能 (带 Kill Switch)",
+    "description": "这是一个带有 Kill Switch 的功能，可用于紧急情况下的快速关闭",
+    "enabled": true,
+    "killSwitch": true,
+    "segments": [],
+    "percentage": 100,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  },
+  {
+    "id": "a27ad4c9-f8df-4ae0-ab6c-bcc3cb7a3531",
+    "key": "disabled_feature",
+    "name": "已禁用的功能",
+    "description": "这个功能已经全局关闭，用于测试关闭状态",
+    "enabled": false,
+    "killSwitch": false,
+    "segments": [],
+    "percentage": 100,
+    "dependsOn": [],
+    "createdAt": "2026-05-02T19:27:29.384Z"
+  }
+]

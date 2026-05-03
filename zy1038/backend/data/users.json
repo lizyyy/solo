@@ -1,0 +1,278 @@
+[
+  {
+    "id": "319a610e-81cd-4262-bcf7-718d15f98d0d",
+    "name": "张三",
+    "email": "张三1@example.com",
+    "region": "CN",
+    "accountType": "pro",
+    "tags": [
+      "active",
+      "beta_tester"
+    ],
+    "registerDays": 180,
+    "createdAt": "2026-01-05T20:34:06.704Z"
+  },
+  {
+    "id": "895441b0-06da-4743-90eb-aaa94792d303",
+    "name": "李四",
+    "email": "李四2@example.com",
+    "region": "CN",
+    "accountType": "free",
+    "tags": [
+      "new_user"
+    ],
+    "registerDays": 5,
+    "createdAt": "2026-02-03T17:35:06.797Z"
+  },
+  {
+    "id": "90af9a6d-181d-421f-b410-fd1ef5d25476",
+    "name": "王五",
+    "email": "王五3@example.com",
+    "region": "US",
+    "accountType": "enterprise",
+    "tags": [
+      "premium",
+      "active"
+    ],
+    "registerDays": 360,
+    "createdAt": "2025-06-03T08:26:27.088Z"
+  },
+  {
+    "id": "3a6989c7-c42e-40f7-b1c3-56888a877287",
+    "name": "赵六",
+    "email": "赵六4@example.com",
+    "region": "DE",
+    "accountType": "enterprise",
+    "tags": [
+      "premium",
+      "inactive"
+    ],
+    "registerDays": 361,
+    "createdAt": "2025-07-04T23:51:29.541Z"
+  },
+  {
+    "id": "8889b49d-0bd4-4736-8e4b-c427a22fd338",
+    "name": "钱七",
+    "email": "钱七5@example.com",
+    "region": "US",
+    "accountType": "enterprise",
+    "tags": [],
+    "registerDays": 362,
+    "createdAt": "2025-11-19T05:45:33.467Z"
+  },
+  {
+    "id": "c118d398-4131-4f09-b68f-8c06e34b63d5",
+    "name": "孙八",
+    "email": "孙八6@example.com",
+    "region": "IN",
+    "accountType": "trial",
+    "tags": [],
+    "registerDays": 124,
+    "createdAt": "2025-08-27T20:11:52.710Z"
+  },
+  {
+    "id": "cef0a7c5-4efc-4d29-80e6-38aa1d1c3d5f",
+    "name": "周九",
+    "email": "周九7@example.com",
+    "region": "IN",
+    "accountType": "trial",
+    "tags": [
+      "new_user"
+    ],
+    "registerDays": 272,
+    "createdAt": "2025-05-10T11:42:05.659Z"
+  },
+  {
+    "id": "e3a18093-96f9-4282-a443-c36ae0cacb67",
+    "name": "吴十",
+    "email": "吴十8@example.com",
+    "region": "FR",
+    "accountType": "trial",
+    "tags": [],
+    "registerDays": 351,
+    "createdAt": "2026-01-18T03:05:42.272Z"
+  },
+  {
+    "id": "e47ed4a0-e1bb-4685-af83-a757627e82a7",
+    "name": "Alice Smith",
+    "email": "alice.smith9@example.com",
+    "region": "FR",
+    "accountType": "trial",
+    "tags": [
+      "premium"
+    ],
+    "registerDays": 59,
+    "createdAt": "2025-09-17T03:30:41.947Z"
+  },
+  {
+    "id": "7c17fe89-4b7a-4e12-9473-542296d0594a",
+    "name": "Bob Johnson",
+    "email": "bob.johnson10@example.com",
+    "region": "CN",
+    "accountType": "free",
+    "tags": [
+      "beta_tester"
+    ],
+    "registerDays": 173,
+    "createdAt": "2025-09-23T18:45:58.065Z"
+  },
+  {
+    "id": "69bb1842-8665-465e-b7a4-ee79b4075af8",
+    "name": "Charlie Brown",
+    "email": "charlie.brown11@example.com",
+    "region": "IN",
+    "accountType": "pro",
+    "tags": [
+      "inactive"
+    ],
+    "registerDays": 359,
+    "createdAt": "2025-07-10T13:59:27.625Z"
+  },
+  {
+    "id": "95234ca9-4d26-48a9-bb13-986f5302a58f",
+    "name": "Diana Wilson",
+    "email": "diana.wilson12@example.com",
+    "region": "FR",
+    "accountType": "enterprise",
+    "tags": [
+      "inactive"
+    ],
+    "registerDays": 19,
+    "createdAt": "2026-02-08T17:37:35.016Z"
+  },
+  {
+    "id": "316f2384-7316-4046-a274-f77906c36cae",
+    "name": "Edward Davis",
+    "email": "edward.davis13@example.com",
+    "region": "US",
+    "accountType": "pro",
+    "tags": [
+      "beta_tester"
+    ],
+    "registerDays": 222,
+    "createdAt": "2025-05-24T10:28:41.207Z"
+  },
+  {
+    "id": "253c19b6-0bcb-4539-950e-e2ab04ab3cae",
+    "name": "Fiona Garcia",
+    "email": "fiona.garcia14@example.com",
+    "region": "DE",
+    "accountType": "trial",
+    "tags": [],
+    "registerDays": 301,
+    "createdAt": "2025-07-31T07:29:47.827Z"
+  },
+  {
+    "id": "d0440448-6858-48d8-b5d1-e0aafcacbfee",
+    "name": "George Martinez",
+    "email": "george.martinez15@example.com",
+    "region": "FR",
+    "accountType": "free",
+    "tags": [
+      "active"
+    ],
+    "registerDays": 76,
+    "createdAt": "2025-11-03T02:04:14.943Z"
+  },
+  {
+    "id": "10cffa2b-8225-4b55-bef7-01ac29fbdc91",
+    "name": "Hannah Anderson",
+    "email": "hannah.anderson16@example.com",
+    "region": "FR",
+    "accountType": "enterprise",
+    "tags": [
+      "active"
+    ],
+    "registerDays": 110,
+    "createdAt": "2025-07-05T11:39:28.020Z"
+  },
+  {
+    "id": "f22233d8-4112-47d6-98ed-a08c221c4a6f",
+    "name": "田中太郎",
+    "email": "田中太郎17@example.com",
+    "region": "US",
+    "accountType": "free",
+    "tags": [],
+    "registerDays": 359,
+    "createdAt": "2026-03-06T01:05:18.660Z"
+  },
+  {
+    "id": "4e206b6f-890a-4a71-95ac-ece2c5e00fbf",
+    "name": "山田花子",
+    "email": "山田花子18@example.com",
+    "region": "JP",
+    "accountType": "free",
+    "tags": [
+      "active"
+    ],
+    "registerDays": 39,
+    "createdAt": "2026-03-13T14:31:01.038Z"
+  },
+  {
+    "id": "4b12aacd-89a8-4987-8e7c-15aeb53a0575",
+    "name": "佐藤健",
+    "email": "佐藤健19@example.com",
+    "region": "FR",
+    "accountType": "trial",
+    "tags": [],
+    "registerDays": 164,
+    "createdAt": "2025-08-24T13:35:37.452Z"
+  },
+  {
+    "id": "5b5b6dc2-222f-48aa-90ee-c5005c324f6f",
+    "name": "铃木美香",
+    "email": "铃木美香20@example.com",
+    "region": "IN",
+    "accountType": "enterprise",
+    "tags": [
+      "inactive"
+    ],
+    "registerDays": 181,
+    "createdAt": "2025-06-14T03:38:01.756Z"
+  },
+  {
+    "id": "1954cf2f-ef72-4895-a0ba-dc210719977a",
+    "name": "Hans Mueller",
+    "email": "hans.mueller21@example.com",
+    "region": "DE",
+    "accountType": "free",
+    "tags": [
+      "premium",
+      "inactive"
+    ],
+    "registerDays": 363,
+    "createdAt": "2026-03-25T22:53:58.063Z"
+  },
+  {
+    "id": "e98984fd-1263-4ff7-b011-328dd548cbb4",
+    "name": "Anna Schmidt",
+    "email": "anna.schmidt22@example.com",
+    "region": "UK",
+    "accountType": "trial",
+    "tags": [],
+    "registerDays": 14,
+    "createdAt": "2025-05-15T13:15:45.138Z"
+  },
+  {
+    "id": "97060c80-3384-4e85-b483-e5e9a96cb3f1",
+    "name": "Pierre Dubois",
+    "email": "pierre.dubois23@example.com",
+    "region": "JP",
+    "accountType": "pro",
+    "tags": [],
+    "registerDays": 160,
+    "createdAt": "2025-12-31T18:31:27.846Z"
+  },
+  {
+    "id": "eeb0ea22-0b1c-4786-8061-1e9634300b41",
+    "name": "Marie Martin",
+    "email": "marie.martin24@example.com",
+    "region": "FR",
+    "accountType": "trial",
+    "tags": [
+      "early_adopter"
+    ],
+    "registerDays": 245,
+    "createdAt": "2025-12-21T15:11:50.404Z"
+  }
+]
