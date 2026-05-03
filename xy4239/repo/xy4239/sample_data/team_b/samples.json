@@ -1,0 +1,54 @@
+[
+    {
+        "sample_id": "QZ-2026-001",
+        "latitude": 35.678912,
+        "longitude": 94.567890,
+        "sample_time": "2026-05-02T09:15:00",
+        "collector": "地质队A组-张三",
+        "rock_type": "花岗岩",
+        "description": "中粗粒黑云母花岗岩，风化程度中等（后补充：见有少量钾长石斑晶）",
+        "depth": 12.5,
+        "photo_paths": ["photos/QZ-2026-001_1.jpg", "photos/QZ-2026-001_2.jpg", "photos/QZ-2026-001_3.jpg"],
+        "create_time": "2026-05-02T09:15:00",
+        "modify_time": "2026-05-02T18:45:00"
+    },
+    {
+        "sample_id": "QZ-2026-002",
+        "latitude": 35.679150,
+        "longitude": 94.568280,
+        "sample_time": "2026-05-02T10:30:00",
+        "collector": "地质队A组-张三",
+        "rock_type": "片麻岩",
+        "description": "黑云斜长片麻岩，条带状构造",
+        "depth": 8.2,
+        "photo_paths": ["photos/QZ-2026-002_1.jpg"],
+        "create_time": "2026-05-02T10:30:00",
+        "modify_time": "2026-05-02T10:30:00"
+    },
+    {
+        "sample_id": "QZ-2026-004",
+        "latitude": 35.681234,
+        "longitude": 94.570123,
+        "sample_time": "2026-05-02T11:45:00",
+        "collector": "地质队B组-李四",
+        "rock_type": "石灰岩",
+        "description": "厚层块状石灰岩，含腕足类化石碎片",
+        "depth": 20.5,
+        "photo_paths": ["photos/QZ-2026-004_1.jpg", "photos/QZ-2026-004_2.jpg"],
+        "create_time": "2026-05-02T11:45:00",
+        "modify_time": "2026-05-02T11:45:00"
+    },
+    {
+        "sample_id": "QZ-2026-005",
+        "latitude": 35.682345,
+        "longitude": 94.571234,
+        "sample_time": "2026-05-02T13:00:00",
+        "collector": "地质队B组-李四",
+        "rock_type": "安山岩",
+        "description": "灰绿色安山岩，斑状结构",
+        "depth": 5.0,
+        "photo_paths": ["photos/missing_photo_001.jpg", "photos/QZ-2026-005_2.jpg"],
+        "create_time": "2026-05-02T13:00:00",
+        "modify_time": "2026-05-02T13:00:00"
+    }
+]

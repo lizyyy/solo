@@ -1,0 +1,41 @@
+[
+    {
+        "sample_id": "QZ-2026-001",
+        "latitude": 35.678912,
+        "longitude": 94.567890,
+        "sample_time": "2026-05-02T09:15:00",
+        "collector": "地质队A组-张三",
+        "rock_type": "花岗岩",
+        "description": "中粗粒黑云母花岗岩，风化程度中等",
+        "depth": 12.5,
+        "photo_paths": ["photos/QZ-2026-001_1.jpg", "photos/QZ-2026-001_2.jpg"],
+        "create_time": "2026-05-02T09:15:00",
+        "modify_time": "2026-05-02T09:15:00"
+    },
+    {
+        "sample_id": "QZ-2026-002",
+        "latitude": 35.679123,
+        "longitude": 94.568234,
+        "sample_time": "2026-05-02T10:30:00",
+        "collector": "地质队A组-张三",
+        "rock_type": "片麻岩",
+        "description": "黑云斜长片麻岩，条带状构造",
+        "depth": 8.2,
+        "photo_paths": ["photos/QZ-2026-002_1.jpg"],
+        "create_time": "2026-05-02T10:30:00",
+        "modify_time": "2026-05-02T10:30:00"
+    },
+    {
+        "sample_id": "QZ-2026-003",
+        "latitude": 35.680001,
+        "longitude": 94.569000,
+        "sample_time": "2026-05-02T14:20:00",
+        "collector": "地质队A组-张三",
+        "rock_type": "砂岩",
+        "description": "中细粒石英砂岩，分选较好",
+        "depth": 15.0,
+        "photo_paths": [],
+        "create_time": "2026-05-02T14:20:00",
+        "modify_time": "2026-05-02T14:20:00"
+    }
+]
