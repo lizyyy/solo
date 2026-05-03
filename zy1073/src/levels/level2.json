@@ -1,0 +1,232 @@
+{
+  "id": "level2",
+  "name": "周末市集",
+  "description": "中等规模的周末市集，有更多摊位和更复杂的场地布局。需要平衡各种冲突规则，让人流顺畅流动。",
+  "gridSize": {
+    "width": 8,
+    "height": 8
+  },
+  "budget": 5000,
+  "maxElectricity": 50,
+  "entrances": [
+    {
+      "id": "entrance1",
+      "position": { "x": 0, "y": 3 },
+      "flowRate": 120
+    },
+    {
+      "id": "entrance2",
+      "position": { "x": 7, "y": 3 },
+      "flowRate": 100
+    },
+    {
+      "id": "entrance3",
+      "position": { "x": 4, "y": 7 },
+      "flowRate": 80
+    }
+  ],
+  "mainRoads": [
+    {
+      "id": "road1",
+      "cells": [
+        { "x": 3, "y": 0 }, { "x": 3, "y": 1 }, { "x": 3, "y": 2 },
+        { "x": 3, "y": 3 }, { "x": 3, "y": 4 }, { "x": 3, "y": 5 },
+        { "x": 3, "y": 6 }, { "x": 3, "y": 7 }
+      ],
+      "priority": 1
+    },
+    {
+      "id": "road2",
+      "cells": [
+        { "x": 0, "y": 4 }, { "x": 1, "y": 4 }, { "x": 2, "y": 4 },
+        { "x": 3, "y": 4 }, { "x": 4, "y": 4 }, { "x": 5, "y": 4 },
+        { "x": 6, "y": 4 }, { "x": 7, "y": 4 }
+      ],
+      "priority": 2
+    }
+  ],
+  "fireExits": [
+    {
+      "id": "fire1",
+      "cells": [{ "x": 0, "y": 0 }, { "x": 1, "y": 0 }],
+      "required": true
+    },
+    {
+      "id": "fire2",
+      "cells": [{ "x": 6, "y": 0 }, { "x": 7, "y": 0 }],
+      "required": true
+    },
+    {
+      "id": "fire3",
+      "cells": [{ "x": 0, "y": 7 }, { "x": 1, "y": 7 }],
+      "required": true
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "tree1",
+      "position": { "x": 1, "y": 1 },
+      "size": { "width": 1, "height": 1 },
+      "type": "tree"
+    },
+    {
+      "id": "tree2",
+      "position": { "x": 6, "y": 6 },
+      "size": { "width": 1, "height": 1 },
+      "type": "tree"
+    },
+    {
+      "id": "fountain",
+      "position": { "x": 5, "y": 1 },
+      "size": { "width": 2, "height": 2 },
+      "type": "fountain"
+    }
+  ],
+  "stalls": [
+    {
+      "id": "coffee1",
+      "name": "晨光咖啡",
+      "category": "coffee",
+      "size": { "width": 1, "height": 1 },
+      "cost": 300,
+      "electricity": 3,
+      "noise": 20,
+      "odor": 30,
+      "attraction": 60,
+      "incomePerPerson": 15,
+      "adjacentRules": []
+    },
+    {
+      "id": "coffee2",
+      "name": "午后茶香",
+      "category": "coffee",
+      "size": { "width": 1, "height": 2 },
+      "cost": 500,
+      "electricity": 4,
+      "noise": 25,
+      "odor": 25,
+      "attraction": 70,
+      "incomePerPerson": 18,
+      "adjacentRules": []
+    },
+    {
+      "id": "food1",
+      "name": "幸福小馆",
+      "category": "food",
+      "size": { "width": 1, "height": 2 },
+      "cost": 500,
+      "electricity": 5,
+      "noise": 30,
+      "odor": 80,
+      "attraction": 75,
+      "incomePerPerson": 25,
+      "adjacentRules": []
+    },
+    {
+      "id": "food2",
+      "name": "烧烤达人",
+      "category": "food",
+      "size": { "width": 2, "height": 2 },
+      "cost": 800,
+      "electricity": 8,
+      "noise": 50,
+      "odor": 90,
+      "attraction": 90,
+      "incomePerPerson": 30,
+      "adjacentRules": []
+    },
+    {
+      "id": "handicraft1",
+      "name": "手作工作室",
+      "category": "handicraft",
+      "size": { "width": 2, "height": 1 },
+      "cost": 400,
+      "electricity": 2,
+      "noise": 10,
+      "odor": 5,
+      "attraction": 50,
+      "incomePerPerson": 30,
+      "adjacentRules": []
+    },
+    {
+      "id": "handicraft2",
+      "name": "陶艺坊",
+      "category": "handicraft",
+      "size": { "width": 2, "height": 2 },
+      "cost": 700,
+      "electricity": 4,
+      "noise": 15,
+      "odor": 10,
+      "attraction": 65,
+      "incomePerPerson": 35,
+      "adjacentRules": []
+    },
+    {
+      "id": "band1",
+      "name": "街头乐队",
+      "category": "band",
+      "size": { "width": 2, "height": 1 },
+      "cost": 600,
+      "electricity": 6,
+      "noise": 90,
+      "odor": 5,
+      "attraction": 85,
+      "incomePerPerson": 8,
+      "adjacentRules": []
+    },
+    {
+      "id": "children1",
+      "name": "欢乐乐园",
+      "category": "children",
+      "size": { "width": 2, "height": 2 },
+      "cost": 600,
+      "electricity": 4,
+      "noise": 40,
+      "odor": 10,
+      "attraction": 80,
+      "incomePerPerson": 10,
+      "adjacentRules": []
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj1",
+      "type": "minIncome",
+      "description": "预估收入达到 5000 元",
+      "target": 5000,
+      "weight": 2
+    },
+    {
+      "id": "obj2",
+      "type": "maxSatisfaction",
+      "description": "满意度达到 75 分",
+      "target": 75,
+      "weight": 1
+    },
+    {
+      "id": "obj3",
+      "type": "minRisk",
+      "description": "风险度低于 30 分",
+      "target": 30,
+      "weight": 2
+    }
+  ],
+  "rules": {
+    "noiseConflict": {
+      "threshold": 80,
+      "penalty": -10,
+      "affectedCategories": ["children", "handicraft"]
+    },
+    "odorConflict": {
+      "threshold": 70,
+      "penalty": -8,
+      "affectedCategories": ["coffee", "handicraft"]
+    },
+    "adjacentBonus": {
+      "coffee+handicraft": 15,
+      "food+children": 10,
+      "band+coffee": 12,
+      "handicraft+children": 8
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "id": "level1",
+  "name": "新手市集",
+  "description": "这是你的第一个挑战！在小型社区场地布置几个简单摊位，学习基本的摆放规则。",
+  "gridSize": {
+    "width": 6,
+    "height": 6
+  },
+  "budget": 2000,
+  "maxElectricity": 20,
+  "entrances": [
+    {
+      "id": "entrance1",
+      "position": { "x": 0, "y": 2 },
+      "flowRate": 80
+    },
+    {
+      "id": "entrance2",
+      "position": { "x": 5, "y": 2 },
+      "flowRate": 60
+    }
+  ],
+  "mainRoads": [
+    {
+      "id": "road1",
+      "cells": [
+        { "x": 2, "y": 0 }, { "x": 2, "y": 1 }, { "x": 2, "y": 2 },
+        { "x": 2, "y": 3 }, { "x": 2, "y": 4 }, { "x": 2, "y": 5 }
+      ],
+      "priority": 1
+    }
+  ],
+  "fireExits": [
+    {
+      "id": "fire1",
+      "cells": [{ "x": 0, "y": 0 }, { "x": 1, "y": 0 }],
+      "required": true
+    },
+    {
+      "id": "fire2",
+      "cells": [{ "x": 4, "y": 5 }, { "x": 5, "y": 5 }],
+      "required": true
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "tree1",
+      "position": { "x": 4, "y": 0 },
+      "size": { "width": 1, "height": 1 },
+      "type": "tree"
+    }
+  ],
+  "stalls": [
+    {
+      "id": "coffee1",
+      "name": "晨光咖啡",
+      "category": "coffee",
+      "size": { "width": 1, "height": 1 },
+      "cost": 300,
+      "electricity": 3,
+      "noise": 20,
+      "odor": 30,
+      "attraction": 60,
+      "incomePerPerson": 15,
+      "adjacentRules": []
+    },
+    {
+      "id": "food1",
+      "name": "幸福小馆",
+      "category": "food",
+      "size": { "width": 1, "height": 2 },
+      "cost": 500,
+      "electricity": 5,
+      "noise": 30,
+      "odor": 80,
+      "attraction": 75,
+      "incomePerPerson": 25,
+      "adjacentRules": []
+    },
+    {
+      "id": "handicraft1",
+      "name": "手作工作室",
+      "category": "handicraft",
+      "size": { "width": 2, "height": 1 },
+      "cost": 400,
+      "electricity": 2,
+      "noise": 10,
+      "odor": 5,
+      "attraction": 50,
+      "incomePerPerson": 30,
+      "adjacentRules": []
+    },
+    {
+      "id": "children1",
+      "name": "欢乐乐园",
+      "category": "children",
+      "size": { "width": 2, "height": 2 },
+      "cost": 600,
+      "electricity": 4,
+      "noise": 40,
+      "odor": 10,
+      "attraction": 80,
+      "incomePerPerson": 10,
+      "adjacentRules": []
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj1",
+      "type": "minIncome",
+      "description": "预估收入达到 2000 元",
+      "target": 2000,
+      "weight": 2
+    },
+    {
+      "id": "obj2",
+      "type": "maxSatisfaction",
+      "description": "满意度达到 70 分",
+      "target": 70,
+      "weight": 1
+    }
+  ],
+  "rules": {
+    "noiseConflict": {
+      "threshold": 80,
+      "penalty": -10,
+      "affectedCategories": ["children", "handicraft"]
+    },
+    "odorConflict": {
+      "threshold": 70,
+      "penalty": -8,
+      "affectedCategories": ["coffee", "handicraft"]
+    },
+    "adjacentBonus": {
+      "coffee+handicraft": 15,
+      "food+children": 10,
+      "handicraft+children": 8
+    }
+  }
+}

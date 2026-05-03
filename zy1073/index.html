@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周末市集摊位摆位</title>
+  <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航 -->
+    <header class="header">
+      <div class="header-left">
+        <h1>🎪 周末市集摊位摆位</h1>
+      </div>
+      <div class="header-right">
+        <select id="levelSelector" class="level-selector">
+          <option value="">选择关卡</option>
+        </select>
+        <button id="importLevelBtn" class="btn btn-secondary">
+          📁 导入关卡
+        </button>
+      </div>
+    </header>
+
+    <!-- 主游戏区域 -->
+    <main class="main-content">
+      <!-- 左侧：摊位列表 -->
+      <aside class="sidebar left-sidebar">
+        <div class="sidebar-header">
+          <h2>🏪 可用摊位</h2>
+        </div>
+        <div id="stallList" class="stall-list">
+          <!-- 摊位列表将通过JS渲染 -->
+        </div>
+      </aside>
+
+      <!-- 中间：游戏网格 -->
+      <section class="game-area">
+        <!-- 关卡信息 -->
+        <div id="levelInfo" class="level-info" style="display: none;">
+          <h3 id="levelName"></h3>
+          <p id="levelDescription"></p>
+        </div>
+
+        <!-- 工具条 -->
+        <div class="toolbar">
+          <button id="undoBtn" class="btn btn-tool" disabled title="撤销 (Ctrl+Z)">
+            ↩️ 撤销
+          </button>
+          <button id="redoBtn" class="btn btn-tool" disabled title="重做 (Ctrl+Y)">
+            ↪️ 重做
+          </button>
+          <button id="restartBtn" class="btn btn-warning">
+            🔄 重开
+          </button>
+          <button id="saveLayoutBtn" class="btn btn-success">
+            💾 保存布局
+          </button>
+        </div>
+
+        <!-- 网格区域 -->
+        <div id="gridContainer" class="grid-container">
+          <div id="gameGrid" class="game-grid"></div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+          <h4>图例说明</h4>
+          <div class="legend-items">
+            <span class="legend-item"><span class="legend-color legend-entrance"></span> 入口</span>
+            <span class="legend-item"><span class="legend-color legend-road"></span> 主路</span>
+            <span class="legend-item"><span class="legend-color legend-fire"></span> 消防通道</span>
+            <span class="legend-item"><span class="legend-color legend-obstacle"></span> 障碍物</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 右侧：评分面板 -->
+      <aside class="sidebar right-sidebar">
+        <!-- 实时评分 -->
+        <div class="score-panel">
+          <h3>📊 实时评分</h3>
+          <div class="score-display">
+            <div class="score-item">
+              <span class="score-label">总分</span>
+              <span id="totalScore" class="score-value">0</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">满意度</span>
+              <span id="satisfactionScore" class="score-value">0%</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">风险度</span>
+              <span id="riskScore" class="score-value">0%</span>
+            </div>
+            <div class="score-item">
+              <span class="score-label">预估收入</span>
+              <span id="incomeScore" class="score-value">¥0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 资源使用 -->
+        <div class="resource-panel">
+          <h3>💰 资源使用</h3>
+          <div class="resource-item">
+            <div class="resource-header">
+              <span>预算</span>
+              <span id="budgetText">0 / 0</span>
+            </div>
+            <div class="progress-bar">
+              <div id="budgetProgress" class="progress-fill progress-green" style="width: 0%"></div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-header">
+              <span>电力</span>
+              <span id="electricityText">0 / 0</span>
+            </div>
+            <div class="progress-bar">
+              <div id="electricityProgress" class="progress-fill progress-blue" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 冲突警告 -->
+        <div class="conflict-panel">
+          <h3>⚠️ 冲突警告</h3>
+          <div id="conflictList" class="conflict-list">
+            <p class="empty-message">暂无冲突</p>
+          </div>
+        </div>
+
+        <!-- 加成奖励 -->
+        <div class="bonus-panel">
+          <h3>✨ 加成奖励</h3>
+          <div id="bonusList" class="bonus-list">
+            <p class="empty-message">暂未获得加成</p>
+          </div>
+        </div>
+
+        <!-- 导出按钮 -->
+        <div class="export-panel">
+          <h3>📄 导出结算</h3>
+          <div class="export-buttons">
+            <button id="exportJSONBtn" class="btn btn-secondary">
+              📋 导出 JSON
+            </button>
+            <button id="exportMarkdownBtn" class="btn btn-secondary">
+              📝 导出 Markdown
+            </button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- 模态框：保存布局 -->
+    <div id="saveLayoutModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>💾 保存布局</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label>布局名称:</label>
+          <input type="text" id="layoutNameInput" class="modal-input" placeholder="输入布局名称...">
+        </div>
+        <div class="modal-footer">
+          <button id="cancelSaveLayout" class="btn btn-secondary">取消</button>
+          <button id="confirmSaveLayout" class="btn btn-success">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模态框：加载布局 -->
+    <div id="loadLayoutModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📂 加载布局</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="savedLayoutsList" class="layout-list">
+            <!-- 保存的布局列表 -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary modal-close">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
