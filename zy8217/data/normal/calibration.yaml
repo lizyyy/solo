@@ -1,0 +1,72 @@
+batch_info:
+  analyst: Zhang San
+  batch_id: BATCH_20260503
+  instrument: Agilent 6460
+compounds:
+  6-MAM:
+    calibration_levels:
+    - concentration: 0.05
+      name: CAL_005
+    - concentration: 0.1
+      name: CAL_010
+    - concentration: 0.5
+      name: CAL_050
+    - concentration: 1.0
+      name: CAL_100
+    - concentration: 5.0
+      name: CAL_500
+    - concentration: 10.0
+      name: CAL_1000
+    internal_standard: IS_6MAM
+    min_r_squared: 0.99
+  Codeine:
+    calibration_levels:
+    - concentration: 0.05
+      name: CAL_005
+    - concentration: 0.1
+      name: CAL_010
+    - concentration: 0.5
+      name: CAL_050
+    - concentration: 1.0
+      name: CAL_100
+    - concentration: 5.0
+      name: CAL_500
+    - concentration: 10.0
+      name: CAL_1000
+    internal_standard: IS_Codeine
+    min_r_squared: 0.99
+  Morphine:
+    calibration_levels:
+    - concentration: 0.05
+      name: CAL_005
+    - concentration: 0.1
+      name: CAL_010
+    - concentration: 0.5
+      name: CAL_050
+    - concentration: 1.0
+      name: CAL_100
+    - concentration: 5.0
+      name: CAL_500
+    - concentration: 10.0
+      name: CAL_1000
+    internal_standard: IS_Morphine
+    min_r_squared: 0.99
+qc_parameters:
+  max_internal_standard_drift_percent: 20.0
+  max_qc_deviation_percent: 15.0
+qc_samples:
+  QC_HIGH:
+    expected_concentration:
+      6-MAM: 8.0
+      Codeine: 8.0
+      Morphine: 8.0
+  QC_LOW:
+    expected_concentration:
+      6-MAM: 0.5
+      Codeine: 0.5
+      Morphine: 0.5
+  QC_MID:
+    expected_concentration:
+      6-MAM: 2.5
+      Codeine: 2.5
+      Morphine: 2.5
