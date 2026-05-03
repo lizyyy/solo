@@ -1,0 +1,23 @@
+[
+  {
+    "id": "segment-1",
+    "name": "开场介绍",
+    "startTime": 0,
+    "endTime": 10,
+    "segmentType": "intro"
+  },
+  {
+    "id": "segment-2",
+    "name": "主题讨论",
+    "startTime": 10,
+    "endTime": 18,
+    "segmentType": "discussion"
+  },
+  {
+    "id": "segment-3",
+    "name": "总结结尾",
+    "startTime": 18,
+    "endTime": 25,
+    "segmentType": "outro"
+  }
+]
