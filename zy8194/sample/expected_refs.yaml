@@ -1,0 +1,41 @@
+expected_refs:
+  - query_id: q-001
+    expected_chunks:
+      - chunk-001
+    expected_documents:
+      - doc-api-v2
+    explanation: "OAuth2.0 认证相关内容应该在 API v2 文档中"
+
+  - query_id: q-002
+    expected_chunks:
+      - chunk-002
+    expected_documents: []
+    explanation: "用户信息接口路径在 chunk-002 中有详细说明"
+
+  - query_id: q-003
+    expected_chunks:
+      - chunk-004
+      - chunk-005
+    expected_documents:
+      - doc-database
+    explanation: "数据库连接池配置在 doc-database 文档中"
+
+  - query_id: q-004
+    expected_chunks:
+      - chunk-006
+    expected_documents: []
+    explanation: "安全最佳实践在 security 文档中"
+
+  - query_id: q-005
+    expected_chunks:
+      - chunk-007
+    expected_documents:
+      - doc-monitoring
+    explanation: "监控指标相关内容"
+
+  - query_id: q-007
+    expected_chunks:
+      - chunk-003
+    expected_documents:
+      - doc-api-v1
+    explanation: "API v1 版本相关，但这是过期文档"
