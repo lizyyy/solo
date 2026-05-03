@@ -1,0 +1,405 @@
+{
+  "summary": {
+    "checked_at": "2026-05-03T17:41:49.328767",
+    "package_path": "/Users/lzy/pro/solocoder/pro/zy1060/repo/zy1060/test-sample-package",
+    "total_expenses": 5,
+    "total_attachments": 7,
+    "total_amount": 21800.0,
+    "error_count": 3,
+    "warning_count": 4,
+    "has_errors": true
+  },
+  "errors": [
+    {
+      "issue_type": "duplicate_invoice",
+      "severity": "error",
+      "message": "发票号重复: INV202601010002，出现在 2 条记录中",
+      "reference": "INV202601010002",
+      "details": {
+        "invoice_number": "INV202601010002",
+        "expense_ids": [
+          "EXP002",
+          "EXP004"
+        ],
+        "amounts": [
+          3500.0,
+          2000.0
+        ],
+        "line_numbers": [
+          3,
+          5
+        ]
+      }
+    },
+    {
+      "issue_type": "missing_attachment",
+      "severity": "error",
+      "message": "缺少附件: 发票号 INV202601010003 未找到对应的附件文件",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "invoice_number": "INV202601010003",
+        "amount": 15000.0,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "missing_attachment",
+      "severity": "error",
+      "message": "缺少附件: 发票号 INV202601019999 未找到对应的附件文件",
+      "reference": "EXP005",
+      "details": {
+        "expense_id": "EXP005",
+        "invoice_number": "INV202601019999",
+        "amount": 800.0,
+        "line_number": 6
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "issue_type": "amount_exceed_limit",
+      "severity": "warning",
+      "message": "单笔金额超限: 15000.0 元，超过上限 10000.0 元",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "amount": 15000.0,
+        "max_amount": 10000.0,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "date_expired",
+      "severity": "warning",
+      "message": "发票日期超期: 2026-01-15，距今天 108 天，超过允许的 90 天",
+      "reference": "EXP001",
+      "details": {
+        "expense_id": "EXP001",
+        "invoice_date": "2026-01-15",
+        "days_since": 108,
+        "max_days": 90,
+        "line_number": 2
+      }
+    },
+    {
+      "issue_type": "date_expired",
+      "severity": "warning",
+      "message": "发票日期超期: 2025-11-01，距今天 183 天，超过允许的 90 天",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "invoice_date": "2025-11-01",
+        "days_since": 183,
+        "max_days": 90,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "invalid_filename",
+      "severity": "warning",
+      "message": "文件名不规范: 'random_file.jpg' 未识别出发票号或报销单号",
+      "reference": "random_file.jpg",
+      "details": {
+        "filename": "random_file.jpg",
+        "full_path": "test-sample-package/random_file.jpg",
+        "size": 0
+      }
+    }
+  ],
+  "issues": [
+    {
+      "issue_type": "duplicate_invoice",
+      "severity": "error",
+      "message": "发票号重复: INV202601010002，出现在 2 条记录中",
+      "reference": "INV202601010002",
+      "details": {
+        "invoice_number": "INV202601010002",
+        "expense_ids": [
+          "EXP002",
+          "EXP004"
+        ],
+        "amounts": [
+          3500.0,
+          2000.0
+        ],
+        "line_numbers": [
+          3,
+          5
+        ]
+      }
+    },
+    {
+      "issue_type": "amount_exceed_limit",
+      "severity": "warning",
+      "message": "单笔金额超限: 15000.0 元，超过上限 10000.0 元",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "amount": 15000.0,
+        "max_amount": 10000.0,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "date_expired",
+      "severity": "warning",
+      "message": "发票日期超期: 2026-01-15，距今天 108 天，超过允许的 90 天",
+      "reference": "EXP001",
+      "details": {
+        "expense_id": "EXP001",
+        "invoice_date": "2026-01-15",
+        "days_since": 108,
+        "max_days": 90,
+        "line_number": 2
+      }
+    },
+    {
+      "issue_type": "date_expired",
+      "severity": "warning",
+      "message": "发票日期超期: 2025-11-01，距今天 183 天，超过允许的 90 天",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "invoice_date": "2025-11-01",
+        "days_since": 183,
+        "max_days": 90,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "missing_attachment",
+      "severity": "error",
+      "message": "缺少附件: 发票号 INV202601010003 未找到对应的附件文件",
+      "reference": "EXP003",
+      "details": {
+        "expense_id": "EXP003",
+        "invoice_number": "INV202601010003",
+        "amount": 15000.0,
+        "line_number": 4
+      }
+    },
+    {
+      "issue_type": "missing_attachment",
+      "severity": "error",
+      "message": "缺少附件: 发票号 INV202601019999 未找到对应的附件文件",
+      "reference": "EXP005",
+      "details": {
+        "expense_id": "EXP005",
+        "invoice_number": "INV202601019999",
+        "amount": 800.0,
+        "line_number": 6
+      }
+    },
+    {
+      "issue_type": "invalid_filename",
+      "severity": "warning",
+      "message": "文件名不规范: 'random_file.jpg' 未识别出发票号或报销单号",
+      "reference": "random_file.jpg",
+      "details": {
+        "filename": "random_file.jpg",
+        "full_path": "test-sample-package/random_file.jpg",
+        "size": 0
+      }
+    }
+  ],
+  "expenses": [
+    {
+      "line_number": 2,
+      "expense_id": "EXP001",
+      "invoice_number": "INV202601010001",
+      "amount": 500.0,
+      "date": "2026-01-15",
+      "expense_type": "差旅费",
+      "project_code": "PRJ001",
+      "description": "北京出差交通费",
+      "attachment_requirements": [
+        "发票",
+        "付款凭证"
+      ],
+      "raw_data": {
+        "expense_id": "EXP001",
+        "invoice_number": "INV202601010001",
+        "amount": "500.00",
+        "date": "2026-01-15",
+        "expense_type": "差旅费",
+        "project_code": "PRJ001",
+        "description": "北京出差交通费",
+        "attachment_requirements": "发票;付款凭证"
+      }
+    },
+    {
+      "line_number": 3,
+      "expense_id": "EXP002",
+      "invoice_number": "INV202601010002",
+      "amount": 3500.0,
+      "date": "2026-02-20",
+      "expense_type": "办公费",
+      "project_code": "PRJ001",
+      "description": "采购办公设备",
+      "attachment_requirements": [
+        "发票"
+      ],
+      "raw_data": {
+        "expense_id": "EXP002",
+        "invoice_number": "INV202601010002",
+        "amount": "3500.00",
+        "date": "2026-02-20",
+        "expense_type": "办公费",
+        "project_code": "PRJ001",
+        "description": "采购办公设备",
+        "attachment_requirements": "发票"
+      }
+    },
+    {
+      "line_number": 4,
+      "expense_id": "EXP003",
+      "invoice_number": "INV202601010003",
+      "amount": 15000.0,
+      "date": "2025-11-01",
+      "expense_type": "服务费",
+      "project_code": "PRJ002",
+      "description": "技术咨询服务费",
+      "attachment_requirements": [
+        "发票",
+        "合同",
+        "验收单"
+      ],
+      "raw_data": {
+        "expense_id": "EXP003",
+        "invoice_number": "INV202601010003",
+        "amount": "15000.00",
+        "date": "2025-11-01",
+        "expense_type": "服务费",
+        "project_code": "PRJ002",
+        "description": "技术咨询服务费",
+        "attachment_requirements": "发票;合同;验收单"
+      }
+    },
+    {
+      "line_number": 5,
+      "expense_id": "EXP004",
+      "invoice_number": "INV202601010002",
+      "amount": 2000.0,
+      "date": "2026-03-01",
+      "expense_type": "办公费",
+      "project_code": "PRJ001",
+      "description": "重复发票号测试",
+      "attachment_requirements": [
+        "发票"
+      ],
+      "raw_data": {
+        "expense_id": "EXP004",
+        "invoice_number": "INV202601010002",
+        "amount": "2000.00",
+        "date": "2026-03-01",
+        "expense_type": "办公费",
+        "project_code": "PRJ001",
+        "description": "重复发票号测试",
+        "attachment_requirements": "发票"
+      }
+    },
+    {
+      "line_number": 6,
+      "expense_id": "EXP005",
+      "invoice_number": "INV202601019999",
+      "amount": 800.0,
+      "date": "2026-04-01",
+      "expense_type": "差旅费",
+      "project_code": "PRJ003",
+      "description": "缺少附件测试",
+      "attachment_requirements": [
+        "发票"
+      ],
+      "raw_data": {
+        "expense_id": "EXP005",
+        "invoice_number": "INV202601019999",
+        "amount": "800.00",
+        "date": "2026-04-01",
+        "expense_type": "差旅费",
+        "project_code": "PRJ003",
+        "description": "缺少附件测试",
+        "attachment_requirements": "发票"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "filename": "expenses.csv",
+      "full_path": "test-sample-package/expenses.csv",
+      "file_type": "csv",
+      "size": 566,
+      "last_modified": "2026-05-03T17:40:55.871491",
+      "invoice_number": null,
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "验收单_YS20251101.pdf",
+      "full_path": "test-sample-package/subfolder/验收单_YS20251101.pdf",
+      "file_type": "pdf",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.872033",
+      "invoice_number": "20251101",
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "发票_INV202601010002.pdf",
+      "full_path": "test-sample-package/发票_INV202601010002.pdf",
+      "file_type": "pdf",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.871868",
+      "invoice_number": "INV202601010002",
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "发票_INV202601010001.pdf",
+      "full_path": "test-sample-package/发票_INV202601010001.pdf",
+      "file_type": "pdf",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.871729",
+      "invoice_number": "INV202601010001",
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "付款_INV202601010001.png",
+      "full_path": "test-sample-package/付款_INV202601010001.png",
+      "file_type": "png",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.871813",
+      "invoice_number": "202601010001",
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "合同_HT20251101.pdf",
+      "full_path": "test-sample-package/合同_HT20251101.pdf",
+      "file_type": "pdf",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.871926",
+      "invoice_number": "20251101",
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    },
+    {
+      "filename": "random_file.jpg",
+      "full_path": "test-sample-package/random_file.jpg",
+      "file_type": "jpg",
+      "size": 0,
+      "last_modified": "2026-05-03T17:40:55.872087",
+      "invoice_number": null,
+      "expense_id": null,
+      "metadata": null,
+      "sidecar_meta": null
+    }
+  ]
+}
