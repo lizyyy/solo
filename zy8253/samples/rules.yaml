@@ -1,0 +1,44 @@
+globalSettings:
+  maxGapMinutes: 10
+  duplicateBatteryMinutes: 30
+
+rules:
+  - ruleId: RULE-001
+    name: 温度快速上升检测
+    type: temperature_slope
+    threshold: 0.5
+    timeWindowMinutes: 30
+    severity: high
+    enabled: true
+
+  - ruleId: RULE-002
+    name: 温度异常上升检测
+    type: temperature_slope
+    threshold: 0.2
+    timeWindowMinutes: 30
+    severity: medium
+    enabled: true
+
+  - ruleId: RULE-003
+    name: 频繁换电检测
+    type: abnormal_swap
+    threshold: 15
+    timeWindowMinutes: 60
+    severity: medium
+    enabled: true
+
+  - ruleId: RULE-004
+    name: 传感器断采检测
+    type: sensor_failure
+    threshold: 10
+    timeWindowMinutes: 30
+    severity: high
+    enabled: true
+
+  - ruleId: RULE-005
+    name: 轻微温度上升检测
+    type: temperature_slope
+    threshold: 0.1
+    timeWindowMinutes: 30
+    severity: low
+    enabled: true

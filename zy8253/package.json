@@ -1,0 +1,27 @@
+{
+  "name": "thermal-review-cli",
+  "version": "1.0.0",
+  "description": "换电柜热失控早期复盘工具",
+  "main": "dist/index.js",
+  "bin": {
+    "thermal-review": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["换电柜", "热失控", "复盘", "CLI"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@types/node": "^25.6.0",
+    "commander": "^14.0.3",
+    "csv-parser": "^3.2.0",
+    "date-fns": "^4.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "yaml": "^2.8.4"
+  }
+}
