@@ -1,0 +1,252 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 供应商
+model Supplier {
+  id        Int       @id @default(autoincrement())
+  name      String
+  contact   String?
+  phone     String?
+  email     String?
+  address   String?
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  materialBatches MaterialBatch[]
+
+  @@index([name])
+}
+
+// 材料分类
+model MaterialCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+
+  materials Material[]
+}
+
+// 材料基础信息
+model Material {
+  id          Int       @id @default(autoincrement())
+  name        String
+  categoryId  Int?
+  unit        String    // 基础单位，如: g, ml, 个, 盒
+  allergens   String?   // 过敏原，逗号分隔
+  description String?
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  category     MaterialCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  batches      MaterialBatch[]
+  recipeItems  RecipeIngredient[]
+
+  @@index([name])
+}
+
+// 材料批次
+model MaterialBatch {
+  id               Int       @id @default(autoincrement())
+  materialId       Int
+  supplierId       Int?
+  batchNumber      String    // 批次号
+  quantity         Float     // 入库数量
+  remainingQuantity Float    // 剩余数量
+  unitPrice        Float     // 单位价格
+  totalPrice       Float     // 总价
+  unit             String    // 单位
+  receivedDate     DateTime? // 入库日期
+  expiryDate       DateTime? // 有效期
+  allergens        String?   // 该批次过敏原（可能与基础不同）
+  note             String?
+  status           String    @default("active") // active, used_up, expired, recalled
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  material     Material        @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  supplier     Supplier?       @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  usages       ProductionMaterial[]
+
+  @@index([materialId])
+  @@index([batchNumber])
+  @@index([expiryDate])
+  @@index([status])
+}
+
+// 产品（成品）
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  sku         String?
+  description String?
+  note        String?
+  basePrice   Float?    // 基础价格（参考）
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  recipes      Recipe[]
+  production   ProductionBatch[]
+  orderItems   OrderItem[]
+
+  @@index([name])
+  @@index([sku])
+}
+
+// 配方
+model Recipe {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  name        String
+  version     String    @default("v1.0")
+  description String?
+  yield       Float     // 产出数量
+  yieldUnit   String    // 产出单位
+  isDefault   Boolean   @default(false)
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  product            Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredients        RecipeIngredient[]
+  productionBatches  ProductionBatch[]
+
+  @@index([productId])
+}
+
+// 配方成分
+model RecipeIngredient {
+  id           Int     @id @default(autoincrement())
+  recipeId     Int
+  materialId   Int
+  quantity     Float   // 用量
+  unit         String  // 单位
+  lossRate     Float   @default(0) // 损耗率，百分比 0-100
+  note         String?
+  sortOrder    Int     @default(0)
+
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@index([recipeId])
+}
+
+// 生产批次
+model ProductionBatch {
+  id            Int       @id @default(autoincrement())
+  productId     Int
+  batchNumber   String    // 生产批次号
+  quantity      Float     // 生产数量
+  unit          String    // 单位
+  recipeId      Int?
+  status        String    @default("draft") // draft, in_progress, completed, cancelled
+  startDate     DateTime?
+  endDate       DateTime?
+  note          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  product  Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  recipe   Recipe?              @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  materials ProductionMaterial[]
+  orderItems OrderItem[]
+
+  @@index([productId])
+  @@index([batchNumber])
+  @@index([status])
+}
+
+// 生产耗用材料
+model ProductionMaterial {
+  id                Int   @id @default(autoincrement())
+  productionBatchId Int
+  materialBatchId   Int
+  quantity          Float // 实际耗用数量
+  unit              String
+  unitPrice         Float // 耗用当时的单价
+  totalCost         Float // 该材料总成本
+
+  productionBatch ProductionBatch @relation(fields: [productionBatchId], references: [id], onDelete: Cascade)
+  materialBatch   MaterialBatch   @relation(fields: [materialBatchId], references: [id], onDelete: Cascade)
+
+  @@index([productionBatchId])
+  @@index([materialBatchId])
+}
+
+// 客户
+model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  contact   String?
+  phone     String?
+  email     String?
+  address   String?
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  orders Order[]
+
+  @@index([name])
+}
+
+// 订单
+model Order {
+  id            Int       @id @default(autoincrement())
+  orderNumber   String
+  customerId    Int?
+  status        String    @default("draft") // draft, quoted, confirmed, completed, cancelled
+  totalCost     Float?    // 总成本
+  totalPrice    Float?    // 总报价
+  profit        Float?    // 利润
+  profitMargin  Float?    // 利润率
+  note          String?
+  quotedAt      DateTime?
+  confirmedAt   DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  customer Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items    OrderItem[]
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([status])
+}
+
+// 订单项
+model OrderItem {
+  id                Int   @id @default(autoincrement())
+  orderId           Int
+  productId         Int?
+  productionBatchId Int?
+  productName       String  // 冗余存储产品名
+  quantity          Float
+  unit              String
+  unitCost          Float?  // 单位成本
+  unitPrice         Float?  // 单位报价
+  totalCost         Float?
+  totalPrice        Float?
+  profit            Float?
+  note              String?
+
+  order           Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product?         @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productionBatch ProductionBatch? @relation(fields: [productionBatchId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([productionBatchId])
+}

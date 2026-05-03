@@ -1,0 +1,24 @@
+{
+  "name": "craft-workshop-system",
+  "version": "1.0.0",
+  "description": "手作工作室管理系统 - 材料批次、配方、生产、订单管理",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:seed": "cd backend && npx prisma db seed"
+  },
+  "keywords": [
+    "craft",
+    "workshop",
+    "inventory",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
