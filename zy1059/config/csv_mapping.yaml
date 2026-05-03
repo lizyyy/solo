@@ -1,0 +1,187 @@
+# CSV 字段映射配置
+# 用于将不同格式的 CSV 日程文件映射到标准字段
+
+# 默认映射配置
+default:
+  # 必填字段
+  title:
+    - "标题"
+    - "主题"
+    - "事件"
+    - "活动"
+    - "name"
+    - "title"
+    - "summary"
+    - "subject"
+    - "event"
+  
+  start:
+    - "开始时间"
+    - "开始日期"
+    - "日期"
+    - "start"
+    - "start_time"
+    - "start_date"
+    - "dtstart"
+    - "begin"
+    - "date"
+  
+  end:
+    - "结束时间"
+    - "结束日期"
+    - "end"
+    - "end_time"
+    - "end_date"
+    - "dtend"
+    - "finish"
+  
+  # 可选字段
+  location:
+    - "地点"
+    - "位置"
+    - "location"
+    - "place"
+    - "venue"
+    - "地址"
+    - "address"
+  
+  description:
+    - "描述"
+    - "详情"
+    - "说明"
+    - "备注"
+    - "description"
+    - "notes"
+    - "detail"
+    - "comment"
+  
+  all_day:
+    - "全天"
+    - "全天事件"
+    - "is_all_day"
+    - "all_day"
+    - "全天活动"
+  
+  timezone:
+    - "时区"
+    - "timezone"
+    - "tz"
+  
+  duration:
+    - "时长"
+    - "持续时间"
+    - "duration"
+    - "minutes"
+    - "hours"
+  
+  status:
+    - "状态"
+    - "status"
+  
+  organizer:
+    - "组织者"
+    - "organizer"
+    - "创建人"
+    - "creator"
+  
+  attendees:
+    - "参会人"
+    - "参与者"
+    - "attendees"
+    - "participants"
+    - "guests"
+  
+  recurrence:
+    - "重复"
+    - "重复规则"
+    - "recurrence"
+    - "rrule"
+    - "repeat"
+
+# 特定来源的映射配置
+# 学校课程表格式
+school:
+  title:
+    - "课程名称"
+    - "课程"
+    - "科目"
+  start:
+    - "上课时间"
+    - "开始时间"
+    - "日期"
+  end:
+    - "下课时间"
+    - "结束时间"
+  location:
+    - "教室"
+    - "地点"
+    - "教学楼"
+  description:
+    - "教师"
+    - "老师"
+    - "任课教师"
+    - "备注"
+
+# 兼职排班格式
+parttime:
+  title:
+    - "班次"
+    - "工作内容"
+    - "岗位"
+  start:
+    - "上班时间"
+    - "开始时间"
+    - "日期"
+  end:
+    - "下班时间"
+    - "结束时间"
+  location:
+    - "门店"
+    - "工作地点"
+    - "地址"
+  description:
+    - "备注"
+    - "排班说明"
+
+# 健身预约格式
+fitness:
+  title:
+    - "课程"
+    - "项目"
+    - "教练"
+    - "课程名称"
+  start:
+    - "预约时间"
+    - "开始时间"
+    - "日期"
+  end:
+    - "结束时间"
+  location:
+    - "场馆"
+    - "健身房"
+    - "教室"
+    - "地点"
+  description:
+    - "教练"
+    - "备注"
+
+# 时间格式解析配置
+datetime_formats:
+  - "%Y-%m-%d %H:%M:%S"
+  - "%Y-%m-%d %H:%M"
+  - "%Y/%m/%d %H:%M:%S"
+  - "%Y/%m/%d %H:%M"
+  - "%Y-%m-%d"
+  - "%Y/%m/%d"
+  - "%m-%d-%Y %H:%M:%S"
+  - "%m/%d/%Y %H:%M"
+  - "%d/%m/%Y %H:%M"
+  - "%Y年%m月%d日 %H:%M"
+  - "%Y年%m月%d日"
+
+# 持续时间格式
+duration_formats:
+  - "minutes"  # 纯数字表示分钟
+  - "hours"    # 纯数字表示小时
+  - "%H:%M"    # "01:30" 表示1小时30分钟
+  - "PT%HH%MM" # ISO 8601 格式如 "PT1H30M"
