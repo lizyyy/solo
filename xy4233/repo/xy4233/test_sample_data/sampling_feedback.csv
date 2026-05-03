@@ -1,0 +1,21 @@
+﻿session_id,turn_id,original_label,reviewer_label,reviewer_id,is_agreement,feedback_notes,reviewed_at
+session_0000,,account_query,account_query,reviewer_01,True,确认无误,2026-05-02T23:58:45.979377
+session_0001,,account_modify,account_modify,reviewer_01,True,确认无误,2026-05-02T19:58:45.979377
+session_0002,,payment_query,payment_query,reviewer_02,True,确认无误,2026-05-03T03:58:45.979377
+session_0003,,order_cancel,refund_apply,reviewer_03,False,原标签 order_cancel 不准确，应改为 refund_apply,2026-05-03T05:58:45.979377
+session_0004,,payment_query,suggestion,reviewer_02,False,原标签 payment_query 不准确，应改为 suggestion,2026-05-03T02:58:45.979377
+session_0005,,payment_query,payment_query,reviewer_03,True,确认无误,2026-05-02T20:58:45.979377
+session_0006,,order_query,order_query,reviewer_01,True,确认无误,2026-05-02T19:58:45.979377
+session_0007,,product_query,product_query,reviewer_02,True,确认无误,2026-05-03T02:58:45.979377
+session_0008,,suggestion,suggestion,reviewer_03,True,确认无误,2026-05-02T19:58:45.979377
+session_0009,,account_query,account_query,reviewer_01,True,确认无误,2026-05-02T20:58:45.979377
+session_0010,,refund_apply,refund_apply,reviewer_01,True,确认无误,2026-05-03T00:58:45.979377
+session_0011,,refund_query,refund_query,reviewer_03,True,确认无误,2026-05-02T16:58:45.979377
+session_0012,,account_modify,account_modify,reviewer_03,True,确认无误,2026-05-03T12:58:45.979377
+session_0013,,refund_apply,refund_apply,reviewer_01,True,确认无误,2026-05-03T07:58:45.979377
+session_0014,,password_reset,password_reset,reviewer_03,True,确认无误,2026-05-02T19:58:45.979377
+session_0015,,refund_apply,refund_apply,reviewer_01,True,确认无误,2026-05-03T12:58:45.979377
+session_0016,,order_query,order_query,reviewer_01,True,确认无误,2026-05-03T04:58:45.979377
+session_0017,,password_reset,password_reset,reviewer_02,True,确认无误,2026-05-03T11:58:45.979377
+session_0018,,suggestion,suggestion,reviewer_02,True,确认无误,2026-05-02T20:58:45.979377
+session_0019,,service_query,service_query,reviewer_02,True,确认无误,2026-05-02T19:58:45.979377

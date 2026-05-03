@@ -1,0 +1,40 @@
+name: customer_service_intents
+version: "2.0.0"
+description: 客服意图分类标签体系
+labels:
+  account_query: 账户查询
+  account_modify: 账户修改
+  password_reset: 密码重置
+  order_query: 订单查询
+  order_modify: 订单修改
+  order_cancel: 订单取消
+  payment_query: 支付查询
+  payment_issue: 支付问题
+  refund_apply: 退款申请
+  refund_query: 退款查询
+  complaint: 投诉
+  suggestion: 建议
+  product_query: 商品查询
+  service_query: 服务查询
+  other: 其他
+parent_labels:
+  account:
+    - account_query
+    - account_modify
+    - password_reset
+  order:
+    - order_query
+    - order_modify
+    - order_cancel
+  payment:
+    - payment_query
+    - payment_issue
+  refund:
+    - refund_apply
+    - refund_query
+  customer_care:
+    - complaint
+    - suggestion
+  info_query:
+    - product_query
+    - service_query
