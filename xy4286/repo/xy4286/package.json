@@ -1,0 +1,38 @@
+{
+  "name": "vaccine-tracking-system",
+  "version": "1.0.0",
+  "description": "疾控站疫苗运输监控系统 - 监控保温箱温度、车辆轨迹和交接流程",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "vaccine",
+    "tracking",
+    "temperature",
+    "logistics",
+    "cdc"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0",
+    "joi": "^17.9.2",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
