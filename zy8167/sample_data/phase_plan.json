@@ -1,0 +1,130 @@
+[
+  {
+    "intersection_id": "INT001",
+    "plan_id": "PEAK_MORNING",
+    "name": "早高峰计划",
+    "start_time": "07:00:00",
+    "end_time": "09:00:00",
+    "cycle_length": 120,
+    "phases": [
+      {"phase_id": 1, "duration": 35, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 2, "duration": 25, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 3, "duration": 3, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 4, "duration": 27, "is_pedestrian": false, "is_bus_priority": true}
+    ]
+  },
+  {
+    "intersection_id": "INT001",
+    "plan_id": "NORMAL_DAY",
+    "name": "日间平峰计划",
+    "start_time": "09:00:00",
+    "end_time": "17:00:00",
+    "cycle_length": 90,
+    "phases": [
+      {"phase_id": 1, "duration": 25, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 2, "duration": 20, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 3, "duration": 25, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 4, "duration": 20, "is_pedestrian": false, "is_bus_priority": true}
+    ]
+  },
+  {
+    "intersection_id": "INT001",
+    "plan_id": "PEAK_EVENING",
+    "name": "晚高峰计划",
+    "start_time": "17:00:00",
+    "end_time": "19:00:00",
+    "cycle_length": 120,
+    "phases": [
+      {"phase_id": 1, "duration": 30, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 2, "duration": 30, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 3, "duration": 30, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 4, "duration": 30, "is_pedestrian": false, "is_bus_priority": true}
+    ]
+  },
+  {
+    "intersection_id": "INT001",
+    "plan_id": "NIGHT",
+    "name": "夜间计划",
+    "start_time": "19:00:00",
+    "end_time": "07:00:00",
+    "cycle_length": 60,
+    "phases": [
+      {"phase_id": 1, "duration": 15, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 2, "duration": 15, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 3, "duration": 15, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 4, "duration": 15, "is_pedestrian": false, "is_bus_priority": true}
+    ]
+  },
+  {
+    "intersection_id": "INT002",
+    "plan_id": "PEAK_MORNING",
+    "name": "早高峰计划",
+    "start_time": "07:00:00",
+    "end_time": "09:00:00",
+    "cycle_length": 100,
+    "phases": [
+      {"phase_id": 1, "duration": 28, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 2, "duration": 22, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 3, "duration": 28, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 4, "duration": 22, "is_pedestrian": true, "is_bus_priority": false}
+    ]
+  },
+  {
+    "intersection_id": "INT002",
+    "plan_id": "NORMAL_DAY",
+    "name": "日间平峰计划",
+    "start_time": "09:00:00",
+    "end_time": "17:00:00",
+    "cycle_length": 80,
+    "phases": [
+      {"phase_id": 1, "duration": 22, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 2, "duration": 18, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 3, "duration": 22, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 4, "duration": 18, "is_pedestrian": true, "is_bus_priority": false}
+    ]
+  },
+  {
+    "intersection_id": "INT002",
+    "plan_id": "PEAK_EVENING",
+    "name": "晚高峰计划",
+    "start_time": "17:00:00",
+    "end_time": "19:00:00",
+    "cycle_length": 100,
+    "phases": [
+      {"phase_id": 1, "duration": 30, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 2, "duration": 20, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 3, "duration": 30, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 4, "duration": 20, "is_pedestrian": true, "is_bus_priority": false}
+    ]
+  },
+  {
+    "intersection_id": "INT002",
+    "plan_id": "NIGHT",
+    "name": "夜间计划",
+    "start_time": "19:00:00",
+    "end_time": "00:00:00",
+    "cycle_length": 50,
+    "phases": [
+      {"phase_id": 1, "duration": 15, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 2, "duration": 10, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 3, "duration": 15, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 4, "duration": 10, "is_pedestrian": true, "is_bus_priority": false}
+    ]
+  },
+  {
+    "intersection_id": "INT003",
+    "plan_id": "ALL_DAY",
+    "name": "全天计划",
+    "start_time": "00:00:00",
+    "end_time": "23:59:59",
+    "cycle_length": 150,
+    "phases": [
+      {"phase_id": 1, "duration": 30, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 2, "duration": 20, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 3, "duration": 30, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 4, "duration": 20, "is_pedestrian": false, "is_bus_priority": true},
+      {"phase_id": 5, "duration": 25, "is_pedestrian": true, "is_bus_priority": false},
+      {"phase_id": 6, "duration": 25, "is_pedestrian": false, "is_bus_priority": true}
+    ]
+  }
+]

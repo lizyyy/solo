@@ -1,0 +1,16 @@
+[project]
+name = "signal_replay"
+version = "0.1.0"
+description = "Traffic signal timing replay and analysis tool"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+signal-replay = "signal_replay.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
