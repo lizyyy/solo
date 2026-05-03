@@ -1,0 +1,5 @@
+section_id,start_km,end_km,section_type,curve_direction,curve_radius
+K100+000_100+200,100.000,100.200,straight,,
+K100+200_100+500,100.200,100.500,curve,left,800
+K100+500_100+800,100.500,100.800,straight,,
+K100+800_101+000,100.800,101.000,curve,right,1200

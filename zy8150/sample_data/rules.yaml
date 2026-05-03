@@ -1,0 +1,162 @@
+version: "1.0"
+description: "铁路轨道几何状态检测超限规则标准"
+
+thresholds:
+  track_gauge:
+    description: "轨距 (标准值1435mm)"
+    straight:
+      nominal: 1435.0
+      tolerance_plus: 6.0
+      tolerance_minus: 4.0
+    curve:
+      nominal: 1435.0
+      tolerance_plus: 8.0
+      tolerance_minus: 5.0
+
+  level:
+    description: "水平 (mm)"
+    straight:
+      nominal: 0.0
+      tolerance_plus: 4.0
+      tolerance_minus: 4.0
+    curve:
+      nominal: 0.0
+      tolerance_plus: 5.0
+      tolerance_minus: 5.0
+
+  alignment:
+    description: "轨向 (mm)"
+    straight:
+      max: 5.0
+    curve:
+      max: 6.0
+
+  profile:
+    description: "高低 (mm)"
+    straight:
+      max: 5.0
+    curve:
+      max: 6.0
+
+scoring:
+  description: "超限扣分规则"
+  
+  track_gauge:
+    straight:
+      minor:
+        threshold: 1.0
+        score: 5
+        description: "轻微超限"
+      general:
+        threshold: 3.0
+        score: 10
+        description: "一般超限"
+      severe:
+        threshold: 6.0
+        score: 20
+        description: "严重超限"
+    curve:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 3.0
+        score: 10
+      severe:
+        threshold: 7.0
+        score: 20
+
+  level:
+    straight:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 2.0
+        score: 10
+      severe:
+        threshold: 4.0
+        score: 20
+    curve:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 3.0
+        score: 10
+      severe:
+        threshold: 5.0
+        score: 20
+
+  alignment:
+    straight:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 3.0
+        score: 10
+      severe:
+        threshold: 5.0
+        score: 20
+    curve:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 4.0
+        score: 10
+      severe:
+        threshold: 6.0
+        score: 20
+
+  profile:
+    straight:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 3.0
+        score: 10
+      severe:
+        threshold: 5.0
+        score: 20
+    curve:
+      minor:
+        threshold: 1.0
+        score: 5
+      general:
+        threshold: 4.0
+        score: 10
+      severe:
+        threshold: 6.0
+        score: 20
+
+priority_rules:
+  description: "维修优先级判定规则"
+  
+  urgent:
+    description: "紧急 - 需要立即处理"
+    conditions:
+      level: "严重"
+      length_threshold_m: 50.0
+      score_threshold: 50
+  
+  high:
+    description: "高 - 优先处理"
+    conditions:
+      levels: ["一般", "严重"]
+      length_threshold_m: 20.0
+      score_threshold: 30
+  
+  medium:
+    description: "中 - 计划处理"
+    conditions:
+      levels: ["轻微", "一般"]
+      length_threshold_m: 10.0
+      score_threshold: 15
+  
+  low:
+    description: "低 - 观察处理"
+    conditions:
+      default: true
