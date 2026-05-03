@@ -1,0 +1,117 @@
+version: "1.0"
+date: 2025-04-15
+created_by: "营养师"
+notes: "2025年第二季度日粮配方"
+
+herd_rations:
+  G001:
+    group_name: "高产泌乳牛"
+    target_dry_matter_kg: 26.0
+    target_crude_protein_percent: 17.5
+    target_net_energy_mcal_kg: 1.75
+    target_calcium_percent: 0.80
+    target_phosphorus_percent: 0.42
+    budget_cny_per_head_daily: 85.0
+    feeds:
+      - feed_id: F001
+        as_fed_kg: 30.0
+      - feed_id: F002
+        as_fed_kg: 4.5
+      - feed_id: F003
+        as_fed_kg: 5.0
+      - feed_id: F004
+        as_fed_kg: 3.5
+      - feed_id: F005
+        as_fed_kg: 1.0
+      - feed_id: F006
+        as_fed_kg: 0.15
+      - feed_id: F007
+        as_fed_kg: 0.25
+
+  G002:
+    group_name: "中产泌乳牛"
+    target_dry_matter_kg: 22.0
+    target_crude_protein_percent: 16.0
+    target_net_energy_mcal_kg: 1.68
+    target_calcium_percent: 0.75
+    target_phosphorus_percent: 0.39
+    budget_cny_per_head_daily: 70.0
+    feeds:
+      - feed_id: F001
+        as_fed_kg: 25.0
+      - feed_id: F002
+        as_fed_kg: 3.5
+      - feed_id: F003
+        as_fed_kg: 4.0
+      - feed_id: F004
+        as_fed_kg: 2.8
+      - feed_id: F006
+        as_fed_kg: 0.12
+      - feed_id: F007
+        as_fed_kg: 0.20
+      - feed_id: F008
+        as_fed_kg: 3.0
+
+  G003:
+    group_name: "低产泌乳牛"
+    target_dry_matter_kg: 20.0
+    target_crude_protein_percent: 14.5
+    target_net_energy_mcal_kg: 1.60
+    target_calcium_percent: 0.68
+    target_phosphorus_percent: 0.36
+    budget_cny_per_head_daily: 55.0
+    feeds:
+      - feed_id: F001
+        as_fed_kg: 22.0
+      - feed_id: F002
+        as_fed_kg: 2.5
+      - feed_id: F003
+        as_fed_kg: 3.0
+      - feed_id: F004
+        as_fed_kg: 1.8
+      - feed_id: F008
+        as_fed_kg: 5.0
+      - feed_id: F006
+        as_fed_kg: 0.10
+      - feed_id: F007
+        as_fed_kg: 0.18
+
+  G004:
+    group_name: "干奶牛"
+    target_dry_matter_kg: 14.0
+    target_crude_protein_percent: 12.0
+    target_net_energy_mcal_kg: 1.45
+    target_calcium_percent: 0.45
+    target_phosphorus_percent: 0.28
+    budget_cny_per_head_daily: 35.0
+    feeds:
+      - feed_id: F001
+        as_fed_kg: 18.0
+      - feed_id: F002
+        as_fed_kg: 3.0
+      - feed_id: F003
+        as_fed_kg: 1.5
+      - feed_id: F006
+        as_fed_kg: 0.05
+      - feed_id: F007
+        as_fed_kg: 0.15
+
+  G005:
+    group_name: "青年牛"
+    target_dry_matter_kg: 12.0
+    target_crude_protein_percent: 15.0
+    target_net_energy_mcal_kg: 1.55
+    target_calcium_percent: 0.55
+    target_phosphorus_percent: 0.32
+    budget_cny_per_head_daily: 40.0
+    feeds:
+      - feed_id: F001
+        as_fed_kg: 15.0
+      - feed_id: F002
+        as_fed_kg: 2.8
+      - feed_id: F003
+        as_fed_kg: 2.0
+      - feed_id: F004
+        as_fed_kg: 1.0
+      - feed_id: F007
+        as_fed_kg: 0.18
