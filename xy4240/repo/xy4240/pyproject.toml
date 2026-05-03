@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fragrance-checker"
+version = "0.1.0"
+description = "香精配方标签核验员 - 小型调香工作室的本地命令行工具"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "Fragrance Checker Team"}
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Manufacturing",
+  "Topic :: Utilities",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+  "click>=8.0",
+  "pyyaml>=6.0",
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+]
+
+[project.scripts]
+fragrance-checker = "fragrance_checker.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
