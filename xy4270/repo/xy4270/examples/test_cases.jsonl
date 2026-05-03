@@ -1,0 +1,15 @@
+{"id": "tc_001", "prompt": "请解释什么是机器学习，用简单的语言说明。", "system_prompt": "你是一个教育专家，善于用简单的语言解释复杂概念。", "expected_output": "一个关于机器学习的简单解释", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_002", "prompt": "写一首关于春天的短诗。", "system_prompt": "你是一个诗人，擅长创作优美的诗词。", "expected_output": "一首春天主题的短诗", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_003", "prompt": "如何提高编程效率？分享5个实用技巧。", "system_prompt": "你是一个资深软件工程师，乐于分享编程经验。", "expected_output": "5个提高编程效率的技巧", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_004", "prompt": "请分析以下数据的趋势：[10, 15, 22, 18, 30, 28, 35]", "system_prompt": "你是一个数据分析师，善于从数据中发现规律。", "expected_output": "数据分析趋势报告", "sensitive_tags": [], "metadata": {}, "priority": 2}
+{"id": "tc_005", "prompt": "请翻译这句话为英文：明天是美好的一天。", "system_prompt": "你是一个专业翻译，精通中英文翻译。", "expected_output": "英文翻译", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_006", "prompt": "什么是量子计算？它和传统计算机有什么不同？", "system_prompt": "你是一个科普作家，善于解释前沿科技。", "expected_output": "量子计算的解释", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_007", "prompt": "帮我写一封商务邮件，主题是邀请参加产品发布会。", "system_prompt": "你是一个商务沟通专家，擅长撰写专业邮件。", "expected_output": "商务邀请邮件", "sensitive_tags": [], "metadata": {}, "priority": 2}
+{"id": "tc_008", "prompt": "请列出Python中常用的数据结构及其特点。", "system_prompt": "你是一个Python专家，精通语言特性。", "expected_output": "Python数据结构列表", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_009", "prompt": "这是一个测试敏感标签的请求。", "system_prompt": "你是一个助手。", "expected_output": null, "sensitive_tags": ["confidential", "restricted"], "metadata": {}, "priority": 1}
+{"id": "tc_010", "prompt": "请分析用户行为数据，提供优化建议。", "system_prompt": "你是一个产品经理，关注用户体验。", "expected_output": "用户行为分析报告", "sensitive_tags": [], "metadata": {"force_timeout": true}, "priority": 1}
+{"id": "tc_011", "prompt": "如何设计一个可扩展的微服务架构？", "system_prompt": "你是一个架构师，善于设计高可用系统。", "expected_output": "微服务架构设计方案", "sensitive_tags": [], "metadata": {}, "priority": 3}
+{"id": "tc_012", "prompt": "请解释RESTful API的设计原则。", "system_prompt": "你是一个API设计专家。", "expected_output": "RESTful API原则解释", "sensitive_tags": [], "metadata": {}, "priority": 1}
+{"id": "tc_013", "prompt": "这是一个需要限流的测试请求。", "system_prompt": "你是一个助手。", "expected_output": null, "sensitive_tags": [], "metadata": {"force_rate_limit": true}, "priority": 1}
+{"id": "tc_014", "prompt": "如何优化数据库查询性能？分享最佳实践。", "system_prompt": "你是一个DBA，精通数据库优化。", "expected_output": "数据库优化建议", "sensitive_tags": [], "metadata": {}, "priority": 2}
+{"id": "tc_015", "prompt": "请为新产品写一段吸引人的产品描述。", "system_prompt": "你是一个营销文案专家。", "expected_output": "产品营销文案", "sensitive_tags": [], "metadata": {"force_failure": true}, "priority": 1}

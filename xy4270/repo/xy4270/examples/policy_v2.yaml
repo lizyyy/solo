@@ -1,0 +1,22 @@
+name: "aggressive_route"
+version: "2.0"
+
+primary_selection_strategy: "least_load"
+fallback_enabled: true
+
+retry_enabled: true
+retry_on_errors:
+  - "timeout"
+  - "rate_limited"
+max_retries_override: 3
+
+circuit_breaker_enabled: true
+
+budget_tracking_enabled: true
+budget_alert_threshold: 0.9
+
+sensitive_tag_blocking_enabled: false
+blocked_sensitive_tags: []
+
+degradation_enabled: true
+auto_degrade_on_failure: true

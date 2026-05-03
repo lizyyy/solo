@@ -1,0 +1,28 @@
+name: "conservative_route"
+version: "1.0"
+
+primary_selection_strategy: "round_robin"
+fallback_enabled: true
+
+retry_enabled: true
+retry_on_errors:
+  - "timeout"
+  - "rate_limited"
+  - "failed"
+max_retries_override: 2
+
+circuit_breaker_enabled: true
+
+budget_tracking_enabled: true
+budget_alert_threshold: 0.8
+
+sensitive_tag_blocking_enabled: true
+blocked_sensitive_tags:
+  - "confidential"
+  - "restricted"
+  - "pii"
+  - "health"
+  - "financial"
+
+degradation_enabled: true
+auto_degrade_on_failure: true
