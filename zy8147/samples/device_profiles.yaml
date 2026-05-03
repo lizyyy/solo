@@ -1,0 +1,27 @@
+devices:
+  - station_id: WEIGH01
+    device_model: WeighMaster-3000
+    stx: "["
+    etx: "]"
+    unit: kg
+    tare: 0.5
+    precision: 3
+    frame_format: type1
+
+  - station_id: WEIGH02
+    device_model: ScalePro-X1
+    stx: "STX"
+    etx: "ETX"
+    unit: g
+    tare: 100.0
+    precision: 2
+    frame_format: type2
+
+  - station_id: WEIGH03
+    device_model: SmartScale-500
+    stx: "["
+    etx: "]"
+    unit: kg
+    tare: 2.0
+    precision: 4
+    frame_format: type3

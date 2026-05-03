@@ -1,0 +1,38 @@
+{
+  "name": "weighing-log-analyzer",
+  "version": "1.0.0",
+  "description": "离线回放串口称重仪表日志分析工具",
+  "main": "dist/cli.js",
+  "bin": {
+    "weighing-analyzer": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli.ts",
+    "demo": "npm run start -- --log ./samples/serial.log --profiles ./samples/device_profiles.yaml --calibration ./samples/calibration.csv --batches ./samples/batches.csv --output ./output",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "serial",
+    "weighing",
+    "log-analyzer",
+    "cli",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "csv-parse": "^5.5.2",
+    "csv-stringify": "^6.4.4",
+    "chalk": "^4.1.2"
+  }
+}
