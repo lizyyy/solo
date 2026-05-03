@@ -1,0 +1,43 @@
+# 测段计划配置
+# 定义各基站的观测计划
+
+sessions:
+  - session_name: "BJFS_2024_001"
+    station_name: "BJFS"
+    start_time: "2024-01-01 00:00:00"
+    end_time: "2024-01-01 06:00:00"
+    interval: 30.0
+    antenna_height: 1.4500
+    notes: "6小时静态观测"
+
+  - session_name: "SHAO_2024_001"
+    station_name: "SHAO"
+    start_time: "2024-01-01 00:00:00"
+    end_time: "2024-01-01 08:00:00"
+    interval: 30.0
+    antenna_height: 1.5420
+    notes: "8小时静态观测"
+
+  - session_name: "WUHN_2024_001"
+    station_name: "WUHN"
+    start_time: "2024-01-01 00:00:00"
+    end_time: "2024-01-01 04:00:00"
+    interval: 15.0
+    antenna_height: 1.6200
+    notes: "4小时快速静态观测"
+
+  - session_name: "XIAA_2024_001"
+    station_name: "XIAA"
+    start_time: "2024-01-01 00:00:00"
+    end_time: "2024-01-01 12:00:00"
+    interval: 30.0
+    antenna_height: 1.3500
+    notes: "12小时长时间观测"
+
+  - session_name: "URUM_2024_001"
+    station_name: "URUM"
+    start_time: "2024-01-01 02:00:00"
+    end_time: "2024-01-01 10:00:00"
+    interval: 30.0
+    antenna_height: 1.5800
+    notes: "乌鲁木齐站跨UTC时段观测"
