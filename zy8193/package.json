@@ -1,0 +1,39 @@
+{
+  "name": "i18n-preflight",
+  "version": "1.0.0",
+  "description": "Frontend ICU i18n preflight check CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "i18n-preflight": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "demo": "tsx src/cli.ts --localeDir ./sample/locales --routes ./sample/routes.csv --screenshotManifest ./sample/screenshot-manifest.json --rules ./sample/rules.yaml --output ./output"
+  },
+  "keywords": [
+    "i18n",
+    "icu",
+    "preflight",
+    "localization",
+    "internationalization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/glob": "^8.1.0",
+    "typescript": "^5.3.0",
+    "tsx": "^4.6.0"
+  },
+  "dependencies": {
+    "glob": "^10.3.0",
+    "yaml": "^2.3.0",
+    "csv-stringify": "^6.4.0",
+    "chalk": "^4.1.2"
+  }
+}

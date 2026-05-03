@@ -1,0 +1,46 @@
+{
+  "common": {
+    "welcome": "欢迎使用我们的应用",
+    "loading": "加载中...",
+    "error": "发生错误"
+  },
+  "nav": {
+    "home": "首页",
+    "dashboard": "控制台",
+    "settings": "设置",
+    "profile": "个人中心"
+  },
+  "button": {
+    "submit": "提交",
+    "cancel": "取消",
+    "save": "保存更改",
+    "delete": "删除",
+    "ok": "确定",
+    "veryLongButtonTextThatWillTriggerWarning": "这是一个非常长的按钮文本，应该触发警告，因为它超过了字符限制"
+  },
+  "user": {
+    "greeting": "你好，{username}！",
+    "status": "您的状态是 {status}",
+    "messages": "您有 {count, plural, one {# 条消息} other {# 条消息}}",
+    "notifications": "您有 {count, plural, other {# 条通知}}"
+  },
+  "page": {
+    "home": {
+      "title": "首页",
+      "description": "欢迎来到我们的主页，在这里您可以找到惊人的功能"
+    },
+    "dashboard": {
+      "title": "控制台"
+    }
+  },
+  "oldFeature": {
+    "title": "这是一个旧的已弃用功能",
+    "description": "此密钥应标记为已弃用"
+  },
+  "invalid": {
+    "icu": "这有一个 {invalid 占位符没有闭合",
+    "extra": "这里没有额外的占位符"
+  },
+  "unusedKey": "这个密钥在路由或截图中没有使用",
+  "extraKey": "这个密钥只在中文中存在"
+}

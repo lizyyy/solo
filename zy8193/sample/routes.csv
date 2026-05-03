@@ -1,0 +1,5 @@
+path,keys,component
+/home,"common.welcome,page.home.title,nav.home",HomePage
+/dashboard,"user.greeting,user.messages,user.notifications,page.dashboard.title,nav.dashboard",DashboardPage
+/settings,"nav.settings,button.save,button.cancel,common.success",SettingsPage
+/profile,"user.status,nav.profile,button.submit",ProfilePage

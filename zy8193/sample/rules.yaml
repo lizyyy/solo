@@ -1,0 +1,38 @@
+maxTextLength:
+  button: 30
+  navigation: 20
+  title: 60
+
+pluralRules:
+  requiredForms:
+    - "one"
+    - "other"
+  localeOverrides:
+    "zh-CN":
+      - "other"
+    "zh-TW":
+      - "other"
+    "ja":
+      - "other"
+    "ko":
+      - "other"
+    "ar":
+      - "zero"
+      - "one"
+      - "two"
+      - "few"
+      - "many"
+      - "other"
+    "ru":
+      - "one"
+      - "few"
+      - "many"
+      - "other"
+
+deprecatedKeys:
+  - "oldFeature.title"
+  - "oldFeature.description"
+
+keyPatterns:
+  allowed: []
+  forbidden: []

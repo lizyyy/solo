@@ -1,0 +1,26 @@
+[
+  {
+    "name": "homepage",
+    "path": "/screenshots/home.png",
+    "keys": ["common.welcome", "page.home.title", "nav.home"],
+    "status": "active"
+  },
+  {
+    "name": "dashboard",
+    "path": "/screenshots/dashboard.png",
+    "keys": ["user.greeting", "user.messages", "page.dashboard.title", "oldFeature.title"],
+    "status": "active"
+  },
+  {
+    "name": "settings",
+    "path": "/screenshots/settings.png",
+    "keys": ["nav.settings", "button.save", "button.cancel"],
+    "status": "active"
+  },
+  {
+    "name": "old-feature-page",
+    "path": "/screenshots/old-feature.png",
+    "keys": ["oldFeature.title", "oldFeature.description"],
+    "status": "deprecated"
+  }
+]

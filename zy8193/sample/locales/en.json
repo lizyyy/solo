@@ -1,0 +1,48 @@
+{
+  "common": {
+    "welcome": "Welcome to our app",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "button": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "delete": "Delete",
+    "ok": "OK",
+    "veryLongButtonTextThatWillTriggerWarning": "This is a very long button text that should trigger a warning because it exceeds the character limit"
+  },
+  "user": {
+    "greeting": "Hello, {name}!",
+    "status": "Your status is {status}",
+    "messages": "You have {count, plural, one {# message} other {# messages}}",
+    "notifications": "You have {count, plural, one {# notification} other {# notifications}}",
+    "items": "You selected {count, plural, one {# item} other {# items}}"
+  },
+  "page": {
+    "home": {
+      "title": "Home Page",
+      "description": "Welcome to our homepage where you can find amazing features"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Your overview"
+    }
+  },
+  "oldFeature": {
+    "title": "This is an old deprecated feature",
+    "description": "This key should be flagged as deprecated"
+  },
+  "invalid": {
+    "icu": "This has an {invalid placeholder without closing",
+    "extra": "Extra placeholder {extra} here"
+  },
+  "unusedKey": "This key is not used anywhere in routes or screenshots"
+}
