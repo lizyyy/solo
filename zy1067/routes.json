@@ -1,0 +1,68 @@
+{
+  "version": "1.0",
+  "name": "键盘可访问性巡检示例配置",
+  "description": "包含示例页面的默认配置，用于演示可访问性问题的检测",
+  "defaultSettings": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "checkers": [
+      "focus-order",
+      "focus-visibility",
+      "skip-link",
+      "form-label",
+      "button-name",
+      "modal-trap"
+    ],
+    "timeout": 30000
+  },
+  "groups": [
+    {
+      "id": "demo",
+      "name": "示例页面",
+      "description": "用于演示可访问性问题检测的示例页面"
+    }
+  ],
+  "routes": [
+    {
+      "id": "demo-page",
+      "name": "演示页面",
+      "url": "./examples/demo.html",
+      "type": "html",
+      "description": "包含多种可访问性问题的演示页面，用于验证扫描功能",
+      "group": "demo",
+      "keyControls": [
+        {
+          "selector": "#submit-btn",
+          "name": "提交按钮",
+          "expectedRole": "button",
+          "expectedActions": [
+            "tab",
+            "enter",
+            "click"
+          ]
+        },
+        {
+          "selector": "#username",
+          "name": "用户名输入框",
+          "expectedRole": "textbox",
+          "expectedActions": [
+            "tab",
+            "enter"
+          ]
+        },
+        {
+          "selector": "#open-modal",
+          "name": "打开模态框按钮",
+          "expectedRole": "button",
+          "expectedActions": [
+            "tab",
+            "enter",
+            "click"
+          ]
+        }
+      ]
+    }
+  ]
+}

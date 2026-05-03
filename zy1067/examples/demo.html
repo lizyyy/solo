@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可访问性问题演示页面</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #2d3748;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    h2 {
+      color: #4a5568;
+      margin: 30px 0 15px;
+      font-size: 1.4em;
+    }
+    .section {
+      background: #f7fafc;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .good-example {
+      background: #f0fff4;
+      border-left: 4px solid #48bb78;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .bad-example {
+      background: #fff5f5;
+      border-left: 4px solid #f56565;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .good-example::before {
+      content: '✅ 正确示例';
+      display: block;
+      font-weight: bold;
+      color: #276749;
+      margin-bottom: 8px;
+    }
+    .bad-example::before {
+      content: '❌ 问题示例';
+      display: block;
+      font-weight: bold;
+      color: #c53030;
+      margin-bottom: 8px;
+    }
+    form {
+      margin: 15px 0;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid #4299e1;
+      outline-offset: 2px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    .btn-primary {
+      background: #4299e1;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #3182ce;
+    }
+    .btn-secondary {
+      background: #718096;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #4a5568;
+    }
+    .btn-icon {
+      background: #edf2f7;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .btn-no-outline:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    .btn-bad:focus {
+      outline: none;
+    }
+    a {
+      color: #4299e1;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    .modal h3 {
+      margin-bottom: 15px;
+      color: #2d3748;
+    }
+    .modal p {
+      margin-bottom: 20px;
+      color: #4a5568;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .tabindex-5 {
+      tabIndex: 5;
+    }
+    .invisible-element {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+    }
+    .nav-links {
+      margin: 15px 0;
+      padding: 15px;
+      background: #edf2f7;
+      border-radius: 4px;
+    }
+    .nav-links a {
+      margin-right: 20px;
+    }
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #4299e1;
+      color: white;
+      padding: 8px 16px;
+      z-index: 100;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    .hidden-element {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎯 可访问性问题演示页面</h1>
+  
+  <p>本页面包含多种可访问性问题，用于验证键盘可访问性扫描工具的功能。</p>
+
+  <div class="section">
+    <h2>📋 跳过链接</h2>
+    <p>跳过链接帮助键盘用户快速跳转到主要内容区域。</p>
+    
+    <div class="bad-example">
+      <p>缺少跳过链接 - 键盘用户需要按 Tab 键多次才能到达主要内容。</p>
+    </div>
+    
+    <div class="good-example">
+      <a href="#main-content" class="skip-link">跳过导航</a>
+      <p>这里有一个跳过链接（默认隐藏，获取焦点时显示）。</p>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="#">首页</a>
+    <a href="#">产品</a>
+    <a href="#">服务</a>
+    <a href="#">关于我们</a>
+    <a href="#">联系我们</a>
+  </div>
+
+  <main id="main-content">
+    <div class="section">
+      <h2>📝 表单标签问题</h2>
+      <p>表单控件需要正确的标签关联，以便屏幕阅读器能够正确识别。</p>
+      
+      <div class="bad-example">
+        <p>问题：输入框没有关联的 label 标签。</p>
+        <div class="form-group">
+          <span>用户名（无 label）:</span>
+          <input type="text" id="bad-username" placeholder="请输入用户名">
+        </div>
+        
+        <div class="form-group">
+          <span>仅使用 placeholder:</span>
+          <input type="email" placeholder="请输入邮箱">
+        </div>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：使用 label 标签关联表单控件。</p>
+        <div class="form-group">
+          <label for="username">用户名:</label>
+          <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">邮箱地址:</label>
+          <input type="email" id="email" placeholder="example@email.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="aria-input">使用 aria-label 的输入框:</label>
+          <input type="text" id="aria-input" aria-label="搜索内容" placeholder="搜索...">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🔘 按钮可访问名称问题</h2>
+      <p>按钮需要有可访问的名称，以便屏幕阅读器用户知道按钮的功能。</p>
+      
+      <div class="bad-example">
+        <p>问题：图标按钮没有可访问名称。</p>
+        
+        <button class="btn-icon">🔍</button>
+        <span>（只有图标，无 aria-label）</span>
+        
+        <br><br>
+        
+        <button class="btn-icon">✏️</button>
+        <span>（只有图标，无 aria-label）</span>
+        
+        <br><br>
+        
+        <div onclick="alert('自定义按钮')" style="display: inline-block; padding: 10px 20px; background: #e2e8f0; border-radius: 4px; cursor: pointer;">
+          自定义按钮（div + onclick）
+        </div>
+        <span>（使用 div 作为按钮，没有 role="button" 或 tabindex）</span>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：按钮有清晰的可访问名称。</p>
+        
+        <button class="btn-primary" id="submit-btn">提交表单</button>
+        
+        <button class="btn-icon" aria-label="搜索">🔍</button>
+        <span>（有 aria-label）</span>
+        
+        <br><br>
+        
+        <button class="btn-icon" aria-label="编辑">✏️</button>
+        <span>（有 aria-label）</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>👁️ 焦点可见性问题</h2>
+      <p>焦点样式被 CSS 覆盖会导致键盘用户无法看到当前焦点位置。</p>
+      
+      <div class="bad-example">
+        <p>问题：按钮使用 outline: none 但没有替代的焦点样式。</p>
+        
+        <button class="btn-secondary btn-no-outline btn-bad">无焦点样式的按钮</button>
+        <span>（点击后用 Tab 键测试，焦点不可见）</span>
+        
+        <br><br>
+        
+        <a href="#" style="outline: none;" class="btn-bad">无焦点样式的链接</a>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：按钮有清晰的焦点样式。</p>
+        
+        <button class="btn-primary">有焦点样式的按钮</button>
+        <span>（获取焦点时有蓝色轮廓）</span>
+        
+        <br><br>
+        
+        <a href="#">有焦点样式的链接</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🔢 焦点顺序问题</h2>
+      <p>使用正的 tabindex 会改变默认的焦点顺序，导致逻辑混乱。</p>
+      
+      <div class="bad-example">
+        <p>问题：使用正的 tabindex 值改变了焦点顺序。</p>
+        <p>按 Tab 键顺序测试，预期顺序应该是 1 → 2 → 3 → 4</p>
+        
+        <div class="form-group">
+          <label>字段 1 (tabindex=1):</label>
+          <input type="text" tabindex="1" placeholder="tabindex=1">
+        </div>
+        
+        <div class="form-group">
+          <label>字段 2 (默认顺序):</label>
+          <input type="text" placeholder="无 tabindex">
+        </div>
+        
+        <div class="form-group">
+          <label>字段 3 (tabindex=2):</label>
+          <input type="text" tabindex="2" placeholder="tabindex=2">
+        </div>
+        
+        <div class="form-group">
+          <label>字段 4 (默认顺序):</label>
+          <input type="text" placeholder="无 tabindex">
+        </div>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：让焦点遵循自然的 DOM 顺序。</p>
+        
+        <div class="form-group">
+          <label>字段 A:</label>
+          <input type="text" placeholder="自然顺序 1">
+        </div>
+        
+        <div class="form-group">
+          <label>字段 B:</label>
+          <input type="text" placeholder="自然顺序 2">
+        </div>
+        
+        <div class="form-group">
+          <label>字段 C:</label>
+          <input type="text" placeholder="自然顺序 3">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>📦 模态框/弹窗问题</h2>
+      <p>模态框需要正确的焦点管理，包括打开时聚焦、关闭时返回焦点，以及焦点陷阱。</p>
+      
+      <div class="bad-example">
+        <p>问题：模态框没有正确的 ARIA 属性和焦点管理。</p>
+        
+        <button class="btn-secondary" id="open-bad-modal">
+          打开问题模态框
+        </button>
+        <span>（点击后，模态框打开时不会自动聚焦到内部元素）</span>
+        
+        <div id="bad-modal-overlay" class="modal-overlay">
+          <div class="modal" style="position: relative;">
+            <button class="close-btn" onclick="closeBadModal()">&times;</button>
+            <h3>问题模态框</h3>
+            <p>这个模态框没有设置 role="dialog" 或 aria-modal="true"。</p>
+            <p>打开时也不会自动聚焦到第一个可聚焦元素。</p>
+            <div class="form-group">
+              <label for="modal-input">输入框:</label>
+              <input type="text" id="modal-input">
+            </div>
+            <button class="btn-primary" onclick="closeBadModal()">确认</button>
+            <button class="btn-secondary" onclick="closeBadModal()">取消</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：模态框有正确的 ARIA 属性。</p>
+        
+        <button class="btn-primary" id="open-modal" aria-haspopup="dialog">
+          打开正确的模态框
+        </button>
+        <span>（有 aria-haspopup="dialog"）</span>
+        
+        <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <div class="modal" style="position: relative;">
+            <button class="close-btn" aria-label="关闭" onclick="closeModal()">&times;</button>
+            <h3 id="modal-title">正确的模态框</h3>
+            <p>这个模态框设置了 role="dialog" 和 aria-modal="true"。</p>
+            <div class="form-group">
+              <label for="good-modal-input">输入框:</label>
+              <input type="text" id="good-modal-input">
+            </div>
+            <button class="btn-primary" onclick="closeModal()">确认</button>
+            <button class="btn-secondary" onclick="closeModal()">取消</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>👻 不可见元素问题</h2>
+      <p>不可见的元素不应该获取键盘焦点。</p>
+      
+      <div class="bad-example">
+        <p>问题：隐藏的输入框仍然可以通过 Tab 键聚焦。</p>
+        
+        <input type="text" class="invisible-element" value="隐藏但可聚焦">
+        
+        <input type="text" class="hidden-element" value="display: none">
+        
+        <p>按 Tab 键测试，看看是否会聚焦到不可见的元素。</p>
+      </div>
+      
+      <div class="good-example">
+        <p>正确：不可见的元素设置 tabindex="-1" 或使用 disabled。</p>
+        
+        <input type="text" disabled value="禁用的输入框" style="background: #f7fafc;">
+        <span>（disabled 属性）</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 问题模态框
+    document.getElementById('open-bad-modal').addEventListener('click', function() {
+      document.getElementById('bad-modal-overlay').classList.add('active');
+      // 注意：这里没有自动聚焦到模态框内部
+    });
+
+    function closeBadModal() {
+      document.getElementById('bad-modal-overlay').classList.remove('active');
+    }
+
+    // 正确模态框
+    document.getElementById('open-modal').addEventListener('click', function() {
+      const overlay = document.getElementById('modal-overlay');
+      overlay.classList.add('active');
+      // 自动聚焦到第一个输入框
+      setTimeout(() => {
+        document.getElementById('good-modal-input').focus();
+      }, 100);
+    });
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+      // 返回焦点到触发按钮
+      document.getElementById('open-modal').focus();
+    }
+
+    // 按 Escape 键关闭模态框
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeBadModal();
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
