@@ -1,0 +1,25 @@
+antennas:
+  - id: ANT-01
+    name: 主天线-1
+    azimuth_min: 0
+    azimuth_max: 360
+    elevation_min: 5
+    elevation_max: 90
+    slew_rate: 3.0
+    cooldown_minutes: 5
+  - id: ANT-02
+    name: 主天线-2
+    azimuth_min: 45
+    azimuth_max: 315
+    elevation_min: 10
+    elevation_max: 85
+    slew_rate: 4.0
+    cooldown_minutes: 3
+  - id: ANT-03
+    name: 应急天线-3
+    azimuth_min: 90
+    azimuth_max: 270
+    elevation_min: 15
+    elevation_max: 80
+    slew_rate: 2.5
+    cooldown_minutes: 8

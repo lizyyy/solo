@@ -1,0 +1,28 @@
+{
+  "priorities": [
+    {
+      "mission_type": "紧急任务",
+      "priority_level": 1,
+      "can_preempt": true,
+      "description": "最高优先级任务，可抢占其他任务"
+    },
+    {
+      "mission_type": "遥测任务",
+      "priority_level": 2,
+      "can_preempt": false,
+      "description": "次高优先级任务，不可抢占"
+    },
+    {
+      "mission_type": "通信任务",
+      "priority_level": 3,
+      "can_preempt": false,
+      "description": "普通优先级任务，不可抢占"
+    },
+    {
+      "mission_type": "试验任务",
+      "priority_level": 4,
+      "can_preempt": false,
+      "description": "最低优先级任务"
+    }
+  ]
+}
