@@ -1,0 +1,46 @@
+{
+  "name": "podcast-delivery-check",
+  "version": "0.1.0",
+  "description": "播客交付体检 CLI 工具 - 在上传之前检查音频文件、响度、章节时间等",
+  "main": "dist/index.js",
+  "bin": {
+    "pdc": "./bin/pdc.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "start": "node dist/index.js",
+    "pdc": "node dist/index.js",
+    "generate-samples": "node dist/scripts/generate-samples.js",
+    "demo": "npm run build && npm run demo:init && npm run demo:generate && npm run demo:check",
+    "demo:init": "node dist/index.js init --output demo-project",
+    "demo:generate": "node dist/scripts/generate-samples.js --output demo-project/audio --with-issues",
+    "demo:check": "node dist/index.js validate demo-project/manifest.yaml",
+    "demo:report": "node dist/index.js report demo-project/manifest.yaml --output demo-project/output",
+    "test": "echo \"No test specified\" && exit 1"
+  },
+  "keywords": [
+    "podcast",
+    "audio",
+    "cli",
+    "validation",
+    "loudness"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.1.1",
+    "table": "^6.8.1",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

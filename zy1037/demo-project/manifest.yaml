@@ -1,0 +1,55 @@
+version: 1.0.0
+project:
+  name: 我的播客
+  episode: EP001 - 第一期节目
+  publishDate: 2024-01-15
+settings:
+  targetLoudness: -16
+  loudnessTolerance: 2
+  maxSilenceAtStart: 0.5
+  maxSilenceAtEnd: 1
+  sampleRate: 44100
+  channels: 1
+namingRules:
+  pattern: ^ep\d{3}-[a-z0-9-]+\.wav$
+  description: "文件名格式: epXXX-描述性名称.wav"
+  examples:
+    - ep001-intro.wav
+    - ep001-main.wav
+    - ep001-outro.wav
+export:
+  directory: ./output
+audioFiles:
+  - id: intro-001
+    path: ./audio/intro-loud.wav
+    role: intro
+    name: 片头
+  - id: main-001
+    path: ./audio/main-silent.wav
+    role: main
+    name: 正片
+  - id: ad-001
+    path: ./audio/ad-quiet.wav
+    role: ad
+    name: 广告口播
+  - id: outro-001
+    path: ./audio/outro-both.wav
+    role: outro
+    name: 片尾
+chapters:
+  - id: chap-001
+    title: 开场问候
+    startTime: 0:00
+    audioRef: intro-001
+  - id: chap-002
+    title: 本期主题介绍
+    startTime: 0:05
+    audioRef: main-001
+  - id: chap-003
+    title: 广告时间
+    startTime: 0:02
+    audioRef: ad-001
+  - id: chap-004
+    title: 片尾致谢
+    startTime: 0:01
+    audioRef: outro-001
