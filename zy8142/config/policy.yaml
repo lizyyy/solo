@@ -1,0 +1,35 @@
+defaultPolicy: allow
+
+rules:
+  # 灰度测试：新功能只对 VIP 用户开放
+  - id: rule_001
+    name: VIP 用户专属功能
+    type: user_segment
+    value: ["vip", "svip"]
+    routes:
+      - /order/detail
+      - /vip/*
+
+  # 版本限制：某些功能需要特定版本
+  - id: rule_002
+    name: 2.0 版本以上功能
+    type: version
+    value: ["2.0.0", "2.1.0", "2.2.0"]
+    routes:
+      - /order/detail
+
+  # 百分比灰度：新功能只对 10% 用户开放
+  - id: rule_003
+    name: 10% 用户灰度
+    type: percentage
+    value: 10
+    routes:
+      - /new-feature/*
+
+  # 地区限制：某些功能只对特定地区开放
+  - id: rule_004
+    name: 中国大陆地区专属
+    type: region
+    value: ["CN", "HK", "TW"]
+    routes:
+      - /region-specific/*

@@ -1,0 +1,9 @@
+{"eventName":"page_view_home","screenId":"home_screen","routePath":"/home","timestamp":"2026-05-03T10:00:00Z","userId":"user_001","properties":{"source":"push"}}
+{"eventName":"home_impression","screenId":"home_screen","routePath":"/home","timestamp":"2026-05-03T10:00:01Z","userId":"user_001","properties":{"tab":"recommend"}}
+{"eventName":"page_view_product","screenId":"product_detail_screen","routePath":"/product/detail","timestamp":"2026-05-03T10:05:00Z","userId":"user_001","properties":{"productId":"prod_123"}}
+{"eventName":"product_detail_view","screenId":"product_detail_screen","routePath":"/product/detail","timestamp":"2026-05-03T10:05:01Z","userId":"user_001","properties":{"productId":"prod_123"}}
+{"eventName":"page_view_profile","screenId":"profile_screen","routePath":"/profile","timestamp":"2026-05-03T10:10:00Z","userId":"user_001","properties":{}}
+{"eventName":"profile_view","screenId":"profile_screen","routePath":"/profile","timestamp":"2026-05-03T10:10:01Z","userId":"user_001","properties":{}}
+{"eventName":"page_view_order","screenId":"order_detail_screen","routePath":"/order/detail","timestamp":"2026-05-03T10:15:00Z","userId":"user_001","properties":{"orderId":"order_456"}}
+{"eventName":"page_view_activity","screenId":"activity_screen","routePath":"/activity","timestamp":"2026-05-03T10:20:00Z","userId":"user_002","properties":{"activityId":"act_789"}}
+{"eventName":"activity_impression","screenId":"activity_screen","routePath":"/activity","timestamp":"2026-05-03T10:20:01Z","userId":"user_002","properties":{"activityId":"act_789"}}

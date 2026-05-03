@@ -1,0 +1,45 @@
+{
+  "screens": [
+    {
+      "id": "home_screen",
+      "name": "首页",
+      "requiredEvents": [
+        "page_view_home",
+        "home_impression"
+      ],
+      "deprecated": false,
+      "minimumAppVersion": "1.0.0"
+    },
+    {
+      "id": "product_detail_screen",
+      "name": "商品详情页",
+      "requiredEvents": [
+        "page_view_product",
+        "product_detail_view",
+        "add_to_cart_impression"
+      ],
+      "deprecated": false,
+      "minimumAppVersion": "1.0.0"
+    },
+    {
+      "id": "profile_screen",
+      "name": "个人中心",
+      "requiredEvents": [
+        "page_view_profile",
+        "profile_view"
+      ],
+      "deprecated": false,
+      "minimumAppVersion": "1.0.0"
+    },
+    {
+      "id": "order_detail_screen",
+      "name": "订单详情页",
+      "requiredEvents": [
+        "page_view_order",
+        "order_detail_view"
+      ],
+      "deprecated": false,
+      "minimumAppVersion": "2.0.0"
+    }
+  ]
+}

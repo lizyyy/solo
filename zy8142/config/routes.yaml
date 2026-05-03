@@ -1,0 +1,65 @@
+defaultScheme: myapp
+
+routes:
+  # 首页
+  - path: /home
+    scheme: myapp
+    targetScreen: home_screen
+    requiredParams: []
+    optionalParams:
+      - tab
+      - source
+    requiresLogin: false
+    isDeprecated: false
+
+  # 商品详情页（需要参数）
+  - path: /product/detail
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams:
+      - productId
+    optionalParams:
+      - source
+      - campaign
+    requiresLogin: false
+    isDeprecated: false
+
+  # 个人中心（需要登录）
+  - path: /profile
+    scheme: myapp
+    targetScreen: profile_screen
+    requiredParams: []
+    optionalParams:
+      - userId
+    requiresLogin: true
+    isDeprecated: false
+
+  # 旧版商品页（已废弃）
+  - path: /old/product
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams:
+      - id
+    optionalParams: []
+    requiresLogin: false
+    isDeprecated: true
+    redirectTo: /product/detail
+
+  # 旧短链格式（边界情况）
+  - path: /s/p123
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams: []
+    optionalParams: []
+    requiresLogin: false
+    isDeprecated: false
+
+  # 订单详情页（灰度测试）
+  - path: /order/detail
+    scheme: myapp
+    targetScreen: order_detail_screen
+    requiredParams:
+      - orderId
+    optionalParams: []
+    requiresLogin: true
+    isDeprecated: false

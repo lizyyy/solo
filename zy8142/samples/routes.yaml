@@ -1,0 +1,88 @@
+defaultScheme: myapp
+
+routes:
+  # 首页 - 正常路由
+  - path: /home
+    scheme: myapp
+    targetScreen: home_screen
+    requiredParams: []
+    optionalParams:
+      - tab
+      - source
+    requiresLogin: false
+    isDeprecated: false
+
+  # 商品详情页 - 需要参数（测试参数缺失场景）
+  - path: /product/detail
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams:
+      - productId
+    optionalParams:
+      - source
+      - campaign
+    requiresLogin: false
+    isDeprecated: false
+
+  # 个人中心 - 需要登录（测试登录态要求场景）
+  - path: /profile
+    scheme: myapp
+    targetScreen: profile_screen
+    requiredParams: []
+    optionalParams:
+      - userId
+    requiresLogin: true
+    isDeprecated: false
+
+  # 旧版商品页 - 已废弃（测试废弃路由场景）
+  - path: /old/product
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams:
+      - id
+    optionalParams: []
+    requiresLogin: false
+    isDeprecated: true
+    redirectTo: /product/detail
+
+  # 旧短链格式（边界情况：旧短链仍被投放）
+  - path: /s/p123
+    scheme: myapp
+    targetScreen: product_detail_screen
+    requiredParams: []
+    optionalParams: []
+    requiresLogin: false
+    isDeprecated: false
+
+  # 订单详情页 - 灰度测试（测试灰度规则场景）
+  - path: /order/detail
+    scheme: myapp
+    targetScreen: order_detail_screen
+    requiredParams:
+      - orderId
+    optionalParams: []
+    requiresLogin: true
+    isDeprecated: false
+
+  # 活动页面 - 可选参数为空（边界情况：同一路由参数缺失）
+  - path: /activity
+    scheme: myapp
+    targetScreen: activity_screen
+    requiredParams: []
+    optionalParams:
+      - activityId
+      - source
+    requiresLogin: false
+    isDeprecated: false
+
+  # 优惠券页面 - 多必填参数
+  - path: /coupon/detail
+    scheme: myapp
+    targetScreen: coupon_detail_screen
+    requiredParams:
+      - couponId
+      - userId
+    optionalParams:
+      - source
+    requiresLogin: true
+    isDeprecated: false
