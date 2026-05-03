@@ -1,0 +1,75 @@
+{"foup_id": "FOUP-001", "event_type": "task_created", "timestamp": "2026-05-03T08:00:00.000000", "node_id": "N001", "target_node": "N005"}
+{"foup_id": "FOUP-001", "event_type": "assigned", "timestamp": "2026-05-03T08:00:05.000000", "vehicle_id": "V001"}
+{"foup_id": "FOUP-001", "event_type": "departed", "timestamp": "2026-05-03T08:00:10.000000", "node_id": "N001", "target_node": "N005"}
+{"foup_id": "FOUP-001", "event_type": "arrived", "timestamp": "2026-05-03T08:00:25.000000", "node_id": "N002"}
+{"foup_id": "FOUP-001", "event_type": "queue_start", "timestamp": "2026-05-03T08:00:25.000000", "node_id": "N002", "reason": "node_congestion"}
+{"foup_id": "FOUP-001", "event_type": "queue_end", "timestamp": "2026-05-03T08:00:50.000000", "node_id": "N002"}
+{"foup_id": "FOUP-001", "event_type": "departed", "timestamp": "2026-05-03T08:00:51.000000", "node_id": "N002", "target_node": "N003"}
+{"foup_id": "FOUP-001", "event_type": "arrived", "timestamp": "2026-05-03T08:01:05.000000", "node_id": "N003"}
+{"foup_id": "FOUP-001", "event_type": "departed", "timestamp": "2026-05-03T08:01:06.000000", "node_id": "N003", "target_node": "N005"}
+{"foup_id": "FOUP-001", "event_type": "arrived", "timestamp": "2026-05-03T08:01:20.000000", "node_id": "N005", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-001", "event_type": "unload_start", "timestamp": "2026-05-03T08:01:21.000000", "node_id": "N005", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-001", "event_type": "unload_end", "timestamp": "2026-05-03T08:01:45.000000", "node_id": "N005", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-001", "event_type": "completed", "timestamp": "2026-05-03T08:01:46.000000"}
+
+{"foup_id": "FOUP-002", "event_type": "task_created", "timestamp": "2026-05-03T08:10:00.000000", "node_id": "N008", "target_node": "N007"}
+{"foup_id": "FOUP-002", "event_type": "assigned", "timestamp": "2026-05-03T08:10:03.000000", "vehicle_id": "V002"}
+{"foup_id": "FOUP-002", "event_type": "departed", "timestamp": "2026-05-03T08:10:08.000000", "node_id": "N008", "target_node": "N007"}
+{"foup_id": "FOUP-002", "event_type": "arrived", "timestamp": "2026-05-03T08:10:23.000000", "node_id": "N004"}
+{"foup_id": "FOUP-002", "event_type": "queue_start", "timestamp": "2026-05-03T08:10:24.000000", "node_id": "N004", "reason": "path_blocked"}
+{"foup_id": "FOUP-002", "event_type": "reroute", "timestamp": "2026-05-03T08:10:30.000000", "node_id": "N004", "target_node": "N007"}
+{"foup_id": "FOUP-002", "event_type": "reroute_failed", "timestamp": "2026-05-03T08:10:35.000000", "node_id": "N004", "reason": "no_alternative_path"}
+{"foup_id": "FOUP-002", "event_type": "queue_end", "timestamp": "2026-05-03T08:11:00.000000", "node_id": "N004"}
+{"foup_id": "FOUP-002", "event_type": "departed", "timestamp": "2026-05-03T08:11:01.000000", "node_id": "N004", "target_node": "N007"}
+{"foup_id": "FOUP-002", "event_type": "arrived", "timestamp": "2026-05-03T08:11:15.000000", "node_id": "N007", "equipment_id": "CVD_001"}
+{"foup_id": "FOUP-002", "event_type": "load_start", "timestamp": "2026-05-03T08:11:16.000000", "node_id": "N007", "equipment_id": "CVD_001"}
+{"foup_id": "FOUP-002", "event_type": "load_end", "timestamp": "2026-05-03T08:14:30.000000", "node_id": "N007", "equipment_id": "CVD_001"}
+{"foup_id": "FOUP-002", "event_type": "completed", "timestamp": "2026-05-03T08:14:31.000000"}
+
+{"foup_id": "FOUP-003", "event_type": "task_created", "timestamp": "2026-05-03T08:20:00.000000", "node_id": "N001", "target_node": "N009"}
+{"foup_id": "FOUP-003", "event_type": "assigned", "timestamp": "2026-05-03T08:20:05.000000", "vehicle_id": "V003"}
+{"foup_id": "FOUP-003", "event_type": "departed", "timestamp": "2026-05-03T08:20:10.000000", "node_id": "N001", "target_node": "N009"}
+{"foup_id": "FOUP-003", "event_type": "completed", "timestamp": "2026-05-03T08:21:00.000000"}
+
+{"foup_id": "FOUP-004", "event_type": "task_created", "timestamp": "2026-05-03T08:30:00.000000", "node_id": "N005", "target_node": "N001"}
+{"foup_id": "FOUP-004", "event_type": "assigned", "timestamp": "2026-05-03T08:30:05.000000", "vehicle_id": "V004"}
+{"foup_id": "FOUP-004", "event_type": "arrived", "timestamp": "2026-05-03T08:30:35.000000", "node_id": "N003"}
+{"foup_id": "FOUP-004", "event_type": "departed", "timestamp": "2026-05-03T08:30:20.000000", "node_id": "N005", "target_node": "N001"}
+{"foup_id": "FOUP-004", "event_type": "departed", "timestamp": "2026-05-03T08:30:36.000000", "node_id": "N003", "target_node": "N002"}
+{"foup_id": "FOUP-004", "event_type": "arrived", "timestamp": "2026-05-03T08:30:50.000000", "node_id": "N002"}
+{"foup_id": "FOUP-004", "event_type": "departed", "timestamp": "2026-05-03T08:30:51.000000", "node_id": "N002", "target_node": "N001"}
+{"foup_id": "FOUP-004", "event_type": "arrived", "timestamp": "2026-05-03T08:31:05.000000", "node_id": "N001"}
+{"foup_id": "FOUP-004", "event_type": "completed", "timestamp": "2026-05-03T08:31:06.000000"}
+
+{"foup_id": "FOUP-005", "event_type": "task_created", "timestamp": "2026-05-03T08:40:00.000000", "node_id": "N007", "target_node": "N009"}
+{"foup_id": "FOUP-005", "event_type": "assigned", "timestamp": "2026-05-03T08:40:03.000000", "vehicle_id": "V005"}
+{"foup_id": "FOUP-005", "event_type": "departed", "timestamp": "2026-05-03T08:40:10.000000", "node_id": "N007", "target_node": "N009"}
+{"foup_id": "FOUP-005", "event_type": "arrived", "timestamp": "2026-05-03T08:40:25.000000", "node_id": "N004"}
+{"foup_id": "FOUP-005", "event_type": "queue_start", "timestamp": "2026-05-03T08:40:25.000000", "node_id": "N004", "reason": "equipment_downstream"}
+{"foup_id": "FOUP-005", "event_type": "queue_end", "timestamp": "2026-05-03T08:42:15.000000", "node_id": "N004"}
+{"foup_id": "FOUP-005", "event_type": "departed", "timestamp": "2026-05-03T08:42:16.000000", "node_id": "N004", "target_node": "N008"}
+{"foup_id": "FOUP-005", "event_type": "arrived", "timestamp": "2026-05-03T08:42:30.000000", "node_id": "N008"}
+{"foup_id": "FOUP-005", "event_type": "departed", "timestamp": "2026-05-03T08:42:31.000000", "node_id": "N008", "target_node": "N009"}
+{"foup_id": "FOUP-005", "event_type": "arrived", "timestamp": "2026-05-03T08:42:40.000000", "node_id": "N009", "equipment_id": "METRO_001"}
+{"foup_id": "FOUP-005", "event_type": "unload_start", "timestamp": "2026-05-03T08:42:41.000000", "node_id": "N009", "equipment_id": "METRO_001"}
+{"foup_id": "FOUP-005", "event_type": "unload_end", "timestamp": "2026-05-03T08:43:10.000000", "node_id": "N009", "equipment_id": "METRO_001"}
+{"foup_id": "FOUP-005", "event_type": "completed", "timestamp": "2026-05-03T08:43:11.000000"}
+
+{"foup_id": "FOUP-006", "event_type": "task_created", "timestamp": "2026-05-03T09:00:00.000000", "node_id": "N001", "target_node": "N006"}
+{"foup_id": "FOUP-006", "event_type": "assigned", "timestamp": "2026-05-03T09:00:05.000000", "vehicle_id": "V006"}
+{"foup_id": "FOUP-006", "event_type": "departed", "timestamp": "2026-05-03T09:00:10.000000", "node_id": "N001", "target_node": "N006"}
+{"foup_id": "FOUP-006", "event_type": "arrived", "timestamp": "2026-05-03T09:00:25.000000", "node_id": "N002"}
+{"foup_id": "FOUP-006", "event_type": "queue_start", "timestamp": "2026-05-03T09:00:25.000000", "node_id": "N002", "reason": "forward_blocked"}
+{"foup_id": "FOUP-006", "event_type": "reroute", "timestamp": "2026-05-03T09:00:35.000000", "node_id": "N002", "target_node": "N004"}
+{"foup_id": "FOUP-006", "event_type": "reroute_failed", "timestamp": "2026-05-03T09:00:40.000000", "node_id": "N002", "reason": "all_paths_blocked"}
+{"foup_id": "FOUP-006", "event_type": "reroute", "timestamp": "2026-05-03T09:00:45.000000", "node_id": "N002", "target_node": "N003"}
+{"foup_id": "FOUP-006", "event_type": "queue_end", "timestamp": "2026-05-03T09:01:30.000000", "node_id": "N002"}
+{"foup_id": "FOUP-006", "event_type": "departed", "timestamp": "2026-05-03T09:01:31.000000", "node_id": "N002", "target_node": "N003"}
+{"foup_id": "FOUP-006", "event_type": "arrived", "timestamp": "2026-05-03T09:01:45.000000", "node_id": "N003"}
+{"foup_id": "FOUP-006", "event_type": "queue_start", "timestamp": "2026-05-03T09:01:45.000000", "node_id": "N003", "reason": "equipment_port_busy"}
+{"foup_id": "FOUP-006", "event_type": "queue_end", "timestamp": "2026-05-03T09:02:10.000000", "node_id": "N003"}
+{"foup_id": "FOUP-006", "event_type": "departed", "timestamp": "2026-05-03T09:02:11.000000", "node_id": "N003", "target_node": "N006"}
+{"foup_id": "FOUP-006", "event_type": "arrived", "timestamp": "2026-05-03T09:02:30.000000", "node_id": "N006", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-006", "event_type": "load_start", "timestamp": "2026-05-03T09:02:31.000000", "node_id": "N006", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-006", "event_type": "load_end", "timestamp": "2026-05-03T09:02:55.000000", "node_id": "N006", "equipment_id": "ETCHER_001"}
+{"foup_id": "FOUP-006", "event_type": "completed", "timestamp": "2026-05-03T09:02:56.000000"}

@@ -1,0 +1,116 @@
+nodes:
+  - id: N001
+    name: Stocker_A_Entry
+    type: regular
+    x: 0.0
+    y: 0.0
+  - id: N002
+    name: Junction_1
+    type: regular
+    x: 100.0
+    y: 0.0
+  - id: N003
+    name: Junction_2
+    type: regular
+    x: 200.0
+    y: 0.0
+  - id: N004
+    name: Junction_3
+    type: regular
+    x: 100.0
+    y: 100.0
+  - id: N005
+    name: Etcher_1_Port1
+    type: equipment_port
+    x: 300.0
+    y: 0.0
+    is_equipment: true
+    equipment_id: ETCHER_001
+  - id: N006
+    name: Etcher_1_Port2
+    type: equipment_port
+    x: 300.0
+    y: 50.0
+    is_equipment: true
+    equipment_id: ETCHER_001
+  - id: N007
+    name: CVD_1_Port1
+    type: equipment_port
+    x: 200.0
+    y: 100.0
+    is_equipment: true
+    equipment_id: CVD_001
+  - id: N008
+    name: Stocker_B_Entry
+    type: regular
+    x: 0.0
+    y: 100.0
+  - id: N009
+    name: Metrology_Port1
+    type: equipment_port
+    x: 0.0
+    y: 50.0
+    is_equipment: true
+    equipment_id: METRO_001
+
+edges:
+  - id: E001
+    from: N001
+    to: N002
+    bidirectional: true
+    distance: 100.0
+  - id: E002
+    from: N002
+    to: N003
+    bidirectional: true
+    distance: 100.0
+  - id: E003
+    from: N003
+    to: N005
+    bidirectional: true
+    distance: 100.0
+  - id: E004
+    from: N003
+    to: N006
+    bidirectional: true
+    distance: 112.0
+  - id: E005
+    from: N002
+    to: N004
+    bidirectional: true
+    distance: 100.0
+  - id: E006
+    from: N004
+    to: N007
+    bidirectional: true
+    distance: 100.0
+  - id: E007
+    from: N004
+    to: N008
+    bidirectional: true
+    distance: 100.0
+  - id: E008
+    from: N001
+    to: N009
+    bidirectional: true
+    distance: 50.0
+  - id: E009
+    from: N009
+    to: N008
+    bidirectional: true
+    distance: 50.0
+
+equipments:
+  - id: ETCHER_001
+    name: Etcher_Chamber_1
+    port_nodes:
+      - N005
+      - N006
+  - id: CVD_001
+    name: CVD_Deposition_1
+    port_nodes:
+      - N007
+  - id: METRO_001
+    name: Metrology_Station
+    port_nodes:
+      - N009
