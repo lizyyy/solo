@@ -1,0 +1,277 @@
+{
+  "version": "1.0",
+  "generated_at": "2024-05-03T10:00:00Z",
+  "database": {
+    "name": "app_db",
+    "version": "PostgreSQL 15.0"
+  },
+  "tables": [
+    {
+      "name": "users",
+      "schema": "public",
+      "row_count": 500000,
+      "table_size": 157286400,
+      "index_size": 52428800,
+      "total_size": 209715200,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "is_primary_key": true
+        },
+        {
+          "name": "username",
+          "type": "character varying(50)",
+          "nullable": false,
+          "is_primary_key": false
+        },
+        {
+          "name": "email",
+          "type": "character varying(100)",
+          "nullable": false,
+          "is_primary_key": false
+        },
+        {
+          "name": "password_hash",
+          "type": "character varying(255)",
+          "nullable": false,
+          "is_primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary_key": false
+        }
+      ],
+      "primary_key": "users_pkey",
+      "foreign_keys": [],
+      "indexes": [
+        "users_pkey",
+        "idx_users_email"
+      ],
+      "has_triggers": false
+    },
+    {
+      "name": "posts",
+      "schema": "public",
+      "row_count": 2500000,
+      "table_size": 1048576000,
+      "index_size": 314572800,
+      "total_size": 1363148800,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "is_primary_key": true
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "nullable": false,
+          "is_foreign_key": true,
+          "references": "users.id"
+        },
+        {
+          "name": "title",
+          "type": "character varying(200)",
+          "nullable": false,
+          "is_primary_key": false
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": true,
+          "is_primary_key": false
+        },
+        {
+          "name": "status",
+          "type": "character varying(20)",
+          "nullable": true,
+          "default": "'draft'::character varying",
+          "is_primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary_key": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary_key": false
+        }
+      ],
+      "primary_key": "posts_pkey",
+      "foreign_keys": [
+        {
+          "name": "fk_posts_user_id",
+          "column": "user_id",
+          "references_table": "users",
+          "references_column": "id"
+        }
+      ],
+      "indexes": [
+        "posts_pkey",
+        "idx_posts_user_id",
+        "idx_posts_status"
+      ],
+      "has_triggers": true,
+      "triggers": [
+        "trg_posts_updated_at"
+      ]
+    },
+    {
+      "name": "comments",
+      "schema": "public",
+      "row_count": 10000000,
+      "table_size": 5242880000,
+      "index_size": 2097152000,
+      "total_size": 7340032000,
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": false,
+          "is_primary_key": true
+        },
+        {
+          "name": "post_id",
+          "type": "integer",
+          "nullable": false,
+          "is_foreign_key": true,
+          "references": "posts.id"
+        },
+        {
+          "name": "user_id",
+          "type": "integer",
+          "nullable": false,
+          "is_foreign_key": true,
+          "references": "users.id"
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": false,
+          "is_primary_key": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "nullable": false,
+          "default": "now()",
+          "is_primary_key": false
+        }
+      ],
+      "primary_key": "comments_pkey",
+      "foreign_keys": [
+        {
+          "name": "fk_comments_post_id",
+          "column": "post_id",
+          "references_table": "posts",
+          "references_column": "id"
+        },
+        {
+          "name": "fk_comments_user_id",
+          "column": "user_id",
+          "references_table": "users",
+          "references_column": "id"
+        }
+      ],
+      "indexes": [
+        "comments_pkey",
+        "idx_comments_post_id",
+        "idx_comments_user_id"
+      ],
+      "has_triggers": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "users_pkey",
+      "table": "users",
+      "columns": ["id"],
+      "is_unique": true,
+      "is_primary": true,
+      "method": "btree",
+      "size": 10485760
+    },
+    {
+      "name": "idx_users_email",
+      "table": "users",
+      "columns": ["email"],
+      "is_unique": true,
+      "is_primary": false,
+      "method": "btree",
+      "size": 20971520
+    },
+    {
+      "name": "posts_pkey",
+      "table": "posts",
+      "columns": ["id"],
+      "is_unique": true,
+      "is_primary": true,
+      "method": "btree",
+      "size": 52428800
+    },
+    {
+      "name": "idx_posts_user_id",
+      "table": "posts",
+      "columns": ["user_id"],
+      "is_unique": false,
+      "is_primary": false,
+      "method": "btree",
+      "size": 104857600
+    },
+    {
+      "name": "idx_posts_status",
+      "table": "posts",
+      "columns": ["status"],
+      "is_unique": false,
+      "is_primary": false,
+      "method": "btree",
+      "size": 52428800
+    },
+    {
+      "name": "comments_pkey",
+      "table": "comments",
+      "columns": ["id"],
+      "is_unique": true,
+      "is_primary": true,
+      "method": "btree",
+      "size": 209715200
+    },
+    {
+      "name": "idx_comments_post_id",
+      "table": "comments",
+      "columns": ["post_id"],
+      "is_unique": false,
+      "is_primary": false,
+      "method": "btree",
+      "size": 419430400
+    },
+    {
+      "name": "idx_comments_user_id",
+      "table": "comments",
+      "columns": ["user_id"],
+      "is_unique": false,
+      "is_primary": false,
+      "method": "btree",
+      "size": 209715200
+    }
+  ]
+}

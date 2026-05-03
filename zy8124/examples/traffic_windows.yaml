@@ -1,0 +1,139 @@
+# PostgreSQL 迁移流量窗口配置
+# 定义不同时段的表流量情况，用于评估迁移风险
+
+version: "1.0"
+description: "应用数据库流量窗口配置"
+
+windows:
+  - name: "高峰时段 (工作日)"
+    start_time: "09:00"
+    end_time: "18:00"
+    description: "工作日上班时间，流量最高"
+    risk_level: "high"
+    tables:
+      - name: "users"
+        traffic_level: "high"
+        read_qps: 5000
+        write_qps: 500
+        concurrent_connections: 200
+        high_risk: true
+        description: "用户表，高峰时段写入频繁"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "posts"
+        traffic_level: "high"
+        read_qps: 8000
+        write_qps: 1000
+        concurrent_connections: 300
+        high_risk: true
+        description: "文章表，读写都很频繁"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "comments"
+        traffic_level: "very_high"
+        read_qps: 15000
+        write_qps: 2000
+        concurrent_connections: 500
+        high_risk: true
+        description: "评论表，流量最大的表之一"
+        maintenance_window: "01:00-04:00"
+
+  - name: "低峰时段 (工作日)"
+    start_time: "18:00"
+    end_time: "23:00"
+    description: "工作日晚间，流量中等"
+    risk_level: "medium"
+    tables:
+      - name: "users"
+        traffic_level: "medium"
+        read_qps: 2000
+        write_qps: 200
+        concurrent_connections: 100
+        high_risk: false
+        description: "晚间用户活跃度下降"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "posts"
+        traffic_level: "medium"
+        read_qps: 3000
+        write_qps: 300
+        concurrent_connections: 150
+        high_risk: false
+        description: "晚间仍有一定流量"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "comments"
+        traffic_level: "medium"
+        read_qps: 5000
+        write_qps: 500
+        concurrent_connections: 200
+        high_risk: false
+        description: "晚间评论流量下降"
+        maintenance_window: "01:00-04:00"
+
+  - name: "维护窗口 (凌晨)"
+    start_time: "23:00"
+    end_time: "05:00"
+    description: "凌晨维护窗口，流量最低"
+    risk_level: "low"
+    tables:
+      - name: "users"
+        traffic_level: "low"
+        read_qps: 100
+        write_qps: 10
+        concurrent_connections: 20
+        high_risk: false
+        description: "凌晨几乎无流量"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "posts"
+        traffic_level: "low"
+        read_qps: 200
+        write_qps: 20
+        concurrent_connections: 30
+        high_risk: false
+        description: "凌晨几乎无流量"
+        maintenance_window: "02:00-04:00"
+      
+      - name: "comments"
+        traffic_level: "low"
+        read_qps: 300
+        write_qps: 30
+        concurrent_connections: 50
+        high_risk: false
+        description: "凌晨几乎无流量"
+        maintenance_window: "01:00-04:00"
+
+  - name: "周末低峰"
+    start_time: "05:00"
+    end_time: "09:00"
+    description: "周末清晨，流量低"
+    risk_level: "low"
+    tables:
+      - name: "users"
+        traffic_level: "low"
+        read_qps: 500
+        write_qps: 50
+        concurrent_connections: 50
+        high_risk: false
+      
+      - name: "posts"
+        traffic_level: "low"
+        read_qps: 800
+        write_qps: 80
+        concurrent_connections: 80
+        high_risk: false
+      
+      - name: "comments"
+        traffic_level: "low"
+        read_qps: 1000
+        write_qps: 100
+        concurrent_connections: 100
+        high_risk: false
+
+# 全局配置
+global:
+  default_maintenance_window: "02:00-04:00"
+  max_safe_lock_duration_seconds: 300
+  warn_on_mixed_ddl_dml: true
+  warn_on_concurrently_in_transaction: true

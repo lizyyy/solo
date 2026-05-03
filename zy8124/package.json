@@ -1,0 +1,27 @@
+{
+  "name": "pg-migration-risk-check",
+  "version": "1.0.0",
+  "description": "PostgreSQL 迁移脚本锁表风险预检 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "pg-migration-risk-check": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js --migrations examples/migrations --schema examples/schema_snapshot.json --traffic examples/traffic_windows.yaml"
+  },
+  "keywords": [
+    "postgresql",
+    "migration",
+    "lock",
+    "risk",
+    "checker"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "sql-formatter": "^13.0.0"
+  }
+}
