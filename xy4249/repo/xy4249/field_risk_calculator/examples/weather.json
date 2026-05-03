@@ -1,0 +1,82 @@
+{
+  "forecasts": [
+    {
+      "date": "2026-05-03",
+      "hour": 8,
+      "temperature": 18,
+      "humidity": 55,
+      "wind_speed": 3,
+      "wind_direction": "东北",
+      "precipitation_probability": 5,
+      "precipitation_amount": 0,
+      "condition": "晴朗",
+      "visibility": 15000,
+      "uv_index": 6
+    },
+    {
+      "date": "2026-05-03",
+      "hour": 12,
+      "temperature": 26,
+      "humidity": 40,
+      "wind_speed": 5,
+      "wind_direction": "东",
+      "precipitation_probability": 10,
+      "precipitation_amount": 0,
+      "condition": "多云",
+      "visibility": 12000,
+      "uv_index": 9
+    },
+    {
+      "date": "2026-05-03",
+      "hour": 16,
+      "temperature": 23,
+      "humidity": 50,
+      "wind_speed": 4,
+      "wind_direction": "东南",
+      "precipitation_probability": 30,
+      "precipitation_amount": 5,
+      "condition": "阵雨",
+      "visibility": 8000,
+      "uv_index": 4
+    },
+    {
+      "date": "2026-05-04",
+      "hour": 8,
+      "temperature": 15,
+      "humidity": 70,
+      "wind_speed": 8,
+      "wind_direction": "西南",
+      "precipitation_probability": 60,
+      "precipitation_amount": 15,
+      "condition": "小雨",
+      "visibility": 5000,
+      "uv_index": 2
+    }
+  ],
+  "water_crossings": [
+    {
+      "name": "东河涉水点",
+      "lat": 34.056000,
+      "lon": 108.903500,
+      "current_depth": 0.45,
+      "warning_depth": 0.5,
+      "danger_depth": 0.8,
+      "flow_rate": 0.8
+    },
+    {
+      "name": "西河支流",
+      "lat": 34.063000,
+      "lon": 108.907300,
+      "current_depth": 0.6,
+      "warning_depth": 0.5,
+      "danger_depth": 0.8,
+      "flow_rate": 1.2
+    }
+  ],
+  "metadata": {
+    "source": "当地气象站",
+    "updated_at": "2026-05-02T18:00:00Z",
+    "forecast_days": 2,
+    "water_crossing_count": 2
+  }
+}

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Field Risk Calculator Example" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>地质野外踏勘路线示例</name>
+    <desc>秦岭地区地质考察路线 - 从营地到观测点A</desc>
+    <time>2026-05-03T08:00:00Z</time>
+  </metadata>
+  <wpt lat="34.050000" lon="108.900000">
+    <ele>1200.0</ele>
+    <name>营地</name>
+    <desc>出发营地，海拔1200m</desc>
+  </wpt>
+  <wpt lat="34.055000" lon="108.903000">
+    <ele>1350.0</ele>
+    <name>补给点1</name>
+    <desc>山间溪流，可补水</desc>
+  </wpt>
+  <wpt lat="34.060000" lon="108.906000">
+    <ele>1500.0</ele>
+    <name>陡坡起点</name>
+    <desc>前方坡度较大</desc>
+  </wpt>
+  <wpt lat="34.065000" lon="108.908000">
+    <ele>1800.0</ele>
+    <name>撤返点1</name>
+    <desc>评估点，坡度超过30%</desc>
+  </wpt>
+  <wpt lat="34.070000" lon="108.910000">
+    <ele>2000.0</ele>
+    <name>观测点A</name>
+    <desc>目标地质观测点</desc>
+  </wpt>
+  <rte>
+    <name>踏勘路线</name>
+    <desc>从营地到观测点A的完整路线</desc>
+    <rtept lat="34.050000" lon="108.900000">
+      <ele>1200.0</ele>
+      <name>营地</name>
+    </rtept>
+    <rtept lat="34.052000" lon="108.901500">
+      <ele>1250.0</ele>
+    </rtept>
+    <rtept lat="34.055000" lon="108.903000">
+      <ele>1350.0</ele>
+      <name>补给点1</name>
+    </rtept>
+    <rtept lat="34.057000" lon="108.904500">
+      <ele>1420.0</ele>
+    </rtept>
+    <rtept lat="34.060000" lon="108.906000">
+      <ele>1500.0</ele>
+      <name>陡坡起点</name>
+    </rtept>
+    <rtept lat="34.062000" lon="108.907000">
+      <ele>1650.0</ele>
+    </rtept>
+    <rtept lat="34.065000" lon="108.908000">
+      <ele>1800.0</ele>
+      <name>撤返点1</name>
+    </rtept>
+    <rtept lat="34.068000" lon="108.909000">
+      <ele>1920.0</ele>
+    </rtept>
+    <rtept lat="34.070000" lon="108.910000">
+      <ele>2000.0</ele>
+      <name>观测点A</name>
+    </rtept>
+  </rte>
+</gpx>
