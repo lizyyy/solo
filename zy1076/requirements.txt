@@ -1,0 +1,19 @@
+# 简历岗位匹配小助手依赖
+# 核心依赖
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# 文本处理
+jieba>=0.42.1
+python-Levenshtein>=0.21.0
+
+# 命令行
+click>=8.0.0
+
+# 报告生成
+jinja2>=3.1.0
+
+# 测试
+pytest>=7.0.0
+pytest-cov>=4.0.0
