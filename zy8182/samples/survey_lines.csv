@@ -1,0 +1,5 @@
+line_id,start_lat,start_lon,end_lat,end_lon,swath_left,swath_right,swath_unit,planned_speed,speed_unit,priority,notes
+L001,30.500000,121.000000,30.500000,121.005000,100,100,meters,4,knots,1,主测线1 - 东西走向
+L002,30.502000,121.000000,30.502000,121.005000,100,100,meters,4,knots,1,主测线2 - 东西走向
+L003,30.504000,121.000000,30.504000,121.005000,100,100,meters,4,knots,1,主测线3 - 东西走向(故意漏扫)
+L004,30.506000,121.000000,30.506000,121.005000,100,100,meters,4,knots,1,主测线4 - 东西走向

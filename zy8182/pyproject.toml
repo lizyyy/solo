@@ -1,0 +1,20 @@
+[project]
+name = "sonar-coverage-checker"
+version = "1.0.0"
+description = "水下侧扫声呐测线覆盖复核工具"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "click>=8.0",
+]
+
+[project.scripts]
+sonar-check = "sonar_coverage.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sonar_coverage*"]

@@ -1,0 +1,10 @@
+sonar:
+  frequency: 100.0
+  swath_left: 100
+  swath_right: 100
+  range_scale: 100
+  tvg: 20
+  gain: 0
+  unit: meters
+  along_track_resolution: 0.5
+  across_track_resolution: 0.1

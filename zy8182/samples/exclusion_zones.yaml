@@ -1,0 +1,27 @@
+exclusion_zones:
+  - zone_id: Z001
+    name: 养殖区A
+    reason: 渔业养殖区，禁止进入
+    priority: 1
+    polygon:
+      - lat: 30.5030
+        lon: 121.0020
+      - lat: 30.5030
+        lon: 121.0035
+      - lat: 30.5050
+        lon: 121.0035
+      - lat: 30.5050
+        lon: 121.0020
+  - zone_id: Z002
+    name: 管道区
+    reason: 海底管线，需保持距离
+    priority: 2
+    polygon:
+      - lat: 30.4990
+        lon: 121.0015
+      - lat: 30.4990
+        lon: 121.0018
+      - lat: 30.5070
+        lon: 121.0018
+      - lat: 30.5070
+        lon: 121.0015
