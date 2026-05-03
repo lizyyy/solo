@@ -1,0 +1,202 @@
+version: "1.0"
+defaultConflictStrategy: rename
+defaultOperation: move
+excludePatterns:
+  - "node_modules/**"
+  - "*.tmp"
+  - ".DS_Store"
+  - "Thumbs.db"
+
+rules:
+  - name: "PDF文档"
+    description: "PDF文件归档到Documents/PDF"
+    condition:
+      extensions:
+        - pdf
+    destination: "./Documents/PDF"
+    priority: 10
+
+  - name: "Word文档"
+    description: "Word文档归档到Documents/Word"
+    condition:
+      extensions:
+        - doc
+        - docx
+    destination: "./Documents/Word"
+    priority: 10
+
+  - name: "Excel表格"
+    description: "Excel表格归档到Documents/Excel"
+    condition:
+      extensions:
+        - xls
+        - xlsx
+        - csv
+    destination: "./Documents/Excel"
+    priority: 10
+
+  - name: "演示文稿"
+    description: "PowerPoint归档到Documents/PowerPoint"
+    condition:
+      extensions:
+        - ppt
+        - pptx
+        - key
+    destination: "./Documents/PowerPoint"
+    priority: 10
+
+  - name: "纯文本文档"
+    description: "文本文件归档到Documents/Text"
+    condition:
+      extensions:
+        - txt
+        - md
+        - rst
+    destination: "./Documents/Text"
+    priority: 10
+
+  - name: "图片文件"
+    description: "图片归档到Images"
+    condition:
+      extensions:
+        - png
+        - jpg
+        - jpeg
+        - gif
+        - bmp
+        - svg
+        - webp
+        - ico
+    destination: "./Images"
+    priority: 5
+
+  - name: "截图"
+    description: "包含screenshot关键词的图片归档到Screenshots"
+    condition:
+      extensions:
+        - png
+        - jpg
+        - jpeg
+      keywords:
+        - screenshot
+        - Screenshot
+        - 截图
+        - 屏幕截图
+    destination: "./Screenshots"
+    priority: 15
+
+  - name: "视频文件"
+    description: "视频文件归档到Videos"
+    condition:
+      extensions:
+        - mp4
+        - mkv
+        - avi
+        - mov
+        - wmv
+        - flv
+        - webm
+    destination: "./Videos"
+    priority: 5
+
+  - name: "音频文件"
+    description: "音频文件归档到Audio"
+    condition:
+      extensions:
+        - mp3
+        - wav
+        - flac
+        - aac
+        - ogg
+        - m4a
+    destination: "./Audio"
+    priority: 5
+
+  - name: "压缩包"
+    description: "压缩文件归档到Archives"
+    condition:
+      extensions:
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+        - bz2
+    destination: "./Archives"
+    priority: 5
+
+  - name: "安装包"
+    description: "安装包归档到Installers"
+    condition:
+      extensions:
+        - dmg
+        - pkg
+        - app
+        - exe
+        - msi
+        - deb
+        - rpm
+    destination: "./Installers"
+    priority: 8
+
+  - name: "代码文件"
+    description: "源代码归档到Code"
+    condition:
+      extensions:
+        - js
+        - ts
+        - jsx
+        - tsx
+        - py
+        - java
+        - go
+        - rs
+        - cpp
+        - c
+        - h
+        - html
+        - css
+        - scss
+        - less
+        - json
+        - yaml
+        - yml
+        - xml
+        - sh
+        - bat
+    destination: "./Code"
+    priority: 3
+
+  - name: "发票文件"
+    description: "包含invoice或发票关键词的文件归档到Invoices"
+    condition:
+      extensions:
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+      keywords:
+        - invoice
+        - Invoice
+        - INVOICE
+        - 发票
+        - 报销
+        - receipt
+        - Receipt
+    destination: "./Invoices"
+    priority: 20
+
+  - name: "大文件"
+    description: "大于100MB的文件归档到LargeFiles"
+    condition:
+      minSize: 104857600
+    destination: "./LargeFiles"
+    priority: 2
+
+  - name: "旧文件"
+    description: "一年前修改的文件归档到Archive"
+    condition:
+      modifiedBefore: "2023-01-01T00:00:00Z"
+    destination: "./OldFiles"
+    priority: 1
