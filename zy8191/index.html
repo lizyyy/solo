@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考古探方地层可视化工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #16213e;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-right: 1px solid #0f3460;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .header {
+            padding: 15px 20px;
+            background: #0f3460;
+            border-bottom: 1px solid #16213e;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: #e94560;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 1rem;
+            color: #e94560;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #0f3460;
+        }
+
+        .file-input-wrapper {
+            margin-bottom: 10px;
+        }
+
+        .file-input-wrapper label {
+            display: block;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 8px;
+            background: #0f3460;
+            border: 1px solid #1a1a2e;
+            border-radius: 4px;
+            color: #eee;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .file-input:hover {
+            border-color: #e94560;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background: #ff6b6b;
+        }
+
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #0f3460;
+            border: 1px solid #e94560;
+        }
+
+        .btn-secondary:hover {
+            background: #16213e;
+        }
+
+        .info-panel {
+            background: #0f3460;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-panel h3 {
+            font-size: 0.95rem;
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        .info-panel .value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .issues-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .issue-item {
+            background: #1a1a2e;
+            border-left: 3px solid #e94560;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .issue-item.warning {
+            border-left-color: #ffa500;
+        }
+
+        .issue-item.error {
+            border-left-color: #e94560;
+        }
+
+        .issue-item h4 {
+            font-size: 0.85rem;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .issue-item p {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        .layer-info {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 52, 96, 0.95);
+            border: 1px solid #e94560;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 300px;
+            z-index: 100;
+        }
+
+        .layer-info.visible {
+            display: block;
+        }
+
+        .layer-info h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .layer-info .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .layer-info .detail-item {
+            margin-bottom: 10px;
+        }
+
+        .layer-info .detail-item label {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        .layer-info .detail-item .detail-value {
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .layer-info .artifacts-list {
+            margin-top: 10px;
+            padding-left: 15px;
+        }
+
+        .layer-info .artifacts-list li {
+            color: #ccc;
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 52, 96, 0.9);
+            border-radius: 8px;
+            padding: 15px;
+            z-index: 10;
+        }
+
+        .controls h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .controls .control-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .controls .control-item label {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(15, 52, 96, 0.9);
+            border-radius: 4px;
+            padding: 10px 15px;
+            z-index: 10;
+        }
+
+        .status-bar p {
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .status-bar .ready {
+            color: #4ade80;
+        }
+
+        .status-bar .error {
+            color: #e94560;
+        }
+
+        .file-status {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            font-size: 0.75rem;
+        }
+
+        .file-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .file-status .loaded {
+            background: #4ade80;
+        }
+
+        .file-status .missing {
+            background: #e94560;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .export-buttons .btn {
+            flex: 1;
+            font-size: 0.8rem;
+            padding: 8px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0f3460;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e94560;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="sidebar">
+            <div class="header">
+                <h1>🔍 探方地层可视化</h1>
+                <p>考古现场地层记录复核工具</p>
+            </div>
+
+            <div class="section">
+                <h2>📁 数据导入</h2>
+                <div class="file-input-wrapper">
+                    <label>地层记录 (contexts.csv)</label>
+                    <input type="file" id="contextsFile" accept=".csv" class="file-input">
+                    <div class="file-status" id="contextsStatus">
+                        <span class="dot missing"></span>
+                        <span>未加载</span>
+                    </div>
+                </div>
+                <div class="file-input-wrapper">
+                    <label>出土物记录 (finds.json)</label>
+                    <input type="file" id="findsFile" accept=".json" class="file-input">
+                    <div class="file-status" id="findsStatus">
+                        <span class="dot missing"></span>
+                        <span>未加载</span>
+                    </div>
+                </div>
+                <div class="file-input-wrapper">
+                    <label>校验规则 (rules.yaml)</label>
+                    <input type="file" id="rulesFile" accept=".yaml,.yml" class="file-input">
+                    <div class="file-status" id="rulesStatus">
+                        <span class="dot missing"></span>
+                        <span>未加载</span>
+                    </div>
+                </div>
+                <button class="btn" id="loadSampleBtn">加载样例数据</button>
+            </div>
+
+            <div class="section">
+                <h2>📊 数据概览</h2>
+                <div class="info-panel" id="dataOverview">
+                    <p>地层数: <span class="value" id="layerCount">0</span></p>
+                    <p>出土物数: <span class="value" id="findsCount">0</span></p>
+                    <p>探方尺寸: <span class="value" id="trenchSize">-</span></p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>⚠️ 问题检测</h2>
+                <button class="btn btn-secondary" id="validateBtn" disabled>执行校验</button>
+                <div class="issues-list" id="issuesList">
+                    <p style="color: #999; font-size: 0.85rem; text-align: center; padding: 20px;">
+                        请先加载数据并执行校验
+                    </p>
+                </div>
+                <div class="export-buttons" style="margin-top: 15px;">
+                    <button class="btn btn-secondary" id="exportIssuesBtn" disabled>导出问题</button>
+                    <button class="btn btn-secondary" id="exportReportBtn" disabled>导出报告</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="canvas-container">
+                <canvas id="canvas3d"></canvas>
+                <div class="status-bar" id="statusBar">
+                    <p>状态: <span class="error">等待数据加载</span></p>
+                </div>
+                <div class="controls" id="controls">
+                    <h4>视图控制</h4>
+                    <div class="control-item">
+                        <input type="checkbox" id="showWireframe" checked>
+                        <label for="showWireframe">显示网格线</label>
+                    </div>
+                    <div class="control-item">
+                        <input type="checkbox" id="showAxes" checked>
+                        <label for="showAxes">显示坐标轴</label>
+                    </div>
+                    <div class="control-item">
+                        <input type="checkbox" id="showOutlines" checked>
+                        <label for="showOutlines">显示地层边界</label>
+                    </div>
+                </div>
+                <div class="layer-info" id="layerInfo">
+                    <button class="close-btn" id="closeLayerInfo">&times;</button>
+                    <h3 id="layerTitle">地层信息</h3>
+                    <div class="detail-item">
+                        <label>地层编号:</label>
+                        <div class="detail-value" id="layerId">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>年代:</label>
+                        <div class="detail-value" id="layerAge">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>描述:</label>
+                        <div class="detail-value" id="layerDescription">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>包含物:</label>
+                        <div class="detail-value" id="layerInclusions">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <label>出土物:</label>
+                        <ul class="artifacts-list" id="layerArtifacts">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

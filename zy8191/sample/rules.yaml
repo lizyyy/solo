@@ -1,0 +1,56 @@
+trench:
+  id: T1
+  name: 探方 T1
+  dimensions:
+    x_min: 0
+    x_max: 10
+    y_min: 0
+    y_max: 10
+    z_min: 0
+    z_max: 5
+
+validation:
+  elevation:
+    enabled: true
+    allow_inversion: false
+    tolerance: 0.01
+    check_layer_order: true
+    expected_order:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+
+  relationships:
+    enabled: true
+    check_mutual: true
+    check_cyclic: true
+    validate_cut_logic: true
+
+  coordinates:
+    enabled: true
+    check_bounds: true
+    check_elevation_match: true
+    tolerance: 0.01
+    allow_orphan_finds: false
+
+display:
+  sections:
+    - id: S1
+      name: 南剖面
+      axis: x
+      position: 0
+    - id: S2
+      name: 北剖面
+      axis: x
+      position: 10
+    - id: S3
+      name: 东剖面
+      axis: y
+      position: 10
+    - id: S4
+      name: 西剖面
+      axis: y
+      position: 0
