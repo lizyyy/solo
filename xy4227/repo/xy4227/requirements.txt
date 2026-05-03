@@ -1,0 +1,11 @@
+# 采访素材脱敏剪辑台 - 依赖清单
+# Python 3.7+ 所需依赖
+
+# GUI 框架 - tkinter 是 Python 标准库，无需安装
+# 但在某些 Linux 发行版可能需要安装 python3-tk
+
+# CSV 和 JSON 处理 - 标准库
+
+# 可选依赖（用于增强功能）
+# python-dateutil>=2.8.0  # 日期处理
+# openpyxl>=3.0.0        # Excel支持（可选）

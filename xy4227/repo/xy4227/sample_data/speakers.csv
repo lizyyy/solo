@@ -1,0 +1,4 @@
+name,permission,alias,notes,authorized_phrases
+张教授,PARTIAL_AUTHORIZATION,"张三,张老师",部分授权，研究相关内容可公开,"人工智能,机器学习,自然语言处理"
+主持人,FULL_AUTHORIZATION,"主持,访谈人",完全授权，所有内容可公开,""
+李博士,NO_AUTHORIZATION,"李四,李同学",未授权，所有个人信息需脱敏,""

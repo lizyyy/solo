@@ -1,0 +1,9 @@
+word,level,category,replacement,notes,is_pattern
+清华大学,HIGH,COMPANY,[大学名称],知名大学名称,false
+百度,MEDIUM,COMPANY,[公司名称],互联网公司,false
+敏感,HIGH,SENSITIVE_WORD,[已脱敏],敏感词,false
+伦理,MEDIUM,SENSITIVE_WORD,[已脱敏],敏感领域,false
+秘密,CRITICAL,SENSITIVE_WORD,[已脱敏],高敏感词,false
+机密,CRITICAL,SENSITIVE_WORD,[已脱敏],高敏感词,false
+内部,HIGH,SENSITIVE_WORD,[已脱敏],内部信息,false
+保密,HIGH,SENSITIVE_WORD,[已脱敏],保密信息,false
