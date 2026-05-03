@@ -1,0 +1,26 @@
+zone_gate_mapping:
+  A区:
+    - G1
+    - G2
+  B区:
+    - G3
+    - G4
+
+time_windows:
+  - name: "入场早高峰"
+    start: "2026-05-04 18:00:00"
+    end: "2026-05-04 18:30:00"
+    expected_traffic: "high"
+  - name: "常规入场"
+    start: "2026-05-04 18:30:00"
+    end: "2026-05-04 19:30:00"
+    expected_traffic: "medium"
+  - name: "临开场入场"
+    start: "2026-05-04 19:30:00"
+    end: "2026-05-04 20:00:00"
+    expected_traffic: "high"
+
+thresholds:
+  congestion_threshold_per_minute: 10
+  bag_check_overload_multiplier: 1.5
+  duplicate_entry_interval_minutes: 5
