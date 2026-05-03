@@ -1,0 +1,38 @@
+{
+  "name": "receipt-layout-player",
+  "version": "1.0.0",
+  "description": "本地票据版式回放器 - 离线检查 POS/自助机小票模板",
+  "main": "dist/index.js",
+  "bin": {
+    "receipt-player": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "receipt",
+    "pos",
+    "printer",
+    "layout",
+    "preview"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0",
+    "fast-json-stringify": "^5.12.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

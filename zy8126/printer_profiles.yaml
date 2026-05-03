@@ -1,0 +1,38 @@
+thermal_58mm:
+  name: 58mm 热敏打印机
+  paperWidth: 58
+  charsPerLine: 32
+  supportedEncodings:
+    - GBK
+    - UTF-8
+  hasBarcode: true
+  maxLinesPerPage: 100
+  features:
+    cutter: true
+    cashDrawer: true
+
+thermal_80mm:
+  name: 80mm 热敏打印机
+  paperWidth: 80
+  charsPerLine: 48
+  supportedEncodings:
+    - GBK
+    - UTF-8
+  hasBarcode: true
+  maxLinesPerPage: 120
+  features:
+    cutter: true
+    cashDrawer: true
+    twoColor: true
+
+impact_dot:
+  name: 针式打印机
+  paperWidth: 80
+  charsPerLine: 40
+  supportedEncodings:
+    - GBK
+  hasBarcode: false
+  maxLinesPerPage: 60
+  features:
+    cutter: false
+    twoColor: true
