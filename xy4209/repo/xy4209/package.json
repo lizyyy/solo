@@ -1,0 +1,23 @@
+{
+  "name": "evacuation-simulator",
+  "version": "1.0.0",
+  "description": "十分钟清场 - 展会志愿者疏散训练游戏",
+  "main": "src/game.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx http-server -p 8080",
+    "test": "node --test tests/test-levels.js",
+    "dev": "npx http-server -p 8080 -c-1"
+  },
+  "keywords": [
+    "game",
+    "simulation",
+    "evacuation",
+    "training"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
