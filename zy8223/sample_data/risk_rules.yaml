@@ -1,0 +1,64 @@
+wind_risk:
+  thresholds:
+    - wind_speed: 10
+      risk_level: low
+    - wind_speed: 20
+      risk_level: medium
+    - wind_speed: 30
+      risk_level: high
+  weights:
+    exposure_hours: 0.3
+    max_wind: 0.7
+
+root_risk:
+  shallow_root_factor: 1.5
+  categories:
+    浅根: high
+    中根: medium
+    深根: low
+
+age_risk:
+  old_tree_age_threshold: 30
+  young_tree_age_threshold: 10
+  age_factor:
+    old: 1.5
+    young: 0.8
+    normal: 1.0
+
+water_risk:
+  rainfall_threshold: 50
+  water_pool_factor: 1.3
+
+overall_risk:
+  weights:
+    wind_risk: 0.35
+    root_risk: 0.25
+    age_risk: 0.20
+    water_risk: 0.20
+  thresholds:
+    low: 30
+    medium: 60
+    high: 80
+
+damage_types:
+  fall_over: 倒伏
+  branch_break: 断枝
+  leaning: 倾斜
+  root_exposed: 露根
+
+species_risk_factors:
+  樟树:
+    wind_resistance: 0.8
+    shallow_root_bonus: 1.2
+  悬铃木:
+    wind_resistance: 0.7
+    shallow_root_bonus: 1.3
+  水杉:
+    wind_resistance: 0.6
+    shallow_root_bonus: 1.4
+  香樟:
+    wind_resistance: 0.85
+    shallow_root_bonus: 1.1
+  广玉兰:
+    wind_resistance: 0.75
+    shallow_root_bonus: 1.2
