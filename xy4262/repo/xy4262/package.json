@@ -1,0 +1,19 @@
+{
+  "name": "drone-light-show-simulator",
+  "version": "1.0.0",
+  "description": "无人机灯光秀航线排练台 - 3D交互可视化工具",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}
