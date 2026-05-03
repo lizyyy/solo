@@ -1,0 +1,11 @@
+cue_number,cue_name,time,fade_in,fade_out,delay,is_locked,is_blackout,active_fixtures,notes
+1,开场暗场,0,2,0,0,false,true,"fixture-001,fixture-002,fixture-003,fixture-004,fixture-005",开场全黑
+2,主光亮起,2,3,0,0,false,false,"fixture-001,fixture-002",面光渐亮
+3,背景染色,5,2,0,0,false,false,fixture-004,背景蓝色
+4,人物登场,8,1.5,0,0,false,false,"fixture-001,fixture-002,fixture-005",追光灯定位
+5,场景过渡,15,4,2,0,false,false,"fixture-003,fixture-004",摇头灯效果
+6,高潮场景,20,3,1,0,false,false,"fixture-001,fixture-002,fixture-003,fixture-004",全亮
+7,过渡黑场,25,1,2,0,false,true,"fixture-001,fixture-002,fixture-003,fixture-004",黑场过渡
+8,新场景,28,2,0,0,false,false,"fixture-003,fixture-004",新场景开始
+9,结束,35,1,3,0,true,false,"fixture-001,fixture-002",淡入淡出重叠测试
+10,谢幕,38,5,0,0,true,false,"fixture-001,fixture-002,fixture-004",谢幕光

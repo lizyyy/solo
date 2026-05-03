@@ -1,0 +1,49 @@
+{
+  "patches": [
+    {
+      "id": "patch-001",
+      "fixtureId": "fixture-001",
+      "universe": 1,
+      "startChannel": 1,
+      "endChannel": 16,
+      "patchName": "面光1",
+      "notes": "主舞台左侧面光"
+    },
+    {
+      "id": "patch-002",
+      "fixtureId": "fixture-002",
+      "universe": 1,
+      "startChannel": 17,
+      "endChannel": 32,
+      "patchName": "面光2",
+      "notes": "主舞台右侧面光"
+    },
+    {
+      "id": "patch-003",
+      "fixtureId": "fixture-003",
+      "universe": 1,
+      "startChannel": 33,
+      "endChannel": 50,
+      "patchName": "摇头1",
+      "notes": "舞台左侧摇头灯"
+    },
+    {
+      "id": "patch-004",
+      "fixtureId": "fixture-004",
+      "universe": 1,
+      "startChannel": 51,
+      "endChannel": 60,
+      "patchName": "染色条1",
+      "notes": "背景墙染色"
+    },
+    {
+      "id": "patch-005",
+      "fixtureId": "fixture-005",
+      "universe": 1,
+      "startChannel": 61,
+      "endChannel": 66,
+      "patchName": "追光灯",
+      "notes": "主追光灯"
+    }
+  ]
+}
