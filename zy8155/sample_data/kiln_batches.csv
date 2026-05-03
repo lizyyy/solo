@@ -1,0 +1,5 @@
+batch_id,kiln_id,recipe_name,start_time,end_time,status,target_temp,operator
+K01_20260401_001,K01,standard_gas_kiln,2026-04-01T08:00:00,2026-04-01T18:00:00,completed,1250.0,张三
+K01_20260402_002,K01,standard_gas_kiln,2026-04-02T10:00:00,2026-04-02T20:00:00,completed,1250.0,李四
+K02_20260402_003,K02,fast_firing,2026-04-02T22:00:00,2026-04-03T08:00:00,completed,1280.0,王五
+K01_20260403_004,K01,standard_gas_kiln,2026-04-03T09:00:00,2026-04-03T19:30:00,completed,1250.0,张三

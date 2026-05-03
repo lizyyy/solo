@@ -1,0 +1,54 @@
+recipes:
+  standard_gas_kiln:
+    max_heating_rate: 150.0
+    min_holding_time: 60.0
+    valid_temp_range: [0, 1400]
+    phases:
+      - name: 升温阶段1
+        type: heating
+        duration_min: 180
+        start_temp: 25
+        end_temp: 600
+        rate_limit: 120
+      - name: 升温阶段2
+        type: heating
+        duration_min: 120
+        start_temp: 600
+        end_temp: 1250
+        rate_limit: 150
+      - name: 保温阶段
+        type: holding
+        duration_min: 60
+        start_temp: 1250
+        end_temp: 1250
+        rate_limit: null
+      - name: 降温阶段
+        type: cooling
+        duration_min: 240
+        start_temp: 1250
+        end_temp: 200
+        rate_limit: null
+  
+  fast_firing:
+    max_heating_rate: 200.0
+    min_holding_time: 45.0
+    valid_temp_range: [0, 1350]
+    phases:
+      - name: 快速升温
+        type: heating
+        duration_min: 120
+        start_temp: 25
+        end_temp: 1280
+        rate_limit: 200
+      - name: 高温保温
+        type: holding
+        duration_min: 45
+        start_temp: 1280
+        end_temp: 1280
+        rate_limit: null
+      - name: 快速冷却
+        type: cooling
+        duration_min: 180
+        start_temp: 1280
+        end_temp: 150
+        rate_limit: null
