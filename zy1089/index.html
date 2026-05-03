@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡店早高峰出杯调度</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 主菜单 -->
+        <div id="main-menu" class="menu-screen">
+            <h1>☕ 咖啡店早高峰出杯调度</h1>
+            <p class="subtitle">你是咖啡店店长，在8分钟的早高峰里，安排好一切！</p>
+            
+            <div class="menu-buttons">
+                <button id="btn-new-game" class="btn primary">🎮 开始新游戏</button>
+                <button id="btn-continue" class="btn secondary" disabled>📂 继续游戏</button>
+                <button id="btn-levels" class="btn secondary">🏆 选择关卡</button>
+                <button id="btn-highscores" class="btn secondary">📊 最高分记录</button>
+                <button id="btn-help" class="btn secondary">❓ 游戏帮助</button>
+            </div>
+            
+            <div id="highscore-display" class="info-box">
+                <p>🏆 历史最高分: <span id="best-score">0</span> 分</p>
+            </div>
+        </div>
+        
+        <!-- 关卡选择 -->
+        <div id="level-select" class="menu-screen hidden">
+            <h2>🏆 选择关卡</h2>
+            <div id="level-list" class="level-list"></div>
+            <button id="btn-back-to-menu" class="btn secondary">返回菜单</button>
+        </div>
+        
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="game-screen hidden">
+            <!-- 顶部状态栏 -->
+            <div class="top-bar">
+                <div class="time-info">
+                    <span>⏱️ 时间: <span id="game-time">00:00</span> / <span id="total-time">08:00</span></span>
+                    <span class="time-controls">
+                        <button id="btn-pause" class="btn small">⏸️ 暂停</button>
+                        <button id="btn-speed-1" class="btn small active">1x</button>
+                        <button id="btn-speed-2" class="btn small">2x</button>
+                        <button id="btn-speed-3" class="btn small">3x</button>
+                    </span>
+                </div>
+                <div class="score-info">
+                    <span>💰 分数: <span id="current-score">0</span></span>
+                    <span>📋 关卡: <span id="level-name">新手练习</span></span>
+                </div>
+                <div class="game-controls">
+                    <button id="btn-undo" class="btn small">↩️ 撤销</button>
+                    <button id="btn-restart" class="btn small warning">🔄 重开</button>
+                    <button id="btn-exit" class="btn small danger">🚪 退出</button>
+                </div>
+            </div>
+            
+            <!-- 主游戏区域 -->
+            <div class="game-container">
+                <!-- 左侧：订单队列 -->
+                <div class="panel order-panel">
+                    <h3>📋 订单队列</h3>
+                    <div id="order-queue" class="order-list"></div>
+                </div>
+                
+                <!-- 中间：设备和操作区 -->
+                <div class="panel equipment-panel">
+                    <h3>🔧 设备与操作</h3>
+                    
+                    <div class="equipment-section">
+                        <h4>☕ 咖啡机</h4>
+                        <div id="coffee-machines" class="equipment-grid"></div>
+                    </div>
+                    
+                    <div class="equipment-section">
+                        <h4>🫘 磨豆机</h4>
+                        <div id="grinders" class="equipment-grid"></div>
+                    </div>
+                    
+                    <div class="equipment-section">
+                        <h4>🧊 冰柜</h4>
+                        <div id="freezers" class="equipment-grid"></div>
+                    </div>
+                    
+                    <div class="equipment-section">
+                        <h4>👨‍🍳 店员</h4>
+                        <div id="staff" class="staff-grid"></div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：库存和详情 -->
+                <div class="panel info-panel">
+                    <div class="stock-section">
+                        <h3>📦 库存</h3>
+                        <div id="stock-display" class="stock-list"></div>
+                    </div>
+                    
+                    <div class="selected-order-section">
+                        <h3>📝 订单详情</h3>
+                        <div id="selected-order-detail" class="order-detail">
+                            <p class="placeholder">点击订单查看详情</p>
+                        </div>
+                    </div>
+                    
+                    <div class="queue-estimate">
+                        <h3>⏳ 预计等待时间</h3>
+                        <div id="queue-estimate" class="estimate-display">
+                            <p class="placeholder">当前: --</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3>📊 当前统计</h3>
+                        <div id="game-stats" class="stats-display">
+                            <div class="stat-item">
+                                <span>已完成:</span>
+                                <span id="stat-completed">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>超时:</span>
+                                <span id="stat-overdue">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>小费:</span>
+                                <span id="stat-tips">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>浪费:</span>
+                                <span id="stat-wasted">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 底部操作提示 -->
+            <div class="action-bar">
+                <div id="action-hint" class="hint">选择订单和空闲店员来安排任务</div>
+            </div>
+        </div>
+        
+        <!-- 游戏结束日报 -->
+        <div id="report-screen" class="menu-screen hidden">
+            <h2>📊 营业日报</h2>
+            <div id="report-content" class="report-content"></div>
+            <div class="report-actions">
+                <button id="btn-export-markdown" class="btn primary">📄 导出 Markdown</button>
+                <button id="btn-export-json" class="btn primary">📋 导出 JSON</button>
+                <button id="btn-replay" class="btn secondary">🔄 再玩一次</button>
+                <button id="btn-menu-from-report" class="btn secondary">🏠 返回菜单</button>
+            </div>
+        </div>
+        
+        <!-- 帮助界面 -->
+        <div id="help-screen" class="menu-screen hidden">
+            <h2>❓ 游戏帮助</h2>
+            <div class="help-content">
+                <h3>🎯 游戏目标</h3>
+                <p>在8分钟的早高峰营业时间内，尽可能多地完成订单，获得高分！</p>
+                
+                <h3>📋 订单类型</h3>
+                <ul>
+                    <li><strong>普通单</strong>: 标准订单，按时完成得基础分</li>
+                    <li><strong>加急单</strong>: 时间更短，但完成后有额外小费</li>
+                    <li><strong>冰饮单</strong>: 需要使用冰柜，制作时间更长</li>
+                    <li><strong>外带单</strong>: 需要额外包装时间</li>
+                </ul>
+                
+                <h3>🔧 设备管理</h3>
+                <ul>
+                    <li><strong>咖啡机</strong>: 制作咖啡核心设备，连续使用会过热</li>
+                    <li><strong>磨豆机</strong>: 磨制咖啡豆，也需要冷却时间</li>
+                    <li><strong>冰柜</strong>: 冰饮必备，占用时不能用于其他订单</li>
+                </ul>
+                
+                <h3>👨‍🍳 店员操作</h3>
+                <p>每个店员同一时间只能做一件事。选择订单，然后选择空闲店员来安排制作。</p>
+                
+                <h3>🎮 游戏控制</h3>
+                <ul>
+                    <li><strong>暂停</strong>: 暂停游戏（暂停时也可以排程）</li>
+                    <li><strong>倍速</strong>: 1x/2x/3x 加速游戏</li>
+                    <li><strong>撤销</strong>: 撤销最近一次排程操作</li>
+                </ul>
+                
+                <h3>💰 评分规则</h3>
+                <ul>
+                    <li>按时完成: +100分</li>
+                    <li>提前完成: +额外50分</li>
+                    <li>加急单小费: +50分</li>
+                    <li>连单奖励: 连续完成订单额外加分</li>
+                    <li>超时: -50分</li>
+                    <li>漏单: -100分</li>
+                    <li>设备过热: -20分</li>
+                    <li>原料浪费: 按浪费量扣分</li>
+                </ul>
+            </div>
+            <button id="btn-help-back" class="btn secondary">返回菜单</button>
+        </div>
+        
+        <!-- 最高分记录 -->
+        <div id="highscore-screen" class="menu-screen hidden">
+            <h2>🏆 最高分记录</h2>
+            <div id="highscore-list" class="highscore-list"></div>
+            <button id="btn-highscore-back" class="btn secondary">返回菜单</button>
+        </div>
+    </div>
+    
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    <script src="game-engine.js"></script>
+    <script src="ui.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
