@@ -1,0 +1,70 @@
+seat_rules:
+  - rule_name: "B737-800 商务舱座位规则"
+    aircraft_type: "B737-800"
+    cabin_class: "Business"
+    seat_range_start: "01A"
+    seat_range_end: "06F"
+    special_meal_allowed: "VML,VGML,DBML,CHML,SPML"
+    priority_meal: true
+    meal_type_restriction: "hot,ambient"
+    description: "商务舱座位1A-6F，支持特殊餐食"
+
+  - rule_name: "B737-800 经济舱前区规则"
+    aircraft_type: "B737-800"
+    cabin_class: "Economy"
+    seat_range_start: "11A"
+    seat_range_end: "20F"
+    special_meal_allowed: "VML,VGML,DBML,CHML"
+    priority_meal: false
+    meal_type_restriction: "hot,cold,ambient"
+    description: "经济舱前区座位11A-20F"
+
+  - rule_name: "B737-800 经济舱后区规则"
+    aircraft_type: "B737-800"
+    cabin_class: "Economy"
+    seat_range_start: "21A"
+    seat_range_end: "35F"
+    special_meal_allowed: "VML,VGML,CHML"
+    priority_meal: false
+    meal_type_restriction: "hot,ambient"
+    description: "经济舱后区座位21A-35F，限制特殊餐类型"
+
+  - rule_name: "A320 商务舱座位规则"
+    aircraft_type: "A320"
+    cabin_class: "Business"
+    seat_range_start: "01A"
+    seat_range_end: "04F"
+    special_meal_allowed: "VML,VGML,DBML,CHML,SPML,KSML"
+    priority_meal: true
+    meal_type_restriction: "hot,ambient,cold"
+    description: "A320商务舱，支持更多特殊餐类型"
+
+  - rule_name: "A320 经济舱规则"
+    aircraft_type: "A320"
+    cabin_class: "Economy"
+    seat_range_start: "11A"
+    seat_range_end: "30F"
+    special_meal_allowed: "VML,VGML,DBML,CHML"
+    priority_meal: false
+    meal_type_restriction: "hot,cold,ambient"
+    description: "A320经济舱标准配置"
+
+  - rule_name: "B787-9 豪华头等舱规则"
+    aircraft_type: "B787-9"
+    cabin_class: "First"
+    seat_range_start: "01A"
+    seat_range_end: "04K"
+    special_meal_allowed: "ALL"
+    priority_meal: true
+    meal_type_restriction: "hot,cold,ambient"
+    description: "头等舱支持所有特殊餐类型"
+
+  - rule_name: "通用特殊餐禁止规则"
+    aircraft_type: null
+    cabin_class: "All"
+    seat_range_start: null
+    seat_range_end: null
+    special_meal_allowed: null
+    priority_meal: false
+    meal_type_restriction: null
+    description: "通用规则模板"

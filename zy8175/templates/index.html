@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>航空配餐调度复核工具</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1>✈️ 航空配餐调度复核工具</h1>
+                <p class="subtitle">航班餐食装载舱单复核系统</p>
+            </div>
+            <div class="header-right">
+                <button id="btn-import-samples" class="btn btn-secondary">导入样本数据</button>
+                <button id="btn-import" class="btn btn-primary">导入数据</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>航班列表</h3>
+                    <div id="flight-list" class="flight-list">
+                        <p class="loading-text">加载中...</p>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div id="no-flight-selected" class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h2>选择或导入航班数据</h2>
+                    <p>从左侧选择航班，或点击右上角导入数据</p>
+                </div>
+
+                <div id="flight-detail" class="flight-detail hidden">
+                    <div class="detail-header">
+                        <div class="flight-info">
+                            <h2 id="detail-flight-number">MU5101</h2>
+                            <div class="flight-meta">
+                                <span id="detail-route">PEK → SHA</span>
+                                <span id="detail-aircraft">B737-800</span>
+                                <span id="detail-departure">计划: 2026-05-03 08:00</span>
+                            </div>
+                        </div>
+                        <div class="detail-actions">
+                            <button id="btn-export-issues" class="btn btn-danger">导出问题 CSV</button>
+                            <button id="btn-export-report" class="btn btn-success">导出舱单报告</button>
+                            <button id="btn-run-match" class="btn btn-primary">执行匹配</button>
+                        </div>
+                    </div>
+
+                    <div class="risk-summary">
+                        <div id="risk-banner" class="risk-banner hidden">
+                            <span class="risk-icon">⚠️</span>
+                            <span id="risk-message">检测到风险问题</span>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="overview">概览</button>
+                        <button class="tab-btn" data-tab="timeline">时间线</button>
+                        <button class="tab-btn" data-tab="cabin">舱位容量</button>
+                        <button class="tab-btn" data-tab="special-meals">特殊餐匹配</button>
+                        <button class="tab-btn" data-tab="temperature">保温窗口</button>
+                        <button class="tab-btn" data-tab="issues">问题管理</button>
+                        <button class="tab-btn" data-tab="notes">备注</button>
+                    </div>
+
+                    <div id="tab-overview" class="tab-content active">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">📦</div>
+                                <div class="stat-info">
+                                    <h4>订单总数</h4>
+                                    <p id="stat-total-orders">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
+                                    <h4>已匹配</h4>
+                                    <p id="stat-matched">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⚠️</div>
+                                <div class="stat-info">
+                                    <h4>未匹配订单</h4>
+                                    <p id="stat-unmatched-orders">0</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🔴</div>
+                                <div class="stat-info">
+                                    <h4>待解决问题</h4>
+                                    <p id="stat-open-issues">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cabin-summary">
+                            <h3>舱位配餐汇总</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>舱位等级</th>
+                                        <th>订单数</th>
+                                        <th>总份数</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cabin-summary-body">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="aircraft-change-alert" class="alert-box hidden">
+                            <div class="alert-header">
+                                <span class="alert-icon">🔄</span>
+                                <strong>机型变更检测</strong>
+                            </div>
+                            <div class="alert-content">
+                                <p id="aircraft-change-message">检测到机型变更，容量可能不匹配</p>
+                                <button id="btn-view-capacity" class="btn btn-sm btn-secondary">查看容量详情</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-timeline" class="tab-content">
+                        <div class="timeline-container">
+                            <h3>批次时间线</h3>
+                            <div id="timeline-events" class="timeline">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-cabin" class="tab-content">
+                        <div class="cabin-capacity-section">
+                            <h3>舱位容量配置</h3>
+                            
+                            <div id="original-config" class="config-section hidden">
+                                <h4>原机型配置</h4>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>舱位等级</th>
+                                            <th>座位数</th>
+                                            <th>配餐容量</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="original-config-body">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="current-config" class="config-section">
+                                <h4>当前机型配置</h4>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>舱位等级</th>
+                                            <th>座位数</th>
+                                            <th>配餐容量</th>
+                                            <th>已订餐食</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="current-config-body">
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="capacity-issues" class="issues-section hidden">
+                                <h4>容量问题</h4>
+                                <div id="capacity-issues-list">
+                                </div>
+                            </div>
+
+                            <div class="add-config-section">
+                                <h4>添加机型配置</h4>
+                                <form id="config-form" class="config-form">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>机型</label>
+                                            <input type="text" id="config-aircraft-type" placeholder="例如: B737-800">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>注册号</label>
+                                            <input type="text" id="config-registration" placeholder="例如: B-1234">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>变更原因</label>
+                                            <input type="text" id="config-change-reason" placeholder="临时换机">
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="config-is-original">
+                                                作为原始配置
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div id="cabin-config-dynamic">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="button" id="btn-add-cabin" class="btn btn-sm btn-secondary">+ 添加舱位</button>
+                                        <button type="submit" class="btn btn-sm btn-primary">保存配置</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-special-meals" class="tab-content">
+                        <div class="special-meals-section">
+                            <h3>特殊餐匹配检查</h3>
+                            
+                            <div id="special-meals-list" class="meals-list">
+                            </div>
+
+                            <div id="special-mismatches" class="mismatches-section hidden">
+                                <h4>匹配问题</h4>
+                                <div id="mismatches-list">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-temperature" class="tab-content">
+                        <div class="temperature-section">
+                            <h3>冷/热餐保温窗口风险</h3>
+                            
+                            <div class="window-info">
+                                <div class="info-card">
+                                    <h4>🔥 热餐</h4>
+                                    <p>保温窗口: 20-90分钟</p>
+                                </div>
+                                <div class="info-card">
+                                    <h4>❄️ 冷餐</h4>
+                                    <p>冷藏窗口: 20-240分钟</p>
+                                </div>
+                            </div>
+
+                            <div id="temperature-risks" class="risks-list">
+                            </div>
+
+                            <div id="temperature-checks" class="checks-table">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>餐食类型</th>
+                                            <th>温度类型</th>
+                                            <th>出库时间</th>
+                                            <th>装载时间</th>
+                                            <th>已过时间</th>
+                                            <th>状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="temperature-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-issues" class="tab-content">
+                        <div class="issues-section">
+                            <div class="section-header">
+                                <h3>问题管理</h3>
+                                <button id="btn-add-issue" class="btn btn-sm btn-primary">+ 添加问题</button>
+                            </div>
+                            
+                            <div id="issues-list" class="issues-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-notes" class="tab-content">
+                        <div class="notes-section">
+                            <div class="section-header">
+                                <h3>人工备注</h3>
+                                <button id="btn-add-note" class="btn btn-sm btn-primary">+ 添加备注</button>
+                            </div>
+                            
+                            <div id="notes-list" class="notes-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="import-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>导入数据</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="import-form" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>选择文件</label>
+                            <div class="file-upload">
+                                <input type="file" id="import-file" name="file" accept=".csv,.yaml,.yml,.jsonl,.json">
+                                <div class="file-upload-label">
+                                    <span>点击选择或拖拽文件</span>
+                                    <p id="selected-file-name">支持: CSV, YAML, JSONL, JSON</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>航班号 (可选)</label>
+                            <input type="text" id="import-flight-number" name="flight_number" placeholder="例如: MU5101">
+                        </div>
+                        <div class="file-type-hint">
+                            <p><strong>文件类型说明:</strong></p>
+                            <ul>
+                                <li><code>.csv</code> - 航班餐食订单</li>
+                                <li><code>.yaml</code> / <code>.yml</code> - 座位/特殊餐规则</li>
+                                <li><code>.jsonl</code> - 厨房出库扫码记录</li>
+                                <li><code>.json</code> - 机上装载确认</li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">取消</button>
+                    <button id="btn-confirm-import" class="btn btn-primary">导入</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="issue-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加问题</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="issue-form">
+                        <div class="form-group">
+                            <label>问题类型</label>
+                            <select id="issue-type">
+                                <option value="temperature_window">保温窗口</option>
+                                <option value="capacity_mismatch">容量不匹配</option>
+                                <option value="unmatched_meal">餐食未匹配</option>
+                                <option value="special_meal_mismatch">特殊餐不匹配</option>
+                                <option value="duplicate_scan">重复扫码</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>严重程度</label>
+                            <select id="issue-severity">
+                                <option value="low">低</option>
+                                <option value="medium" selected>中</option>
+                                <option value="high">高</option>
+                                <option value="critical">严重</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>问题描述</label>
+                            <textarea id="issue-description" rows="4" placeholder="详细描述问题..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">取消</button>
+                    <button id="btn-confirm-issue" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="note-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加备注</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="note-form">
+                        <div class="form-group">
+                            <label>备注类型</label>
+                            <select id="note-type">
+                                <option value="general">一般备注</option>
+                                <option value="resolution">解决说明</option>
+                                <option value="warning">警示</option>
+                                <option value="followup">跟进</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>备注内容</label>
+                            <textarea id="note-content" rows="4" placeholder="输入备注内容..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">取消</button>
+                    <button id="btn-confirm-note" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification hidden">
+            <span id="notification-message"></span>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

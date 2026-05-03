@@ -1,0 +1,22 @@
+flight_number,aircraft_registration,aircraft_type,departure_airport,arrival_airport,scheduled_departure_time,order_id,cabin_class,seat_number,meal_type,meal_category,special_meal_code,special_meal_description,is_special,quantity,temperature_type
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-001,Business,01A,Beef Steak,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-002,Business,01C,Fish Fillet,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-003,Business,02A,Vegetarian,special,VML,Vegetarian Oriental Meal,1,1,ambient
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-004,Business,02C,Chicken Rice,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-005,Business,03A,Diabetic,special,DBML,Diabetic Meal,1,1,cold
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-006,Economy,11A,Chicken Rice,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-007,Economy,11B,Beef Steak,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-008,Economy,12A,Fish Fillet,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-009,Economy,12B,Vegetarian,special,VGML,Vegetarian Meal,1,1,ambient
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-010,Economy,13A,Chicken Rice,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-011,Economy,13B,Beef Steak,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-012,Economy,14A,Fish Fillet,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-013,Economy,14B,Child Meal,special,CHML,Child Meal,1,1,cold
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-014,Economy,15A,Chicken Rice,regular,,,0,1,hot
+MU5101,B-1234,B737-800,PEK,SHA,2026-05-03T08:00:00+08:00,ORD-MU5101-015,Economy,15B,Beef Steak,regular,,,0,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-001,Business,01A,Pork Chop,regular,,,0,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-002,Business,01C,Seafood,special,SPML,Seafood Meal,1,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-003,Economy,11A,Chicken Rice,regular,,,0,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-004,Economy,11B,Beef Steak,regular,,,0,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-005,Economy,12A,Fish Fillet,regular,,,0,1,hot
+MU5102,B-5678,A320,SHA,PEK,2026-05-03T14:00:00+08:00,ORD-MU5102-006,Economy,12B,Vegetarian,special,VJML,Vegetarian Jain Meal,1,1,ambient
