@@ -1,0 +1,33 @@
+{
+  "name": "清凉薄荷蜡烛",
+  "description": "提神醒脑的薄荷香型，适合办公室使用",
+  "total_batch_size": 500,
+  "total_batch_unit": "g",
+  "target_per_cup_capacity": 100,
+  "target_per_cup_unit": "g",
+  "container_count": 5,
+  "target_per_cup_cost": 12.0,
+  "notes": "注意：此配方后调较弱，可能存在香调断层风险",
+  "ingredients": [
+    {
+      "name": "石蜡 58-60",
+      "amount": 450,
+      "unit": "g"
+    },
+    {
+      "name": "硬脂酸",
+      "amount": 15,
+      "unit": "g"
+    },
+    {
+      "name": "薄荷香精",
+      "amount": 25,
+      "unit": "g"
+    },
+    {
+      "name": "柠檬香精",
+      "amount": 10,
+      "unit": "g"
+    }
+  ]
+}

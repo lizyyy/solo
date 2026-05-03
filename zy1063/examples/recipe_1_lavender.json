@@ -1,0 +1,38 @@
+{
+  "name": "薰衣草助眠蜡烛",
+  "description": "经典薰衣草香型，适合卧室使用，舒缓助眠",
+  "total_batch_size": 500,
+  "total_batch_unit": "g",
+  "target_per_cup_capacity": 100,
+  "target_per_cup_unit": "g",
+  "container_count": 5,
+  "target_per_cup_cost": 15.0,
+  "notes": "使用大豆蜡为主，添加薰衣草作为主香调",
+  "ingredients": [
+    {
+      "name": "大豆蜡 464",
+      "amount": 440,
+      "unit": "g"
+    },
+    {
+      "name": "硬脂酸",
+      "amount": 10,
+      "unit": "g"
+    },
+    {
+      "name": "薰衣草香精",
+      "amount": 35,
+      "unit": "g"
+    },
+    {
+      "name": "柠檬香精",
+      "amount": 8,
+      "unit": "g"
+    },
+    {
+      "name": "香草香精",
+      "amount": 7,
+      "unit": "g"
+    }
+  ]
+}
