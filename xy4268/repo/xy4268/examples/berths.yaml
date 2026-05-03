@@ -1,0 +1,46 @@
+berths:
+  - id: "B1"
+    name: "1号泊位"
+    type: "general"
+    max_draft: 4.5
+    max_length: 200
+    max_width: 30
+    available_time_slots:
+      - start: "00:00"
+        end: "24:00"
+    restrictions: []
+  
+  - id: "B2"
+    name: "2号泊位"
+    type: "container"
+    max_draft: 4.0
+    max_length: 180
+    max_width: 28
+    available_time_slots:
+      - start: "06:00"
+        end: "22:00"
+    restrictions:
+      - "仅白天作业"
+  
+  - id: "B3"
+    name: "3号泊位"
+    type: "general"
+    max_draft: 3.5
+    max_length: 160
+    max_width: 25
+    available_time_slots:
+      - start: "00:00"
+        end: "24:00"
+    restrictions: []
+  
+  - id: "B4"
+    name: "4号泊位"
+    type: "container"
+    max_draft: 3.8
+    max_length: 170
+    max_width: 26
+    available_time_slots:
+      - start: "08:00"
+        end: "20:00"
+    restrictions:
+      - "仅白天作业"

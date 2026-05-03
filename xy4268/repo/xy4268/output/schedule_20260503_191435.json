@@ -1,0 +1,4711 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-03T19:14:35.533724",
+    "version": "0.1.0",
+    "start_date": "2026-05-03",
+    "end_date": "2026-05-05",
+    "safety_margin": 0.3
+  },
+  "ships": [
+    {
+      "name": "东方之星",
+      "imo": "IMO1234567",
+      "draft": 3.0,
+      "cargo_weight": 15000.0,
+      "length": 150.0,
+      "width": 22.0,
+      "required_berth_types": [
+        "general",
+        "container"
+      ],
+      "required_tug_count": 1,
+      "operation_duration_minutes": 240
+    },
+    {
+      "name": "海阔号",
+      "imo": "IMO7654321",
+      "draft": 3.5,
+      "cargo_weight": 20000.0,
+      "length": 180.0,
+      "width": 25.0,
+      "required_berth_types": [
+        "general"
+      ],
+      "required_tug_count": 2,
+      "operation_duration_minutes": 300
+    },
+    {
+      "name": "远航轮",
+      "imo": "IMO9876543",
+      "draft": 2.8,
+      "cargo_weight": 12000.0,
+      "length": 130.0,
+      "width": 20.0,
+      "required_berth_types": [
+        "container",
+        "general"
+      ],
+      "required_tug_count": 1,
+      "operation_duration_minutes": 180
+    },
+    {
+      "name": "深吃水号",
+      "imo": "IMO4567890",
+      "draft": 5.0,
+      "cargo_weight": 30000.0,
+      "length": 220.0,
+      "width": 32.0,
+      "required_berth_types": [
+        "deep_draft"
+      ],
+      "required_tug_count": 2,
+      "operation_duration_minutes": 360
+    }
+  ],
+  "berths": [
+    {
+      "id": "B1",
+      "name": "1号泊位",
+      "type": "general",
+      "max_draft": 4.5,
+      "max_length": 200.0,
+      "max_width": 30.0,
+      "available_time_slots": [
+        {
+          "start": "00:00",
+          "end": "23:59"
+        }
+      ],
+      "restrictions": []
+    },
+    {
+      "id": "B2",
+      "name": "2号泊位",
+      "type": "container",
+      "max_draft": 4.0,
+      "max_length": 180.0,
+      "max_width": 28.0,
+      "available_time_slots": [
+        {
+          "start": "06:00",
+          "end": "22:00"
+        }
+      ],
+      "restrictions": [
+        "仅白天作业"
+      ]
+    },
+    {
+      "id": "B3",
+      "name": "3号泊位",
+      "type": "general",
+      "max_draft": 3.5,
+      "max_length": 160.0,
+      "max_width": 25.0,
+      "available_time_slots": [
+        {
+          "start": "00:00",
+          "end": "23:59"
+        }
+      ],
+      "restrictions": []
+    },
+    {
+      "id": "B4",
+      "name": "4号泊位",
+      "type": "container",
+      "max_draft": 3.8,
+      "max_length": 170.0,
+      "max_width": 26.0,
+      "available_time_slots": [
+        {
+          "start": "08:00",
+          "end": "20:00"
+        }
+      ],
+      "restrictions": [
+        "仅白天作业"
+      ]
+    }
+  ],
+  "tugs": [
+    {
+      "id": "T1",
+      "name": "拖轮1号",
+      "capacity": 3000.0,
+      "available_time_slots": [
+        {
+          "start": "00:00",
+          "end": "23:59"
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "name": "拖轮2号",
+      "capacity": 3500.0,
+      "available_time_slots": [
+        {
+          "start": "06:00",
+          "end": "22:00"
+        }
+      ]
+    },
+    {
+      "id": "T3",
+      "name": "拖轮3号",
+      "capacity": 4000.0,
+      "available_time_slots": [
+        {
+          "start": "08:00",
+          "end": "20:00"
+        }
+      ]
+    }
+  ],
+  "tidal_records": [
+    {
+      "time": "2026-05-03 00:00",
+      "height": 1.2
+    },
+    {
+      "time": "2026-05-03 06:00",
+      "height": 3.5
+    },
+    {
+      "time": "2026-05-03 12:00",
+      "height": 1.5
+    },
+    {
+      "time": "2026-05-03 18:00",
+      "height": 4.2
+    },
+    {
+      "time": "2026-05-04 00:00",
+      "height": 1.0
+    },
+    {
+      "time": "2026-05-04 06:00",
+      "height": 3.8
+    },
+    {
+      "time": "2026-05-04 12:00",
+      "height": 1.3
+    },
+    {
+      "time": "2026-05-04 18:00",
+      "height": 4.5
+    },
+    {
+      "time": "2026-05-05 00:00",
+      "height": 0.8
+    },
+    {
+      "time": "2026-05-05 06:00",
+      "height": 3.2
+    },
+    {
+      "time": "2026-05-05 12:00",
+      "height": 1.6
+    },
+    {
+      "time": "2026-05-05 18:00",
+      "height": 4.0
+    }
+  ],
+  "schedules": [
+    {
+      "ship_name": "深吃水号",
+      "ship_draft": 5.0,
+      "berth_name": "无可用泊位",
+      "berth_max_draft": 0,
+      "arrival_time": "2026-05-03 00:00",
+      "departure_time": "2026-05-03 00:00",
+      "berthing_window": null,
+      "departure_window": null,
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "berth_incompatible",
+          "description": "没有找到兼容的泊位。船舶吃水 5.0m，长度 220.0m，宽度 32.0m",
+          "severity": "critical"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 01:32",
+      "departure_time": "2026-05-03 04:32",
+      "berthing_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-03 01:32",
+      "departure_time": "2026-05-03 04:32",
+      "berthing_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-03 01:32",
+      "departure_time": "2026-05-03 04:32",
+      "berthing_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-03 01:32",
+      "departure_time": "2026-05-03 04:32",
+      "berthing_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:32",
+        "end": "2026-05-03 06:50",
+        "min_height": 3.105389151269387,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 01:47",
+      "departure_time": "2026-05-03 05:47",
+      "berthing_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-03 01:47",
+      "departure_time": "2026-05-03 05:47",
+      "berthing_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-03 01:47",
+      "departure_time": "2026-05-03 05:47",
+      "berthing_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-03 01:47",
+      "departure_time": "2026-05-03 05:47",
+      "berthing_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 01:47",
+        "end": "2026-05-03 06:26",
+        "min_height": 3.3023634673115625,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "海阔号",
+      "ship_draft": 3.5,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 02:39",
+      "departure_time": "2026-05-03 05:12",
+      "berthing_window": {
+        "start": "2026-05-03 02:39",
+        "end": "2026-05-03 05:12",
+        "min_height": 3.801078765646432,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.8
+      },
+      "departure_window": {
+        "start": "2026-05-03 02:39",
+        "end": "2026-05-03 05:12",
+        "min_height": 3.801078765646432,
+        "max_height": 4.027680303735113,
+        "required_depth": 3.8
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 300 分钟超过潮窗时长 153 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 15:00",
+      "departure_time": "2026-05-03 18:00",
+      "berthing_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-03 15:00",
+      "departure_time": "2026-05-03 18:00",
+      "berthing_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-03 15:00",
+      "departure_time": "2026-05-03 18:00",
+      "berthing_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-03 15:00",
+      "departure_time": "2026-05-03 18:00",
+      "berthing_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:00",
+        "end": "2026-05-03 20:15",
+        "min_height": 3.1012426008139116,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 15:19",
+      "departure_time": "2026-05-03 19:19",
+      "berthing_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-03 15:19",
+      "departure_time": "2026-05-03 19:19",
+      "berthing_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-03 15:19",
+      "departure_time": "2026-05-03 19:19",
+      "berthing_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-03 15:19",
+      "departure_time": "2026-05-03 19:19",
+      "berthing_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-03 15:19",
+        "end": "2026-05-03 19:58",
+        "min_height": 3.30262819323508,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "海阔号",
+      "ship_draft": 3.5,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-03 16:13",
+      "departure_time": "2026-05-03 19:10",
+      "berthing_window": {
+        "start": "2026-05-03 16:13",
+        "end": "2026-05-03 19:10",
+        "min_height": 3.8047415034558156,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.8
+      },
+      "departure_window": {
+        "start": "2026-05-03 16:13",
+        "end": "2026-05-03 19:10",
+        "min_height": 3.8047415034558156,
+        "max_height": 4.2141538715568,
+        "required_depth": 3.8
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 300 分钟超过潮窗时长 177 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-04 04:06",
+      "departure_time": "2026-05-04 07:06",
+      "berthing_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-04 04:06",
+      "departure_time": "2026-05-04 07:06",
+      "berthing_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-04 04:06",
+      "departure_time": "2026-05-04 07:06",
+      "berthing_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-04 04:06",
+      "departure_time": "2026-05-04 07:06",
+      "berthing_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:06",
+        "end": "2026-05-04 08:03",
+        "min_height": 3.102010563407437,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-04 04:27",
+      "departure_time": "2026-05-04 07:41",
+      "berthing_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 240 分钟超过潮窗时长 194 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-04 04:27",
+      "departure_time": "2026-05-04 07:41",
+      "berthing_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 240 分钟超过潮窗时长 194 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-04 04:27",
+      "departure_time": "2026-05-04 07:41",
+      "berthing_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 240 分钟超过潮窗时长 194 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-04 04:27",
+      "departure_time": "2026-05-04 07:41",
+      "berthing_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 04:27",
+        "end": "2026-05-04 07:41",
+        "min_height": 3.3087035296730773,
+        "max_height": 3.8005246469341243,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 240 分钟超过潮窗时长 194 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-04 15:09",
+      "departure_time": "2026-05-04 18:09",
+      "berthing_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-04 15:09",
+      "departure_time": "2026-05-04 18:09",
+      "berthing_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-04 15:09",
+      "departure_time": "2026-05-04 18:09",
+      "berthing_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-04 15:09",
+      "departure_time": "2026-05-04 18:09",
+      "berthing_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:09",
+        "end": "2026-05-04 20:38",
+        "min_height": 3.1013322260410034,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-04 15:24",
+      "departure_time": "2026-05-04 19:24",
+      "berthing_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-04 15:24",
+      "departure_time": "2026-05-04 19:24",
+      "berthing_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-04 15:24",
+      "departure_time": "2026-05-04 19:24",
+      "berthing_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-04 15:24",
+      "departure_time": "2026-05-04 19:24",
+      "berthing_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-04 15:24",
+        "end": "2026-05-04 20:23",
+        "min_height": 3.301403368015115,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "海阔号",
+      "ship_draft": 3.5,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-04 16:06",
+      "departure_time": "2026-05-04 19:44",
+      "berthing_window": {
+        "start": "2026-05-04 16:06",
+        "end": "2026-05-04 19:44",
+        "min_height": 3.801451392062525,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.8
+      },
+      "departure_window": {
+        "start": "2026-05-04 16:06",
+        "end": "2026-05-04 19:44",
+        "min_height": 3.801451392062525,
+        "max_height": 4.5009176401981374,
+        "required_depth": 3.8
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 300 分钟超过潮窗时长 218 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-05 05:40",
+      "departure_time": "2026-05-05 08:13",
+      "berthing_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 180 分钟超过潮窗时长 153 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-05 05:40",
+      "departure_time": "2026-05-05 08:13",
+      "berthing_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 180 分钟超过潮窗时长 153 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-05 05:40",
+      "departure_time": "2026-05-05 08:13",
+      "berthing_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 180 分钟超过潮窗时长 153 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-05 05:40",
+      "departure_time": "2026-05-05 08:13",
+      "berthing_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 05:40",
+        "end": "2026-05-05 08:13",
+        "min_height": 3.1027395863588834,
+        "max_height": 3.3012947263691115,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [
+        {
+          "type": "operation_duration_exceeds_window",
+          "description": "作业时长 180 分钟超过潮窗时长 153 分钟",
+          "severity": "high"
+        }
+      ],
+      "is_feasible": false
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-05 17:22",
+      "departure_time": "2026-05-05 20:22",
+      "berthing_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-05 17:22",
+      "departure_time": "2026-05-05 20:22",
+      "berthing_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-05 17:22",
+      "departure_time": "2026-05-05 20:22",
+      "berthing_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "远航轮",
+      "ship_draft": 2.8,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-05 17:22",
+      "departure_time": "2026-05-05 20:22",
+      "berthing_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:22",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.105779102544264,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.0999999999999996
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-05 17:32",
+      "departure_time": "2026-05-05 21:32",
+      "berthing_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "2号泊位",
+      "berth_max_draft": 4.0,
+      "arrival_time": "2026-05-05 17:32",
+      "departure_time": "2026-05-05 21:32",
+      "berthing_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "3号泊位",
+      "berth_max_draft": 3.5,
+      "arrival_time": "2026-05-05 17:32",
+      "departure_time": "2026-05-05 21:32",
+      "berthing_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "东方之星",
+      "ship_draft": 3.0,
+      "berth_name": "4号泊位",
+      "berth_max_draft": 3.8,
+      "arrival_time": "2026-05-05 17:32",
+      "departure_time": "2026-05-05 21:32",
+      "berthing_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:32",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.321398968935654,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.3
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    },
+    {
+      "ship_name": "海阔号",
+      "ship_draft": 3.5,
+      "berth_name": "1号泊位",
+      "berth_max_draft": 4.5,
+      "arrival_time": "2026-05-05 17:53",
+      "departure_time": "2026-05-05 22:53",
+      "berthing_window": {
+        "start": "2026-05-05 17:53",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.8197596349389222,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.8
+      },
+      "departure_window": {
+        "start": "2026-05-05 17:53",
+        "end": "2026-05-05 23:59",
+        "min_height": 3.8197596349389222,
+        "max_height": 25.464186477121054,
+        "required_depth": 3.8
+      },
+      "assigned_tugs": [],
+      "conflicts": [],
+      "is_feasible": true
+    }
+  ],
+  "conflicts": [
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 1号泊位 存在时间冲突：远航轮 (01:32-04:32) 与 东方之星 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "berth_id": "B1",
+        "berth_name": "1号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 01:32",
+        "ship1_departure": "2026-05-03 04:32",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 01:47",
+        "ship2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 1号泊位 存在时间冲突：远航轮 (15:00-18:00) 与 东方之星 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "berth_id": "B1",
+        "berth_name": "1号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 15:00",
+        "ship1_departure": "2026-05-03 18:00",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 15:19",
+        "ship2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 1号泊位 存在时间冲突：远航轮 (15:09-18:09) 与 东方之星 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "berth_id": "B1",
+        "berth_name": "1号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-04 15:09",
+        "ship1_departure": "2026-05-04 18:09",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-04 15:24",
+        "ship2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 1号泊位 存在时间冲突：远航轮 (17:22-20:22) 与 东方之星 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "berth_id": "B1",
+        "berth_name": "1号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-05 17:22",
+        "ship1_departure": "2026-05-05 20:22",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-05 17:32",
+        "ship2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 1号泊位 存在时间冲突：东方之星 (17:32-21:32) 与 海阔号 (17:53-22:53) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "海阔号_B1"
+      ],
+      "details": {
+        "berth_id": "B1",
+        "berth_name": "1号泊位",
+        "ship1_name": "东方之星",
+        "ship1_arrival": "2026-05-05 17:32",
+        "ship1_departure": "2026-05-05 21:32",
+        "ship2_name": "海阔号",
+        "ship2_arrival": "2026-05-05 17:53",
+        "ship2_departure": "2026-05-05 22:53"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 2号泊位 存在时间冲突：远航轮 (01:32-04:32) 与 东方之星 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "berth_id": "B2",
+        "berth_name": "2号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 01:32",
+        "ship1_departure": "2026-05-03 04:32",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 01:47",
+        "ship2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 2号泊位 存在时间冲突：远航轮 (15:00-18:00) 与 东方之星 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "berth_id": "B2",
+        "berth_name": "2号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 15:00",
+        "ship1_departure": "2026-05-03 18:00",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 15:19",
+        "ship2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 2号泊位 存在时间冲突：远航轮 (15:09-18:09) 与 东方之星 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "berth_id": "B2",
+        "berth_name": "2号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-04 15:09",
+        "ship1_departure": "2026-05-04 18:09",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-04 15:24",
+        "ship2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 2号泊位 存在时间冲突：远航轮 (17:22-20:22) 与 东方之星 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "berth_id": "B2",
+        "berth_name": "2号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-05 17:22",
+        "ship1_departure": "2026-05-05 20:22",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-05 17:32",
+        "ship2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 3号泊位 存在时间冲突：远航轮 (01:32-04:32) 与 东方之星 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "berth_id": "B3",
+        "berth_name": "3号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 01:32",
+        "ship1_departure": "2026-05-03 04:32",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 01:47",
+        "ship2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 3号泊位 存在时间冲突：远航轮 (15:00-18:00) 与 东方之星 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "berth_id": "B3",
+        "berth_name": "3号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 15:00",
+        "ship1_departure": "2026-05-03 18:00",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 15:19",
+        "ship2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 3号泊位 存在时间冲突：远航轮 (15:09-18:09) 与 东方之星 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "berth_id": "B3",
+        "berth_name": "3号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-04 15:09",
+        "ship1_departure": "2026-05-04 18:09",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-04 15:24",
+        "ship2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 3号泊位 存在时间冲突：远航轮 (17:22-20:22) 与 东方之星 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "berth_id": "B3",
+        "berth_name": "3号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-05 17:22",
+        "ship1_departure": "2026-05-05 20:22",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-05 17:32",
+        "ship2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 4号泊位 存在时间冲突：远航轮 (01:32-04:32) 与 东方之星 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "berth_id": "B4",
+        "berth_name": "4号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 01:32",
+        "ship1_departure": "2026-05-03 04:32",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 01:47",
+        "ship2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 4号泊位 存在时间冲突：远航轮 (15:00-18:00) 与 东方之星 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "berth_id": "B4",
+        "berth_name": "4号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-03 15:00",
+        "ship1_departure": "2026-05-03 18:00",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-03 15:19",
+        "ship2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 4号泊位 存在时间冲突：远航轮 (15:09-18:09) 与 东方之星 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "berth_id": "B4",
+        "berth_name": "4号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-04 15:09",
+        "ship1_departure": "2026-05-04 18:09",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-04 15:24",
+        "ship2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "berth_conflict",
+      "severity": "critical",
+      "description": "泊位 4号泊位 存在时间冲突：远航轮 (17:22-20:22) 与 东方之星 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "berth_id": "B4",
+        "berth_name": "4号泊位",
+        "ship1_name": "远航轮",
+        "ship1_arrival": "2026-05-05 17:22",
+        "ship1_departure": "2026-05-05 20:22",
+        "ship2_name": "东方之星",
+        "ship2_arrival": "2026-05-05 17:32",
+        "ship2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 01:32-04:32 与 01:32-04:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:32",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 01:32-04:32 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 01:47-05:47 与 01:47-05:47 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 01:47",
+        "overlap_end": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:00-18:00 与 15:00-18:00 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:00",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:00-18:00 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:19-19:19 与 15:19-19:19 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-03 15:19",
+        "overlap_end": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 04:06-07:06 与 04:06-07:06 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 04:06",
+        "overlap_end": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 15:09-18:09 与 15:09-18:09 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:09",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 15:09-18:09 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 15:24-19:24 与 15:24-19:24 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-04 15:24",
+        "overlap_end": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 海阔号 在时间段 17:22-20:22 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B1",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 海阔号 在时间段 17:22-20:22 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B2",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 远航轮 在时间段 17:22-20:22 与 17:22-20:22 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "远航轮",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:22",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 海阔号 在时间段 17:22-20:22 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B3",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 东方之星 在时间段 17:22-20:22 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：远航轮 和 海阔号 在时间段 17:22-20:22 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "远航轮_B4",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "远航轮",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 海阔号 在时间段 17:32-21:32 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B1",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 海阔号 在时间段 17:32-21:32 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B2",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 东方之星 在时间段 17:32-21:32 与 17:32-21:32 时间重叠，共需要 2 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "东方之星",
+        "ship2_tug_count": 1,
+        "total_tug_needed": 2,
+        "overlap_start": "2026-05-05 17:32",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 海阔号 在时间段 17:32-21:32 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B3",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "tug_conflict",
+      "severity": "high",
+      "description": "拖轮潜在冲突：东方之星 和 海阔号 在时间段 17:32-21:32 与 17:53-22:53 时间重叠，共需要 3 艘拖轮",
+      "involved_schedules": [
+        "东方之星_B4",
+        "海阔号_B1"
+      ],
+      "details": {
+        "ship1_name": "东方之星",
+        "ship1_tug_count": 1,
+        "ship2_name": "海阔号",
+        "ship2_tug_count": 2,
+        "total_tug_needed": 3,
+        "overlap_start": "2026-05-05 17:53",
+        "overlap_end": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (01:32-04:32) 与泊位 2号泊位 (01:32-04:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-03 01:32",
+        "berth1_departure": "2026-05-03 04:32",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-03 01:32",
+        "berth2_departure": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (01:32-04:32) 与泊位 3号泊位 (01:32-04:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-03 01:32",
+        "berth1_departure": "2026-05-03 04:32",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-03 01:32",
+        "berth2_departure": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (01:32-04:32) 与泊位 4号泊位 (01:32-04:32) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-03 01:32",
+        "berth1_departure": "2026-05-03 04:32",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-03 01:32",
+        "berth2_departure": "2026-05-03 04:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (15:00-18:00) 与泊位 2号泊位 (15:00-18:00) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-03 15:00",
+        "berth1_departure": "2026-05-03 18:00",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-03 15:00",
+        "berth2_departure": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (15:00-18:00) 与泊位 3号泊位 (15:00-18:00) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-03 15:00",
+        "berth1_departure": "2026-05-03 18:00",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-03 15:00",
+        "berth2_departure": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (15:00-18:00) 与泊位 4号泊位 (15:00-18:00) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-03 15:00",
+        "berth1_departure": "2026-05-03 18:00",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-03 15:00",
+        "berth2_departure": "2026-05-03 18:00"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (04:06-07:06) 与泊位 2号泊位 (04:06-07:06) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-04 04:06",
+        "berth1_departure": "2026-05-04 07:06",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-04 04:06",
+        "berth2_departure": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (04:06-07:06) 与泊位 3号泊位 (04:06-07:06) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-04 04:06",
+        "berth1_departure": "2026-05-04 07:06",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-04 04:06",
+        "berth2_departure": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (04:06-07:06) 与泊位 4号泊位 (04:06-07:06) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-04 04:06",
+        "berth1_departure": "2026-05-04 07:06",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-04 04:06",
+        "berth2_departure": "2026-05-04 07:06"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (15:09-18:09) 与泊位 2号泊位 (15:09-18:09) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-04 15:09",
+        "berth1_departure": "2026-05-04 18:09",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-04 15:09",
+        "berth2_departure": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (15:09-18:09) 与泊位 3号泊位 (15:09-18:09) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-04 15:09",
+        "berth1_departure": "2026-05-04 18:09",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-04 15:09",
+        "berth2_departure": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (15:09-18:09) 与泊位 4号泊位 (15:09-18:09) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-04 15:09",
+        "berth1_departure": "2026-05-04 18:09",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-04 15:09",
+        "berth2_departure": "2026-05-04 18:09"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (05:40-08:13) 与泊位 2号泊位 (05:40-08:13) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-05 05:40",
+        "berth1_departure": "2026-05-05 08:13",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-05 05:40",
+        "berth2_departure": "2026-05-05 08:13"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (05:40-08:13) 与泊位 3号泊位 (05:40-08:13) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-05 05:40",
+        "berth1_departure": "2026-05-05 08:13",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-05 05:40",
+        "berth2_departure": "2026-05-05 08:13"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (05:40-08:13) 与泊位 4号泊位 (05:40-08:13) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-05 05:40",
+        "berth1_departure": "2026-05-05 08:13",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-05 05:40",
+        "berth2_departure": "2026-05-05 08:13"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 1号泊位 (17:22-20:22) 与泊位 2号泊位 (17:22-20:22) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B1",
+        "远航轮_B2"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-05 17:22",
+        "berth1_departure": "2026-05-05 20:22",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-05 17:22",
+        "berth2_departure": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 2号泊位 (17:22-20:22) 与泊位 3号泊位 (17:22-20:22) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B2",
+        "远航轮_B3"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-05 17:22",
+        "berth1_departure": "2026-05-05 20:22",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-05 17:22",
+        "berth2_departure": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 远航轮 存在多个计划时间冲突：泊位 3号泊位 (17:22-20:22) 与泊位 4号泊位 (17:22-20:22) 时间重叠",
+      "involved_schedules": [
+        "远航轮_B3",
+        "远航轮_B4"
+      ],
+      "details": {
+        "ship_name": "远航轮",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-05 17:22",
+        "berth1_departure": "2026-05-05 20:22",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-05 17:22",
+        "berth2_departure": "2026-05-05 20:22"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 1号泊位 (01:47-05:47) 与泊位 2号泊位 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-03 01:47",
+        "berth1_departure": "2026-05-03 05:47",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-03 01:47",
+        "berth2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 2号泊位 (01:47-05:47) 与泊位 3号泊位 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-03 01:47",
+        "berth1_departure": "2026-05-03 05:47",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-03 01:47",
+        "berth2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 3号泊位 (01:47-05:47) 与泊位 4号泊位 (01:47-05:47) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-03 01:47",
+        "berth1_departure": "2026-05-03 05:47",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-03 01:47",
+        "berth2_departure": "2026-05-03 05:47"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 1号泊位 (15:19-19:19) 与泊位 2号泊位 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-03 15:19",
+        "berth1_departure": "2026-05-03 19:19",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-03 15:19",
+        "berth2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 2号泊位 (15:19-19:19) 与泊位 3号泊位 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-03 15:19",
+        "berth1_departure": "2026-05-03 19:19",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-03 15:19",
+        "berth2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 3号泊位 (15:19-19:19) 与泊位 4号泊位 (15:19-19:19) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-03 15:19",
+        "berth1_departure": "2026-05-03 19:19",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-03 15:19",
+        "berth2_departure": "2026-05-03 19:19"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 1号泊位 (04:27-07:41) 与泊位 2号泊位 (04:27-07:41) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-04 04:27",
+        "berth1_departure": "2026-05-04 07:41",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-04 04:27",
+        "berth2_departure": "2026-05-04 07:41"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 2号泊位 (04:27-07:41) 与泊位 3号泊位 (04:27-07:41) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-04 04:27",
+        "berth1_departure": "2026-05-04 07:41",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-04 04:27",
+        "berth2_departure": "2026-05-04 07:41"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 3号泊位 (04:27-07:41) 与泊位 4号泊位 (04:27-07:41) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-04 04:27",
+        "berth1_departure": "2026-05-04 07:41",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-04 04:27",
+        "berth2_departure": "2026-05-04 07:41"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 1号泊位 (15:24-19:24) 与泊位 2号泊位 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-04 15:24",
+        "berth1_departure": "2026-05-04 19:24",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-04 15:24",
+        "berth2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 2号泊位 (15:24-19:24) 与泊位 3号泊位 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-04 15:24",
+        "berth1_departure": "2026-05-04 19:24",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-04 15:24",
+        "berth2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 3号泊位 (15:24-19:24) 与泊位 4号泊位 (15:24-19:24) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-04 15:24",
+        "berth1_departure": "2026-05-04 19:24",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-04 15:24",
+        "berth2_departure": "2026-05-04 19:24"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 1号泊位 (17:32-21:32) 与泊位 2号泊位 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B1",
+        "东方之星_B2"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "1号泊位",
+        "berth1_arrival": "2026-05-05 17:32",
+        "berth1_departure": "2026-05-05 21:32",
+        "berth2_name": "2号泊位",
+        "berth2_arrival": "2026-05-05 17:32",
+        "berth2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 2号泊位 (17:32-21:32) 与泊位 3号泊位 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B2",
+        "东方之星_B3"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "2号泊位",
+        "berth1_arrival": "2026-05-05 17:32",
+        "berth1_departure": "2026-05-05 21:32",
+        "berth2_name": "3号泊位",
+        "berth2_arrival": "2026-05-05 17:32",
+        "berth2_departure": "2026-05-05 21:32"
+      }
+    },
+    {
+      "conflict_type": "ship_time_conflict",
+      "severity": "high",
+      "description": "船舶 东方之星 存在多个计划时间冲突：泊位 3号泊位 (17:32-21:32) 与泊位 4号泊位 (17:32-21:32) 时间重叠",
+      "involved_schedules": [
+        "东方之星_B3",
+        "东方之星_B4"
+      ],
+      "details": {
+        "ship_name": "东方之星",
+        "berth1_name": "3号泊位",
+        "berth1_arrival": "2026-05-05 17:32",
+        "berth1_departure": "2026-05-05 21:32",
+        "berth2_name": "4号泊位",
+        "berth2_arrival": "2026-05-05 17:32",
+        "berth2_departure": "2026-05-05 21:32"
+      }
+    }
+  ],
+  "summary": {
+    "schedules": {
+      "total": 49,
+      "feasible": 37,
+      "infeasible": 12
+    },
+    "conflicts": {
+      "total": 176,
+      "by_severity": {
+        "critical": 17,
+        "high": 159,
+        "medium": 0,
+        "low": 0
+      },
+      "by_type": {
+        "berth_conflict": 17,
+        "tug_conflict": 126,
+        "ship_time_conflict": 33
+      }
+    }
+  }
+}

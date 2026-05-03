@@ -1,0 +1,46 @@
+[
+    {
+        "name": "东方之星",
+        "imo": "IMO1234567",
+        "draft": 3.0,
+        "cargo_weight": 15000,
+        "length": 150,
+        "width": 22,
+        "required_berth_types": ["general", "container"],
+        "required_tug_count": 1,
+        "operation_duration": 240
+    },
+    {
+        "name": "海阔号",
+        "imo": "IMO7654321",
+        "draft": 3.5,
+        "cargo_weight": 20000,
+        "length": 180,
+        "width": 25,
+        "required_berth_types": ["general"],
+        "required_tug_count": 2,
+        "operation_duration": 300
+    },
+    {
+        "name": "远航轮",
+        "imo": "IMO9876543",
+        "draft": 2.8,
+        "cargo_weight": 12000,
+        "length": 130,
+        "width": 20,
+        "required_berth_types": ["container", "general"],
+        "required_tug_count": 1,
+        "operation_duration": 180
+    },
+    {
+        "name": "深吃水号",
+        "imo": "IMO4567890",
+        "draft": 5.0,
+        "cargo_weight": 30000,
+        "length": 220,
+        "width": 32,
+        "required_berth_types": ["deep_draft"],
+        "required_tug_count": 2,
+        "operation_duration": 360
+    }
+]

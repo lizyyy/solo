@@ -1,0 +1,35 @@
+[
+    {
+        "id": "T1",
+        "name": "拖轮1号",
+        "capacity": 3000,
+        "available_time_slots": [
+            {
+                "start": "00:00",
+                "end": "24:00"
+            }
+        ]
+    },
+    {
+        "id": "T2",
+        "name": "拖轮2号",
+        "capacity": 3500,
+        "available_time_slots": [
+            {
+                "start": "06:00",
+                "end": "22:00"
+            }
+        ]
+    },
+    {
+        "id": "T3",
+        "name": "拖轮3号",
+        "capacity": 4000,
+        "available_time_slots": [
+            {
+                "start": "08:00",
+                "end": "20:00"
+            }
+        ]
+    }
+]

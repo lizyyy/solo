@@ -1,0 +1,23 @@
+[project]
+name = "tide-window-scheduler"
+version = "0.1.0"
+description = "潮窗靠泊推演器 - 小港口调度员专用本地工具"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=1.5.0",
+    "numpy>=1.21.0",
+    "pyyaml>=6.0",
+    "scipy>=1.9.0",
+]
+
+[project.scripts]
+tide-scheduler = "tide_window_scheduler.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tide_window_scheduler"]
