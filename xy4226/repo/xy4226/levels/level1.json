@@ -1,0 +1,183 @@
+{
+  "id": "level1",
+  "name": "新手入门 - 基础操作训练",
+  "description": "学习叉车的基本操作：取货、搬运、放货，熟悉仓库环境",
+  "difficulty": 1,
+  "timeLimit": 180,
+  
+  "vehicle": {
+    "startPosition": { "x": 0, "y": 0, "z": -20 },
+    "startRotation": 0,
+    "maxSpeed": 5,
+    "turningRadius": 3
+  },
+  
+  "racks": [
+    {
+      "id": "rack1",
+      "position": { "x": -15, "y": 0, "z": 0 },
+      "rotation": 0,
+      "width": 8,
+      "depth": 2,
+      "height": 8
+    },
+    {
+      "id": "rack2",
+      "position": { "x": -15, "y": 0, "z": 12 },
+      "rotation": 0,
+      "width": 8,
+      "depth": 2,
+      "height": 8
+    },
+    {
+      "id": "rack3",
+      "position": { "x": 15, "y": 0, "z": 0 },
+      "rotation": 0,
+      "width": 8,
+      "depth": 2,
+      "height": 8
+    },
+    {
+      "id": "rack4",
+      "position": { "x": 15, "y": 0, "z": 12 },
+      "rotation": 0,
+      "width": 8,
+      "depth": 2,
+      "height": 8
+    }
+  ],
+  
+  "pedestrianZones": [
+    {
+      "id": "pedZone1",
+      "position": { "x": 0, "y": 0, "z": 5 },
+      "width": 8,
+      "depth": 8,
+      "hasPedestrians": true,
+      "pedestrianCount": 3
+    }
+  ],
+  
+  "speedLimitZones": [
+    {
+      "id": "speedZone1",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "width": 20,
+      "depth": 15,
+      "maxSpeed": 2
+    }
+  ],
+  
+  "loadingDocks": [
+    {
+      "id": "dock1",
+      "position": { "x": 0, "y": 0, "z": 25 },
+      "rotation": 0,
+      "width": 10,
+      "depth": 4
+    }
+  ],
+  
+  "pallets": [
+    {
+      "id": "pallet1",
+      "position": { "x": -15, "y": 0, "z": -4 },
+      "rotation": 0,
+      "hasCargo": true,
+      "cargoHeight": 1.5,
+      "cargoColor": 13458524,
+      "targetDockId": "dock1",
+      "sequence": 1
+    },
+    {
+      "id": "pallet2",
+      "position": { "x": 15, "y": 0, "z": -4 },
+      "rotation": 0,
+      "hasCargo": true,
+      "cargoHeight": 1.2,
+      "cargoColor": 16744448,
+      "targetDockId": "dock1",
+      "sequence": 2
+    }
+  ],
+  
+  "obstacles": [
+    {
+      "id": "obstacle1",
+      "position": { "x": -8, "y": 0, "z": 10 },
+      "rotation": 0,
+      "type": "box",
+      "width": 3,
+      "height": 2,
+      "depth": 3,
+      "color": 16738740
+    },
+    {
+      "id": "obstacle2",
+      "position": { "x": 8, "y": 0, "z": 10 },
+      "rotation": 0,
+      "type": "cylinder",
+      "radius": 1,
+      "height": 2.5,
+      "color": 4286945
+    }
+  ],
+  
+  "tasks": [
+    {
+      "id": "task1",
+      "type": "pickup",
+      "description": "取取 pallet1 货物",
+      "targetId": "pallet1",
+      "sequence": 1
+    },
+    {
+      "id": "task2",
+      "type": "delivery",
+      "description": "将 pallet1 送到 dock1",
+      "targetId": "dock1",
+      "sequence": 2
+    },
+    {
+      "id": "task3",
+      "type": "avoid",
+      "description": "安全避让行人区域",
+      "targetId": "pedZone1",
+      "sequence": 3
+    },
+    {
+      "id": "task4",
+      "type": "pickup",
+      "description": "取取 pallet2 货物",
+      "targetId": "pallet2",
+      "sequence": 4
+    },
+    {
+      "id": "task5",
+      "type": "delivery",
+      "description": "将 pallet2 送到 dock1",
+      "targetId": "dock1",
+      "sequence": 5
+    }
+  ],
+  
+  "scoringRules": {
+    "baseScore": 100,
+    "timeBonus": {
+      "perSecond": 0.5,
+      "maxBonus": 50
+    },
+    "violations": {
+      "collision": -20,
+      "speeding": -10,
+      "turningRadius": -15,
+      "blindSpot": -25,
+      "wrongSequence": -30
+    },
+    "tasks": {
+      "pickup": 20,
+      "delivery": 30,
+      "avoid": 15
+    }
+  }
+}

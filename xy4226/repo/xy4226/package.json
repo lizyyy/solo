@@ -1,0 +1,27 @@
+{
+  "name": "forklift-training-simulator",
+  "version": "1.0.0",
+  "description": "3D 叉车通道演练台 - 仓库新员工培训系统",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "forklift",
+    "training",
+    "simulator",
+    "threejs",
+    "3d"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0",
+    "@tweenjs/tween.js": "^21.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
