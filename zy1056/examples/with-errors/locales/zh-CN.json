@@ -1,0 +1,42 @@
+{
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "loading": "加载中...",
+    "success": "操作成功",
+    "error": "操作失败"
+  },
+  "user": {
+    "greeting": "你好，{name}！",
+    "welcome": "欢迎回来，{username}",
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "退出登录"
+  },
+  "order": {
+    "title": "订单管理",
+    "count": "共 {count} 个订单",
+    "pluralCount": "{count, plural, =0 {没有订单} one {1 个订单} other {{count} 个订单}}",
+    "status": {
+      "pending": "待处理",
+      "processing": "处理中",
+      "shipped": "已发货",
+      "delivered": "已送达",
+      "cancelled": "已取消"
+    },
+    "checkout": {
+      "pay": {
+        "button": "立即支付",
+        "amount": "支付金额: ¥{amount}"
+      }
+    }
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "email": "请输入有效的邮箱地址",
+    "minLength": "至少需要 %{min} 个字符",
+    "maxLength": "最多 %{max} 个字符"
+  }
+}

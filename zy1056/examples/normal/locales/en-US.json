@@ -1,0 +1,42 @@
+{
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "success": "Operation successful",
+    "error": "Operation failed"
+  },
+  "user": {
+    "greeting": "Hello, {name}!",
+    "welcome": "Welcome back, {username}",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "order": {
+    "title": "Order Management",
+    "count": "Total {count} orders",
+    "pluralCount": "{count, plural, =0 {No orders} one {1 order} other {{count} orders}}",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "checkout": {
+      "pay": {
+        "button": "Pay Now",
+        "amount": "Amount: ${amount}"
+      }
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "minLength": "At least %{min} characters required",
+    "maxLength": "Maximum %{max} characters"
+  }
+}

@@ -1,0 +1,48 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2024 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0800\n"
+"PO-Revision-Date: 2024-01-01 00:00+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Chinese\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "common.confirm"
+msgstr "确认"
+
+msgid "common.cancel"
+msgstr "取消"
+
+msgid "common.save"
+msgstr "保存"
+
+msgid "common.delete"
+msgstr "删除"
+
+msgid "user.greeting"
+msgstr "你好，{name}！"
+
+msgid "user.welcome"
+msgstr "欢迎回来，{username}"
+
+msgid "order.title"
+msgstr "订单管理"
+
+msgid "order.count"
+msgstr "共 {count} 个订单"
+
+msgid "validation.required"
+msgstr "此字段为必填项"
+
+msgid "validation.email"
+msgstr "请输入有效的邮箱地址"

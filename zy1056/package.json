@@ -1,0 +1,32 @@
+{
+  "name": "i18n-lint-cli",
+  "version": "1.0.0",
+  "description": "多语言文案质量检查 CLI 工具 - 检查缺失 key、占位符错误、ICU plural 一致性等",
+  "main": "src/cli.js",
+  "bin": {
+    "i18n-lint": "./bin/i18n-lint.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "lint": "echo 'No linter configured yet'"
+  },
+  "keywords": [
+    "i18n",
+    "locale",
+    "translation",
+    "lint",
+    "cli",
+    "multi-language"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "yaml": "^2.3.4",
+    "gettext-parser": "^7.0.1"
+  }
+}
