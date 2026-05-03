@@ -1,0 +1,27 @@
+oxygen_thresholds:
+  critical: 3.0
+  warning: 4.0
+  normal: 6.0
+
+aerator_rules:
+  auto_on_below: 3.5
+  minimum_runtime_minutes: 30
+  grace_period_minutes: 15
+
+feeding_rules:
+  minimum_oxygen_required: 4.0
+  minimum_interval_minutes: 120
+  maximum_feeds_per_day: 3
+  feed_time_window:
+    - "06:00"
+    - "10:00"
+    - "16:00"
+    - "20:00"
+
+sensor_rules:
+  expected_interval_minutes: 30
+  max_gap_minutes: 90
+  max_missing_readings: 3
+
+analysis_window:
+  hours_before: 24

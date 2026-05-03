@@ -1,0 +1,9 @@
+pond_id,issue_type,severity,description,timestamp,details_json
+P001,low_oxygen_feeding,high,低氧时投喂，溶氧值3.9mg/L低于阈值4.0mg/L,2026-05-02T06:00:00,"{""oxygen_level"": 3.933333333333333, ""threshold"": 4.0, ""feed_amount"": 45.0, ""operator"": ""张师傅""}"
+P001,low_oxygen_feeding,high,低氧时投喂，溶氧值3.3mg/L低于阈值4.0mg/L,2026-05-02T20:00:00,"{""oxygen_level"": 3.3000000000000003, ""threshold"": 4.0, ""feed_amount"": 40.0, ""operator"": ""李师傅""}"
+P001,aerator_missed,high,低氧期间增氧机未开启，持续180分钟，溶氧低于3.5mg/L,2026-05-02T20:00:00,"{""start_time"": ""2026-05-02T20:00:00"", ""end_time"": ""2026-05-02T23:00:00"", ""duration_minutes"": 180.0, ""threshold"": 3.5}"
+P001,duplicate_feeding,medium,重复投喂，两次投喂间隔15分钟，低于最小间隔120分钟,2026-05-02T10:00:00,"{""first_feed_time"": ""2026-05-02T10:00:00"", ""second_feed_time"": ""2026-05-02T10:15:00"", ""interval_minutes"": 15.0, ""first_amount"": 45.0, ""second_amount"": 45.0, ""first_operator"": ""张师傅"", ""second_operator"": ""李师傅""}"
+P001,excessive_feeding,medium,当日投喂次数5次，超过每日最大限制3次,2026-05-02T06:00:00,"{""date"": ""2026-05-02"", ""feed_count"": 5, ""max_limit"": 3, ""total_amount_kg"": 225.0}"
+P002,low_oxygen_feeding,high,低氧时投喂，溶氧值3.8mg/L低于阈值4.0mg/L,2026-05-02T06:30:00,"{""oxygen_level"": 3.8333333333333335, ""threshold"": 4.0, ""feed_amount"": 35.0, ""operator"": ""王师傅""}"
+P002,low_oxygen_feeding,high,低氧时投喂，溶氧值2.4mg/L低于阈值4.0mg/L,2026-05-02T23:45:00,"{""oxygen_level"": 2.4, ""threshold"": 4.0, ""feed_amount"": 30.0, ""operator"": ""李师傅""}"
+P002,aerator_missed,high,低氧期间增氧机未开启，持续240分钟，溶氧低于3.5mg/L,2026-05-02T20:00:00,"{""start_time"": ""2026-05-02T20:00:00"", ""end_time"": ""2026-05-03T00:00:00"", ""duration_minutes"": 240.0, ""threshold"": 3.5}"
