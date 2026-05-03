@@ -1,0 +1,126 @@
+inventory:
+  - id: "TR-001"
+    name: "1#牵引变压器"
+    type: "牵引变压器"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    capacity: "10MVA"
+    protection_devices:
+      - "1#牵引变过流保护"
+      - "1#牵引变接地保护"
+    related_buses:
+      - "27.5kV I段母线"
+    parent_devices: []
+    child_devices:
+      - "1#馈线断路器"
+
+  - id: "TR-002"
+    name: "2#牵引变压器"
+    type: "牵引变压器"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    capacity: "10MVA"
+    protection_devices:
+      - "2#牵引变过流保护"
+      - "2#牵引变接地保护"
+    related_buses:
+      - "27.5kV II段母线"
+    parent_devices: []
+    child_devices:
+      - "2#馈线断路器"
+
+  - id: "BUS-001"
+    name: "27.5kV I段母线"
+    type: "母线"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    protection_devices:
+      - "27.5kV母联保护"
+    related_buses:
+      - "27.5kV II段母线"
+    parent_devices:
+      - "1#牵引变压器"
+    child_devices:
+      - "1#馈线断路器"
+      - "母联断路器"
+
+  - id: "BUS-002"
+    name: "27.5kV II段母线"
+    type: "母线"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    protection_devices:
+      - "27.5kV母联保护"
+    related_buses:
+      - "27.5kV I段母线"
+    parent_devices:
+      - "2#牵引变压器"
+    child_devices:
+      - "2#馈线断路器"
+      - "母联断路器"
+
+  - id: "CB-001"
+    name: "1#馈线断路器"
+    type: "断路器"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    current_rating: "2000A"
+    protection_devices:
+      - "1#馈线过流保护"
+    related_buses:
+      - "27.5kV I段母线"
+    parent_devices:
+      - "27.5kV I段母线"
+    child_devices: []
+
+  - id: "CB-002"
+    name: "母联断路器"
+    type: "断路器"
+    location: "牵引变电所A"
+    voltage: "27.5kV"
+    current_rating: "3000A"
+    protection_devices:
+      - "27.5kV母联保护"
+    related_buses:
+      - "27.5kV I段母线"
+      - "27.5kV II段母线"
+    parent_devices:
+      - "27.5kV I段母线"
+      - "27.5kV II段母线"
+    child_devices: []
+
+  - id: "PD-001"
+    name: "1#牵引变过流保护"
+    type: "保护装置"
+    location: "牵引变电所A 保护屏1"
+    manufacturer: "南瑞继保"
+    model: "RCS-9671"
+    related_devices:
+      - "1#牵引变压器"
+
+  - id: "PD-002"
+    name: "1#牵引变接地保护"
+    type: "保护装置"
+    location: "牵引变电所A 保护屏1"
+    manufacturer: "南瑞继保"
+    model: "RCS-9671"
+    related_devices:
+      - "1#牵引变压器"
+
+  - id: "PD-003"
+    name: "2#牵引变过流保护"
+    type: "保护装置"
+    location: "牵引变电所A 保护屏2"
+    manufacturer: "南瑞继保"
+    model: "RCS-9671"
+    related_devices:
+      - "2#牵引变压器"
+
+  - id: "PD-004"
+    name: "27.5kV母联保护"
+    type: "保护装置"
+    location: "牵引变电所A 保护屏3"
+    manufacturer: "南瑞继保"
+    model: "RCS-9611"
+    related_devices:
+      - "母联断路器"

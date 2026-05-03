@@ -1,0 +1,100 @@
+version: "2024-01"
+effective_date: "2024-01-01"
+devices:
+  - name: "1#牵引变过流保护"
+    type: "过流保护"
+    settings:
+      - name: "过流I段定值"
+        value: 5.0
+        unit: "A"
+        effective_date: "2023-06-01"
+        expiry_date: "2024-12-31"
+      - name: "过流I段时限"
+        value: 0.1
+        unit: "s"
+      - name: "过流II段定值"
+        value: 8.0
+        unit: "A"
+        effective_date: "2024-01-01"
+      - name: "过流II段时限"
+        value: 0.5
+        unit: "s"
+      - name: "过流III段定值"
+        value: 12.0
+        unit: "A"
+      - name: "过流III段时限"
+        value: 1.0
+        unit: "s"
+
+  - name: "1#牵引变接地保护"
+    type: "接地保护"
+    settings:
+      - name: "接地保护定值"
+        value: 2.0
+        unit: "A"
+        effective_date: "2023-06-01"
+        expiry_date: "2024-06-01"
+      - name: "接地保护定值"
+        value: 2.5
+        unit: "A"
+        effective_date: "2024-06-01"
+      - name: "接地保护时限"
+        value: 0.2
+        unit: "s"
+
+  - name: "2#牵引变过流保护"
+    type: "过流保护"
+    settings:
+      - name: "过流I段定值"
+        value: 5.5
+        unit: "A"
+      - name: "过流I段时限"
+        value: 0.1
+        unit: "s"
+      - name: "过流II段定值"
+        value: 8.0
+        unit: "A"
+      - name: "过流II段时限"
+        value: 0.5
+        unit: "s"
+      - name: "过流III段定值"
+        value: 12.5
+        unit: "A"
+      - name: "过流III段时限"
+        value: 1.0
+        unit: "s"
+
+  - name: "27.5kV母联保护"
+    type: "母联保护"
+    settings:
+      - name: "母联联跳使能"
+        value: 1.0
+        unit: "boolean"
+      - name: "母联联跳延时"
+        value: 0.05
+        unit: "s"
+      - name: "过流保护定值"
+        value: 10.0
+        unit: "A"
+
+  - name: "1#馈线过流保护"
+    type: "馈线保护"
+    settings:
+      - name: "过流I段定值"
+        value: 6.0
+        unit: "A"
+      - name: "过流I段时限"
+        value: 0.05
+        unit: "s"
+      - name: "过流II段定值"
+        value: 10.0
+        unit: "A"
+      - name: "过流II段时限"
+        value: 0.3
+        unit: "s"
+      - name: "接地保护定值"
+        value: 1.5
+        unit: "A"
+      - name: "接地保护时限"
+        value: 0.1
+        unit: "s"
