@@ -1,0 +1,37 @@
+courses:
+  - name: 数据结构与算法
+    questions:
+      - num: 1
+        max_score: 10
+        deduction_rules:
+          - condition: 代码逻辑错误
+            points: 2
+      - num: 2
+        max_score: 10
+        deduction_rules:
+          - condition: 思路不清
+            points: 3
+      - num: 3
+        max_score: 8
+        deduction_rules:
+          - condition: 步骤缺失
+            points: 2
+  - name: 操作系统
+    questions:
+      - num: 1
+        max_score: 20
+        deduction_rules:
+          - condition: 概念错误
+            points: 5
+  - name: 计算机网络
+    questions:
+      - num: 1
+        max_score: 12
+        deduction_rules:
+          - condition: 协议理解错误
+            points: 4
+
+review_settings:
+  conflict_threshold: 3
+  conflict_threshold_percent: 0.3
+  strictness_window: 0.5
