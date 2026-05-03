@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "allergen-release-checker"
+version = "0.1.0"
+description = "食品厂 QA 过敏原清线放行复核 CLI 工具"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "pandas>=2.0.0",
+    "jinja2>=3.0.0",
+]
+keywords = ["qa", "allergen", "food-safety", "production"]
+
+[project.scripts]
+allergen-check = "allergen_release_checker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["allergen_release_checker*"]

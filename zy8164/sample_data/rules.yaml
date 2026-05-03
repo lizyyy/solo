@@ -1,0 +1,92 @@
+# 过敏原清线放行规则配置
+
+high_risk_allergens:
+  - 花生
+  - 坚果
+  - 大豆
+
+cross_contamination_matrix:
+  花生:
+    high_risk:
+      - 无
+    cleaning_required: true
+  坚果:
+    high_risk:
+      - 无
+    cleaning_required: true
+  大豆:
+    high_risk:
+      - 无
+    cleaning_required: true
+  乳制品:
+    high_risk:
+      - 无
+    cleaning_required: true
+  可可:
+    high_risk: []
+    cleaning_required: false
+
+required_swab_points:
+  - SWAB-A1-01
+  - SWAB-A1-02
+  - SWAB-A1-03
+  - SWAB-B1-01
+  - SWAB-B1-02
+  - SWAB-B1-03
+  - SWAB-C1-01
+  - SWAB-C1-02
+  - SWAB-C1-03
+
+swab_validity_hours: 24
+
+cleaning_grace_hours: 4
+
+max_label_lag_minutes: 30
+
+critical_equipment:
+  - MIXER-A1
+  - FILLER-A1
+  - PASTEURIZER-A1
+  - MIXER-B1
+  - FILLER-B1
+  - PASTEURIZER-B1
+  - MIXER-C1
+  - FILLER-C1
+  - PASTEURIZER-C1
+
+production_lines:
+  - name: LINE-A
+    description: A线 - 主要生产
+    equipment:
+      - MIXER-A1
+      - FILLER-A1
+      - PASTEURIZER-A1
+  - name: LINE-B
+    description: B线 - 夜班专用
+    equipment:
+      - MIXER-B1
+      - FILLER-B1
+      - PASTEURIZER-B1
+  - name: LINE-C
+    description: C线 - 试验线
+    equipment:
+      - MIXER-C1
+      - FILLER-C1
+      - PASTEURIZER-C1
+
+allergen_risk_levels:
+  high:
+    - 花生
+    - 坚果
+    - 大豆
+  medium:
+    - 乳制品
+  low:
+    - 可可
+
+release_criteria:
+  require_all_swab_points: true
+  require_cleaning_after_allergen: true
+  require_label_switch_before_production: true
+  allow_midnight_transition: true
+  midnight_transition_require_review: true
