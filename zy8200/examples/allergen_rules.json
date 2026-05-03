@@ -1,0 +1,113 @@
+{
+  "allergens": [
+    {
+      "name": "Limonene",
+      "chineseName": "柠檬烯",
+      "casNumber": "138-86-3",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Linalool",
+      "chineseName": "芳樟醇",
+      "casNumber": "78-70-6",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Citral",
+      "chineseName": "柠檬醛",
+      "casNumber": "5392-40-5",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Eugenol",
+      "chineseName": "丁香酚",
+      "casNumber": "97-53-0",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Isoeugenol",
+      "chineseName": "异丁香酚",
+      "casNumber": "97-54-1",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Citronellol",
+      "chineseName": "香茅醇",
+      "casNumber": "106-22-9",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Geraniol",
+      "chineseName": "香叶醇",
+      "casNumber": "106-24-1",
+      "category": "香精过敏原"
+    },
+    {
+      "name": "Benzyl Alcohol",
+      "chineseName": "苯甲醇",
+      "casNumber": "100-51-6",
+      "category": "香精过敏原"
+    }
+  ],
+  "threshold": 0.001,
+  "labelingRequirements": {
+    "mustLabel": true,
+    "location": "ingredients_list",
+    "format": "parentheses",
+    "example": "香精(柠檬烯, 芳樟醇)"
+  },
+  "restrictedIngredients": [
+    {
+      "name": "Mercury",
+      "chineseName": "汞",
+      "casNumber": "7439-97-6",
+      "banned": true,
+      "reason": "重金属，对人体有害"
+    },
+    {
+      "name": "Lead",
+      "chineseName": "铅",
+      "casNumber": "7439-92-1",
+      "banned": true,
+      "reason": "重金属，对人体有害"
+    },
+    {
+      "name": "Arsenic",
+      "chineseName": "砷",
+      "casNumber": "7440-38-2",
+      "banned": true,
+      "reason": "重金属，对人体有害"
+    },
+    {
+      "name": "Formaldehyde",
+      "chineseName": "甲醛",
+      "casNumber": "50-00-0",
+      "banned": false,
+      "maxPercentage": 0.2,
+      "reason": "限用防腐剂，含量不得超过0.2%"
+    },
+    {
+      "name": "Methylparaben",
+      "chineseName": "羟苯甲酯",
+      "casNumber": "99-76-3",
+      "banned": false,
+      "maxPercentage": 0.4,
+      "reason": "限用防腐剂，单一使用含量不得超过0.4%"
+    },
+    {
+      "name": "Propylparaben",
+      "chineseName": "羟苯丙酯",
+      "casNumber": "94-13-3",
+      "banned": false,
+      "maxPercentage": 0.4,
+      "reason": "限用防腐剂，单一使用含量不得超过0.4%"
+    },
+    {
+      "name": "Retinoic Acid",
+      "chineseName": "维甲酸",
+      "casNumber": "302-79-4",
+      "banned": true,
+      "reason": "处方药成分，禁止用于化妆品"
+    }
+  ]
+}
