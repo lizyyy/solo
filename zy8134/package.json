@@ -1,0 +1,36 @@
+{
+  "name": "hls-preflight",
+  "version": "1.0.0",
+  "description": "HLS delivery package preflight validation tool",
+  "main": "dist/index.js",
+  "bin": {
+    "hls-preflight": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "validate": "tsx src/cli.ts validate",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "hls",
+    "m3u8",
+    "validation",
+    "preflight",
+    "livestream"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "yaml": "^2.3.4"
+  }
+}

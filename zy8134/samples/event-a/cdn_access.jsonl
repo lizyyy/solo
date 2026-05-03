@@ -1,0 +1,20 @@
+{"uri":"https://cdn.example.com/event-a/segment_360p_1000.ts","statusCode":200,"responseTimeMs":145,"timestamp":"2024-05-04T00:10:00.000Z","byteSize":156789}
+{"uri":"https://cdn.example.com/event-a/segment_360p_1001.ts","statusCode":200,"responseTimeMs":123,"timestamp":"2024-05-04T00:10:01.000Z","byteSize":167890}
+{"uri":"https://cdn.example.com/event-a/segment_360p_1002.ts","statusCode":200,"responseTimeMs":156,"timestamp":"2024-05-04T00:10:02.000Z","byteSize":158901}
+{"uri":"https://cdn.example.com/event-a/segment_360p_1003.ts","statusCode":200,"responseTimeMs":132,"timestamp":"2024-05-04T00:10:03.000Z","byteSize":160012}
+{"uri":"https://cdn.example.com/event-a/segment_360p_1004.ts","statusCode":200,"responseTimeMs":141,"timestamp":"2024-05-04T00:10:04.000Z","byteSize":155567}
+{"uri":"https://cdn.example.com/event-a/segment_480p_1000.ts","statusCode":200,"responseTimeMs":234,"timestamp":"2024-05-04T00:10:05.000Z","byteSize":345678}
+{"uri":"https://cdn.example.com/event-a/segment_480p_1001.ts","statusCode":200,"responseTimeMs":245,"timestamp":"2024-05-04T00:10:06.000Z","byteSize":356789}
+{"uri":"https://cdn.example.com/event-a/segment_480p_1002.ts","statusCode":404,"responseTimeMs":56,"timestamp":"2024-05-04T00:10:07.000Z","error":"Not Found"}
+{"uri":"https://cdn.example.com/event-a/segment_480p_1003.ts","statusCode":200,"responseTimeMs":223,"timestamp":"2024-05-04T00:10:08.000Z","byteSize":340000}
+{"uri":"https://cdn.example.com/event-a/segment_480p_alt_1000.ts","statusCode":200,"responseTimeMs":212,"timestamp":"2024-05-04T00:10:09.000Z","byteSize":345000}
+{"uri":"https://cdn.example.com/event-a/segment_480p_alt_1001.ts","statusCode":200,"responseTimeMs":221,"timestamp":"2024-05-04T00:10:10.000Z","byteSize":350000}
+{"uri":"https://cdn.example.com/event-a/segment_480p_alt_1002.ts","statusCode":200,"responseTimeMs":1890,"timestamp":"2024-05-04T00:10:11.000Z","byteSize":342000}
+{"uri":"https://cdn.example.com/event-a/segment_480p_alt_1003.ts","statusCode":200,"responseTimeMs":233,"timestamp":"2024-05-04T00:10:12.000Z","byteSize":338000}
+{"uri":"https://cdn.example.com/event-a/segment_480p_alt_1004.ts","statusCode":200,"responseTimeMs":244,"timestamp":"2024-05-04T00:10:13.000Z","byteSize":341000}
+{"uri":"https://cdn.example.com/event-a/segment_1080p_1000.ts","statusCode":200,"responseTimeMs":456,"timestamp":"2024-05-04T00:10:14.000Z","byteSize":1234567}
+{"uri":"https://cdn.example.com/event-a/segment_1080p_1001.ts","statusCode":200,"responseTimeMs":478,"timestamp":"2024-05-04T00:10:15.000Z","byteSize":1345678}
+{"uri":"https://cdn.example.com/event-a/segment_1080p_1002.ts","statusCode":200,"responseTimeMs":523,"timestamp":"2024-05-04T00:10:16.000Z","byteSize":1289012}
+{"uri":"https://cdn.example.com/event-a/segment_1080p_1003.ts","statusCode":200,"responseTimeMs":490,"timestamp":"2024-05-04T00:10:17.000Z","byteSize":1301234}
+{"uri":"https://cdn.example.com/event-a/segment_1080p_1004.ts","statusCode":200,"responseTimeMs":512,"timestamp":"2024-05-04T00:10:18.000Z","byteSize":1278901}
+{"uri":"https://cdn.example.com/event-a/key/12345.key","statusCode":200,"responseTimeMs":89,"timestamp":"2024-05-04T00:10:19.000Z","byteSize":16}
