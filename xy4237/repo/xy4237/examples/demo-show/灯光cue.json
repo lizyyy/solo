@@ -1,0 +1,76 @@
+[
+  {
+    "cueNumber": 1,
+    "scene": "第一幕",
+    "description": "开场白光 - 全灯亮",
+    "time": 0,
+    "responsible": "灯光师A",
+    "intensity": "100%",
+    "colorTemp": "5600K"
+  },
+  {
+    "cueNumber": 2,
+    "scene": "第一幕",
+    "description": "王座聚光 - 主角独白",
+    "time": 5,
+    "responsible": "灯光师A",
+    "intensity": "80%",
+    "colorTemp": "3200K"
+  },
+  {
+    "cueNumber": 3,
+    "scene": "第一幕",
+    "description": "战斗场景 - 红光闪烁",
+    "time": 10,
+    "responsible": "灯光师B",
+    "intensity": "100%",
+    "colorTemp": "红色",
+    "effects": ["strobe"]
+  },
+  {
+    "cueNumber": 5,
+    "scene": "第二幕",
+    "description": "室内场景 - 暖光",
+    "time": 0,
+    "responsible": "灯光师A",
+    "intensity": "70%",
+    "colorTemp": "3000K"
+  },
+  {
+    "cueNumber": 6,
+    "scene": "第二幕",
+    "description": "枪击场景 - 快速闪白",
+    "time": 8,
+    "responsible": "灯光师B",
+    "intensity": "100%",
+    "colorTemp": "6500K",
+    "duration": "0.5秒"
+  },
+  {
+    "cueNumber": 10,
+    "scene": "第三幕",
+    "description": "葬礼场景 - 冷光",
+    "time": 0,
+    "responsible": "灯光师A",
+    "intensity": "40%",
+    "colorTemp": "8000K"
+  },
+  {
+    "cueNumber": 12,
+    "scene": "第三幕",
+    "description": "大幕升起",
+    "time": 15,
+    "responsible": "灯光师A",
+    "intensity": "渐亮",
+    "colorTemp": "5600K"
+  },
+  {
+    "cueNumber": 13,
+    "scene": "第三幕",
+    "description": "火把场景 - 橙黄模拟",
+    "time": 20,
+    "responsible": "灯光师B",
+    "intensity": "60%",
+    "colorTemp": "橙色"
+  }
+]
