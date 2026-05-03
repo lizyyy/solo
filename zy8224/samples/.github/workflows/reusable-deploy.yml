@@ -1,0 +1,38 @@
+name: Reusable Deployment Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'Target environment to deploy'
+      version:
+        required: false
+        type: string
+        default: 'latest'
+    secrets:
+      API_KEY:
+        required: true
+      DB_PASSWORD:
+        required: false
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy Application
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          echo "Deploying version ${{ inputs.version }} to ${{ inputs.environment }}"
+          echo "API Key: $API_KEY"
+          if [ -n "$DB_PASSWORD" ]; then
+            echo "DB Password configured"
+          fi

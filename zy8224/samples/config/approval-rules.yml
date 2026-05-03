@@ -1,0 +1,23 @@
+rules:
+  - environment: production
+    triggerType:
+      - push
+      - workflow_dispatch
+      - schedule
+    requiresApproval: true
+    approvers:
+      - dev-leads
+      - sre-team
+    minApprovals: 2
+
+  - environment: staging
+    triggerType:
+      - "*"
+    requiresApproval: false
+
+  - environment: "*"
+    triggerType:
+      - schedule
+    requiresApproval: true
+    approvers:
+      - sre-team

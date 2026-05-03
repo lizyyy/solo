@@ -1,0 +1,4 @@
+name,type,branches,description
+production,prod,main,Production environment
+staging,non-prod,develop,Staging environment
+feature,non-prod,feature/*,Feature branch preview environment

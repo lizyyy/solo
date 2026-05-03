@@ -1,0 +1,45 @@
+{
+  "name": "gh-actions-guard",
+  "version": "1.0.0",
+  "description": "GitHub Actions 工作流离线预检 CLI 工具",
+  "main": "dist/cli/index.js",
+  "bin": {
+    "gh-actions-guard": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli/index.ts",
+    "dev": "ts-node src/cli/index.ts",
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "github-actions",
+    "cli",
+    "security",
+    "ci-cd",
+    "preflight"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "glob": "^10.3.10",
+    "chalk": "^4.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.55.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
