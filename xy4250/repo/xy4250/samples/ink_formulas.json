@@ -1,0 +1,53 @@
+[
+  {
+    "color_code": "CUST-PANTONE-186C",
+    "color_name": "Pantone Red 186 C",
+    "customer_id": "CUST001",
+    "customer_name": "宏达包装有限公司",
+    "pantone_code": "186 C",
+    "base_inks": {
+      "PANTONE Rubine Red": "65.0",
+      "PANTONE Transparent White": "20.0",
+      "PANTONE Yellow": "15.0"
+    },
+    "total_weight": "100",
+    "viscosity": "18.5",
+    "ph_value": "8.2",
+    "create_date": "2026-05-03",
+    "notes": "宏达包装常用红色配方"
+  },
+  {
+    "color_code": "CUST-PANTONE-286C",
+    "color_name": "Pantone Blue 286 C",
+    "customer_id": "CUST001",
+    "customer_name": "宏达包装有限公司",
+    "pantone_code": "286 C",
+    "base_inks": {
+      "PANTONE Reflex Blue": "70.0",
+      "PANTONE Process Blue": "20.0",
+      "PANTONE Transparent White": "10.0"
+    },
+    "total_weight": "100",
+    "viscosity": "17.8",
+    "ph_value": "8.0",
+    "create_date": "2026-05-03",
+    "notes": "宏达包装常用蓝色配方"
+  },
+  {
+    "color_code": "CUST-PANTONE-485C",
+    "color_name": "Pantone Orange 485 C",
+    "customer_id": "CUST002",
+    "customer_name": "悦达纸品股份有限公司",
+    "pantone_code": "485 C",
+    "base_inks": {
+      "PANTONE Orange": "80.0",
+      "PANTONE Yellow": "15.0",
+      "PANTONE Transparent White": "5.0"
+    },
+    "total_weight": "100",
+    "viscosity": "19.2",
+    "ph_value": "8.1",
+    "create_date": "2026-05-03",
+    "notes": "悦达纸品橙色专用"
+  }
+]

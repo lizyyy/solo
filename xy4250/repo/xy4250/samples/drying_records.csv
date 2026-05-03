@@ -1,0 +1,4 @@
+﻿proof_id,batch_number,print_time,drying_start_time,drying_end_time,drying_method,drying_temperature,drying_humidity,coating_type,coating_amount,operator_name,visual_check_result,touch_check_result,notes
+PROOF-001,BATCH-2026-001,2026-05-03T04:52:02.577124,2026-05-03T06:52:02.577124,2026-05-03T12:52:02.577124,自然晾干,25,65,水性光油,1.2,张师傅,yes,yes,干燥良好，无粘连
+PROOF-002,BATCH-2026-002,2026-05-03T08:52:02.577124,2026-05-03T10:52:02.577124,2026-05-03T15:52:02.577124,烘干箱,45,50,UV上光,1.5,李师傅,yes,yes,UV固化完成
+PROOF-003,BATCH-2026-003,2026-05-03T13:52:02.577124,2026-05-03T14:52:02.577124,,自然晾干,26,68,,,王师傅,,,正在干燥中，尚未完成

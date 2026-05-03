@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colorproof-checker"
+version = "0.1.0"
+description = "专色打样放行员 - 小型印刷厂打样室命令行工具"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "Print Lab Team"}
+]
+keywords = ["printing", "color", "quality-control", "proofing"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Manufacturing",
+  "Topic :: Scientific/Engineering",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+  "click>=8.0",
+  "rich>=12.0",
+  "python-dateutil>=2.8",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+]
+
+[project.scripts]
+colorproof = "colorproof_checker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["colorproof_checker*"]
