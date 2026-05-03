@@ -1,0 +1,67 @@
+{
+  "version": "1.0.0",
+  "name": "活动海报处理管线",
+  "description": "用于处理活动海报的滤镜管线：马赛克、水印、完整特效链",
+  "createdAt": "2025-06-01T12:00:00.000Z",
+  "updatedAt": "2025-06-01T12:00:00.000Z",
+  "imageSource": null,
+  "filterNodes": [
+    {
+      "id": "node-mosaic-001",
+      "type": "mosaic",
+      "name": "马赛克",
+      "parameters": {
+        "blockSize": 30,
+        "method": "average",
+        "x": 0,
+        "y": 0,
+        "regionWidth": 0,
+        "regionHeight": 0
+      },
+      "enabled": false,
+      "order": 0
+    },
+    {
+      "id": "node-levels-002",
+      "type": "levels",
+      "name": "色阶增强",
+      "parameters": {
+        "inputBlack": 10,
+        "inputWhite": 245,
+        "gamma": 1.0,
+        "outputBlack": 0,
+        "outputWhite": 255
+      },
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "node-sharpen-003",
+      "type": "sharpen",
+      "name": "边缘增强",
+      "parameters": {
+        "amount": 1.2,
+        "radius": 2,
+        "threshold": 0
+      },
+      "enabled": true,
+      "order": 2
+    },
+    {
+      "id": "node-watermark-004",
+      "type": "watermark",
+      "name": "水印",
+      "parameters": {
+        "text": "Confidential",
+        "fontSize": 48,
+        "color": "#ffffff",
+        "opacity": 0.3,
+        "positionX": 50,
+        "positionY": 50,
+        "rotation": -30
+      },
+      "enabled": true,
+      "order": 3
+    }
+  ]
+}

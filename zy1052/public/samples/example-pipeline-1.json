@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "name": "电商商品图处理管线",
+  "description": "用于处理电商商品图片的完整滤镜管线：裁切、缩放、灰度、锐化、色阶调整",
+  "createdAt": "2025-06-01T12:00:00.000Z",
+  "updatedAt": "2025-06-01T12:00:00.000Z",
+  "imageSource": null,
+  "filterNodes": [
+    {
+      "id": "node-crop-001",
+      "type": "crop",
+      "name": "裁切",
+      "parameters": {
+        "x": 0,
+        "y": 0,
+        "width": 800,
+        "height": 800
+      },
+      "enabled": true,
+      "order": 0
+    },
+    {
+      "id": "node-resize-002",
+      "type": "resize",
+      "name": "缩放",
+      "parameters": {
+        "width": 512,
+        "height": 512,
+        "mode": "bicubic",
+        "maintainAspectRatio": true
+      },
+      "enabled": true,
+      "order": 1
+    },
+    {
+      "id": "node-grayscale-003",
+      "type": "grayscale",
+      "name": "灰度",
+      "parameters": {
+        "method": "luminosity",
+        "intensity": 1.0
+      },
+      "enabled": false,
+      "order": 2
+    },
+    {
+      "id": "node-levels-004",
+      "type": "levels",
+      "name": "色阶",
+      "parameters": {
+        "inputBlack": 20,
+        "inputWhite": 235,
+        "gamma": 1.1,
+        "outputBlack": 0,
+        "outputWhite": 255
+      },
+      "enabled": true,
+      "order": 3
+    },
+    {
+      "id": "node-sharpen-005",
+      "type": "sharpen",
+      "name": "锐化",
+      "parameters": {
+        "amount": 0.8,
+        "radius": 1,
+        "threshold": 0
+      },
+      "enabled": true,
+      "order": 4
+    }
+  ]
+}
