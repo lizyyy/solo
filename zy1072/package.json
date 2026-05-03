@@ -1,0 +1,23 @@
+{
+  "name": "wedding-seating-checker",
+  "version": "1.0.0",
+  "description": "婚礼座位表和宾客关系冲突检查器 - 本地工具",
+  "main": "src/cli/index.js",
+  "bin": {
+    "wedding-seating": "./src/cli/index.js"
+  },
+  "scripts": {
+    "start": "node src/cli/index.js",
+    "test": "node --test test/",
+    "validate": "node src/cli/index.js validate",
+    "suggest": "node src/cli/index.js suggest",
+    "export": "node src/cli/index.js export"
+  },
+  "keywords": ["wedding", "seating", "checker", "guest", "table"],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

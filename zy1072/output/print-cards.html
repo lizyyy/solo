@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>座位表打印卡片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @media print {
+      .no-print {
+        display: none;
+      }
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      .page-break {
+        page-break-after: always;
+      }
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .no-print {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .no-print h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .no-print .summary {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    @media (max-width: 800px) {
+      .cards-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .table-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .table-number {
+      font-size: 72px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .table-label {
+      font-size: 24px;
+      margin-bottom: 15px;
+      opacity: 0.9;
+    }
+
+    .table-info {
+      font-size: 14px;
+      opacity: 0.8;
+      text-align: center;
+    }
+
+    .guest-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border-left: 6px solid #667eea;
+    }
+
+    .guest-card.vip {
+      border-left-color: #f59e0b;
+      background: linear-gradient(to right, #fffbeb, white);
+    }
+
+    .guest-card.child {
+      border-left-color: #10b981;
+    }
+
+    .guest-card.mobility {
+      border-left-color: #ef4444;
+    }
+
+    .guest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .guest-name {
+      font-size: 36px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .guest-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .tag-vip {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .tag-child {
+      background: #10b981;
+      color: white;
+    }
+
+    .tag-mobility {
+      background: #ef4444;
+      color: white;
+    }
+
+    .tag-diet {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .guest-table {
+      font-size: 18px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .guest-details {
+      margin-top: auto;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .detail-row {
+      margin-bottom: 5px;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      color: #444;
+    }
+
+    .dietary-warning {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #92400e;
+    }
+
+    .section-title {
+      grid-column: 1 / -1;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      padding: 10px 0;
+      border-bottom: 2px solid #667eea;
+      margin-top: 20px;
+    }
+
+    .unseated-section {
+      grid-column: 1 / -1;
+      background: #fef2f2;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #fecaca;
+    }
+
+    .unseated-section h3 {
+      color: #991b1b;
+      margin-bottom: 15px;
+    }
+
+    .unseated-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .unseated-item {
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 3px solid #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <h1>座位表打印卡片</h1>
+    <div class="summary">
+      <p>生成时间: 2026/5/3 20:50:21</p>
+      <p>桌数: 7 桌 | 宾客: 22 人 | 已入座: 22 人</p>
+      <p style="margin-top: 10px; color: #888;">提示: 按 Ctrl+P 或 Cmd+P 打印此页面</p>
+    </div>
+  </div>
+
+  <div class="cards-container">
+    <div class="section-title">桌号卡（按桌排列）</div>
+
+    <div class="table-card">
+      <div class="table-number">1</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 主舞台前 | 4/10 人 | VIP: 2人 | 饮食注意: 4人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">2</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 主舞台前 | 3/8 人 | VIP: 2人 | 饮食注意: 3人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">3</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 贵宾区 | 4/8 人 | VIP: 1人 | 饮食注意: 4人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">4</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 朋友区 | 2/6 人 | 饮食注意: 2人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">5</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 长辈区 | 3/8 人 | 饮食注意: 3人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">6</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 家庭区 | 3/4 人 | 儿童: 1人 | 饮食注意: 3人
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-number">7</div>
+      <div class="table-label">桌</div>
+      <div class="table-info">
+        区域: 家庭区 | 3/4 人 | 儿童: 1人 | 饮食注意: 3人
+      </div>
+    </div>
+
+    <div class="section-title">宾客座位卡</div>
+
+    <div class="guest-card vip">
+      <div class="guest-header">
+        <div class="guest-name">张大明</div>
+        <div class="guest-tags">
+          <span class="tag tag-vip">VIP</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 1</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新郎家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 父亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 李美娟</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 素食
+         </div>
+    </div>
+
+    <div class="guest-card vip">
+      <div class="guest-header">
+        <div class="guest-name">李美娟</div>
+        <div class="guest-tags">
+          <span class="tag tag-vip">VIP</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 1</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新郎家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 母亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 张大明</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 坚果过敏
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">张小华</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 1</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新郎家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 儿子</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 王小红</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">王小红</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 1</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新娘家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 儿媳</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 张小华</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 海鲜过敏
+         </div>
+    </div>
+
+    <div class="guest-card vip">
+      <div class="guest-header">
+        <div class="guest-name">李建国</div>
+        <div class="guest-tags">
+          <span class="tag tag-vip">VIP</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 2</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新娘家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 父亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 王芳</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 糖尿病饮食
+         </div>
+    </div>
+
+    <div class="guest-card vip">
+      <div class="guest-header">
+        <div class="guest-name">王芳</div>
+        <div class="guest-tags">
+          <span class="tag tag-vip">VIP</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 2</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新娘家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 母亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 李建国</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 高血压饮食
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">李婷</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 2</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 新娘家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 女儿</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 海鲜过敏
+         </div>
+    </div>
+
+    <div class="guest-card vip">
+      <div class="guest-header">
+        <div class="guest-name">王总</div>
+        <div class="guest-tags">
+          <span class="tag tag-vip">VIP</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 3</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 公司领导</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 领导</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">刘经理</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 3</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 公司同事</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同事</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 素食
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">陈主管</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 3</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 公司同事</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同事</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 坚果过敏
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">周设计师</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 3</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 公司同事</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同事</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">赵小明</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 4</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 同学</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同学</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 钱小华</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">钱小华</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 4</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 同学</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同学</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 赵小明</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 海鲜过敏
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">孙大伟</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 5</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 同学</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 同学</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card mobility">
+      <div class="guest-header">
+        <div class="guest-name">李奶奶</div>
+        <div class="guest-tags">
+          <span class="tag tag-mobility">行动不便</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 5</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 长辈</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 长辈</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 王爷爷</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 软食
+         </div>
+    </div>
+
+    <div class="guest-card mobility">
+      <div class="guest-header">
+        <div class="guest-name">王爷爷</div>
+        <div class="guest-tags">
+          <span class="tag tag-mobility">行动不便</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 5</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 长辈</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 长辈</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 李奶奶</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 糖尿病饮食
+         </div>
+    </div>
+
+    <div class="guest-card child">
+      <div class="guest-header">
+        <div class="guest-name">小宝</div>
+        <div class="guest-tags">
+          <span class="tag tag-child">儿童</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 6</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 儿童</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 儿童</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 宝爸、宝妈</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 牛奶过敏
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">宝爸</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 6</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 父亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 小宝、宝妈</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">宝妈</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 6</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 母亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 小宝、宝爸</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 素食
+         </div>
+    </div>
+
+    <div class="guest-card child">
+      <div class="guest-header">
+        <div class="guest-name">甜甜</div>
+        <div class="guest-tags">
+          <span class="tag tag-child">儿童</span>
+        </div>
+      </div>
+      <div class="guest-table">桌号 7</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 儿童</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 儿童</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 爸爸、妈妈</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 坚果过敏
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">爸爸</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 7</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 父亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 甜甜、妈妈</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 否
+         </div>
+    </div>
+
+    <div class="guest-card">
+      <div class="guest-header">
+        <div class="guest-name">妈妈</div>
+        <div class="guest-tags">
+          
+        </div>
+      </div>
+      <div class="guest-table">桌号 7</div>
+      <div class="guest-details"><div class="detail-row"><span class="detail-label">分组:</span> 家人</div>
+      <div class="detail-row"><span class="detail-label">关系:</span> 母亲</div>
+      <div class="detail-row"><span class="detail-label">同行人:</span> 甜甜、爸爸</div></div>
+      <div class="dietary-warning">
+           <strong>饮食注意:</strong> 海鲜过敏
+         </div>
+    </div>
+
+  </div>
+</body>
+</html>
