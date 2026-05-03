@@ -1,0 +1,43 @@
+cut_rules:
+  default_gutter:
+    horizontal: 10mm
+    vertical: 10mm
+    
+  minimum_margin:
+    top: 15mm
+    bottom: 15mm
+    left: 15mm
+    right: 15mm
+    
+  grip_margin: 10mm
+  tail_margin: 5mm
+  
+  special_rules:
+    - condition: paper_size <= 16开
+      gutter_adjustment:
+        horizontal: 8mm
+        vertical: 8mm
+      margin_adjustment:
+        top: 10mm
+        bottom: 10mm
+        left: 10mm
+        right: 10mm
+        
+    - condition: quantity > 50000
+      extra_wastage_percent: 2
+      
+    - condition: color_mode == 彩色
+      extra_wastage_base: 50
+      
+    - condition: bleed > 3mm
+      margin_adjustment:
+        top: 20mm
+        bottom: 20mm
+        left: 20mm
+        right: 20mm
+
+wastage_rules:
+  base_wastage_per_run: 50
+  additional_wastage_per_10k: 10
+  minimum_wastage: 30
+  maximum_wastage_percent: 5

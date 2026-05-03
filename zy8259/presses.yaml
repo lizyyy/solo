@@ -1,0 +1,63 @@
+presses:
+  - name: 小森LS-440
+    max_width: 1130mm
+    max_height: 820mm
+    min_width: 400mm
+    min_height: 300mm
+    color_capacity: 4
+    formats:
+      - name: 对开
+        width: 1092mm
+        height: 787mm
+      - name: 4开
+        width: 546mm
+        height: 787mm
+      - name: 8开
+        width: 546mm
+        height: 393mm
+      - name: 16开
+        width: 273mm
+        height: 393mm
+    default_formats: [对开, 4开, 8开]
+    wastage_base: 100
+    wastage_per_run: 30
+    
+  - name: 海德堡CD-102
+    max_width: 1020mm
+    max_height: 720mm
+    min_width: 350mm
+    min_height: 260mm
+    color_capacity: 4
+    formats:
+      - name: 对开
+        width: 1020mm
+        height: 720mm
+      - name: 4开
+        width: 510mm
+        height: 720mm
+      - name: 8开
+        width: 510mm
+        height: 360mm
+    default_formats: [对开, 4开]
+    wastage_base: 80
+    wastage_per_run: 25
+    
+  - name: 小森G-40
+    max_width: 720mm
+    max_height: 520mm
+    min_width: 200mm
+    min_height: 150mm
+    color_capacity: 4
+    formats:
+      - name: 4开
+        width: 720mm
+        height: 520mm
+      - name: 8开
+        width: 360mm
+        height: 520mm
+      - name: 16开
+        width: 360mm
+        height: 260mm
+    default_formats: [4开, 8开, 16开]
+    wastage_base: 60
+    wastage_per_run: 20

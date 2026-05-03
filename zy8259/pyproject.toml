@@ -1,0 +1,23 @@
+[project]
+name = "imposition-cli"
+version = "1.0.0"
+description = "印刷拼版估算 CLI 工具 - 用于小型印刷厂在接单前估算拼版和纸张损耗"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+imposition-cli = "imposition_cli.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["imposition_cli"]
