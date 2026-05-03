@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>重复投诉归并复核台</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">📞 重复投诉归并复核台</h1>
+                <p class="app-subtitle">社区热线督导智能分析工具</p>
+            </div>
+            <div class="header-actions">
+                <button id="exportWeeklyBtn" class="btn btn-secondary" disabled>
+                    📄 导出周报
+                </button>
+                <button id="exportDispatchBtn" class="btn btn-secondary" disabled>
+                    📋 派单建议
+                </button>
+                <button id="exportJsonBtn" class="btn btn-secondary" disabled>
+                    💾 导出JSON
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>📊 数据上传</h3>
+                    <div class="upload-area" id="complaintsUpload">
+                        <input type="file" id="complaintsFile" accept=".csv" hidden>
+                        <div class="upload-icon">📁</div>
+                        <p>投诉摘要 CSV</p>
+                        <span id="complaintsStatus" class="upload-status">未上传</span>
+                    </div>
+
+                    <div class="upload-area" id="workordersUpload">
+                        <input type="file" id="workordersFile" accept=".json" hidden>
+                        <div class="upload-icon">📋</div>
+                        <p>工单结果 JSON</p>
+                        <span id="workordersStatus" class="upload-status">未上传</span>
+                    </div>
+
+                    <div class="upload-area" id="keywordsUpload">
+                        <input type="file" id="keywordsFile" accept=".csv" hidden>
+                        <div class="upload-icon">🔑</div>
+                        <p>街道关键词 CSV</p>
+                        <span id="keywordsStatus" class="upload-status">未上传</span>
+                    </div>
+
+                    <button id="runClusterBtn" class="btn btn-primary btn-full" disabled>
+                        🔍 开始聚类分析
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>📈 统计概览</h3>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalClusters">-</span>
+                            <span class="stat-label">事件簇</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalComplaints">-</span>
+                            <span class="stat-label">投诉数</span>
+                        </div>
+                        <div class="stat-item stat-urgent">
+                            <span class="stat-value" id="urgentCount">-</span>
+                            <span class="stat-label">紧急</span>
+                        </div>
+                        <div class="stat-item stat-pending">
+                            <span class="stat-value" id="pendingCount">-</span>
+                            <span class="stat-label">待复核</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🔍 筛选器</h3>
+                    <div class="filter-group">
+                        <label>状态筛选</label>
+                        <select id="statusFilter">
+                            <option value="">全部状态</option>
+                            <option value="pending_review">待复核</option>
+                            <option value="reviewing">复核中</option>
+                            <option value="confirmed">已确认</option>
+                            <option value="assigned">已指派</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>街道筛选</label>
+                        <select id="districtFilter">
+                            <option value="">全部街道</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>紧急程度</label>
+                        <select id="urgencyFilter">
+                            <option value="">全部</option>
+                            <option value="紧急">紧急</option>
+                            <option value="高">高</option>
+                            <option value="普通">普通</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>💾 历史会话</h3>
+                    <div class="session-list" id="sessionList">
+                        <p class="empty-text">暂无历史会话</p>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div class="content-header">
+                    <h2 id="contentTitle">事件簇列表</h2>
+                    <div class="content-actions">
+                        <button id="selectMultipleBtn" class="btn btn-outline">
+                            ✅ 多选模式
+                        </button>
+                        <button id="mergeSelectedBtn" class="btn btn-warning" disabled>
+                            🔗 合并选中
+                        </button>
+                        <button id="refreshBtn" class="btn btn-outline">
+                            🔄 刷新
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cluster-list" id="clusterList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <h3>暂无数据</h3>
+                        <p>请上传投诉数据并运行聚类分析</p>
+                    </div>
+                </div>
+            </main>
+
+            <aside class="detail-panel" id="detailPanel">
+                <div class="detail-header">
+                    <h3 id="detailTitle">事件簇详情</h3>
+                    <button id="closeDetailBtn" class="btn-close">✕</button>
+                </div>
+                <div class="detail-content" id="detailContent">
+                    <p class="empty-text">请选择一个事件簇查看详情</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">操作</h3>
+                <button class="btn-close" id="modalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>
