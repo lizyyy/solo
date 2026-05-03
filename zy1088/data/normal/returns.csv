@@ -1,0 +1,3 @@
+returnId,timestamp,date,stallId,originalOrderId,productId,productName,quantity,refundAmount,reason,paymentMethod,refundId,notes
+RET-001,2024-05-01 21:15:00,2024-05-01,stall-001,ORD-2024-006,PRD-002,手打柠檬茶,1,18,太酸了,wechat,REF-001,顾客要求退款
+RET-002,2024-05-02 20:45:00,2024-05-02,stall-001,ORD-2024-017,PRD-006,芝士鸡蛋仔,1,15,不够热,alipay,REF-002,重新制作了一份

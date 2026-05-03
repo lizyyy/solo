@@ -1,0 +1,9 @@
+paymentId,orderId,timestamp,date,stallId,amount,method,status,fee,notes
+PAY-001,ORD-2024-001,2024-05-01 18:30:00,2024-05-01,stall-001,30,wechat,success,0.18,
+PAY-001,ORD-2024-002,2024-05-01 18:45:00,2024-05-01,stall-001,18,alipay,success,0.11,重复收款ID
+PAY-003,ORD-INVALID,2024-05-01 19:00:00,2024-05-01,stall-001,66,wechat,success,0.40,订单不存在
+PAY-004,ORD-2024-005,2024-05-01 19:45:00,2024-05-01,stall-001,50,wechat,success,0.30,销售金额是45，但收款是50(多收了)
+PAY-005,ORD-2024-006,2024-05-01 20:10:00,2024-05-01,stall-001,50,alipay,success,0.30,销售金额是72，但收款是50(少收了)
+,ORD-2024-007,2024-05-01 20:30:00,2024-05-01,stall-001,22,wechat,success,0.13,缺少收款ID
+PAY-008,ORD-2024-010,2024-05-01 22:00:00,2024-05-01,stall-001,-60,alipay,success,-0.36,金额为负数
+PAY-009,ORD-2024-009,2024-05-01 21:30:00,2024-05-01,stall-001,0,wechat,success,0,金额为0

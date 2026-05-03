@@ -1,0 +1,6 @@
+returnId,timestamp,date,stallId,originalOrderId,productId,productName,quantity,refundAmount,reason,paymentMethod,refundId,notes
+RET-001,2024-05-01 21:15:00,2024-05-01,stall-001,ORD-NOT-EXIST,PRD-002,手打柠檬茶,1,18,太酸了,wechat,REF-001,原订单不存在
+RET-002,2024-05-01 21:30:00,2024-05-01,stall-001,ORD-2024-006,PRD-002,手打柠檬茶,10,180,退货数量超过原订单,wechat,REF-002,原订单只有4件
+RET-003,2024-05-01 22:00:00,2024-05-01,stall-001,ORD-2024-006,PRD-002,手打柠檬茶,2,200,退款金额过高,wechat,REF-003,原订单每件18元
+RET-004,2024-05-01 22:15:00,2024-05-01,stall-001,,PRD-003,芒果冰沙,1,22,缺少原订单号,wechat,REF-004,
+RET-005,2024-05-01 22:30:00,2024-05-01,stall-001,ORD-2024-001,PRD-001,珍珠奶茶,-1,-15,数量和金额为负,wechat,REF-005,

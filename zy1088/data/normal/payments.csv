@@ -1,0 +1,17 @@
+paymentId,orderId,timestamp,date,stallId,amount,method,status,fee,notes
+PAY-001,ORD-2024-001,2024-05-01 18:30:00,2024-05-01,stall-001,30,wechat,success,0.18,微信支付手续费0.6%
+PAY-002,ORD-2024-002,2024-05-01 18:45:00,2024-05-01,stall-001,18,alipay,success,0.11,支付宝手续费0.6%
+PAY-003,ORD-2024-003,2024-05-01 19:00:00,2024-05-01,stall-001,66,wechat,success,0.40,
+PAY-004,ORD-2024-005,2024-05-01 19:45:00,2024-05-01,stall-001,50,wechat,success,0.30,
+PAY-005,ORD-2024-006,2024-05-01 20:10:00,2024-05-01,stall-001,72,alipay,success,0.43,
+PAY-006,ORD-2024-007,2024-05-01 20:30:00,2024-05-01,stall-001,22,wechat,success,0.13,
+PAY-007,ORD-2024-009,2024-05-01 21:30:00,2024-05-01,stall-001,72,wechat,success,0.43,
+PAY-008,ORD-2024-010,2024-05-01 22:00:00,2024-05-01,stall-001,60,alipay,success,0.36,
+PAY-009,ORD-2024-011,2024-05-02 00:30:00,2024-05-01,stall-001,30,wechat,success,0.18,凌晨营业
+PAY-010,ORD-2024-012,2024-05-02 18:00:00,2024-05-02,stall-001,45,wechat,success,0.27,
+PAY-011,ORD-2024-013,2024-05-02 18:30:00,2024-05-02,stall-001,36,alipay,success,0.22,
+PAY-012,ORD-2024-014,2024-05-02 19:00:00,2024-05-02,stall-001,88,wechat,success,0.53,
+PAY-013,ORD-2024-016,2024-05-02 20:00:00,2024-05-02,stall-001,60,wechat,success,0.36,
+PAY-014,ORD-2024-017,2024-05-02 20:30:00,2024-05-02,stall-001,45,alipay,success,0.27,
+PAY-015,ORD-2024-018,2024-05-02 21:00:00,2024-05-02,stall-001,60,wechat,success,0.36,
+PAY-016,ORD-2024-019,2024-05-02 21:30:00,2024-05-02,stall-001,36,wechat,success,0.22,

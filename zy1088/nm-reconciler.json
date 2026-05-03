@@ -1,0 +1,49 @@
+{
+  "stallIds": ["stall-001", "stall-002"],
+  "stallNames": {
+    "stall-001": "主摊位",
+    "stall-002": "副摊位"
+  },
+  
+  "fees": {
+    "defaultRentalFee": 500,
+    "utilityFeePerDay": 50,
+    "cleaningFeePerDay": 30,
+    "marketingFeePerDay": 20
+  },
+  
+  "platformFees": {
+    "wechat": 0.006,
+    "alipay": 0.006,
+    "cash": 0,
+    "other": 0
+  },
+  
+  "taxes": {
+    "rate": 0.03,
+    "threshold": 100000,
+    "enabled": false
+  },
+  
+  "inventory": {
+    "damageWarningThreshold": 0.05,
+    "negativeStockWarning": true,
+    "autoAdjust": false
+  },
+  
+  "businessHours": {
+    "crossDayCutoff": "06:00",
+    "startHour": 18,
+    "endHour": 2
+  },
+  
+  "currency": {
+    "symbol": "¥",
+    "decimalPlaces": 2
+  },
+  
+  "output": {
+    "defaultFormat": "console",
+    "exportDirectory": "./reports"
+  }
+}
