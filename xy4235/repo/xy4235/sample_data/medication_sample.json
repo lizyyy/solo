@@ -1,0 +1,158 @@
+{
+  "case_id": "CASE-20240115-001",
+  "patient_name": "小黑",
+  "species": "犬",
+  "breed": "拉布拉多",
+  "age": 3,
+  "weight": 25.5,
+  "surgery_type": "绝育手术",
+  "anesthesia_start_time": "2024-01-15 09:00:00",
+  "medications": [
+    {
+      "medication_id": "MED-001",
+      "name": "丙泊酚",
+      "type": "induction",
+      "records": [
+        {
+          "record_id": "REC-001",
+          "medication_name": "丙泊酚",
+          "admin_time": "2024-01-15 08:55:00",
+          "scheduled_time": "2024-01-15 08:55:00",
+          "dosage": 100.0,
+          "dosage_unit": "mg",
+          "route": "iv",
+          "operator": "张医生",
+          "notes": "诱导麻醉"
+        }
+      ]
+    },
+    {
+      "medication_id": "MED-002",
+      "name": "异氟烷",
+      "type": "maintenance",
+      "records": [
+        {
+          "record_id": "REC-002",
+          "medication_name": "异氟烷",
+          "admin_time": "2024-01-15 09:00:00",
+          "scheduled_time": "2024-01-15 09:00:00",
+          "dosage": 1.5,
+          "dosage_unit": "%",
+          "route": "inhalation",
+          "operator": "李护士",
+          "notes": "维持麻醉，浓度1.5%"
+        },
+        {
+          "record_id": "REC-003",
+          "medication_name": "异氟烷",
+          "admin_time": "2024-01-15 09:30:00",
+          "scheduled_time": "2024-01-15 09:30:00",
+          "dosage": 2.0,
+          "dosage_unit": "%",
+          "route": "inhalation",
+          "operator": "李护士",
+          "notes": "手术刺激增加，提高浓度"
+        }
+      ]
+    },
+    {
+      "medication_id": "MED-003",
+      "name": "芬太尼",
+      "type": "analgesic",
+      "records": [
+        {
+          "record_id": "REC-004",
+          "medication_name": "芬太尼",
+          "admin_time": "2024-01-15 09:00:00",
+          "scheduled_time": "2024-01-15 09:00:00",
+          "dosage": 50.0,
+          "dosage_unit": "mcg",
+          "route": "iv",
+          "operator": "张医生",
+          "notes": "镇痛给药"
+        },
+        {
+          "record_id": "REC-005",
+          "medication_name": "芬太尼",
+          "admin_time": "2024-01-15 10:00:00",
+          "scheduled_time": "2024-01-15 09:30:00",
+          "dosage": 30.0,
+          "dosage_unit": "mcg",
+          "route": "iv",
+          "operator": "李护士",
+          "notes": "追加镇痛，延迟30分钟"
+        }
+      ]
+    },
+    {
+      "medication_id": "MED-004",
+      "name": "阿托品",
+      "type": "anticholinergic",
+      "records": [
+        {
+          "record_id": "REC-006",
+          "medication_name": "阿托品",
+          "admin_time": "2024-01-15 09:15:00",
+          "scheduled_time": "2024-01-15 09:10:00",
+          "dosage": 0.5,
+          "dosage_unit": "mg",
+          "route": "iv",
+          "operator": "张医生",
+          "notes": "心率下降时使用，延迟5分钟"
+        }
+      ]
+    },
+    {
+      "medication_id": "MED-005",
+      "name": "头孢唑林",
+      "type": "antibiotic",
+      "records": [
+        {
+          "record_id": "REC-007",
+          "medication_name": "头孢唑林",
+          "admin_time": "2024-01-15 09:00:00",
+          "scheduled_time": "2024-01-15 09:00:00",
+          "dosage": 500.0,
+          "dosage_unit": "mg",
+          "route": "iv",
+          "operator": "李护士",
+          "notes": "术前预防性抗生素"
+        }
+      ]
+    }
+  ],
+  "manual_notes": [
+    {
+      "timestamp": "2024-01-15 09:15:00",
+      "note": "患者体温开始下降，注意保暖"
+    },
+    {
+      "timestamp": "2024-01-15 09:30:00",
+      "note": "血氧饱和度有波动，检查气道"
+    },
+    {
+      "timestamp": "2024-01-15 09:45:00",
+      "note": "低体温持续，采取升温措施"
+    },
+    {
+      "timestamp": "2024-01-15 10:00:00",
+      "note": "手术即将结束，准备复苏"
+    },
+    {
+      "timestamp": "2024-01-15 10:10:00",
+      "note": "患者恢复自主呼吸，拔管"
+    }
+  ],
+  "recovery_score": {
+    "score_time": "2024-01-15 10:10:00",
+    "total_score": 6,
+    "max_score": 10,
+    "category_scores": {
+      "consciousness": 1,
+      "respiration": 2,
+      "circulation": 1,
+      "temperature": 1,
+      "pain": 1
+    }
+  }
+}
