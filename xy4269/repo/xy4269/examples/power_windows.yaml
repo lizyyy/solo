@@ -1,0 +1,30 @@
+windows:
+  - window_id: PW20260503001
+    power_section: 供电段1
+    line: 1号线
+    start_time: 2026-05-03 22:00:00
+    end_time: 2026-05-04 06:00:00
+    voltage: 1500V
+    substation: 主变电站A
+    feeder: 1号馈线
+    status: 计划
+
+  - window_id: PW20260503002
+    power_section: 供电段2
+    line: 2号线
+    start_time: 2026-05-03 22:00:00
+    end_time: 2026-05-04 06:00:00
+    voltage: 1500V
+    substation: 主变电站B
+    feeder: 2号馈线
+    status: 计划
+
+  - window_id: PW20260504001
+    power_section: 供电段1
+    line: 1号线
+    start_time: 2026-05-04 22:00:00
+    end_time: 2026-05-05 05:00:00
+    voltage: 1500V
+    substation: 主变电站A
+    feeder: 1号馈线
+    status: 计划

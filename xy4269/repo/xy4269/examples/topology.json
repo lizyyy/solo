@@ -1,0 +1,158 @@
+{
+  "sections": [
+    {
+      "section_id": "S001",
+      "section_name": "车辆段入口",
+      "line": "1号线",
+      "start_mileage": 0.000,
+      "end_mileage": 0.500,
+      "adjacent_sections": ["S002"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S002",
+      "section_name": "A站至B站区间",
+      "line": "1号线",
+      "start_mileage": 0.500,
+      "end_mileage": 2.300,
+      "adjacent_sections": ["S001", "S003"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S003",
+      "section_name": "B站站台",
+      "line": "1号线",
+      "start_mileage": 2.300,
+      "end_mileage": 2.500,
+      "adjacent_sections": ["S002", "S004"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S004",
+      "section_name": "B站至C站区间",
+      "line": "1号线",
+      "start_mileage": 2.500,
+      "end_mileage": 4.800,
+      "adjacent_sections": ["S003", "S005"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S005",
+      "section_name": "C站至D站区间",
+      "line": "1号线",
+      "start_mileage": 4.800,
+      "end_mileage": 7.200,
+      "adjacent_sections": ["S004", "S006"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S006",
+      "section_name": "D站折返段",
+      "line": "1号线",
+      "start_mileage": 7.200,
+      "end_mileage": 7.500,
+      "adjacent_sections": ["S005"],
+      "power_section": "供电段1",
+      "is_double_track": false,
+      "direction": "单向"
+    },
+    {
+      "section_id": "S007",
+      "section_name": "D站至E站区间",
+      "line": "1号线",
+      "start_mileage": 7.500,
+      "end_mileage": 9.800,
+      "adjacent_sections": ["S006", "S008"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S008",
+      "section_name": "E站至终点站区间",
+      "line": "1号线",
+      "start_mileage": 9.800,
+      "end_mileage": 12.500,
+      "adjacent_sections": ["S007", "S009"],
+      "power_section": "供电段1",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S101",
+      "section_name": "2号线起点站",
+      "line": "2号线",
+      "start_mileage": 0.000,
+      "end_mileage": 0.800,
+      "adjacent_sections": ["S102"],
+      "power_section": "供电段2",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S102",
+      "section_name": "2号线一期区间",
+      "line": "2号线",
+      "start_mileage": 0.800,
+      "end_mileage": 3.500,
+      "adjacent_sections": ["S101", "S103"],
+      "power_section": "供电段2",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S103",
+      "section_name": "2号线中转站",
+      "line": "2号线",
+      "start_mileage": 3.500,
+      "end_mileage": 3.800,
+      "adjacent_sections": ["S102", "S104"],
+      "power_section": "供电段2",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S104",
+      "section_name": "2号线二期区间",
+      "line": "2号线",
+      "start_mileage": 3.800,
+      "end_mileage": 6.200,
+      "adjacent_sections": ["S103", "S105"],
+      "power_section": "供电段2",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S105",
+      "section_name": "2号线换乘站",
+      "line": "2号线",
+      "start_mileage": 6.200,
+      "end_mileage": 6.500,
+      "adjacent_sections": ["S104", "S106"],
+      "power_section": "供电段2",
+      "is_double_track": true,
+      "direction": "双向"
+    },
+    {
+      "section_id": "S106",
+      "section_name": "2号线终点站",
+      "line": "2号线",
+      "start_mileage": 6.500,
+      "end_mileage": 8.000,
+      "adjacent_sections": ["S105"],
+      "power_section": "供电段2",
+      "is_double_track": false,
+      "direction": "单向"
+    }
+  ]
+}
