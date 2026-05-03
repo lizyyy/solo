@@ -1,0 +1,314 @@
+{
+  "upper": [
+    {
+      "id": 17,
+      "position": 7,
+      "quadrant": 1,
+      "center": { "x": -2.85, "y": 1.5, "z": 0.9 },
+      "rotation": { "x": 0, "y": 0.8, "z": 0 },
+      "size": { "width": 0.65, "height": 0.7, "depth": 0.5 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 16,
+      "position": 6,
+      "quadrant": 1,
+      "center": { "x": -2.55, "y": 1.5, "z": 1.4 },
+      "rotation": { "x": 0, "y": 0.6, "z": 0 },
+      "size": { "width": 0.62, "height": 0.7, "depth": 0.48 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 15,
+      "position": 5,
+      "quadrant": 1,
+      "center": { "x": -2.1, "y": 1.5, "z": 1.8 },
+      "rotation": { "x": 0, "y": 0.45, "z": 0 },
+      "size": { "width": 0.58, "height": 0.75, "depth": 0.46 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 14,
+      "position": 4,
+      "quadrant": 1,
+      "center": { "x": -1.5, "y": 1.5, "z": 2.1 },
+      "rotation": { "x": 0, "y": 0.3, "z": 0 },
+      "size": { "width": 0.55, "height": 0.8, "depth": 0.45 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 13,
+      "position": 3,
+      "quadrant": 1,
+      "center": { "x": -0.9, "y": 1.5, "z": 2.3 },
+      "rotation": { "x": 0, "y": 0.15, "z": 0 },
+      "size": { "width": 0.5, "height": 0.9, "depth": 0.42 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 12,
+      "position": 2,
+      "quadrant": 1,
+      "center": { "x": -0.45, "y": 1.5, "z": 2.4 },
+      "rotation": { "x": 0, "y": 0.08, "z": 0 },
+      "size": { "width": 0.48, "height": 0.95, "depth": 0.4 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 11,
+      "position": 1,
+      "quadrant": 1,
+      "center": { "x": -0.2, "y": 1.5, "z": 2.45 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "size": { "width": 0.45, "height": 0.95, "depth": 0.38 },
+      "isMissing": true,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 21,
+      "position": 1,
+      "quadrant": 2,
+      "center": { "x": 0.2, "y": 1.5, "z": 2.45 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "size": { "width": 0.45, "height": 0.95, "depth": 0.38 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 22,
+      "position": 2,
+      "quadrant": 2,
+      "center": { "x": 0.45, "y": 1.5, "z": 2.4 },
+      "rotation": { "x": 0, "y": -0.08, "z": 0 },
+      "size": { "width": 0.48, "height": 0.95, "depth": 0.4 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 23,
+      "position": 3,
+      "quadrant": 2,
+      "center": { "x": 0.9, "y": 1.5, "z": 2.3 },
+      "rotation": { "x": 0, "y": -0.15, "z": 0 },
+      "size": { "width": 0.5, "height": 0.9, "depth": 0.42 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 24,
+      "position": 4,
+      "quadrant": 2,
+      "center": { "x": 1.5, "y": 1.5, "z": 2.1 },
+      "rotation": { "x": 0, "y": -0.3, "z": 0 },
+      "size": { "width": 0.55, "height": 0.8, "depth": 0.45 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 25,
+      "position": 5,
+      "quadrant": 2,
+      "center": { "x": 2.1, "y": 1.5, "z": 1.8 },
+      "rotation": { "x": 0, "y": -0.45, "z": 0 },
+      "size": { "width": 0.58, "height": 0.75, "depth": 0.46 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 26,
+      "position": 6,
+      "quadrant": 2,
+      "center": { "x": 2.55, "y": 1.5, "z": 1.4 },
+      "rotation": { "x": 0, "y": -0.6, "z": 0 },
+      "size": { "width": 0.62, "height": 0.7, "depth": 0.48 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 27,
+      "position": 7,
+      "quadrant": 2,
+      "center": { "x": 2.85, "y": 1.5, "z": 0.9 },
+      "rotation": { "x": 0, "y": -0.8, "z": 0 },
+      "size": { "width": 0.65, "height": 0.7, "depth": 0.5 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    }
+  ],
+  "lower": [
+    {
+      "id": 37,
+      "position": 7,
+      "quadrant": 3,
+      "center": { "x": -2.85, "y": -1.5, "z": 0.9 },
+      "rotation": { "x": 0, "y": 0.8, "z": 0 },
+      "size": { "width": 0.65, "height": 0.7, "depth": 0.5 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 36,
+      "position": 6,
+      "quadrant": 3,
+      "center": { "x": -2.55, "y": -1.5, "z": 1.4 },
+      "rotation": { "x": 0, "y": 0.6, "z": 0 },
+      "size": { "width": 0.62, "height": 0.7, "depth": 0.48 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 35,
+      "position": 5,
+      "quadrant": 3,
+      "center": { "x": -2.1, "y": -1.5, "z": 1.8 },
+      "rotation": { "x": 0, "y": 0.45, "z": 0 },
+      "size": { "width": 0.58, "height": 0.75, "depth": 0.46 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 34,
+      "position": 4,
+      "quadrant": 3,
+      "center": { "x": -1.5, "y": -1.5, "z": 2.1 },
+      "rotation": { "x": 0, "y": 0.3, "z": 0 },
+      "size": { "width": 0.55, "height": 0.8, "depth": 0.45 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 33,
+      "position": 3,
+      "quadrant": 3,
+      "center": { "x": -0.9, "y": -1.5, "z": 2.3 },
+      "rotation": { "x": 0, "y": 0.15, "z": 0 },
+      "size": { "width": 0.5, "height": 0.9, "depth": 0.42 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 32,
+      "position": 2,
+      "quadrant": 3,
+      "center": { "x": -0.45, "y": -1.5, "z": 2.4 },
+      "rotation": { "x": 0, "y": 0.08, "z": 0 },
+      "size": { "width": 0.48, "height": 0.95, "depth": 0.4 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 31,
+      "position": 1,
+      "quadrant": 3,
+      "center": { "x": -0.2, "y": -1.5, "z": 2.45 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "size": { "width": 0.45, "height": 0.95, "depth": 0.38 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 41,
+      "position": 1,
+      "quadrant": 4,
+      "center": { "x": 0.2, "y": -1.5, "z": 2.45 },
+      "rotation": { "x": 0, "y": 0, "z": 0 },
+      "size": { "width": 0.45, "height": 0.95, "depth": 0.38 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 42,
+      "position": 2,
+      "quadrant": 4,
+      "center": { "x": 0.45, "y": -1.5, "z": 2.4 },
+      "rotation": { "x": 0, "y": -0.08, "z": 0 },
+      "size": { "width": 0.48, "height": 0.95, "depth": 0.4 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 43,
+      "position": 3,
+      "quadrant": 4,
+      "center": { "x": 0.9, "y": -1.5, "z": 2.3 },
+      "rotation": { "x": 0, "y": -0.15, "z": 0 },
+      "size": { "width": 0.5, "height": 0.9, "depth": 0.42 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 44,
+      "position": 4,
+      "quadrant": 4,
+      "center": { "x": 1.5, "y": -1.5, "z": 2.1 },
+      "rotation": { "x": 0, "y": -0.3, "z": 0 },
+      "size": { "width": 0.55, "height": 0.8, "depth": 0.45 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 45,
+      "position": 5,
+      "quadrant": 4,
+      "center": { "x": 2.1, "y": -1.5, "z": 1.8 },
+      "rotation": { "x": 0, "y": -0.45, "z": 0 },
+      "size": { "width": 0.58, "height": 0.75, "depth": 0.46 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 46,
+      "position": 6,
+      "quadrant": 4,
+      "center": { "x": 2.55, "y": -1.5, "z": 1.4 },
+      "rotation": { "x": 0, "y": -0.6, "z": 0 },
+      "size": { "width": 0.62, "height": 0.7, "depth": 0.48 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    },
+    {
+      "id": 47,
+      "position": 7,
+      "quadrant": 4,
+      "center": { "x": 2.85, "y": -1.5, "z": 0.9 },
+      "rotation": { "x": 0, "y": -0.8, "z": 0 },
+      "size": { "width": 0.65, "height": 0.7, "depth": 0.5 },
+      "isMissing": false,
+      "buccalRange": { "min": 0.05, "max": 0.35, "ideal": 0.18 },
+      "lingualRange": { "min": -0.35, "max": -0.05, "ideal": -0.18 }
+    }
+  ]
+}

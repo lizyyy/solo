@@ -1,0 +1,19 @@
+{
+  "name": "ortho-3d-preview",
+  "version": "1.0.0",
+  "description": "3D交互正畸托槽位置预演工具",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0",
+    "papaparse": "^5.4.1",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

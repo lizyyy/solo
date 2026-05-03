@@ -1,0 +1,22 @@
+collision:
+  minDistance: 0.1
+  checkAdjacentOnly: true
+
+range:
+  buccal:
+    min: 0.05
+    max: 0.35
+  lingual:
+    min: -0.35
+    max: -0.05
+
+mirror:
+  enableCheck: true
+  symmetryThreshold: 0.15
+
+missing:
+  enableCheck: true
+
+steps:
+  maxStep: 20
+  allowMultiStep: true

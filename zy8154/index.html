@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>正畸附件放置预演工具</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>🦷 正畸附件放置预演工具</h1>
+      <div class="header-actions">
+        <button id="export-report" class="btn btn-primary">
+          📄 导出报告
+        </button>
+        <button id="export-issues" class="btn btn-secondary">
+          📊 导出问题 CSV
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="left-panel">
+        <div class="panel-section">
+          <h3>📂 数据导入</h3>
+          <div class="file-input-group">
+            <label class="file-label">
+              <span>牙齿数据 (teeth.json)</span>
+              <input type="file" id="load-teeth" accept=".json">
+            </label>
+          </div>
+          <div class="file-input-group">
+            <label class="file-label">
+              <span>附件数据 (attachments.csv)</span>
+              <input type="file" id="load-attachments" accept=".csv">
+            </label>
+          </div>
+          <div class="file-input-group">
+            <label class="file-label">
+              <span>规则配置 (placement_rules.yaml)</span>
+              <input type="file" id="load-rules" accept=".yaml,.yml">
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>⏱️ 步骤控制</h3>
+          <div class="step-controls">
+            <button id="step-prev" class="btn btn-icon" disabled>◀</button>
+            <div class="step-display">
+              <input type="number" id="step-input" min="1" max="1" value="1">
+              <span>/</span>
+              <span id="step-total">1</span>
+            </div>
+            <button id="step-next" class="btn btn-icon">▶</button>
+          </div>
+          <div id="attachment-count" class="attachment-count">当前步骤: 0 个附件</div>
+        </div>
+
+        <div class="panel-section">
+          <h3>🎮 操作</h3>
+          <div class="action-buttons">
+            <button id="btn-undo" class="btn btn-small" disabled>↩ 撤销</button>
+            <button id="btn-redo" class="btn btn-small" disabled>↪ 重做</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>👁️ 视图</h3>
+          <div class="view-controls">
+            <button class="view-btn btn-small" data-view="front">前面</button>
+            <button class="view-btn btn-small" data-view="back">后面</button>
+            <button class="view-btn btn-small" data-view="top">顶部</button>
+            <button class="view-btn btn-small" data-view="left">左侧</button>
+            <button class="view-btn btn-small" data-view="right">右侧</button>
+            <button class="view-btn btn-small" data-view="iso">等距</button>
+          </div>
+        </div>
+      </aside>
+
+      <main class="scene-area">
+        <div id="scene-container"></div>
+        <div class="scene-overlay">
+          <div class="mouse-instructions">
+            <p>🖱️ 鼠标左键: 旋转视图 | 滚轮: 缩放 | 右键: 平移</p>
+            <p>📦 点击附件可选中 | 拖拽附件可微调位置</p>
+          </div>
+        </div>
+      </main>
+
+      <aside class="right-panel">
+        <div id="attachment-panel" class="panel-section">
+          <h3>📍 附件属性</h3>
+          <div id="no-selection" class="no-selection">
+            <p>点击 3D 场景中的附件<br>以查看和编辑属性</p>
+          </div>
+          <div id="attachment-details" class="hidden">
+            <table class="property-table">
+              <tr>
+                <td>ID</td>
+                <td id="att-id">-</td>
+              </tr>
+              <tr>
+                <td>牙位</td>
+                <td id="att-tooth">-</td>
+              </tr>
+              <tr>
+                <td>类型</td>
+                <td id="att-type">-</td>
+              </tr>
+              <tr>
+                <td>步骤</td>
+                <td id="att-step">-</td>
+              </tr>
+              <tr>
+                <td>镜像</td>
+                <td id="att-mirrored">-</td>
+              </tr>
+              <tr>
+                <td>侧方</td>
+                <td id="att-side">-</td>
+              </tr>
+            </table>
+            
+            <div class="position-controls">
+              <h4>位置</h4>
+              <div class="input-row">
+                <label>X:</label>
+                <input type="number" id="pos-x" step="0.001" value="0">
+              </div>
+              <div class="input-row">
+                <label>Y:</label>
+                <input type="number" id="pos-y" step="0.001" value="0">
+              </div>
+              <div class="input-row">
+                <label>Z:</label>
+                <input type="number" id="pos-z" step="0.001" value="0">
+              </div>
+            </div>
+            
+            <div class="rotation-controls">
+              <h4>旋转 (弧度)</h4>
+              <div class="input-row">
+                <label>X:</label>
+                <input type="number" id="rot-x" step="0.01" value="0">
+              </div>
+              <div class="input-row">
+                <label>Y:</label>
+                <input type="number" id="rot-y" step="0.01" value="0">
+              </div>
+              <div class="input-row">
+                <label>Z:</label>
+                <input type="number" id="rot-z" step="0.01" value="0">
+              </div>
+            </div>
+            
+            <div class="action-buttons">
+              <button id="apply-position" class="btn btn-primary btn-small">应用</button>
+              <button id="reset-position" class="btn btn-secondary btn-small">重置</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h3>⚠️ 问题检测</h3>
+          <div id="issues-summary" class="issues-summary">
+            <span class="issue-error">错误: 0</span>
+            <span class="issue-warning">警告: 0</span>
+          </div>
+          <div id="issues-list" class="issues-list">
+            <div class="no-issues">加载中...</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
