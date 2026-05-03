@@ -1,0 +1,67 @@
+{
+  "problem_1": {
+    "description": "基础门练习：使用H门创建叠加态",
+    "expected_distribution": {
+      "0": 0.5,
+      "1": 0.5
+    },
+    "gate_rules": {
+      "forbidden_gates": [
+        "cx",
+        "ccx",
+        "swap"
+      ],
+      "max_depth": 5,
+      "max_qubits": 2
+    },
+    "grading_config": {
+      "max_score": 20.0,
+      "probability_tolerance": 0.05
+    }
+  },
+  "problem_2": {
+    "description": "纠缠态练习：创建Bell态 |Φ+⟩",
+    "expected_distribution": {
+      "00": 0.5,
+      "11": 0.5
+    },
+    "gate_rules": {
+      "forbidden_gates": [
+        "ccx",
+        "toffoli"
+      ],
+      "max_depth": 10,
+      "max_qubits": 3,
+      "required_qubits": [
+        0,
+        1
+      ]
+    },
+    "grading_config": {
+      "max_score": 30.0,
+      "probability_tolerance": 0.05
+    }
+  },
+  "problem_3": {
+    "description": "多量子比特练习：创建3量子比特GHZ态",
+    "expected_distribution": {
+      "000": 0.5,
+      "111": 0.5
+    },
+    "gate_rules": {
+      "forbidden_gates": [],
+      "allowed_gates": [
+        "h",
+        "cx",
+        "measure"
+      ],
+      "max_depth": 15,
+      "min_qubits": 3,
+      "max_qubits": 3
+    },
+    "grading_config": {
+      "max_score": 50.0,
+      "probability_tolerance": 0.08
+    }
+  }
+}

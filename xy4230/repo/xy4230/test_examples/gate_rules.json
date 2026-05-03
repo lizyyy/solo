@@ -1,0 +1,24 @@
+{
+  "basic": {
+    "forbidden_gates": [
+      "ccx",
+      "toffoli",
+      "fredkin"
+    ],
+    "max_depth": 20,
+    "max_qubits": 5
+  },
+  "strict": {
+    "forbidden_gates": [],
+    "allowed_gates": [
+      "h",
+      "x",
+      "y",
+      "z",
+      "cx",
+      "measure"
+    ],
+    "max_depth": 10,
+    "max_qubits": 2
+  }
+}

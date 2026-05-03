@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qc-grader"
+version = "0.1.0"
+description = "量子电路作业验收员 - 量子计算课程作业自动评分工具"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.21.0",
+    "click>=8.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[project.scripts]
+qc-grader = "qc_grader.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["qc_grader"]
