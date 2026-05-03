@@ -1,0 +1,73 @@
+# 雪道开放阈值规则
+# 用于早场开园前的风险评估
+
+trail_categories:
+  beginner:
+    name: 初级道
+    min_completion_pct: 90
+    max_wind_speed_kmh: 30
+    max_snowfall_cm_per_hour: 2
+    patrol_expiry_hours: 2
+    risk_thresholds:
+      low: 0
+      medium: 1
+      high: 2
+
+  intermediate:
+    name: 中级道
+    min_completion_pct: 85
+    max_wind_speed_kmh: 35
+    max_snowfall_cm_per_hour: 2.5
+    patrol_expiry_hours: 2
+    risk_thresholds:
+      low: 0
+      medium: 1
+      high: 2
+
+  advanced:
+    name: 高级道
+    min_completion_pct: 80
+    max_wind_speed_kmh: 40
+    max_snowfall_cm_per_hour: 3
+    patrol_expiry_hours: 2
+    risk_thresholds:
+      low: 0
+      medium: 1
+      high: 2
+
+risk_types:
+  incomplete_grooming:
+    name: 未压实
+    description: 压雪作业完成度低于阈值
+    severity: medium
+    mitigation: 补充压雪作业
+
+  wind_drift_coverage:
+    name: 风吹雪覆盖不足
+    description: 大风导致雪面覆盖不均
+    severity: high
+    mitigation: 检查并补充雪量
+
+  patrol_expired:
+    name: 巡查过期
+    description: 巡查时间超过有效期
+    severity: medium
+    mitigation: 重新巡查
+
+  midnight_crossing:
+    name: 跨午夜作业归属异常
+    description: 压雪作业跨越午夜，归属日期不明确
+    severity: low
+    mitigation: 确认作业归属日期
+
+  ice_exposure:
+    name: 结冰/裸露
+    description: 巡查发现结冰或裸露点
+    severity: high
+    mitigation: 处理结冰/裸露点
+
+operating_hours:
+  night_grooming_start: "22:00"
+  night_grooming_end: "06:00"
+  morning_patrol_start: "05:00"
+  opening_time: "08:00"
