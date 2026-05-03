@@ -1,0 +1,27 @@
+rules:
+  - lamp_type: LED_TypeA
+    daily_consumption: 2.5
+    min_voltage: 10.5
+    max_voltage: 14.0
+    critical_soc: 20
+    inspection_interval_days: 30
+  - lamp_type: LED_TypeB
+    daily_consumption: 3.0
+    min_voltage: 10.5
+    max_voltage: 14.0
+    critical_soc: 20
+    inspection_interval_days: 25
+  - lamp_type: LED_TypeC
+    daily_consumption: 4.0
+    min_voltage: 10.0
+    max_voltage: 14.5
+    critical_soc: 15
+    inspection_interval_days: 20
+
+default_rule:
+  lamp_type: default
+  daily_consumption: 2.5
+  min_voltage: 10.5
+  max_voltage: 14.0
+  critical_soc: 20
+  inspection_interval_days: 30

@@ -1,0 +1,9 @@
+id,buoy_id,repair_date,technician,issue_type,description,resolved,resolution_date
+R-001,BUOY-001,2024-03-15,张三,inspection,季度常规巡检,true,2024-03-15
+R-002,BUOY-003,2024-03-20,李四,battery_fault,电池电压异常偏低,true,2024-03-22
+R-003,BUOY-002,2024-04-02,王五,lamp_fault,灯质闪烁异常,true,2024-04-03
+R-004,BUOY-006,2024-04-06,赵六,inspection,月度巡检,true,2024-04-06
+R-005,BUOY-003,2024-04-08,李四,battery_low,电池电量持续下降,true,2024-04-09
+R-006,BUOY-004,2024-04-11,张三,lamp_fault,灯泡损坏需要更换,false,
+R-007,BUOY-001,2024-04-08,王五,reinspection,恶劣天气后复巡检查,true,2024-04-08
+R-008,BUOY-002,2024-04-09,李四,reinspection,恶劣天气后复巡检查,true,2024-04-09
