@@ -1,0 +1,32 @@
+phone_model_x:
+  model: "phone_model_x"
+  sensor: "IMX766"
+  lens: "f/1.8"
+  isp_version: "ISP_v5.0"
+  is_front_camera: false
+  supported_resolutions:
+    - "4080x3060"
+    - "1920x1080"
+    - "1280x720"
+
+phone_model_y:
+  model: "phone_model_y"
+  sensor: "IMX890"
+  lens: "f/2.0"
+  isp_version: "ISP_v5.1"
+  is_front_camera: false
+  supported_resolutions:
+    - "8160x6120"
+    - "3840x2160"
+    - "1920x1080"
+
+phone_model_z:
+  model: "phone_model_z"
+  sensor: "GN5"
+  lens: "f/1.6"
+  isp_version: "ISP_v4.2"
+  is_front_camera: false
+  supported_resolutions:
+    - "6400x4800"
+    - "3840x2160"
+    - "1920x1080"

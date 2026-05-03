@@ -1,0 +1,18 @@
+version: "1.2.0"
+release_date: "2026-05-01"
+camera_profiles: "camera_profiles.yaml"
+sensor_modes: "sensor_modes.csv"
+calibration_dir: "calibration"
+
+allowed_models:
+  - "phone_model_x"
+  - "phone_model_y"
+  - "phone_model_z"
+
+target_platforms:
+  - "android_14"
+  - "android_15"
+
+validation_rules:
+  strict_mode: true
+  warn_on_duplicate_calibration: true

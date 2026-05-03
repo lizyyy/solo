@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISP 标定参数包审计报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .health-status {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .health-healthy {
+            background-color: #4ade80;
+            color: #065f46;
+        }
+        
+        .health-caution {
+            background-color: #fbbf24;
+            color: #78350f;
+        }
+        
+        .health-unhealthy {
+            background-color: #f87171;
+            color: #7f1d1d;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-title {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .card-subtitle {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .errors .card-value {
+            color: #ef4444;
+        }
+        
+        .warnings .card-value {
+            color: #f59e0b;
+        }
+        
+        .models .card-value {
+            color: #8b5cf6;
+        }
+        
+        .resolutions .card-value {
+            color: #06b6d4;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .violations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .violations-table th,
+        .violations-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .violations-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .violations-table tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .level-error {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .level-warning {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        .validator-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            font-weight: 500;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .model-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #6366f1;
+        }
+        
+        .model-card h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #1e40af;
+        }
+        
+        .model-card p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .resolutions-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .resolution-tag {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .resolution-covered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .resolution-missing {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .file-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+        }
+        
+        .file-card .filename {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .file-card .meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .file-card .checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .check-pill {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        
+        .check-present {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        
+        .summary-bar {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .summary-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-error {
+            background-color: #ef4444;
+        }
+        
+        .dot-warning {
+            background-color: #f59e0b;
+        }
+        
+        .dot-success {
+            background-color: #10b981;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6b7280;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>正在加载审计数据...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('audit_output/package_manifest.json');
+                const manifest = await response.json();
+                renderReport(manifest);
+            } catch (error) {
+                document.getElementById('app').innerHTML = `
+                    <div class="container">
+                        <div class="section" style="text-align: center; padding: 50px;">
+                            <h2 style="color: #ef4444; margin-bottom: 20px;">❌ 加载数据失败</h2>
+                            <p>请确保已运行: <code>npm run dev -- check samples/release_policy.yaml</code></p>
+                            <p style="margin-top: 15px; color: #6b7280;">错误: ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderReport(manifest) {
+            const { package_health, validation_summary, camera_profiles, sensor_modes, calibration_files } = manifest;
+            
+            const healthClass = {
+                'HEALTHY': 'health-healthy',
+                'CAUTION': 'health-caution',
+                'UNHEALTHY': 'health-unhealthy'
+            }[package_health.status];
+
+            const healthIcon = {
+                'HEALTHY': '✅',
+                'CAUTION': '⚠️',
+                'UNHEALTHY': '❌'
+            }[package_health.status];
+
+            const validatorNames = {
+                'exposureGain': '曝光/增益曲线',
+                'whiteBalance': '白平衡矩阵',
+                'lensShading': '镜头阴影表',
+                'model': '机型适配',
+                'resolution': '分辨率档位'
+            };
+
+            const coveredResolutions = new Set(
+                calibration_files.files.map(f => f.resolution)
+            );
+            const allResolutions = sensor_modes.resolutions;
+
+            const allViolations = [];
+            for (const [validator, result] of Object.entries(validation_summary.validation_details)) {
+                for (const error of result.errors) {
+                    allViolations.push({
+                        ...error,
+                        level: 'error',
+                        validator
+                    });
+                }
+                for (const warning of result.warnings) {
+                    allViolations.push({
+                        ...warning,
+                        level: 'warning',
+                        validator
+                    });
+                }
+            }
+
+            document.getElementById('app').innerHTML = `
+                <div class="container">
+                    <header>
+                        <h1>${healthIcon} ISP 标定参数包审计报告</h1>
+                        <p class="subtitle">生成时间: ${manifest.generated_at}</p>
+                        <p class="subtitle">版本: ${manifest.release_policy.version}</p>
+                        <div class="health-status ${healthClass}">
+                            ${package_health.status} (${package_health.score}/100)
+                        </div>
+                        <div class="summary-bar" style="margin-top: 20px;">
+                            <div class="summary-item">
+                                <div class="summary-dot dot-error"></div>
+                                <span>错误: ${validation_summary.total_errors}</span>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-dot dot-warning"></div>
+                                <span>警告: ${validation_summary.total_warnings}</span>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-dot dot-success"></div>
+                                <span>状态: ${validation_summary.valid ? '通过' : '失败'}</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="dashboard-grid">
+                        <div class="card errors">
+                            <div class="card-title">错误数</div>
+                            <div class="card-value">${validation_summary.total_errors}</div>
+                            <div class="card-subtitle">必须修复的问题</div>
+                        </div>
+                        <div class="card warnings">
+                            <div class="card-title">警告数</div>
+                            <div class="card-value">${validation_summary.total_warnings}</div>
+                            <div class="card-subtitle">建议检查的问题</div>
+                        </div>
+                        <div class="card models">
+                            <div class="card-title">支持机型</div>
+                            <div class="card-value">${camera_profiles.count}</div>
+                            <div class="card-subtitle">${camera_profiles.profiles.map(p => p.model).join(', ')}</div>
+                        </div>
+                        <div class="card resolutions">
+                            <div class="card-title">分辨率模式</div>
+                            <div class="card-value">${sensor_modes.count}</div>
+                            <div class="card-subtitle">${allResolutions.length} 种分辨率</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📊 校验器结果统计</div>
+                        <div class="chart-container">
+                            <canvas id="validatorChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="two-column">
+                        <div class="section">
+                            <div class="section-title">📱 机型配置</div>
+                            <div class="models-grid">
+                                ${camera_profiles.profiles.map(profile => `
+                                    <div class="model-card">
+                                        <h4>${profile.model}</h4>
+                                        <p><strong>传感器:</strong> ${profile.sensor || 'N/A'}</p>
+                                        <p><strong>镜头:</strong> ${profile.lens || 'N/A'}</p>
+                                        <p><strong>ISP版本:</strong> ${profile.isp_version || 'N/A'}</p>
+                                        <p><strong>类型:</strong> ${profile.is_front_camera ? '前置' : '后置'}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🖼️ 分辨率覆盖情况</div>
+                            <div class="resolutions-list">
+                                ${allResolutions.map(res => `
+                                    <span class="resolution-tag ${coveredResolutions.has(res) ? 'resolution-covered' : 'resolution-missing'}">
+                                        ${coveredResolutions.has(res) ? '✓' : '✗'} ${res}
+                                    </span>
+                                `).join('')}
+                            </div>
+                            <div style="margin-top: 20px; font-size: 13px; color: #6b7280;">
+                                <span style="color: #059669;">✓ 已覆盖</span> | 
+                                <span style="color: #dc2626;">✗ 缺失</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">📁 标定文件列表 (${calibration_files.count})</div>
+                        <div class="files-grid">
+                            ${calibration_files.files.map(file => `
+                                <div class="file-card">
+                                    <div class="filename">📄 ${file.file_name}</div>
+                                    <div class="meta">
+                                        <span>机型: ${file.model}</span>
+                                        <span>分辨率: ${file.resolution || 'N/A'}</span>
+                                    </div>
+                                    <div class="checks">
+                                        <span class="check-pill ${file.has_exposure_curve ? 'check-present' : ''}">
+                                            ${file.has_exposure_curve ? '✓' : '✗'} 曝光曲线
+                                        </span>
+                                        <span class="check-pill ${file.has_gain_curve ? 'check-present' : ''}">
+                                            ${file.has_gain_curve ? '✓' : '✗'} 增益曲线
+                                        </span>
+                                        <span class="check-pill ${file.has_white_balance_matrix ? 'check-present' : ''}">
+                                            ${file.has_white_balance_matrix ? '✓' : '✗'} WB矩阵
+                                        </span>
+                                        <span class="check-pill ${file.has_lens_shading_table ? 'check-present' : ''}">
+                                            ${file.has_lens_shading_table ? '✓' : '✗'} 阴影表
+                                        </span>
+                                        <span class="check-pill ${file.has_ccm ? 'check-present' : ''}">
+                                            ${file.has_ccm ? '✓' : '✗'} CCM
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">⚠️ 违规记录 (${allViolations.length})</div>
+                        <table class="violations-table">
+                            <thead>
+                                <tr>
+                                    <th>级别</th>
+                                    <th>校验器</th>
+                                    <th>类别</th>
+                                    <th>描述</th>
+                                    <th>上下文</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${allViolations.map(v => `
+                                    <tr>
+                                        <td>
+                                            <span class="level-badge ${v.level === 'error' ? 'level-error' : 'level-warning'}">
+                                                ${v.level === 'error' ? 'ERROR' : 'WARNING'}
+                                            </span>
+                                        </td>
+                                        <td><span class="validator-tag">${validatorNames[v.validator] || v.validator}</span></td>
+                                        <td>${v.category}</td>
+                                        <td>${v.message}</td>
+                                        <td style="max-width: 300px; font-size: 11px; color: #6b7280;">
+                                            ${v.context ? JSON.stringify(v.context) : '-'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        ${allViolations.length === 0 ? '<p style="text-align: center; padding: 30px; color: #6b7280;">✅ 没有违规记录</p>' : ''}
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">💡 健康状态说明</div>
+                        <div style="padding: 20px; background-color: #f8fafc; border-radius: 8px;">
+                            <p style="font-size: 14px; line-height: 1.8;">
+                                <strong>当前状态:</strong> ${package_health.status} (${package_health.score}/100)<br>
+                                <strong>原因:</strong> ${package_health.reason}
+                            </p>
+                            ${!validation_summary.valid ? `
+                                <div style="margin-top: 20px; padding: 15px; background-color: #fef2f2; border-left: 4px solid #ef4444; border-radius: 4px;">
+                                    <strong>⚠️ 重要提示:</strong> 存在 ${validation_summary.total_errors} 个错误必须修复后才能发布。
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const ctx = document.getElementById('validatorChart').getContext('2d');
+            const validators = Object.keys(validation_summary.validation_details);
+            const errors = validators.map(v => validation_summary.validation_details[v].error_count);
+            const warnings = validators.map(v => validation_summary.validation_details[v].warning_count);
+            const labels = validators.map(v => validatorNames[v] || v);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '错误',
+                            data: errors,
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '警告',
+                            data: warnings,
+                            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '各校验器违规统计'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

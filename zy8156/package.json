@@ -1,0 +1,30 @@
+{
+  "name": "isp-audit-cli",
+  "version": "1.0.0",
+  "description": "ISP 标定参数包预检 CLI 工具",
+  "type": "module",
+  "main": "src/cli/index.js",
+  "bin": {
+    "isp-audit": "src/cli/index.js"
+  },
+  "scripts": {
+    "dev": "node src/cli/index.js"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "isp",
+    "camera",
+    "calibration",
+    "audit",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT"
+}
