@@ -1,0 +1,77 @@
+{
+  "id": "garage-demo-001",
+  "name": "演示立体停车库",
+  "floors": [
+    {
+      "id": "floor-0",
+      "level": 0,
+      "name": "地面层（入口）",
+      "height": 3.5,
+      "slots": [
+        { "id": "slot-0-01", "position": { "x": -12, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-0-02", "position": { "x": -8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-0-03", "position": { "x": -4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "charging", "maxWeight": 2500 },
+        { "id": "slot-0-04", "position": { "x": 0, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-0-05", "position": { "x": 4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-0-06", "position": { "x": 8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 }
+      ],
+      "aisles": [
+        { "id": "aisle-0-01", "path": [{ "x": -15, "z": -5 }, { "x": 10, "z": -5 }], "width": 3.0 }
+      ]
+    },
+    {
+      "id": "floor-1",
+      "level": 1,
+      "name": "一层",
+      "height": 3.5,
+      "slots": [
+        { "id": "slot-1-01", "position": { "x": -12, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-1-02", "position": { "x": -8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-1-03", "position": { "x": -4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-1-04", "position": { "x": 0, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "charging", "maxWeight": 2500 },
+        { "id": "slot-1-05", "position": { "x": 4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-1-06", "position": { "x": 8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 }
+      ],
+      "aisles": [
+        { "id": "aisle-1-01", "path": [{ "x": -15, "z": -5 }, { "x": 10, "z": -5 }], "width": 3.0 }
+      ]
+    },
+    {
+      "id": "floor-2",
+      "level": 2,
+      "name": "二层",
+      "height": 3.5,
+      "slots": [
+        { "id": "slot-2-01", "position": { "x": -12, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-2-02", "position": { "x": -8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-2-03", "position": { "x": -4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2000 },
+        { "id": "slot-2-04", "position": { "x": 0, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-2-05", "position": { "x": 4, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 },
+        { "id": "slot-2-06", "position": { "x": 8, "z": 0 }, "size": { "width": 2.5, "depth": 5.0 }, "type": "standard", "maxWeight": 2500 }
+      ],
+      "aisles": [
+        { "id": "aisle-2-01", "path": [{ "x": -15, "z": -5 }, { "x": 10, "z": -5 }], "width": 3.0 }
+      ]
+    }
+  ],
+  "elevators": [
+    {
+      "id": "elevator-01",
+      "name": "升降机A",
+      "position": { "x": -18, "z": 0 },
+      "floors": [0, 1, 2],
+      "maxCapacity": 2500,
+      "speed": 2.0,
+      "currentFloor": 0
+    },
+    {
+      "id": "elevator-02",
+      "name": "升降机B",
+      "position": { "x": 12, "z": 0 },
+      "floors": [0, 1, 2],
+      "maxCapacity": 2500,
+      "speed": 2.0,
+      "currentFloor": 0
+    }
+  ]
+}

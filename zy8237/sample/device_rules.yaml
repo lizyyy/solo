@@ -1,0 +1,38 @@
+# 立体停车库设备规则配置
+# 用于配置升降机、横移车等设备的运行参数和安全规则
+
+elevators:
+  - id: elevator-01
+    max_capacity: 2500
+    speed: 2.0
+    acceleration: 0.5
+    max_floors: 10
+    door_open_time: 3
+    door_close_time: 3
+  - id: elevator-02
+    max_capacity: 2500
+    speed: 2.0
+    acceleration: 0.5
+    max_floors: 10
+    door_open_time: 3
+    door_close_time: 3
+
+shuttles:
+  - id: shuttle-01
+    max_capacity: 2500
+    speed: 3.0
+    acceleration: 1.0
+  - id: shuttle-02
+    max_capacity: 2500
+    speed: 3.0
+    acceleration: 1.0
+
+safety:
+  min_distance_between_cars: 1.5
+  max_occupancy_per_zone: 8
+  emergency_stop_delay: 0.5
+
+timing:
+  park_time_limit: 120
+  pickup_time_limit: 180
+  transfer_time_limit: 60
