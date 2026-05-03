@@ -1,0 +1,29 @@
+{
+  "name": "cold-chain-analyzer",
+  "version": "1.0.0",
+  "description": "冷链温度复盘器 - 食品工厂质检数据分析工具",
+  "main": "src/cli/index.js",
+  "scripts": {
+    "start": "node src/cli/index.js",
+    "test": "node test/run-tests.js",
+    "demo": "node src/cli/index.js analyze --temperature data/sample/temperature.csv --door data/sample/door.csv --notes data/sample/notes.csv --output output/demo"
+  },
+  "keywords": ["cold-chain", "temperature", "food-safety", "quality-control"],
+  "author": "Cold Chain Analyzer Team",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "fast-csv": "^4.3.6",
+    "dayjs": "^1.11.10",
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "figlet": "^1.7.0",
+    "cli-table3": "^0.6.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
