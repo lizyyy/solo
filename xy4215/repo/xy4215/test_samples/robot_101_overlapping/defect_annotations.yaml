@@ -1,0 +1,46 @@
+defects:
+- annotator: auto
+  defect_id: robot_101_crack_120
+  defect_type: crack
+  description: 管壁纵向裂缝
+  mileage: 120.15
+  pipe_segment: segment_001
+  severity: high
+  source: robot_101
+  timestamp: 1777190160.42855
+- annotator: auto
+  defect_id: robot_101_leak_245
+  defect_type: leak
+  description: 接头处漏水
+  mileage: 245.05
+  pipe_segment: segment_001
+  severity: critical
+  source: robot_101
+  timestamp: 1777188905.9214265
+- annotator: auto
+  defect_id: robot_101_corrosion_378
+  defect_type: corrosion
+  description: 金属表面锈蚀
+  mileage: 377.55
+  pipe_segment: segment_001
+  severity: medium
+  source: robot_101
+  timestamp: 1777191060.0590503
+- annotator: auto
+  defect_id: robot_101_unique_0
+  defect_type: corrosion
+  description: 'robot_101 独有缺陷 #1'
+  mileage: 202.7
+  pipe_segment: segment_001
+  severity: high
+  source: robot_101
+  timestamp: 1777190555.575294
+- annotator: auto
+  defect_id: robot_101_unique_1
+  defect_type: corrosion
+  description: 'robot_101 独有缺陷 #2'
+  mileage: 316.28
+  pipe_segment: segment_001
+  severity: high
+  source: robot_101
+  timestamp: 1777189519.460437
