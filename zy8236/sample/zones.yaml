@@ -1,0 +1,23 @@
+- zone_id: "Z001"
+  zone_name: "1楼东区防烟分区"
+  floor: 1
+  area: 250.5
+  assigned_fans: ["F001"]
+  assigned_dampers: ["D001", "D002"]
+  sensors: ["S001", "S002"]
+
+- zone_id: "Z002"
+  zone_name: "1楼西区防烟分区"
+  floor: 1
+  area: 180.0
+  assigned_fans: ["F001"]
+  assigned_dampers: ["D003"]
+  sensors: ["S003"]
+
+- zone_id: "Z003"
+  zone_name: "2楼北区防烟分区"
+  floor: 2
+  area: 320.0
+  assigned_fans: ["F002"]
+  assigned_dampers: ["D004", "D005"]
+  sensors: ["S004", "S005"]
