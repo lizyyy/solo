@@ -1,0 +1,50 @@
+{
+  "id": "level_1",
+  "name": "紧急启动",
+  "description": "这是一个入门关卡，帮助你熟悉游戏基本操作。你需要调度维修车和发电机，在限时内恢复足够的广播覆盖。",
+  "timeLimit": 300,
+  "targetCoverage": 60,
+  "grid": {
+    "width": 10,
+    "height": 8,
+    "cells": [
+      ["building", "building", "building", "building", "building", "building", "building", "building", "building", "building"],
+      ["building", "road", "road", "road", "blocked", "road", "road", "road", "road", "building"],
+      ["building", "road", "building", "road", "road", "road", "building", "road", "road", "building"],
+      ["building", "road", "road", "road", "road", "road", "road", "road", "broadcast_point", "building"],
+      ["building", "road", "building", "blocked", "road", "road", "building", "road", "road", "building"],
+      ["building", "road", "road", "road", "road", "broadcast_point", "road", "road", "road", "building"],
+      ["building", "road", "road", "road", "road", "road", "road", "road", "road", "building"],
+      ["building", "building", "building", "building", "building", "building", "building", "building", "building", "building"]
+    ]
+  },
+  "initialUnits": [
+    {
+      "id": "repair_1",
+      "type": "repair_vehicle",
+      "position": { "x": 1, "y": 1 },
+      "moveSpeed": 5,
+      "capacity": 100,
+      "currentLoad": 0,
+      "repairSpeed": 1,
+      "fuel": 100,
+      "maxFuel": 100
+    },
+    {
+      "id": "generator_1",
+      "type": "generator",
+      "position": { "x": 1, "y": 6 },
+      "moveSpeed": 5,
+      "fuel": 100,
+      "maxFuel": 100,
+      "powerOutput": 100,
+      "isDeployed": false
+    }
+  ],
+  "scoring": {
+    "perfectTime": 90,
+    "goodTime": 180,
+    "perfectCoverage": 100,
+    "goodCoverage": 80
+  }
+}

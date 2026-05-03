@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应急广播抢修 - 策略小游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="game-header">
+            <div class="header-left">
+                <h1>应急广播抢修</h1>
+                <div class="game-info">
+                    <span id="level-name">关卡 1: 紧急启动</span>
+                    <span id="timer">时间: 00:00</span>
+                    <span id="coverage">覆盖: 0%</span>
+                    <span id="score">评分: 0</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="undo-btn" disabled>撤销</button>
+                <button id="redo-btn" disabled>重做</button>
+                <button id="save-btn">保存进度</button>
+                <button id="load-btn">加载进度</button>
+                <button id="import-btn">导入关卡</button>
+                <button id="export-btn">导出关卡</button>
+                <button id="restart-btn">重新开始</button>
+            </div>
+        </header>
+        
+        <main class="game-main">
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h3>操作指南</h3>
+                    <ul class="instructions">
+                        <li>点击选择维修车/发电机</li>
+                        <li>点击目标位置下达指令</li>
+                        <li>右键取消选择</li>
+                        <li>点击「执行」确认操作</li>
+                    </ul>
+                </div>
+                
+                <div class="panel-section">
+                    <h3>选中单位</h3>
+                    <div id="selected-unit-info" class="unit-info">
+                        <p>请选择一个单位</p>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <h3>资源状态</h3>
+                    <div id="resource-status" class="resource-status">
+                        <div class="resource-item">
+                            <span class="resource-name">维修车:</span>
+                            <span id="repair-vehicles-count">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-name">发电机:</span>
+                            <span id="generators-count">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-name">广播点:</span>
+                            <span id="broadcast-points-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <h3>待执行指令</h3>
+                    <div id="pending-commands" class="pending-commands">
+                        <p>暂无可执行指令</p>
+                    </div>
+                    <button id="execute-btn" class="execute-btn" disabled>执行指令</button>
+                </div>
+                
+                <div class="panel-section">
+                    <h3>游戏状态</h3>
+                    <div id="game-status" class="game-status">
+                        <p class="status-message">游戏进行中</p>
+                    </div>
+                </div>
+            </aside>
+            
+            <div class="game-area">
+                <canvas id="game-canvas"></canvas>
+                <div class="message-overlay" id="message-overlay"></div>
+            </div>
+        </main>
+        
+        <footer class="game-footer">
+            <div id="game-log" class="game-log">
+                <p>欢迎来到应急广播抢修游戏！</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="file-input" accept=".json" style="display: none;">
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

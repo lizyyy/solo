@@ -1,0 +1,17 @@
+{
+  "name": "emergency-broadcast-repair",
+  "version": "1.0.0",
+  "description": "应急广播抢修策略小游戏",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint": "echo \"Linting skipped - pure JavaScript project\""
+  },
+  "keywords": ["game", "strategy", "emergency-response"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
