@@ -1,0 +1,40 @@
+# Memory Regions Configuration for Embedded Device
+# This file defines the memory layout for the target device
+# Address formats: 0x prefix, h suffix, or bare hex are all supported
+
+metadata:
+  device: "STM32F4xx"
+  architecture: "ARM Cortex-M4"
+  totalFlash: "1MB"
+  totalRam: "128KB"
+
+memoryRegions:
+  - name: "FLASH"
+    origin: "0x08000000"
+    length: "0x00100000"
+    type: "FLASH"
+    attributes: "xr"
+
+  - name: "RAM"
+    origin: "20000000h"
+    length: "128KB"
+    type: "RAM"
+    attributes: "rw"
+
+  - name: "OTP"
+    origin: "0x1FFF7800"
+    length: "1024"
+    type: "OTP"
+    attributes: "r"
+
+  - name: "CCMRAM"
+    origin: "0x10000000"
+    length: "64KB"
+    type: "RAM"
+    attributes: "rw"
+
+  - name: "BKPSRAM"
+    origin: "0x40024000"
+    length: "0x00001000"
+    type: "RAM"
+    attributes: "rw"

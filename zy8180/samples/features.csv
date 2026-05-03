@@ -1,0 +1,10 @@
+featureName,enabled,flashDelta,ramDelta,dependencies,description
+bluetooth,true,32768,8192,,Bluetooth Low Energy stack
+wifi,false,65536,16384,network,WiFi 802.11n stack
+network,true,16384,4096,,TCP/IP network stack
+audio_processing,true,24576,32768,,Audio signal processing
+encryption,true,8192,2048,,Hardware encryption accelerator
+debug_logging,false,4096,8192,,Debug logging subsystem
+ota_update,true,12288,4096,network,Firmware over-the-air update
+power_management,true,6144,1024,,Advanced power management
+display,false,49152,12288,,LCD display driver

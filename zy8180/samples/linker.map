@@ -1,0 +1,103 @@
+/*
+ * Sample linker.map for embedded device firmware
+ * This file contains various edge cases for testing:
+ * 1. Hex address format mixing (0x, h suffix, bare hex)
+ * 2. Section crossing memory regions
+ * 3. Memory overflow scenarios
+ */
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00100000         xr
+RAM              20000000h          0x00020000         rw
+OTP              0x1FFF7800         0x00000400         r
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+ENTRY(0x08000000)
+
+.text           0x08000000     0x10000
+                0x08000000                . = ALIGN (0x4)
+                0x08000000                _stext = .
+ *(.text)
+ .text          0x08000000      0x400 build/main.o
+                0x08000000                main
+                0x08000100                SystemInit
+                0x08000200                __libc_init_array
+ .text          0x08000400      0x200 build/drivers.o
+                0x08000400                GPIO_Init
+                0x08000500                UART_Transmit
+ .text          0x08000600      0x800 build/network.o
+                0x08000600                TCP_Connect
+                0x08000800                HTTP_Server
+                0x08000a00                MQTT_Publish
+ *(.text.*)
+ .text.startup  0x08000e00      0x100 build/startup.o
+                0x08000e00                Reset_Handler
+                0x08000f00                _start
+
+.rodata         0x08001000      0x2000
+ *(.rodata)
+ .rodata        0x08001000      0x800 build/strings.o
+                0x08001000                error_messages
+                0x08001200                welcome_text
+ .rodata        0x08001800      0x400 build/config.o
+                0x08001800                default_config
+ *(.rodata.*)
+ .rodata.const  0x08001c00      0x200 build/crypto.o
+                0x08001c00                public_key
+                0x08001d00                aes_sbox
+
+.data           0x20000000      0x1000
+                0x20000000                _sdata = .
+ *(.data)
+ .data          0x20000000      0x200 build/main.o
+                0x20000000                system_state
+                0x20000100                sensor_readings
+ .data          0x20000200      0x400 build/network.o
+                0x20000200                tcp_socket_buffer
+                0x20000400                http_request_buffer
+ .data          0x20000600      0x200 build/fw_update.o
+                0x20000600                firmware_image_header
+
+.bss            0x20001000     0x18000
+                0x20001000                _sbss = .
+ *(.bss)
+ .bss           0x20001000     0x1000 build/main.o
+                0x20001000                log_buffer
+                0x20001400                debug_trace
+ .bss           0x20002000     0x4000 build/audio.o
+                0x20002000                audio_input_buffer
+                0x20003000                audio_output_buffer
+                0x20004000                audio_processing_buffer
+ .bss           0x20006000     0x8000 build/large_feature.o
+                0x20006000                large_feature_buffer
+ .bss           0x2000e000     0x8000 build/overflow_test.o
+                0x2000e000                overflow_buffer_1
+                0x20012000                overflow_buffer_2
+
+.ARM.exidx      0x08003000       0x200
+ *(.ARM.exidx*)
+
+/*
+ * Edge case: Section crossing memory region boundary
+ * This section starts in FLASH but extends into the reserved area
+ */
+.cross_section  0x080FFC00     0x1000
+                0x080FFC00                cross_start
+                0x080FFE00                cross_mid
+                0x08100000                cross_end
+
+/*
+ * Edge case: Section overlapping with bootloader reserved area
+ * This section intentionally overlaps with bootloader region
+ */
+.overlap_boot   0x08004000      0x1000
+                0x08004000                bad_section_start
+
+.vectors        0x08000000      0x200
+                0x08000000                __vector_table
+                0x08000040                NMI_Handler
+                0x08000080                HardFault_Handler
