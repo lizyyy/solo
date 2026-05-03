@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跑步训练负荷分析工具</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      color: white;
+      padding: 30px 0;
+    }
+    
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .card h2 {
+      font-size: 1.2rem;
+      color: #2c3e50;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .status-safe {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      color: white;
+    }
+    
+    .status-warning {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+    }
+    
+    .status-danger {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+    }
+    
+    .status-icon {
+      font-size: 1.5rem;
+    }
+    
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    
+    .metric {
+      text-align: center;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+    
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+    
+    .metric-label {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-top: 4px;
+    }
+    
+    .risk-list {
+      list-style: none;
+    }
+    
+    .risk-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .risk-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .risk-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    
+    .risk-content {
+      flex: 1;
+    }
+    
+    .risk-category {
+      font-size: 0.75rem;
+      color: #7f8c8d;
+      margin-bottom: 2px;
+    }
+    
+    .risk-message {
+      font-size: 0.9rem;
+      color: #2c3e50;
+    }
+    
+    .shoe-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .shoe-info {
+      flex: 1;
+    }
+    
+    .shoe-name {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .shoe-meta {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      margin-top: 2px;
+    }
+    
+    .shoe-status {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    
+    .large-card {
+      grid-column: span 2;
+    }
+    
+    @media (max-width: 768px) {
+      .large-card {
+        grid-column: span 1;
+      }
+      
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+    
+    .tab:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .tab.active {
+      background: white;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    
+    .export-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      background: #fff3f3;
+      color: #dc3545;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .soreness-location {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .soreness-location:last-child {
+      border-bottom: none;
+    }
+    
+    .severity-bar {
+      height: 8px;
+      background: #eee;
+      border-radius: 4px;
+      overflow: hidden;
+      flex: 1;
+      margin: 0 16px;
+    }
+    
+    .severity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f5576c, #f093fb);
+      border-radius: 4px;
+    }
+    
+    .no-data {
+      text-align: center;
+      color: #7f8c8d;
+      padding: 40px;
+    }
+    
+    .no-data-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏃 跑步训练负荷分析工具</h1>
+      <p>Running Analyzer - 智能分析训练风险、跑鞋状态和健康关联</p>
+    </header>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">📊 分析仪表盘</button>
+      <button class="tab" data-tab="risks">⚠️ 风险详情</button>
+      <button class="tab" data-tab="shoes">👟 跑鞋管理</button>
+      <button class="tab" data-tab="soreness">💊 疼痛关联</button>
+    </div>
+    
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>正在加载和分析数据...</p>
+    </div>
+    
+    <div id="content" style="display: none;">
+      <div id="tab-dashboard" class="tab-content">
+        <div class="dashboard">
+          <div class="card">
+            <h2>🎯 风险状态</h2>
+            <div id="risk-status"></div>
+            <div class="metric-grid" style="margin-top: 16px;">
+              <div class="metric">
+                <div class="metric-value" id="acwr-value">-</div>
+                <div class="metric-label">急慢比 (ACWR)</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="risk-count">-</div>
+                <div class="metric-label">风险项</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>👟 跑鞋概览</h2>
+            <div class="metric-grid">
+              <div class="metric">
+                <div class="metric-value" id="shoe-count">-</div>
+                <div class="metric-label">活跃鞋款</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="shoe-attention">-</div>
+                <div class="metric-label">需关注</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="total-mileage">-</div>
+                <div class="metric-label">总里程 (km)</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="retired-count">-</div>
+                <div class="metric-label">已退役</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>💊 疼痛记录</h2>
+            <div id="soreness-summary"></div>
+            <div class="metric-grid" style="margin-top: 16px;">
+              <div class="metric">
+                <div class="metric-value" id="soreness-count">-</div>
+                <div class="metric-label">总记录</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value" id="soreness-locations">-</div>
+                <div class="metric-label">疼痛部位</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card large-card">
+            <h2>📈 周跑量趋势</h2>
+            <div class="chart-container">
+              <canvas id="weeklyChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>👟 鞋款里程分布</h2>
+            <div class="chart-container">
+              <canvas id="shoeChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>📄 导出报告</h2>
+            <p style="color: #7f8c8d; margin-bottom: 16px; font-size: 0.9rem;">
+              导出完整的分析报告，包含风险摘要、跑鞋建议和数据统计
+            </p>
+            <div class="export-buttons">
+              <a href="/api/report/markdown" class="export-btn" target="_blank">
+                📝 Markdown
+              </a>
+              <a href="/api/report/html" class="export-btn" target="_blank">
+                🌐 HTML
+              </a>
+              <a href="/api/report/json" class="export-btn" target="_blank">
+                📋 JSON
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tab-risks" class="tab-content" style="display: none;">
+        <div class="dashboard">
+          <div class="card large-card">
+            <h2>⚠️ 高风险项</h2>
+            <div id="high-risks"></div>
+          </div>
+          
+          <div class="card large-card">
+            <h2>🟡 警告项</h2>
+            <div id="warnings"></div>
+          </div>
+          
+          <div class="card">
+            <h2>📊 ACWR 详情</h2>
+            <div id="acwr-details"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tab-shoes" class="tab-content" style="display: none;">
+        <div class="dashboard">
+          <div class="card large-card">
+            <h2>👟 所有跑鞋</h2>
+            <div id="all-shoes"></div>
+          </div>
+          
+          <div class="card">
+            <h2>🔄 轮换建议</h2>
+            <div id="rotation-suggestions"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tab-soreness" class="tab-content" style="display: none;">
+        <div class="dashboard">
+          <div class="card">
+            <h2>💊 疼痛部位分布</h2>
+            <div class="chart-container">
+              <canvas id="sorenessChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card">
+            <h2>🔍 关联模式</h2>
+            <div id="soreness-patterns"></div>
+          </div>
+          
+          <div class="card large-card">
+            <h2>📋 近期疼痛记录</h2>
+            <div id="recent-soreness"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let weeklyChart, shoeChart, sorenessChart;
+    let currentData = {};
+    
+    async function loadData() {
+      try {
+        const [analyzeRes, risksRes, shoesRes, sorenessRes, weeklyRes, shoeMileageRes, sorenessDistRes] = await Promise.all([
+          fetch('/api/analyze'),
+          fetch('/api/risks'),
+          fetch('/api/shoes'),
+          fetch('/api/soreness'),
+          fetch('/api/charts/weekly-distance'),
+          fetch('/api/charts/shoe-mileage'),
+          fetch('/api/charts/soreness-distribution')
+        ]);
+        
+        currentData.analyze = await analyzeRes.json();
+        currentData.risks = await risksRes.json();
+        currentData.shoes = await shoesRes.json();
+        currentData.soreness = await sorenessRes.json();
+        currentData.weekly = await weeklyRes.json();
+        currentData.shoeMileage = await shoeMileageRes.json();
+        currentData.sorenessDist = await sorenessDistRes.json();
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        
+        renderDashboard();
+        renderRisks();
+        renderShoes();
+        renderSoreness();
+        renderCharts();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('loading').innerHTML = `
+          <div class="error-message">
+            <h3>❌ 加载数据失败</h3>
+            <p>${error.message}</p>
+            <p style="margin-top: 16px; font-size: 0.9rem;">
+              请确保 data 目录中存在 runs.csv、shoes.json 和 soreness.csv 文件
+            </p>
+          </div>
+        `;
+      }
+    }
+    
+    function renderDashboard() {
+      const risk = currentData.analyze.summary.risk;
+      const shoes = currentData.analyze.summary.shoes;
+      const soreness = currentData.analyze.summary.soreness;
+      
+      let statusClass, statusIcon, statusText;
+      if (risk.overallLevel === 'danger') {
+        statusClass = 'status-danger';
+        statusIcon = '🔴';
+        statusText = '高风险 - 建议立即调整';
+      } else if (risk.overallLevel === 'warning') {
+        statusClass = 'status-warning';
+        statusIcon = '🟡';
+        statusText = '中风险 - 需要关注';
+      } else {
+        statusClass = 'status-safe';
+        statusIcon = '🟢';
+        statusText = '正常 - 继续保持';
+      }
+      
+      document.getElementById('risk-status').innerHTML = `
+        <span class="status-badge ${statusClass}">
+          <span class="status-icon">${statusIcon}</span>
+          ${statusText}
+        </span>
+      `;
+      
+      const acwr = currentData.risks.acwr;
+      document.getElementById('acwr-value').textContent = acwr.value ? acwr.value.toFixed(2) : '-';
+      document.getElementById('risk-count').textContent = `${risk.riskCount} / ${risk.warningCount}`;
+      
+      document.getElementById('shoe-count').textContent = shoes.activeShoes || 0;
+      document.getElementById('shoe-attention').textContent = shoes.shoesNeedingAttention || 0;
+      document.getElementById('total-mileage').textContent = shoes.totalMileage ? shoes.totalMileage.toFixed(0) : '-';
+      document.getElementById('retired-count').textContent = shoes.retiredShoes || 0;
+      
+      document.getElementById('soreness-count').textContent = soreness.totalSorenessRecords || 0;
+      document.getElementById('soreness-locations').textContent = soreness.uniqueLocations || 0;
+      
+      if (soreness.hasHighRiskPatterns) {
+        document.getElementById('soreness-summary').innerHTML = `
+          <span class="status-badge status-warning">
+            <span class="status-icon">⚠️</span>
+            发现疼痛关联模式
+          </span>
+        `;
+      }
+    }
+    
+    function renderRisks() {
+      const risks = currentData.risks.risks;
+      const warnings = currentData.risks.warnings;
+      const acwr = currentData.risks.acwr;
+      
+      if (risks.length === 0) {
+        document.getElementById('high-risks').innerHTML = `
+          <div class="no-data">
+            <div class="no-data-icon">✅</div>
+            <p>没有高风险项</p>
+          </div>
+        `;
+      } else {
+        document.getElementById('high-risks').innerHTML = `
+          <ul class="risk-list">
+            ${risks.map(r => `
+              <li class="risk-item">
+                <span class="risk-icon">🔴</span>
+                <div class="risk-content">
+                  <div class="risk-category">${r.category}</div>
+                  <div class="risk-message">${r.message}</div>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+      
+      if (warnings.length === 0) {
+        document.getElementById('warnings').innerHTML = `
+          <div class="no-data">
+            <div class="no-data-icon">✅</div>
+            <p>没有警告项</p>
+          </div>
+        `;
+      } else {
+        document.getElementById('warnings').innerHTML = `
+          <ul class="risk-list">
+            ${warnings.map(w => `
+              <li class="risk-item">
+                <span class="risk-icon">🟡</span>
+                <div class="risk-content">
+                  <div class="risk-category">${w.category}</div>
+                  <div class="risk-message">${w.message}</div>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+      
+      document.getElementById('acwr-details').innerHTML = `
+        <div class="metric-grid">
+          <div class="metric">
+            <div class="metric-value">${acwr.value ? acwr.value.toFixed(2) : '-'}</div>
+            <div class="metric-label">急慢比 (ACWR)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">${acwr.acuteDistance ? acwr.acuteDistance.toFixed(1) : '-'} km</div>
+            <div class="metric-label">近7天跑量</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">${acwr.chronicAvgDistance ? acwr.chronicAvgDistance.toFixed(1) : '-'} km</div>
+            <div class="metric-label">周均跑量 (近28天)</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value">${acwr.acuteWorkload ? acwr.acuteWorkload.toFixed(0) : '-'}</div>
+            <div class="metric-label">近7天负荷</div>
+          </div>
+        </div>
+        <p style="margin-top: 16px; color: #7f8c8d; font-size: 0.9rem;">
+          ${acwr.message}
+        </p>
+      `;
+    }
+    
+    function renderShoes() {
+      const shoes = currentData.shoes.shoes;
+      const rotation = currentData.shoes.rotationSuggestions;
+      
+      if (shoes.length === 0) {
+        document.getElementById('all-shoes').innerHTML = `
+          <div class="no-data">
+            <div class="no-data-icon">👟</div>
+            <p>没有跑鞋数据</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;">请在 shoes.json 中添加跑鞋信息</p>
+          </div>
+        `;
+      } else {
+        document.getElementById('all-shoes').innerHTML = shoes.map(s => {
+          let statusClass, statusText;
+          if (s.overallStatus === 'danger') {
+            statusClass = 'shoe-status status-danger';
+            statusText = '需退役';
+          } else if (s.overallStatus === 'warning') {
+            statusClass = 'shoe-status status-warning';
+            statusText = '需关注';
+          } else {
+            statusClass = 'shoe-status status-safe';
+            statusText = '正常';
+          }
+          
+          return `
+            <div class="shoe-item">
+              <div class="shoe-info">
+                <div class="shoe-name">${s.name}</div>
+                <div class="shoe-meta">
+                  ${s.totalDistance.toFixed(1)} km | 
+                  最后使用: ${s.lastRunStr || '-'} | 
+                  剩余: ${s.remainingMileage > 0 ? s.remainingMileage.toFixed(1) + ' km' : '0 km'}
+                </div>
+              </div>
+              <span class="${statusClass}">${statusText}</span>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      if (rotation.hasSuggestions) {
+        let suggestionsHtml = '';
+        if (rotation.suggestions && rotation.suggestions.length > 0) {
+          suggestionsHtml += '<h3 style="margin-bottom: 12px; color: #2c3e50;">💡 建议</h3>';
+          suggestionsHtml += '<ul class="risk-list">';
+          suggestionsHtml += rotation.suggestions.map(s => `
+            <li class="risk-item">
+              <span class="risk-icon">💡</span>
+              <div class="risk-content">
+                <div class="risk-message">${s.message}</div>
+              </div>
+            </li>
+          `).join('');
+          suggestionsHtml += '</ul>';
+        }
+        if (rotation.warnings && rotation.warnings.length > 0) {
+          suggestionsHtml += '<h3 style="margin: 16px 0 12px; color: #f39c12;">⚠️ 提醒</h3>';
+          suggestionsHtml += '<ul class="risk-list">';
+          suggestionsHtml += rotation.warnings.map(w => `
+            <li class="risk-item">
+              <span class="risk-icon">⚠️</span>
+              <div class="risk-content">
+                <div class="risk-message">${w.message}</div>
+              </div>
+            </li>
+          `).join('');
+          suggestionsHtml += '</ul>';
+        }
+        document.getElementById('rotation-suggestions').innerHTML = suggestionsHtml;
+      } else {
+        document.getElementById('rotation-suggestions').innerHTML = `
+          <div class="no-data">
+            <div class="no-data-icon">✅</div>
+            <p>${rotation.message || '轮换情况良好'}</p>
+          </div>
+        `;
+      }
+    }
+    
+    function renderSoreness() {
+      const patterns = currentData.soreness.patterns;
+      const recent = currentData.soreness.recentSoreness;
+      
+      let patternsHtml = '';
+      
+      if (patterns.hasPatterns) {
+        if (patterns.highRiskShoes && patterns.highRiskShoes.length > 0) {
+          patternsHtml += '<h4 style="margin-bottom: 8px; color: #e74c3c;">👟 鞋款关联</h4>';
+          patternsHtml += '<ul class="risk-list">';
+          patternsHtml += patterns.highRiskShoes.map(s => `
+            <li class="risk-item">
+              <span class="risk-icon">👟</span>
+              <div class="risk-content">
+                <div class="risk-message">${s.message}</div>
+              </div>
+            </li>
+          `).join('');
+          patternsHtml += '</ul>';
+        }
+        
+        if (patterns.highRiskSurfaces && patterns.highRiskSurfaces.length > 0) {
+          patternsHtml += '<h4 style="margin: 16px 0 8px; color: #f39c12;">🛤️ 路面关联</h4>';
+          patternsHtml += '<ul class="risk-list">';
+          patternsHtml += patterns.highRiskSurfaces.map(s => `
+            <li class="risk-item">
+              <span class="risk-icon">🛤️</span>
+              <div class="risk-content">
+                <div class="risk-message">${s.message}</div>
+              </div>
+            </li>
+          `).join('');
+          patternsHtml += '</ul>';
+        }
+        
+        if (patterns.highRiskTypes && patterns.highRiskTypes.length > 0) {
+          patternsHtml += '<h4 style="margin: 16px 0 8px; color: #3498db;">🏃 训练类型关联</h4>';
+          patternsHtml += '<ul class="risk-list">';
+          patternsHtml += patterns.highRiskTypes.map(t => `
+            <li class="risk-item">
+              <span class="risk-icon">🏃</span>
+              <div class="risk-content">
+                <div class="risk-message">${t.message}</div>
+              </div>
+            </li>
+          `).join('');
+          patternsHtml += '</ul>';
+        }
+      }
+      
+      if (!patternsHtml) {
+        patternsHtml = `
+          <div class="no-data">
+            <div class="no-data-icon">✅</div>
+            <p>${patterns.message || '没有发现明显的关联模式'}</p>
+          </div>
+        `;
+      }
+      
+      document.getElementById('soreness-patterns').innerHTML = patternsHtml;
+      
+      if (recent && recent.length > 0) {
+        document.getElementById('recent-soreness').innerHTML = recent.map(s => `
+          <div class="soreness-location">
+            <div style="font-weight: 600;">${s.dateStr || formatDate(s.date)}</div>
+            <div style="flex: 1; margin: 0 16px;">
+              ${s.location} ${s.side && s.side !== 'unknown' ? `(${s.side})` : ''}
+              ${s.description ? ` - ${s.description}` : ''}
+            </div>
+            <div style="font-size: 0.85rem; color: #7f8c8d;">
+              严重程度: ${s.severity}/10
+            </div>
+          </div>
+        `).join('');
+      } else {
+        document.getElementById('recent-soreness').innerHTML = `
+          <div class="no-data">
+            <div class="no-data-icon">✅</div>
+            <p>近期没有疼痛记录</p>
+          </div>
+        `;
+      }
+    }
+    
+    function renderCharts() {
+      const weeklyData = currentData.weekly.data;
+      const shoeData = currentData.shoeMileage.data;
+      const sorenessData = currentData.sorenessDist.data;
+      
+      if (weeklyChart) weeklyChart.destroy();
+      if (weeklyData && weeklyData.length > 0) {
+        const ctx1 = document.getElementById('weeklyChart').getContext('2d');
+        weeklyChart = new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: weeklyData.map(d => d.week),
+            datasets: [
+              {
+                label: '跑量 (km)',
+                data: weeklyData.map(d => d.distance),
+                backgroundColor: 'rgba(102, 126, 234, 0.7)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                yAxisID: 'y'
+              },
+              {
+                label: '爬升 (m)',
+                data: weeklyData.map(d => d.elevation),
+                backgroundColor: 'rgba(240, 147, 251, 0.7)',
+                borderColor: 'rgba(240, 147, 251, 1)',
+                borderWidth: 1,
+                yAxisID: 'y1',
+                type: 'line'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: '跑量 (km)'
+                }
+              },
+              y1: {
+                beginAtZero: true,
+                position: 'right',
+                title: {
+                  display: true,
+                  text: '爬升 (m)'
+                }
+              }
+            }
+          }
+        });
+      }
+      
+      if (shoeChart) shoeChart.destroy();
+      if (shoeData && shoeData.length > 0) {
+        const ctx2 = document.getElementById('shoeChart').getContext('2d');
+        shoeChart = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: shoeData.map(s => s.name),
+            datasets: [{
+              data: shoeData.map(s => s.totalDistance),
+              backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(240, 147, 251, 0.8)',
+                'rgba(56, 239, 125, 0.8)',
+                'rgba(255, 154, 158, 0.8)',
+                'rgba(250, 208, 196, 0.8)',
+                'rgba(255, 236, 210, 0.8)'
+              ],
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+      
+      if (sorenessChart) sorenessChart.destroy();
+      if (sorenessData && sorenessData.length > 0) {
+        const ctx3 = document.getElementById('sorenessChart').getContext('2d');
+        sorenessChart = new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: sorenessData.map(s => s.location),
+            datasets: [{
+              label: '发作次数',
+              data: sorenessData.map(s => s.count),
+              backgroundColor: 'rgba(245, 87, 108, 0.7)',
+              borderColor: 'rgba(245, 87, 108, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        
+        tab.classList.add('active');
+        const tabName = tab.dataset.tab;
+        document.getElementById(`tab-${tabName}`).style.display = 'block';
+      });
+    });
+    
+    function formatDate(date) {
+      if (!date) return '-';
+      const d = new Date(date);
+      return d.toLocaleDateString('zh-CN');
+    }
+    
+    loadData();
+  </script>
+</body>
+</html>
