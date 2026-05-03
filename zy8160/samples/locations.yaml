@@ -1,0 +1,63 @@
+locations:
+  - name: 市中心广场
+    address: 北京市朝阳区建国路88号
+    is_exterior: true
+    is_sound_stage: false
+    latitude: 39.9042
+    longitude: 116.4074
+
+  - name: 主角公寓
+    address: 北京市海淀区中关村大街1号
+    is_exterior: false
+    is_sound_stage: false
+    latitude: 39.9847
+    longitude: 116.3046
+
+  - name: 废弃仓库
+    address: 北京市通州区工业开发区
+    is_exterior: true
+    is_sound_stage: false
+    latitude: 39.9087
+    longitude: 116.6569
+
+  - name: 商业中心停车场
+    address: 北京市朝阳区国贸商圈
+    is_exterior: true
+    is_sound_stage: false
+    latitude: 39.9087
+    longitude: 116.4605
+
+  - name: 商业中心天台
+    address: 北京市朝阳区国贸商圈
+    is_exterior: true
+    is_sound_stage: false
+    latitude: 39.9087
+    longitude: 116.4605
+
+  - name: 街角咖啡馆
+    address: 北京市东城区南锣鼓巷
+    is_exterior: false
+    is_sound_stage: false
+    latitude: 39.9388
+    longitude: 116.4074
+
+  - name: 一号摄影棚
+    address: 北京市怀柔区影视基地A区
+    is_exterior: false
+    is_sound_stage: true
+    latitude: 40.3470
+    longitude: 116.6320
+
+  - name: 二号摄影棚
+    address: 北京市怀柔区影视基地A区
+    is_exterior: false
+    is_sound_stage: true
+    latitude: 40.3472
+    longitude: 116.6325
+
+  - name: 室内街景棚
+    address: 北京市怀柔区影视基地B区
+    is_exterior: false
+    is_sound_stage: true
+    latitude: 40.3468
+    longitude: 116.6330

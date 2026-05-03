@@ -1,0 +1,52 @@
+{
+  "crew": [
+    {
+      "name": "张明",
+      "role": "男主角",
+      "is_actor": true,
+      "group_name": "A组",
+      "availability_start": "2026-05-01",
+      "availability_end": "2026-05-31"
+    },
+    {
+      "name": "李华",
+      "role": "反派主角",
+      "is_actor": true,
+      "group_name": "A组",
+      "availability_start": "2026-05-01",
+      "availability_end": "2026-05-31"
+    },
+    {
+      "name": "王强",
+      "role": "男配角",
+      "is_actor": true,
+      "group_name": "B组",
+      "availability_start": "2026-05-01",
+      "availability_end": "2026-05-31"
+    },
+    {
+      "name": "陈导演",
+      "role": "导演",
+      "is_actor": false,
+      "group_name": "A组"
+    },
+    {
+      "name": "刘副导",
+      "role": "副导演",
+      "is_actor": false,
+      "group_name": "B组"
+    },
+    {
+      "name": "赵摄影",
+      "role": "摄影师",
+      "is_actor": false,
+      "group_name": "A组"
+    },
+    {
+      "name": "孙灯光",
+      "role": "灯光师",
+      "is_actor": false,
+      "group_name": "A组"
+    }
+  ]
+}

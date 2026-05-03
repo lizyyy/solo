@@ -1,0 +1,68 @@
+{
+  "weather": [
+    {
+      "location_name": "市中心广场",
+      "date": "2026-05-04",
+      "condition": "晴",
+      "temperature": 22.5,
+      "precipitation_probability": 0.05,
+      "is_rainy": false
+    },
+    {
+      "location_name": "市中心广场",
+      "date": "2026-05-05",
+      "condition": "中雨",
+      "temperature": 16.0,
+      "precipitation_probability": 0.95,
+      "is_rainy": true
+    },
+    {
+      "location_name": "废弃仓库",
+      "date": "2026-05-04",
+      "condition": "多云",
+      "temperature": 20.0,
+      "precipitation_probability": 0.2,
+      "is_rainy": false
+    },
+    {
+      "location_name": "废弃仓库",
+      "date": "2026-05-05",
+      "condition": "小雨",
+      "temperature": 15.5,
+      "precipitation_probability": 0.8,
+      "is_rainy": true
+    },
+    {
+      "location_name": "商业中心停车场",
+      "date": "2026-05-04",
+      "condition": "晴",
+      "temperature": 23.0,
+      "precipitation_probability": 0.0,
+      "is_rainy": false
+    },
+    {
+      "location_name": "商业中心停车场",
+      "date": "2026-05-05",
+      "condition": "阵雨",
+      "temperature": 17.0,
+      "precipitation_probability": 0.7,
+      "is_rainy": true
+    },
+    {
+      "location_name": "商业中心天台",
+      "date": "2026-05-04",
+      "condition": "晴",
+      "temperature": 22.0,
+      "precipitation_probability": 0.02,
+      "is_rainy": false
+    },
+    {
+      "location_name": "商业中心天台",
+      "date": "2026-05-05",
+      "condition": "中雨",
+      "temperature": 15.0,
+      "precipitation_probability": 0.9,
+      "is_rainy": true
+    }
+  ]
+}
