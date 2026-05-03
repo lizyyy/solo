@@ -1,0 +1,56 @@
+version: "1.0"
+salt: "my_secret_salt_2024_production"
+outputDir: "./masked_output"
+dryRun: false
+preserveOriginalFilenames: true
+
+globalIgnoreFields:
+  - "user_id"
+  - "order_id"
+  - "ticket_id"
+  - "created_at"
+  - "status"
+  - "assigned_to"
+
+files:
+  - path: "./users.csv"
+    type: "csv"
+    fields:
+      real_name:
+        type: "name"
+      email:
+        type: "email"
+      phone:
+        type: "phone"
+      address:
+        type: "address"
+      username:
+        type: "name"
+
+  - path: "./orders.csv"
+    type: "csv"
+    fields:
+      user_name:
+        type: "name"
+      user_phone:
+        type: "phone"
+      user_email:
+        type: "email"
+      shipping_address:
+        type: "address"
+      remark:
+        type: "free_text"
+
+  - path: "./tickets.json"
+    type: "json"
+    fields:
+      user_info.name:
+        type: "name"
+      user_info.phone:
+        type: "phone"
+      user_info.email:
+        type: "email"
+      content:
+        type: "free_text"
+      title:
+        type: "free_text"

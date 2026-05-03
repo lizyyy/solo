@@ -1,0 +1,58 @@
+[
+  {
+    "ticket_id": "TK001",
+    "order_id": "ORD2024001",
+    "user_info": {
+      "name": "张三",
+      "phone": "13812345678",
+      "email": "zhangsan@example.com"
+    },
+    "title": "订单发货延迟",
+    "content": "用户张三来电投诉，订单ORD2024001发货延迟。联系电话：13812345678，邮箱zhangsan@example.com。用户表示如果明天还不发货就取消订单。",
+    "status": "处理中",
+    "created_at": "2024-03-02T10:30:00Z",
+    "assigned_to": "客服小王"
+  },
+  {
+    "ticket_id": "TK002",
+    "order_id": "ORD2024002",
+    "user_info": {
+      "name": "李四",
+      "phone": "13987654321",
+      "email": "lisi@example.com"
+    },
+    "title": "商品质量问题",
+    "content": "收到的MacBook Air有外观划痕，用户李四希望退换货。联系手机：139-8765-4321，或者发邮件到lisi@example.com。用户地址：上海市浦东新区张江高科技园区。",
+    "status": "待处理",
+    "created_at": "2024-03-06T14:20:00Z",
+    "assigned_to": "售后小张"
+  },
+  {
+    "ticket_id": "TK003",
+    "order_id": "ORD2024003",
+    "user_info": {
+      "name": "张三",
+      "phone": "13812345678",
+      "email": "zhangsan@example.com"
+    },
+    "title": "耳机连接问题",
+    "content": "AirPods Pro连接不稳定，经常断线。用户张三（13812345678）希望技术支持协助排查。邮箱backup@test.com也可以联系。",
+    "status": "已解决",
+    "created_at": "2024-03-11T09:15:00Z",
+    "assigned_to": "技术小李"
+  },
+  {
+    "ticket_id": "TK004",
+    "order_id": "ORD2024005",
+    "user_info": {
+      "name": "赵六",
+      "phone": "13577776666",
+      "email": "zhaoliu@gmail.com"
+    },
+    "title": "表带颜色发错",
+    "content": "Apple Watch的表带颜色订单上是黑色，但收到的是白色。用户赵六要求换货。电话：13577776666，邮箱zhaoliu@gmail.com。地址：深圳市南山区科技园。",
+    "status": "处理中",
+    "created_at": "2024-03-16T16:45:00Z",
+    "assigned_to": "客服小王"
+  }
+]

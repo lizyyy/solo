@@ -1,0 +1,42 @@
+{
+  "name": "data-masker",
+  "version": "1.0.0",
+  "description": "本地数据脱敏CLI工具 - 支持CSV/JSON文件批量脱敏，保持跨文件一致性映射",
+  "main": "dist/index.js",
+  "bin": {
+    "data-masker": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bin/cli.js",
+    "dev": "ts-node src/bin/cli.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "data-masking",
+    "privacy",
+    "csv",
+    "json",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "js-yaml": "^4.1.0",
+    "chalk": "^4.1.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
