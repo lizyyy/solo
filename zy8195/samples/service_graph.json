@@ -1,0 +1,61 @@
+{
+  "services": [
+    {
+      "name": "api-gateway",
+      "trust_bundle": "internal-ca",
+      "endpoint": "https://api.example.com:443"
+    },
+    {
+      "name": "user-service",
+      "trust_bundle": "internal-ca",
+      "endpoint": "https://user.example.com:8443"
+    },
+    {
+      "name": "order-service",
+      "trust_bundle": "internal-ca",
+      "endpoint": "https://order.example.com:8443"
+    },
+    {
+      "name": "payment-service",
+      "trust_bundle": "internal-ca",
+      "endpoint": "https://payment.example.com:8443"
+    },
+    {
+      "name": "notification-service",
+      "trust_bundle": "external-ca",
+      "endpoint": "https://notify.example.com:8443"
+    }
+  ],
+  "relationships": [
+    {
+      "client": "api-gateway",
+      "server": "user-service",
+      "protocol": "http",
+      "requires_mtls": true
+    },
+    {
+      "client": "api-gateway",
+      "server": "order-service",
+      "protocol": "http",
+      "requires_mtls": true
+    },
+    {
+      "client": "order-service",
+      "server": "payment-service",
+      "protocol": "grpc",
+      "requires_mtls": true
+    },
+    {
+      "client": "order-service",
+      "server": "notification-service",
+      "protocol": "http",
+      "requires_mtls": true
+    },
+    {
+      "client": "user-service",
+      "server": "notification-service",
+      "protocol": "http",
+      "requires_mtls": true
+    }
+  ]
+}

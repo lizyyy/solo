@@ -1,0 +1,19 @@
+internal-ca:
+  name: Internal CA Bundle
+  root_certs:
+    - certs/root-ca.pem
+  intermediate_certs:
+    - certs/intermediate-ca.pem
+  services:
+    - api-gateway
+    - user-service
+    - order-service
+    - payment-service
+
+external-ca:
+  name: External CA Bundle
+  root_certs:
+    - certs/external-root-ca.pem
+  intermediate_certs: []
+  services:
+    - notification-service

@@ -1,0 +1,6 @@
+service_name,cert_file_path,key_file_path,rotation_batch,expected_sans
+api-gateway,certs/api-gateway.pem,certs/api-gateway-key.pem,batch-1,"api.example.com,gateway.example.com"
+user-service,certs/user-service.pem,certs/user-service-key.pem,batch-1,user.example.com
+order-service,certs/order-service.pem,certs/order-service-key.pem,batch-2,"order.example.com,orders.example.com"
+payment-service,certs/payment-service.pem,certs/payment-service-key.pem,batch-2,payment.example.com
+notification-service,certs/notification-service.pem,certs/notification-service-key.pem,batch-3,notify.example.com
