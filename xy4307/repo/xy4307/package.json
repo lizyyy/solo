@@ -1,0 +1,29 @@
+{
+  "name": "incubator-log-manager",
+  "version": "1.0.0",
+  "description": "培养箱巡检日志整理器 - 合并设备CSV和批次数据，识别异常，生成报告",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "incubator-log": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js import --device ./examples/device_csv/ --batch ./examples/batch_csv/"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "chalk": "^5.3.0"
+  },
+  "keywords": [
+    "incubator",
+    "lab",
+    "log",
+    "csv",
+    "report"
+  ],
+  "author": "Lab Team",
+  "license": "MIT"
+}
