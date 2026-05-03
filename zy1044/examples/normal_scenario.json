@@ -1,0 +1,20 @@
+{
+  "name": "正常维护场景",
+  "tank_volume": 50,
+  "fish": [
+    {"size": "small", "quantity": 6},
+    {"size": "medium", "quantity": 2}
+  ],
+  "filtration_level": "medium",
+  "daily_feeding_amount": 2.5,
+  "initial_ammonia": 0.02,
+  "initial_nitrite": 0.01,
+  "initial_nitrate": 25.0,
+  "initial_ph": 7.2,
+  "water_changes": [
+    {"day": 7, "percentage": 25},
+    {"day": 14, "percentage": 25}
+  ],
+  "add_fish": [],
+  "simulation_days": 14
+}

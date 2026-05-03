@@ -1,0 +1,16 @@
+{
+  "name": "无效换水测试",
+  "tank_volume": 50,
+  "fish": [{"size": "small", "quantity": 5}],
+  "filtration_level": "medium",
+  "daily_feeding_amount": 2.0,
+  "initial_ammonia": 0.02,
+  "initial_nitrite": 0.01,
+  "initial_nitrate": 20.0,
+  "initial_ph": 7.0,
+  "water_changes": [
+    {"day": 5, "percentage": 80}
+  ],
+  "add_fish": [],
+  "simulation_days": 7
+}

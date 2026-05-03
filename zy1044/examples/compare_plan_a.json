@@ -1,0 +1,18 @@
+{
+  "name": "方案 A - 每周换水 25%",
+  "tank_volume": 50,
+  "fish": [
+    {"size": "small", "quantity": 10}
+  ],
+  "filtration_level": "medium",
+  "daily_feeding_amount": 3.0,
+  "initial_ammonia": 0.02,
+  "initial_nitrite": 0.01,
+  "initial_nitrate": 30.0,
+  "initial_ph": 7.2,
+  "water_changes": [
+    {"day": 7, "percentage": 25}
+  ],
+  "add_fish": [],
+  "simulation_days": 14
+}

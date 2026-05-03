@@ -1,0 +1,20 @@
+{
+  "name": "高风险场景 - 喂食过量",
+  "tank_volume": 30,
+  "fish": [
+    {"size": "medium", "quantity": 8}
+  ],
+  "filtration_level": "low",
+  "daily_feeding_amount": 8.0,
+  "initial_ammonia": 0.1,
+  "initial_nitrite": 0.05,
+  "initial_nitrate": 40.0,
+  "initial_ph": 7.0,
+  "water_changes": [
+    {"day": 14, "percentage": 20}
+  ],
+  "add_fish": [
+    {"day": 3, "quantity": 4, "size": "medium"}
+  ],
+  "simulation_days": 14
+}

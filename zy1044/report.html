@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鱼缸水质模拟报告 - 正常维护场景</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f7fa; }
+        h1, h2, h3 { color: #2c3e50; margin-bottom: 15px; }
+        h1 { font-size: 2em; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { font-size: 1.5em; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 10px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+        .risk-safe { background: #d4edda; color: #155724; }
+        .risk-warning { background: #fff3cd; color: #856404; }
+        .risk-danger { background: #ffeaa7; color: #d35400; }
+        .risk-critical { background: #f8d7da; color: #721c24; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        tr:hover { background: #f8f9fa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-card { text-align: center; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; }
+        .stat-value { font-size: 2em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; }
+        ul { margin: 10px 0 10px 20px; }
+        li { margin: 5px 0; }
+        .chart-container { height: 300px; margin: 20px 0; position: relative; }
+        .chart { width: 100%; height: 100%; }
+        .legend { display: flex; gap: 20px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; }
+        .comparison-highlight { background: #e8f4f8; border-left: 4px solid #3498db; padding: 10px 15px; margin: 15px 0; border-radius: 0 4px 4px 0; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #7f8c8d; font-size: 0.9em; }
+        .timestamp { color: #7f8c8d; font-size: 0.9em; }
+        .icon { margin-right: 5px; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        .warning-box { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 4px; margin: 15px 0; }
+        .danger-box { background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 4px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🐠 鱼缸水质模拟报告</h1>
+        <p><strong>正常维护场景</strong></p>
+        <p class="timestamp">生成时间: 2026-05-03 12:19:26</p>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">📊</span>总体评估</h2>
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value"><span class="risk-badge risk-warning">偏高</span></div>
+                <div class="stat-label">最高风险等级</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">安全天数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">15</div>
+                <div class="stat-label">偏高天数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">危险天数</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">📈</span>水质趋势</h2>
+        <div class="chart-container">
+            <canvas id="waterChart" class="chart"></canvas>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="legend-color" style="background: #e74c3c;"></span> 氨氮 (mg/L)</div>
+            <div class="legend-item"><span class="legend-color" style="background: #f39c12;"></span> 亚硝酸盐 (mg/L)</div>
+            <div class="legend-item"><span class="legend-color" style="background: #3498db;"></span> 硝酸盐 (mg/L × 0.01)</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">🐟</span>场景参数</h2>
+        <table>
+            <tr><th>参数</th><th>值</th></tr>
+            <tr><td>鱼缸体积</td><td>50 升</td></tr>
+            <tr><td>鱼只数量</td><td>8 条</td></tr>
+            <tr><td>过滤等级</td><td>medium</td></tr>
+            <tr><td>每日喂食量</td><td>2.5 克</td></tr>
+            <tr><td>模拟天数</td><td>14 天</td></tr>
+        </table>
+        <h3>换水计划</h3>
+        <ul>
+  <li>第 7 天: 换水 25.0%</li>
+  <li>第 14 天: 换水 25.0%</li>
+</ul>
+        
+        
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">⚠️</span>高风险因素</h2>
+        <ul>
+  <li>喂食量相对鱼的数量偏高</li>
+</ul>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">💡</span>总体建议</h2>
+        <ul>
+            <li>存在一些偏高的指标，建议优化饲养习惯</li><li>建议：喂食后观察 5 分钟，如有剩余饲料及时吸出</li><li>建议：每周至少停喂一天，帮助消化系统清理</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">📋</span>水质指标摘要</h2>
+        <table>
+            <tr><th>指标</th><th>初始值</th><th>最终值</th><th>最大值</th><th>趋势</th></tr>
+            <tr><td>氨氮 (mg/L)</td><td>0.0200</td><td>0.0528</td><td>0.0704</td><td>上升</td></tr>
+            <tr><td>亚硝酸盐 (mg/L)</td><td>0.0100</td><td>0.0608</td><td>0.0808</td><td>上升</td></tr>
+            <tr><td>硝酸盐 (mg/L)</td><td>25.00</td><td>13.02</td><td>25.00</td><td>下降</td></tr>
+            <tr><td>pH</td><td>7.20</td><td>7.08</td><td>-</td><td>稳定</td></tr>
+        </table>
+    </div>
+
+    
+
+    <div class="card">
+        <h2><span class="icon">📅</span>每日详细数据</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <tr><th>天数</th><th>氨氮 (mg/L)</th><th>亚硝酸盐 (mg/L)</th><th>硝酸盐 (mg/L)</th><th>pH</th><th>风险等级</th></tr>
+                <tr><td>0</td><td>0.0200</td><td>0.0100</td><td>25.00</td><td>7.20</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>1</td><td>0.0500</td><td>0.0367</td><td>24.80</td><td>7.19</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>2</td><td>0.0622</td><td>0.0564</td><td>24.62</td><td>7.17</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>3</td><td>0.0671</td><td>0.0682</td><td>24.46</td><td>7.16</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>4</td><td>0.0691</td><td>0.0747</td><td>24.31</td><td>7.15</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>5</td><td>0.0699</td><td>0.0780</td><td>24.16</td><td>7.14</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>6</td><td>0.0702</td><td>0.0797</td><td>24.02</td><td>7.13</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>7</td><td>0.0528</td><td>0.0604</td><td>17.91</td><td>7.13</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>8</td><td>0.0633</td><td>0.0675</td><td>17.82</td><td>7.12</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>9</td><td>0.0675</td><td>0.0734</td><td>17.73</td><td>7.11</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>10</td><td>0.0693</td><td>0.0771</td><td>17.65</td><td>7.10</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>11</td><td>0.0700</td><td>0.0791</td><td>17.58</td><td>7.10</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>12</td><td>0.0703</td><td>0.0802</td><td>17.50</td><td>7.09</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>13</td><td>0.0704</td><td>0.0808</td><td>17.43</td><td>7.09</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+<tr><td>14</td><td>0.0528</td><td>0.0608</td><td>13.02</td><td>7.08</td><td><span class='risk-badge risk-warning'>偏高</span></td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>安全阈值说明:</strong></p>
+        <p>氨氮: 0.05 mg/L 以下 | 亚硝酸盐: 0.02 mg/L 以下 | 硝酸盐: 20 mg/L 以下 | pH: 6.5-7.5</p>
+        <p style="margin-top: 10px;">⚠️ 本报告基于模拟模型生成，仅供参考。实际水质请以专业检测为准。</p>
+    </div>
+
+    <script>
+        const dailyData = [{"day": 0, "ammonia": 0.02, "nitrite": 0.01, "nitrate": 25.0, "ph": 7.2, "risk": "warning"}, {"day": 1, "ammonia": 0.05, "nitrite": 0.0367, "nitrate": 24.7963, "ph": 7.19, "risk": "warning"}, {"day": 2, "ammonia": 0.0622, "nitrite": 0.0564, "nitrate": 24.6193, "ph": 7.17, "risk": "warning"}, {"day": 3, "ammonia": 0.0671, "nitrite": 0.0682, "nitrate": 24.459, "ph": 7.16, "risk": "warning"}, {"day": 4, "ammonia": 0.0691, "nitrite": 0.0747, "nitrate": 24.3085, "ph": 7.15, "risk": "warning"}, {"day": 5, "ammonia": 0.0699, "nitrite": 0.078, "nitrate": 24.1637, "ph": 7.14, "risk": "warning"}, {"day": 6, "ammonia": 0.0702, "nitrite": 0.0797, "nitrate": 24.0226, "ph": 7.13, "risk": "warning"}, {"day": 7, "ammonia": 0.0528, "nitrite": 0.0604, "nitrate": 17.9129, "ph": 7.13, "risk": "warning"}, {"day": 8, "ammonia": 0.0633, "nitrite": 0.0675, "nitrate": 17.8188, "ph": 7.12, "risk": "warning"}, {"day": 9, "ammonia": 0.0675, "nitrite": 0.0734, "nitrate": 17.7331, "ph": 7.11, "risk": "warning"}, {"day": 10, "ammonia": 0.0693, "nitrite": 0.0771, "nitrate": 17.6528, "ph": 7.1, "risk": "warning"}, {"day": 11, "ammonia": 0.07, "nitrite": 0.0791, "nitrate": 17.576, "ph": 7.1, "risk": "warning"}, {"day": 12, "ammonia": 0.0703, "nitrite": 0.0802, "nitrate": 17.5013, "ph": 7.09, "risk": "warning"}, {"day": 13, "ammonia": 0.0704, "nitrite": 0.0808, "nitrate": 17.4281, "ph": 7.09, "risk": "warning"}, {"day": 14, "ammonia": 0.0528, "nitrite": 0.0608, "nitrate": 13.017, "ph": 7.08, "risk": "warning"}];
+        const comparisonData = [];
+        
+        function drawChart() {
+            const canvas = document.getElementById('waterChart');
+            const ctx = canvas.getContext('2d');
+            
+            const padding = { top: 30, right: 30, bottom: 50, left: 60 };
+            const chartWidth = canvas.width - padding.left - padding.right;
+            const chartHeight = canvas.height - padding.top - padding.bottom;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const maxAmmonia = Math.max(...dailyData.map(d => d.ammonia), 0.1);
+            const maxNitrite = Math.max(...dailyData.map(d => d.nitrite), 0.1);
+            const maxNitrate = Math.max(...dailyData.map(d => d.nitrate) || [0], 1) * 0.01;
+            const maxValue = Math.max(maxAmmonia, maxNitrite, maxNitrate);
+            
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + chartWidth, y);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#666';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText((maxValue * (5 - i) / 5).toFixed(2), padding.left - 5, y + 4);
+            }
+            
+            const labelCount = Math.min(dailyData.length, 10);
+            const labelStep = Math.max(1, Math.floor(dailyData.length / labelCount));
+            for (let i = 0; i < dailyData.length; i += labelStep) {
+                const x = padding.left + (chartWidth / (dailyData.length - 1)) * i;
+                ctx.fillStyle = '#666';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`D${dailyData[i].day}`, x, canvas.height - padding.bottom + 20);
+            }
+            
+            function plotLine(data, key, color, scale = 1) {
+                if (!data.length) return;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < data.length; i++) {
+                    const x = padding.left + (chartWidth / (data.length - 1)) * i;
+                    const value = data[i][key] * scale;
+                    const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.stroke();
+            }
+            
+            function plotPoints(data, key, color, scale = 1) {
+                ctx.fillStyle = color;
+                for (let i = 0; i < data.length; i++) {
+                    const x = padding.left + (chartWidth / (data.length - 1)) * i;
+                    const value = data[i][key] * scale;
+                    const y = padding.top + chartHeight - (value / maxValue) * chartHeight;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            plotLine(dailyData, 'ammonia', '#e74c3c');
+            plotPoints(dailyData, 'ammonia', '#e74c3c');
+            
+            plotLine(dailyData, 'nitrite', '#f39c12');
+            plotPoints(dailyData, 'nitrite', '#f39c12');
+            
+            plotLine(dailyData, 'nitrate', '#3498db', 0.01);
+            plotPoints(dailyData, 'nitrate', '#3498db', 0.01);
+            
+            if (comparisonData.length) {
+                ctx.setLineDash([5, 5]);
+                plotLine(comparisonData, 'ammonia', '#c0392b');
+                plotLine(comparisonData, 'nitrite', '#e67e22');
+                plotLine(comparisonData, 'nitrate', '#2980b9', 0.01);
+                ctx.setLineDash([]);
+            }
+        }
+        
+        window.onload = drawChart;
+    </script>
+</body>
+</html>

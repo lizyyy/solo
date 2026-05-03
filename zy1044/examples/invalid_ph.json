@@ -1,0 +1,14 @@
+{
+  "name": "无效 pH 测试",
+  "tank_volume": 50,
+  "fish": [{"size": "small", "quantity": 5}],
+  "filtration_level": "medium",
+  "daily_feeding_amount": 2.0,
+  "initial_ammonia": 0.02,
+  "initial_nitrite": 0.01,
+  "initial_nitrate": 20.0,
+  "initial_ph": 15.0,
+  "water_changes": [],
+  "add_fish": [],
+  "simulation_days": 7
+}
