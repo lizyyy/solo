@@ -1,0 +1,50 @@
+[
+  {
+    "serialNumber": "OXY-001",
+    "inspectionDate": "2025-01-10",
+    "inspector": "张检验员",
+    "result": "合格",
+    "notes": "外观检查良好，压力正常",
+    "nextInspectionDate": "2026-01-10"
+  },
+  {
+    "serialNumber": "OXY-002",
+    "inspectionDate": "2024-06-10",
+    "inspector": "李检验员",
+    "result": "合格",
+    "notes": "正常",
+    "nextInspectionDate": "2025-06-10"
+  },
+  {
+    "serialNumber": "OXY-003",
+    "inspectionDate": "2025-02-15",
+    "inspector": "张检验员",
+    "result": "合格",
+    "notes": "正常",
+    "nextInspectionDate": "2026-02-15"
+  },
+  {
+    "serialNumber": "LAUGH-001",
+    "inspectionDate": "2025-01-05",
+    "inspector": "王检验员",
+    "result": "合格",
+    "notes": "正常",
+    "nextInspectionDate": "2026-01-05"
+  },
+  {
+    "serialNumber": "LAUGH-002",
+    "inspectionDate": "2024-12-01",
+    "inspector": "李检验员",
+    "result": "合格",
+    "notes": "正常",
+    "nextInspectionDate": "2025-12-01"
+  },
+  {
+    "serialNumber": "OXY-004",
+    "inspectionDate": "2023-10-01",
+    "inspector": "张检验员",
+    "result": "合格",
+    "notes": "检验已过期，需重新检验",
+    "nextInspectionDate": "2024-10-01"
+  }
+]
