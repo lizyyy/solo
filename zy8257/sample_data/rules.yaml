@@ -1,0 +1,26 @@
+rules:
+  - rule_id: "TEMP_RANGE_001"
+    rule_name: "冷藏柜温度范围"
+    rule_type: "temperature"
+    min_value: -25.0
+    max_value: -15.0
+    description: "冷藏柜温度应保持在-25°C到-15°C之间"
+    is_active: true
+    
+  - rule_id: "OVERLAP_CHECK_001"
+    rule_name: "同柜占用检查"
+    rule_type: "overlap"
+    description: "同一冷藏柜不得同时占用两位逝者"
+    is_active: true
+    
+  - rule_id: "SIGNATURE_REQ_001"
+    rule_name: "交接签收要求"
+    rule_type: "signature"
+    description: "所有交接记录必须有签收确认"
+    is_active: true
+    
+  - rule_id: "MIDNIGHT_CHECK_001"
+    rule_name: "跨午夜归属检查"
+    rule_type: "midnight"
+    description: "跨午夜的占用需要确认值班归属日期"
+    is_active: true

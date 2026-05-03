@@ -1,0 +1,44 @@
+{"log_id": "L001", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "入柜", "temperature": -20.5, "timestamp": "2026-04-28 10:00:00", "operator": "王值班", "remarks": "正常入柜"}
+{"log_id": "L002", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-28 12:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L003", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -19.8, "timestamp": "2026-04-28 14:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L004", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -12.5, "timestamp": "2026-04-28 16:00:00", "operator": "王值班", "remarks": "温度异常偏高！"}
+{"log_id": "L005", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -18.0, "timestamp": "2026-04-28 18:00:00", "operator": "李值班", "remarks": "恢复正常"}
+{"log_id": "L006", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -28.2, "timestamp": "2026-04-28 20:00:00", "operator": "李值班", "remarks": "温度异常偏低！"}
+{"log_id": "L007", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -22.0, "timestamp": "2026-04-28 22:00:00", "operator": "李值班", "remarks": "恢复正常"}
+{"log_id": "L008", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-04-29 00:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L009", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-04-29 02:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L010", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-29 04:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L011", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -19.5, "timestamp": "2026-04-29 06:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L012", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-29 08:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L013", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "入柜", "temperature": -20.0, "timestamp": "2026-04-29 08:00:00", "operator": "王值班", "remarks": "正常入柜"}
+{"log_id": "L014", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -19.8, "timestamp": "2026-04-29 10:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L015", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-04-29 12:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L016", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-04-29 14:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L017", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-29 16:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L018", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -19.5, "timestamp": "2026-04-29 18:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L019", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-29 20:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L020", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-04-29 22:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L021", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-04-30 00:30:00", "operator": "李值班", "remarks": "跨午夜检查"}
+{"log_id": "L022", "chamber_id": "C002", "deceased_id": "D002", "operation_type": "出柜", "temperature": -20.0, "timestamp": "2026-04-30 02:00:00", "operator": "李值班", "remarks": "出柜 - 跨午夜"}
+{"log_id": "L023", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "入柜", "temperature": -19.0, "timestamp": "2026-04-30 13:00:00", "operator": "王值班", "remarks": "入柜"}
+{"log_id": "L024", "chamber_id": "C001", "deceased_id": "D001", "operation_type": "出柜", "temperature": -20.0, "timestamp": "2026-04-30 14:00:00", "operator": "王值班", "remarks": "出柜 - 注意：D003已在13:00入柜"}
+{"log_id": "L025", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -19.5, "timestamp": "2026-04-30 15:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L026", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-04-30 17:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L027", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-04-30 19:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L028", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-04-30 21:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L029", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-05-01 00:00:00", "operator": "李值班", "remarks": "跨午夜检查"}
+{"log_id": "L030", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "温度检查", "temperature": -19.5, "timestamp": "2026-05-01 02:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L031", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "入柜", "temperature": -20.0, "timestamp": "2026-05-01 08:00:00", "operator": "王值班", "remarks": "入柜"}
+{"log_id": "L032", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-05-01 10:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L033", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-05-01 12:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L034", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -13.0, "timestamp": "2026-05-01 14:00:00", "operator": "王值班", "remarks": "温度异常偏高！柜门可能未关严"}
+{"log_id": "L035", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -11.5, "timestamp": "2026-05-01 15:00:00", "operator": "李值班", "remarks": "温度持续异常！"}
+{"log_id": "L036", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -10.0, "timestamp": "2026-05-01 16:00:00", "operator": "李值班", "remarks": "温度继续上升！紧急处理中"}
+{"log_id": "L037", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -22.0, "timestamp": "2026-05-01 18:00:00", "operator": "李值班", "remarks": "恢复正常 - 柜门已关闭"}
+{"log_id": "L038", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -21.0, "timestamp": "2026-05-01 20:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L039", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-05-01 22:00:00", "operator": "李值班", "remarks": "正常"}
+{"log_id": "L040", "chamber_id": "C004", "deceased_id": "D004", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-05-02 00:15:00", "operator": "李值班", "remarks": "跨午夜检查"}
+{"log_id": "L041", "chamber_id": "C003", "deceased_id": "D003", "operation_type": "出柜", "temperature": -20.0, "timestamp": "2026-05-02 09:00:00", "operator": "王值班", "remarks": "出柜"}
+{"log_id": "L042", "chamber_id": "C005", "deceased_id": "D005", "operation_type": "入柜", "temperature": -19.5, "timestamp": "2026-05-02 10:00:00", "operator": "王值班", "remarks": "入柜"}
+{"log_id": "L043", "chamber_id": "C005", "deceased_id": "D005", "operation_type": "温度检查", "temperature": -20.0, "timestamp": "2026-05-02 12:00:00", "operator": "王值班", "remarks": "正常"}
+{"log_id": "L044", "chamber_id": "C005", "deceased_id": "D005", "operation_type": "温度检查", "temperature": -20.5, "timestamp": "2026-05-02 14:00:00", "operator": "王值班", "remarks": "正常"}
