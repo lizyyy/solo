@@ -1,0 +1,17 @@
+{
+  "name": "webrtc-weaknet-lab",
+  "version": "1.0.0",
+  "description": "本地 WebRTC 弱网协作预演台 - 用于在线白板、协同编辑、远程操控等功能的前端自测工具",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": ["webrtc", "webrtc-datachannel", "weak-network", "simulation", "collaboration"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  }
+}

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC 弱网协作预演台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>WebRTC 弱网协作预演台</h1>
+      <div class="header-actions">
+        <span id="connectionStatus" class="status-badge status-disconnected">未连接</span>
+        <button id="btnSaveSession" class="btn btn-secondary" disabled>保存会话</button>
+        <button id="btnLoadSession" class="btn btn-secondary">加载会话</button>
+        <button id="btnExport" class="btn btn-secondary" disabled>导出报告</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div id="connectionPanel" class="panel">
+        <h2>连接设置</h2>
+        <div class="connection-controls">
+          <div class="connection-mode">
+          </div>
+          <div class="room-controls">
+            <button id="btnCreateRoom" class="btn btn-primary">创建房间</button>
+            <div class="join-room">
+              <input type="text" id="roomCodeInput" placeholder="输入房间码" maxlength="6">
+              <button id="btnJoinRoom" class="btn btn-secondary">加入房间</button>
+            </div>
+          </div>
+          <div id="roomInfo" class="room-info hidden">
+            <span>房间码: </span>
+            <code id="currentRoomCode"></code>
+            <button id="btnCopyRoomCode" class="btn btn-sm">复制</button>
+            <button id="btnLeaveRoom" class="btn btn-danger btn-sm">离开</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="riskPanel" class="panel risk-panel hidden">
+        <div class="risk-header">
+          <h3>风险提示</h3>
+          <button id="btnClearRisks" class="btn btn-sm">清除</button>
+        </div>
+        <div id="riskList" class="risk-list"></div>
+      </div>
+
+      <div class="workspace">
+        <div id="peerPanel" class="panel">
+          <div class="peer-header">
+            <h2>本地端</h2>
+            <span id="peerStatus" class="status-badge status-disconnected">DataChannel 未连接</span>
+          </div>
+          
+          <div class="message-send-area">
+            <h3>发送消息</h3>
+            <div class="message-type-selector">
+              <button class="msg-type-btn active" data-type="cursor">光标</button>
+              <button class="msg-type-btn" data-type="annotation">批注</button>
+              <button class="msg-type-btn" data-type="stroke">白板笔画</button>
+              <button class="msg-type-btn" data-type="patch">文档 Patch</button>
+              <button class="msg-type-btn" data-type="text">文本</button>
+            </div>
+            
+            <div id="messagePayload" class="message-payload">
+            </div>
+            
+            <div class="send-controls">
+              <button id="btnSendMessage" class="btn btn-primary" disabled>发送</button>
+              <label class="btn btn-secondary">
+                导入脚本
+                <input type="file" id="scriptFileInput" accept=".json" style="display:none">
+              </label>
+              <button id="btnStartReplay" class="btn btn-secondary" disabled>开始回放</button>
+              <button id="btnStopReplay" class="btn btn-danger hidden">停止回放</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-panel">
+          <div class="panel">
+            <div class="timeline-header">
+              <h2>消息时间线</h2>
+              <div class="timeline-stats">
+                <span id="statTotal">总计: 0</span>
+                <span id="statSuccess" class="stat-success">成功: 0</span>
+                <span id="statSlow" class="stat-warning">慢包: 0</span>
+                <span id="statLost" class="stat-danger">丢包: 0</span>
+                <span id="statOoo" class="stat-warning">乱序: 0</span>
+                <span id="statDup" class="stat-info">重复: 0</span>
+              </div>
+            </div>
+            <div id="timeline" class="timeline">
+              <div class="timeline-empty">
+                <p>暂无消息记录</p>
+                <p>连接后发送消息将显示在这里</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-panels">
+        <div id="weaknetPanel" class="panel">
+          <div class="panel-header">
+            <h2>弱网模拟</h2>
+            <label class="switch">
+              <input type="checkbox" id="weaknetEnabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div id="weaknetControls" class="weaknet-controls disabled">
+            <div class="profile-selector">
+              <label>预设 Profile:</label>
+              <select id="profileSelect">
+                <option value="custom">自定义</option>
+                <option value="subway">地铁网络</option>
+                <option value="cafe">咖啡店 Wi-Fi</option>
+                <option value="overseas">海外会议</option>
+                <option value="satellite">卫星网络</option>
+              </select>
+            </div>
+            
+            <div class="network-sliders">
+              <div class="slider-group">
+                <label>
+                  延迟: <span id="latencyValue">0</span>ms
+                </label>
+                <input type="range" id="latencySlider" min="0" max="2000" value="0">
+                <div class="slider-info">基础传输延迟</div>
+              </div>
+              
+              <div class="slider-group">
+                <label>
+                  抖动: <span id="jitterValue">0</span>ms
+                </label>
+                <input type="range" id="jitterSlider" min="0" max="1000" value="0">
+                <div class="slider-info">延迟波动范围</div>
+              </div>
+              
+              <div class="slider-group">
+                <label>
+                  丢包率: <span id="lossValue">0</span>%
+                </label>
+                <input type="range" id="lossSlider" min="0" max="100" value="0">
+                <div class="slider-info">随机丢包百分比</div>
+              </div>
+              
+              <div class="slider-group">
+                <label>
+                  乱序率: <span id="reorderValue">0</span>%
+                </label>
+                <input type="range" id="reorderSlider" min="0" max="50" value="0">
+                <div class="slider-info">消息乱序概率</div>
+              </div>
+              
+              <div class="slider-group">
+                <label>
+                  重复率: <span id="duplicateValue">0</span>%
+                </label>
+                <input type="range" id="duplicateSlider" min="0" max="50" value="0">
+                <div class="slider-info">消息重复概率</div>
+              </div>
+            </div>
+            
+            <div class="reconnection-controls">
+              <h4>断线重连模拟</h4>
+              <div class="slider-group">
+                <label>
+                  断线概率: <span id="disconnectValue">0</span>%
+                </label>
+                <input type="range" id="disconnectSlider" min="0" max="30" value="0">
+                <div class="slider-info">每次发送后的断线概率</div>
+              </div>
+              <div class="slider-group">
+                <label>
+                  重连延迟: <span id="reconnectDelayValue">1000</span>ms
+                </label>
+                <input type="range" id="reconnectDelaySlider" min="500" max="10000" value="1000">
+                <div class="slider-info">断线后多久尝试重连</div>
+              </div>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" id="replayOnReconnect" checked>
+                  重连后重放未确认消息
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="statsPanel" class="panel">
+          <h2>统计信息</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">发送消息数</span>
+              <span class="stat-value" id="statSent">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">接收消息数</span>
+              <span class="stat-value" id="statReceived">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均延迟</span>
+              <span class="stat-value" id="statAvgLatency">0ms</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">最大延迟</span>
+              <span class="stat-value" id="statMaxLatency">0ms</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">消息队列</span>
+              <span class="stat-value" id="statQueueSize">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">重连次数</span>
+              <span class="stat-value" id="statReconnects">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  
+  <input type="file" id="sessionFileInput" accept=".json" style="display:none">
+
+  <script src="js/utils.js"></script>
+  <script src="js/signaling.js"></script>
+  <script src="js/webrtc.js"></script>
+  <script src="js/weaknet.js"></script>
+  <script src="js/messages.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/risk.js"></script>
+  <script src="js/replay.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+{
+  "name": "基础协作场景",
+  "version": "1.0",
+  "description": "光标移动、批注和文档编辑的基本协作流程",
+  "interval": 800,
+  "messages": [
+    {
+      "type": "cursor",
+      "payload": {
+        "x": 100,
+        "y": 150,
+        "pageId": "page-1"
+      }
+    },
+    {
+      "delay": 300
+    },
+    {
+      "type": "cursor",
+      "payload": {
+        "x": 150,
+        "y": 180,
+        "pageId": "page-1"
+      }
+    },
+    {
+      "delay": 300
+    },
+    {
+      "type": "cursor",
+      "payload": {
+        "x": 200,
+        "y": 200,
+        "pageId": "page-1"
+      }
+    },
+    {
+      "type": "annotation",
+      "payload": {
+        "type": "comment",
+        "targetId": "paragraph-1",
+        "text": "这里需要修改一下格式，建议调整字体大小",
+        "author": "User A",
+        "position": {
+          "x": 200,
+          "y": 200
+        }
+      }
+    },
+    {
+      "delay": 1000
+    },
+    {
+      "type": "cursor",
+      "payload": {
+        "x": 300,
+        "y": 250,
+        "pageId": "page-1"
+      }
+    },
+    {
+      "type": "patch",
+      "payload": {
+        "path": "/document/chapter-1",
+        "from": "v1",
+        "to": "v2",
+        "ops": [
+          {
+            "type": "retain",
+            "value": 10
+          },
+          {
+            "type": "insert",
+            "value": "这是一段新增的文本内容，用于演示文档协作编辑场景"
+          }
+        ],
+        "author": "User A"
+      }
+    },
+    {
+      "delay": 500
+    },
+    {
+      "type": "stroke",
+      "payload": {
+        "strokeId": "stroke-demo-1",
+        "color": "#ef4444",
+        "width": 3,
+        "opacity": 1,
+        "points": [
+          {
+            "x": 100,
+            "y": 100,
+            "pressure": 0.8,
+            "time": 0
+          },
+          {
+            "x": 150,
+            "y": 120,
+            "pressure": 0.75,
+            "time": 10
+          },
+          {
+            "x": 200,
+            "y": 110,
+            "pressure": 0.8,
+            "time": 20
+          },
+          {
+            "x": 250,
+            "y": 130,
+            "pressure": 0.7,
+            "time": 30
+          },
+          {
+            "x": 300,
+            "y": 125,
+            "pressure": 0.72,
+            "time": 40
+          }
+        ],
+        "tool": "pen"
+      }
+    },
+    {
+      "type": "cursor",
+      "payload": {
+        "x": 400,
+        "y": 300,
+        "pageId": "page-1"
+      }
+    }
+  ]
+}
