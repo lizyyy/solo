@@ -1,0 +1,33 @@
+{
+  "name": "finance-reconciliation-tool",
+  "version": "1.0.0",
+  "description": "理财收益到账核对台 - 全栈 Web 应用",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "start": "npm run start --workspace=backend",
+    "build": "npm run build --workspace=frontend",
+    "test": "npm run test --workspace=backend",
+    "lint": "npm run lint --workspace=backend && npm run lint --workspace=frontend",
+    "seed": "npm run seed --workspace=backend",
+    "init-db": "npm run init-db --workspace=backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "finance",
+    "reconciliation",
+    "bank",
+    "investment",
+    "理财"
+  ],
+  "author": "",
+  "license": "MIT"
+}

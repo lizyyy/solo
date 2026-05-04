@@ -1,0 +1,48 @@
+{
+  "rules": [
+    {
+      "product_code": "BW001",
+      "day_count_convention": "actual/365",
+      "payout_frequency": "at_maturity",
+      "management_fee_rate": 0.003,
+      "redemption_fee_rate": 0.001,
+      "redemption_fee_min_days": 7,
+      "redemption_fee_max_days": 30
+    },
+    {
+      "product_code": "BW002",
+      "day_count_convention": "actual/360",
+      "payout_frequency": "at_maturity",
+      "management_fee_rate": 0.0025,
+      "redemption_fee_rate": 0
+    },
+    {
+      "product_code": "MM001",
+      "day_count_convention": "actual/365",
+      "payout_frequency": "daily",
+      "management_fee_rate": 0.001,
+      "redemption_fee_rate": 0
+    },
+    {
+      "product_code": "MM002",
+      "day_count_convention": "actual/365",
+      "payout_frequency": "daily",
+      "management_fee_rate": 0.0008,
+      "redemption_fee_rate": 0
+    },
+    {
+      "product_code": "BC001",
+      "day_count_convention": "actual/365",
+      "payout_frequency": "monthly",
+      "management_fee_rate": 0.002,
+      "redemption_fee_rate": 0.0005
+    },
+    {
+      "product_code": "BC002",
+      "day_count_convention": "actual/360",
+      "payout_frequency": "quarterly",
+      "management_fee_rate": 0.0015,
+      "redemption_fee_rate": 0
+    }
+  ]
+}
