@@ -1,0 +1,56 @@
+services:
+  - name: user-service
+    type: java
+    pool_config: java-default
+    instances: 3
+    priority: 1
+    tenant_id: core
+    description: 用户核心服务，处理登录、注册、用户信息管理
+
+  - name: order-service
+    type: java
+    pool_config: java-aggressive
+    instances: 4
+    priority: 2
+    tenant_id: core
+    description: 订单服务，处理订单创建、支付、查询
+
+  - name: payment-service
+    type: node
+    pool_config: node-default
+    instances: 2
+    priority: 1
+    tenant_id: core
+    description: 支付服务，处理支付网关对接
+
+  - name: notification-service
+    type: python
+    pool_config: python-default
+    instances: 2
+    priority: 4
+    tenant_id: shared
+    description: 通知服务，发送邮件、短信、推送
+
+  - name: analytics-service
+    type: python
+    pool_config: python-analytics
+    instances: 1
+    priority: 5
+    tenant_id: analytics
+    description: 分析服务，处理报表和统计查询
+
+  - name: api-gateway
+    type: node
+    pool_config: node-light
+    instances: 3
+    priority: 3
+    tenant_id: shared
+    description: API网关，路由和限流
+
+  - name: admin-portal
+    type: java
+    pool_config: java-light
+    instances: 1
+    priority: 6
+    tenant_id: admin
+    description: 管理后台

@@ -1,0 +1,9 @@
+service_name: giant-pool
+max_pool_size: 50
+min_pool_size: 10
+connection_timeout: 30.0
+idle_timeout: 600.0
+max_lifetime: 3600.0
+retry_attempts: 3
+retry_delay: 1.0
+statement_timeout: 60.0

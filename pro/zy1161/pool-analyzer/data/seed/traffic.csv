@@ -1,0 +1,8 @@
+service_name,peak_qps,avg_db_calls_per_request,peak_db_calls_per_request,avg_connection_hold_time_ms,peak_connection_hold_time_ms,time_window_minutes
+user-service,500,1.5,3,50,200,5
+order-service,300,2.5,5,100,500,5
+payment-service,200,1.0,2,80,300,5
+notification-service,100,0.5,1,150,600,5
+analytics-service,50,3.0,8,500,2000,10
+api-gateway,800,0.3,0.8,30,100,5
+admin-portal,20,1.0,2,200,800,5

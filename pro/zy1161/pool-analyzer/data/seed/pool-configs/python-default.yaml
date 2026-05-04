@@ -1,0 +1,9 @@
+service_name: python-default
+max_pool_size: 12
+min_pool_size: 2
+connection_timeout: 30.0
+idle_timeout: 120.0
+max_lifetime: 600.0
+retry_attempts: 2
+retry_delay: 2.0
+statement_timeout: 120.0

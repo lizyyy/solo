@@ -1,0 +1,9 @@
+service_name: retry-storm
+max_pool_size: 20
+min_pool_size: 5
+connection_timeout: 5.0
+idle_timeout: 120.0
+max_lifetime: 600.0
+retry_attempts: 10
+retry_delay: 0.1
+statement_timeout: 10.0

@@ -1,0 +1,6 @@
+max_connections: 150
+reserved_connections: 10
+superuser_reserved_connections: 3
+max_connections_per_tenant: 80
+max_wal_size: 2GB
+shared_buffers: 256MB

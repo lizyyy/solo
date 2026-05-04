@@ -1,0 +1,9 @@
+service_name: quick-timeout
+max_pool_size: 15
+min_pool_size: 3
+connection_timeout: 2.0
+idle_timeout: 60.0
+max_lifetime: 600.0
+retry_attempts: 3
+retry_delay: 0.1
+statement_timeout: 5.0

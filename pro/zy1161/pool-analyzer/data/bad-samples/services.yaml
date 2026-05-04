@@ -1,0 +1,56 @@
+services:
+  - name: giant-service
+    type: java
+    pool_config: giant-pool
+    instances: 10
+    priority: 1
+    tenant_id: tenant-a
+    description: 单个超大服务，连接池配置极端
+
+  - name: quick-service
+    type: node
+    pool_config: quick-timeout
+    instances: 5
+    priority: 2
+    tenant_id: tenant-a
+    description: 超时时间极短的服务
+
+  - name: retry-heavy
+    type: python
+    pool_config: retry-storm
+    instances: 8
+    priority: 3
+    tenant_id: tenant-b
+    description: 重试次数过多
+
+  - name: normal-service
+    type: java
+    pool_config: normal-pool
+    instances: 2
+    priority: 4
+    tenant_id: tenant-b
+    description: 正常服务但被其他服务挤压
+
+  - name: tenant-a-service-1
+    type: node
+    pool_config: normal-pool
+    instances: 3
+    priority: 5
+    tenant_id: tenant-a
+    description: 租户A的另一个服务
+
+  - name: tenant-a-service-2
+    type: python
+    pool_config: normal-pool
+    instances: 4
+    priority: 5
+    tenant_id: tenant-a
+    description: 租户A的第三个服务
+
+  - name: tenant-a-service-3
+    type: java
+    pool_config: normal-pool
+    instances: 2
+    priority: 5
+    tenant_id: tenant-a
+    description: 租户A的第四个服务

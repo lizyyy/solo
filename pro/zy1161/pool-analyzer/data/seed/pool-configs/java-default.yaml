@@ -1,0 +1,9 @@
+service_name: java-default
+max_pool_size: 10
+min_pool_size: 2
+connection_timeout: 30.0
+idle_timeout: 300.0
+max_lifetime: 1800.0
+retry_attempts: 3
+retry_delay: 1.0
+statement_timeout: 60.0
