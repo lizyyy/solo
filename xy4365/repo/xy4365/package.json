@@ -1,0 +1,33 @@
+{
+  "name": "laser-cutter-manager",
+  "version": "1.0.0",
+  "description": "高校创客空间激光切割机管理工具",
+  "main": "src/index.js",
+  "bin": {
+    "laser-manager": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "laser-cutter",
+    "maker-space",
+    "cli",
+    "sqlite"
+  ],
+  "author": "创客空间管理员",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "express": "^4.18.2",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.30.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "slot_id": "MAINT001",
+    "machine_id": "LC01",
+    "start_time": "2026-05-05T12:00:00",
+    "end_time": "2026-05-05T13:00:00",
+    "maintenance_type": "排风系统检查",
+    "description": "每周例行排风系统检查和清洁"
+  },
+  {
+    "slot_id": "MAINT002",
+    "machine_id": "LC01",
+    "start_time": "2026-05-06T17:00:00",
+    "end_time": "2026-05-06T19:00:00",
+    "maintenance_type": "镜头清洁",
+    "description": "激光镜头清洁和校准"
+  },
+  {
+    "slot_id": "MAINT003",
+    "machine_id": "LC02",
+    "start_time": "2026-05-06T10:00:00",
+    "end_time": "2026-05-06T11:00:00",
+    "maintenance_type": "皮带调整",
+    "description": "X轴Y轴传动皮带张力调整"
+  }
+]

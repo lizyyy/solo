@@ -1,0 +1,62 @@
+[
+  {
+    "material_type": "acrylic",
+    "material_name": "亚克力板",
+    "min_thickness": 1.0,
+    "max_thickness": 8.0,
+    "recommended_power_min": 40,
+    "recommended_power_max": 70,
+    "recommended_speed_min": 50,
+    "recommended_speed_max": 150,
+    "is_forbidden": false,
+    "safety_notes": "注意通风，避免产生有毒气体"
+  },
+  {
+    "material_type": "plywood",
+    "material_name": "胶合板",
+    "min_thickness": 2.0,
+    "max_thickness": 10.0,
+    "recommended_power_min": 50,
+    "recommended_power_max": 80,
+    "recommended_speed_min": 40,
+    "recommended_speed_max": 120,
+    "is_forbidden": false,
+    "safety_notes": "注意防火，配备灭火器"
+  },
+  {
+    "material_type": "pvc",
+    "material_name": "PVC板",
+    "min_thickness": 1.0,
+    "max_thickness": 5.0,
+    "recommended_power_min": 30,
+    "recommended_power_max": 60,
+    "recommended_speed_min": 60,
+    "recommended_speed_max": 140,
+    "is_forbidden": true,
+    "safety_notes": "禁止切割！PVC燃烧产生剧毒氯气"
+  },
+  {
+    "material_type": "cardboard",
+    "material_name": "硬纸板",
+    "min_thickness": 1.0,
+    "max_thickness": 5.0,
+    "recommended_power_min": 20,
+    "recommended_power_max": 40,
+    "recommended_speed_min": 80,
+    "recommended_speed_max": 200,
+    "is_forbidden": false,
+    "safety_notes": "易燃烧，需密切监控"
+  },
+  {
+    "material_type": "leather",
+    "material_name": "皮革",
+    "min_thickness": 1.0,
+    "max_thickness": 4.0,
+    "recommended_power_min": 35,
+    "recommended_power_max": 55,
+    "recommended_speed_min": 70,
+    "recommended_speed_max": 130,
+    "is_forbidden": false,
+    "safety_notes": "注意通风，皮革燃烧有异味"
+  }
+]

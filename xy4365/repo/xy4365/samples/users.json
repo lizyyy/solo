@@ -1,0 +1,26 @@
+[
+  {
+    "user_id": "U001",
+    "name": "张三",
+    "is_trained": true,
+    "training_date": "2026-01-15"
+  },
+  {
+    "user_id": "U002",
+    "name": "李四",
+    "is_trained": true,
+    "training_date": "2026-02-20"
+  },
+  {
+    "user_id": "U003",
+    "name": "王五",
+    "is_trained": false,
+    "training_date": null
+  },
+  {
+    "user_id": "U004",
+    "name": "赵六",
+    "is_trained": false,
+    "training_date": null
+  }
+]

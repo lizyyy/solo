@@ -1,0 +1,62 @@
+[
+  {
+    "record_id": "OP001",
+    "machine_id": "LC01",
+    "user_id": "U001",
+    "start_time": "2026-05-05T09:00:00",
+    "end_time": "2026-05-05T11:30:00",
+    "actual_power": 60,
+    "actual_speed": 100,
+    "material_used": "acrylic",
+    "material_thickness_actual": 3.0,
+    "notes": "正常切割亚克力铭牌"
+  },
+  {
+    "record_id": "OP002",
+    "machine_id": "LC01",
+    "user_id": "U002",
+    "start_time": "2026-05-05T14:00:00",
+    "end_time": "2026-05-05T15:45:00",
+    "actual_power": 70,
+    "actual_speed": 80,
+    "material_used": "plywood",
+    "material_thickness_actual": 5.0,
+    "notes": "切割木刻画"
+  },
+  {
+    "record_id": "OP003",
+    "machine_id": "LC02",
+    "user_id": "U003",
+    "start_time": "2026-05-05T10:00:00",
+    "end_time": "2026-05-05T11:20:00",
+    "actual_power": 50,
+    "actual_speed": 120,
+    "material_used": "pvc",
+    "material_thickness_actual": 2.0,
+    "notes": "尝试切割PVC材料"
+  },
+  {
+    "record_id": "OP004",
+    "machine_id": "LC01",
+    "user_id": "U001",
+    "start_time": "2026-05-06T08:00:00",
+    "end_time": "2026-05-06T17:00:00",
+    "actual_power": 65,
+    "actual_speed": 90,
+    "material_used": "acrylic",
+    "material_thickness_actual": 5.0,
+    "notes": "长时间连续切割亚克力展板"
+  },
+  {
+    "record_id": "OP005",
+    "machine_id": "LC02",
+    "user_id": "U004",
+    "start_time": "2026-05-06T14:30:00",
+    "end_time": "2026-05-06T17:30:00",
+    "actual_power": 40,
+    "actual_speed": 150,
+    "material_used": "plywood",
+    "material_thickness_actual": 3.0,
+    "notes": "切割拼图零件"
+  }
+]
