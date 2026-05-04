@@ -1,0 +1,114 @@
+{
+  "id": "hall-main",
+  "name": "一号展厅",
+  "dimensions": {
+    "width": 40,
+    "depth": 30,
+    "height": 6
+  },
+  "gridSize": 1,
+  "entrances": [
+    {
+      "id": "entrance-main",
+      "name": "主入口",
+      "position": {
+        "x": 15,
+        "y": 0
+      },
+      "size": {
+        "width": 10,
+        "depth": 1
+      },
+      "isMain": true
+    },
+    {
+      "id": "entrance-side",
+      "name": "侧入口",
+      "position": {
+        "x": 0,
+        "y": 10
+      },
+      "size": {
+        "width": 1,
+        "depth": 4
+      },
+      "isMain": false
+    }
+  ],
+  "exits": [
+    {
+      "id": "exit-1",
+      "name": "消防出口1",
+      "position": {
+        "x": 0,
+        "y": 22
+      },
+      "size": {
+        "width": 1,
+        "depth": 3
+      },
+      "isEmergency": true
+    },
+    {
+      "id": "exit-2",
+      "name": "消防出口2",
+      "position": {
+        "x": 39,
+        "y": 15
+      },
+      "size": {
+        "width": 1,
+        "depth": 3
+      },
+      "isEmergency": true
+    }
+  ],
+  "walls": [],
+  "pillars": [
+    {
+      "id": "pillar-1",
+      "position": {
+        "x": 10,
+        "y": 10
+      },
+      "size": {
+        "width": 1,
+        "depth": 1
+      }
+    },
+    {
+      "id": "pillar-2",
+      "position": {
+        "x": 25,
+        "y": 10
+      },
+      "size": {
+        "width": 1,
+        "depth": 1
+      }
+    },
+    {
+      "id": "pillar-3",
+      "position": {
+        "x": 10,
+        "y": 20
+      },
+      "size": {
+        "width": 1,
+        "depth": 1
+      }
+    },
+    {
+      "id": "pillar-4",
+      "position": {
+        "x": 25,
+        "y": 20
+      },
+      "size": {
+        "width": 1,
+        "depth": 1
+      }
+    }
+  ],
+  "fixedObstacles": []
+}

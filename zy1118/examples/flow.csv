@@ -1,0 +1,6 @@
+id,name,x,y,width,depth,expected_foot_traffic,priority
+flow-001,入口区域,12,0,16,5,500,high
+flow-002,主舞台区,13,4,14,10,400,high
+flow-003,美食区,0,2,10,8,300,medium
+flow-004,游戏区,24,20,10,10,350,medium
+flow-005,创业区,4,14,24,8,200,low
