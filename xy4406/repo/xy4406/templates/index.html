@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>急救培训复盘工具</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🩺 急救培训复盘工具</h1>
+            <div class="subtitle">学员数据导入、达标分析、复盘报告导出</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="alert-container"></div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>班级列表</h2>
+                <button class="btn btn-primary" data-modal="createClassModal">
+                    ➕ 新建班级
+                </button>
+            </div>
+            <div id="classes-table">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="createClassModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建班级</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="createClassForm">
+                <div class="form-group">
+                    <label for="className">班级名称 *</label>
+                    <input type="text" id="className" class="form-control" required placeholder="例如：2024年第5期急救培训">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="trainingDate">培训日期 *</label>
+                        <input type="date" id="trainingDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="instructor">讲师</label>
+                        <input type="text" id="instructor" class="form-control" placeholder="讲师姓名">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="location">培训地点</label>
+                    <input type="text" id="location" class="form-control" placeholder="培训地点">
+                </div>
+                <div class="form-group">
+                    <label for="classNotes">备注</label>
+                    <textarea id="classNotes" class="form-control" rows="3" placeholder="其他备注信息"></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createClassModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            initModals();
+            await loadClasses();
+        });
+        
+        async function loadClasses() {
+            try {
+                const classes = await apiRequest('/classes/');
+                renderClasses(classes);
+            } catch (error) {
+                showAlert('加载班级列表失败: ' + error.message, 'danger');
+            }
+        }
+        
+        function renderClasses(classes) {
+            const container = document.getElementById('classes-table');
+            
+            if (!classes || classes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📚</div>
+                        <p>暂无班级数据</p>
+                        <p style="margin-top: 10px; font-size: 14px; color: #6c757d;">
+                            点击上方"新建班级"按钮开始创建第一个培训班级
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const columns = [
+                {
+                    label: '班级名称',
+                    key: 'name',
+                    render: (value, row) => `<strong>${value}</strong>`
+                },
+                { label: '培训日期', key: 'training_date' },
+                { label: '讲师', key: 'instructor' },
+                { label: '学员数', key: 'student_count' },
+                { label: '分组数', key: 'group_count' },
+                {
+                    label: '操作',
+                    key: 'id',
+                    render: (value, row) => `
+                        <div class="btn-group">
+                            <a href="/class/${value}" class="btn btn-sm btn-primary">
+                                查看详情
+                            </a>
+                            <button class="btn btn-sm btn-danger" onclick="deleteClass(${value}, '${row.name}')">
+                                删除
+                            </button>
+                        </div>
+                    `
+                }
+            ];
+            
+            renderTable('classes-table', columns, classes, {
+                emptyText: '暂无班级数据'
+            });
+        }
+        
+        document.getElementById('createClassForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const classData = {
+                name: document.getElementById('className').value,
+                training_date: document.getElementById('trainingDate').value,
+                instructor: document.getElementById('instructor').value || null,
+                location: document.getElementById('location').value || null,
+                notes: document.getElementById('classNotes').value || null
+            };
+            
+            try {
+                const result = await apiRequest('/classes/', {
+                    method: 'POST',
+                    body: classData
+                });
+                
+                showAlert(`班级创建成功: ${classData.name}`, 'success');
+                closeModal('createClassModal');
+                document.getElementById('createClassForm').reset();
+                await loadClasses();
+                
+            } catch (error) {
+                showAlert('创建班级失败: ' + error.message, 'danger');
+            }
+        });
+        
+        async function deleteClass(id, name) {
+            if (!confirm(`确定要删除班级 "${name}" 吗？此操作将删除所有相关数据，无法恢复。`)) {
+                return;
+            }
+            
+            try {
+                await apiRequest(`/classes/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                showAlert(`班级已删除: ${name}`, 'success');
+                await loadClasses();
+                
+            } catch (error) {
+                showAlert('删除失败: ' + error.message, 'danger');
+            }
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

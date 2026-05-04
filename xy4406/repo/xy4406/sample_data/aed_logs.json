@@ -1,0 +1,202 @@
+{
+  "logs": [
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "power_on",
+      "step_name": "开机",
+      "timestamp": "2024-05-01 09:05:00",
+      "duration_seconds": 2.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "attach_pads",
+      "step_name": "粘贴电极片",
+      "timestamp": "2024-05-01 09:05:15",
+      "duration_seconds": 8.3,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "analyze_heart_rhythm",
+      "step_name": "分析心律",
+      "timestamp": "2024-05-01 09:05:30",
+      "duration_seconds": 12.1,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "clear_for_shock",
+      "step_name": "请远离患者",
+      "timestamp": "2024-05-01 09:05:50",
+      "duration_seconds": 5.2,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "deliver_shock",
+      "step_name": "除颤",
+      "timestamp": "2024-05-01 09:06:00",
+      "duration_seconds": 3.8,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_01",
+      "session_id": "AED_SESSION_001",
+      "step_code": "resume_cpr",
+      "step_name": "继续CPR",
+      "timestamp": "2024-05-01 09:06:10",
+      "duration_seconds": 4.1,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_02",
+      "session_id": "AED_SESSION_002",
+      "step_code": "power_on",
+      "step_name": "开机",
+      "timestamp": "2024-05-01 09:20:00",
+      "duration_seconds": 3.2,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_02",
+      "session_id": "AED_SESSION_002",
+      "step_code": "attach_pads",
+      "step_name": "粘贴电极片",
+      "timestamp": "2024-05-01 09:20:20",
+      "duration_seconds": 15.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_02",
+      "session_id": "AED_SESSION_002",
+      "step_code": "clear_for_shock",
+      "step_name": "请远离患者",
+      "timestamp": "2024-05-01 09:20:45",
+      "duration_seconds": 6.8,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_02",
+      "session_id": "AED_SESSION_002",
+      "step_code": "deliver_shock",
+      "step_name": "除颤",
+      "timestamp": "2024-05-01 09:21:00",
+      "duration_seconds": 4.2,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "power_on",
+      "step_name": "开机",
+      "timestamp": "2024-05-01 09:35:00",
+      "duration_seconds": 2.8,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "attach_pads",
+      "step_name": "粘贴电极片",
+      "timestamp": "2024-05-01 09:35:12",
+      "duration_seconds": 7.6,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "analyze_heart_rhythm",
+      "step_name": "分析心律",
+      "timestamp": "2024-05-01 09:35:25",
+      "duration_seconds": 11.3,
+      "success": false
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "clear_for_shock",
+      "step_name": "请远离患者",
+      "timestamp": "2024-05-01 09:35:45",
+      "duration_seconds": 5.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "deliver_shock",
+      "step_name": "除颤",
+      "timestamp": "2024-05-01 09:35:55",
+      "duration_seconds": 3.9,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_03",
+      "session_id": "AED_SESSION_003",
+      "step_code": "resume_cpr",
+      "step_name": "继续CPR",
+      "timestamp": "2024-05-01 09:36:05",
+      "duration_seconds": 4.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "power_on",
+      "step_name": "开机",
+      "timestamp": "2024-05-01 09:50:00",
+      "duration_seconds": 2.3,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "attach_pads",
+      "step_name": "粘贴电极片",
+      "timestamp": "2024-05-01 09:50:10",
+      "duration_seconds": 6.8,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "analyze_heart_rhythm",
+      "step_name": "分析心律",
+      "timestamp": "2024-05-01 09:50:22",
+      "duration_seconds": 10.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "clear_for_shock",
+      "step_name": "请远离患者",
+      "timestamp": "2024-05-01 09:50:38",
+      "duration_seconds": 4.8,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "deliver_shock",
+      "step_name": "除颤",
+      "timestamp": "2024-05-01 09:50:48",
+      "duration_seconds": 3.5,
+      "success": true
+    },
+    {
+      "device_id": "MANNEQUIN_04",
+      "session_id": "AED_SESSION_004",
+      "step_code": "resume_cpr",
+      "step_name": "继续CPR",
+      "timestamp": "2024-05-01 09:50:56",
+      "duration_seconds": 3.9,
+      "success": true
+    }
+  ]
+}

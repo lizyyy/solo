@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级详情 - 急救培训复盘工具</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🩺 急救培训复盘工具</h1>
+            <div class="subtitle">班级详情与数据管理</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="alert-container"></div>
+        
+        <div class="breadcrumb">
+            <a href="/">首页</a>
+            <span>/</span>
+            <span id="classNameDisplay">加载中...</span>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <h3>学员总数</h3>
+                <div class="value" id="statStudents">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>按压达标</h3>
+                <div class="value" id="statCompression">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>AED达标</h3>
+                <div class="value" id="statAED">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>需补训</h3>
+                <div class="value danger" id="statRetraining">-</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="tab-upload">📁 数据导入</div>
+            <div class="tab" data-tab="tab-analysis">📊 分析结果</div>
+            <div class="tab" data-tab="tab-review">🔍 数据复核</div>
+            <div class="tab" data-tab="tab-export">📋 导出报告</div>
+        </div>
+        
+        <div class="tab-content active" id="tab-upload">
+            <div class="card">
+                <div class="card-header">
+                    <h2>导入数据</h2>
+                </div>
+                
+                <div class="form-row">
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>1. 学员名单 (CSV)</h3>
+                        </div>
+                        <div class="upload-area" onclick="document.getElementById('studentsFile').click()">
+                            <div class="icon">👥</div>
+                            <p>点击或拖拽上传学员名单</p>
+                            <p style="font-size: 12px; margin-top: 10px; color: #999;">
+                                需包含：学号、姓名 等字段
+                            </p>
+                        </div>
+                        <input type="file" id="studentsFile" accept=".csv" style="display: none;">
+                        <button class="btn btn-primary btn-sm" style="margin-top: 10px; width: 100%;" 
+                                onclick="uploadStudents()">
+                            上传学员名单
+                        </button>
+                    </div>
+                    
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>2. 分组表 (CSV)</h3>
+                        </div>
+                        <div class="upload-area" onclick="document.getElementById('groupsFile').click()">
+                            <div class="icon">📋</div>
+                            <p>点击或拖拽上传分组表</p>
+                            <p style="font-size: 12px; margin-top: 10px; color: #999;">
+                                需包含：组号、学号、设备ID 等字段
+                            </p>
+                        </div>
+                        <input type="file" id="groupsFile" accept=".csv" style="display: none;">
+                        <button class="btn btn-primary btn-sm" style="margin-top: 10px; width: 100%;"
+                                onclick="uploadGroups()">
+                            上传分组表
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-row" style="margin-top: 20px;">
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>3. 假人按压数据 (CSV)</h3>
+                        </div>
+                        <div class="upload-area" onclick="document.getElementById('compressionFile').click()">
+                            <div class="icon">❤️</div>
+                            <p>点击或拖拽上传按压数据</p>
+                            <p style="font-size: 12px; margin-top: 10px; color: #999;">
+                                需包含：设备ID、深度(cm)、频率 等字段
+                            </p>
+                        </div>
+                        <input type="file" id="compressionFile" accept=".csv" style="display: none;">
+                        <button class="btn btn-primary btn-sm" style="margin-top: 10px; width: 100%;"
+                                onclick="uploadCompression()">
+                            上传按压数据
+                        </button>
+                    </div>
+                    
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>4. AED操作日志 (JSON)</h3>
+                        </div>
+                        <div class="upload-area" onclick="document.getElementById('aedFile').click()">
+                            <div class="icon">⚡</div>
+                            <p>点击或拖拽上传AED日志</p>
+                            <p style="font-size: 12px; margin-top: 10px; color: #999;">
+                                需包含：步骤代码、设备ID 等字段
+                            </p>
+                        </div>
+                        <input type="file" id="aedFile" accept=".json" style="display: none;">
+                        <button class="btn btn-primary btn-sm" style="margin-top: 10px; width: 100%;"
+                                onclick="uploadAED()">
+                            上传AED日志
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-success" style="font-size: 16px; padding: 12px 30px;"
+                            onclick="runAnalysis()">
+                        🚀 开始数据分析
+                    </button>
+                    <p style="margin-top: 10px; font-size: 13px; color: #6c757d;">
+                        完成所有数据导入后，点击开始分析
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>上传记录</h2>
+                </div>
+                <div id="uploadStatus">
+                    <div class="empty-state">
+                        <p>暂无上传记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-analysis">
+            <div class="card">
+                <div class="card-header">
+                    <h2>分析结果概览</h2>
+                    <button class="btn btn-primary btn-sm" onclick="loadAnalysisResults()">
+                        🔄 刷新数据
+                    </button>
+                </div>
+                
+                <div class="tabs" style="margin-top: 15px;">
+                    <div class="tab active" data-tab="subtab-compression">按压达标</div>
+                    <div class="tab" data-tab="subtab-aed">AED操作</div>
+                    <div class="tab" data-tab="subtab-conflicts">设备冲突</div>
+                    <div class="tab" data-tab="subtab-retraining">补训名单</div>
+                </div>
+                
+                <div class="tab-content active" id="subtab-compression">
+                    <div id="compressionResultsTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="subtab-aed">
+                    <div id="aedResultsTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="subtab-conflicts">
+                    <div id="conflictsTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="subtab-retraining">
+                    <div id="retrainingTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-review">
+            <div class="card">
+                <div class="card-header">
+                    <h2>数据复核</h2>
+                </div>
+                <p style="color: #6c757d; margin-bottom: 15px;">
+                    对系统判定的未达标结果进行复核，可以添加备注说明特殊情况。添加备注后的数据将在复盘报告中体现。
+                </p>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="reviewtab-compression">按压复核</div>
+                    <div class="tab" data-tab="reviewtab-aed">AED复核</div>
+                </div>
+                
+                <div class="tab-content active" id="reviewtab-compression">
+                    <div id="reviewCompressionTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="reviewtab-aed">
+                    <div id="reviewAEDTable">
+                        <div class="empty-state">
+                            <p>请先运行数据分析</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="tab-export">
+            <div class="card">
+                <div class="card-header">
+                    <h2>导出报告</h2>
+                </div>
+                
+                <div class="form-row">
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>Markdown 复盘单</h3>
+                        </div>
+                        <p style="color: #6c757d; margin-bottom: 15px;">
+                            生成包含所有分析结果、备注信息的 Markdown 格式复盘报告，可直接用于文档归档。
+                        </p>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="previewMarkdown()">
+                                👁️ 预览报告
+                            </button>
+                            <button class="btn btn-success" onclick="exportMarkdown()">
+                                📥 下载 MD
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="flex: 1; margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3>JSON 审计包</h3>
+                        </div>
+                        <p style="color: #6c757d; margin-bottom: 15px;">
+                            导出完整的结构化数据 JSON 文件，包含所有原始分析结果和备注，用于数据审计和备份。
+                        </p>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="exportJSON()">
+                                📥 下载 JSON
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" id="previewCard" style="display: none;">
+                <div class="card-header">
+                    <h2>报告预览</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="closePreview()">
+                        关闭预览
+                    </button>
+                </div>
+                <pre id="markdownPreview" style="background: #f8f9fa; padding: 20px; border-radius: 6px; white-space: pre-wrap; font-size: 13px; max-height: 500px; overflow-y: auto;"></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="noteModalTitle">添加备注</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="noteForm">
+                <input type="hidden" id="noteResultId">
+                <input type="hidden" id="noteResultType">
+                <div class="form-group">
+                    <label for="noteContent">备注内容</label>
+                    <textarea id="noteContent" class="form-control" rows="4" required
+                              placeholder="例如：该学员因设备问题导致数据异常，实际操作达标..."></textarea>
+                </div>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('noteModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+    <script>
+        const classId = {{ class_id }};
+        let analysisData = null;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            initTabs();
+            initModals();
+            await loadClassInfo();
+            await loadUploadStatus();
+        });
+        
+        async function loadClassInfo() {
+            try {
+                const data = await apiRequest(`/classes/${classId}`);
+                document.getElementById('classNameDisplay').textContent = data.class.name;
+                
+                document.getElementById('statStudents').textContent = data.students.length;
+            } catch (error) {
+                showAlert('加载班级信息失败: ' + error.message, 'danger');
+            }
+        }
+        
+        async function loadUploadStatus() {
+            try {
+                const records = await apiRequest(`/upload/status/${classId}`);
+                
+                if (records && records.length > 0) {
+                    const columns = [
+                        { label: '文件类型', key: 'file_type', render: (v) => {
+                            const typeMap = {
+                                'students': '学员名单',
+                                'groups': '分组表',
+                                'compression': '按压数据',
+                                'aed': 'AED日志'
+                            };
+                            return `<span class="badge badge-info">${typeMap[v] || v}</span>`;
+                        }},
+                        { label: '文件名', key: 'original_filename' },
+                        { label: '数据行数', key: 'row_count' },
+                        { label: '状态', key: 'processed', render: (v) => 
+                            v ? '<span class="badge badge-success">已处理</span>' : '<span class="badge badge-warning">处理中</span>'
+                        },
+                        { label: '上传时间', key: 'created_at' }
+                    ];
+                    
+                    renderTable('uploadStatus', columns, records);
+                }
+            } catch (error) {
+                console.error('加载上传状态失败:', error);
+            }
+        }
+        
+        async function uploadStudents() {
+            await uploadFile('/upload/students', 'studentsFile', classId, '学员名单上传成功');
+            await loadClassInfo();
+            await loadUploadStatus();
+        }
+        
+        async function uploadGroups() {
+            await uploadFile('/upload/groups', 'groupsFile', classId, '分组表上传成功');
+            await loadUploadStatus();
+        }
+        
+        async function uploadCompression() {
+            await uploadFile('/upload/compression', 'compressionFile', classId, '按压数据上传成功');
+            await loadUploadStatus();
+        }
+        
+        async function uploadAED() {
+            await uploadFile('/upload/aed', 'aedFile', classId, 'AED日志上传成功');
+            await loadUploadStatus();
+        }
+        
+        async function runAnalysis() {
+            if (!confirm('确定要开始数据分析吗？这将重新计算所有分析结果。')) {
+                return;
+            }
+            
+            try {
+                showAlert('正在进行数据分析，请稍候...', 'info');
+                
+                const result = await apiRequest(`/analysis/run/${classId}`, {
+                    method: 'POST'
+                });
+                
+                showAlert(`分析完成！按压: ${result.compression_analyzed}人, AED: ${result.aed_analyzed}人, 冲突: ${result.device_conflicts}个, 补训: ${result.retraining_needed}人`, 'success');
+                
+                await loadAnalysisResults();
+                
+            } catch (error) {
+                showAlert('分析失败: ' + error.message, 'danger');
+            }
+        }
+        
+        async function loadAnalysisResults() {
+            try {
+                analysisData = await apiRequest(`/analysis/results/${classId}`);
+                
+                updateStats(analysisData);
+                renderCompressionResults(analysisData.compression_results);
+                renderAEDResults(analysisData.aed_results);
+                renderConflicts(analysisData.device_conflicts);
+                renderRetraining(analysisData.retraining_records);
+                renderReviewTables(analysisData);
+                
+            } catch (error) {
+                showAlert('加载分析结果失败: ' + error.message, 'danger');
+            }
+        }
+        
+        function updateStats(data) {
+            const compression = data.compression_results || [];
+            const aed = data.aed_results || [];
+            const retraining = data.retraining_records || [];
+            
+            const passCompression = compression.filter(r => r.overall_pass).length;
+            const passAED = aed.filter(r => r.overall_pass).length;
+            
+            document.getElementById('statCompression').textContent = `${passCompression}/${compression.length}`;
+            document.getElementById('statCompression').className = `value ${passCompression === compression.length ? 'success' : ''}`;
+            
+            document.getElementById('statAED').textContent = `${passAED}/${aed.length}`;
+            document.getElementById('statAED').className = `value ${passAED === aed.length ? 'success' : ''}`;
+            
+            document.getElementById('statRetraining').textContent = retraining.length;
+        }
+        
+        function renderCompressionResults(results) {
+            const columns = [
+                { label: '学员', key: 'student_name', render: (v, row) => 
+                    `<strong>${v}</strong>`
+                },
+                { label: '总按压数', key: 'total_presses' },
+                { 
+                    label: '深度达标率', 
+                    key: 'depth_pass_rate',
+                    render: (v, row) => {
+                        const color = v >= 70 ? 'success' : 'danger';
+                        return `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="progress-bar" style="flex: 1; height: 10px;">
+                                    <div class="progress-bar-fill ${color}" style="width: ${v}%;"></div>
+                                </div>
+                                <span>${v}%</span>
+                            </div>
+                        `;
+                    }
+                },
+                { 
+                    label: '频率达标率', 
+                    key: 'rate_pass_rate',
+                    render: (v, row) => {
+                        const color = v >= 60 ? 'success' : 'danger';
+                        return `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="progress-bar" style="flex: 1; height: 10px;">
+                                    <div class="progress-bar-fill ${color}" style="width: ${v}%;"></div>
+                                </div>
+                                <span>${v}%</span>
+                            </div>
+                        `;
+                    }
+                },
+                { label: '平均深度(cm)', key: 'avg_depth' },
+                { label: '平均频率', key: 'avg_rate' },
+                { 
+                    label: '连续30次', 
+                    key: 'consecutive_30_pass',
+                    render: (v) => `<span class="badge ${getBadgeClass(v)}">${getBadgeText(v)}</span>`
+                },
+                { 
+                    label: '总体', 
+                    key: 'overall_pass',
+                    render: (v) => `<span class="badge ${getBadgeClass(v)}">${getBadgeText(v)}</span>`
+                }
+            ];
+            
+            renderTable('compressionResultsTable', columns, results, {
+                emptyText: '暂无按压数据',
+                highlightRow: (row) => !row.overall_pass
+            });
+        }
+        
+        function renderAEDResults(results) {
+            const columns = [
+                { label: '学员', key: 'student_name', render: (v) => `<strong>${v}</strong>` },
+                { label: '完成步骤数', key: 'steps_completed' },
+                { 
+                    label: '遗漏步骤', 
+                    key: 'steps_missed',
+                    render: (v, row) => {
+                        if (row.steps_missed_count === 0) {
+                            return '<span class="badge badge-success">无遗漏</span>';
+                        }
+                        const missed = v.join('、') || `${row.steps_missed_count}个步骤`;
+                        return `<span class="badge badge-danger" title="${missed}">${row.steps_missed_count}个</span>`;
+                    }
+                },
+                { label: '总耗时(秒)', key: 'total_duration' },
+                { 
+                    label: '总体', 
+                    key: 'overall_pass',
+                    render: (v) => `<span class="badge ${getBadgeClass(v)}">${getBadgeText(v)}</span>`
+                }
+            ];
+            
+            renderTable('aedResultsTable', columns, results, {
+                emptyText: '暂无AED操作数据',
+                highlightRow: (row) => !row.overall_pass
+            });
+        }
+        
+        function renderConflicts(conflicts) {
+            const columns = [
+                { label: '设备ID', key: 'device_id' },
+                { 
+                    label: '冲突类型', 
+                    key: 'conflict_type',
+                    render: (v) => {
+                        const typeMap = {
+                            'multiple_students_same_session': '同一设备多人使用',
+                            'multiple_students_aed_session': 'AED设备多人操作'
+                        };
+                        return `<span class="badge badge-warning">${typeMap[v] || v}</span>`;
+                    }
+                },
+                { label: '涉及学员', key: 'student_1_name', render: (v, row) => {
+                    const names = [v, row.student_2_name].filter(x => x);
+                    return names.join('、');
+                }},
+                { label: '持续时间(分钟)', key: 'duration_minutes' },
+                { label: '描述', key: 'description' },
+                { 
+                    label: '状态', 
+                    key: 'resolved',
+                    render: (v) => v ? '<span class="badge badge-success">已处理</span>' : '<span class="badge badge-danger">待处理</span>'
+                }
+            ];
+            
+            renderTable('conflictsTable', columns, conflicts, {
+                emptyText: '无设备冲突记录'
+            });
+        }
+        
+        function renderRetraining(records) {
+            const columns = [
+                { label: '学员', key: 'student_name', render: (v) => `<strong>${v}</strong>` },
+                { 
+                    label: '优先级', 
+                    key: 'severity',
+                    render: (v) => {
+                        const badge = getSeverityBadge(v);
+                        return `<span class="badge ${badge.class}">${badge.text}</span>`;
+                    }
+                },
+                { label: '原因', key: 'reason' },
+                { label: '补训内容', key: 'retraining_items', render: (v) => v.join('、') },
+                { 
+                    label: '状态', 
+                    key: 'completed',
+                    render: (v, row) => v ? '<span class="badge badge-success">已完成</span>' : '<span class="badge badge-warning">待补训</span>'
+                }
+            ];
+            
+            renderTable('retrainingTable', columns, records, {
+                emptyText: '所有学员均达标，无需补训',
+                highlightRow: (row) => !row.completed
+            });
+        }
+        
+        function renderReviewTables(data) {
+            const compressionFail = (data.compression_results || []).filter(r => !r.overall_pass);
+            const aedFail = (data.aed_results || []).filter(r => !r.overall_pass);
+            
+            const compressionColumns = [
+                { label: '学员', key: 'student_name', render: (v) => `<strong>${v}</strong>` },
+                { 
+                    label: '未达标原因', 
+                    key: 'id',
+                    render: (v, row) => {
+                        const reasons = [];
+                        if (row.depth_pass_rate < 70) reasons.push(`深度达标率 ${row.depth_pass_rate}%`);
+                        if (row.rate_pass_rate < 60) reasons.push(`频率达标率 ${row.rate_pass_rate}%`);
+                        if (!row.consecutive_30_pass) reasons.push('无连续30次达标');
+                        return reasons.join('；') || '未达标';
+                    }
+                },
+                { 
+                    label: '已有备注', 
+                    key: 'notes',
+                    render: (v) => {
+                        if (!v || v.length === 0) return '-';
+                        return v.map(n => `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">💬 ${n.content}</div>`).join('');
+                    }
+                },
+                { 
+                    label: '操作', 
+                    key: 'id',
+                    render: (v, row) => `
+                        <button class="btn btn-sm btn-primary" onclick="openNoteModal(${v}, 'compression')">
+                            添加备注
+                        </button>
+                    `
+                }
+            ];
+            
+            const aedColumns = [
+                { label: '学员', key: 'student_name', render: (v) => `<strong>${v}</strong>` },
+                { 
+                    label: '未达标原因', 
+                    key: 'steps_missed_count',
+                    render: (v, row) => {
+                        const reasons = [];
+                        if (row.steps_missed_count > 0) reasons.push(`遗漏 ${row.steps_missed_count} 个步骤`);
+                        try {
+                            const wrongOrder = eval(row.steps_order_wrong_order || '[]');
+                            if (wrongOrder.length > 0) reasons.push(`${wrongOrder.length} 个步骤顺序错误`);
+                        } catch {}
+                        try {
+                            const failed = eval(row.failed_steps || '[]');
+                            if (failed.length > 0) reasons.push(`${failed.length} 个步骤执行失败`);
+                        } catch {}
+                        return reasons.join('；') || '未达标';
+                    }
+                },
+                { 
+                    label: '已有备注', 
+                    key: 'notes',
+                    render: (v) => {
+                        if (!v || v.length === 0) return '-';
+                        return v.map(n => `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">💬 ${n.content}</div>`).join('');
+                    }
+                },
+                { 
+                    label: '操作', 
+                    key: 'id',
+                    render: (v, row) => `
+                        <button class="btn btn-sm btn-primary" onclick="openNoteModal(${v}, 'aed')">
+                            添加备注
+                        </button>
+                    `
+                }
+            ];
+            
+            renderTable('reviewCompressionTable', compressionColumns, compressionFail, {
+                emptyText: '所有学员按压均达标，无需复核'
+            });
+            
+            renderTable('reviewAEDTable', aedColumns, aedFail, {
+                emptyText: '所有学员AED操作均达标，无需复核'
+            });
+        }
+        
+        function openNoteModal(resultId, resultType) {
+            document.getElementById('noteResultId').value = resultId;
+            document.getElementById('noteResultType').value = resultType;
+            document.getElementById('noteContent').value = '';
+            document.getElementById('noteModalTitle').textContent = 
+                resultType === 'compression' ? '添加按压复核备注' : '添加AED复核备注';
+            document.getElementById('noteModal').classList.add('active');
+        }
+        
+        document.getElementById('noteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const resultId = document.getElementById('noteResultId').value;
+            const resultType = document.getElementById('noteResultType').value;
+            const content = document.getElementById('noteContent').value;
+            
+            try {
+                const endpoint = resultType === 'compression' 
+                    ? `/notes/compression/${resultId}` 
+                    : `/notes/aed/${resultId}`;
+                
+                await apiRequest(endpoint, {
+                    method: 'POST',
+                    body: { content: content }
+                });
+                
+                showAlert('备注添加成功', 'success');
+                closeModal('noteModal');
+                
+                if (analysisData) {
+                    await loadAnalysisResults();
+                }
+                
+            } catch (error) {
+                showAlert('添加备注失败: ' + error.message, 'danger');
+            }
+        });
+        
+        async function previewMarkdown() {
+            try {
+                const data = await apiRequest(`/export/preview/markdown/${classId}`);
+                document.getElementById('markdownPreview').textContent = data.content;
+                document.getElementById('previewCard').style.display = 'block';
+            } catch (error) {
+                showAlert('生成预览失败: ' + error.message, 'danger');
+            }
+        }
+        
+        function closePreview() {
+            document.getElementById('previewCard').style.display = 'none';
+        }
+        
+        function exportMarkdown() {
+            window.location.href = `${API_BASE}/export/markdown/${classId}`;
+        }
+        
+        function exportJSON() {
+            window.location.href = `${API_BASE}/export/json/${classId}`;
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>
