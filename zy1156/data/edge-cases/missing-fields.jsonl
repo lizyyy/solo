@@ -1,0 +1,5 @@
+{"role": "system", "timestamp": 1}
+{"content": "这个消息缺少 role 字段", "timestamp": 2}
+{"role": "user", "content": "这个消息缺少 timestamp 字段"}
+{"role": "assistant", "content": "这个消息有所有必要的字段", "timestamp": 4}
+{"wrongField": "这个消息的字段名不正确", "timestamp": 5}

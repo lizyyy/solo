@@ -1,0 +1,31 @@
+{
+  "name": "llm-context-evaluator-backend",
+  "version": "1.0.0",
+  "description": "LLM 上下文评估台后端服务",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "seed": "node src/scripts/seed.js",
+    "init-db": "node src/scripts/init-db.js"
+  },
+  "keywords": ["llm", "context", "evaluator", "token"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "multer": "^1.4.5-lts.1",
+    "sql.js": "^1.9.0",
+    "tiktoken": "^1.0.15",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  }
+}

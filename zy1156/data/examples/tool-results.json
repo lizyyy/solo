@@ -1,0 +1,89 @@
+{
+  "orderQuery": {
+    "success": true,
+    "data": {
+      "orderId": "20240501-8888",
+      "orderDate": "2024-05-01",
+      "items": [
+        {
+          "productId": "PROD-001234",
+          "name": "男士基础款圆领T恤",
+          "color": "蓝色",
+          "size": "S",
+          "quantity": 1,
+          "price": 99.00
+        }
+      ],
+      "totalAmount": 99.00,
+      "paymentMethod": "微信支付",
+      "status": "已收货",
+      "shippingAddress": {
+        "name": "张三",
+        "phone": "138****1234",
+        "address": "北京市朝阳区某某街道某某小区 1 号楼 101 室"
+      }
+    }
+  },
+  "inventoryCheck": {
+    "success": true,
+    "data": {
+      "productId": "PROD-001234",
+      "name": "男士基础款圆领T恤",
+      "availableStock": {
+        "蓝色-S": 25,
+        "蓝色-M": 42,
+        "蓝色-L": 38,
+        "红色-S": 15,
+        "红色-M": 20,
+        "红色-L": 18
+      }
+    }
+  },
+  "couponQuery": {
+    "success": true,
+    "data": {
+      "availableCoupons": [
+        {
+          "id": "COUPON-2024-001",
+          "name": "新用户专享券",
+          "amount": 50,
+          "minSpend": 200,
+          "validUntil": "2024-12-31"
+        },
+        {
+          "id": "COUPON-2024-002",
+          "name": "会员专享券",
+          "amount": 30,
+          "minSpend": 150,
+          "validUntil": "2024-06-30"
+        }
+      ]
+    }
+  },
+  "recommendProducts": {
+    "success": true,
+    "data": {
+      "userId": "USER-12345",
+      "recommendations": [
+        {
+          "productId": "PROD-005678",
+          "name": "休闲直筒牛仔裤",
+          "price": 199.00,
+          "reason": "根据历史购买记录推荐"
+        },
+        {
+          "productId": "PROD-005679",
+          "name": "运动束脚裤",
+          "price": 159.00,
+          "reason": "同类型商品热销"
+        },
+        {
+          "productId": "PROD-005680",
+          "name": "商务休闲西裤",
+          "price": 259.00,
+          "reason": "新品上市"
+        }
+      ]
+    }
+  }
+}

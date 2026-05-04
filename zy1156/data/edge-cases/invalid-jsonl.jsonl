@@ -1,0 +1,5 @@
+{"role": "user", "content": "这是一个有效的 JSON 行"}
+这不是有效的 JSON
+{"role": "assistant", "content": "这又是一个有效的 JSON 行"}
+{invalid json here}
+{"role": "user", "content": "最后一个有效的 JSON 行"}

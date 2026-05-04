@@ -1,0 +1,22 @@
+maxTokens: 8192
+
+hardConstraints:
+  mustInclude:
+    - systemPrompt
+    - userLastMessage
+
+    # 这里缩进有问题
+  mustNotExceed:
+    conversations: 4000
+    docs: 2000
+    toolResults: 1500
+
+invalid-yaml-syntax
+  - this should be a list but indentation is wrong
+
+priorityRules:
+  budget: 100
+  systemPrompt: 95
+  recentMessages: 90
+    userMessages: 85  # 缩进错误
+  toolResults: 75
