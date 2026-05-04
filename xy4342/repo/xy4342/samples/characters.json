@@ -1,0 +1,26 @@
+[
+  {
+    "name": "李明",
+    "full_name": "李明远",
+    "aliases": ["小明", "明哥"],
+    "costume_default": ["休闲外套", "牛仔裤"],
+    "costume_variants": {
+      "正式场合": ["西装", "领带"],
+      "运动": ["运动服", "运动鞋"]
+    },
+    "props_default": ["手机", "手表"],
+    "description": "男主角，28岁，设计师"
+  },
+  {
+    "name": "王小雨",
+    "full_name": "王雨晨",
+    "aliases": ["小雨", "雨晨"],
+    "costume_default": ["连衣裙", "帆布鞋"],
+    "costume_variants": {
+      "正式场合": ["晚礼服", "高跟鞋"],
+      "运动": ["运动服", "跑鞋"]
+    },
+    "props_default": ["手提包", "口红"],
+    "description": "女主角，26岁，插画师"
+  }
+]
