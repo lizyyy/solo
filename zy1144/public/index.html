@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>定位捉迷藏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="start-screen" class="screen active">
+            <div class="header">
+                <h1>🎯 定位捉迷藏</h1>
+                <p class="subtitle">在虚拟地图中寻找隐藏的目标</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="player-name">玩家名称</label>
+                <input type="text" id="player-name" placeholder="请输入你的名字" value="玩家1">
+            </div>
+            
+            <div class="form-group">
+                <label for="location-mode">定位模式</label>
+                <div class="mode-switch">
+                    <button id="mode-simulated" class="mode-btn active">模拟定位</button>
+                    <button id="mode-real" class="mode-btn">真实GPS</button>
+                </div>
+                <p class="hint">模拟模式：在地图上点击设置位置；真实模式：使用设备GPS</p>
+            </div>
+            
+            <div class="form-group">
+                <label>选择关卡</label>
+                <div id="level-list" class="level-list">
+                </div>
+            </div>
+            
+            <button id="start-btn" class="primary-btn">开始新游戏</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="game-info">
+                    <span class="level-name" id="current-level"></span>
+                    <span class="score">得分: <span id="current-score">0</span></span>
+                </div>
+                <div class="timer">
+                    <span id="countdown">05:00</span>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div id="status-message" class="status-message">准备中...</div>
+                <div id="drift-indicator" class="drift-indicator hidden">
+                    <span class="drift-icon">⚠️</span>
+                    <span class="drift-text">信号飘了</span>
+                </div>
+            </div>
+
+            <div class="radar-container">
+                <canvas id="radar-canvas" class="radar-canvas"></canvas>
+                <div id="direction-indicator" class="direction-indicator">
+                    <div class="arrow" id="direction-arrow"></div>
+                    <span id="direction-text" class="direction-text">--</span>
+                </div>
+                <div id="distance-display" class="distance-display">
+                    <span id="distance-value">--</span>
+                    <span class="distance-unit">m</span>
+                </div>
+            </div>
+
+            <div class="spot-progress">
+                <span>藏身点: </span>
+                <span id="spots-found">0</span> / <span id="spots-total">0</span>
+            </div>
+
+            <div class="control-panel">
+                <button id="sample-btn" class="action-btn">
+                    <span class="btn-icon">📍</span>
+                    <span>采样定位</span>
+                </button>
+                <button id="item-btn" class="action-btn">
+                    <span class="btn-icon">🔍</span>
+                    <span>扩大扫描 (<span id="item-count">1</span>)</span>
+                </button>
+                <button id="calibrate-btn" class="action-btn">
+                    <span class="btn-icon">🎚️</span>
+                    <span>校准</span>
+                </button>
+            </div>
+
+            <div id="simulated-map" class="simulated-map hidden">
+                <div class="map-header">
+                    <span>模拟定位 - 点击地图设置位置</span>
+                    <button id="close-map-btn" class="close-btn">✕</button>
+                </div>
+                <canvas id="map-canvas" class="map-canvas"></canvas>
+                <div class="map-legend">
+                    <span class="legend-item"><span class="dot current-pos"></span> 当前位置</span>
+                    <span class="legend-item"><span class="dot spot"></span> 已发现</span>
+                    <span class="legend-item"><span class="dot zone"></span> 干扰区</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <div class="result-container">
+                <div id="result-icon" class="result-icon">🎉</div>
+                <h2 id="result-title">游戏结束</h2>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">最终得分</span>
+                        <span class="stat-value" id="final-score">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">发现藏身点</span>
+                        <span class="stat-value"><span id="final-found">0</span>/<span id="final-total">0</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">采样次数</span>
+                        <span class="stat-value" id="final-samples">0</span>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button id="replay-btn" class="primary-btn">查看回放</button>
+                    <button id="export-btn" class="secondary-btn">导出报告</button>
+                    <button id="restart-btn" class="secondary-btn">再来一局</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="replay-screen" class="screen">
+            <div class="replay-header">
+                <h3>轨迹回放</h3>
+                <button id="close-replay-btn" class="close-btn">✕</button>
+            </div>
+            <div class="replay-controls">
+                <button id="replay-play" class="replay-btn">▶ 播放</button>
+                <button id="replay-pause" class="replay-btn">⏸ 暂停</button>
+                <span id="replay-progress" class="replay-progress">0 / 0</span>
+            </div>
+            <canvas id="replay-canvas" class="replay-canvas"></canvas>
+            <div class="replay-details">
+                <h4>采样详情</h4>
+                <div id="sample-list" class="sample-list">
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="game.js"></script>
+    <script src="ui.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
