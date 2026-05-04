@@ -1,0 +1,30 @@
+[
+  {
+    "name": "电视塔发射频段",
+    "freq_start": 598.0,
+    "freq_end": 606.0,
+    "reason": "当地电视台发射塔占用，信号强度极高",
+    "priority": 2
+  },
+  {
+    "name": "场馆内部WiFi干扰区",
+    "freq_start": 568.0,
+    "freq_end": 572.0,
+    "reason": "场馆内部WiFi 5GHz频段可能干扰",
+    "priority": 1
+  },
+  {
+    "name": "对讲机专用频段",
+    "freq_start": 450.0,
+    "freq_end": 470.0,
+    "reason": "保安对讲机专用频段，避免与安保系统冲突",
+    "priority": 2
+  },
+  {
+    "name": "手机基站频段",
+    "freq_start": 890.0,
+    "freq_end": 960.0,
+    "reason": "GSM/CDMA手机基站频段，强烈干扰",
+    "priority": 3
+  }
+]

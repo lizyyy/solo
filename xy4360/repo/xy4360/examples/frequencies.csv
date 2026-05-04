@@ -1,0 +1,15 @@
+device_name,type,frequency,channel,is_backup,manufacturer,model,notes
+主唱麦克1,microphone,580.125,CH01,false,Shure,SLX24/SM58,
+主唱麦克2,microphone,580.125,CH01,false,Shure,SLX24/SM58,同频冲突示例
+吉他手麦克,microphone,580.500,CH03,false,Shure,SLX24/BETA58,
+贝斯手麦克,microphone,582.300,CH10,false,Sennheiser,EW 100 G4,
+键盘手麦克,microphone,584.100,CH15,false,Sennheiser,EW 100 G4,
+鼓手耳返1,iem,578.000,IEM01,false,Sennheiser,EW 300 IEM G4,
+鼓手耳返2,iem,578.050,IEM02,false,Sennheiser,EW 300 IEM G4,距离过近示例
+监听耳返3,iem,600.000,IEM08,false,Sennheiser,EW 300 IEM G4,禁用频段示例
+主唱耳返,iem,581.000,IEM04,false,Shure,PSM 300,
+对讲机1,intercom,586.000,COMM01,false,Motorola,GP328,
+对讲机2,intercom,586.500,COMM02,false,Motorola,GP328,
+备用频点1,microphone,581.500,CH07,true,Shure,SLX24,备用-主唱1,
+备用频点2,microphone,582.800,CH12,true,Sennheiser,EW 100,备用-吉他手,
+无备用麦克,microphone,590.000,CH25,false,Audio-Technica,ATW-3200,无备用频点示例
