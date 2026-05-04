@@ -1,0 +1,31 @@
+{
+  "repairs": [
+    {
+      "repairId": "REP-2026-001",
+      "warehouseId": "WH-001",
+      "repairDate": "2026-04-28",
+      "description": "门禁读卡器故障，无法识别员工卡",
+      "status": "in_progress",
+      "assignee": "张维修",
+      "closedDate": null
+    },
+    {
+      "repairId": "REP-2026-002",
+      "warehouseId": "WH-002",
+      "repairDate": "2026-05-01",
+      "description": "电磁锁松动，门无法正常关闭",
+      "status": "open",
+      "assignee": "李技术",
+      "closedDate": null
+    },
+    {
+      "repairId": "REP-2026-003",
+      "warehouseId": "WH-001",
+      "repairDate": "2026-04-20",
+      "description": "监控摄像头角度偏移",
+      "status": "closed",
+      "assignee": "王工程师",
+      "closedDate": "2026-04-22"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "archive-low-oxygen-warehouse-service",
+  "version": "1.0.0",
+  "description": "档案馆低氧库房管理后端服务 - 开库放行系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "archive",
+    "warehouse",
+    "low-oxygen",
+    "risk-management"
+  ],
+  "author": "Trae IDE",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.0",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

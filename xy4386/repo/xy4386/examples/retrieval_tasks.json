@@ -1,0 +1,53 @@
+{
+  "tasks": [
+    {
+      "taskId": "TASK-2026-0504-001",
+      "warehouseId": "WH-001",
+      "date": "2026-05-04",
+      "rackId": "RACK-01-A",
+      "personnel": [
+        {
+          "id": "EMP-001",
+          "name": "张三",
+          "qualification": "档案管理员"
+        },
+        {
+          "id": "EMP-002",
+          "name": "李四",
+          "qualification": "调阅人员"
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-2026-0504-002",
+      "warehouseId": "WH-001",
+      "date": "2026-05-04",
+      "rackId": "RACK-01-A",
+      "personnel": [
+        {
+          "id": "EMP-003",
+          "name": "王五",
+          "qualification": "实习生"
+        },
+        {
+          "id": "EMP-004",
+          "name": "赵六",
+          "qualification": "高级档案管理员"
+        }
+      ]
+    },
+    {
+      "taskId": "TASK-2026-0504-003",
+      "warehouseId": "WH-002",
+      "date": "2026-05-04",
+      "rackId": "RACK-02-B",
+      "personnel": [
+        {
+          "id": "EMP-005",
+          "name": "钱七",
+          "qualification": "库房管理员"
+        }
+      ]
+    }
+  ]
+}
