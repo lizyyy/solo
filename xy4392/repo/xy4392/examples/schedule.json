@@ -1,0 +1,50 @@
+[
+  {
+    "id": "scene-001",
+    "sceneId": "S01",
+    "sceneName": "第一场：室内对话开场",
+    "date": "2024-01-15",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "lightIds": ["00000000-0000-0000-0000-000000000001"],
+    "cameraIds": ["cam-1"],
+    "actorIds": ["actor-1", "actor-2"],
+    "notes": "男女主角在客厅对话，温馨氛围"
+  },
+  {
+    "id": "scene-002",
+    "sceneId": "S02",
+    "sceneName": "第二场：男主角特写",
+    "date": "2024-01-15",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "lightIds": ["00000000-0000-0000-0000-000000000001"],
+    "cameraIds": ["cam-2"],
+    "actorIds": ["actor-1"],
+    "notes": "男主角情绪特写，戏剧化布光"
+  },
+  {
+    "id": "scene-003",
+    "sceneId": "S03",
+    "sceneName": "第三场：女主角独白",
+    "date": "2024-01-15",
+    "startTime": "14:00",
+    "endTime": "15:30",
+    "lightIds": ["00000000-0000-0000-0000-000000000002", "00000000-0000-0000-0000-000000000003"],
+    "cameraIds": ["cam-1"],
+    "actorIds": ["actor-2"],
+    "notes": "柔和侧光，营造情感氛围"
+  },
+  {
+    "id": "scene-004",
+    "sceneId": "S04",
+    "sceneName": "第四场：双人全景",
+    "date": "2024-01-15",
+    "startTime": "15:00",
+    "endTime": "17:00",
+    "lightIds": ["00000000-0000-0000-0000-000000000004", "00000000-0000-0000-0000-000000000005"],
+    "cameraIds": ["cam-1", "cam-2"],
+    "actorIds": ["actor-1", "actor-2"],
+    "notes": "全景展示空间关系"
+  }
+]
