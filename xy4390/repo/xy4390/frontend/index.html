@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区药箱用药提醒系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>社区药箱用药提醒系统</h1>
+            <nav>
+                <button class="nav-btn active" data-tab="today">今日服药</button>
+                <button class="nav-btn" data-tab="plans">服药计划</button>
+                <button class="nav-btn" data-tab="elderly">老人管理</button>
+                <button class="nav-btn" data-tab="medicines">药品管理</button>
+                <button class="nav-btn" data-tab="inventory">库存管理</button>
+                <button class="nav-btn" data-tab="replenish">补药任务</button>
+                <button class="nav-btn" data-tab="handover">交接记录</button>
+                <button class="nav-btn" data-tab="export">数据导出</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- 今日服药清单 -->
+            <section id="today" class="tab-content active">
+                <div class="section-header">
+                    <h2>今日服药清单</h2>
+                    <button class="btn btn-primary" onclick="generateTodayReminders()">生成今日提醒</button>
+                </div>
+                <div class="summary">
+                    <span id="today-summary"></span>
+                </div>
+                <div class="table-container">
+                    <table id="today-table">
+                        <thead>
+                            <tr>
+                                <th>老人姓名</th>
+                                <th>房间号</th>
+                                <th>药品名称</th>
+                                <th>剂量</th>
+                                <th>服药时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 服药计划 -->
+            <section id="plans" class="tab-content">
+                <div class="section-header">
+                    <h2>服药计划管理</h2>
+                    <button class="btn btn-primary" onclick="openPlanModal()">添加服药计划</button>
+                </div>
+                <div class="table-container">
+                    <table id="plans-table">
+                        <thead>
+                            <tr>
+                                <th>老人姓名</th>
+                                <th>药品名称</th>
+                                <th>剂量</th>
+                                <th>服药时间</th>
+                                <th>频率</th>
+                                <th>开始日期</th>
+                                <th>结束日期</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 老人管理 -->
+            <section id="elderly" class="tab-content">
+                <div class="section-header">
+                    <h2>老人管理</h2>
+                    <button class="btn btn-primary" onclick="openElderlyModal()">添加老人</button>
+                </div>
+                <div class="table-container">
+                    <table id="elderly-table">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>年龄</th>
+                                <th>房间号</th>
+                                <th>联系电话</th>
+                                <th>紧急联系人</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 药品管理 -->
+            <section id="medicines" class="tab-content">
+                <div class="section-header">
+                    <h2>药品管理</h2>
+                    <button class="btn btn-primary" onclick="openMedicineModal()">添加药品</button>
+                </div>
+                <div class="table-container">
+                    <table id="medicines-table">
+                        <thead>
+                            <tr>
+                                <th>药品名称</th>
+                                <th>规格</th>
+                                <th>生产厂家</th>
+                                <th>分类</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 库存管理 -->
+            <section id="inventory" class="tab-content">
+                <div class="section-header">
+                    <h2>库存管理</h2>
+                    <button class="btn btn-warning" onclick="checkLowStock()">检查低库存</button>
+                </div>
+                <div id="low-stock-alert" class="alert alert-warning" style="display: none;">
+                    <strong>低库存警告：</strong><span id="low-stock-count"></span> 种药品库存不足
+                </div>
+                <div class="table-container">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>药品名称</th>
+                                <th>规格</th>
+                                <th>当前库存</th>
+                                <th>预警阈值</th>
+                                <th>单位</th>
+                                <th>状态</th>
+                                <th>最后更新</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 补药任务 -->
+            <section id="replenish" class="tab-content">
+                <div class="section-header">
+                    <h2>补药任务</h2>
+                    <button class="btn btn-primary" onclick="autoCreateReplenishTasks()">自动创建补药任务</button>
+                </div>
+                <div class="table-container">
+                    <table id="replenish-table">
+                        <thead>
+                            <tr>
+                                <th>药品名称</th>
+                                <th>当前库存</th>
+                                <th>需要数量</th>
+                                <th>状态</th>
+                                <th>分配给</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 交接记录 -->
+            <section id="handover" class="tab-content">
+                <div class="section-header">
+                    <h2>交接记录</h2>
+                    <button class="btn btn-primary" onclick="openHandoverModal()">添加交接记录</button>
+                </div>
+                <div class="table-container">
+                    <table id="handover-table">
+                        <thead>
+                            <tr>
+                                <th>药品名称</th>
+                                <th>交接人</th>
+                                <th>接收人</th>
+                                <th>数量</th>
+                                <th>交接时间</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 数据导出 -->
+            <section id="export" class="tab-content">
+                <div class="section-header">
+                    <h2>数据导出</h2>
+                </div>
+                <div class="export-container">
+                    <div class="export-card">
+                        <h3>按老人导出近7天提醒记录</h3>
+                        <div class="form-group">
+                            <label for="export-elderly">选择老人</label>
+                            <select id="export-elderly">
+                                <option value="">请选择老人</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportElderlyRecords()">导出数据</button>
+                    </div>
+                    
+                    <div id="export-result" style="display: none;">
+                        <h3>导出结果</h3>
+                        <div id="export-summary"></div>
+                        <div class="table-container">
+                            <table id="export-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>药品名称</th>
+                                        <th>剂量</th>
+                                        <th>计划时间</th>
+                                        <th>实际时间</th>
+                                        <th>状态</th>
+                                        <th>志愿者</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <button class="btn btn-success" onclick="downloadExportCSV()">下载CSV</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框 -->
+    <!-- 老人模态框 -->
+    <div id="elderly-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="elderly-modal-title">添加老人</h3>
+                <span class="close" onclick="closeModal('elderly-modal')">&times;</span>
+            </div>
+            <form id="elderly-form">
+                <input type="hidden" id="elderly-id">
+                <div class="form-group">
+                    <label for="elderly-name">姓名 *</label>
+                    <input type="text" id="elderly-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="elderly-age">年龄</label>
+                    <input type="number" id="elderly-age">
+                </div>
+                <div class="form-group">
+                    <label for="elderly-room">房间号</label>
+                    <input type="text" id="elderly-room">
+                </div>
+                <div class="form-group">
+                    <label for="elderly-phone">联系电话</label>
+                    <input type="text" id="elderly-phone">
+                </div>
+                <div class="form-group">
+                    <label for="elderly-emergency">紧急联系人</label>
+                    <input type="text" id="elderly-emergency">
+                </div>
+                <div class="form-group">
+                    <label for="elderly-notes">备注</label>
+                    <textarea id="elderly-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('elderly-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 药品模态框 -->
+    <div id="medicine-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="medicine-modal-title">添加药品</h3>
+                <span class="close" onclick="closeModal('medicine-modal')">&times;</span>
+            </div>
+            <form id="medicine-form">
+                <input type="hidden" id="medicine-id">
+                <div class="form-group">
+                    <label for="medicine-name">药品名称 *</label>
+                    <input type="text" id="medicine-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="medicine-spec">规格</label>
+                    <input type="text" id="medicine-spec">
+                </div>
+                <div class="form-group">
+                    <label for="medicine-manufacturer">生产厂家</label>
+                    <input type="text" id="medicine-manufacturer">
+                </div>
+                <div class="form-group">
+                    <label for="medicine-category">分类</label>
+                    <select id="medicine-category">
+                        <option value="">请选择</option>
+                        <option value="处方药">处方药</option>
+                        <option value="非处方药">非处方药</option>
+                        <option value="保健品">保健品</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="medicine-description">描述</label>
+                    <textarea id="medicine-description" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('medicine-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 服药计划模态框 -->
+    <div id="plan-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="plan-modal-title">添加服药计划</h3>
+                <span class="close" onclick="closeModal('plan-modal')">&times;</span>
+            </div>
+            <form id="plan-form">
+                <input type="hidden" id="plan-id">
+                <div class="form-group">
+                    <label for="plan-elderly">老人 *</label>
+                    <select id="plan-elderly" required>
+                        <option value="">请选择老人</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plan-medicine">药品 *</label>
+                    <select id="plan-medicine" required>
+                        <option value="">请选择药品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plan-dosage">剂量 *</label>
+                    <input type="text" id="plan-dosage" required placeholder="如：每次1片">
+                </div>
+                <div class="form-group">
+                    <label for="plan-time">服药时间 *</label>
+                    <input type="time" id="plan-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="plan-frequency">频率</label>
+                    <select id="plan-frequency">
+                        <option value="每天">每天</option>
+                        <option value="工作日">工作日</option>
+                        <option value="周末">周末</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plan-start">开始日期</label>
+                    <input type="date" id="plan-start">
+                </div>
+                <div class="form-group">
+                    <label for="plan-end">结束日期</label>
+                    <input type="date" id="plan-end">
+                </div>
+                <div class="form-group">
+                    <label for="plan-status">状态</label>
+                    <select id="plan-status">
+                        <option value="active">激活</option>
+                        <option value="inactive">停用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plan-notes">备注</label>
+                    <textarea id="plan-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('plan-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 交接记录模态框 -->
+    <div id="handover-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加交接记录</h3>
+                <span class="close" onclick="closeModal('handover-modal')">&times;</span>
+            </div>
+            <form id="handover-form">
+                <div class="form-group">
+                    <label for="handover-medicine">药品 *</label>
+                    <select id="handover-medicine" required>
+                        <option value="">请选择药品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="handover-from">交接人 *</label>
+                    <input type="text" id="handover-from" required>
+                </div>
+                <div class="form-group">
+                    <label for="handover-to">接收人 *</label>
+                    <input type="text" id="handover-to" required>
+                </div>
+                <div class="form-group">
+                    <label for="handover-quantity">数量 *</label>
+                    <input type="number" id="handover-quantity" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="handover-notes">备注</label>
+                    <textarea id="handover-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('handover-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 库存调整模态框 -->
+    <div id="inventory-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="inventory-modal-title">调整库存</h3>
+                <span class="close" onclick="closeModal('inventory-modal')">&times;</span>
+            </div>
+            <form id="inventory-form">
+                <input type="hidden" id="inventory-id">
+                <div class="form-group">
+                    <label>药品名称</label>
+                    <input type="text" id="inventory-medicine-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label>当前库存</label>
+                    <input type="text" id="inventory-current" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="inventory-quantity">调整数量</label>
+                    <input type="number" id="inventory-quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="inventory-action">操作类型</label>
+                    <select id="inventory-action">
+                        <option value="add">增加库存</option>
+                        <option value="remove">减少库存</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inventory-threshold">预警阈值</label>
+                    <input type="number" id="inventory-threshold" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="inventory-notes">备注</label>
+                    <textarea id="inventory-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('inventory-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 标记提醒状态模态框 -->
+    <div id="reminder-status-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>标记提醒状态</h3>
+                <span class="close" onclick="closeModal('reminder-status-modal')">&times;</span>
+            </div>
+            <form id="reminder-status-form">
+                <input type="hidden" id="reminder-id">
+                <div class="form-group">
+                    <label>老人姓名</label>
+                    <input type="text" id="reminder-elderly" readonly>
+                </div>
+                <div class="form-group">
+                    <label>药品名称</label>
+                    <input type="text" id="reminder-medicine" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="reminder-status">状态</label>
+                    <select id="reminder-status">
+                        <option value="reminded">已提醒</option>
+                        <option value="missed">漏服</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reminder-volunteer">志愿者姓名</label>
+                    <input type="text" id="reminder-volunteer">
+                </div>
+                <div class="form-group">
+                    <label for="reminder-notes">备注</label>
+                    <textarea id="reminder-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('reminder-status-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 补药任务模态框 -->
+    <div id="replenish-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>完成补药任务</h3>
+                <span class="close" onclick="closeModal('replenish-modal')">&times;</span>
+            </div>
+            <form id="replenish-form">
+                <input type="hidden" id="replenish-task-id">
+                <div class="form-group">
+                    <label>药品名称</label>
+                    <input type="text" id="replenish-medicine-name" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="replenish-volunteer">志愿者姓名</label>
+                    <input type="text" id="replenish-volunteer">
+                </div>
+                <div class="form-group">
+                    <label for="replenish-notes">备注</label>
+                    <textarea id="replenish-notes" rows="3"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('replenish-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">标记完成</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
