@@ -1,0 +1,74 @@
+[
+  {
+    "bookId": "B001",
+    "bookName": "活着",
+    "tagId": "TAG001",
+    "status": "borrowed",
+    "cabinetId": "C01",
+    "location": "A01",
+    "lastScanTime": "2026-04-01T10:00:00"
+  },
+  {
+    "bookId": "B002",
+    "bookName": "百年孤独",
+    "tagId": "TAG002",
+    "status": "in_cabinet",
+    "cabinetId": "C01",
+    "location": "A02",
+    "lastScanTime": "2026-05-04T09:15:00"
+  },
+  {
+    "bookId": "B003",
+    "bookName": "三体",
+    "tagId": "TAG003",
+    "status": "borrowed",
+    "cabinetId": "C02",
+    "location": "B01",
+    "lastScanTime": "2026-04-10T16:45:00"
+  },
+  {
+    "bookId": "B004",
+    "bookName": "围城",
+    "tagId": "TAG004",
+    "status": "in_cabinet",
+    "cabinetId": "C02",
+    "location": "B02",
+    "lastScanTime": "2026-05-04T10:30:00"
+  },
+  {
+    "bookId": "B005",
+    "bookName": "红楼梦",
+    "tagId": "TAG005",
+    "status": "in_cabinet",
+    "cabinetId": "C03",
+    "location": "C01",
+    "lastScanTime": "2026-05-01T08:00:00"
+  },
+  {
+    "bookId": "B006",
+    "bookName": "西游记",
+    "tagId": "TAG006",
+    "status": "borrowed",
+    "cabinetId": "C03",
+    "location": "C02",
+    "lastScanTime": "2026-04-28T10:30:00"
+  },
+  {
+    "bookId": "B007",
+    "bookName": "三国演义",
+    "tagId": "TAG007",
+    "status": "borrowed",
+    "cabinetId": "C01",
+    "location": "A03",
+    "lastScanTime": "2026-05-01T08:45:00"
+  },
+  {
+    "bookId": "B008",
+    "bookName": "水浒传",
+    "tagId": "TAG008",
+    "status": "in_cabinet",
+    "cabinetId": "C02",
+    "location": "B03",
+    "lastScanTime": "2026-05-04T14:00:00"
+  }
+]

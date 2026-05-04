@@ -1,0 +1,46 @@
+[
+  {
+    "reservationId": "RES20260504001",
+    "bookId": "B001",
+    "bookName": "活着",
+    "borrowerId": "L010",
+    "borrowerName": "王十二",
+    "pickupTime": "2026-05-04T15:00:00",
+    "cabinetId": "C01",
+    "status": "pending",
+    "createTime": "2026-05-03T10:00:00"
+  },
+  {
+    "reservationId": "RES20260504002",
+    "bookId": "B007",
+    "bookName": "三国演义",
+    "borrowerId": "L011",
+    "borrowerName": "冯十三",
+    "pickupTime": "2026-05-04T15:15:00",
+    "cabinetId": "C01",
+    "status": "pending",
+    "createTime": "2026-05-03T11:30:00"
+  },
+  {
+    "reservationId": "RES20260504003",
+    "bookId": "B003",
+    "bookName": "三体",
+    "borrowerId": "L012",
+    "borrowerName": "陈十四",
+    "pickupTime": "2026-05-04T16:00:00",
+    "cabinetId": "C02",
+    "status": "pending",
+    "createTime": "2026-05-04T09:00:00"
+  },
+  {
+    "reservationId": "RES20260505001",
+    "bookId": "B006",
+    "bookName": "西游记",
+    "borrowerId": "L013",
+    "borrowerName": "褚十五",
+    "pickupTime": "2026-05-05T10:00:00",
+    "cabinetId": "C03",
+    "status": "pending",
+    "createTime": "2026-05-04T08:00:00"
+  }
+]

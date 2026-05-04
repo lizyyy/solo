@@ -1,0 +1,25 @@
+{
+  "name": "book-cabinet-precheck",
+  "version": "1.0.0",
+  "description": "社区图书漂流柜归还消毒预审工具",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "book",
+    "cabinet",
+    "precheck",
+    "community"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
+  }
+}

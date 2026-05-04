@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图书漂流柜 - 归还消毒预审工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+    }
+    
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .stat-card.warning {
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    }
+    
+    .stat-card.danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+      color: white;
+    }
+    
+    .stat-card.success {
+      background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+      color: white;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .upload-area:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .upload-area.dragover {
+      border-color: #667eea;
+      background: #f0f3ff;
+    }
+    
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    .upload-text {
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      margin: 5px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 184, 148, 0.4);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(253, 203, 110, 0.4);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .upload-item {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .upload-item h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .upload-item p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .file-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    .file-label:hover {
+      background: #5a6fd8;
+    }
+    
+    .file-info {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #28a745;
+    }
+    
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-item label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .filter-item select,
+    .filter-item input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .anomaly-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .anomaly-card:hover {
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .anomaly-card.overdue {
+      border-left: 4px solid #ff6b6b;
+    }
+    
+    .anomaly-card.duplicate_occupancy {
+      border-left: 4px solid #fdcb6e;
+    }
+    
+    .anomaly-card.sterilization_incomplete {
+      border-left: 4px solid #74b9ff;
+    }
+    
+    .anomaly-card.cabinet_conflict {
+      border-left: 4px solid #a29bfe;
+    }
+    
+    .anomaly-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    
+    .anomaly-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .anomaly-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-overdue {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .badge-duplicate {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+    
+    .badge-sterilization {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .badge-conflict {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+    
+    .badge-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .badge-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .badge-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .badge-noted {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+    
+    .anomaly-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .detail-item {
+      background: #f8f9fa;
+      padding: 10px 15px;
+      border-radius: 6px;
+    }
+    
+    .detail-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 3px;
+    }
+    
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .anomaly-description {
+      background: #fefefe;
+      padding: 12px 15px;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+      margin-bottom: 15px;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    .decision-area {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    
+    .decision-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .remark-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .modal-text {
+      color: #666;
+      margin-bottom: 25px;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background: #00b894;
+    }
+    
+    .toast.error {
+      background: #ff6b6b;
+    }
+    
+    .toast.info {
+      background: #74b9ff;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .empty-state-text {
+      font-size: 16px;
+    }
+    
+    .last-update {
+      text-align: right;
+      font-size: 13px;
+      color: #999;
+      margin-top: 10px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 0;
+    }
+    
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s ease;
+    }
+    
+    .tab:hover {
+      color: #667eea;
+    }
+    
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📚 图书漂流柜 - 归还消毒预审工具</h1>
+      <p>自动检测逾期、重复占用、消毒未完成、同柜取书冲突等异常情况</p>
+    </header>
+    
+    <div class="section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-borrow">0</div>
+          <div class="stat-label">借还记录</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-books">0</div>
+          <div class="stat-label">书本标签</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-sterilization">0</div>
+          <div class="stat-label">消毒记录</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-reservations">0</div>
+          <div class="stat-label">预约记录</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-number" id="stat-anomalies">0</div>
+          <div class="stat-label">异常总数</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-number" id="stat-pending">0</div>
+          <div class="stat-label">待处理</div>
+        </div>
+      </div>
+      <div class="last-update" id="last-update"></div>
+    </div>
+    
+    <div class="tabs">
+      <button class="tab active" data-tab="import">📥 数据导入</button>
+      <button class="tab" data-tab="anomalies">⚠️ 异常列表</button>
+      <button class="tab" data-tab="export">📤 数据导出</button>
+    </div>
+    
+    <div class="tab-content active" id="tab-import">
+      <div class="section">
+        <h2 class="section-title">数据导入</h2>
+        <div class="upload-grid">
+          <div class="upload-item">
+            <h3>📋 借还记录 (CSV)</h3>
+            <p>扫码枪导出的借还记录，包含借阅时间、归还时间等信息</p>
+            <input type="file" id="file-borrow" class="file-input" accept=".csv">
+            <label for="file-borrow" class="file-label">选择文件</label>
+            <div class="file-info" id="info-borrow"></div>
+          </div>
+          
+          <div class="upload-item">
+            <h3>🏷️ 书本标签 (JSON)</h3>
+            <p>图书RFID标签数据，包含图书ID、状态、位置等信息</p>
+            <input type="file" id="file-book-tags" class="file-input" accept=".json">
+            <label for="file-book-tags" class="file-label">选择文件</label>
+            <div class="file-info" id="info-book-tags"></div>
+          </div>
+          
+          <div class="upload-item">
+            <h3>🧼 消毒记录 (JSON)</h3>
+            <p>消毒柜批次记录，包含消毒开始时间、完成状态等</p>
+            <input type="file" id="file-sterilization" class="file-input" accept=".json">
+            <label for="file-sterilization" class="file-label">选择文件</label>
+            <div class="file-info" id="info-sterilization"></div>
+          </div>
+          
+          <div class="upload-item">
+            <h3>📅 预约取书单 (JSON)</h3>
+            <p>用户预约取书记录，包含预约时间、书柜ID等</p>
+            <input type="file" id="file-reservations" class="file-input" accept=".json">
+            <label for="file-reservations" class="file-label">选择文件</label>
+            <div class="file-info" id="info-reservations"></div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 25px; text-align: center;">
+          <button class="btn btn-primary" id="btn-process" onclick="processData()">
+            🔍 执行规则检测
+          </button>
+          <button class="btn btn-secondary" id="btn-refresh" onclick="loadStats()">
+            🔄 刷新数据
+          </button>
+          <button class="btn btn-danger" onclick="showClearModal()">
+            🗑️ 清空所有数据
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="tab-anomalies">
+      <div class="section">
+        <h2 class="section-title">异常列表</h2>
+        
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>异常类型：</label>
+            <select id="filter-type" onchange="loadAnomalies()">
+              <option value="">全部类型</option>
+              <option value="overdue">逾期</option>
+              <option value="duplicate_occupancy">重复占用</option>
+              <option value="sterilization_incomplete">消毒未完成</option>
+              <option value="cabinet_conflict">同柜冲突</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>处理状态：</label>
+            <select id="filter-status" onchange="loadAnomalies()">
+              <option value="">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="approved">确认异常</option>
+              <option value="rejected">驳回</option>
+              <option value="noted">已备注</option>
+            </select>
+          </div>
+        </div>
+        
+        <div id="anomalies-list"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="tab-export">
+      <div class="section">
+        <h2 class="section-title">数据导出</h2>
+        
+        <div class="upload-grid">
+          <div class="upload-item">
+            <h3>📋 当天上架清单</h3>
+            <p>导出今天归还并已完成消毒的图书清单（Markdown格式）</p>
+            <button class="btn btn-success" onclick="exportShelfList()">
+              📥 导出 Markdown
+            </button>
+          </div>
+          
+          <div class="upload-item">
+            <h3>⚠️ 异常记录导出</h3>
+            <p>导出所有异常记录及处理决策（JSON格式）</p>
+            <button class="btn btn-warning" onclick="exportAnomalies()">
+              📥 导出 JSON
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="clear-modal">
+    <div class="modal-content">
+      <div class="modal-title">⚠️ 确认清空</div>
+      <div class="modal-text">确定要清空所有数据吗？此操作不可恢复。</div>
+      <div class="action-buttons" style="justify-content: center;">
+        <button class="btn btn-secondary" onclick="hideClearModal()">取消</button>
+        <button class="btn btn-danger" onclick="clearAllData()">确认清空</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    const API_BASE = '';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      setupTabs();
+      setupFileUploads();
+      loadStats();
+      loadAnomalies();
+    });
+    
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          tabs.forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          this.classList.add('active');
+          const tabId = this.dataset.tab;
+          document.getElementById(`tab-${tabId}`).classList.add('active');
+          
+          if (tabId === 'anomalies') {
+            loadAnomalies();
+          }
+        });
+      });
+    }
+    
+    function setupFileUploads() {
+      const fileInputs = {
+        'file-borrow': { endpoint: '/api/upload/borrow', info: 'info-borrow' },
+        'file-book-tags': { endpoint: '/api/upload/book-tags', info: 'info-book-tags' },
+        'file-sterilization': { endpoint: '/api/upload/sterilization', info: 'info-sterilization' },
+        'file-reservations': { endpoint: '/api/upload/reservations', info: 'info-reservations' }
+      };
+      
+      Object.keys(fileInputs).forEach(id => {
+        const input = document.getElementById(id);
+        const config = fileInputs[id];
+        
+        input.addEventListener('change', function() {
+          if (this.files.length > 0) {
+            uploadFile(this.files[0], config.endpoint, config.info);
+          }
+        });
+      });
+    }
+    
+    async function uploadFile(file, endpoint, infoId) {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const infoEl = document.getElementById(infoId);
+      infoEl.innerHTML = '<span class="loading"></span> 上传中...';
+      
+      try {
+        const response = await fetch(API_BASE + endpoint, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          infoEl.innerHTML = `✅ ${result.message}`;
+          infoEl.style.color = '#28a745';
+          showToast(result.message, 'success');
+          loadStats();
+        } else {
+          infoEl.innerHTML = `❌ ${result.error}`;
+          infoEl.style.color = '#dc3545';
+          showToast(result.error, 'error');
+        }
+      } catch (e) {
+        infoEl.innerHTML = `❌ 上传失败: ${e.message}`;
+        infoEl.style.color = '#dc3545';
+        showToast('上传失败', 'error');
+      }
+    }
+    
+    async function loadStats() {
+      try {
+        const response = await fetch(API_BASE + '/api/stats');
+        const result = await response.json();
+        
+        if (result.success) {
+          const data = result.data;
+          document.getElementById('stat-borrow').textContent = data.borrowRecords;
+          document.getElementById('stat-books').textContent = data.bookTags;
+          document.getElementById('stat-sterilization').textContent = data.sterilizationRecords;
+          document.getElementById('stat-reservations').textContent = data.reservations;
+          document.getElementById('stat-anomalies').textContent = data.anomalies.total;
+          document.getElementById('stat-pending').textContent = data.anomalies.byStatus.pending;
+          
+          if (data.lastProcessed) {
+            const date = new Date(data.lastProcessed);
+            document.getElementById('last-update').textContent = 
+              `最后检测时间：${date.toLocaleString('zh-CN')}`;
+          }
+        }
+      } catch (e) {
+        console.error('加载统计失败:', e);
+      }
+    }
+    
+    async function processData() {
+      const btn = document.getElementById('btn-process');
+      btn.innerHTML = '<span class="loading"></span> 检测中...';
+      btn.disabled = true;
+      
+      try {
+        const response = await fetch(API_BASE + '/api/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast(`检测完成：共 ${result.total} 个异常，新增 ${result.new} 个`, 'success');
+          loadStats();
+          loadAnomalies();
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (e) {
+        showToast('检测失败: ' + e.message, 'error');
+      } finally {
+        btn.innerHTML = '🔍 执行规则检测';
+        btn.disabled = false;
+      }
+    }
+    
+    async function loadAnomalies() {
+      const type = document.getElementById('filter-type').value;
+      const status = document.getElementById('filter-status').value;
+      
+      let url = API_BASE + '/api/anomalies';
+      const params = [];
+      if (type) params.push(`type=${encodeURIComponent(type)}`);
+      if (status) params.push(`status=${encodeURIComponent(status)}`);
+      if (params.length > 0) url += '?' + params.join('&');
+      
+      try {
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.success) {
+          renderAnomalies(result.data);
+        }
+      } catch (e) {
+        console.error('加载异常列表失败:', e);
+      }
+    }
+    
+    function renderAnomalies(anomalies) {
+      const container = document.getElementById('anomalies-list');
+      
+      if (anomalies.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div class="empty-state-text">暂无异常记录</div>
+          </div>
+        `;
+        return;
+      }
+      
+      const typeLabels = {
+        'overdue': '逾期',
+        'duplicate_occupancy': '重复占用',
+        'sterilization_incomplete': '消毒未完成',
+        'cabinet_conflict': '同柜冲突'
+      };
+      
+      const typeBadges = {
+        'overdue': 'badge-overdue',
+        'duplicate_occupancy': 'badge-duplicate',
+        'sterilization_incomplete': 'badge-sterilization',
+        'cabinet_conflict': 'badge-conflict'
+      };
+      
+      const statusBadges = {
+        'pending': 'badge-pending',
+        'approved': 'badge-approved',
+        'rejected': 'badge-rejected',
+        'noted': 'badge-noted'
+      };
+      
+      const statusLabels = {
+        'pending': '待处理',
+        'approved': '确认异常',
+        'rejected': '驳回',
+        'noted': '已备注'
+      };
+      
+      let html = '';
+      anomalies.forEach(anomaly => {
+        html += `
+          <div class="anomaly-card ${anomaly.type}">
+            <div class="anomaly-header">
+              <div>
+                <span class="anomaly-badge ${typeBadges[anomaly.type]}">
+                  ${typeLabels[anomaly.type]}
+                </span>
+                <span class="anomaly-badge ${statusBadges[anomaly.status]}" style="margin-left: 8px;">
+                  ${statusLabels[anomaly.status]}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: #999;">
+                ID: ${anomaly.id.substring(0, 20)}...
+              </div>
+            </div>
+            
+            <div class="anomaly-title">
+              ${anomaly.bookName ? `📖 ${anomaly.bookName}` : '📖 未知图书'}
+              ${anomaly.bookId ? `(ID: ${anomaly.bookId})` : ''}
+            </div>
+            
+            <div class="anomaly-description">
+              ${anomaly.description}
+            </div>
+            
+            ${renderDetails(anomaly)}
+            
+            ${anomaly.status === 'pending' ? `
+              <div class="decision-area">
+                <div class="decision-row">
+                  <input type="text" class="remark-input" placeholder="输入备注（可选）" id="remark-${anomaly.id}">
+                  <div class="action-buttons">
+                    <button class="btn btn-success" onclick="makeDecision('${anomaly.id}', 'approved')">
+                      ✓ 确认异常
+                    </button>
+                    <button class="btn btn-danger" onclick="makeDecision('${anomaly.id}', 'rejected')">
+                      ✗ 驳回
+                    </button>
+                    <button class="btn btn-warning" onclick="makeDecision('${anomaly.id}', 'noted')">
+                      📝 仅备注
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ` : `
+              <div class="decision-area">
+                <div class="anomaly-details">
+                  <div class="detail-item">
+                    <div class="detail-label">处理人</div>
+                    <div class="detail-value">${anomaly.operator || '-'}</div>
+                  </div>
+                  <div class="detail-item">
+                    <div class="detail-label">处理时间</div>
+                    <div class="detail-value">
+                      ${anomaly.decisionTime ? new Date(anomaly.decisionTime).toLocaleString('zh-CN') : '-'}
+                    </div>
+                  </div>
+                </div>
+                ${anomaly.remark ? `
+                  <div class="anomaly-description">
+                    📝 备注：${anomaly.remark}
+                  </div>
+                ` : ''}
+              </div>
+            `}
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    function renderDetails(anomaly) {
+      let details = '';
+      
+      if (anomaly.type === 'overdue') {
+        details = `
+          <div class="anomaly-details">
+            <div class="detail-item">
+              <div class="detail-label">借阅人</div>
+              <div class="detail-value">${anomaly.borrowerName || '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">借阅时间</div>
+              <div class="detail-value">${anomaly.borrowTime ? new Date(anomaly.borrowTime).toLocaleString('zh-CN') : '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">应还日期</div>
+              <div class="detail-value">${anomaly.dueDate || '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">逾期天数</div>
+              <div class="detail-value" style="color: #ff6b6b;">${anomaly.daysOverdue} 天</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">书柜ID</div>
+              <div class="detail-value">${anomaly.cabinetId || '-'}</div>
+            </div>
+          </div>
+        `;
+      } else if (anomaly.type === 'duplicate_occupancy') {
+        if (anomaly.tagStatus) {
+          details = `
+            <div class="anomaly-details">
+              <div class="detail-item">
+                <div class="detail-label">借阅人</div>
+                <div class="detail-value">${anomaly.borrowerName || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">借阅时间</div>
+                <div class="detail-value">${anomaly.borrowTime ? new Date(anomaly.borrowTime).toLocaleString('zh-CN') : '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">标签状态</div>
+                <div class="detail-value">${anomaly.tagStatus || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">记录状态</div>
+                <div class="detail-value">${anomaly.recordStatus || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">书柜ID</div>
+                <div class="detail-value">${anomaly.cabinetId || '-'}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          details = `
+            <div class="anomaly-details">
+              <div class="detail-item">
+                <div class="detail-label">当前借阅人</div>
+                <div class="detail-value">${anomaly.currentBorrower || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">借出时间</div>
+                <div class="detail-value">${anomaly.lastBorrowTime ? new Date(anomaly.lastBorrowTime).toLocaleString('zh-CN') : '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">新借阅人</div>
+                <div class="detail-value">${anomaly.newBorrower || '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">新借出时间</div>
+                <div class="detail-value">${anomaly.newBorrowTime ? new Date(anomaly.newBorrowTime).toLocaleString('zh-CN') : '-'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">书柜ID</div>
+                <div class="detail-value">${anomaly.cabinetId || '-'}</div>
+              </div>
+            </div>
+          `;
+        }
+      } else if (anomaly.type === 'sterilization_incomplete') {
+        details = `
+          <div class="anomaly-details">
+            <div class="detail-item">
+              <div class="detail-label">归还时间</div>
+              <div class="detail-value">${anomaly.returnTime ? new Date(anomaly.returnTime).toLocaleString('zh-CN') : '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">消毒状态</div>
+              <div class="detail-value">${anomaly.sterilizationStatus || '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">书柜ID</div>
+              <div class="detail-value">${anomaly.cabinetId || '-'}</div>
+            </div>
+          </div>
+        `;
+      } else if (anomaly.type === 'cabinet_conflict') {
+        const r1 = anomaly.reservation1 || {};
+        const r2 = anomaly.reservation2 || {};
+        details = `
+          <div class="anomaly-details">
+            <div class="detail-item">
+              <div class="detail-label">书柜ID</div>
+              <div class="detail-value">${anomaly.cabinetId || '-'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">时间间隔</div>
+              <div class="detail-value" style="color: #a29bfe;">${anomaly.timeDiffMinutes} 分钟</div>
+            </div>
+          </div>
+          <div class="anomaly-details">
+            <div class="detail-item" style="grid-column: span 2;">
+              <div class="detail-label">预约 1</div>
+              <div class="detail-value">
+                ${r1.borrowerName || '-'} - ${r1.bookName || '-'}
+                <br><small>${r1.pickupTime ? new Date(r1.pickupTime).toLocaleString('zh-CN') : '-'}</small>
+              </div>
+            </div>
+            <div class="detail-item" style="grid-column: span 2;">
+              <div class="detail-label">预约 2</div>
+              <div class="detail-value">
+                ${r2.borrowerName || '-'} - ${r2.bookName || '-'}
+                <br><small>${r2.pickupTime ? new Date(r2.pickupTime).toLocaleString('zh-CN') : '-'}</small>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      return details;
+    }
+    
+    async function makeDecision(id, decision) {
+      const remarkInput = document.getElementById(`remark-${id}`);
+      const remark = remarkInput ? remarkInput.value : '';
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/anomalies/${id}/decision`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            decision: decision,
+            remark: remark,
+            operator: '管理员'
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('处理成功', 'success');
+          loadStats();
+          loadAnomalies();
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (e) {
+        showToast('处理失败: ' + e.message, 'error');
+      }
+    }
+    
+    function exportShelfList() {
+      window.location.href = API_BASE + '/api/export/shelf-list';
+      showToast('正在下载上架清单...', 'info');
+    }
+    
+    function exportAnomalies() {
+      window.location.href = API_BASE + '/api/export/anomalies';
+      showToast('正在下载异常记录...', 'info');
+    }
+    
+    function showClearModal() {
+      document.getElementById('clear-modal').classList.add('active');
+    }
+    
+    function hideClearModal() {
+      document.getElementById('clear-modal').classList.remove('active');
+    }
+    
+    async function clearAllData() {
+      hideClearModal();
+      
+      try {
+        const response = await fetch(API_BASE + '/api/data/clear', {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast(result.message, 'success');
+          loadStats();
+          loadAnomalies();
+          
+          document.querySelectorAll('.file-info').forEach(el => {
+            el.innerHTML = '';
+          });
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (e) {
+        showToast('清空失败: ' + e.message, 'error');
+      }
+    }
+    
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

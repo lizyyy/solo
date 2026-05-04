@@ -1,0 +1,42 @@
+[
+  {
+    "batchId": "BATCH20260504001",
+    "bookId": "B002",
+    "bookName": "百年孤独",
+    "startTime": "2026-05-04T09:30:00",
+    "endTime": "2026-05-04T10:00:00",
+    "status": "completed",
+    "cabinetId": "C01",
+    "operator": "管理员A"
+  },
+  {
+    "batchId": "BATCH20260504002",
+    "bookId": "B004",
+    "bookName": "围城",
+    "startTime": "2026-05-04T11:00:00",
+    "endTime": null,
+    "status": "in_progress",
+    "cabinetId": "C02",
+    "operator": "管理员A"
+  },
+  {
+    "batchId": "BATCH20260504003",
+    "bookId": "B008",
+    "bookName": "水浒传",
+    "startTime": null,
+    "endTime": null,
+    "status": "pending",
+    "cabinetId": "C02",
+    "operator": null
+  },
+  {
+    "batchId": "BATCH20260503001",
+    "bookId": "B001",
+    "bookName": "活着",
+    "startTime": "2026-04-01T10:30:00",
+    "endTime": "2026-04-01T11:00:00",
+    "status": "completed",
+    "cabinetId": "C01",
+    "operator": "管理员B"
+  }
+]
