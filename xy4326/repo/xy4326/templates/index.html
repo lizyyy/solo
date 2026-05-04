@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热像异常复盘台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-thermometer-half"></i> 热像异常复盘台
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="batchDropdown" data-bs-toggle="dropdown">
+                        <i class="bi bi-folder"></i> 选择巡检批次
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="batchList">
+                        <li><a class="dropdown-item" href="#" onclick="showCreateBatchModal()">+ 新建批次</a></li>
+                    </ul>
+                </div>
+                <span class="navbar-text me-3" id="currentBatchInfo"></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-speedometer2"></i> 数据概览
+                    </div>
+                    <div class="card-body" id="statsCard">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-hourglass" style="font-size: 2rem;"></i>
+                            <p>请选择巡检批次</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-upload"></i> 数据导入
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">温度数据CSV</label>
+                            <input type="file" class="form-control" id="csvFileInput" accept=".csv">
+                            <button class="btn btn-primary btn-sm mt-2" onclick="importCsv()">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> 导入CSV
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">设备运行日志</label>
+                            <input type="file" class="form-control" id="logFileInput" accept=".txt,.log,.csv">
+                            <button class="btn btn-secondary btn-sm mt-2" onclick="importLogs()">
+                                <i class="bi bi-file-text"></i> 导入日志
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">现场照片</label>
+                            <input type="file" class="form-control" id="photoFileInput" accept="image/*" multiple>
+                            <input type="text" class="form-control form-control-sm mt-1" id="photoPointCode" placeholder="关联点位代码（可选）">
+                            <button class="btn btn-secondary btn-sm mt-2" onclick="uploadPhotos()">
+                                <i class="bi bi-image"></i> 上传照片
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-gear"></i> 分析操作
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-warning w-100 mb-2" onclick="runAnalysis()">
+                            <i class="bi bi-search"></i> 运行风险分析
+                        </button>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-success" onclick="exportRiskList()">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> 导出风险清单
+                            </button>
+                            <button class="btn btn-outline-info" onclick="exportReport()">
+                                <i class="bi bi-file-earmark-text"></i> 导出复盘报告
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <ul class="nav nav-tabs" id="mainTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#riskTab">
+                            <i class="bi bi-exclamation-triangle"></i> 风险列表
+                            <span class="badge bg-danger ms-1" id="highRiskCount">-</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#mapTab">
+                            <i class="bi bi-geo-alt"></i> 点位分布图
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#trendTab">
+                            <i class="bi bi-graph-up"></i> 温度趋势
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#reviewTab">
+                            <i class="bi bi-clipboard-check"></i> 复核记录
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="riskTab">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="riskLevelFilter" onchange="filterRisks()">
+                                    <option value="">全部风险等级</option>
+                                    <option value="high">高风险</option>
+                                    <option value="medium">中风险</option>
+                                    <option value="low">低风险</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="riskStatusFilter" onchange="filterRisks()">
+                                    <option value="">全部状态</option>
+                                    <option value="false">待处理</option>
+                                    <option value="true">已闭环</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="riskSearchInput" placeholder="搜索点位代码或名称..." onkeyup="filterRisks()">
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>风险等级</th>
+                                        <th>点位代码</th>
+                                        <th>点位名称</th>
+                                        <th>风险类型</th>
+                                        <th>温度值</th>
+                                        <th>检测时间</th>
+                                        <th>人工判定</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="riskTableBody">
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted">暂无风险数据</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="mapTab">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <span class="legend-item"><span class="legend-color bg-success"></span> 正常</span>
+                                        <span class="legend-item"><span class="legend-color bg-warning"></span> 中风险</span>
+                                        <span class="legend-item"><span class="legend-color bg-danger"></span> 高风险</span>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="resetMapView()">
+                                            <i class="bi bi-zoom-out"></i> 重置视图
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="pointMap" class="point-map">
+                                    <div class="text-center text-muted h-100 d-flex align-items-center justify-content-center">
+                                        <div>
+                                            <i class="bi bi-map" style="font-size: 3rem;"></i>
+                                            <p>导入点位数据后显示分布图</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="trendTab">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">选择点位</label>
+                                <select class="form-select" id="pointSelect" onchange="loadTemperatureTrend()">
+                                    <option value="">请选择点位</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8 d-flex align-items-end">
+                                <button class="btn btn-outline-secondary me-2" onclick="toggleTrendType('line')">折线图</button>
+                                <button class="btn btn-outline-secondary" onclick="toggleTrendType('bar')">柱状图</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <canvas id="trendChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="reviewTab">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>复核时间</th>
+                                        <th>复核人</th>
+                                        <th>关联风险</th>
+                                        <th>复核结果</th>
+                                        <th>复核备注</th>
+                                        <th>跟进措施</th>
+                                        <th>建议复查日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reviewTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">暂无复核记录</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createBatchModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-folder-plus"></i> 新建巡检批次</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createBatchForm">
+                        <div class="mb-3">
+                            <label class="form-label">批次名称 *</label>
+                            <input type="text" class="form-control" id="batchName" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">巡检日期</label>
+                                <input type="date" class="form-control" id="inspectionDate">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">巡检人员</label>
+                                <input type="text" class="form-control" id="inspector">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">天气情况</label>
+                            <input type="text" class="form-control" id="weather" placeholder="如：晴、多云、小雨">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-control" id="batchNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="createBatch()">创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="riskDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-circle"></i> 
+                        <span id="detailRiskTitle">风险详情</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>点位信息</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr><td>点位代码：</td><td id="detailPointCode"></td></tr>
+                                <tr><td>点位名称：</td><td id="detailPointName"></td></tr>
+                                <tr><td>点位类型：</td><td id="detailPointType"></td></tr>
+                                <tr><td>位置：</td><td id="detailLocation"></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>风险信息</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr><td>风险等级：</td><td id="detailRiskLevel"></td></tr>
+                                <tr><td>风险类型：</td><td id="detailRiskType"></td></tr>
+                                <tr><td>温度值：</td><td id="detailTemperature"></td></tr>
+                                <tr><td>检测时间：</td><td id="detailDetectedAt"></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <h6>风险描述</h6>
+                        <p id="detailDescription" class="text-muted"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>温度历史</h6>
+                        <canvas id="detailTrendChart" height="150"></canvas>
+                    </div>
+                    <div class="mb-3">
+                        <h6>相关照片</h6>
+                        <div id="detailPhotos" class="photo-gallery"></div>
+                    </div>
+                    <hr>
+                    <h6>人工复核</h6>
+                    <form id="judgmentForm">
+                        <input type="hidden" id="currentRiskId">
+                        <div class="mb-3">
+                            <label class="form-label">复核判定</label>
+                            <select class="form-select" id="judgmentSelect">
+                                <option value="">请选择</option>
+                                <option value="confirmed">确认风险</option>
+                                <option value="false_alarm">误报</option>
+                                <option value="low_priority">低优先级</option>
+                                <option value="needs_monitoring">需持续关注</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">复核备注</label>
+                            <textarea class="form-control" id="judgmentNotes" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">跟进措施</label>
+                                <textarea class="form-control" id="followUpActions" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">建议复查日期</label>
+                                <input type="date" class="form-control" id="recommendedReviewDate">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-success" onclick="closeRisk()" id="closeRiskBtn" style="display:none;">
+                        <i class="bi bi-check-circle"></i> 闭环风险
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitJudgment()">
+                        <i class="bi bi-save"></i> 保存复核
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notificationToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong class="me-auto" id="toastTitle">提示</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
