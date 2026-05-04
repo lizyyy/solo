@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水质巡检分析台</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+      --danger-color: #e74c3c;
+      --info-color: #17a2b8;
+      --bg-color: #f5f7fa;
+      --card-bg: #ffffff;
+      --text-primary: #2c3e50;
+      --text-secondary: #7f8c8d;
+      --border-color: #e1e4e8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), #2980b9);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header h1::before {
+      content: '🏊';
+      font-size: 1.8rem;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      background: var(--card-bg);
+      padding: 0.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .nav-tab {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      background: var(--bg-color);
+      color: var(--text-primary);
+    }
+
+    .nav-tab.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .stat-card.danger {
+      border-left-color: var(--danger-color);
+    }
+
+    .stat-card.warning {
+      border-left-color: var(--warning-color);
+    }
+
+    .stat-card.success {
+      border-left-color: var(--success-color);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--bg-color);
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--primary-color);
+      background: rgba(52, 152, 219, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .upload-text strong {
+      color: var(--primary-color);
+    }
+
+    #csvFile {
+      display: none;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+
+    .btn-success {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #219a52;
+    }
+
+    .btn-warning {
+      background: var(--warning-color);
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e67e22;
+    }
+
+    .btn-danger {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-secondary {
+      background: var(--bg-color);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border-color);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1rem;
+    }
+
+    .chart-container {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 250px;
+    }
+
+    .risk-item {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .risk-item:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .risk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      cursor: pointer;
+      background: var(--card-bg);
+    }
+
+    .risk-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .risk-severity {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .risk-severity.CRITICAL {
+      background: var(--danger-color);
+      box-shadow: 0 0 8px var(--danger-color);
+    }
+
+    .risk-severity.HIGH {
+      background: #e74c3c;
+    }
+
+    .risk-severity.MEDIUM {
+      background: var(--warning-color);
+    }
+
+    .risk-severity.LOW {
+      background: var(--info-color);
+    }
+
+    .risk-title {
+      font-weight: 600;
+    }
+
+    .risk-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .risk-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .risk-status.PENDING {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .risk-status.REVIEWING {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .risk-status.RESOLVED {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .risk-status.DISMISSED {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+
+    .risk-status.REVISED {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .risk-body {
+      display: none;
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+      background: #fafbfc;
+    }
+
+    .risk-body.expanded {
+      display: block;
+    }
+
+    .risk-section {
+      margin-bottom: 1rem;
+    }
+
+    .risk-section-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .risk-detail {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .risk-detail-item {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .risk-detail-label {
+      color: var(--text-secondary);
+    }
+
+    .risk-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: var(--bg-color);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    tr:hover {
+      background: var(--bg-color);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-badge.NORMAL {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.WARNING {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.OVERLIMIT {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--card-bg);
+      border-radius: 8px;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-item label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .filter-item select,
+    .filter-item input {
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .pagination button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination span {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .loading::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-color);
+      border-top-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 0.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .sample-data-row {
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-tabs {
+        flex-direction: column;
+      }
+      
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .row {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>水质巡检分析台</h1>
+  </header>
+
+  <div class="container">
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="dashboard">仪表盘</button>
+      <button class="nav-tab" data-tab="import">数据导入</button>
+      <button class="nav-tab" data-tab="risks">风险队列</button>
+      <button class="nav-tab" data-tab="charts">图表分析</button>
+      <button class="nav-tab" data-tab="samples">采样数据</button>
+      <button class="nav-tab" data-tab="export">数据导出</button>
+    </nav>
+
+    <div id="dashboard" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-samples">0</div>
+          <div class="stat-label">总采样数据</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-value" id="stat-active-risks">0</div>
+          <div class="stat-label">待处理风险</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value" id="stat-warning">0</div>
+          <div class="stat-label">警告状态</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-value" id="stat-normal">0</div>
+          <div class="stat-label">正常状态</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">风险统计</h3>
+          </div>
+          <div class="row" id="risk-stats-container">
+            <div class="stat-card">
+              <div class="stat-value" id="stat-pending">0</div>
+              <div class="stat-label">待处理</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-reviewing">0</div>
+              <div class="stat-label">复核中</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-resolved">0</div>
+              <div class="stat-label">已解决</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total-risks">0</div>
+              <div class="stat-label">风险总数</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">快捷操作</h3>
+          </div>
+          <div class="btn-group" style="flex-direction: column;">
+            <button class="btn btn-primary" onclick="switchTab('import')">
+              📁 导入CSV数据
+            </button>
+            <button class="btn btn-warning" onclick="switchTab('risks')">
+              ⚠️ 查看风险队列
+            </button>
+            <button class="btn btn-success" onclick="switchTab('export')">
+              📄 导出交接单
+            </button>
+            <button class="btn btn-secondary" onclick="refreshDashboard()">
+              🔄 刷新数据
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="import" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">导入CSV数据</h3>
+        </div>
+        
+        <div class="row">
+          <div style="flex: 1;">
+            <div class="upload-area" id="uploadArea">
+              <div class="upload-icon">📊</div>
+              <div class="upload-text">
+                拖拽CSV文件到此处，或 <strong>点击选择文件</strong>
+              </div>
+              <div style="margin-top: 1rem;">
+                <input type="file" id="csvFile" accept=".csv">
+                <button class="btn btn-primary" onclick="document.getElementById('csvFile').click()">
+                  选择文件
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label">当班人员（可选）</label>
+              <input type="text" class="form-input" id="importOperator" placeholder="请输入当班人员姓名">
+            </div>
+
+            <div id="importResult" style="display: none; margin-top: 1rem;"></div>
+          </div>
+
+          <div style="flex: 1;">
+            <div class="card" style="margin-bottom: 0;">
+              <div class="card-header">
+                <h3 class="card-title">CSV格式说明</h3>
+              </div>
+              <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                <p style="margin-bottom: 1rem;">CSV文件应包含以下列（支持中英文列名）：</p>
+                <table style="font-size: 0.85rem;">
+                  <thead>
+                    <tr>
+                      <th>列名</th>
+                      <th>说明</th>
+                      <th>示例</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>采样点 / sample_point</td>
+                      <td>采样点名称</td>
+                      <td>浅水池1号</td>
+                    </tr>
+                    <tr>
+                      <td>时间 / sample_time</td>
+                      <td>采样时间</td>
+                      <td>2024-01-15 09:00:00</td>
+                    </tr>
+                    <tr>
+                      <td>余氯 / chlorine</td>
+                      <td>余氯值 (mg/L)</td>
+                      <td>0.4</td>
+                    </tr>
+                    <tr>
+                      <td>pH / ph</td>
+                      <td>pH值</td>
+                      <td>7.5</td>
+                    </tr>
+                    <tr>
+                      <td>浊度 / turbidity</td>
+                      <td>浊度 (NTU)</td>
+                      <td>0.5</td>
+                    </tr>
+                    <tr>
+                      <td>水温 / temperature</td>
+                      <td>水温 (°C)</td>
+                      <td>25</td>
+                    </tr>
+                    <tr>
+                      <td>当班人员 / operator</td>
+                      <td>值班人员（可选）</td>
+                      <td>张三</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div style="margin-top: 1rem;">
+                  <button class="btn btn-secondary" onclick="downloadSampleCsv()">
+                    📥 下载示例CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="risks" class="tab-content">
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label>状态：</label>
+          <select id="riskStatusFilter">
+            <option value="">全部</option>
+            <option value="PENDING">待处理</option>
+            <option value="REVIEWING">复核中</option>
+            <option value="RESOLVED">已解决</option>
+            <option value="DISMISSED">已忽略</option>
+            <option value="REVISED">已改判</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>类型：</label>
+          <select id="riskTypeFilter">
+            <option value="">全部</option>
+            <option value="CONTINUOUS_ANOMALY">连续异常</option>
+            <option value="REPEATED_OVERLIMIT">反复超标</option>
+            <option value="NO_RECOVERY_AFTER_TREATMENT">补药后未恢复</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>严重程度：</label>
+          <select id="riskSeverityFilter">
+            <option value="">全部</option>
+            <option value="CRITICAL">严重</option>
+            <option value="HIGH">高</option>
+            <option value="MEDIUM">中</option>
+            <option value="LOW">低</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <button class="btn btn-primary" onclick="loadRisks()">
+            🔍 筛选
+          </button>
+          <button class="btn btn-secondary" onclick="clearRiskFilters()">
+            清除筛选
+          </button>
+        </div>
+      </div>
+
+      <div id="risksContainer"></div>
+
+      <div class="pagination" id="riskPagination" style="display: none;">
+        <button id="prevRiskPage" onclick="prevRiskPage()">上一页</button>
+        <span id="riskPageInfo">第 1 页</span>
+        <button id="nextRiskPage" onclick="nextRiskPage()">下一页</button>
+      </div>
+    </div>
+
+    <div id="charts" class="tab-content">
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label>采样点：</label>
+          <select id="chartSamplePoint">
+            <option value="">全部采样点</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>开始时间：</label>
+          <input type="date" id="chartStartDate">
+        </div>
+        <div class="filter-item">
+          <label>结束时间：</label>
+          <input type="date" id="chartEndDate">
+        </div>
+        <div class="filter-item">
+          <button class="btn btn-primary" onclick="loadCharts()">
+            📊 刷新图表
+          </button>
+        </div>
+      </div>
+
+      <div class="charts-grid" id="chartsContainer">
+        <div class="chart-container">
+          <div class="chart-title">余氯趋势 (标准: 0.3-0.5 mg/L)</div>
+          <div class="chart-wrapper">
+            <canvas id="chlorineChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-title">pH趋势 (标准: 6.8-8.5)</div>
+          <div class="chart-wrapper">
+            <canvas id="phChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-title">浊度趋势 (标准: ≤1 NTU)</div>
+          <div class="chart-wrapper">
+            <canvas id="turbidityChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart-title">水温趋势 (标准: 22-26°C)</div>
+          <div class="chart-wrapper">
+            <canvas id="temperatureChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="samples" class="tab-content">
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label>采样点：</label>
+          <select id="samplePointFilter">
+            <option value="">全部</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>开始时间：</label>
+          <input type="date" id="sampleStartDate">
+        </div>
+        <div class="filter-item">
+          <label>结束时间：</label>
+          <input type="date" id="sampleEndDate">
+        </div>
+        <div class="filter-item">
+          <button class="btn btn-primary" onclick="loadSamples()">
+            🔍 筛选
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table id="samplesTable">
+            <thead>
+              <tr>
+                <th>采样点</th>
+                <th>采样时间</th>
+                <th>余氯</th>
+                <th>pH</th>
+                <th>浊度</th>
+                <th>水温</th>
+                <th>当班人员</th>
+                <th>来源文件</th>
+              </tr>
+            </thead>
+            <tbody id="samplesTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination" id="samplePagination" style="display: none;">
+          <button id="prevSamplePage" onclick="prevSamplePage()">上一页</button>
+          <span id="samplePageInfo">第 1 页</span>
+          <button id="nextSamplePage" onclick="nextSamplePage()">下一页</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="export" class="tab-content">
+      <div class="row">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">导出Markdown交接单</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">交接日期</label>
+            <input type="date" class="form-input" id="handoverDate" value="">
+          </div>
+          <div class="form-group">
+            <label class="form-label">值班人员</label>
+            <input type="text" class="form-input" id="handoverOperator" placeholder="请输入值班人员姓名">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="includeResolved">
+              包含已解决的风险
+            </label>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="previewHandover()">
+              👁️ 预览
+            </button>
+            <button class="btn btn-success" onclick="downloadHandover()">
+              📥 下载Markdown
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">导出JSON审计包</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">开始时间</label>
+            <input type="date" class="form-input" id="auditStartDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">结束时间</label>
+            <input type="date" class="form-input" id="auditEndDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="includeAllData">
+              包含所有采样数据
+            </label>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="previewAudit()">
+              👁️ 预览
+            </button>
+            <button class="btn btn-success" onclick="downloadAudit()">
+              📥 下载JSON
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="previewCard" style="display: none;">
+        <div class="card-header">
+          <h3 class="card-title">预览</h3>
+          <button class="btn btn-secondary" onclick="closePreview()">
+            ✕ 关闭
+          </button>
+        </div>
+        <div id="previewContent" style="white-space: pre-wrap; font-family: monospace; font-size: 0.85rem; max-height: 500px; overflow-y: auto; background: var(--bg-color); padding: 1rem; border-radius: 6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reviseModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">风险改判</h3>
+        <button class="modal-close" onclick="closeModal('reviseModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">改判状态 *</label>
+        <select class="form-select" id="revisedStatus">
+          <option value="NORMAL">正常</option>
+          <option value="MINOR">轻微</option>
+          <option value="NO_RISK">无风险</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">改判原因 *</label>
+        <textarea class="form-textarea" id="revisedReason" placeholder="请详细说明改判原因..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">改判人员</label>
+        <input type="text" class="form-input" id="revisedBy" placeholder="请输入改判人员姓名">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('reviseModal')">取消</button>
+        <button class="btn btn-warning" onclick="submitRevise()">确认改判</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="disposeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">处置风险</h3>
+        <button class="modal-close" onclick="closeModal('disposeModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">处置人员 *</label>
+        <input type="text" class="form-input" id="disposer" placeholder="请输入处置人员姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">处置类型 *</label>
+        <select class="form-select" id="disposalType">
+          <option value="CHLORINE_ADD">加氯</option>
+          <option value="PH_ADJUST">调pH</option>
+          <option value="FILTER_BACKWASH">反冲洗过滤</option>
+          <option value="WATER_REPLACE">换水</option>
+          <option value="ALGAECIDE_ADD">加除藻剂</option>
+          <option value="OTHER">其他</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label">处置用量</label>
+          <input type="number" class="form-input" id="disposalAmount" placeholder="用量">
+        </div>
+        <div class="form-group">
+          <label class="form-label">单位</label>
+          <input type="text" class="form-input" id="disposalUnit" placeholder="如: kg、L">
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label">处置前值</label>
+          <input type="number" class="form-input" id="beforeValue" placeholder="处置前参数值" step="0.01">
+        </div>
+        <div class="form-group">
+          <label class="form-label">目标值</label>
+          <input type="number" class="form-input" id="targetValue" placeholder="目标参数值" step="0.01">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">处置描述</label>
+        <textarea class="form-textarea" id="disposalDescription" placeholder="请详细描述处置过程..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">
+          <input type="checkbox" id="followUpNeeded">
+          需要跟进
+        </label>
+      </div>
+      <div class="form-group" id="followUpTimeGroup" style="display: none;">
+        <label class="form-label">跟进时间</label>
+        <input type="datetime-local" class="form-input" id="followUpTime">
+      </div>
+      <div class="form-group">
+        <label class="form-label">备注</label>
+        <textarea class="form-textarea" id="disposalRemark" placeholder="其他备注信息..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('disposeModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitDispose()">保存处置记录</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resolveModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">解决风险</h3>
+        <button class="modal-close" onclick="closeModal('resolveModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">处理结果 *</label>
+        <textarea class="form-textarea" id="treatmentResult" placeholder="请详细说明处理结果..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">处理人员</label>
+        <input type="text" class="form-input" id="treatedBy" placeholder="请输入处理人员姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">处置后参数值</label>
+        <input type="number" class="form-input" id="afterValue" placeholder="处置后的参数值" step="0.01">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('resolveModal')">取消</button>
+        <button class="btn btn-success" onclick="submitResolve()">确认解决</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
