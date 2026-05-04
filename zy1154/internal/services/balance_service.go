@@ -233,3 +233,9 @@ func (s *BalanceService) GetBalanceLogs(orderID string) ([]models.BalanceLog, er
 	err := s.db.Where("order_id = ?", orderID).Order("created_at ASC").Find(&logs).Error
 	return logs, err
 }
+
+func (s *BalanceService) GetBalanceLogsByUser(userID string) ([]models.BalanceLog, error) {
+	var logs []models.BalanceLog
+	err := s.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&logs).Error
+	return logs, err
+}

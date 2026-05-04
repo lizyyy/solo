@@ -14,12 +14,12 @@ import (
 )
 
 type SagaService struct {
-	db             *gorm.DB
-	orderService   *OrderService
-	inventoryService *InventoryService
-	balanceService *BalanceService
-	couponService  *CouponService
-	outboxService  *OutboxService
+	db                  *gorm.DB
+	orderService        *OrderService
+	inventoryService    *InventoryService
+	balanceService      *BalanceService
+	couponService       *CouponService
+	outboxService       *OutboxService
 	compensationService *CompensationService
 }
 
@@ -438,6 +438,14 @@ func (s *SagaService) ListSagas(status models.SagaStatus) ([]models.SagaInstance
 	}
 	err := query.Find(&sagas).Error
 	return sagas, err
+}
+
+func (s *SagaService) GetSagaByOrderID(orderID string) (*models.SagaInstance, error) {
+	var saga models.SagaInstance
+	if err := s.db.Where("order_id = ?", orderID).First(&saga).Error; err != nil {
+		return nil, fmt.Errorf("saga not found for order: %w", err)
+	}
+	return &saga, nil
 }
 
 type StepPayload struct {

@@ -266,3 +266,18 @@ func (s *CompensationService) GetAllTasks() ([]models.CompensationTask, error) {
 	err := s.db.Order("created_at DESC").Find(&tasks).Error
 	return tasks, err
 }
+
+func (s *CompensationService) GetTask(taskID string) (*models.CompensationTask, error) {
+	var task models.CompensationTask
+	if err := s.db.Where("id = ?", taskID).First(&task).Error; err != nil {
+		return nil, fmt.Errorf("compensation task not found: %w", err)
+	}
+	return &task, nil
+}
+
+func (s *CompensationService) GetFailedTasks() ([]models.CompensationTask, error) {
+	var tasks []models.CompensationTask
+	err := s.db.Where("status = ?", models.CompensationStatusFailed).
+		Order("created_at ASC").Find(&tasks).Error
+	return tasks, err
+}

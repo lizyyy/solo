@@ -233,3 +233,15 @@ func (s *InventoryService) GetInventoryLogs(orderID string) ([]models.InventoryL
 	err := s.db.Where("order_id = ?", orderID).Order("created_at ASC").Find(&logs).Error
 	return logs, err
 }
+
+func (s *InventoryService) ListInventory() ([]models.Inventory, error) {
+	var inventories []models.Inventory
+	err := s.db.Order("created_at ASC").Find(&inventories).Error
+	return inventories, err
+}
+
+func (s *InventoryService) GetInventoryLogsByProduct(productID string) ([]models.InventoryLog, error) {
+	var logs []models.InventoryLog
+	err := s.db.Where("product_id = ?", productID).Order("created_at DESC").Find(&logs).Error
+	return logs, err
+}

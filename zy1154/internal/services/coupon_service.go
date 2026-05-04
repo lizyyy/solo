@@ -188,3 +188,9 @@ func (s *CouponService) CalculateDiscount(couponID string, orderAmount float64) 
 
 	return coupon.Discount, nil
 }
+
+func (s *CouponService) ListCoupons() ([]models.Coupon, error) {
+	var coupons []models.Coupon
+	err := s.db.Order("created_at DESC").Find(&coupons).Error
+	return coupons, err
+}
