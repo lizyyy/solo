@@ -1,0 +1,27 @@
+{
+  "name": "apple-health-dashboard",
+  "version": "1.0.0",
+  "description": "Apple 健康数据复盘工具 - 完全本地运行的 Apple Health 数据分析与可视化应用",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "test:backend": "cd backend && npm test",
+    "test": "cd backend && npm test"
+  },
+  "keywords": [
+    "apple-health",
+    "health-data",
+    "data-analysis",
+    "dashboard",
+    "local-first",
+    "privacy-first"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

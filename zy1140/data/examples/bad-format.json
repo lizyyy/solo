@@ -1,0 +1,27 @@
+{
+  "thresholds": [
+    {
+      "category": "sleep",
+      "key": "minSleepHours",
+      "value": "abc",
+      "unit": "hours"
+    },
+    {
+      "category": "sleep",
+      "key": "idealSleepHours",
+      "value": -5,
+      "unit": "hours"
+    },
+    {
+      "category": "heartRate",
+      "key": "maxRestingHR",
+      "value": null,
+      "unit": "bpm"
+    },
+    {
+      "category": "steps",
+      "key": "minDailySteps",
+      "value": 1000000000,
+      "unit": "steps"
+    }
+  ]

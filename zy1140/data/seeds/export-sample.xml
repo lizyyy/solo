@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HealthData locale="zh_CN">
+  <ExportDate value="2026-05-04 10:00:00 +0800"/>
+  <Me>
+    <Characteristic type="HKCharacteristicTypeIdentifierDateOfBirth" value="1990-01-01"/>
+    <Characteristic type="HKCharacteristicTypeIdentifierBiologicalSex" value="HKBiologicalSexMale"/>
+  </Me>
+  
+  <!-- 步数记录 - 2026年4月 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-01 08:00:00 +0800" startDate="2026-04-01 08:00:00 +0800" endDate="2026-04-01 09:00:00 +0800" value="1250"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-01 09:00:00 +0800" startDate="2026-04-01 09:00:00 +0800" endDate="2026-04-01 10:00:00 +0800" value="850"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-01 14:00:00 +0800" startDate="2026-04-01 14:00:00 +0800" endDate="2026-04-01 15:00:00 +0800" value="2100"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-01 18:00:00 +0800" startDate="2026-04-01 18:00:00 +0800" endDate="2026-04-01 19:00:00 +0800" value="3200"/>
+  
+  <!-- 4月2日 - 睡眠不足后 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-02 08:00:00 +0800" startDate="2026-04-02 08:00:00 +0800" endDate="2026-04-02 12:00:00 +0800" value="1500"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-02 16:00:00 +0800" startDate="2026-04-02 16:00:00 +0800" endDate="2026-04-02 20:00:00 +0800" value="2000"/>
+  
+  <!-- 4月3日 - 睡眠不足第3天 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-03 08:00:00 +0800" startDate="2026-04-03 08:00:00 +0800" endDate="2026-04-03 12:00:00 +0800" value="1000"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-03 16:00:00 +0800" startDate="2026-04-03 16:00:00 +0800" endDate="2026-04-03 20:00:00 +0800" value="1500"/>
+  
+  <!-- 4月4日 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-04 09:00:00 +0800" startDate="2026-04-04 09:00:00 +0800" endDate="2026-04-04 20:00:00 +0800" value="8500"/>
+  
+  <!-- 4月5日 - 跑步 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-05 07:00:00 +0800" startDate="2026-04-05 07:00:00 +0800" endDate="2026-04-05 08:00:00 +0800" value="8500"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-05 12:00:00 +0800" startDate="2026-04-05 12:00:00 +0800" endDate="2026-04-05 20:00:00 +0800" value="5000"/>
+  
+  <!-- 4月6日 - 恢复不足 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-06 10:00:00 +0800" startDate="2026-04-06 10:00:00 +0800" endDate="2026-04-06 20:00:00 +0800" value="3000"/>
+  
+  <!-- 4月7日 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-07 08:00:00 +0800" startDate="2026-04-07 08:00:00 +0800" endDate="2026-04-07 20:00:00 +0800" value="10000"/>
+  
+  <!-- 4月8日 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-08 08:00:00 +0800" startDate="2026-04-08 08:00:00 +0800" endDate="2026-04-08 20:00:00 +0800" value="11500"/>
+  
+  <!-- 4月9日 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-09 08:00:00 +0800" startDate="2026-04-09 08:00:00 +0800" endDate="2026-04-09 20:00:00 +0800" value="9800"/>
+  
+  <!-- 4月10日 -->
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Apple Watch" unit="count" creationDate="2026-04-10 08:00:00 +0800" startDate="2026-04-10 08:00:00 +0800" endDate="2026-04-10 20:00:00 +0800" value="12000"/>
+  
+  <!-- 静息心率 -->
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-01 06:00:00 +0800" startDate="2026-04-01 06:00:00 +0800" endDate="2026-04-01 07:00:00 +0800" value="62"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-02 06:00:00 +0800" startDate="2026-04-02 06:00:00 +0800" endDate="2026-04-02 07:00:00 +0800" value="68"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-03 06:00:00 +0800" startDate="2026-04-03 06:00:00 +0800" endDate="2026-04-03 07:00:00 +0800" value="75"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-04 06:00:00 +0800" startDate="2026-04-04 06:00:00 +0800" endDate="2026-04-04 07:00:00 +0800" value="65"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-05 06:00:00 +0800" startDate="2026-04-05 06:00:00 +0800" endDate="2026-04-05 07:00:00 +0800" value="60"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-06 06:00:00 +0800" startDate="2026-04-06 06:00:00 +0800" endDate="2026-04-06 07:00:00 +0800" value="72"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-07 06:00:00 +0800" startDate="2026-04-07 06:00:00 +0800" endDate="2026-04-07 07:00:00 +0800" value="63"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-08 06:00:00 +0800" startDate="2026-04-08 06:00:00 +0800" endDate="2026-04-08 07:00:00 +0800" value="61"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-09 06:00:00 +0800" startDate="2026-04-09 06:00:00 +0800" endDate="2026-04-09 07:00:00 +0800" value="59"/>
+  <Record type="HKQuantityTypeIdentifierRestingHeartRate" sourceName="Apple Watch" unit="count/min" creationDate="2026-04-10 06:00:00 +0800" startDate="2026-04-10 06:00:00 +0800" endDate="2026-04-10 07:00:00 +0800" value="58"/>
+  
+  <!-- 心率变异性 -->
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-01 06:00:00 +0800" startDate="2026-04-01 06:00:00 +0800" endDate="2026-04-01 07:00:00 +0800" value="45"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-02 06:00:00 +0800" startDate="2026-04-02 06:00:00 +0800" endDate="2026-04-02 07:00:00 +0800" value="38"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-03 06:00:00 +0800" startDate="2026-04-03 06:00:00 +0800" endDate="2026-04-03 07:00:00 +0800" value="28"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-04 06:00:00 +0800" startDate="2026-04-04 06:00:00 +0800" endDate="2026-04-04 07:00:00 +0800" value="42"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-05 06:00:00 +0800" startDate="2026-04-05 06:00:00 +0800" endDate="2026-04-05 07:00:00 +0800" value="55"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-06 06:00:00 +0800" startDate="2026-04-06 06:00:00 +0800" endDate="2026-04-06 07:00:00 +0800" value="32"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-07 06:00:00 +0800" startDate="2026-04-07 06:00:00 +0800" endDate="2026-04-07 07:00:00 +0800" value="48"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-08 06:00:00 +0800" startDate="2026-04-08 06:00:00 +0800" endDate="2026-04-08 07:00:00 +0800" value="50"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-09 06:00:00 +0800" startDate="2026-04-09 06:00:00 +0800" endDate="2026-04-09 07:00:00 +0800" value="52"/>
+  <Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN" sourceName="Apple Watch" unit="ms" creationDate="2026-04-10 06:00:00 +0800" startDate="2026-04-10 06:00:00 +0800" endDate="2026-04-10 07:00:00 +0800" value="58"/>
+  
+  <!-- 睡眠分析 -->
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-01 07:00:00 +0800" startDate="2026-04-01 00:00:00 +0800" endDate="2026-04-01 07:30:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-02 07:00:00 +0800" startDate="2026-04-02 02:00:00 +0800" endDate="2026-04-02 07:00:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-03 07:00:00 +0800" startDate="2026-04-03 02:30:00 +0800" endDate="2026-04-03 07:30:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-04 07:00:00 +0800" startDate="2026-04-04 00:00:00 +0800" endDate="2026-04-04 08:00:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-05 07:00:00 +0800" startDate="2026-04-04 23:00:00 +0800" endDate="2026-04-05 07:00:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-06 07:00:00 +0800" startDate="2026-04-06 01:00:00 +0800" endDate="2026-04-06 08:00:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-07 07:00:00 +0800" startDate="2026-04-06 23:30:00 +0800" endDate="2026-04-07 07:30:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-08 07:00:00 +0800" startDate="2026-04-07 23:00:00 +0800" endDate="2026-04-08 07:00:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-09 07:00:00 +0800" startDate="2026-04-08 22:30:00 +0800" endDate="2026-04-09 06:30:00 +0800"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Apple Watch" value="HKCategoryValueSleepAnalysisAsleep" creationDate="2026-04-10 07:00:00 +0800" startDate="2026-04-09 23:00:00 +0800" endDate="2026-04-10 07:00:00 +0800"/>
+  
+  <!-- 活动能量 -->
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-01 23:00:00 +0800" startDate="2026-04-01 00:00:00 +0800" endDate="2026-04-01 23:00:00 +0800" value="450"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-02 23:00:00 +0800" startDate="2026-04-02 00:00:00 +0800" endDate="2026-04-02 23:00:00 +0800" value="320"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-03 23:00:00 +0800" startDate="2026-04-03 00:00:00 +0800" endDate="2026-04-03 23:00:00 +0800" value="280"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-04 23:00:00 +0800" startDate="2026-04-04 00:00:00 +0800" endDate="2026-04-04 23:00:00 +0800" value="520"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-05 23:00:00 +0800" startDate="2026-04-05 00:00:00 +0800" endDate="2026-04-05 23:00:00 +0800" value="850"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-06 23:00:00 +0800" startDate="2026-04-06 00:00:00 +0800" endDate="2026-04-06 23:00:00 +0800" value="260"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-07 23:00:00 +0800" startDate="2026-04-07 00:00:00 +0800" endDate="2026-04-07 23:00:00 +0800" value="580"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-08 23:00:00 +0800" startDate="2026-04-08 00:00:00 +0800" endDate="2026-04-08 23:00:00 +0800" value="620"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-09 23:00:00 +0800" startDate="2026-04-09 00:00:00 +0800" endDate="2026-04-09 23:00:00 +0800" value="560"/>
+  <Record type="HKQuantityTypeIdentifierActiveEnergyBurned" sourceName="Apple Watch" unit="kcal" creationDate="2026-04-10 23:00:00 +0800" startDate="2026-04-10 00:00:00 +0800" endDate="2026-04-10 23:00:00 +0800" value="680"/>
+  
+  <!-- 运动记录 -->
+  <Workout workoutActivityType="HKWorkoutActivityTypeRunning" duration="1800" durationUnit="min" totalDistance="5.2" totalDistanceUnit="km" totalEnergyBurned="420" totalEnergyBurnedUnit="kcal" sourceName="Apple Watch" device="Apple Watch Series 8" creationDate="2026-04-05 07:30:00 +0800" startDate="2026-04-05 07:00:00 +0800" endDate="2026-04-05 07:30:00 +0800">
+    <MetadataEntry key="HKWorkoutMetadataKeyAverageHeartRate" value="145"/>
+    <MetadataEntry key="HKWorkoutMetadataKeyAverageSpeed" value="10.4"/>
+    <MetadataEntry key="HKWorkoutMetadataKeyElevationAscended" value="35"/>
+  </Workout>
+  
+</HealthData>

@@ -1,0 +1,81 @@
+{
+  "thresholds": [
+    {
+      "category": "sleep",
+      "key": "minSleepHours",
+      "value": 6,
+      "unit": "hours",
+      "description": "低于此值视为睡眠不足"
+    },
+    {
+      "category": "sleep",
+      "key": "idealSleepHours",
+      "value": 7.5,
+      "unit": "hours",
+      "description": "每日理想的睡眠时长"
+    },
+    {
+      "category": "sleep",
+      "key": "maxSleepDebtHours",
+      "value": 2,
+      "unit": "hours",
+      "description": "超过此值视为睡眠债累积风险"
+    },
+    {
+      "category": "sleep",
+      "key": "consecutivePoorSleepDays",
+      "value": 3,
+      "unit": "days",
+      "description": "连续此天数睡眠不足触发警告"
+    },
+    {
+      "category": "heartRate",
+      "key": "maxRestingHR",
+      "value": 70,
+      "unit": "bpm",
+      "description": "超过此值视为静息心率偏高"
+    },
+    {
+      "category": "heartRate",
+      "key": "minRestingHR",
+      "value": 45,
+      "unit": "bpm",
+      "description": "低于此值视为静息心率偏低"
+    },
+    {
+      "category": "heartRate",
+      "key": "minHRV",
+      "value": 35,
+      "unit": "ms",
+      "description": "低于此值视为心率变异性偏低"
+    },
+    {
+      "category": "steps",
+      "key": "minDailySteps",
+      "value": 3000,
+      "unit": "steps",
+      "description": "低于此值视为活动量不足"
+    },
+    {
+      "category": "steps",
+      "key": "dailyStepsGoal",
+      "value": 10000,
+      "unit": "steps",
+      "description": "每日期望达到的步数"
+    },
+    {
+      "category": "workout",
+      "key": "workoutSpikeThreshold",
+      "value": 2,
+      "unit": "ratio",
+      "description": "超过此比例视为运动量突增（相对于前7天平均值）"
+    },
+    {
+      "category": "recovery",
+      "key": "dataMissingThreshold",
+      "value": 2,
+      "unit": "days",
+      "description": "连续此天数无数据视为缺失"
+    }
+  ]
+}
