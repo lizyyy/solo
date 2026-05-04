@@ -1,0 +1,193 @@
+{
+  "events": [
+    {
+      "event_type": "query",
+      "category": "sql",
+      "description": "SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC",
+      "duration_ms": 450.5,
+      "start_timestamp": "2024-12-01T10:30:15Z",
+      "tags": "slow_query,users",
+      "metadata": "{\"rows_examined\": 15000, \"rows_returned\": 50, \"index_used\": false}"
+    },
+    {
+      "event_type": "query",
+      "category": "sql",
+      "description": "SELECT * FROM orders WHERE user_id = 123 AND status = 'pending'",
+      "duration_ms": 320.3,
+      "start_timestamp": "2024-12-01T10:30:16Z",
+      "tags": "slow_query,orders",
+      "metadata": "{\"rows_examined\": 8000, \"rows_returned\": 12, \"index_used\": true}"
+    },
+    {
+      "event_type": "query",
+      "category": "sql",
+      "description": "INSERT INTO orders (user_id, total_amount, status) VALUES (?, ?, ?)",
+      "duration_ms": 85.2,
+      "start_timestamp": "2024-12-01T10:30:17Z",
+      "tags": "insert,orders",
+      "metadata": "{\"affected_rows\": 1}"
+    },
+    {
+      "event_type": "query",
+      "category": "sql",
+      "description": "SELECT COUNT(*) FROM products WHERE category = ?",
+      "duration_ms": 180.8,
+      "start_timestamp": "2024-12-01T10:30:18Z",
+      "tags": "count,products",
+      "metadata": "{\"rows_examined\": 25000, \"rows_returned\": 1}"
+    },
+    {
+      "event_type": "cache_miss",
+      "category": "cache",
+      "description": "Redis cache miss for key: user:123:profile",
+      "duration_ms": 5.2,
+      "start_timestamp": "2024-12-01T10:30:15Z",
+      "tags": "redis,cache_miss",
+      "metadata": "{\"cache_type\": \"redis\", \"key\": \"user:123:profile\"}"
+    },
+    {
+      "event_type": "cache_miss",
+      "category": "cache",
+      "description": "Redis cache miss for key: order:456:details",
+      "duration_ms": 4.8,
+      "start_timestamp": "2024-12-01T10:30:16Z",
+      "tags": "redis,cache_miss",
+      "metadata": "{\"cache_type\": \"redis\", \"key\": \"order:456:details\"}"
+    },
+    {
+      "event_type": "cache_miss",
+      "category": "cache",
+      "description": "Redis cache miss for key: products:electronics",
+      "duration_ms": 6.1,
+      "start_timestamp": "2024-12-01T10:30:18Z",
+      "tags": "redis,cache_miss",
+      "metadata": "{\"cache_type\": \"redis\", \"key\": \"products:electronics\"}"
+    },
+    {
+      "event_type": "cache_miss",
+      "category": "cache",
+      "description": "Redis cache miss for key: search:product:electronics",
+      "duration_ms": 5.5,
+      "start_timestamp": "2024-12-01T10:30:19Z",
+      "tags": "redis,cache_miss",
+      "metadata": "{\"cache_type\": \"redis\", \"key\": \"search:product:electronics\"}"
+    },
+    {
+      "event_type": "cache_hit",
+      "category": "cache",
+      "description": "Redis cache hit for key: user:789:profile",
+      "duration_ms": 1.2,
+      "start_timestamp": "2024-12-01T10:30:17Z",
+      "tags": "redis,cache_hit",
+      "metadata": "{\"cache_type\": \"redis\", \"key\": \"user:789:profile\"}"
+    },
+    {
+      "event_type": "http_call",
+      "category": "downstream",
+      "description": "POST /api/payment-service/charge",
+      "duration_ms": 850.3,
+      "start_timestamp": "2024-12-01T10:30:16Z",
+      "tags": "payment,http",
+      "metadata": "{\"service\": \"payment-service\", \"endpoint\": \"/api/payment-service/charge\", \"status_code\": 200}"
+    },
+    {
+      "event_type": "http_call",
+      "category": "downstream",
+      "description": "GET /api/inventory-service/check",
+      "duration_ms": 420.5,
+      "start_timestamp": "2024-12-01T10:30:17Z",
+      "tags": "inventory,http",
+      "metadata": "{\"service\": \"inventory-service\", \"endpoint\": \"/api/inventory-service/check\", \"status_code\": 200}"
+    },
+    {
+      "event_type": "timeout",
+      "category": "downstream",
+      "description": "POST /api/notification-service/send - Timeout",
+      "duration_ms": 5000.0,
+      "start_timestamp": "2024-12-01T10:30:18Z",
+      "tags": "notification,timeout",
+      "metadata": "{\"service\": \"notification-service\", \"endpoint\": \"/api/notification-service/send\", \"timeout_ms\": 5000}"
+    },
+    {
+      "event_type": "error",
+      "category": "downstream",
+      "description": "GET /api/shipping-service/track - 500 Internal Server Error",
+      "duration_ms": 1200.8,
+      "start_timestamp": "2024-12-01T10:30:19Z",
+      "tags": "shipping,error",
+      "metadata": "{\"service\": \"shipping-service\", \"endpoint\": \"/api/shipping-service/track\", \"status_code\": 500}"
+    },
+    {
+      "event_type": "serialize",
+      "category": "serialization",
+      "description": "JSON serialization of order details response",
+      "duration_ms": 125.6,
+      "start_timestamp": "2024-12-01T10:30:17Z",
+      "tags": "json,serialize",
+      "metadata": "{\"data_size_bytes\": 45000, \"format\": \"json\"}"
+    },
+    {
+      "event_type": "serialize",
+      "category": "serialization",
+      "description": "JSON serialization of user list response",
+      "duration_ms": 95.3,
+      "start_timestamp": "2024-12-01T10:30:15Z",
+      "tags": "json,serialize",
+      "metadata": "{\"data_size_bytes\": 28000, \"format\": \"json\"}"
+    },
+    {
+      "event_type": "deserialize",
+      "category": "serialization",
+      "description": "JSON deserialization of request body",
+      "duration_ms": 45.2,
+      "start_timestamp": "2024-12-01T10:30:16Z",
+      "tags": "json,deserialize",
+      "metadata": "{\"data_size_bytes\": 1500, \"format\": \"json\"}"
+    },
+    {
+      "event_type": "response_build",
+      "category": "response_size",
+      "description": "Building large response for /api/search",
+      "duration_ms": 350.2,
+      "start_timestamp": "2024-12-01T10:30:19Z",
+      "tags": "large_response,search",
+      "metadata": "{\"response_size_bytes\": 156000, \"records\": 250}"
+    },
+    {
+      "event_type": "response_build",
+      "category": "response_size",
+      "description": "Building response for /api/reports/generate",
+      "duration_ms": 1200.5,
+      "start_timestamp": "2024-12-01T10:30:20Z",
+      "tags": "large_response,report",
+      "metadata": "{\"response_size_bytes\": 520000, \"records\": 1500}"
+    },
+    {
+      "event_type": "connection_wait",
+      "category": "connection_pool",
+      "description": "Waiting for database connection from pool",
+      "duration_ms": 180.5,
+      "start_timestamp": "2024-12-01T10:30:15Z",
+      "tags": "db,connection_pool",
+      "metadata": "{\"pool_type\": \"database\", \"pool_size\": 10, \"active_connections\": 10}"
+    },
+    {
+      "event_type": "connection_wait",
+      "category": "connection_pool",
+      "description": "Waiting for Redis connection from pool",
+      "duration_ms": 95.3,
+      "start_timestamp": "2024-12-01T10:30:16Z",
+      "tags": "redis,connection_pool",
+      "metadata": "{\"pool_type\": \"redis\", \"pool_size\": 20, \"active_connections\": 18}"
+    },
+    {
+      "event_type": "connection_wait",
+      "category": "connection_pool",
+      "description": "Waiting for HTTP client connection",
+      "duration_ms": 220.8,
+      "start_timestamp": "2024-12-01T10:30:17Z",
+      "tags": "http,connection_pool",
+      "metadata": "{\"pool_type\": \"http_client\", \"pool_size\": 50, \"active_connections\": 48}"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{"method": "GET", "path": "/api/users", "query_params": "page=1&size=20", "request_body": "", "weight": 15.0, "tags": "user,list"}
+{"method": "GET", "path": "/api/users/123", "query_params": "", "request_body": "", "weight": 20.0, "tags": "user,detail"}
+{"method": "POST", "path": "/api/users", "query_params": "", "request_body": "{\"name\":\"Test User\",\"email\":\"test@example.com\"}", "weight": 5.0, "tags": "user,create"}
+{"method": "GET", "path": "/api/orders", "query_params": "status=pending&page=1", "request_body": "", "weight": 10.0, "tags": "order,list"}
+{"method": "GET", "path": "/api/orders/456", "query_params": "", "request_body": "", "weight": 12.0, "tags": "order,detail"}
+{"method": "POST", "path": "/api/orders", "query_params": "", "request_body": "{\"user_id\":123,\"items\":[{\"product_id\":1,\"quantity\":2}]}", "weight": 3.0, "tags": "order,create"}
+{"method": "GET", "path": "/api/search", "query_params": "q=product&category=electronics", "request_body": "", "weight": 8.0, "tags": "search,product"}
+{"method": "POST", "path": "/api/reports/generate", "query_params": "", "request_body": "{\"type\":\"sales\",\"start_date\":\"2024-01-01\",\"end_date\":\"2024-12-31\"}", "weight": 2.0, "tags": "report,generate"}
+{"method": "GET", "path": "/api/products", "query_params": "category=electronics&page=1&size=50", "request_body": "", "weight": 18.0, "tags": "product,list"}
+{"method": "POST", "path": "/api/upload", "query_params": "type=document", "request_body": "", "weight": 1.0, "tags": "upload,document"}
+{"method": "GET", "path": "/api/users", "query_params": "status=active", "request_body": "", "weight": 5.0, "tags": "user,filter"}
+{"method": "GET", "path": "/api/orders", "query_params": "user_id=123", "request_body": "", "weight": 6.0, "tags": "order,filter"}
+{"method": "GET", "path": "/api/search", "query_params": "q=order", "request_body": "", "weight": 4.0, "tags": "search,order"}
+{"method": "GET", "path": "/api/products", "query_params": "sort=price&order=desc", "request_body": "", "weight": 7.0, "tags": "product,sort"}
+{"method": "GET", "path": "/api/users/789", "query_params": "", "request_body": "", "weight": 10.0, "tags": "user,detail"}
+{"method": "GET", "path": "/api/orders/101", "query_params": "", "request_body": "", "weight": 8.0, "tags": "order,detail"}
+{"method": "GET", "path": "/api/search", "query_params": "q=user", "request_body": "", "weight": 5.0, "tags": "search,user"}
+{"method": "GET", "path": "/api/products/999", "query_params": "", "request_body": "", "weight": 12.0, "tags": "product,detail"}
+{"method": "POST", "path": "/api/users", "query_params": "", "request_body": "{\"name\":\"New User\",\"email\":\"new@example.com\"}", "weight": 2.0, "tags": "user,create"}
+{"method": "POST", "path": "/api/orders", "query_params": "", "request_body": "{\"user_id\":789,\"items\":[{\"product_id\":999,\"quantity\":1}]}", "weight": 1.0, "tags": "order,create"}

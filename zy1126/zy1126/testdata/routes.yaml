@@ -1,0 +1,90 @@
+routes:
+  - method: GET
+    path: /api/users
+    description: 获取用户列表
+    p95_max_ms: 200
+    p99_max_ms: 500
+    error_rate_max: 0.01
+    timeout_rate_max: 0.005
+    throughput_min: 100
+
+  - method: GET
+    path: /api/users/{id}
+    description: 获取单个用户信息
+    p95_max_ms: 100
+    p99_max_ms: 300
+    error_rate_max: 0.01
+    timeout_rate_max: 0.005
+    throughput_min: 200
+
+  - method: POST
+    path: /api/users
+    description: 创建用户
+    p95_max_ms: 150
+    p99_max_ms: 400
+    error_rate_max: 0.02
+    timeout_rate_max: 0.01
+    throughput_min: 50
+
+  - method: GET
+    path: /api/orders
+    description: 获取订单列表
+    p95_max_ms: 300
+    p99_max_ms: 800
+    error_rate_max: 0.01
+    timeout_rate_max: 0.005
+    throughput_min: 50
+
+  - method: GET
+    path: /api/orders/{id}
+    description: 获取单个订单信息
+    p95_max_ms: 200
+    p99_max_ms: 500
+    error_rate_max: 0.01
+    timeout_rate_max: 0.005
+    throughput_min: 100
+
+  - method: POST
+    path: /api/orders
+    description: 创建订单
+    p95_max_ms: 250
+    p99_max_ms: 600
+    error_rate_max: 0.02
+    timeout_rate_max: 0.01
+    throughput_min: 30
+
+  - method: GET
+    path: /api/search
+    description: 搜索功能
+    p95_max_ms: 500
+    p99_max_ms: 1500
+    error_rate_max: 0.05
+    timeout_rate_max: 0.02
+    throughput_min: 20
+
+  - method: POST
+    path: /api/reports/generate
+    description: 生成报表
+    p95_max_ms: 1000
+    p99_max_ms: 3000
+    error_rate_max: 0.1
+    timeout_rate_max: 0.05
+    throughput_min: 5
+
+  - method: GET
+    path: /api/products
+    description: 获取产品列表
+    p95_max_ms: 150
+    p99_max_ms: 400
+    error_rate_max: 0.01
+    timeout_rate_max: 0.005
+    throughput_min: 100
+
+  - method: POST
+    path: /api/upload
+    description: 文件上传
+    p95_max_ms: 500
+    p99_max_ms: 2000
+    error_rate_max: 0.05
+    timeout_rate_max: 0.03
+    throughput_min: 10
