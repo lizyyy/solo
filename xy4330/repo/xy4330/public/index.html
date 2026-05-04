@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非遗器物修复委托流转台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>非遗器物修复委托流转台</h1>
+            <p class="subtitle">高效管理修复委托，确保每个步骤都有记录</p>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-btn active" data-tab="dashboard">工作台</button>
+            <button class="nav-btn" data-tab="artifacts">器物列表</button>
+            <button class="nav-btn" data-tab="customers">客户管理</button>
+            <button class="nav-btn" data-tab="reminders">提醒事项</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- 工作台页面 -->
+            <section id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>待评估</h3>
+                        <p class="stat-number" id="stat-pending">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>修复中</h3>
+                        <p class="stat-number" id="stat-repairing">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>待确认</h3>
+                        <p class="stat-number" id="stat-confirm">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>已超期</h3>
+                        <p class="stat-number overdue" id="stat-overdue">0</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions">
+                    <button class="btn btn-primary" id="new-artifact-btn">+ 新增委托</button>
+                    <button class="btn btn-secondary" id="export-csv-btn">导出待办清单</button>
+                </div>
+
+                <div class="recent-activities">
+                    <h2>最近修复进度</h2>
+                    <div id="recent-list" class="activity-list">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 器物列表页面 -->
+            <section id="artifacts" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>状态筛选：</label>
+                        <select id="status-filter">
+                            <option value="">全部状态</option>
+                            <option value="待评估">待评估</option>
+                            <option value="评估中">评估中</option>
+                            <option value="报价确认">报价确认</option>
+                            <option value="修复中">修复中</option>
+                            <option value="待客户确认">待客户确认</option>
+                            <option value="已交付">已交付</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>特殊筛选：</label>
+                        <select id="special-filter">
+                            <option value="">无</option>
+                            <option value="overdue">仅显示超期</option>
+                            <option value="pending_confirmation">仅显示待确认</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="add-artifact-btn">+ 新增委托</button>
+                </div>
+
+                <div id="artifacts-list" class="artifacts-grid">
+                    <!-- 动态加载 -->
+                </div>
+            </section>
+
+            <!-- 客户管理页面 -->
+            <section id="customers" class="tab-content">
+                <div class="filter-bar">
+                    <button class="btn btn-primary" id="add-customer-btn">+ 新增客户</button>
+                </div>
+
+                <div id="customers-list" class="customers-grid">
+                    <!-- 动态加载 -->
+                </div>
+            </section>
+
+            <!-- 提醒事项页面 -->
+            <section id="reminders" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>状态筛选：</label>
+                        <select id="reminder-status-filter">
+                            <option value="">全部</option>
+                            <option value="待处理">待处理</option>
+                            <option value="已超期">已超期</option>
+                            <option value="已完成">已完成</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="add-reminder-btn">+ 新增提醒</button>
+                </div>
+
+                <div id="reminders-list" class="reminders-grid">
+                    <!-- 动态加载 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框：新增/编辑器物 -->
+    <div id="artifact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="artifact-modal-title">新增修复委托</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="artifact-form">
+                    <input type="hidden" id="artifact-id">
+                    
+                    <div class="form-group">
+                        <label for="artifact-customer">客户 *</label>
+                        <select id="artifact-customer" required>
+                            <option value="">请选择客户</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="artifact-name">器物名称 *</label>
+                        <input type="text" id="artifact-name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="artifact-type">器物类型</label>
+                            <input type="text" id="artifact-type">
+                        </div>
+                        <div class="form-group">
+                            <label for="artifact-era">年代</label>
+                            <input type="text" id="artifact-era">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="artifact-material">材质</label>
+                            <input type="text" id="artifact-material">
+                        </div>
+                        <div class="form-group">
+                            <label for="artifact-size">尺寸</label>
+                            <input type="text" id="artifact-size">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="artifact-damage">损伤描述</label>
+                        <textarea id="artifact-damage" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="artifact-completion">预计完成日期</label>
+                        <input type="date" id="artifact-completion">
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-artifact-btn">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：器物详情 -->
+    <div id="artifact-detail-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="detail-title">器物详情</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" data-detail-tab="info">基本信息</button>
+                    <button class="detail-tab" data-detail-tab="photos">照片</button>
+                    <button class="detail-tab" data-detail-tab="status">状态日志</button>
+                    <button class="detail-tab" data-detail-tab="quotes">报价</button>
+                </div>
+
+                <div id="detail-content">
+                    <!-- 基本信息 -->
+                    <div id="detail-info" class="detail-tab-content active">
+                        <div class="detail-section">
+                            <h3>客户信息</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">客户姓名</span>
+                                    <span class="detail-value" id="detail-customer-name">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">联系电话</span>
+                                    <span class="detail-value" id="detail-customer-phone">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">电子邮箱</span>
+                                    <span class="detail-value" id="detail-customer-email">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h3>器物信息</h3>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <span class="detail-label">器物名称</span>
+                                    <span class="detail-value" id="detail-artifact-name">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">器物类型</span>
+                                    <span class="detail-value" id="detail-artifact-type">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">年代</span>
+                                    <span class="detail-value" id="detail-artifact-era">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">材质</span>
+                                    <span class="detail-value" id="detail-artifact-material">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">尺寸</span>
+                                    <span class="detail-value" id="detail-artifact-size">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">当前状态</span>
+                                    <span class="detail-value status-badge" id="detail-artifact-status">-</span>
+                                </div>
+                                <div class="detail-item full-width">
+                                    <span class="detail-label">损伤描述</span>
+                                    <span class="detail-value" id="detail-artifact-damage">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">预计完成日期</span>
+                                    <span class="detail-value" id="detail-artifact-completion">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">创建时间</span>
+                                    <span class="detail-value" id="detail-artifact-created">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-actions">
+                            <button class="btn btn-secondary" id="edit-artifact-btn">编辑信息</button>
+                            <button class="btn btn-primary" id="change-status-btn">更新状态</button>
+                            <button class="btn btn-secondary" id="export-markdown-btn">导出修复单</button>
+                        </div>
+                    </div>
+
+                    <!-- 照片 -->
+                    <div id="detail-photos" class="detail-tab-content">
+                        <div class="photo-upload-section">
+                            <h3>上传照片</h3>
+                            <form id="photo-upload-form">
+                                <input type="file" id="photo-file" accept="image/*" required>
+                                <input type="text" id="photo-description" placeholder="照片描述（可选）">
+                                <button type="submit" class="btn btn-primary">上传</button>
+                            </form>
+                        </div>
+                        <div id="photos-gallery" class="photos-gallery">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+
+                    <!-- 状态日志 -->
+                    <div id="detail-status" class="detail-tab-content">
+                        <div class="status-update-section">
+                            <h3>更新状态</h3>
+                            <form id="status-update-form">
+                                <select id="new-status" required>
+                                    <option value="">请选择新状态</option>
+                                    <option value="待评估">待评估</option>
+                                    <option value="评估中">评估中</option>
+                                    <option value="报价确认">报价确认</option>
+                                    <option value="修复中">修复中</option>
+                                    <option value="待客户确认">待客户确认</option>
+                                    <option value="已交付">已交付</option>
+                                </select>
+                                <input type="text" id="status-operator" placeholder="操作人员">
+                                <textarea id="status-description" rows="2" placeholder="状态变更说明"></textarea>
+                                <button type="submit" class="btn btn-primary">更新</button>
+                            </form>
+                        </div>
+                        <div id="status-logs" class="status-logs">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+
+                    <!-- 报价 -->
+                    <div id="detail-quotes" class="detail-tab-content">
+                        <div class="quote-add-section">
+                            <h3>添加报价</h3>
+                            <form id="quote-add-form">
+                                <input type="number" id="quote-amount" placeholder="报价金额" step="0.01" required>
+                                <textarea id="quote-description" rows="2" placeholder="报价说明"></textarea>
+                                <button type="submit" class="btn btn-primary">添加</button>
+                            </form>
+                        </div>
+                        <div id="quotes-list" class="quotes-list">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：新增/编辑客户 -->
+    <div id="customer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="customer-modal-title">新增客户</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="customer-form">
+                    <input type="hidden" id="customer-id">
+                    
+                    <div class="form-group">
+                        <label for="customer-name">客户姓名 *</label>
+                        <input type="text" id="customer-name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="customer-phone">联系电话</label>
+                            <input type="tel" id="customer-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-email">电子邮箱</label>
+                            <input type="email" id="customer-email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-address">地址</label>
+                        <input type="text" id="customer-address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customer-notes">备注</label>
+                        <textarea id="customer-notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-customer-btn">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：新增/编辑提醒 -->
+    <div id="reminder-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="reminder-modal-title">新增提醒</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="reminder-form">
+                    <input type="hidden" id="reminder-id">
+                    
+                    <div class="form-group">
+                        <label for="reminder-artifact">关联器物</label>
+                        <select id="reminder-artifact">
+                            <option value="">无（通用提醒）</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reminder-title">提醒标题 *</label>
+                        <input type="text" id="reminder-title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reminder-description">提醒描述</label>
+                        <textarea id="reminder-description" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reminder-date">提醒日期 *</label>
+                        <input type="date" id="reminder-date" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-reminder-btn">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
