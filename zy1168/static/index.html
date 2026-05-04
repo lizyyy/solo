@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器学习建模对比台</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        header h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            text-align: center;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            border: none;
+            background: #f0f2f5;
+            color: #666;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab:hover {
+            background: #e0e2e5;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .card h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.3em;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #667eea;
+            background: #f5f7ff;
+        }
+        
+        .upload-area input {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .upload-subtext {
+            font-size: 14px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .file-info {
+            display: none;
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .file-info h4 {
+            margin-bottom: 10px;
+            color: #0066cc;
+        }
+        
+        .file-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .file-info li {
+            padding: 4px 0;
+            color: #555;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group select:focus, .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-item:hover {
+            background: #e8ebf0;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .model-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        
+        .model-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .model-option:hover {
+            background: #e8ebf0;
+        }
+        
+        .model-option.selected {
+            background: #f0f3ff;
+            border-color: #667eea;
+        }
+        
+        .model-option input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-error {
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+        }
+        
+        .alert-success {
+            background: #f1fff4;
+            border: 1px solid #b7e1cd;
+            color: #2e7d32;
+        }
+        
+        .alert-info {
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
+            color: #0066cc;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .experiment-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .experiment-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid #667eea;
+        }
+        
+        .experiment-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .experiment-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-regression {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .badge-classification {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+        
+        .badge-model {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .experiment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .metrics-table th, .metrics-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metrics-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .metrics-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .best-value {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .feature-item {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .feature-name {
+            font-weight: 500;
+        }
+        
+        .feature-importance {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .confusion-matrix {
+            display: inline-block;
+            margin: 20px 0;
+        }
+        
+        .matrix-row {
+            display: flex;
+        }
+        
+        .matrix-cell {
+            width: 80px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            margin: -1px 0 0 -1px;
+            font-weight: 600;
+        }
+        
+        .matrix-cell.header {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .matrix-cell.true-positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .matrix-cell.false-positive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .residuals-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .residuals-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .sample-data-section {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .sample-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .sample-table th, .sample-table td {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+        }
+        
+        .sample-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .sample-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .compare-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .compare-results {
+            margin-top: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 30px;
+        }
+        
+        .detail-section h4 {
+            margin-bottom: 15px;
+            color: #444;
+        }
+        
+        .model-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0;
+        }
+        
+        .model-tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+        
+        .model-tab:hover {
+            color: #667eea;
+        }
+        
+        .model-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .loading-overlay.show {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">处理中...</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>📊 机器学习建模对比台</h1>
+            <p>一键上传数据，对比多个模型，快速找到最优解</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('train')">新建实验</button>
+            <button class="nav-tab" onclick="switchTab('experiments')">实验列表</button>
+            <button class="nav-tab" onclick="switchTab('compare')">实验对比</button>
+        </div>
+
+        <div id="trainTab" class="tab-content active">
+            <div class="card">
+                <h3>📁 上传数据</h3>
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".csv" onchange="handleFileUpload(event)">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">点击或拖拽 CSV 文件到此处</div>
+                    <div class="upload-subtext">支持带表头的 CSV 格式文件</div>
+                </div>
+                <div class="file-info" id="fileInfo">
+                    <h4>✅ 文件加载成功</h4>
+                    <ul>
+                        <li id="fileName">文件名: -</li>
+                        <li id="fileRows">行数: -</li>
+                        <li id="fileCols">列数: -</li>
+                    </ul>
+                </div>
+                <div class="sample-data-section" id="sampleDataSection" style="display:none;">
+                    <h4>📋 数据预览（前5行）</h4>
+                    <div id="sampleTable"></div>
+                </div>
+            </div>
+
+            <div class="card" id="configSection" style="display:none;">
+                <h3>⚙️ 实验配置</h3>
+                
+                <div class="form-group">
+                    <label for="taskType">任务类型</label>
+                    <select id="taskType" onchange="updateModelOptions()">
+                        <option value="regression">回归任务 (预测连续值)</option>
+                        <option value="classification">分类任务 (预测类别)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetColumn">目标列 (Y)</label>
+                    <select id="targetColumn">
+                        <option value="">请选择目标列</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>特征列 (X) <small>(不选则使用除目标列外的所有列)</small></label>
+                    <div class="checkbox-group" id="featureCheckboxes">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>选择模型</label>
+                    <div class="model-options" id="modelOptions">
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label for="testSize">测试集比例</label>
+                        <input type="number" id="testSize" value="0.2" min="0.1" max="0.5" step="0.05">
+                    </div>
+                    <div class="form-group">
+                        <label for="randomState">随机种子</label>
+                        <input type="number" id="randomState" value="42">
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="trainBtn" onclick="startTraining()">
+                        🚀 开始训练
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert alert-error" id="errorAlert" style="display:none;"></div>
+            <div class="alert alert-success" id="successAlert" style="display:none;"></div>
+        </div>
+
+        <div id="experimentsTab" class="tab-content">
+            <div class="card">
+                <h3>📋 历史实验</h3>
+                <div id="experimentList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>暂无实验记录</p>
+                        <p style="font-size:14px;color:#aaa;margin-top:10px;">请先在"新建实验"标签页创建实验</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="compareTab" class="tab-content">
+            <div class="card">
+                <h3>🔄 实验对比</h3>
+                <div class="compare-selector" id="compareSelector">
+                    <div class="form-group">
+                        <label>选择要对比的实验（至少2个）</label>
+                        <div class="checkbox-group" id="compareCheckboxes">
+                            <div class="empty-state" style="padding:20px;">
+                                <p style="font-size:14px;color:#999;">暂无实验可对比</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="compareExperiments()">开始对比</button>
+                </div>
+                <div id="compareResults" class="compare-results"></div>
+            </div>
+        </div>
+
+        <div id="experimentDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;overflow-y:auto;">
+            <div style="background:white;margin:20px auto;max-width:1200px;border-radius:12px;padding:30px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h2 id="detailTitle">实验详情</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="closeDetailModal()">关闭</button>
+                </div>
+                <div id="detailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentFileId = null;
+        let currentColumns = [];
+        let experiments = [];
+        let charts = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadExperiments();
+            setupDragDrop();
+        });
+
+        function setupDragDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                    const fileInput = document.getElementById('fileInput');
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(files[0]);
+                    fileInput.files = dataTransfer.files;
+                    handleFileUpload({ target: { files: files } });
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            if (tabName === 'experiments') {
+                loadExperiments();
+            } else if (tabName === 'compare') {
+                loadCompareSelector();
+            }
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showLoading('正在上传文件...');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentFileId = data.file_id;
+                    currentColumns = data.columns;
+                    
+                    document.getElementById('fileInfo').classList.add('show');
+                    document.getElementById('fileName').textContent = `文件名: ${file.name}`;
+                    document.getElementById('fileRows').textContent = `行数: ${data.shape.rows}`;
+                    document.getElementById('fileCols').textContent = `列数: ${data.shape.columns}`;
+                    
+                    renderSampleTable(data.sample, data.columns);
+                    renderColumnSelectors(data.columns, data.dtypes);
+                    
+                    document.getElementById('configSection').style.display = 'block';
+                    hideAlerts();
+                    showSuccess('文件上传成功！请配置实验参数。');
+                } else {
+                    showError(data.error || '文件上传失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderSampleTable(sample, columns) {
+            if (!sample || sample.length === 0) {
+                document.getElementById('sampleDataSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('sampleDataSection').style.display = 'block';
+            
+            let html = '<table class="sample-table"><thead><tr>';
+            columns.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            sample.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    html += `<td>${row[col] !== null && row[col] !== undefined ? row[col] : ''}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('sampleTable').innerHTML = html;
+        }
+
+        function renderColumnSelectors(columns, dtypes) {
+            const targetSelect = document.getElementById('targetColumn');
+            const featureContainer = document.getElementById('featureCheckboxes');
+            
+            targetSelect.innerHTML = '<option value="">请选择目标列</option>';
+            
+            columns.forEach(col => {
+                const dtype = dtypes[col] || 'unknown';
+                targetSelect.innerHTML += `<option value="${col}">${col} (${dtype})</option>`;
+            });
+            
+            featureContainer.innerHTML = '';
+            columns.forEach(col => {
+                const dtype = dtypes[col] || 'unknown';
+                featureContainer.innerHTML += `
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="${col}" class="feature-checkbox">
+                        <span>${col} (${dtype})</span>
+                    </label>
+                `;
+            });
+            
+            updateModelOptions();
+        }
+
+        function updateModelOptions() {
+            const taskType = document.getElementById('taskType').value;
+            const modelContainer = document.getElementById('modelOptions');
+            
+            let models = [];
+            if (taskType === 'regression') {
+                models = [
+                    { id: 'linear_regression', name: '线性回归', desc: '简单快速的线性模型' },
+                    { id: 'decision_tree', name: '决策树', desc: '可解释的树形模型' },
+                    { id: 'random_forest', name: '随机森林', desc: '多棵树的集成学习' },
+                    { id: 'xgboost', name: 'XGBoost', desc: '梯度提升树，性能优秀' }
+                ];
+            } else {
+                models = [
+                    { id: 'logistic_regression', name: '逻辑回归', desc: '经典分类算法' },
+                    { id: 'decision_tree', name: '决策树', desc: '可解释的树形模型' },
+                    { id: 'random_forest', name: '随机森林', desc: '多棵树的集成学习' },
+                    { id: 'xgboost', name: 'XGBoost', desc: '梯度提升树，性能优秀' }
+                ];
+            }
+            
+            modelContainer.innerHTML = '';
+            models.forEach(model => {
+                modelContainer.innerHTML += `
+                    <label class="model-option">
+                        <input type="checkbox" value="${model.id}" class="model-checkbox" checked>
+                        <div>
+                            <strong>${model.name}</strong><br>
+                            <small style="color:#666;">${model.desc}</small>
+                        </div>
+                    </label>
+                `;
+            });
+            
+            document.querySelectorAll('.model-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = opt.querySelector('input');
+                        checkbox.checked = !checkbox.checked;
+                        opt.classList.toggle('selected', checkbox.checked);
+                    }
+                });
+                
+                const checkbox = opt.querySelector('input');
+                if (checkbox.checked) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+
+        async function startTraining() {
+            const targetColumn = document.getElementById('targetColumn').value;
+            const taskType = document.getElementById('taskType').value;
+            const testSize = parseFloat(document.getElementById('testSize').value);
+            const randomState = parseInt(document.getElementById('randomState').value);
+            
+            const selectedFeatures = Array.from(document.querySelectorAll('.feature-checkbox:checked')).map(cb => cb.value);
+            const selectedModels = Array.from(document.querySelectorAll('.model-checkbox:checked')).map(cb => cb.value);
+            
+            if (!currentFileId) {
+                showError('请先上传数据文件');
+                return;
+            }
+            
+            if (!targetColumn) {
+                showError('请选择目标列');
+                return;
+            }
+            
+            if (selectedModels.length === 0) {
+                showError('请至少选择一个模型');
+                return;
+            }
+            
+            showLoading('正在训练模型，请稍候...');
+            hideAlerts();
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/train`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        file_id: currentFileId,
+                        target_column: targetColumn,
+                        feature_columns: selectedFeatures,
+                        task_type: taskType,
+                        model_types: selectedModels,
+                        test_size: testSize,
+                        random_state: randomState
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('训练完成！实验ID: ' + data.experiment_id);
+                    loadExperiments();
+                } else {
+                    showError(data.error || '训练失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadExperiments() {
+            try {
+                const response = await fetch(`${API_BASE}/api/experiments`);
+                const data = await response.json();
+                experiments = data.experiments || [];
+                renderExperimentList();
+            } catch (error) {
+                console.error('加载实验失败:', error);
+            }
+        }
+
+        function renderExperimentList() {
+            const container = document.getElementById('experimentList');
+            
+            if (experiments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>暂无实验记录</p>
+                        <p style="font-size:14px;color:#aaa;margin-top:10px;">请先在"新建实验"标签页创建实验</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            experiments.forEach(exp => {
+                const taskBadgeClass = exp.task_type === 'regression' ? 'badge-regression' : 'badge-classification';
+                const taskText = exp.task_type === 'regression' ? '回归任务' : '分类任务';
+                
+                const modelBadges = exp.model_types.map(m => {
+                    const names = {
+                        'linear_regression': '线性回归',
+                        'logistic_regression': '逻辑回归',
+                        'decision_tree': '决策树',
+                        'random_forest': '随机森林',
+                        'xgboost': 'XGBoost'
+                    };
+                    return `<span class="badge badge-model">${names[m] || m}</span>`;
+                }).join(' ');
+                
+                container.innerHTML += `
+                    <div class="experiment-card">
+                        <h4>实验 ID: ${exp.experiment_id}</h4>
+                        <div class="experiment-meta">
+                            <span class="badge ${taskBadgeClass}">${taskText}</span>
+                            ${modelBadges}
+                        </div>
+                        <p style="color:#666;margin-bottom:15px;">
+                            目标列: ${exp.target_column} | 
+                            训练集: ${exp.data_shape?.train || '-'} 条 | 
+                            测试集: ${exp.data_shape?.test || '-'} 条<br>
+                            <small>创建时间: ${exp.created_at}</small>
+                        </p>
+                        <div class="experiment-actions">
+                            <button class="btn btn-primary btn-sm" onclick="viewExperiment('${exp.experiment_id}')">
+                                查看详情
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportReport('${exp.experiment_id}', 'markdown')">
+                                导出 Markdown
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportReport('${exp.experiment_id}', 'json')">
+                                导出 JSON
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteExperiment('${exp.experiment_id}')">
+                                删除
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function viewExperiment(experimentId) {
+            showLoading('正在加载实验详情...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/experiments/${experimentId}`);
+                const experiment = await response.json();
+                
+                if (response.ok) {
+                    renderExperimentDetail(experiment);
+                } else {
+                    showError(experiment.error || '加载失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderExperimentDetail(experiment) {
+            const taskText = experiment.task_type === 'regression' ? '回归任务' : '分类任务';
+            
+            document.getElementById('detailTitle').textContent = `实验详情 - ${experiment.experiment_id}`;
+            
+            let html = `
+                <div class="detail-section">
+                    <h4>📋 基本信息</h4>
+                    <div class="two-columns">
+                        <div>
+                            <p><strong>任务类型:</strong> ${taskText}</p>
+                            <p><strong>目标列:</strong> ${experiment.target_column}</p>
+                            <p><strong>特征列:</strong> ${experiment.feature_columns?.join(', ') || '全部'}</p>
+                        </div>
+                        <div>
+                            <p><strong>训练集:</strong> ${experiment.data_shape?.train} 条</p>
+                            <p><strong>测试集:</strong> ${experiment.data_shape?.test} 条</p>
+                            <p><strong>创建时间:</strong> ${experiment.created_at}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>📊 模型对比</h4>
+                    ${renderMetricsTable(experiment)}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>📈 各模型详情</h4>
+                    <div class="model-tabs" id="modelTabs">
+                        ${Object.keys(experiment.models).map((model, idx) => {
+                            const names = {
+                                'linear_regression': '线性回归',
+                                'logistic_regression': '逻辑回归',
+                                'decision_tree': '决策树',
+                                'random_forest': '随机森林',
+                                'xgboost': 'XGBoost'
+                            };
+                            return `<button class="model-tab ${idx === 0 ? 'active' : ''}" onclick="switchModelTab('${model}', this)">${names[model] || model}</button>`;
+                        }).join('')}
+                    </div>
+                    <div id="modelDetailContent">
+                        ${renderModelDetail(Object.keys(experiment.models)[0], experiment)}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('experimentDetailModal').style.display = 'block';
+            
+            setTimeout(() => {
+                renderModelCharts(experiment);
+            }, 100);
+        }
+
+        function renderMetricsTable(experiment) {
+            const models = experiment.models;
+            const modelNames = Object.keys(models);
+            
+            if (modelNames.length === 0) return '<p>暂无模型数据</p>';
+            
+            const firstModel = models[modelNames[0]];
+            const metrics = Object.keys(firstModel.metrics || {});
+            
+            if (experiment.task_type === 'regression') {
+                let tableHtml = `
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>模型</th>
+                                <th>MAE</th>
+                                <th>MSE</th>
+                                <th>RMSE</th>
+                                <th>R²</th>
+                                <th>MAPE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                const bestValues = {
+                    MAE: Infinity, MSE: Infinity, RMSE: Infinity, R2: -Infinity, MAPE: Infinity
+                };
+                
+                modelNames.forEach(name => {
+                    const m = models[name].metrics || {};
+                    if (m.MAE < bestValues.MAE) bestValues.MAE = m.MAE;
+                    if (m.MSE < bestValues.MSE) bestValues.MSE = m.MSE;
+                    if (m.RMSE < bestValues.RMSE) bestValues.RMSE = m.RMSE;
+                    if (m.R2 > bestValues.R2) bestValues.R2 = m.R2;
+                    if (m.MAPE < bestValues.MAPE) bestValues.MAPE = m.MAPE;
+                });
+                
+                const displayNames = {
+                    'linear_regression': '线性回归',
+                    'logistic_regression': '逻辑回归',
+                    'decision_tree': '决策树',
+                    'random_forest': '随机森林',
+                    'xgboost': 'XGBoost'
+                };
+                
+                modelNames.forEach(name => {
+                    const m = models[name].metrics || {};
+                    tableHtml += `
+                        <tr>
+                            <td><strong>${displayNames[name] || name}</strong></td>
+                            <td class="${m.MAE === bestValues.MAE ? 'best-value' : ''}">${m.MAE?.toFixed(4) || '-'}</td>
+                            <td class="${m.MSE === bestValues.MSE ? 'best-value' : ''}">${m.MSE?.toFixed(4) || '-'}</td>
+                            <td class="${m.RMSE === bestValues.RMSE ? 'best-value' : ''}">${m.RMSE?.toFixed(4) || '-'}</td>
+                            <td class="${m.R2 === bestValues.R2 ? 'best-value' : ''}">${m.R2?.toFixed(4) || '-'}</td>
+                            <td class="${m.MAPE === bestValues.MAPE ? 'best-value' : ''}">${m.MAPE?.toFixed(2) + '%' || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            } else {
+                let tableHtml = `
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>模型</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1</th>
+                                <th>AUC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                const bestValues = {
+                    Accuracy: -Infinity, Precision: -Infinity, Recall: -Infinity, F1: -Infinity, AUC: -Infinity
+                };
+                
+                modelNames.forEach(name => {
+                    const m = models[name].metrics || {};
+                    if (m.Accuracy > bestValues.Accuracy) bestValues.Accuracy = m.Accuracy;
+                    if (m.Precision > bestValues.Precision) bestValues.Precision = m.Precision;
+                    if (m.Recall > bestValues.Recall) bestValues.Recall = m.Recall;
+                    if (m.F1 > bestValues.F1) bestValues.F1 = m.F1;
+                    if (m.AUC && m.AUC > bestValues.AUC) bestValues.AUC = m.AUC;
+                });
+                
+                const displayNames = {
+                    'linear_regression': '线性回归',
+                    'logistic_regression': '逻辑回归',
+                    'decision_tree': '决策树',
+                    'random_forest': '随机森林',
+                    'xgboost': 'XGBoost'
+                };
+                
+                modelNames.forEach(name => {
+                    const m = models[name].metrics || {};
+                    tableHtml += `
+                        <tr>
+                            <td><strong>${displayNames[name] || name}</strong></td>
+                            <td class="${m.Accuracy === bestValues.Accuracy ? 'best-value' : ''}">${m.Accuracy?.toFixed(4) || '-'}</td>
+                            <td class="${m.Precision === bestValues.Precision ? 'best-value' : ''}">${m.Precision?.toFixed(4) || '-'}</td>
+                            <td class="${m.Recall === bestValues.Recall ? 'best-value' : ''}">${m.Recall?.toFixed(4) || '-'}</td>
+                            <td class="${m.F1 === bestValues.F1 ? 'best-value' : ''}">${m.F1?.toFixed(4) || '-'}</td>
+                            <td class="${m.AUC === bestValues.AUC ? 'best-value' : ''}">${m.AUC?.toFixed(4) || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            }
+        }
+
+        function switchModelTab(modelName, btn) {
+            document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const experimentId = document.getElementById('detailTitle').textContent.match(/[\w]+$/)?.[0];
+            if (experimentId) {
+                fetch(`${API_BASE}/api/experiments/${experimentId}`)
+                    .then(r => r.json())
+                    .then(exp => {
+                        document.getElementById('modelDetailContent').innerHTML = renderModelDetail(modelName, exp);
+                    });
+            }
+        }
+
+        function renderModelDetail(modelName, experiment) {
+            const modelData = experiment.models[modelName];
+            if (!modelData) return '<p>模型数据不存在</p>';
+            
+            const displayNames = {
+                'linear_regression': '线性回归',
+                'logistic_regression': '逻辑回归',
+                'decision_tree': '决策树',
+                'random_forest': '随机森林',
+                'xgboost': 'XGBoost'
+            };
+            
+            let html = `<h4>${displayNames[modelName] || modelName}</h4>`;
+            
+            html += `
+                <div class="two-columns">
+                    <div class="card" style="margin:0;">
+                        <h5>模型参数</h5>
+                        <ul style="list-style:none;padding-left:0;">
+                            ${Object.entries(modelData.model_params || {}).map(([k, v]) => {
+                                let val = v;
+                                if (Array.isArray(v)) {
+                                    val = v.length > 5 ? `[...共${v.length}个元素]` : JSON.stringify(v);
+                                }
+                                return `<li style="padding:5px 0;"><strong>${k}:</strong> ${val}</li>`;
+                            }).join('')}
+                        </ul>
+                    </div>
+                    <div class="card" style="margin:0;">
+                        <h5>评估指标</h5>
+                        <ul style="list-style:none;padding-left:0;">
+                            ${Object.entries(modelData.metrics || {}).map(([k, v]) => {
+                                let val = v;
+                                if (typeof v === 'number') {
+                                    val = k === 'MAPE' ? v.toFixed(2) + '%' : v.toFixed(6);
+                                }
+                                return `<li style="padding:5px 0;"><strong>${k}:</strong> ${val || '-'}</li>`;
+                            }).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            if (modelData.feature_importance) {
+                html += `
+                    <div class="card" style="margin-top:20px;">
+                        <h5>特征重要性</h5>
+                        <div class="feature-list">
+                            ${(modelData.feature_importance.features || []).slice(0, 10).map((feat, i) => `
+                                <div class="feature-item">
+                                    <span class="feature-name">${i + 1}. ${feat}</span>
+                                    <span class="feature-importance">${modelData.feature_importance.importance[i]?.toFixed(6) || '-'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (modelData.residuals) {
+                html += `
+                    <div class="card" style="margin-top:20px;">
+                        <h5>残差统计</h5>
+                        <div class="residuals-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${modelData.residuals.mean?.toFixed(6) || '-'}</div>
+                                <div class="stat-label">残差均值</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${modelData.residuals.std?.toFixed(6) || '-'}</div>
+                                <div class="stat-label">残差标准差</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${modelData.residuals.min?.toFixed(6) || '-'}</div>
+                                <div class="stat-label">残差最小值</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${modelData.residuals.max?.toFixed(6) || '-'}</div>
+                                <div class="stat-label">残差最大值</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (modelData.confusion_matrix) {
+                const cm = modelData.confusion_matrix;
+                html += `
+                    <div class="card" style="margin-top:20px;">
+                        <h5>混淆矩阵</h5>
+                        <div class="confusion-matrix">
+                            <div class="matrix-row">
+                                <div class="matrix-cell header"></div>
+                                ${(cm.labels || []).map(l => `<div class="matrix-cell header">预测:${l}</div>`).join('')}
+                            </div>
+                            ${(cm.matrix || []).map((row, i) => `
+                                <div class="matrix-row">
+                                    <div class="matrix-cell header">实际:${cm.labels[i]}</div>
+                                    ${row.map((val, j) => {
+                                        let cellClass = 'matrix-cell';
+                                        if (i === j) cellClass += ' true-positive';
+                                        else cellClass += ' false-positive';
+                                        return `<div class="${cellClass}">${val}</div>`;
+                                    }).join('')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+
+        function renderModelCharts(experiment) {
+        }
+
+        function closeDetailModal() {
+            document.getElementById('experimentDetailModal').style.display = 'none';
+        }
+
+        async function deleteExperiment(experimentId) {
+            if (!confirm('确定要删除这个实验吗？此操作不可恢复。')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/delete/${experimentId}`, { method: 'DELETE' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    loadExperiments();
+                    showSuccess('实验已删除');
+                } else {
+                    showError(data.error || '删除失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            }
+        }
+
+        function exportReport(experimentId, format) {
+            window.open(`${API_BASE}/api/export/${experimentId}/${format}`, '_blank');
+        }
+
+        function loadCompareSelector() {
+            const container = document.getElementById('compareCheckboxes');
+            
+            if (experiments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding:20px;">
+                        <p style="font-size:14px;color:#999;">暂无实验可对比</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            experiments.forEach(exp => {
+                const taskText = exp.task_type === 'regression' ? '回归' : '分类';
+                container.innerHTML += `
+                    <label class="checkbox-item">
+                        <input type="checkbox" value="${exp.experiment_id}" class="compare-checkbox">
+                        <span>${exp.experiment_id} (${taskText}) - ${exp.target_column}</span>
+                    </label>
+                `;
+            });
+        }
+
+        async function compareExperiments() {
+            const selected = Array.from(document.querySelectorAll('.compare-checkbox:checked')).map(cb => cb.value);
+            
+            if (selected.length < 2) {
+                showError('请至少选择2个实验进行对比');
+                return;
+            }
+            
+            showLoading('正在对比实验...');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/compare`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ experiment_ids: selected })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    renderCompareResults(data.comparison);
+                } else {
+                    showError(data.error || '对比失败');
+                }
+            } catch (error) {
+                showError('网络错误: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderCompareResults(comparison) {
+            if (!comparison) {
+                document.getElementById('compareResults').innerHTML = '<p>对比数据为空</p>';
+                return;
+            }
+            
+            let html = '<h3>📊 对比结果</h3>';
+            
+            html += `
+                <div class="card">
+                    <h4>实验概览</h4>
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>实验ID</th>
+                                <th>任务类型</th>
+                                <th>目标列</th>
+                                <th>训练集</th>
+                                <th>测试集</th>
+                                <th>模型数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(comparison.experiments_info || []).map(exp => {
+                                const taskText = exp.task_type === 'regression' ? '回归任务' : '分类任务';
+                                return `
+                                    <tr>
+                                        <td><strong>${exp.experiment_id}</strong></td>
+                                        <td>${taskText}</td>
+                                        <td>${exp.target_column}</td>
+                                        <td>${exp.train_size}</td>
+                                        <td>${exp.test_size}</td>
+                                        <td>${exp.model_types?.length || 0}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            const metricsComp = comparison.metrics_comparison || {};
+            if (Object.keys(metricsComp).length > 0) {
+                html += `
+                    <div class="card">
+                        <h4>指标对比</h4>
+                        ${Object.entries(metricsComp).map(([metric, data]) => `
+                            <h5 style="margin:15px 0 10px;">${metric}</h5>
+                            <table class="metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th>实验ID</th>
+                                        <th>模型</th>
+                                        <th>${metric}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map(exp => {
+                                        return Object.entries(exp.values || {}).map(([model, value]) => {
+                                            const displayNames = {
+                                                'linear_regression': '线性回归',
+                                                'logistic_regression': '逻辑回归',
+                                                'decision_tree': '决策树',
+                                                'random_forest': '随机森林',
+                                                'xgboost': 'XGBoost'
+                                            };
+                                            let val = value;
+                                            if (typeof value === 'number') {
+                                                val = metric === 'MAPE' ? value.toFixed(2) + '%' : value.toFixed(6);
+                                            }
+                                            return `
+                                                <tr>
+                                                    <td>${exp.experiment_id}</td>
+                                                    <td>${displayNames[model] || model}</td>
+                                                    <td>${val || '-'}</td>
+                                                </tr>
+                                            `;
+                                        }).join('');
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            document.getElementById('compareResults').innerHTML = html;
+        }
+
+        function showLoading(text = '加载中...') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        function showError(message) {
+            hideAlerts();
+            const alert = document.getElementById('errorAlert');
+            alert.textContent = '❌ ' + message;
+            alert.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            hideAlerts();
+            const alert = document.getElementById('successAlert');
+            alert.textContent = '✅ ' + message;
+            alert.style.display = 'block';
+        }
+
+        function hideAlerts() {
+            document.getElementById('errorAlert').style.display = 'none';
+            document.getElementById('successAlert').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
