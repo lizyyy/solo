@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钣金焊接车间复盘工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .tab-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .tab-btn.active {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1a1a2e;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #16213e;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #1a1a2e;
+            color: #1a1a2e;
+        }
+
+        .btn-outline:hover {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .shift-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .risk-summary {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .risk-card {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .risk-card.red {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .risk-card.yellow {
+            background: linear-gradient(135deg, #feca57 0%, #f9ca24 100%);
+            color: #333;
+        }
+
+        .risk-card.green {
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            color: white;
+        }
+
+        .risk-card .count {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .risk-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .risk-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .risk-header {
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .risk-header.red {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .risk-header.yellow {
+            background: linear-gradient(135deg, #feca57 0%, #f9ca24 100%);
+            color: #333;
+        }
+
+        .risk-header.green {
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            color: white;
+        }
+
+        .risk-title {
+            font-weight: 600;
+        }
+
+        .risk-type {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+
+        .risk-body {
+            padding: 1rem;
+            display: none;
+        }
+
+        .risk-body.show {
+            display: block;
+        }
+
+        .risk-detail {
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-detail label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .review-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .review-history {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        .review-history p {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .review-history .reviewer {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .review-history .time {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #ffeaa7;
+            color: #e17055;
+        }
+
+        .status-resolved {
+            background: #dfe6e9;
+            color: #636e72;
+        }
+
+        .status-acknowledged {
+            background: #74b9ff;
+            color: #0984e3;
+        }
+
+        .status-rejected {
+            background: #ff7675;
+            color: #d63031;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #1a1a2e;
+            background: #f8f9fa;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+        .shift-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .shift-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .shift-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #1a1a2e;
+        }
+
+        .shift-card .date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .shift-card .shift-type {
+            font-size: 0.95rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .shift-card .created {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a1a2e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #27ae60;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        .toast.info {
+            background: #3498db;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: #1a1a2e;
+        }
+
+        .filter-btn.active {
+            background: #1a1a2e;
+            color: white;
+            border-color: #1a1a2e;
+        }
+
+        .filter-btn.red {
+            border-color: #ee5a5a;
+        }
+
+        .filter-btn.red.active {
+            background: #ee5a5a;
+        }
+
+        .filter-btn.yellow {
+            border-color: #f9ca24;
+        }
+
+        .filter-btn.yellow.active {
+            background: #f9ca24;
+            color: #333;
+        }
+
+        .filter-btn.green {
+            border-color: #00b894;
+        }
+
+        .filter-btn.green.active {
+            background: #00b894;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #1a1a2e;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🛡️ 钣金焊接车间复盘工具</h1>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="shifts">班次列表</button>
+            <button class="tab-btn" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="review">风险复盘</button>
+        </div>
+
+        <div id="shifts-tab" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">历史班次</h2>
+                <div id="shift-list" class="shift-list">
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <p>暂无班次数据</p>
+                        <p class="upload-hint">请先导入数据创建新班次</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="import-tab" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">导入数据</h2>
+                
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1; min-width: 200px;">
+                        <label for="import-date">日期</label>
+                        <input type="date" id="import-date">
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 200px;">
+                        <label for="import-shift">班次</label>
+                        <select id="import-shift">
+                            <option value="早班">早班</option>
+                            <option value="中班">中班</option>
+                            <option value="晚班">晚班</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">焊机开机记录</h2>
+                <div class="upload-area" id="welding-upload">
+                    <p>📁 点击或拖拽上传 CSV 文件</p>
+                    <p class="upload-hint">支持列：工位、开始时间、结束时间、员工姓名</p>
+                </div>
+                <input type="file" id="welding-file" accept=".csv" style="display: none;">
+                <div id="welding-status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">工位排风传感器数据</h2>
+                <div class="upload-area" id="exhaust-upload">
+                    <p>📁 点击或拖拽上传 CSV 文件</p>
+                    <p class="upload-hint">支持列：工位、时间、烟尘浓度、排风流量、排风状态</p>
+                </div>
+                <input type="file" id="exhaust-file" accept=".csv" style="display: none;">
+                <div id="exhaust-status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">员工排班</h2>
+                <div class="upload-area" id="schedule-upload">
+                    <p>📁 点击或拖拽上传 CSV 文件</p>
+                    <p class="upload-hint">支持列：员工姓名、工位、开始时间、结束时间</p>
+                </div>
+                <input type="file" id="schedule-file" accept=".csv" style="display: none;">
+                <div id="schedule-status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">防护面罩点检表</h2>
+                <div class="upload-area" id="helmet-upload">
+                    <p>📁 点击或拖拽上传 CSV 文件</p>
+                    <p class="upload-hint">支持列：员工姓名、点检时间、面罩配备、滤片有效、点检结果</p>
+                </div>
+                <input type="file" id="helmet-file" accept=".csv" style="display: none;">
+                <div id="helmet-status" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" id="analyze-btn">🔍 分析风险</button>
+                <button class="btn btn-outline" id="clear-imports">清空本次导入</button>
+            </div>
+        </div>
+
+        <div id="review-tab" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">选择班次</h2>
+                <div class="shift-selector">
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label for="review-date">日期</label>
+                        <input type="date" id="review-date">
+                    </div>
+                    <div class="form-group" style="margin: 0; flex: 1; min-width: 200px;">
+                        <label for="review-shift">班次</label>
+                        <select id="review-shift">
+                            <option value="早班">早班</option>
+                            <option value="中班">中班</option>
+                            <option value="晚班">晚班</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0; align-self: flex-end;">
+                        <button class="btn btn-primary" id="load-risks-btn">加载风险</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+
+            <div id="risk-summary" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">当前班次</div>
+                        <div class="value" id="current-shift">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">总风险数</div>
+                        <div class="value" id="total-risks">0</div>
+                    </div>
+                </div>
+
+                <div class="risk-summary">
+                    <div class="risk-card red">
+                        <div class="count" id="red-count">0</div>
+                        <div class="label">🔴 红色风险</div>
+                    </div>
+                    <div class="risk-card yellow">
+                        <div class="count" id="yellow-count">0</div>
+                        <div class="label">🟡 黄色风险</div>
+                    </div>
+                    <div class="risk-card green">
+                        <div class="count" id="green-count">0</div>
+                        <div class="label">🟢 绿色风险</div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <span style="font-weight: 500;">筛选：</span>
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn red" data-filter="red">红色</button>
+                    <button class="filter-btn yellow" data-filter="yellow">黄色</button>
+                    <button class="filter-btn green" data-filter="green">绿色</button>
+                </div>
+            </div>
+
+            <div id="risk-list"></div>
+
+            <div id="empty-risks" class="card empty-state" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>该班次暂无风险记录</p>
+            </div>
+
+            <div id="export-section" class="export-section" style="display: none;">
+                <button class="btn btn-success" id="export-md-btn">📄 导出 Markdown 交接单</button>
+                <button class="btn btn-warning" id="export-json-btn">📦 导出 JSON 审计包</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
