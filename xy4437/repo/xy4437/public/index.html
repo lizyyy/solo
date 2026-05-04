@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水站放行工具 - 街道应急值班员</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💧 水站放行工具</h1>
+            <p class="subtitle">街道应急值班员专用</p>
+            <div class="header-actions">
+                <button onclick="refreshData()" class="btn btn-secondary">🔄 刷新数据</button>
+                <button onclick="clearAllData()" class="btn btn-danger">🗑️ 清除数据</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="overview">📊 总览</button>
+            <button class="tab-btn" data-tab="import">📥 数据导入</button>
+            <button class="tab-btn" data-tab="points">📍 点位管理</button>
+            <button class="tab-btn" data-tab="volunteers">👥 志愿者排班</button>
+            <button class="tab-btn" data-tab="export">📤 导出</button>
+        </nav>
+
+        <main>
+            <section id="overview-tab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card green">
+                        <div class="stat-icon">🟢</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-green">0</div>
+                            <div class="stat-label">正常点位</div>
+                        </div>
+                    </div>
+                    <div class="stat-card yellow">
+                        <div class="stat-icon">🟡</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-yellow">0</div>
+                            <div class="stat-label">警告点位</div>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon">🔴</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-red">0</div>
+                            <div class="stat-label">风险点位</div>
+                        </div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="stat-conflicts">0</div>
+                            <div class="stat-label">排班冲突</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 快速操作</h3>
+                    <div class="quick-actions">
+                        <button onclick="showTab('import')" class="btn btn-primary">📥 导入数据</button>
+                        <button onclick="showTab('points')" class="btn btn-secondary">📍 查看点位</button>
+                        <button onclick="exportMarkdown()" class="btn btn-success">📄 导出交接单</button>
+                        <button onclick="exportJSON()" class="btn btn-info">📊 导出审计包</button>
+                    </div>
+                </div>
+
+                <div id="recent-alerts" class="card">
+                    <h3>🔔 最新警告</h3>
+                    <div id="alerts-list">
+                        <p class="empty-state">暂无警告</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="import-tab" class="tab-content">
+                <div class="card">
+                    <h3>📥 数据导入</h3>
+                    <p class="help-text">请按顺序导入以下CSV文件，系统会自动关联数据。</p>
+                    
+                    <div class="import-section">
+                        <h4>1. 临时饮水点台账</h4>
+                        <div class="import-actions">
+                            <input type="file" id="water-points-file" accept=".csv" style="display:none">
+                            <button onclick="document.getElementById('water-points-file').click()" class="btn btn-primary">
+                                选择文件
+                            </button>
+                            <span id="water-points-status" class="import-status">未导入</span>
+                        </div>
+                        <p class="format-hint">
+                            格式：id, name, address, isPriority, priorityReason, capacity, contactPerson, contactPhone
+                        </p>
+                    </div>
+
+                    <div class="import-section">
+                        <h4>2. 余氯/浊度检测记录</h4>
+                        <div class="import-actions">
+                            <input type="file" id="inspections-file" accept=".csv" style="display:none">
+                            <button onclick="document.getElementById('inspections-file').click()" class="btn btn-primary">
+                                选择文件
+                            </button>
+                            <span id="inspections-status" class="import-status">未导入</span>
+                        </div>
+                        <p class="format-hint">
+                            格式：pointId, inspectionTime, residualChlorine, turbidity, inspector
+                        </p>
+                    </div>
+
+                    <div class="import-section">
+                        <h4>3. 送水车到站记录</h4>
+                        <div class="import-actions">
+                            <input type="file" id="deliveries-file" accept=".csv" style="display:none">
+                            <button onclick="document.getElementById('deliveries-file').click()" class="btn btn-primary">
+                                选择文件
+                            </button>
+                            <span id="deliveries-status" class="import-status">未导入</span>
+                        </div>
+                        <p class="format-hint">
+                            格式：pointId, deliveryTime, vehicleNumber, volume, driver, isPriority
+                        </p>
+                    </div>
+
+                    <div class="import-section">
+                        <h4>4. 志愿者排班</h4>
+                        <div class="import-actions">
+                            <input type="file" id="volunteers-file" accept=".csv" style="display:none">
+                            <button onclick="document.getElementById('volunteers-file').click()" class="btn btn-primary">
+                                选择文件
+                            </button>
+                            <span id="volunteers-status" class="import-status">未导入</span>
+                        </div>
+                        <p class="format-hint">
+                            格式：volunteerName, volunteerPhone, pointId, pointName, startTime, endTime, role
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 示例CSV格式</h3>
+                    <div class="example-container">
+                        <h4>临时饮水点台账示例：</h4>
+                        <pre class="code-block">id,name,address,isPriority,priorityReason,capacity,contactPerson,contactPhone
+WP-1,社区中心广场,幸福路1号,true,老年活动中心,500,张三,13800138001
+WP-2,街道办事处,幸福路2号,false,,300,李四,13800138002</pre>
+                        
+                        <h4>余氯/浊度检测示例：</h4>
+                        <pre class="code-block">pointId,inspectionTime,residualChlorine,turbidity,inspector
+WP-1,2026-05-05 08:00:00,0.5,0.3,检测员A
+WP-1,2026-05-05 14:00:00,0.4,0.2,检测员B</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="points-tab" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>状态筛选：</label>
+                        <select id="status-filter">
+                            <option value="all">全部</option>
+                            <option value="red">🔴 风险</option>
+                            <option value="yellow">🟡 警告</option>
+                            <option value="green">🟢 正常</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>优先级筛选：</label>
+                        <select id="priority-filter">
+                            <option value="all">全部</option>
+                            <option value="true">重点人群点位</option>
+                            <option value="false">普通点位</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <input type="text" id="search-input" placeholder="搜索点位名称...">
+                    </div>
+                </div>
+
+                <div id="points-list">
+                    <p class="empty-state">暂无点位数据，请先导入临时饮水点台账</p>
+                </div>
+            </section>
+
+            <section id="volunteers-tab" class="tab-content">
+                <div class="card">
+                    <h3>⚠️ 排班冲突检测</h3>
+                    <div id="conflicts-list">
+                        <p class="empty-state">暂无冲突</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 排班列表</h3>
+                    <div id="schedules-list">
+                        <p class="empty-state">暂无排班数据</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="export-tab" class="tab-content">
+                <div class="card">
+                    <h3>📄 导出交接单 (Markdown)</h3>
+                    <p class="help-text">导出包含所有点位状态、风险信息和值班备注的Markdown格式交接单。</p>
+                    <button onclick="exportMarkdown()" class="btn btn-success btn-lg">
+                        📄 导出 Markdown 交接单
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h3>📊 导出审计包 (JSON)</h3>
+                    <p class="help-text">导出包含所有数据的JSON格式审计包，用于数据备份和审计。</p>
+                    <button onclick="exportJSON()" class="btn btn-info btn-lg">
+                        📊 导出 JSON 审计包
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h3>📋 导出预览</h3>
+                    <button onclick="previewExport()" class="btn btn-secondary">
+                        🔍 预览交接单内容
+                    </button>
+                    <div id="preview-container" style="display:none; margin-top: 20px;">
+                        <div id="preview-content" class="code-block"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="point-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">点位详情</h2>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-secondary">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="override-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>人工改判状态</h2>
+                <button onclick="closeOverrideModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="override-form">
+                    <input type="hidden" id="override-point-id">
+                    <input type="hidden" id="override-original-status">
+                    
+                    <div class="form-group">
+                        <label>原状态：</label>
+                        <span id="override-original-display"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>改判为：</label>
+                        <select id="override-new-status" required>
+                            <option value="green">🟢 正常</option>
+                            <option value="yellow">🟡 警告</option>
+                            <option value="red">🔴 风险</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>改判原因：</label>
+                        <textarea id="override-reason" rows="3" required placeholder="请输入改判原因..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>操作人：</label>
+                        <input type="text" id="override-operator" placeholder="请输入您的姓名">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeOverrideModal()" class="btn btn-secondary">取消</button>
+                <button onclick="submitOverride()" class="btn btn-primary">确认改判</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="note-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加备注</h2>
+                <button onclick="closeNoteModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="note-form">
+                    <input type="hidden" id="note-point-id">
+                    
+                    <div class="form-group">
+                        <label>备注内容：</label>
+                        <textarea id="note-content" rows="4" required placeholder="请输入备注内容..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>操作人：</label>
+                        <input type="text" id="note-operator" placeholder="请输入您的姓名">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeNoteModal()" class="btn btn-secondary">取消</button>
+                <button onclick="submitNote()" class="btn btn-primary">保存备注</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
