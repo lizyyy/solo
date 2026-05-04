@@ -1,0 +1,9 @@
+id,name,type,x,y,status,mode,direction,expectedDirection,required
+fan-1,主风机-1,fan,5,7,on,exhaust,out,in,true
+fan-2,主风机-2,fan,15,7,on,intake,in,exhaust,true
+fan-3,备用风机,fan,25,7,off,exhaust,out,out,true
+fan-4,控制室风机,fan,25,10,on,exhaust,out,out,false
+window-1,主入口,door,10,0,open,,,true
+window-2,侧窗,window,0,5,closed,,,false
+window-3,后门,door,5,25,closed,,,false
+window-4,通风窗,window,30,10,open,,,false

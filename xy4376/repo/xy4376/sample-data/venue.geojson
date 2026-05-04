@@ -1,0 +1,128 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "room-1",
+      "properties": {
+        "name": "主训练室",
+        "type": "room",
+        "category": "training"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [0, 0],
+            [20, 0],
+            [20, 15],
+            [0, 15],
+            [0, 0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-2",
+      "properties": {
+        "name": "控制室",
+        "type": "room",
+        "category": "control"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [20, 0],
+            [30, 0],
+            [30, 15],
+            [20, 15],
+            [20, 0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "room-3",
+      "properties": {
+        "name": "设备间",
+        "type": "room",
+        "category": "equipment"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [0, 15],
+            [15, 15],
+            [15, 25],
+            [0, 25],
+            [0, 15]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "exit-1",
+      "properties": {
+        "name": "主出口",
+        "type": "exit",
+        "category": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10, 0]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "exit-2",
+      "properties": {
+        "name": "备用出口",
+        "type": "exit",
+        "category": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [25, 0]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "exit-3",
+      "properties": {
+        "name": "后门出口",
+        "type": "exit",
+        "category": "exit"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5, 25]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "obstacle-1",
+      "properties": {
+        "name": "训练台",
+        "type": "obstacle",
+        "category": "equipment"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [8, 5],
+            [12, 5],
+            [12, 10],
+            [8, 10],
+            [8, 5]
+          ]
+        ]
+      }
+    }
+  ]
+}
