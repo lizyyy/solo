@@ -1,0 +1,86 @@
+{
+  "export_time": "2026-05-05T01:06:28.136572",
+  "summary": {
+    "total_batches": 5,
+    "available": 3,
+    "quarantine": 0,
+    "damaged": 2
+  },
+  "results": [
+    {
+      "batch_number": "B20260501001",
+      "drug_name": "胰岛素注射液",
+      "specification": "300U/3ml",
+      "total_quantity": 50,
+      "available_quantity": 35,
+      "reserved_quantity": 15,
+      "overtemperature_duration": 270,
+      "max_temperature": 16.2,
+      "min_temperature": 5.2,
+      "status": "需报损",
+      "review_comment": "已联系供应商，确认该批次药品在超温300分钟内仍可使用，建议隔离观察",
+      "reviewer": "李药师",
+      "review_time": "2026-05-05T01:06:00.266502"
+    },
+    {
+      "batch_number": "B20260501002",
+      "drug_name": "重组人生长激素",
+      "specification": "4IU/支",
+      "total_quantity": 30,
+      "available_quantity": 30,
+      "reserved_quantity": 0,
+      "overtemperature_duration": 270,
+      "max_temperature": 16.2,
+      "min_temperature": 5.2,
+      "status": "需报损",
+      "review_comment": "",
+      "reviewer": "",
+      "review_time": null
+    },
+    {
+      "batch_number": "B20260501003",
+      "drug_name": "双歧杆菌三联活菌胶囊",
+      "specification": "0.21g*36粒",
+      "total_quantity": 100,
+      "available_quantity": 80,
+      "reserved_quantity": 20,
+      "overtemperature_duration": 0,
+      "max_temperature": 7.2,
+      "min_temperature": 4.8,
+      "status": "可售",
+      "review_comment": "",
+      "reviewer": "",
+      "review_time": null
+    },
+    {
+      "batch_number": "B20260501004",
+      "drug_name": "凝血酶冻干粉",
+      "specification": "500U",
+      "total_quantity": 20,
+      "available_quantity": 20,
+      "reserved_quantity": 0,
+      "overtemperature_duration": 0,
+      "max_temperature": 7.2,
+      "min_temperature": 4.8,
+      "status": "可售",
+      "review_comment": "",
+      "reviewer": "",
+      "review_time": null
+    },
+    {
+      "batch_number": "B20260501005",
+      "drug_name": "乙肝疫苗",
+      "specification": "10μg/0.5ml",
+      "total_quantity": 200,
+      "available_quantity": 200,
+      "reserved_quantity": 0,
+      "overtemperature_duration": 0,
+      "max_temperature": 7.2,
+      "min_temperature": 4.8,
+      "status": "可售",
+      "review_comment": "",
+      "reviewer": "",
+      "review_time": null
+    }
+  ]
+}
