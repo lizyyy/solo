@@ -1,0 +1,43 @@
+database_type: mysql
+max_columns_per_index: 5
+max_indexes_per_table: 10
+min_selectivity_for_index: 0.1
+policy_name: production_optimization
+rules:
+- actions:
+  - suggest_index
+  conditions:
+    min_execution_time_ms: 500
+    min_query_count: 5
+  description: Flag columns used in WHERE clauses without indexes
+  enabled: true
+  rule_id: R001
+  rule_type: missing_index
+  severity: high
+- actions:
+  - suggest_drop
+  conditions: {}
+  description: Detect indexes that are prefixes of other indexes
+  enabled: true
+  rule_id: R002
+  rule_type: redundant_index
+  severity: medium
+- actions:
+  - suggest_review
+  conditions:
+    min_age_days: 30
+  description: Flag indexes not used in analyzed queries
+  enabled: true
+  rule_id: R003
+  rule_type: unused_index
+  severity: low
+- actions:
+  - suggest_rewrite
+  conditions:
+    max_selectivity: 0.05
+  description: Flag indexes on low-cardinality columns
+  enabled: true
+  rule_id: R004
+  rule_type: low_selectivity
+  severity: low
+write_cost_threshold: 0.3

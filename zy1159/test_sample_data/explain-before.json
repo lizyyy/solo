@@ -1,0 +1,61 @@
+[
+  {
+    "query": "SELECT * FROM orders WHERE status = 'pending' ORDER BY created_at DESC LIMIT 50",
+    "Plan": {
+      "Node Type": "Sort",
+      "Cost": 150000,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "orders",
+          "Alias": "orders",
+          "Plan Rows": 50000,
+          "Filter": "(status = 'pending'::text)"
+        }
+      ]
+    },
+    "table_scans": [
+      "orders"
+    ],
+    "index_uses": []
+  },
+  {
+    "query": "SELECT * FROM users WHERE status = 'active' ORDER BY created_at DESC",
+    "Plan": {
+      "Node Type": "Sort",
+      "Cost": 85000,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Relation Name": "users",
+          "Alias": "users",
+          "Plan Rows": 15000,
+          "Filter": "(status = 'active'::text)"
+        }
+      ]
+    },
+    "table_scans": [
+      "users"
+    ],
+    "index_uses": []
+  },
+  {
+    "query": "SELECT * FROM products WHERE category_id = 5 AND price BETWEEN 10 AND 100",
+    "Plan": {
+      "Node Type": "Index Scan",
+      "Relation Name": "products",
+      "Index Name": "idx_products_category",
+      "Plan Rows": 156,
+      "Filter": "((price >= 10.0) AND (price <= 100.0))"
+    },
+    "table_scans": [],
+    "index_uses": [
+      {
+        "table": "products",
+        "index": "idx_products_category",
+        "type": "Index Scan",
+        "rows": 156
+      }
+    ]
+  }
+]
