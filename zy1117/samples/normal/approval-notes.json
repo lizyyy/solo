@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "project": "某某科技服务器采购项目",
+    "quoteVersion": "v1.0",
+    "status": "已通过"
+  },
+  "approvals": [
+    {
+      "approver": "张三",
+      "role": "销售经理",
+      "date": "2024-04-20",
+      "time": "10:30",
+      "content": "已确认客户需求，配置符合要求，价格按标准报价执行。",
+      "decision": "同意",
+      "discount": null
+    },
+    {
+      "approver": "李四",
+      "role": "技术总监",
+      "date": "2024-04-21",
+      "time": "14:15",
+      "content": "技术方案已审核，配置合理，可以满足客户需求。华为存储给5%折扣是标准商务政策。",
+      "decision": "同意",
+      "discount": "5%"
+    },
+    {
+      "approver": "王五",
+      "role": "财务总监",
+      "date": "2024-04-22",
+      "time": "09:45",
+      "content": "利润率检查通过，报价合理，付款条款无风险。",
+      "decision": "同意",
+      "discount": null
+    },
+    {
+      "approver": "赵六",
+      "role": "总经理",
+      "date": "2024-04-23",
+      "time": "16:20",
+      "content": "审批通过，可以进入合同谈判阶段。",
+      "decision": "最终同意",
+      "discount": null
+    }
+  ]
+}
