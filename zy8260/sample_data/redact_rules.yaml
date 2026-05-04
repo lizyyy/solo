@@ -1,0 +1,72 @@
+rules:
+  - id: R-001
+    type: id_card
+    pattern: "\\b(\\d{6})\\d{8}(\\d{4})\\b"
+    replacement: "\\1********\\2"
+    description: "18位身份证号脱敏 - 保留前6位和后4位"
+    enabled: true
+    priority: 10
+
+  - id: R-002
+    type: id_card
+    pattern: "\\b(\\d{6})\\d{8}([0-9Xx])\\b"
+    replacement: "\\1********\\2"
+    description: "15位升18位身份证号"
+    enabled: true
+    priority: 10
+
+  - id: R-003
+    type: phone
+    pattern: "\\b(\\d{3})\\d{4}(\\d{4})\\b"
+    replacement: "\\1****\\2"
+    description: "手机号脱敏 - 保留前3位和后4位"
+    enabled: true
+    priority: 9
+
+  - id: R-004
+    type: fixed_phone
+    pattern: "\\b(\\d{3,4}-?)\\d{4}(\\d{4})\\b"
+    replacement: "\\1****\\2"
+    description: "固定电话脱敏"
+    enabled: true
+    priority: 9
+
+  - id: R-005
+    type: address
+    pattern: "([北京上海广州深圳杭州成都武汉南京西安重庆][市区县]{0,2}[区]{0,1})[^\n]{5,}(路|街|巷|大道|号|弄|园|村|大厦|楼|广场)[^\n]{0,15}"
+    replacement: "\\1***\\2***"
+    description: "详细地址脱敏"
+    enabled: true
+    priority: 8
+
+  - id: R-006
+    type: email
+    pattern: "\\b([a-zA-Z0-9._%+-]{1,2})[a-zA-Z0-9._%+-]*(@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})\\b"
+    replacement: "\\1***\\2"
+    description: "邮箱地址脱敏"
+    enabled: true
+    priority: 7
+
+  - id: R-007
+    type: bank_card
+    pattern: "\\b(\\d{4})\\d{8,12}(\\d{4})\\b"
+    replacement: "\\1********\\2"
+    description: "银行卡号脱敏"
+    enabled: true
+    priority: 8
+
+  - id: R-008
+    type: custom_witness
+    pattern: "王五"
+    replacement: "王*"
+    description: "未授权证人王五脱敏"
+    enabled: false
+    priority: 15
+
+  - id: R-009
+    type: custom_name
+    pattern: "李四"
+    replacement: "李*"
+    description: "被告姓名脱敏示例"
+    enabled: false
+    priority: 14

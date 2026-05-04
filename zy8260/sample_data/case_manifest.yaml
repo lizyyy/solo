@@ -1,0 +1,49 @@
+case:
+  case_id: "(2026)京民初字第00123号"
+  case_name: "张三诉李四买卖合同纠纷案"
+  court: "北京市朝阳区人民法院"
+  judge: "王法官"
+  hearing_date: "2026-05-15"
+
+evidence:
+  - id: EV-001
+    filename: "起诉状.txt"
+    category: "诉讼文书"
+    visibility: "all"
+    description: "原告起诉状，包含诉讼请求和事实理由"
+
+  - id: EV-002
+    filename: "答辩状.txt"
+    category: "诉讼文书"
+    visibility: "all"
+    description: "被告答辩状"
+
+  - id: EV-003
+    filename: "银行流水.csv"
+    category: "财务证据"
+    visibility: "all"
+    description: "原被告之间的银行转账记录"
+
+  - id: EV-004
+    filename: "证人证言_王五.json"
+    category: "证人证言"
+    visibility: "judge_only"
+    description: "王五证人证言，仅法官可见"
+
+  - id: EV-005
+    filename: "证人证言_赵六.json"
+    category: "证人证言"
+    visibility: "all"
+    description: "赵六证人证言，已授权"
+
+  - id: EV-006
+    filename: "买卖合同.txt"
+    category: "合同文书"
+    visibility: "all"
+    description: "原被告签订的买卖合同原件扫描件文字版"
+
+  - id: EV-007
+    filename: "通讯记录.txt"
+    category: "沟通证据"
+    visibility: "all"
+    description: "原被告之间的微信聊天记录摘要"
