@@ -1,0 +1,10 @@
+connection_id,request_id,tenant_id,start_time,end_time,duration_ms,sql_text,sql_type,is_slow,error,transaction_id
+conn-001,req-001,tenant-001,2026-05-04T10:00:00Z,2026-05-04T10:00:03Z,3000,SELECT * FROM users WHERE id = 1,SELECT,false,,
+conn-002,req-002,tenant-001,2026-05-04T10:00:01Z,2026-05-04T10:00:04Z,3000,SELECT * FROM products WHERE category = 'electronics',SELECT,false,,
+conn-003,req-003,tenant-002,2026-05-04T10:00:02Z,2026-05-04T10:00:02.5Z,500,INSERT INTO logs (message) VALUES ('user login'),INSERT,false,,
+conn-004,req-004,tenant-003,2026-05-04T10:05:02Z,2026-05-04T10:05:07Z,5000,UPDATE orders SET status = 'processing' WHERE id = 12345,UPDATE,true,,tx-001
+conn-005,req-005,tenant-001,2026-05-04T10:10:00Z,2026-05-04T10:10:15Z,15000,SELECT * FROM large_table WHERE created_at > '2026-01-01',SELECT,true,,
+conn-leak-001,req-leak-001,tenant-005,2026-05-04T09:00:01Z,2026-05-04T09:00:02Z,1000,BEGIN TRANSACTION,OTHER,false,,tx-long-001
+conn-leak-001,req-leak-001,tenant-005,2026-05-04T09:00:02Z,2026-05-04T09:00:03Z,1000,UPDATE inventory SET stock = stock - 1 WHERE product_id = 999,UPDATE,false,,tx-long-001
+conn-006,req-008,tenant-001,2026-05-04T10:20:00Z,2026-05-04T10:20:01Z,1000,SELECT COUNT(*) FROM orders,SELECT,false,,
+conn-007,req-009,tenant-002,2026-05-04T10:20:05Z,2026-05-04T10:20:05.5Z,500,SELECT * FROM users LIMIT 10,SELECT,false,,

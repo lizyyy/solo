@@ -1,0 +1,5 @@
+name: "default-pool"
+max_open: 20
+max_idle: 10
+idle_timeout: "5m"
+tenant_quota: 5
