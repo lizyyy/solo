@@ -1,0 +1,82 @@
+[
+  {
+    "id": "inv-001",
+    "recipe_id": "recipe-general",
+    "solution_type": "A",
+    "current_volume": 500,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2027-03-15",
+    "batch_number": "BATCH-2026-001"
+  },
+  {
+    "id": "inv-002",
+    "recipe_id": "recipe-general",
+    "solution_type": "B",
+    "current_volume": 480,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2027-03-15",
+    "batch_number": "BATCH-2026-001"
+  },
+  {
+    "id": "inv-003",
+    "recipe_id": "recipe-leafy",
+    "solution_type": "A",
+    "current_volume": 250,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2027-04-20",
+    "batch_number": "BATCH-2026-005"
+  },
+  {
+    "id": "inv-004",
+    "recipe_id": "recipe-leafy",
+    "solution_type": "B",
+    "current_volume": 230,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2027-04-20",
+    "batch_number": "BATCH-2026-005"
+  },
+  {
+    "id": "inv-005",
+    "recipe_id": "recipe-fruiting",
+    "solution_type": "A",
+    "current_volume": 80,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2026-12-31",
+    "batch_number": "BATCH-2025-012"
+  },
+  {
+    "id": "inv-006",
+    "recipe_id": "recipe-fruiting",
+    "solution_type": "B",
+    "current_volume": 75,
+    "volume_unit": "mL",
+    "minimum_threshold": 100,
+    "expiration_date": "2026-12-31",
+    "batch_number": "BATCH-2025-012"
+  },
+  {
+    "id": "inv-007",
+    "recipe_id": "recipe-herb",
+    "solution_type": "A",
+    "current_volume": 350,
+    "volume_unit": "mL",
+    "minimum_threshold": 50,
+    "expiration_date": "2027-05-10",
+    "batch_number": "BATCH-2026-008"
+  },
+  {
+    "id": "inv-008",
+    "recipe_id": "recipe-herb",
+    "solution_type": "B",
+    "current_volume": 340,
+    "volume_unit": "mL",
+    "minimum_threshold": 50,
+    "expiration_date": "2027-05-10",
+    "batch_number": "BATCH-2026-008"
+  }
+]

@@ -1,0 +1,6 @@
+crop_id,name,stage,ec_min,ec_max,ec_unit,ph_min,ph_max,notes
+,生菜,seedling,1.0,1.5,mS/cm,5.5,6.0,"缺少 crop_id"
+tomato,番茄,vegetative,3.0,2.0,mS/cm,7.0,5.0,"EC最小值大于最大值，pH范围反向"
+mint,薄荷,invalid_stage,25.0,30.0,ppp,-1.0,15.0,"无效的阶段，EC超出范围，单位ppp无效，pH超出0-14范围"
+cucumber,黄瓜,flowering,,1.8,mS/cm,5.5,6.5,"缺少ec_min"
+spinach,菠菜,mature,1.5,,INVALID_UNIT,5.5,6.5,"缺少ec_max，单位无效"

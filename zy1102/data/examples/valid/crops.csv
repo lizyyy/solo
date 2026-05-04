@@ -1,0 +1,10 @@
+crop_id,name,common_name,stage,ec_min,ec_max,ec_unit,ph_min,ph_max,recommended_recipe,notes
+lettuce,生菜,Leaf Lettuce,seedling,1.0,1.5,mS/cm,5.5,6.0,recipe-general,"幼苗期，较低EC，促进生根"
+lettuce,生菜,Leaf Lettuce,vegetative,1.5,2.0,mS/cm,5.5,6.5,recipe-leafy,"营养生长期，标准EC"
+lettuce,生菜,Leaf Lettuce,mature,1.2,1.8,mS/cm,5.8,6.5,recipe-leafy,"成熟期，略低EC防止苦味"
+mint,薄荷,Peppermint,seedling,0.8,1.2,mS/cm,5.5,6.5,recipe-herb,"薄荷喜欢较低EC"
+mint,薄荷,Peppermint,vegetative,1.0,1.5,mS/cm,5.5,6.5,recipe-herb,"生长期"
+tomato,番茄,Tomato,seedling,1.2,1.8,mS/cm,5.5,6.0,recipe-general,"番茄幼苗期"
+tomato,番茄,Tomato,vegetative,1.8,2.5,mS/cm,5.5,6.5,recipe-fruiting,"营养生长期"
+tomato,番茄,Tomato,flowering,2.0,2.8,mS/cm,5.8,6.5,recipe-fruiting,"开花期，增加EC"
+tomato,番茄,Tomato,fruiting,2.5,3.5,mS/cm,5.8,6.5,recipe-fruiting,"结果期，高EC促进果实发育"

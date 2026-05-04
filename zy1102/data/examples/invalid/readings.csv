@@ -1,0 +1,6 @@
+id,reservoir_id,timestamp,ec_value,ec_unit,ph_value,volume,volume_unit,notes
+rd_001,bucket-999,2026-05-01 08:30:00,1.6,mS/cm,6.2,16,L,"引用不存在的储液桶ID"
+rd_002,bucket-01,invalid_timestamp,25.0,ppm,15.0,-5,L,"无效时间戳，EC过高，pH超出范围，体积负数"
+rd_003,bucket-01,2026-05-02,8.0,mS/cm,-2.0,30,L,"EC超出合理范围，pH负数，体积过大"
+rd_004,,2026-05-03,1.5,mS/cm,6.0,10,L,"缺少reservoir_id"
+rd_005,bucket-01,2026-05-01 08:30:00,1.8,mS/cm,6.1,15,L,"与第一条记录时间重复"

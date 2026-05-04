@@ -1,0 +1,36 @@
+[
+  {
+    "id": "bucket-01",
+    "name": "阳台水培桶 1 号",
+    "max_capacity": 20,
+    "capacity_unit": "L",
+    "description": "种植生菜的圆形深液流桶",
+    "metadata": {
+      "location": "阳台东侧",
+      "system_type": "DFT",
+      "pump": true
+    }
+  },
+  {
+    "id": "bucket-02",
+    "name": "阳台水培桶 2 号",
+    "max_capacity": 15,
+    "capacity_unit": "L",
+    "description": "种植薄荷的 NFT 系统",
+    "metadata": {
+      "location": "阳台西侧",
+      "system_type": "NFT"
+    }
+  },
+  {
+    "id": "bucket-03",
+    "name": "阳台水培桶 3 号",
+    "max_capacity": 25,
+    "capacity_unit": "L",
+    "description": "种植小番茄的桶",
+    "metadata": {
+      "location": "阳台南侧",
+      "system_type": "DWC"
+    }
+  }
+]

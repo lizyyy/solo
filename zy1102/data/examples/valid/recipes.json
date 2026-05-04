@@ -1,0 +1,102 @@
+[
+  {
+    "id": "recipe-general",
+    "name": "通用水培营养液",
+    "type": "general",
+    "description": "适用于大多数叶菜类的通用配方",
+    "source": "标准霍格兰德配方改良",
+    "mixing_ratio": 1.0,
+    "a_solution": {
+      "name": "A液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.12,
+      "unit": "mL",
+      "npk_ratio": "7-11-27",
+      "key_elements": ["钙", "氮", "钾"]
+    },
+    "b_solution": {
+      "name": "B液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.10,
+      "unit": "mL",
+      "npk_ratio": "15-5-15",
+      "key_elements": ["镁", "磷", "微量元素"]
+    },
+    "incompatibility_notes": "A液和B液请分开添加，混合时先加A液搅拌均匀后再加B液，避免沉淀。"
+  },
+  {
+    "id": "recipe-leafy",
+    "name": "叶菜专用配方",
+    "type": "leafy_green",
+    "description": "生菜、白菜等叶菜类专用",
+    "source": "专业叶菜配方",
+    "mixing_ratio": 1.0,
+    "a_solution": {
+      "name": "A液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.15,
+      "unit": "mL",
+      "npk_ratio": "10-5-20",
+      "key_elements": ["钙", "氮", "钾", "镁"]
+    },
+    "b_solution": {
+      "name": "B液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.12,
+      "unit": "mL",
+      "npk_ratio": "5-10-15",
+      "key_elements": ["磷", "铁", "微量元素"]
+    },
+    "incompatibility_notes": "高氮配方，适合叶菜快速生长。注意EC不要超过2.5 mS/cm。"
+  },
+  {
+    "id": "recipe-fruiting",
+    "name": "果菜专用配方",
+    "type": "fruiting",
+    "description": "番茄、黄瓜等结果类作物专用",
+    "source": "专业果菜配方",
+    "mixing_ratio": 1.0,
+    "a_solution": {
+      "name": "A液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.18,
+      "unit": "mL",
+      "npk_ratio": "8-15-30",
+      "key_elements": ["钾", "钙", "镁"]
+    },
+    "b_solution": {
+      "name": "B液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.15,
+      "unit": "mL",
+      "npk_ratio": "15-30-10",
+      "key_elements": ["磷", "硼", "锌", "铁"]
+    },
+    "incompatibility_notes": "高磷高钾配方，促进开花结果。开花期和结果期需要较高EC。"
+  },
+  {
+    "id": "recipe-herb",
+    "name": "香草专用配方",
+    "type": "herb",
+    "description": "薄荷、罗勒、百里香等香草植物专用",
+    "source": "专业香草配方",
+    "mixing_ratio": 1.0,
+    "a_solution": {
+      "name": "A液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.10,
+      "unit": "mL",
+      "npk_ratio": "5-10-15",
+      "key_elements": ["氮", "钾", "镁"]
+    },
+    "b_solution": {
+      "name": "B液",
+      "concentration_per_ml": 1.0,
+      "ec_per_ml_per_liter": 0.08,
+      "unit": "mL",
+      "npk_ratio": "10-5-10",
+      "key_elements": ["磷", "铁", "微量元素"]
+    },
+    "incompatibility_notes": "低浓度配方，香草植物通常不需要高EC。过高浓度会影响风味。"
+  }
+]

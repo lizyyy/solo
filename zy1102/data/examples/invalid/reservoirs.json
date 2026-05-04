@@ -1,0 +1,21 @@
+[
+  {
+    "id": "bucket-01",
+    "name": "",
+    "max_capacity": -5,
+    "capacity_unit": "INVALID_UNIT",
+    "description": "容量为负数，单位无效，名称为空"
+  },
+  {
+    "id": "",
+    "name": "没有ID的桶",
+    "max_capacity": 10,
+    "capacity_unit": "L"
+  },
+  {
+    "id": "bucket-01",
+    "name": "重复ID的桶",
+    "max_capacity": 15,
+    "capacity_unit": "L"
+  }
+]

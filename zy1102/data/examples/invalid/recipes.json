@@ -1,0 +1,25 @@
+[
+  {
+    "id": "recipe-bad-1",
+    "name": "",
+    "type": "invalid_type",
+    "description": "名称为空，类型无效",
+    "mixing_ratio": 0,
+    "a_solution": {
+      "name": "A液",
+      "concentration_per_ml": -1.0,
+      "ec_per_ml_per_liter": -0.1,
+      "unit": "INVALID"
+    },
+    "b_solution": {
+      "name": "B液",
+      "concentration_per_ml": 0,
+      "ec_per_ml_per_liter": 0
+    }
+  },
+  {
+    "id": "recipe-bad-2",
+    "name": "缺少必需字段的配方",
+    "type": "general"
+  }
+]

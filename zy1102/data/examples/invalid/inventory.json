@@ -1,0 +1,23 @@
+[
+  {
+    "id": "inv-bad-001",
+    "recipe_id": "nonexistent-recipe",
+    "solution_type": "A",
+    "current_volume": -50,
+    "volume_unit": "INVALID_UNIT",
+    "minimum_threshold": 100,
+    "expiration_date": "2020-01-01"
+  },
+  {
+    "id": "inv-bad-002",
+    "recipe_id": "recipe-general",
+    "solution_type": "X",
+    "current_volume": 0,
+    "volume_unit": "mL",
+    "minimum_threshold": 100
+  },
+  {
+    "id": "inv-bad-003",
+    "current_volume": 100
+  }
+]
