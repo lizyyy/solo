@@ -1,0 +1,16 @@
+mac_address,device_name,device_type,serial_number,model,manufacturer,battery_level,is_random_address
+00:1A:2B:3C:4D:5E,ESL-货架A1-牛奶区,esl,ESL-2024-001,ESL-Pro-2.4,Sunmi,85,false
+00:1A:2B:3C:4D:5F,ESL-货架A2-零食区,esl,ESL-2024-002,ESL-Pro-2.4,Sunmi,72,false
+00:1A:2B:3C:4D:60,ESL-货架B1-饮料区,esl,ESL-2024-003,ESL-Lite,Sunmi,15,false
+00:1A:2B:3C:4D:61,打印机-收银台1,printer,PRT-2024-001,TM-T88VII,Epson,45,false
+00:1A:2B:3C:4D:62,打印机-收银台2,printer,PRT-2024-002,TM-T88VII,Epson,68,false
+00:1A:2B:3C:4D:63,Beacon-入口门,beacon,BCN-2024-001,iBeacon-Pro,Minew,92,false
+00:1A:2B:3C:4D:64,Beacon-仓库入口,beacon,BCN-2024-002,Eddystone-USB,Minew,8,false
+00:1A:2B:3C:4D:65,扫码枪-收银台1,scanner,SCN-2024-001,DS2208,Zebra,55,false
+00:1A:2B:3C:4D:66,扫码枪-收银台2,scanner,SCN-2024-002,DS2208,Zebra,33,false
+00:1A:2B:3C:4D:67,耳机-员工张三,headset,HDT-2024-001,WH-CH510,Sony,78,false
+00:1A:2B:3C:4D:68,耳机-员工李四,headset,HDT-2024-002,WH-CH510,Sony,95,false
+02:1A:2B:3C:4D:5E,随机地址设备1,other,,,Huawei,,true
+02:1A:2B:3C:4D:5F,随机地址设备2,other,,,Huawei,,true
+00:1A:2B:3C:4D:69,ESL-货架C1-生鲜区,esl,ESL-2024-004,ESL-Pro-2.4,Sunmi,5,false
+00:1A:2B:3C:4D:6A,Beacon-促销区,beacon,BCN-2024-003,iBeacon-Mini,Minew,42,false

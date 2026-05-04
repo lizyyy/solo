@@ -1,0 +1,112 @@
+{
+  "zones": [
+    {
+      "zone_code": "ZONE-001",
+      "zone_name": "零售区A",
+      "zone_type": "retail",
+      "description": "主要零售区域 - 牛奶、零食、饮料货架",
+      "location": {
+        "floor": 1,
+        "building": "主门店",
+        "coordinates": {"x": 0, "y": 0, "width": 20, "height": 15}
+      },
+      "expected_device_types": ["esl", "beacon"],
+      "allowed_device_types": ["esl", "beacon", "scanner", "headset"],
+      "forbidden_device_types": [],
+      "rssi_threshold": -75,
+      "expected_scan_frequency_minutes": 5,
+      "max_allowed_disconnect_minutes": 60,
+      "is_active": true
+    },
+    {
+      "zone_code": "ZONE-002",
+      "zone_name": "收银区",
+      "zone_type": "checkout",
+      "description": "收银台区域 - 包含打印机和扫码枪",
+      "location": {
+        "floor": 1,
+        "building": "主门店",
+        "coordinates": {"x": 25, "y": 0, "width": 10, "height": 15}
+      },
+      "expected_device_types": ["printer", "scanner"],
+      "allowed_device_types": ["printer", "scanner", "headset", "beacon"],
+      "forbidden_device_types": [],
+      "rssi_threshold": -70,
+      "expected_scan_frequency_minutes": 2,
+      "max_allowed_disconnect_minutes": 30,
+      "is_active": true
+    },
+    {
+      "zone_code": "ZONE-003",
+      "zone_name": "入口区",
+      "zone_type": "entrance",
+      "description": "门店入口 - Beacon信标区域",
+      "location": {
+        "floor": 1,
+        "building": "主门店",
+        "coordinates": {"x": 0, "y": 15, "width": 35, "height": 5}
+      },
+      "expected_device_types": ["beacon"],
+      "allowed_device_types": ["beacon", "headset", "scanner"],
+      "forbidden_device_types": [],
+      "rssi_threshold": -65,
+      "expected_scan_frequency_minutes": 1,
+      "max_allowed_disconnect_minutes": 120,
+      "is_active": true
+    },
+    {
+      "zone_code": "ZONE-004",
+      "zone_name": "仓库区",
+      "zone_type": "warehouse",
+      "description": "后台仓库 - 库存管理区域",
+      "location": {
+        "floor": -1,
+        "building": "主门店",
+        "coordinates": {"x": 0, "y": 0, "width": 25, "height": 20}
+      },
+      "expected_device_types": ["beacon", "scanner"],
+      "allowed_device_types": ["beacon", "scanner", "headset"],
+      "forbidden_device_types": ["esl", "printer"],
+      "rssi_threshold": -80,
+      "expected_scan_frequency_minutes": 10,
+      "max_allowed_disconnect_minutes": 240,
+      "is_active": true
+    },
+    {
+      "zone_code": "ZONE-005",
+      "zone_name": "生鲜区",
+      "zone_type": "retail",
+      "description": "生鲜食品区域 - 电子价签密集区",
+      "location": {
+        "floor": 1,
+        "building": "主门店",
+        "coordinates": {"x": 35, "y": 0, "width": 15, "height": 20}
+      },
+      "expected_device_types": ["esl", "beacon"],
+      "allowed_device_types": ["esl", "beacon", "scanner", "headset"],
+      "forbidden_device_types": [],
+      "rssi_threshold": -75,
+      "expected_scan_frequency_minutes": 5,
+      "max_allowed_disconnect_minutes": 60,
+      "is_active": true
+    },
+    {
+      "zone_code": "ZONE-006",
+      "zone_name": "办公区",
+      "zone_type": "office",
+      "description": "员工办公室 - 管理区域",
+      "location": {
+        "floor": 2,
+        "building": "主门店",
+        "coordinates": {"x": 0, "y": 0, "width": 15, "height": 10}
+      },
+      "expected_device_types": ["headset", "printer"],
+      "allowed_device_types": ["headset", "printer", "beacon"],
+      "forbidden_device_types": ["esl"],
+      "rssi_threshold": -70,
+      "expected_scan_frequency_minutes": 30,
+      "max_allowed_disconnect_minutes": 480,
+      "is_active": true
+    }
+  ]
+}
