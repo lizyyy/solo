@@ -1,0 +1,72 @@
+[
+  {
+    "brand": "Mammut",
+    "model": "9.5 Crag",
+    "max_total_energy_kj": 100,
+    "max_service_days": 365,
+    "max_wear_level": 5,
+    "max_daily_uses": 15,
+    "max_daily_energy_kj": 50,
+    "notes": "9.5mm 标准攀岩绳，适用于训练和攀爬"
+  },
+  {
+    "brand": "Mammut",
+    "model": "10.5 Crag Classic",
+    "max_total_energy_kj": 120,
+    "max_service_days": 500,
+    "max_wear_level": 5,
+    "max_daily_uses": 20,
+    "max_daily_energy_kj": 60,
+    "notes": "10.5mm 更粗的攀岩绳，更耐用"
+  },
+  {
+    "brand": "Petzl",
+    "model": "Contact 9.8",
+    "max_total_energy_kj": 90,
+    "max_service_days": 400,
+    "max_wear_level": 5,
+    "max_daily_uses": 12,
+    "max_daily_energy_kj": 45,
+    "notes": "9.8mm 耐用型工作绳"
+  },
+  {
+    "brand": "Petzl",
+    "model": "Semita 9.5",
+    "max_total_energy_kj": 85,
+    "max_service_days": 365,
+    "max_wear_level": 5,
+    "max_daily_uses": 10,
+    "max_daily_energy_kj": 40,
+    "notes": "9.5mm 轻量型绳索"
+  },
+  {
+    "brand": "Black Diamond",
+    "model": "9.4 Dry",
+    "max_total_energy_kj": 80,
+    "max_service_days": 300,
+    "max_wear_level": 4,
+    "max_daily_uses": 8,
+    "max_daily_energy_kj": 35,
+    "notes": "9.4mm 干绳，适合极限环境"
+  },
+  {
+    "brand": "Edelrid",
+    "model": "Tomcat 9.8",
+    "max_total_energy_kj": 70,
+    "max_service_days": 200,
+    "max_wear_level": 4,
+    "max_daily_uses": 6,
+    "max_daily_energy_kj": 30,
+    "notes": "入门级训练绳，适合儿童和初学者"
+  },
+  {
+    "brand": "DEFAULT",
+    "model": "DEFAULT",
+    "max_total_energy_kj": 100,
+    "max_service_days": 365,
+    "max_wear_level": 5,
+    "max_daily_uses": 10,
+    "max_daily_energy_kj": 50,
+    "notes": "默认阈值配置，适用于未指定品牌型号的绳索"
+  }
+]
