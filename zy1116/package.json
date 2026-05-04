@@ -1,0 +1,50 @@
+{
+  "name": "theater-cue-manager",
+  "version": "1.0.0",
+  "description": "社区小剧场场务管理工具 - 节目单、CUE管理、冲突检查、执行追踪",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "vite build && electron-builder",
+    "test": "vitest"
+  },
+  "keywords": [
+    "theater",
+    "cue",
+    "stage",
+    "manager"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.4.0",
+    "pinia": "^2.1.0",
+    "element-plus": "^2.5.0",
+    "@element-plus/icons-vue": "^2.3.0",
+    "better-sqlite3": "^9.4.0",
+    "dayjs": "^1.11.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.2.0",
+    "vitest": "^1.2.0"
+  },
+  "build": {
+    "appId": "com.theater.cue.manager",
+    "productName": "剧场CUE管理器",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ]
+  }
+}
