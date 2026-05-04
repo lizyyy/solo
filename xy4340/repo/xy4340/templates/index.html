@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜巡观测记录台</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌌 夜巡观测记录台</h1>
+            <p class="subtitle">社区天文观测队数据管理系统</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-tab="records">观测记录</button>
+            <button class="tab-btn" data-tab="add-record">添加记录</button>
+            <button class="tab-btn" data-tab="import-export">导入导出</button>
+            <button class="tab-btn" data-tab="settings">基础数据</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-points">0</div>
+                            <div class="stat-label">观测点</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📷</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-devices">0</div>
+                            <div class="stat-label">设备</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🌟</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-targets">0</div>
+                            <div class="stat-label">目标</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-records">0</div>
+                            <div class="stat-label">总记录</div>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-pending">0</div>
+                            <div class="stat-label">待复核</div>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-risks">0</div>
+                            <div class="stat-label">有风险</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-section">
+                    <h3>最近记录</h3>
+                    <div class="table-container">
+                        <table class="data-table" id="recent-table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>目标</th>
+                                    <th>观测点</th>
+                                    <th>云量</th>
+                                    <th>电量</th>
+                                    <th>状态</th>
+                                    <th>风险</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="records" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>状态筛选:</label>
+                        <select id="filter-status">
+                            <option value="all">全部</option>
+                            <option value="pending">待复核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已驳回</option>
+                            <option value="needs_review">需重新复核</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>日期从:</label>
+                        <input type="date" id="filter-date-from">
+                    </div>
+                    <div class="filter-group">
+                        <label>到:</label>
+                        <input type="date" id="filter-date-to">
+                    </div>
+                    <button class="btn btn-primary" id="apply-filter">筛选</button>
+                    <button class="btn" id="reset-filter">重置</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="records-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>观测日期</th>
+                                <th>观测时间</th>
+                                <th>观测点</th>
+                                <th>设备</th>
+                                <th>目标</th>
+                                <th>云量(%)</th>
+                                <th>电量(%)</th>
+                                <th>状态</th>
+                                <th>风险</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="add-record" class="tab-content">
+                <div class="form-container">
+                    <h2>添加观测记录</h2>
+                    <form id="record-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="form-date">观测日期 *</label>
+                                <input type="date" id="form-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-time">观测时间 *</label>
+                                <input type="time" id="form-time" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-point">观测点 *</label>
+                                <select id="form-point" required>
+                                    <option value="">请选择观测点</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-device">设备 *</label>
+                                <select id="form-device" required>
+                                    <option value="">请选择设备</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-target">目标天体 *</label>
+                                <select id="form-target" required>
+                                    <option value="">请选择目标</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-cloud-cover">云量 (%)</label>
+                                <input type="number" id="form-cloud-cover" min="0" max="100" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="form-seeing">视宁度</label>
+                                <input type="number" id="form-seeing" min="1" max="10" step="0.5" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="form-battery">设备电量 (%)</label>
+                                <input type="number" id="form-battery" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-exposure-plan">曝光计划</label>
+                            <textarea id="form-exposure-plan" rows="3" placeholder="例如: L: 10x300s, R: 5x300s, G: 5x300s, B: 5x300s"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-actual-files">实际拍摄文件路径</label>
+                            <textarea id="form-actual-files" rows="3" placeholder="例如: /Volumes/Data/2024-01-15/M42/..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="form-notes">备注</label>
+                            <textarea id="form-notes" rows="2" placeholder="其他备注信息"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">保存记录</button>
+                            <button type="reset" class="btn">重置</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="import-export" class="tab-content">
+                <div class="import-export-container">
+                    <div class="section-card">
+                        <h3>📥 导入 CSV</h3>
+                        <p>导入夜巡观测记录 CSV 文件。支持自动创建关联的观测点、设备和目标。</p>
+                        <div class="upload-area" id="csv-upload-area">
+                            <input type="file" id="csv-file-input" accept=".csv" hidden>
+                            <div class="upload-icon">📁</div>
+                            <p>点击或拖拽 CSV 文件到此处</p>
+                            <button class="btn" id="select-csv-btn">选择文件</button>
+                        </div>
+                        <div class="import-result" id="import-result" style="display: none;"></div>
+                        
+                        <div class="csv-format-info">
+                            <h4>CSV 格式说明:</h4>
+                            <pre>观测点名称,设备名称,目标名称,目标赤经,目标赤纬,观测日期,观测时间,云量(%),视宁度,设备电量(%),曝光计划,实际文件路径,备注</pre>
+                            <button class="btn" id="download-sample-btn">下载示例</button>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>📤 导出数据</h3>
+                        <div class="export-options">
+                            <div class="export-option">
+                                <h4>Markdown 观测简报</h4>
+                                <p>生成包含所有筛选后记录的 Markdown 格式简报，便于分享和存档。</p>
+                                <button class="btn btn-primary" id="export-markdown-btn">导出 Markdown</button>
+                            </div>
+                            <div class="export-option">
+                                <h4>JSON 审计包</h4>
+                                <p>导出完整的结构化数据，包含所有参考数据和观测记录，适用于数据备份和迁移。</p>
+                                <button class="btn btn-primary" id="export-json-btn">导出 JSON</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="settings" class="tab-content">
+                <div class="settings-container">
+                    <div class="section-card">
+                        <h3>📍 观测点管理</h3>
+                        <div class="manage-section">
+                            <form id="point-form" class="inline-form">
+                                <input type="text" id="point-name" placeholder="观测点名称" required>
+                                <input type="text" id="point-desc" placeholder="描述（可选）">
+                                <button type="submit" class="btn btn-small">添加</button>
+                            </form>
+                            <div class="list-container">
+                                <ul id="points-list" class="item-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>📷 设备管理</h3>
+                        <div class="manage-section">
+                            <form id="device-form" class="inline-form">
+                                <input type="text" id="device-name" placeholder="设备名称" required>
+                                <input type="text" id="device-type" placeholder="类型（如：望远镜、相机）">
+                                <button type="submit" class="btn btn-small">添加</button>
+                            </form>
+                            <div class="list-container">
+                                <ul id="devices-list" class="item-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-card">
+                        <h3>🌟 目标天体管理</h3>
+                        <div class="manage-section">
+                            <form id="target-form" class="inline-form">
+                                <input type="text" id="target-name" placeholder="目标名称" required>
+                                <input type="text" id="target-ra" placeholder="赤经（如：05h35m17s）">
+                                <input type="text" id="target-dec" placeholder="赤纬（如：-05°23'28\"）">
+                                <button type="submit" class="btn btn-small">添加</button>
+                            </form>
+                            <div class="list-container">
+                                <ul id="targets-list" class="item-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal" id="detail-modal">
+            <div class="modal-header">
+                <h3>记录详情</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
