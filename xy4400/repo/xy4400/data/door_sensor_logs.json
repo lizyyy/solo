@@ -1,0 +1,52 @@
+{
+  "logs": [
+    {
+      "door_number": "A01",
+      "log_time": "2026-05-04T08:00:00",
+      "event_type": "open",
+      "sensor_reading": 1.0
+    },
+    {
+      "door_number": "A01",
+      "log_time": "2026-05-04T08:01:30",
+      "event_type": "close",
+      "sensor_reading": 0.0
+    },
+    {
+      "door_number": "A02",
+      "log_time": "2026-05-04T09:15:00",
+      "event_type": "open",
+      "sensor_reading": 1.0
+    },
+    {
+      "door_number": "A02",
+      "log_time": "2026-05-04T09:17:00",
+      "event_type": "jam",
+      "sensor_reading": 0.8
+    },
+    {
+      "door_number": "A03",
+      "log_time": "2026-05-04T10:30:00",
+      "event_type": "open",
+      "sensor_reading": 1.0
+    },
+    {
+      "door_number": "A03",
+      "log_time": "2026-05-04T10:32:00",
+      "event_type": "close",
+      "sensor_reading": 0.0
+    },
+    {
+      "door_number": "A04",
+      "log_time": "2026-05-04T11:45:00",
+      "event_type": "open",
+      "sensor_reading": 1.0
+    },
+    {
+      "door_number": "A04",
+      "log_time": "2026-05-04T11:46:30",
+      "event_type": "close",
+      "sensor_reading": 0.0
+    }
+  ]
+}

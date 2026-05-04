@@ -1,0 +1,76 @@
+{
+  "swaps": [
+    {
+      "swap_code": "SWAP-20260504-001",
+      "user_id": "USER-001",
+      "old_battery_code": "BAT-001",
+      "new_battery_code": "BAT-005",
+      "old_door_number": "A01",
+      "new_door_number": "A05",
+      "swap_started_at": "2026-05-04T08:00:00",
+      "swap_completed_at": "2026-05-04T08:02:30",
+      "status": "completed",
+      "amount": 15.0
+    },
+    {
+      "swap_code": "SWAP-20260504-002",
+      "user_id": "USER-002",
+      "old_battery_code": "BAT-003",
+      "new_battery_code": "BAT-006",
+      "old_door_number": "A03",
+      "new_door_number": "A06",
+      "swap_started_at": "2026-05-04T10:30:00",
+      "swap_completed_at": "2026-05-04T10:33:15",
+      "status": "completed",
+      "amount": 12.0
+    },
+    {
+      "swap_code": "SWAP-20260504-003",
+      "user_id": "USER-003",
+      "old_battery_code": "BAT-007",
+      "new_battery_code": "BAT-008",
+      "old_door_number": "A02",
+      "new_door_number": "A07",
+      "swap_started_at": "2026-05-04T09:20:00",
+      "swap_completed_at": "2026-05-04T09:22:45",
+      "status": "completed",
+      "amount": 18.0
+    },
+    {
+      "swap_code": "SWAP-20260504-004",
+      "user_id": "USER-004",
+      "old_battery_code": "BAT-009",
+      "new_battery_code": "BAT-010",
+      "old_door_number": "A04",
+      "new_door_number": "A08",
+      "swap_started_at": "2026-05-04T11:45:00",
+      "swap_completed_at": "2026-05-04T11:48:00",
+      "status": "completed",
+      "amount": 20.0
+    },
+    {
+      "swap_code": "SWAP-20260504-005",
+      "user_id": "USER-005",
+      "old_battery_code": "BAT-011",
+      "new_battery_code": "BAT-012",
+      "old_door_number": "A09",
+      "new_door_number": "A10",
+      "swap_started_at": "2026-05-04T12:00:00",
+      "swap_completed_at": "2026-05-04T12:02:30",
+      "status": "completed",
+      "amount": 10.0
+    },
+    {
+      "swap_code": "SWAP-20260504-006",
+      "user_id": "USER-005",
+      "old_battery_code": "BAT-013",
+      "new_battery_code": "BAT-012",
+      "old_door_number": "A11",
+      "new_door_number": "A12",
+      "swap_started_at": "2026-05-04T12:01:00",
+      "swap_completed_at": "2026-05-04T12:03:30",
+      "status": "completed",
+      "amount": 10.0
+    }
+  ]
+}
