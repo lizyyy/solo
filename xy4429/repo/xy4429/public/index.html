@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜骑队长工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .upload-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .upload-box {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-box:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-box.dragover {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            font-size: 13px;
+            color: #667eea;
+            background: #f0f3ff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff4757;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .risk-card {
+            border-left: 4px solid;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .risk-card.green {
+            border-color: #10b981;
+            background: linear-gradient(to right, #ecfdf5, white);
+        }
+        
+        .risk-card.yellow {
+            border-color: #f59e0b;
+            background: linear-gradient(to right, #fffbeb, white);
+        }
+        
+        .risk-card.red {
+            border-color: #ef4444;
+            background: linear-gradient(to right, #fef2f2, white);
+        }
+        
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .risk-badge.green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .risk-badge.yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .risk-badge.red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        tr:hover {
+            background: #f9fafb;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .rider-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .rider-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .rider-chip:hover {
+            border-color: #667eea;
+        }
+        
+        .rider-chip.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .rider-chip .risk-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .rider-chip .risk-dot.green { background: #10b981; }
+        .rider-chip .risk-dot.yellow { background: #f59e0b; }
+        .rider-chip .risk-dot.red { background: #ef4444; }
+        
+        .checkpoint-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #374151;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .adjustment-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .adjustment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .adjustment-item .type {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .adjustment-item .time {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-bar .fill.green { background: #10b981; }
+        .progress-bar .fill.yellow { background: #f59e0b; }
+        .progress-bar .fill.red { background: #ef4444; }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌙 夜骑队长工具</h1>
+            <p>导入GPX路线、队员数据，自动计算爬升耗时、灯具续航和掉队风险</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="import">📁 数据导入</div>
+            <div class="tab" data-tab="route">🗺️ 路线信息</div>
+            <div class="tab" data-tab="risk">⚠️ 风险评估</div>
+            <div class="tab" data-tab="checkpoints">📍 集合点</div>
+            <div class="tab" data-tab="adjustments">📝 人工调整</div>
+            <div class="tab" data-tab="export">📤 导出</div>
+        </div>
+        
+        <div id="tab-import" class="tab-content active">
+            <div class="card">
+                <h2>导入数据</h2>
+                <div class="upload-section">
+                    <div class="upload-box" id="gpx-upload">
+                        <input type="file" id="gpx-file" accept=".gpx">
+                        <div class="upload-icon">🗺️</div>
+                        <div class="upload-text">点击或拖拽上传 GPX 路线文件</div>
+                        <div id="gpx-filename" class="file-name" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="upload-box" id="rider-upload">
+                        <input type="file" id="rider-file" accept=".csv">
+                        <div class="upload-icon">👥</div>
+                        <div class="upload-text">点击或拖拽上传队员 CSV 文件</div>
+                        <div id="rider-filename" class="file-name" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="upload-box" id="checkpoint-upload">
+                        <input type="file" id="checkpoint-file" accept=".csv">
+                        <div class="upload-icon">📍</div>
+                        <div class="upload-text">点击或拖拽上传集合点 CSV 文件</div>
+                        <div id="checkpoint-filename" class="file-name" style="display:none;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn" id="calculate-btn" style="display:none;">🚀 计算风险评估</button>
+                </div>
+                
+                <div id="import-status" style="margin-top: 20px;"></div>
+            </div>
+            
+            <div class="card">
+                <h2>CSV 文件格式说明</h2>
+                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <h3 style="margin-bottom: 10px; font-size: 16px;">队员灯具/电池表 CSV 格式：</h3>
+                    <code style="font-size: 12px; background: #e5e7eb; padding: 10px; display: block; border-radius: 4px;">
+name,lightOutput,batteryCapacity,batteryRemaining,averageSpeed,fitnessLevel<br>
+张三,1200,5000,80,22,high<br>
+李四,800,3000,45,18,normal<br>
+王五,600,2000,25,15,low
+                    </code>
+                </div>
+                <div style="background: #f9fafb; padding: 16px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px; font-size: 16px;">集合点 CSV 格式：</h3>
+                    <code style="font-size: 12px; background: #e5e7eb; padding: 10px; display: block; border-radius: 4px;">
+name,distance,elevation,estimatedArrival,notes<br>
+起点,0,50,19:00,集合出发<br>
+补给点1,15.5,120,19:45,补水休息<br>
+山顶,30,380,21:00,拍照留念
+                    </code>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-route" class="tab-content">
+            <div class="card">
+                <h2>路线概览</h2>
+                <div id="route-stats" class="stats-grid"></div>
+            </div>
+            
+            <div class="card">
+                <h2>路段详情</h2>
+                <div id="segments-table"></div>
+            </div>
+        </div>
+        
+        <div id="tab-risk" class="tab-content">
+            <div class="card">
+                <h2>风险概览</h2>
+                <div id="risk-stats" class="stats-grid"></div>
+            </div>
+            
+            <div class="card">
+                <h2>按队员查看风险</h2>
+                <div id="rider-selector" class="rider-selector"></div>
+                <div id="rider-risk-detail"></div>
+            </div>
+            
+            <div class="card">
+                <h2>所有队员风险列表</h2>
+                <div id="all-risks"></div>
+            </div>
+        </div>
+        
+        <div id="tab-checkpoints" class="tab-content">
+            <div class="card">
+                <h2>集合点管理</h2>
+                <div class="action-bar">
+                    <button class="btn" id="add-checkpoint-btn">➕ 添加集合点</button>
+                </div>
+                <div id="checkpoint-form" style="display:none; margin-bottom: 20px; background: #f9fafb; padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px;">添加/编辑集合点</h3>
+                    <div class="checkpoint-form">
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input type="text" id="cp-name" placeholder="例如：起点、补给点1">
+                        </div>
+                        <div class="form-group">
+                            <label>距离起点 (km)</label>
+                            <input type="number" id="cp-distance" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>海拔 (m)</label>
+                            <input type="number" id="cp-elevation" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>预计到达时间</label>
+                            <input type="time" id="cp-arrival">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>备注</label>
+                            <textarea id="cp-notes" rows="2" placeholder="备注信息..."></textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn btn-success" id="save-checkpoint-btn">💾 保存</button>
+                        <button class="btn btn-secondary" id="cancel-checkpoint-btn">取消</button>
+                    </div>
+                    <input type="hidden" id="cp-edit-id">
+                </div>
+                <div id="checkpoints-table"></div>
+            </div>
+        </div>
+        
+        <div id="tab-adjustments" class="tab-content">
+            <div class="card">
+                <h2>记录人工调整</h2>
+                <div class="checkpoint-form">
+                    <div class="form-group">
+                        <label>调整类型</label>
+                        <select id="adj-type">
+                            <option value="rider">队员调整</option>
+                            <option value="checkpoint">集合点调整</option>
+                            <option value="route">路线调整</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>调整描述</label>
+                        <textarea id="adj-description" rows="3" placeholder="描述这次调整的内容和原因..."></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn" id="add-adjustment-btn">➕ 添加记录</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>调整记录历史</h2>
+                <div id="adjustments-list" class="adjustment-list"></div>
+            </div>
+        </div>
+        
+        <div id="tab-export" class="tab-content">
+            <div class="card">
+                <h2>导出数据</h2>
+                <div class="upload-section">
+                    <div class="card" style="cursor: pointer;" id="export-markdown">
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                            <h3 style="margin-bottom: 5px;">Markdown 检查单</h3>
+                            <p style="font-size: 14px; color: #6b7280;">导出夜骑出发检查单，包含所有队员风险和路线信息</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="cursor: pointer;" id="export-json">
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📦</div>
+                            <h3 style="margin-bottom: 5px;">JSON 审计包</h3>
+                            <p style="font-size: 14px; color: #6b7280;">导出完整数据，用于备份或审计</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>数据状态</h2>
+                <div id="data-status"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        let appState = {
+            gpxData: null,
+            riderData: [],
+            checkpointData: [],
+            segments: [],
+            riskData: [],
+            manualAdjustments: [],
+            selectedRiderId: null,
+            lastUpdated: null
+        };
+        
+        async function init() {
+            setupEventListeners();
+            await loadSavedData();
+        }
+        
+        function setupEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+            
+            setupUploadBox('gpx', '/upload-gpx', 'gpxFile');
+            setupUploadBox('rider', '/upload-riders', 'riderFile');
+            setupUploadBox('checkpoint', '/upload-checkpoints', 'checkpointFile');
+            
+            document.getElementById('calculate-btn').addEventListener('click', calculateRisk);
+            
+            document.getElementById('add-checkpoint-btn').addEventListener('click', showCheckpointForm);
+            document.getElementById('save-checkpoint-btn').addEventListener('click', saveCheckpoint);
+            document.getElementById('cancel-checkpoint-btn').addEventListener('click', hideCheckpointForm);
+            
+            document.getElementById('add-adjustment-btn').addEventListener('click', addAdjustment);
+            
+            document.getElementById('export-markdown').addEventListener('click', exportMarkdown);
+            document.getElementById('export-json').addEventListener('click', exportJSON);
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            renderCurrentTab();
+        }
+        
+        function renderCurrentTab() {
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            switch(activeTab) {
+                case 'route':
+                    renderRouteInfo();
+                    break;
+                case 'risk':
+                    renderRiskInfo();
+                    break;
+                case 'checkpoints':
+                    renderCheckpoints();
+                    break;
+                case 'adjustments':
+                    renderAdjustments();
+                    break;
+                case 'export':
+                    renderExportStatus();
+                    break;
+            }
+        }
+        
+        function setupUploadBox(type, endpoint, formField) {
+            const box = document.getElementById(`${type}-upload`);
+            const input = document.getElementById(`${type}-file`);
+            const filenameEl = document.getElementById(`${type}-filename`);
+            
+            box.addEventListener('click', () => input.click());
+            
+            input.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0], type, endpoint, formField);
+                }
+            });
+            
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('dragover');
+            });
+            
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('dragover');
+            });
+            
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileUpload(e.dataTransfer.files[0], type, endpoint, formField);
+                }
+            });
+        }
+        
+        async function handleFileUpload(file, type, endpoint, formField) {
+            const filenameEl = document.getElementById(`${type}-filename`);
+            const statusEl = document.getElementById('import-status');
+            
+            filenameEl.textContent = file.name;
+            filenameEl.style.display = 'inline-block';
+            
+            const formData = new FormData();
+            formData.append(formField, file);
+            
+            try {
+                statusEl.innerHTML = '<div class="alert alert-info">⏳ 正在处理文件...</div>';
+                
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    if (type === 'gpx') {
+                        appState.gpxData = result;
+                        appState.segments = result.segments || [];
+                    } else if (type === 'rider') {
+                        appState.riderData = result;
+                    } else if (type === 'checkpoint') {
+                        appState.checkpointData = result;
+                    }
+                    
+                    statusEl.innerHTML = `<div class="alert alert-success">✅ ${type === 'gpx' ? '路线' : type === 'rider' ? '队员' : '集合点'}数据导入成功！</div>`;
+                    
+                    updateCalculateButton();
+                    await saveCurrentData();
+                } else {
+                    statusEl.innerHTML = `<div class="alert alert-error">❌ 导入失败: ${result.error || '未知错误'}</div>`;
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<div class="alert alert-error">❌ 上传失败: ${error.message}</div>`;
+            }
+        }
+        
+        function updateCalculateButton() {
+            const btn = document.getElementById('calculate-btn');
+            if (appState.segments.length > 0 && appState.riderData.length > 0) {
+                btn.style.display = 'inline-block';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+        
+        async function calculateRisk() {
+            const statusEl = document.getElementById('import-status');
+            
+            if (appState.segments.length === 0) {
+                statusEl.innerHTML = '<div class="alert alert-warning">⚠️ 请先导入 GPX 路线文件</div>';
+                return;
+            }
+            
+            if (appState.riderData.length === 0) {
+                statusEl.innerHTML = '<div class="alert alert-warning">⚠️ 请先导入队员 CSV 文件</div>';
+                return;
+            }
+            
+            try {
+                statusEl.innerHTML = '<div class="alert alert-info">⏳ 正在计算风险评估...</div>';
+                
+                const response = await fetch(API_BASE + '/calculate-risk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        segments: appState.segments,
+                        riders: appState.riderData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    appState.riskData = result;
+                    appState.selectedRiderId = result[0]?.riderId || null;
+                    
+                    statusEl.innerHTML = '<div class="alert alert-success">✅ 风险评估计算完成！</div>';
+                    
+                    await saveCurrentData();
+                    
+                    switchTab('risk');
+                } else {
+                    statusEl.innerHTML = `<div class="alert alert-error">❌ 计算失败: ${result.error || '未知错误'}</div>`;
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<div class="alert alert-error">❌ 计算失败: ${error.message}</div>`;
+            }
+        }
+        
+        function renderRouteInfo() {
+            const statsEl = document.getElementById('route-stats');
+            const segmentsEl = document.getElementById('segments-table');
+            
+            if (!appState.gpxData || appState.segments.length === 0) {
+                statsEl.innerHTML = '<div class="empty-state"><h3>暂无路线数据</h3><p>请先导入 GPX 路线文件</p></div>';
+                segmentsEl.innerHTML = '';
+                return;
+            }
+            
+            statsEl.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${(appState.gpxData.totalDistance || 0).toFixed(2)}</div>
+                    <div class="stat-label">总距离 (km)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${(appState.gpxData.totalElevationGain || 0).toFixed(0)}</div>
+                    <div class="stat-label">总爬升 (m)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${(appState.gpxData.totalDuration || 0).toFixed(1)}</div>
+                    <div class="stat-label">预计时长 (小时)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${appState.segments.length}</div>
+                    <div class="stat-label">路段数量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${(appState.gpxData.maxElevation || 0).toFixed(0)}</div>
+                    <div class="stat-label">最高海拔 (m)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${(appState.gpxData.minElevation || 0).toFixed(0)}</div>
+                    <div class="stat-label">最低海拔 (m)</div>
+                </div>
+            `;
+            
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>路段</th>
+                            <th>距离 (km)</th>
+                            <th>爬升 (m)</th>
+                            <th>坡度 (%)</th>
+                            <th>预计时长</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            appState.segments.forEach((seg, i) => {
+                tableHtml += `
+                    <tr>
+                        <td><strong>${seg.name}</strong></td>
+                        <td>${seg.distance.toFixed(2)}</td>
+                        <td>${seg.elevationGain.toFixed(0)}</td>
+                        <td>${seg.averageGrade.toFixed(1)}%</td>
+                        <td>${(seg.duration * 60).toFixed(0)} 分钟</td>
+                    </tr>
+                `;
+            });
+            
+            tableHtml += '</tbody></table>';
+            segmentsEl.innerHTML = tableHtml;
+        }
+        
+        function renderRiskInfo() {
+            const statsEl = document.getElementById('risk-stats');
+            const selectorEl = document.getElementById('rider-selector');
+            const detailEl = document.getElementById('rider-risk-detail');
+            const allRisksEl = document.getElementById('all-risks');
+            
+            if (!appState.riskData || appState.riskData.length === 0) {
+                statsEl.innerHTML = '<div class="empty-state"><h3>暂无风险数据</h3><p>请先导入数据并计算风险评估</p></div>';
+                selectorEl.innerHTML = '';
+                detailEl.innerHTML = '';
+                allRisksEl.innerHTML = '';
+                return;
+            }
+            
+            const greenCount = appState.riskData.filter(r => r.overallRiskLevel === 'green').length;
+            const yellowCount = appState.riskData.filter(r => r.overallRiskLevel === 'yellow').length;
+            const redCount = appState.riskData.filter(r => r.overallRiskLevel === 'red').length;
+            
+            statsEl.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #10b981;">${greenCount}</div>
+                    <div class="stat-label">低风险 (绿)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #f59e0b;">${yellowCount}</div>
+                    <div class="stat-label">中风险 (黄)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" style="color: #ef4444;">${redCount}</div>
+                    <div class="stat-label">高风险 (红)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${appState.riskData.length}</div>
+                    <div class="stat-label">队员总数</div>
+                </div>
+            `;
+            
+            selectorEl.innerHTML = appState.riskData.map(rider => `
+                <div class="rider-chip ${appState.selectedRiderId === rider.riderId ? 'active' : ''}" data-rider-id="${rider.riderId}">
+                    <span class="risk-dot ${rider.overallRiskLevel}"></span>
+                    <span>${rider.riderName}</span>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.rider-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    appState.selectedRiderId = parseInt(chip.dataset.riderId);
+                    renderRiskInfo();
+                });
+            });
+            
+            const selectedRider = appState.riskData.find(r => r.riderId === appState.selectedRiderId);
+            if (selectedRider) {
+                detailEl.innerHTML = `
+                    <div class="risk-card ${selectedRider.overallRiskLevel}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3>${selectedRider.riderName} - 风险详情</h3>
+                            <span class="risk-badge ${selectedRider.overallRiskLevel}">
+                                ${selectedRider.overallRiskLevel === 'green' ? '🟢 低风险' : 
+                                  selectedRider.overallRiskLevel === 'yellow' ? '🟡 中风险' : '🔴 高风险'}
+                            </span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <strong>风险评分:</strong> ${selectedRider.totalRiskScore}
+                            </div>
+                            <div>
+                                <strong>最小电池余量:</strong> ${(selectedRider.minimumBatteryMargin * 100).toFixed(1)}%
+                            </div>
+                            <div>
+                                <strong>灯具输出:</strong> ${selectedRider.rider.lightOutput} 流明
+                            </div>
+                            <div>
+                                <strong>电池容量:</strong> ${selectedRider.rider.batteryCapacity} mAh
+                            </div>
+                            <div>
+                                <strong>剩余电量:</strong> ${selectedRider.rider.batteryRemaining}%
+                            </div>
+                            <div>
+                                <strong>平均速度:</strong> ${selectedRider.rider.averageSpeed} km/h
+                            </div>
+                            <div>
+                                <strong>体能等级:</strong> ${selectedRider.rider.fitnessLevel === 'high' ? '强' : selectedRider.rider.fitnessLevel === 'low' ? '弱' : '一般'}
+                            </div>
+                        </div>
+                        <h4 style="margin-bottom: 10px;">各路段风险:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>路段</th>
+                                    <th>风险等级</th>
+                                    <th>风险评分</th>
+                                    <th>电池余量</th>
+                                    <th>预计剩余电量</th>
+                                    <th>路段时长</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${selectedRider.segmentRisks.map(seg => `
+                                    <tr>
+                                        <td><strong>${seg.segmentName}</strong></td>
+                                        <td><span class="risk-badge ${seg.riskLevel}">${seg.riskLevel === 'green' ? '低' : seg.riskLevel === 'yellow' ? '中' : '高'}</span></td>
+                                        <td>${seg.riskScore}</td>
+                                        <td>
+                                            <div style="width: 100px;">
+                                                <div class="progress-bar">
+                                                    <div class="fill ${seg.batteryMargin > 0.3 ? 'green' : seg.batteryMargin > 0.1 ? 'yellow' : 'red'}" 
+                                                         style="width: ${Math.max(0, seg.batteryMargin * 100)}%;"></div>
+                                                </div>
+                                                <small>${(seg.batteryMargin * 100).toFixed(1)}%</small>
+                                            </div>
+                                        </td>
+                                        <td>${(seg.estimatedBatteryRemaining * 100).toFixed(1)}%</td>
+                                        <td>${(seg.duration * 60).toFixed(0)} 分钟</td>
+                                        <td>${seg.notes?.join(', ') || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            allRisksEl.innerHTML = appState.riskData
+                .sort((a, b) => {
+                    const levelOrder = { red: 0, yellow: 1, green: 2 };
+                    return levelOrder[a.overallRiskLevel] - levelOrder[b.overallRiskLevel];
+                })
+                .map(rider => `
+                    <div class="risk-card ${rider.overallRiskLevel}">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3>${rider.riderName}</h3>
+                                <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">
+                                    灯具: ${rider.rider.lightOutput}流明 | 电池: ${rider.rider.batteryCapacity}mAh (${rider.rider.batteryRemaining}%) | 速度: ${rider.rider.averageSpeed}km/h
+                                </p>
+                            </div>
+                            <span class="risk-badge ${rider.overallRiskLevel}">
+                                ${rider.overallRiskLevel === 'green' ? '🟢 低风险' : 
+                                  rider.overallRiskLevel === 'yellow' ? '🟡 中风险' : '🔴 高风险'}
+                            </span>
+                        </div>
+                        <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                            <div style="background: #f9fafb; padding: 10px; border-radius: 6px; text-align: center;">
+                                <div style="font-weight: 600; font-size: 18px;">${rider.totalRiskScore}</div>
+                                <div style="font-size: 12px; color: #6b7280;">风险评分</div>
+                            </div>
+                            <div style="background: #f9fafb; padding: 10px; border-radius: 6px; text-align: center;">
+                                <div style="font-weight: 600; font-size: 18px;">${(rider.minimumBatteryMargin * 100).toFixed(1)}%</div>
+                                <div style="font-size: 12px; color: #6b7280;">最小电池余量</div>
+                            </div>
+                            <div style="background: #f9fafb; padding: 10px; border-radius: 6px; text-align: center;">
+                                <div style="font-weight: 600; font-size: 18px;">${rider.segmentRisks.length}</div>
+                                <div style="font-size: 12px; color: #6b7280;">路段数</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+        }
+        
+        function showCheckpointForm(checkpoint = null) {
+            const form = document.getElementById('checkpoint-form');
+            form.style.display = 'block';
+            
+            document.getElementById('cp-edit-id').value = checkpoint ? checkpoint.id : '';
+            document.getElementById('cp-name').value = checkpoint ? checkpoint.name : '';
+            document.getElementById('cp-distance').value = checkpoint ? checkpoint.distance : '';
+            document.getElementById('cp-elevation').value = checkpoint ? checkpoint.elevation : '';
+            document.getElementById('cp-arrival').value = checkpoint ? (checkpoint.estimatedArrival || '') : '';
+            document.getElementById('cp-notes').value = checkpoint ? (checkpoint.notes || '') : '';
+        }
+        
+        function hideCheckpointForm() {
+            document.getElementById('checkpoint-form').style.display = 'none';
+        }
+        
+        async function saveCheckpoint() {
+            const editId = document.getElementById('cp-edit-id').value;
+            const checkpoint = {
+                id: editId ? parseInt(editId) : Date.now(),
+                name: document.getElementById('cp-name').value,
+                distance: parseFloat(document.getElementById('cp-distance').value) || 0,
+                elevation: parseFloat(document.getElementById('cp-elevation').value) || 0,
+                estimatedArrival: document.getElementById('cp-arrival').value || null,
+                notes: document.getElementById('cp-notes').value
+            };
+            
+            if (editId) {
+                const index = appState.checkpointData.findIndex(c => c.id === parseInt(editId));
+                if (index !== -1) {
+                    appState.checkpointData[index] = checkpoint;
+                }
+            } else {
+                appState.checkpointData.push(checkpoint);
+            }
+            
+            appState.checkpointData.sort((a, b) => a.distance - b.distance);
+            
+            hideCheckpointForm();
+            await saveCurrentData();
+            addAdjustmentAuto('checkpoint', `集合点 "${checkpoint.name}" 已${editId ? '编辑' : '添加'}`);
+            renderCheckpoints();
+        }
+        
+        function renderCheckpoints() {
+            const tableEl = document.getElementById('checkpoints-table');
+            
+            if (appState.checkpointData.length === 0) {
+                tableEl.innerHTML = '<div class="empty-state"><h3>暂无集合点</h3><p>点击"添加集合点"按钮添加新的集合点</p></div>';
+                return;
+            }
+            
+            let tableHtml = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>距离起点 (km)</th>
+                            <th>海拔 (m)</th>
+                            <th>预计到达</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            appState.checkpointData.forEach(cp => {
+                tableHtml += `
+                    <tr>
+                        <td><strong>${cp.name}</strong></td>
+                        <td>${cp.distance.toFixed(2)}</td>
+                        <td>${cp.elevation.toFixed(0)}</td>
+                        <td>${cp.estimatedArrival || '-'}</td>
+                        <td>${cp.notes || '-'}</td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" 
+                                    onclick="editCheckpoint(${cp.id})">编辑</button>
+                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" 
+                                    onclick="deleteCheckpoint(${cp.id})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHtml += '</tbody></table>';
+            tableEl.innerHTML = tableHtml;
+        }
+        
+        function editCheckpoint(id) {
+            const checkpoint = appState.checkpointData.find(c => c.id === id);
+            if (checkpoint) {
+                showCheckpointForm(checkpoint);
+            }
+        }
+        
+        async function deleteCheckpoint(id) {
+            const checkpoint = appState.checkpointData.find(c => c.id === id);
+            appState.checkpointData = appState.checkpointData.filter(c => c.id !== id);
+            await saveCurrentData();
+            if (checkpoint) {
+                addAdjustmentAuto('checkpoint', `集合点 "${checkpoint.name}" 已删除`);
+            }
+            renderCheckpoints();
+        }
+        
+        async function addAdjustment() {
+            const type = document.getElementById('adj-type').value;
+            const description = document.getElementById('adj-description').value;
+            
+            if (!description.trim()) {
+                alert('请输入调整描述');
+                return;
+            }
+            
+            addAdjustmentAuto(type, description);
+            
+            document.getElementById('adj-description').value = '';
+            await saveCurrentData();
+            renderAdjustments();
+        }
+        
+        function addAdjustmentAuto(type, description) {
+            const adjustment = {
+                id: Date.now(),
+                type: type,
+                description: description,
+                timestamp: new Date().toISOString()
+            };
+            
+            appState.manualAdjustments.unshift(adjustment);
+        }
+        
+        function renderAdjustments() {
+            const listEl = document.getElementById('adjustments-list');
+            
+            if (appState.manualAdjustments.length === 0) {
+                listEl.innerHTML = '<div class="empty-state"><h3>暂无调整记录</h3><p>所有操作记录将显示在这里</p></div>';
+                return;
+            }
+            
+            listEl.innerHTML = appState.manualAdjustments.map(adj => `
+                <div class="adjustment-item">
+                    <div>
+                        <span class="type">${adj.type === 'rider' ? '队员' : adj.type === 'checkpoint' ? '集合点' : adj.type === 'route' ? '路线' : '其他'}</span>
+                        <p style="margin-top: 8px; font-size: 14px;">${adj.description}</p>
+                        <div class="time">${new Date(adj.timestamp).toLocaleString('zh-CN')}</div>
+                    </div>
+                    <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" 
+                            onclick="deleteAdjustment(${adj.id})">删除</button>
+                </div>
+            `).join('');
+        }
+        
+        async function deleteAdjustment(id) {
+            appState.manualAdjustments = appState.manualAdjustments.filter(a => a.id !== id);
+            await saveCurrentData();
+            renderAdjustments();
+        }
+        
+        function renderExportStatus() {
+            const statusEl = document.getElementById('data-status');
+            
+            const hasGpx = appState.gpxData && appState.segments.length > 0;
+            const hasRiders = appState.riderData.length > 0;
+            const hasRisks = appState.riskData.length > 0;
+            const hasCheckpoints = appState.checkpointData.length > 0;
+            
+            statusEl.innerHTML = `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><strong>路线数据 (GPX)</strong></td>
+                            <td>${hasGpx ? '<span style="color: #10b981;">✅ 已导入</span>' : '<span style="color: #ef4444;">❌ 未导入</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>队员数据</strong></td>
+                            <td>${hasRiders ? `<span style="color: #10b981;">✅ ${appState.riderData.length} 名队员</span>` : '<span style="color: #ef4444;">❌ 未导入</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>风险评估</strong></td>
+                            <td>${hasRisks ? '<span style="color: #10b981;">✅ 已计算</span>' : '<span style="color: #f59e0b;">⚠️ 未计算</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>集合点数据</strong></td>
+                            <td>${hasCheckpoints ? `<span style="color: #10b981;">✅ ${appState.checkpointData.length} 个集合点</span>` : '<span style="color: #6b7280;">ℹ️ 无数据</span>'}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>人工调整记录</strong></td>
+                            <td><span style="color: #667eea;">📝 ${appState.manualAdjustments.length} 条记录</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>最后更新</strong></td>
+                            <td>${appState.lastUpdated ? new Date(appState.lastUpdated).toLocaleString('zh-CN') : '-'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function exportMarkdown() {
+            try {
+                const response = await fetch(API_BASE + '/export/markdown', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: appState })
+                });
+                
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'night-ride-checklist.md';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('导出失败: ' + error.message);
+            }
+        }
+        
+        async function exportJSON() {
+            try {
+                const response = await fetch(API_BASE + '/export/json', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: appState })
+                });
+                
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'night-ride-audit.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('导出失败: ' + error.message);
+            }
+        }
+        
+        async function loadSavedData() {
+            try {
+                const response = await fetch(API_BASE + '/data');
+                const result = await response.json();
+                
+                if (result.gpxData) {
+                    appState.gpxData = result.gpxData;
+                    appState.segments = result.segments || [];
+                    
+                    if (appState.segments.length > 0) {
+                        const gpxFilename = document.getElementById('gpx-filename');
+                        gpxFilename.textContent = '已加载';
+                        gpxFilename.style.display = 'inline-block';
+                    }
+                }
+                
+                if (result.riderData && result.riderData.length > 0) {
+                    appState.riderData = result.riderData;
+                    
+                    const riderFilename = document.getElementById('rider-filename');
+                    riderFilename.textContent = `${result.riderData.length} 名队员`;
+                    riderFilename.style.display = 'inline-block';
+                }
+                
+                if (result.checkpointData) {
+                    appState.checkpointData = result.checkpointData;
+                    
+                    if (result.checkpointData.length > 0) {
+                        const cpFilename = document.getElementById('checkpoint-filename');
+                        cpFilename.textContent = `${result.checkpointData.length} 个集合点`;
+                        cpFilename.style.display = 'inline-block';
+                    }
+                }
+                
+                if (result.riskData) {
+                    appState.riskData = result.riskData;
+                    appState.selectedRiderId = result.riskData[0]?.riderId || null;
+                }
+                
+                if (result.manualAdjustments) {
+                    appState.manualAdjustments = result.manualAdjustments;
+                }
+                
+                appState.lastUpdated = result.lastUpdated;
+                
+                updateCalculateButton();
+                
+                if (appState.riskData.length > 0) {
+                    document.getElementById('import-status').innerHTML = 
+                        '<div class="alert alert-success">✅ 已加载上次保存的数据</div>';
+                }
+            } catch (error) {
+                console.log('没有找到保存的数据');
+            }
+        }
+        
+        async function saveCurrentData() {
+            try {
+                await fetch(API_BASE + '/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(appState)
+                });
+            } catch (error) {
+                console.error('保存数据失败:', error);
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>
