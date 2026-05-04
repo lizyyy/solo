@@ -1,0 +1,74 @@
+{
+  "id": "level-3",
+  "name": "高级营救",
+  "description": "夜间复杂地形，多名游客分散在高级区域",
+  "difficulty": 3,
+  "timeLimit": 300,
+  "map": {
+    "width": 30,
+    "height": 25,
+    "tiles": [],
+    "startPosition": {
+      "x": 5,
+      "y": 5
+    }
+  },
+  "tourists": [
+    {
+      "id": "t1",
+      "position": {
+        "x": 22,
+        "y": 18
+      },
+      "temperature": 34.8,
+      "status": "lost"
+    },
+    {
+      "id": "t2",
+      "position": {
+        "x": 25,
+        "y": 10
+      },
+      "temperature": 35,
+      "status": "lost"
+    },
+    {
+      "id": "t3",
+      "position": {
+        "x": 10,
+        "y": 20
+      },
+      "temperature": 34.5,
+      "status": "lost"
+    }
+  ],
+  "resources": {
+    "snowmobiles": 4,
+    "drones": 3,
+    "hotDrinks": 8
+  },
+  "hazards": [
+    {
+      "id": "h1",
+      "type": "avalanche",
+      "area": {
+        "x": 15,
+        "y": 12,
+        "width": 5,
+        "height": 5
+      },
+      "risk": 0.5
+    },
+    {
+      "id": "h2",
+      "type": "avalanche",
+      "area": {
+        "x": 20,
+        "y": 5,
+        "width": 4,
+        "height": 4
+      },
+      "risk": 0.4
+    }
+  ]
+}

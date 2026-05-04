@@ -1,0 +1,33 @@
+{
+  "id": "level-1",
+  "name": "新手训练",
+  "description": "滑雪场初级区域，游客在初级道附近迷路",
+  "difficulty": 1,
+  "timeLimit": 180,
+  "map": {
+    "width": 20,
+    "height": 15,
+    "tiles": [],
+    "startPosition": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "tourists": [
+    {
+      "id": "t1",
+      "position": {
+        "x": 15,
+        "y": 10
+      },
+      "temperature": 36.5,
+      "status": "lost"
+    }
+  ],
+  "resources": {
+    "snowmobiles": 2,
+    "drones": 1,
+    "hotDrinks": 3
+  },
+  "hazards": []
+}

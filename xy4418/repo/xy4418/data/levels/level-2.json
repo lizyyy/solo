@@ -1,0 +1,54 @@
+{
+  "id": "level-2",
+  "name": "中级挑战",
+  "description": "游客在中级道区域，存在雪崩风险区",
+  "difficulty": 2,
+  "timeLimit": 240,
+  "map": {
+    "width": 25,
+    "height": 20,
+    "tiles": [],
+    "startPosition": {
+      "x": 3,
+      "y": 3
+    }
+  },
+  "tourists": [
+    {
+      "id": "t1",
+      "position": {
+        "x": 18,
+        "y": 14
+      },
+      "temperature": 35.8,
+      "status": "lost"
+    },
+    {
+      "id": "t2",
+      "position": {
+        "x": 20,
+        "y": 8
+      },
+      "temperature": 35.2,
+      "status": "lost"
+    }
+  ],
+  "resources": {
+    "snowmobiles": 3,
+    "drones": 2,
+    "hotDrinks": 5
+  },
+  "hazards": [
+    {
+      "id": "h1",
+      "type": "avalanche",
+      "area": {
+        "x": 12,
+        "y": 10,
+        "width": 4,
+        "height": 4
+      },
+      "risk": 0.3
+    }
+  ]
+}
