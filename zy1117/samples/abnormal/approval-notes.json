@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "project": "某某科技服务器采购项目（异常测试）",
+    "quoteVersion": "v2.0-ABNORMAL",
+    "status": "已通过"
+  },
+  "approvals": [
+    {
+      "approver": "张三",
+      "role": "销售经理",
+      "date": "2024-04-20",
+      "time": "10:30",
+      "content": "客户要求降价，已申请给10%折扣，请领导审批。",
+      "decision": "同意",
+      "discount": "10%"
+    },
+    {
+      "approver": "李四",
+      "role": "技术总监",
+      "date": "2024-04-21",
+      "time": "14:15",
+      "content": "技术方案已审核，配置合理。同意给予10%优惠，按标准商务政策执行。",
+      "decision": "同意",
+      "discount": "10%"
+    },
+    {
+      "approver": "王五",
+      "role": "财务总监",
+      "date": "2024-04-22",
+      "time": "09:45",
+      "content": "利润率检查：给10%折扣后仍有合理利润，同意。",
+      "decision": "同意",
+      "discount": "10%"
+    },
+    {
+      "approver": "赵六",
+      "role": "总经理",
+      "date": "2024-04-23",
+      "time": "16:20",
+      "content": "最终同意给予10%折扣优惠，请确保报价单已同步更新。",
+      "decision": "最终同意",
+      "discount": "10%"
+    }
+  ]
+}
