@@ -1,0 +1,311 @@
+.risk-list-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.risk-list-panel .panel-header {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-count-badge {
+  background-color: var(--warning-color);
+  color: var(--bg-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* 筛选器 */
+.filters {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--secondary-color);
+}
+
+.filter-select {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* 风险列表 */
+.risk-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.empty-risks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #888;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  color: var(--success-color);
+}
+
+/* 风险项 */
+.risk-item {
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.risk-item:hover {
+  background-color: rgba(74, 144, 217, 0.05);
+}
+
+.risk-item.reviewed {
+  opacity: 0.7;
+}
+
+.risk-item.active {
+  background-color: rgba(231, 76, 60, 0.1);
+  border-left: 3px solid var(--danger-color);
+}
+
+/* 风险头部 */
+.risk-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  gap: 12px;
+}
+
+.risk-main-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.severity-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.severity-low {
+  background-color: rgba(52, 152, 219, 0.2);
+  color: var(--info-color);
+}
+
+.severity-medium {
+  background-color: rgba(243, 156, 18, 0.2);
+  color: var(--warning-color);
+}
+
+.severity-high {
+  background-color: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.severity-critical {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: var(--danger-color);
+}
+
+.risk-type {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.risk-time {
+  font-size: 12px;
+  color: #888;
+  font-family: monospace;
+}
+
+.expand-arrow {
+  font-size: 10px;
+  color: #888;
+  transition: transform 0.2s;
+}
+
+.expand-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* 风险详情 */
+.risk-details {
+  padding: 0 16px 16px;
+  background-color: var(--secondary-color);
+}
+
+.risk-description {
+  padding: 12px;
+  background-color: var(--panel-bg);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* 元信息 */
+.risk-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.meta-item {
+  display: flex;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.meta-label {
+  color: #888;
+}
+
+.meta-value {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+/* 证据链 */
+.evidence-section {
+  margin-bottom: 12px;
+}
+
+.evidence-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.evidence-list {
+  list-style: none;
+  padding-left: 12px;
+}
+
+.evidence-item {
+  font-size: 12px;
+  color: #aaa;
+  padding: 2px 0;
+  position: relative;
+}
+
+.evidence-item::before {
+  content: '•';
+  position: absolute;
+  left: -12px;
+  color: var(--primary-color);
+}
+
+/* 操作按钮 */
+.risk-actions {
+  margin-bottom: 12px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* 复核区域 */
+.review-section {
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.review-title {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.review-label {
+  font-size: 12px;
+  color: #888;
+}
+
+.review-result,
+.review-notes {
+  font-size: 12px;
+  padding: 8px;
+  background-color: var(--panel-bg);
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* 备注输入 */
+.note-input {
+  margin-top: 8px;
+}
+
+.note-input textarea {
+  width: 100%;
+  padding: 8px;
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-color);
+  font-size: 12px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.note-input textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.add-note-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.add-note-btn:hover {
+  background-color: rgba(74, 144, 217, 0.1);
+}

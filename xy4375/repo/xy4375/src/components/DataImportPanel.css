@@ -1,0 +1,171 @@
+.import-panel {
+  padding: 24px;
+}
+
+.import-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.import-panel .panel-header h2 {
+  font-size: 20px;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--text-color);
+}
+
+.close-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.upload-area {
+  position: relative;
+}
+
+.upload-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--secondary-color);
+}
+
+.upload-label:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(74, 144, 217, 0.05);
+}
+
+.upload-label input[type="file"] {
+  display: none;
+}
+
+.upload-label:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-icon {
+  font-size: 32px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--panel-bg);
+  border-radius: 8px;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upload-text strong {
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.upload-hint {
+  font-size: 12px;
+  color: #888;
+}
+
+.file-info {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background-color: rgba(39, 174, 96, 0.1);
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-name {
+  font-size: 13px;
+  color: var(--success-color);
+}
+
+.file-size {
+  font-size: 12px;
+  color: #888;
+}
+
+.import-tips {
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.tips-header {
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: var(--primary-color);
+}
+
+.tips-content {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+.tips-content p {
+  margin: 4px 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.form-actions .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
