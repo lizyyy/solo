@@ -1,0 +1,58 @@
+[
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 100,
+    "state": "runnable",
+    "stack": "goroutine 100 [runnable]:\nmain.main()\n\t/Users/user/project/main.go:42 +0x130"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 101,
+    "state": "blocked",
+    "stack": "goroutine 101 [chan send]:\nmain.(*Worker).process(0x1400012a000)\n\t/Users/user/project/worker.go:85 +0x8c\ncreated by main.NewWorkerPool\n\t/Users/user/project/worker.go:45 +0x164",
+    "blocked_reason": "channel send",
+    "blocked_since": "2026-05-04T10:00:00Z"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 102,
+    "state": "blocked",
+    "stack": "goroutine 102 [chan receive]:\nmain.(*Queue).consume(0x1400012c000)\n\t/Users/user/project/queue.go:120 +0x54\ncreated by main.NewQueue\n\t/Users/user/project/queue.go:30 +0xa8",
+    "blocked_reason": "channel receive",
+    "blocked_since": "2026-05-04T10:00:05Z"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 103,
+    "state": "waiting",
+    "stack": "goroutine 103 [sync.Mutex.Lock]:\nsync.runtime_SemacquireMutex(0x1400011e0d0?, 0x0?, 0x1?)\n\t/usr/local/go/src/runtime/sema.go:77 +0x2c\nsync.(*Mutex).lockSlow(0x1400011e0cc)\n\t/usr/local/go/src/sync/mutex.go:171 +0x15c\nsync.(*Mutex).Lock(...)\n\t/usr/local/go/src/sync/mutex.go:90\nmain.(*Cache).Get(0x1400011e0c0, {0x14000106210, 0xe})\n\t/Users/user/project/cache.go:56 +0x48\nmain.handleRequest({0x100b6b9a0?, 0x1400011e0c0}, 0x14000116000)\n\t/Users/user/project/handler.go:32 +0x68\ncreated by net/http.(*ServeMux).ServeHTTP\n\t/usr/local/go/src/net/http/server.go:2514 +0x8f4",
+    "blocked_reason": "mutex contention",
+    "blocked_since": "2026-05-04T10:00:10Z"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 104,
+    "state": "IO wait",
+    "stack": "goroutine 104 [IO wait]:\ninternal/poll.runtime_pollWait(0x10c53f8a8, 0x72)\n\t/usr/local/go/src/runtime/netpoll.go:343 +0xa0\ninternal/poll.(*pollDesc).wait(0x1400010c180, 0x72?)\n\t/usr/local/go/src/internal/poll/fd_poll_runtime.go:84 +0x28\ninternal/poll.(*pollDesc).waitRead(...)\n\t/usr/local/go/src/internal/poll/fd_poll_runtime.go:89\ninternal/poll.(*FD).Read(0x1400010c180, {0x14000128000, 0x800, 0x800})\n\t/usr/local/go/src/internal/poll/fd_unix.go:164 +0x1e8\nnet.(*netFD).Read(0x1400010c180, {0x14000128000?, 0x14000104300?, 0x14000104360?})\n\t/usr/local/go/src/net/fd_posix.go:55 +0x28\nnet.(*conn).Read(0x140000aa018, {0x14000128000?, 0x0?, 0x8?})\n\t/usr/local/go/src/net/net.go:179 +0x44\nnet/http.(*connReader).Read(0x1400010c1b0, {0x14000128000, 0x800, 0x800})\n\t/usr/local/go/src/net/http/server.go:789 +0x130"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 105,
+    "state": "blocked",
+    "stack": "goroutine 105 [timer goroutine (idle)]:\ncreated by time.goFunc\n\t/usr/local/go/src/time/sleep.go:176 +0x30"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 106,
+    "state": "running",
+    "stack": "goroutine 106 [running]:\nnet/http.(*conn).serve(0x14000104000, {0x100b6b400, 0x140000aa020})\n\t/usr/local/go/src/net/http/server.go:1887 +0xb2c\ncreated by net/http.(*Server).Serve\n\t/usr/local/go/src/net/http/server.go:3137 +0x3d8"
+  },
+  {
+    "snapshot_id": "snap_001",
+    "goroutine_id": 107,
+    "state": "blocked",
+    "stack": "goroutine 107 [chan send]:\nmain.(*Publisher).publish(0x1400012e000, {0x14000110100, 0x18})\n\t/Users/user/project/publisher.go:67 +0x7c\ncreated by main.NewPublisher\n\t/Users/user/project/publisher.go:25 +0xb0",
+    "blocked_reason": "channel send (no receiver)",
+    "blocked_since": "2026-05-04T09:55:00Z"
+  }
+]

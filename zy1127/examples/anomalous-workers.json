@@ -1,0 +1,35 @@
+[
+  {
+    "queue_name": "api_request_queue",
+    "worker_count": 2,
+    "queue_capacity": 100,
+    "queue_length": 95,
+    "pending_tasks": 150,
+    "failed_tasks": 23,
+    "completed_tasks": 1250,
+    "last_task_duration_ms": 500000000,
+    "timestamp": "2026-05-04T10:00:00Z"
+  },
+  {
+    "queue_name": "email_notification_queue",
+    "worker_count": 1,
+    "queue_capacity": 50,
+    "queue_length": 48,
+    "pending_tasks": 200,
+    "failed_tasks": 45,
+    "completed_tasks": 890,
+    "last_task_duration_ms": 2000000000,
+    "timestamp": "2026-05-04T10:00:00Z"
+  },
+  {
+    "queue_name": "image_processing_queue",
+    "worker_count": 4,
+    "queue_capacity": 200,
+    "queue_length": 180,
+    "pending_tasks": 500,
+    "failed_tasks": 12,
+    "completed_tasks": 3450,
+    "last_task_duration_ms": 3000000000,
+    "timestamp": "2026-05-04T10:00:00Z"
+  }
+]
