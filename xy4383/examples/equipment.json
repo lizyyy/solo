@@ -1,0 +1,65 @@
+[
+  {
+    "id": "eq-1",
+    "type": "吊杆",
+    "number": "1",
+    "name": "主幕布吊杆",
+    "maxLoad": 100,
+    "status": "正常",
+    "area": "舞台前部"
+  },
+  {
+    "id": "eq-2",
+    "type": "吊杆",
+    "number": "2",
+    "name": "场景1背景吊杆",
+    "maxLoad": 100,
+    "status": "正常",
+    "area": "舞台中部"
+  },
+  {
+    "id": "eq-3",
+    "type": "吊杆",
+    "number": "3",
+    "name": "场景2背景吊杆",
+    "maxLoad": 100,
+    "status": "正常",
+    "area": "舞台中部"
+  },
+  {
+    "id": "eq-4",
+    "type": "吊杆",
+    "number": "4",
+    "name": "重型道具吊杆",
+    "maxLoad": 500,
+    "status": "正常",
+    "area": "舞台后部"
+  },
+  {
+    "id": "eq-5",
+    "type": "升降台",
+    "number": "1",
+    "name": "主升降台",
+    "maxLoad": 800,
+    "status": "正常",
+    "area": "舞台中央区域"
+  },
+  {
+    "id": "eq-6",
+    "type": "升降台",
+    "number": "2",
+    "name": "副升降台",
+    "maxLoad": 500,
+    "status": "正常",
+    "area": "舞台左侧区域"
+  },
+  {
+    "id": "eq-7",
+    "type": "吊杆",
+    "number": "5",
+    "name": "灯光吊杆",
+    "maxLoad": 200,
+    "status": "维护中",
+    "area": "舞台前部"
+  }
+]

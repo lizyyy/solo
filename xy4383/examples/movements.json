@@ -1,0 +1,50 @@
+[
+  {
+    "id": "mov-1",
+    "actor": "演员A",
+    "action": "上场",
+    "startTime": "19:31:50",
+    "endTime": "19:32:10",
+    "fromPosition": "侧幕1",
+    "toPosition": "舞台中央区域",
+    "notes": "从升降台1上场"
+  },
+  {
+    "id": "mov-2",
+    "actor": "演员B",
+    "action": "上场",
+    "startTime": "19:33:00",
+    "endTime": "19:33:15",
+    "fromPosition": "侧幕2",
+    "toPosition": "舞台右侧"
+  },
+  {
+    "id": "mov-3",
+    "actor": "演员C",
+    "action": "下场",
+    "startTime": "19:35:05",
+    "endTime": "19:35:20",
+    "fromPosition": "舞台中央区域",
+    "toPosition": "侧幕1"
+  },
+  {
+    "id": "mov-4",
+    "actor": "演员D",
+    "action": "上场",
+    "startTime": "19:45:20",
+    "endTime": "19:45:40",
+    "fromPosition": "舞台左侧区域",
+    "toPosition": "舞台中央",
+    "notes": "从升降台2上场"
+  },
+  {
+    "id": "mov-5",
+    "actor": "演员E",
+    "action": "上场",
+    "startTime": "19:45:25",
+    "endTime": "19:45:45",
+    "fromPosition": "舞台左侧区域",
+    "toPosition": "舞台中央",
+    "notes": "与演员D同上"
+  }
+]

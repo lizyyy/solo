@@ -1,0 +1,79 @@
+[
+  {
+    "id": "cue-1",
+    "number": "1",
+    "name": "开场幕布升起",
+    "time": "19:30:00",
+    "description": "演出开始，主幕布升起",
+    "transitionTime": 8,
+    "equipmentIds": ["eq-1"],
+    "load": 80,
+    "action": "升起"
+  },
+  {
+    "id": "cue-2",
+    "number": "2",
+    "name": "场景1 背景下降",
+    "time": "19:30:15",
+    "description": "第一场景背景吊杆下降",
+    "transitionTime": 5,
+    "equipmentIds": ["eq-2"],
+    "load": 120,
+    "action": "下降"
+  },
+  {
+    "id": "cue-3",
+    "number": "3",
+    "name": "升降台1升起",
+    "time": "19:32:00",
+    "description": "主升降台升起，演员A出场",
+    "transitionTime": 15,
+    "equipmentIds": ["eq-5"],
+    "load": 0,
+    "action": "升起"
+  },
+  {
+    "id": "cue-4",
+    "number": "4",
+    "name": "场景2 换景",
+    "time": "19:35:10",
+    "description": "快速换景，吊杆2上升，吊杆3下降",
+    "transitionTime": 10,
+    "equipmentIds": ["eq-2", "eq-3"],
+    "load": 0,
+    "action": "换景"
+  },
+  {
+    "id": "cue-5",
+    "number": "5",
+    "name": "烟火效果1",
+    "time": "19:40:00",
+    "description": "第一场烟火效果",
+    "transitionTime": 3,
+    "equipmentIds": [],
+    "load": 0,
+    "action": "触发"
+  },
+  {
+    "id": "cue-6",
+    "number": "6",
+    "name": "升降台2降下",
+    "time": "19:45:30",
+    "description": "副升降台降下",
+    "transitionTime": 12,
+    "equipmentIds": ["eq-6"],
+    "load": 0,
+    "action": "降下"
+  },
+  {
+    "id": "cue-7",
+    "number": "7",
+    "name": "终场 幕布落下",
+    "time": "20:00:00",
+    "description": "演出结束，幕布落下",
+    "transitionTime": 8,
+    "equipmentIds": ["eq-1"],
+    "load": 80,
+    "action": "落下"
+  }
+]
