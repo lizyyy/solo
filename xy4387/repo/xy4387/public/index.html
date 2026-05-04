@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D打印夜班管理系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 顶部导航 -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="app-title">🖨️ 3D打印夜班管理系统</h1>
+        <div class="header-actions">
+          <span id="system-status" class="status-badge">加载中...</span>
+          <button id="refresh-btn" class="btn btn-secondary">
+            🔄 刷新
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 侧边栏导航 -->
+      <aside class="sidebar">
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tab="dashboard">
+            <span class="nav-icon">📊</span>
+            <span>仪表板</span>
+          </button>
+          <button class="nav-item" data-tab="import">
+            <span class="nav-icon">📥</span>
+            <span>数据导入</span>
+          </button>
+          <button class="nav-item" data-tab="issues">
+            <span class="nav-icon">⚠️</span>
+            <span>问题管理</span>
+            <span id="issues-badge" class="nav-badge hidden">0</span>
+          </button>
+          <button class="nav-item" data-tab="tasks">
+            <span class="nav-icon">📋</span>
+            <span>任务列表</span>
+          </button>
+          <button class="nav-item" data-tab="machines">
+            <span class="nav-icon">🖨️</span>
+            <span>机器管理</span>
+          </button>
+          <button class="nav-item" data-tab="export">
+            <span class="nav-icon">📤</span>
+            <span>数据导出</span>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- 内容区域 -->
+      <section class="content-area">
+        <!-- 仪表板 -->
+        <div id="dashboard-tab" class="tab-content active">
+          <h2 class="section-title">📊 系统仪表板</h2>
+          
+          <!-- 统计卡片 -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📋</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-tasks">0</div>
+                <div class="stat-label">待处理任务</div>
+              </div>
+            </div>
+            <div class="stat-card warning">
+              <div class="stat-icon">⚠️</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-issues">0</div>
+                <div class="stat-label">未解决问题</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🖨️</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-machines">0</div>
+                <div class="stat-label">可用机器</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-info">
+                <div class="stat-value" id="stat-critical">0</div>
+                <div class="stat-label">严重问题</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 快速操作 -->
+          <div class="quick-actions">
+            <h3 class="section-subtitle">快速操作</h3>
+            <div class="action-buttons">
+              <button id="quick-detect" class="btn btn-primary btn-large">
+                🔍 检测问题
+              </button>
+              <button id="quick-export-report" class="btn btn-success btn-large">
+                📄 导出开机单
+              </button>
+              <button id="quick-export-audit" class="btn btn-secondary btn-large">
+                📦 导出审计包
+              </button>
+            </div>
+          </div>
+
+          <!-- 最近问题 -->
+          <div class="recent-issues">
+            <h3 class="section-subtitle">最近问题</h3>
+            <div id="recent-issues-list" class="issues-list">
+              <p class="empty-message">暂无问题数据</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据导入 -->
+        <div id="import-tab" class="tab-content">
+          <h2 class="section-title">📥 数据导入</h2>
+          
+          <!-- 文件上传 -->
+          <div class="import-section">
+            <h3 class="section-subtitle">文件上传</h3>
+            <div class="upload-area" id="file-upload-area">
+              <div class="upload-icon">📁</div>
+              <p>拖拽文件到此处或点击选择</p>
+              <p class="upload-hint">支持 CSV, JSON, G-code 文件</p>
+              <input type="file" id="file-input" multiple accept=".csv,.json,.gcode,.g" hidden>
+              <button class="btn btn-primary" id="select-file-btn">选择文件</button>
+            </div>
+            
+            <div class="import-options">
+              <label for="data-type-select">数据类型：</label>
+              <select id="data-type-select" class="form-input">
+                <option value="auto">自动识别</option>
+                <option value="materials">材料信息</option>
+                <option value="materialInventories">耗材库存</option>
+                <option value="machines">机器信息</option>
+                <option value="tasks">任务数据</option>
+                <option value="maintenanceRecords">维护记录</option>
+              </select>
+            </div>
+            
+            <div id="upload-preview" class="upload-preview hidden">
+              <h4>待上传文件：</h4>
+              <ul id="file-list"></ul>
+              <button class="btn btn-success" id="upload-confirm-btn">确认上传</button>
+            </div>
+          </div>
+
+          <!-- 文件夹导入 -->
+          <div class="import-section">
+            <h3 class="section-subtitle">文件夹导入</h3>
+            <div class="form-group">
+              <label for="directory-path">文件夹路径：</label>
+              <input type="text" id="directory-path" class="form-input" placeholder="/path/to/your/data/folder">
+              <p class="input-hint">输入包含数据文件的文件夹绝对路径，系统将自动识别并导入所有支持的文件</p>
+            </div>
+            <button class="btn btn-primary" id="import-directory-btn">导入文件夹</button>
+          </div>
+
+          <!-- 导入历史 -->
+          <div class="import-section">
+            <h3 class="section-subtitle">导入状态</h3>
+            <div id="import-status" class="status-message hidden"></div>
+            <div id="import-result" class="import-result hidden"></div>
+          </div>
+        </div>
+
+        <!-- 问题管理 -->
+        <div id="issues-tab" class="tab-content">
+          <h2 class="section-title">⚠️ 问题管理</h2>
+          
+          <!-- 筛选和操作 -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label>状态：</label>
+              <select id="issue-status-filter" class="form-input">
+                <option value="">全部</option>
+                <option value="open" selected>未解决</option>
+                <option value="resolved">已解决</option>
+                <option value="dismissed">已忽略</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>严重程度：</label>
+              <select id="issue-severity-filter" class="form-input">
+                <option value="">全部</option>
+                <option value="critical">🔴 严重</option>
+                <option value="high">🟠 高</option>
+                <option value="medium">🟡 中</option>
+                <option value="low">🟢 低</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>问题类型：</label>
+              <select id="issue-type-filter" class="form-input">
+                <option value="">全部</option>
+                <option value="temperature_incompatible">温度不兼容</option>
+                <option value="time_overdue">超时</option>
+                <option value="maintenance_overdue">维护过期</option>
+                <option value="nozzle_maintenance_overdue">喷嘴维护过期</option>
+                <option value="queue_conflict">排队冲突</option>
+                <option value="material_low">耗材不足</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="detect-issues-btn">
+              🔍 重新检测
+            </button>
+          </div>
+
+          <!-- 问题列表 -->
+          <div id="issues-list" class="issues-container">
+            <p class="empty-message">暂无问题数据，请先导入数据并检测问题</p>
+          </div>
+        </div>
+
+        <!-- 任务列表 -->
+        <div id="tasks-tab" class="tab-content">
+          <h2 class="section-title">📋 任务列表</h2>
+          <div id="tasks-list" class="tasks-container">
+            <p class="empty-message">暂无任务数据</p>
+          </div>
+        </div>
+
+        <!-- 机器管理 -->
+        <div id="machines-tab" class="tab-content">
+          <h2 class="section-title">🖨️ 机器管理</h2>
+          <div id="machines-list" class="machines-container">
+            <p class="empty-message">暂无机器数据</p>
+          </div>
+        </div>
+
+        <!-- 数据导出 -->
+        <div id="export-tab" class="tab-content">
+          <h2 class="section-title">📤 数据导出</h2>
+          
+          <div class="export-section">
+            <div class="export-card">
+              <div class="export-icon">📄</div>
+              <h3>夜班开机单</h3>
+              <p>导出包含今日任务、未解决问题、需要维护的机器和低耗材提醒的Markdown格式开机单</p>
+              <button class="btn btn-success btn-large" id="export-report-btn">
+                导出开机单
+              </button>
+            </div>
+            
+            <div class="export-card">
+              <div class="export-icon">📦</div>
+              <h3>JSON审计包</h3>
+              <p>导出包含所有数据、问题记录和统计信息的完整JSON审计包，用于存档和审计</p>
+              <button class="btn btn-primary btn-large" id="export-audit-btn">
+                导出审计包
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 问题详情模态框 -->
+    <div id="issue-modal" class="modal hidden">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modal-title">问题详情</h3>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+          <!-- 动态内容 -->
+        </div>
+        <div class="modal-footer">
+          <div class="notes-section">
+            <label for="modal-notes">备注：</label>
+            <textarea id="modal-notes" class="form-textarea" rows="3" placeholder="添加备注信息..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-secondary" id="modal-cancel-btn">关闭</button>
+            <button class="btn btn-warning" id="modal-dismiss-btn">忽略问题</button>
+            <button class="btn btn-success" id="modal-resolve-btn">标记解决</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div id="notification" class="notification hidden">
+      <span id="notification-message"></span>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

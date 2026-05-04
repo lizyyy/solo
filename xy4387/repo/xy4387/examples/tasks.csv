@@ -1,0 +1,6 @@
+userId,userName,machineId,scheduledStartTime,scheduledEndTime,status,priority,gcodeFileName,estimatedPrintTime,nozzleTemp,bedTemp,materialType,layerHeight,infillPercentage
+U001,张三,M001,2026-05-04T18:00:00,2026-05-04T20:00:00,pending,normal,case_holder.gcode,150,200,60,PLA,0.2,20
+U002,李四,M001,2026-05-04T20:00:00,2026-05-04T22:00:00,pending,high,bracket.gcode,130,240,100,ABS,0.2,30
+U003,王五,M002,2026-05-04T19:00:00,2026-05-04T21:00:00,pending,normal,phone_stand.gcode,110,210,70,PETG,0.16,25
+U004,赵六,M002,2026-05-04T20:30:00,2026-05-04T22:30:00,pending,normal,keycap.gcode,90,200,60,PLA,0.2,20
+U005,钱七,M003,2026-05-04T18:00:00,2026-05-04T23:00:00,pending,urgent,large_model.gcode,320,220,70,PETG,0.2,15
