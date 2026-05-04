@@ -1,0 +1,41 @@
+{
+  "name": "rate-limit-validator",
+  "version": "1.0.0",
+  "description": "接口限流策略验证服务",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest --verbose",
+    "test:watch": "jest --watch",
+    "seed": "node src/seed.js",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "rate-limit",
+    "throttling",
+    "api-gateway",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.9.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "joi": "^17.11.0",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.10",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
