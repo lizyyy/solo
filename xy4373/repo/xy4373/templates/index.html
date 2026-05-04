@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>播客交付巡检工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .feature-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card a {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+        
+        .feature-card a:hover {
+            background: #5a6fd6;
+        }
+        
+        .quick-start {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        
+        .quick-start h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .quick-start ol {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .quick-start li {
+            margin-bottom: 10px;
+        }
+        
+        .quick-start code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .stats-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .stat-passed { color: #28a745; }
+        .stat-failed { color: #dc3545; }
+        .stat-warning { color: #ffc107; }
+        .stat-total { color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ 播客交付巡检工具</h1>
+            <p>自动化检查您的播客节目文件，确保交付质量</p>
+        </header>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>📊 仪表板</h3>
+                <p>查看所有节目的检查状态概览，快速了解整体交付进度。</p>
+                <a href="/dashboard">进入仪表板</a>
+            </div>
+            
+            <div class="feature-card">
+                <h3>⚠️ 待处理项</h3>
+                <p>查看所有需要修复的问题，按严重程度排序，优先处理重要问题。</p>
+                <a href="/pending">查看待处理项</a>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📁 节目列表</h3>
+                <p>浏览所有扫描到的节目，查看详细检查结果和文件清单。</p>
+                <a href="/programs">浏览节目</a>
+            </div>
+            
+            <div class="feature-card">
+                <h3>📋 报告导出</h3>
+                <p>导出详细的检查报告，支持JSON、CSV、HTML多种格式。</p>
+                <a href="/reports">导出报告</a>
+            </div>
+        </div>
+        
+        <div class="quick-start">
+            <h2>🚀 快速开始</h2>
+            <ol>
+                <li>
+                    <strong>准备项目目录</strong>
+                    <p>确保您的播客节目文件夹按照以下命名规则组织：</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><code>tech_talk_*</code> - 科技访谈节目</li>
+                        <li><code>daily_news_*</code> - 每日新闻节目</li>
+                        <li><code>music_hour_*</code> - 音乐时刻节目</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>使用命令行扫描</strong>
+                    <p>打开终端，运行以下命令扫描您的项目目录：</p>
+                    <code>python cli.py check /path/to/your/projects</code>
+                </li>
+                <li>
+                    <strong>在Web界面查看结果</strong>
+                    <p>启动Web服务器，在浏览器中查看详细检查结果：</p>
+                    <code>python cli.py web</code>
+                </li>
+                <li>
+                    <strong>确认修复并导出报告</strong>
+                    <p>修复问题后，在Web界面或命令行中确认修复，然后导出交付报告。</p>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="stats-preview">
+            <div class="stat-item">
+                <div class="stat-number stat-total" id="stat-total">--</div>
+                <div class="stat-label">总节目数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number stat-passed" id="stat-passed">--</div>
+                <div class="stat-label">已通过</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number stat-failed" id="stat-failed">--</div>
+                <div class="stat-label">失败</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number stat-warning" id="stat-warning">--</div>
+                <div class="stat-label">警告</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>播客交付巡检工具 | 帮助您确保每期节目的交付质量</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('stat-total').textContent = data.programs.total;
+                    document.getElementById('stat-passed').textContent = data.programs.passed;
+                    document.getElementById('stat-failed').textContent = data.programs.failed;
+                    document.getElementById('stat-warning').textContent = data.programs.warning;
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+        
+        // 页面加载时执行
+        loadStats();
+    </script>
+</body>
+</html>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待处理项 - 播客交付巡检工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        nav {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        nav a:hover {
+            text-decoration: underline;
+        }
+        
+        nav a.active {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #666;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            min-width: 150px;
+        }
+        
+        .filter-group button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .filter-group button:hover {
+            background: #5a6fd6;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-item .number {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-item .label {
+            color: #666;
+            font-size: 0.85em;
+        }
+        
+        .stat-high .number { color: #dc3545; }
+        .stat-medium .number { color: #ffc107; }
+        .stat-low .number { color: #17a2b8; }
+        .stat-total .number { color: #667eea; }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .severity-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .severity-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .severity-low {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+        
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a6fd6;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .program-group {
+            margin-bottom: 30px;
+        }
+        
+        .program-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .program-group-header h3 {
+            font-size: 1.2em;
+            color: #333;
+        }
+        
+        .program-group-header .program-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .folder-path {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85em;
+            color: #666;
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .item-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .item-card:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-card.confirmed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            opacity: 0.7;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .item-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .item-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .item-message {
+            color: #666;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .confirmed-badge {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select,
+            .filter-group input {
+                width: 100%;
+            }
+            
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表板</a>
+            <a href="/pending" class="active">待处理项</a>
+            <a href="/programs">节目列表</a>
+            <a href="/reports">报告导出</a>
+        </nav>
+        
+        <header>
+            <h1>⚠️ 待处理项</h1>
+            <p>查看所有需要修复的问题，按严重程度排序</p>
+        </header>
+        
+        <!-- 统计摘要 -->
+        <div class="stats-summary" id="statsSummary">
+            <div class="stat-item stat-total">
+                <div class="number">--</div>
+                <div class="label">总计</div>
+            </div>
+            <div class="stat-item stat-high">
+                <div class="number">--</div>
+                <div class="label">高严重程度</div>
+            </div>
+            <div class="stat-item stat-medium">
+                <div class="number">--</div>
+                <div class="label">中严重程度</div>
+            </div>
+            <div class="stat-item stat-low">
+                <div class="number">--</div>
+                <div class="label">低严重程度</div>
+            </div>
+        </div>
+        
+        <!-- 筛选器 -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>节目筛选</label>
+                <select id="programFilter">
+                    <option value="">全部节目</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>严重程度</label>
+                <select id="severityFilter">
+                    <option value="">全部</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                    <option value="info">信息</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>检查类型</label>
+                <select id="checkTypeFilter">
+                    <option value="">全部类型</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button id="refreshBtn">刷新</button>
+            </div>
+        </div>
+        
+        <!-- 待处理项列表 -->
+        <div class="section">
+            <h2>📋 待处理项列表</h2>
+            <div id="pendingItems">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allItems = [];
+        let programs = [];
+        
+        // 加载数据
+        async function loadData() {
+            try {
+                // 加载待处理项
+                const pendingResponse = await fetch('/api/pending');
+                const pendingData = await pendingResponse.json();
+                
+                if (pendingData.success) {
+                    allItems = pendingData.items;
+                    
+                    // 统计
+                    updateStats(allItems);
+                    
+                    // 提取唯一的节目和检查类型
+                    extractFilters(allItems);
+                    
+                    // 渲染列表
+                    renderItems(allItems);
+                }
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('pendingItems').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <h3>加载失败</h3>
+                        <p>无法加载待处理项数据，请稍后重试</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 更新统计
+        function updateStats(items) {
+            const total = items.length;
+            const high = items.filter(i => i.severity === 'high').length;
+            const medium = items.filter(i => i.severity === 'medium').length;
+            const low = items.filter(i => i.severity === 'low').length;
+            
+            const statsEl = document.getElementById('statsSummary');
+            statsEl.innerHTML = `
+                <div class="stat-item stat-total">
+                    <div class="number">${total}</div>
+                    <div class="label">总计</div>
+                </div>
+                <div class="stat-item stat-high">
+                    <div class="number">${high}</div>
+                    <div class="label">高严重程度</div>
+                </div>
+                <div class="stat-item stat-medium">
+                    <div class="number">${medium}</div>
+                    <div class="label">中严重程度</div>
+                </div>
+                <div class="stat-item stat-low">
+                    <div class="number">${low}</div>
+                    <div class="label">低严重程度</div>
+                </div>
+            `;
+        }
+        
+        // 提取筛选器选项
+        function extractFilters(items) {
+            // 提取节目
+            const uniquePrograms = [...new Set(items.map(i => i.program_name))];
+            const programSelect = document.getElementById('programFilter');
+            programSelect.innerHTML = '<option value="">全部节目</option>';
+            uniquePrograms.forEach(program => {
+                programSelect.innerHTML += `<option value="${program}">${program}</option>`;
+            });
+            
+            // 提取检查类型
+            const uniqueCheckTypes = [...new Set(items.map(i => i.check_type))];
+            const checkTypeSelect = document.getElementById('checkTypeFilter');
+            checkTypeSelect.innerHTML = '<option value="">全部类型</option>';
+            uniqueCheckTypes.forEach(type => {
+                checkTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+        }
+        
+        // 渲染项目
+        function renderItems(items) {
+            const container = document.getElementById('pendingItems');
+            
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎉</div>
+                        <h3>太棒了！</h3>
+                        <p>当前没有待处理项，所有检查均已通过</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 按节目分组
+            const grouped = {};
+            items.forEach(item => {
+                const key = item.folder_path;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        program_name: item.program_name,
+                        folder_name: item.folder_name,
+                        folder_path: item.folder_path,
+                        overall_status: item.overall_status,
+                        items: []
+                    };
+                }
+                grouped[key].items.push(item);
+            });
+            
+            let html = '';
+            
+            for (const key in grouped) {
+                const group = grouped[key];
+                const statusClass = `status-${group.overall_status}`;
+                const statusText = group.overall_status === 'passed' ? '通过' : 
+                                  group.overall_status === 'failed' ? '失败' : 
+                                  group.overall_status === 'warning' ? '警告' : '未知';
+                
+                html += `
+                    <div class="program-group">
+                        <div class="program-group-header">
+                            <div class="program-info">
+                                <h3>${group.program_name}</h3>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                                <span class="folder-path">${group.folder_path}</span>
+                            </div>
+                            <div>
+                                <span class="status-badge">${group.items.length} 个待处理项</span>
+                            </div>
+                        </div>
+                `;
+                
+                // 渲染该节目下的所有待处理项
+                group.items.forEach((item, index) => {
+                    const severityClass = `severity-${item.severity}`;
+                    const statusClass = `status-${item.check_status}`;
+                    const statusText = item.check_status === 'failed' ? '失败' : '警告';
+                    
+                    html += `
+                        <div class="item-card" data-folder="${item.folder_path}" data-type="${item.check_type}">
+                            <div class="item-header">
+                                <div class="item-title">${item.check_type}</div>
+                                <div class="item-meta">
+                                    <span class="status-badge ${statusClass}">${statusText}</span>
+                                    <span class="status-badge ${severityClass}">${item.severity}</span>
+                                </div>
+                            </div>
+                            <div class="item-message">${item.message}</div>
+                            <div class="item-footer">
+                                <div></div>
+                                <div class="action-buttons">
+                                    <button class="btn btn-success confirm-btn" 
+                                            data-folder="${item.folder_path}" 
+                                            data-type="${item.check_type}">
+                                        ✓ 确认修复
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            container.innerHTML = html;
+            
+            // 绑定确认按钮事件
+            document.querySelectorAll('.confirm-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const folderPath = this.dataset.folder;
+                    const checkType = this.dataset.type;
+                    
+                    if (confirm(`确认修复 "${checkType}" 类型的问题吗？`)) {
+                        try {
+                            const response = await fetch('/api/confirm', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ 
+                                    folder_path: folderPath,
+                                    check_type: checkType
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                // 刷新数据
+                                loadData();
+                            } else {
+                                alert('确认失败: ' + (data.error || '未知错误'));
+                            }
+                        } catch (error) {
+                            console.error('确认失败:', error);
+                            alert('确认过程中发生错误');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 应用筛选
+        function applyFilters() {
+            const programFilter = document.getElementById('programFilter').value;
+            const severityFilter = document.getElementById('severityFilter').value;
+            const checkTypeFilter = document.getElementById('checkTypeFilter').value;
+            
+            let filtered = [...allItems];
+            
+            if (programFilter) {
+                filtered = filtered.filter(i => i.program_name === programFilter);
+            }
+            
+            if (severityFilter) {
+                filtered = filtered.filter(i => i.severity === severityFilter);
+            }
+            
+            if (checkTypeFilter) {
+                filtered = filtered.filter(i => i.check_type === checkTypeFilter);
+            }
+            
+            updateStats(filtered);
+            renderItems(filtered);
+        }
+        
+        // 绑定事件
+        document.getElementById('programFilter').addEventListener('change', applyFilters);
+        document.getElementById('severityFilter').addEventListener('change', applyFilters);
+        document.getElementById('checkTypeFilter').addEventListener('change', applyFilters);
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+        
+        // 页面加载时执行
+        loadData();
+    </script>
+</body>
+</html>

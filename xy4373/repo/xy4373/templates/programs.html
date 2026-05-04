@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>节目列表 - 播客交付巡检工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        nav {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        nav a:hover {
+            text-decoration: underline;
+        }
+        
+        nav a.active {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        header {
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #666;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            min-width: 150px;
+        }
+        
+        .filter-group button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .filter-group button:hover {
+            background: #5a6fd6;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .status-passed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+        
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a6fd6;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .program-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .program-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .program-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .program-card-header h3 {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .program-card-header .program-meta {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .program-card-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-item .number {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .stat-item .label {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .stat-passed .number { color: #28a745; }
+        .stat-failed .number { color: #dc3545; }
+        .stat-warning .number { color: #ffc107; }
+        
+        .program-card-checks {
+            margin-top: 15px;
+        }
+        
+        .check-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .check-item.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .check-item.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .check-item.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .check-item.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .check-item .check-type {
+            font-weight: bold;
+        }
+        
+        .check-item .check-message {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .check-item .check-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .folder-path {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85em;
+            color: #666;
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .files-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .file-type {
+            text-align: center;
+            font-size: 0.85em;
+        }
+        
+        .file-type .count {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        @media (max-width: 768px) {
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .filter-group select {
+                width: 100%;
+            }
+            
+            .program-card-stats {
+                flex-wrap: wrap;
+            }
+            
+            .stat-item {
+                flex: 1;
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/">首页</a>
+            <a href="/dashboard">仪表板</a>
+            <a href="/pending">待处理项</a>
+            <a href="/programs" class="active">节目列表</a>
+            <a href="/reports">报告导出</a>
+        </nav>
+        
+        <header>
+            <h1>📁 节目列表</h1>
+            <p>浏览所有扫描到的播客节目，查看详细检查结果</p>
+        </header>
+        
+        <!-- 筛选器 -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>状态筛选</label>
+                <select id="statusFilter">
+                    <option value="">全部状态</option>
+                    <option value="passed">通过</option>
+                    <option value="failed">失败</option>
+                    <option value="warning">警告</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>节目类型</label>
+                <select id="programFilter">
+                    <option value="">全部类型</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>&nbsp;</label>
+                <button id="refreshBtn">刷新</button>
+            </div>
+        </div>
+        
+        <!-- 节目列表 -->
+        <div class="section">
+            <h2>📋 所有节目</h2>
+            <div id="programsList">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allPrograms = [];
+        
+        // 加载数据
+        async function loadData() {
+            try {
+                const response = await fetch('/api/programs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allPrograms = data.programs;
+                    
+                    // 提取节目类型
+                    extractProgramTypes(allPrograms);
+                    
+                    // 渲染列表
+                    renderPrograms(allPrograms);
+                }
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                document.getElementById('programsList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <h3>加载失败</h3>
+                        <p>无法加载节目数据，请稍后重试</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 提取节目类型
+        function extractProgramTypes(programs) {
+            const uniqueTypes = [...new Set(programs.map(p => p.program_name))];
+            const programSelect = document.getElementById('programFilter');
+            programSelect.innerHTML = '<option value="">全部类型</option>';
+            uniqueTypes.forEach(type => {
+                programSelect.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+        }
+        
+        // 渲染节目列表
+        function renderPrograms(programs) {
+            const container = document.getElementById('programsList');
+            
+            if (programs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <h3>暂无节目数据</h3>
+                        <p>请先扫描您的项目目录以开始检查</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            programs.forEach(program => {
+                const statusClass = `status-${program.overall_status}`;
+                const statusText = program.overall_status === 'passed' ? '通过' : 
+                                  program.overall_status === 'failed' ? '失败' : 
+                                  program.overall_status === 'warning' ? '警告' : '未知';
+                
+                const checkTime = new Date(program.check_time).toLocaleString('zh-CN');
+                
+                // 统计检查项
+                const stats = program.stats;
+                const files = program.files;
+                
+                html += `
+                    <div class="program-card" data-status="${program.overall_status}" data-program="${program.program_name}">
+                        <div class="program-card-header">
+                            <div>
+                                <h3>${program.program_name}</h3>
+                                <div class="program-meta">
+                                    <span class="folder-path">${program.folder_path}</span>
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                                <div style="margin-top: 5px; font-size: 0.85em; color: #666;">
+                                    检查时间: ${checkTime}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 统计信息 -->
+                        <div class="program-card-stats">
+                            <div class="stat-item stat-passed">
+                                <div class="number">${stats.passed}</div>
+                                <div class="label">通过</div>
+                            </div>
+                            <div class="stat-item stat-failed">
+                                <div class="number">${stats.failed}</div>
+                                <div class="label">失败</div>
+                            </div>
+                            <div class="stat-item stat-warning">
+                                <div class="number">${stats.warning}</div>
+                                <div class="label">警告</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 文件摘要 -->
+                        <div class="files-summary">
+                            <div class="file-type">
+                                <div class="count">${files.audio.length}</div>
+                                <div class="label">音频文件</div>
+                            </div>
+                            <div class="file-type">
+                                <div class="count">${files.subtitles.length}</div>
+                                <div class="label">字幕文件</div>
+                            </div>
+                            <div class="file-type">
+                                <div class="count">${files.covers.length}</div>
+                                <div class="label">封面文件</div>
+                            </div>
+                            <div class="file-type">
+                                <div class="count">${files.notes.length}</div>
+                                <div class="label">备注文件</div>
+                            </div>
+                            <div class="file-type">
+                                <div class="count">${files.edit_lists.length}</div>
+                                <div class="label">剪辑单</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 检查项详情 -->
+                        <div class="program-card-checks">
+                            <h4 style="margin-bottom: 10px; color: #666;">检查详情</h4>
+                `;
+                
+                // 渲染检查项
+                program.checks.forEach(check => {
+                    const checkStatus = check.status;
+                    const checkClass = checkStatus === 'passed' ? 'passed' : 
+                                       checkStatus === 'failed' ? 'failed' : 
+                                       checkStatus === 'warning' ? 'warning' : 'info';
+                    
+                    const statusIcon = checkStatus === 'passed' ? '✓' : 
+                                      checkStatus === 'failed' ? '✗' : 
+                                      checkStatus === 'warning' ? '⚠' : 'ℹ';
+                    
+                    const isConfirmed = program.fix_confirmations && program.fix_confirmations[check.type];
+                    
+                    html += `
+                        <div class="check-item ${checkClass}">
+                            <span class="check-type">${statusIcon} ${check.type}</span>
+                            <span class="check-message">${check.message}</span>
+                            <span class="check-actions">
+                                ${!isConfirmed && checkStatus !== 'passed' ? `
+                                    <button class="btn btn-success confirm-btn" 
+                                            data-folder="${program.folder_path}" 
+                                            data-type="${check.type}"
+                                            style="padding: 4px 8px; font-size: 0.8em;">
+                                        确认修复
+                                    </button>
+                                ` : isConfirmed ? `
+                                    <span style="font-size: 0.85em; color: #28a745;">✓ 已确认</span>
+                                ` : ''}
+                            </span>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // 绑定确认按钮事件
+            document.querySelectorAll('.confirm-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const folderPath = this.dataset.folder;
+                    const checkType = this.dataset.type;
+                    
+                    if (confirm(`确认修复 "${checkType}" 类型的问题吗？`)) {
+                        try {
+                            const response = await fetch('/api/confirm', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ 
+                                    folder_path: folderPath,
+                                    check_type: checkType
+                                })
+                            });
+                            
+                            const data = await response.json();
+                            
+                            if (data.success) {
+                                // 刷新数据
+                                loadData();
+                            } else {
+                                alert('确认失败: ' + (data.error || '未知错误'));
+                            }
+                        } catch (error) {
+                            console.error('确认失败:', error);
+                            alert('确认过程中发生错误');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 应用筛选
+        function applyFilters() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const programFilter = document.getElementById('programFilter').value;
+            
+            let filtered = [...allPrograms];
+            
+            if (statusFilter) {
+                filtered = filtered.filter(p => p.overall_status === statusFilter);
+            }
+            
+            if (programFilter) {
+                filtered = filtered.filter(p => p.program_name === programFilter);
+            }
+            
+            renderPrograms(filtered);
+        }
+        
+        // 绑定事件
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+        document.getElementById('programFilter').addEventListener('change', applyFilters);
+        document.getElementById('refreshBtn').addEventListener('click', loadData);
+        
+        // 页面加载时执行
+        loadData();
+    </script>
+</body>
+</html>
