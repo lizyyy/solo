@@ -1,0 +1,157 @@
+{
+  "test_cases": [
+    {
+      "id": "test_001",
+      "name": "精确匹配测试 - 赌博",
+      "text": "今天去赌场赌博，赢了很多钱",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling"],
+        "hit_words": ["赌博"]
+      },
+      "description": "测试精确匹配赌博敏感词"
+    },
+    {
+      "id": "test_002",
+      "name": "变体绕过测试 - 空格插入",
+      "text": "今天去赌 场赌 博，赢了很多钱",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling"]
+      },
+      "description": "测试空格插入的变体绕过"
+    },
+    {
+      "id": "test_003",
+      "name": "变体绕过测试 - 符号插入",
+      "text": "今天去赌*场赌_博，赢了很多钱",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling"]
+      },
+      "description": "测试符号插入的变体绕过"
+    },
+    {
+      "id": "test_004",
+      "name": "全半角测试",
+      "text": "今天去赌場賭博，贏了很多錢",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling"]
+      },
+      "description": "测试全角字符的归一化"
+    },
+    {
+      "id": "test_005",
+      "name": "大小写测试",
+      "text": "I like to GAMBLE online",
+      "expected": {
+        "is_sensitive": true
+      },
+      "description": "测试大小写的归一化"
+    },
+    {
+      "id": "test_006",
+      "name": "白名单豁免测试 - 赌博罪",
+      "text": "赌博罪是刑法规定的罪名",
+      "expected": {
+        "is_sensitive": false
+      },
+      "description": "测试白名单豁免功能"
+    },
+    {
+      "id": "test_007",
+      "name": "语义理解测试 - 赌博相关",
+      "text": "这个游戏可以下注，赔率很高",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling"]
+      },
+      "description": "测试语义理解和上下文匹配"
+    },
+    {
+      "id": "test_008",
+      "name": "正常文本测试 - 运营客服",
+      "text": "您好，我是客服小张，有什么可以帮助您的？运营团队正在处理您的问题。",
+      "expected": {
+        "is_sensitive": false
+      },
+      "description": "测试正常运营客服文本不被误判"
+    },
+    {
+      "id": "test_009",
+      "name": "辱骂攻击测试",
+      "text": "你这个傻逼，滚蛋！",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["abusive"]
+      },
+      "description": "测试辱骂攻击内容检测"
+    },
+    {
+      "id": "test_010",
+      "name": "严重级别测试 - 枪支",
+      "text": "我有一把枪支，可以卖给你",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["violent"],
+        "severity": "critical"
+      },
+      "description": "测试critical级别的敏感词检测"
+    },
+    {
+      "id": "test_011",
+      "name": "混合敏感词测试",
+      "text": "我想去赌博，还想骂人傻逼，太生气了",
+      "expected": {
+        "is_sensitive": true,
+        "categories": ["gambling", "abusive"],
+        "hit_count": 2
+      },
+      "description": "测试多种类型敏感词同时检测"
+    },
+    {
+      "id": "test_012",
+      "name": "空文本测试",
+      "text": "",
+      "expected": {
+        "should_error": true
+      },
+      "description": "测试空文本输入的异常处理"
+    },
+    {
+      "id": "test_013",
+      "name": "空白文本测试",
+      "text": "   ",
+      "expected": {
+        "should_error": true
+      },
+      "description": "测试空白文本输入的异常处理"
+    },
+    {
+      "id": "test_014",
+      "name": "特殊字符测试",
+      "text": "!!!@@@###$$$%%%^&&*()",
+      "expected": {
+        "is_sensitive": false
+      },
+      "description": "测试纯特殊字符文本"
+    },
+    {
+      "id": "test_015",
+      "name": "长文本测试",
+      "text": "这是一段很长的测试文本。" * 100,
+      "expected": {
+        "is_sensitive": false
+      },
+      "description": "测试长文本处理性能"
+    }
+  ],
+  "batch_test": [
+    "今天去赌博",
+    "我是客服，有什么可以帮助您的",
+    "你这个傻逼",
+    "运营团队正在处理",
+    "我想买枪支"
+  ]
+}
