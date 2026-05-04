@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口播合规检查助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        header p {
+            text-align: center;
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .nav-tab:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: #333;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .form-group input[type="text"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .project-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .project-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+        
+        .project-info p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .project-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .badge-medium {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .badge-low {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .check-item {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .check-item:hover {
+            border-color: #667eea;
+        }
+        
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #fafbfc;
+            cursor: pointer;
+        }
+        
+        .check-header:hover {
+            background: #f0f2f5;
+        }
+        
+        .check-type {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .type-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .type-missing {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .type-mismatch {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .type-forbidden {
+            background: #fce4ec;
+            color: #ad1457;
+        }
+        
+        .type-duration {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .check-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .check-info p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .check-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #e0e0e0;
+            color: #424242;
+        }
+        
+        .status-confirmed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .status-dismissed {
+            background: #f5f5f5;
+            color: #757575;
+        }
+        
+        .status-resolved {
+            background: #b3e5fc;
+            color: #0277bd;
+        }
+        
+        .check-content {
+            padding: 20px;
+            display: none;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .check-content.expanded {
+            display: block;
+        }
+        
+        .content-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .content-box {
+            background: #f5f7fa;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .content-box h5 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .content-box p {
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .suggestion-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .suggestion-box h5 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .review-section {
+            background: #fafbfc;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .review-section h5 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .review-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .review-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .review-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .review-btn.confirmed {
+            background: #2e7d32;
+            color: white;
+            border-color: #2e7d32;
+        }
+        
+        .review-btn.dismissed {
+            background: #757575;
+            color: white;
+            border-color: #757575;
+        }
+        
+        .review-btn.resolved {
+            background: #0277bd;
+            color: white;
+            border-color: #0277bd;
+        }
+        
+        .notes-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+        
+        .notes-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .save-note-btn {
+            margin-top: 10px;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-item label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .filter-item select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: #555;
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+        }
+        
+        .sponsor-item, .forbidden-item {
+            background: #f5f7fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .sponsor-header, .forbidden-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .sponsor-header h4, .forbidden-header h4 {
+            font-size: 1rem;
+        }
+        
+        .remove-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .add-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+        
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                width: 100%;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .toast-error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .similarity-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .similarity-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .similarity-high { background: #4caf50; }
+        .similarity-medium { background: #ff9800; }
+        .similarity-low { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ 口播合规检查助手</h1>
+            <p>为播客剪辑团队打造的本地合规检查工具</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="projects">📋 项目列表</button>
+            <button class="nav-tab" data-tab="create">➕ 新建项目</button>
+            <button class="nav-tab hidden" data-tab="details">📝 项目详情</button>
+            <button class="nav-tab hidden" data-tab="review">🔍 复核检查</button>
+        </div>
+        
+        <div id="projects-tab" class="tab-content">
+            <div class="card">
+                <h2>所有项目</h2>
+                <div id="projects-list">
+                    <div class="empty-state">
+                        <h3>暂无项目</h3>
+                        <p>点击"新建项目"开始创建第一个检查项目</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="create-tab" class="tab-content hidden">
+            <div class="card">
+                <h2>新建合规检查项目</h2>
+                <div class="form-group">
+                    <label for="project-name">项目名称 *</label>
+                    <input type="text" id="project-name" placeholder="例如：第123期 - XX品牌口播检查">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transcript">转写稿内容 *</label>
+                    <textarea id="transcript" placeholder="粘贴完整的音频转写稿内容..."></textarea>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>赞助商口播要求</h2>
+                <div id="sponsor-requirements">
+                </div>
+                <button class="add-btn" onclick="addSponsorRequirement()">➕ 添加赞助要求</button>
+            </div>
+            
+            <div class="card">
+                <h2>禁用表述清单</h2>
+                <div id="forbidden-terms">
+                </div>
+                <button class="add-btn" onclick="addForbiddenTerm()">➕ 添加禁用词</button>
+            </div>
+            
+            <div class="card">
+                <button class="btn btn-primary" onclick="createProject()" id="create-project-btn">
+                    创建项目并运行检查
+                </button>
+            </div>
+        </div>
+        
+        <div id="details-tab" class="tab-content hidden">
+            <div class="card">
+                <h2 id="current-project-name">项目详情</h2>
+                <div class="stats-grid" id="stats-grid">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="switchTab('review')">🔍 进入复核</button>
+                    <button class="btn btn-primary" onclick="runChecks()">🔄 重新运行检查</button>
+                    <button class="btn btn-warning" onclick="exportMarkdown()">📄 导出 Markdown</button>
+                    <button class="btn btn-warning" onclick="exportCSV()">📊 导出 CSV</button>
+                    <button class="btn btn-warning" onclick="exportJSON()">📋 导出 JSON 审计包</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>项目配置</h2>
+                <div class="two-col">
+                    <div>
+                        <h4 style="margin-bottom: 12px;">转写稿预览</h4>
+                        <div style="background: #f5f7fa; padding: 16px; border-radius: 8px; max-height: 300px; overflow-y: auto;">
+                            <pre id="transcript-preview" style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6;"></pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 12px;">配置项</h4>
+                        <div id="config-preview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="review-tab" class="tab-content hidden">
+            <div class="card">
+                <h2>复核检查结果</h2>
+                <div class="stats-grid" id="review-stats-grid">
+                </div>
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label>按类型筛选:</label>
+                        <select id="filter-type" onchange="applyFilters()">
+                            <option value="all">全部</option>
+                            <option value="missing">遗漏</option>
+                            <option value="mismatch">错读</option>
+                            <option value="forbidden">违规词</option>
+                            <option value="duration">时长偏差</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>按严重度筛选:</label>
+                        <select id="filter-severity" onchange="applyFilters()">
+                            <option value="all">全部</option>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>按状态筛选:</label>
+                        <select id="filter-status" onchange="applyFilters()">
+                            <option value="all">全部</option>
+                            <option value="pending">待复核</option>
+                            <option value="confirmed">已确认问题</option>
+                            <option value="dismissed">已驳回</option>
+                            <option value="resolved">已修复</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-warning" onclick="exportMarkdown()">📄 导出 Markdown</button>
+                    <button class="btn btn-warning" onclick="exportCSV()">📊 导出 CSV</button>
+                    <button class="btn btn-warning" onclick="exportJSON()">📋 导出 JSON 审计包</button>
+                </div>
+            </div>
+            
+            <div id="checks-container">
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-container"></div>
+
+    <script>
+        const API_BASE = '';
+        let currentProject = null;
+        let sponsorCount = 0;
+        let forbiddenCount = 0;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+            addSponsorRequirement();
+            addForbiddenTerm();
+        });
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            
+            if (tabName === 'details' && currentProject) {
+                renderProjectDetails();
+            } else if (tabName === 'review' && currentProject) {
+                renderReviewPage();
+            }
+        }
+        
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                if (tabName === 'details' || tabName === 'review') {
+                    if (!currentProject) {
+                        showToast('请先选择一个项目', 'error');
+                        return;
+                    }
+                }
+                switchTab(tabName);
+            });
+        });
+        
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE}/api/projects`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    renderProjectsList(result.projects);
+                }
+            } catch (error) {
+                console.error('加载项目失败:', error);
+            }
+        }
+        
+        function renderProjectsList(projects) {
+            const container = document.getElementById('projects-list');
+            
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>暂无项目</h3>
+                        <p>点击"新建项目"开始创建第一个检查项目</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = projects.map(project => `
+                <div class="project-item">
+                    <div class="project-info">
+                        <h3>${escapeHtml(project.name)}</h3>
+                        <p>创建时间: ${new Date(project.createdAt).toLocaleString('zh-CN')} | 
+                           最后更新: ${new Date(project.updatedAt).toLocaleString('zh-CN')}
+                           ${project.checkCount > 0 ? `<span class="project-badge badge-high">${project.checkCount} 个检查项</span>` : ''}
+                        </p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="openProject('${project.id}')">查看</button>
+                        <button class="btn btn-secondary" onclick="deleteProject('${project.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function openProject(projectId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${projectId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentProject = result.project;
+                    
+                    document.querySelectorAll('.nav-tab').forEach(tab => {
+                        if (tab.dataset.tab === 'details' || tab.dataset.tab === 'review') {
+                            tab.classList.remove('hidden');
+                        }
+                    });
+                    
+                    switchTab('details');
+                }
+            } catch (error) {
+                showToast('加载项目失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function deleteProject(projectId) {
+            if (!confirm('确定要删除这个项目吗？此操作不可撤销。')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('项目已删除', 'success');
+                    loadProjects();
+                }
+            } catch (error) {
+                showToast('删除项目失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        function addSponsorRequirement() {
+            sponsorCount++;
+            const container = document.getElementById('sponsor-requirements');
+            const div = document.createElement('div');
+            div.className = 'sponsor-item';
+            div.id = `sponsor-${sponsorCount}`;
+            div.innerHTML = `
+                <div class="sponsor-header">
+                    <h4>赞助要求 #${sponsorCount}</h4>
+                    <button class="remove-btn" onclick="removeSponsor(${sponsorCount})">删除</button>
+                </div>
+                <div class="form-group">
+                    <label>要求名称</label>
+                    <input type="text" placeholder="例如：品牌名称提及" class="sponsor-name" data-id="${sponsorCount}">
+                </div>
+                <div class="form-group">
+                    <label>类型</label>
+                    <select class="sponsor-type" data-id="${sponsorCount}" onchange="toggleSponsorFields(${sponsorCount})">
+                        <option value="keywords">关键词/短语</option>
+                        <option value="segment">完整段落</option>
+                    </select>
+                </div>
+                <div class="form-group sponsor-keywords-field" data-sponsor="${sponsorCount}">
+                    <label>关键词（每行一个）</label>
+                    <textarea placeholder="品牌A&#10;品牌B&#10;产品C" class="sponsor-keywords" data-id="${sponsorCount}"></textarea>
+                </div>
+                <div class="form-group sponsor-text-field hidden" data-sponsor="${sponsorCount}">
+                    <label>预期段落内容</label>
+                    <textarea placeholder="请输入预期的口播内容..." class="sponsor-text" data-id="${sponsorCount}"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>预期时长（秒，可选）</label>
+                    <input type="number" placeholder="例如：30" class="sponsor-duration" data-id="${sponsorCount}">
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" class="sponsor-required" data-id="${sponsorCount}" checked>
+                        必填项（未满足时标记为高严重度）
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>必须包含的要素（每行一个，可选）</label>
+                    <textarea placeholder="优惠码&#10;限时活动&#10;购买链接" class="sponsor-elements" data-id="${sponsorCount}"></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        
+        function removeSponsor(id) {
+            const element = document.getElementById(`sponsor-${id}`);
+            if (element) {
+                element.remove();
+            }
+        }
+        
+        function toggleSponsorFields(id) {
+            const type = document.querySelector(`.sponsor-type[data-id="${id}"]`).value;
+            const keywordsField = document.querySelector(`.sponsor-keywords-field[data-sponsor="${id}"]`);
+            const textField = document.querySelector(`.sponsor-text-field[data-sponsor="${id}"]`);
+            
+            if (type === 'keywords') {
+                keywordsField.classList.remove('hidden');
+                textField.classList.add('hidden');
+            } else {
+                keywordsField.classList.add('hidden');
+                textField.classList.remove('hidden');
+            }
+        }
+        
+        function addForbiddenTerm() {
+            forbiddenCount++;
+            const container = document.getElementById('forbidden-terms');
+            const div = document.createElement('div');
+            div.className = 'forbidden-item';
+            div.id = `forbidden-${forbiddenCount}`;
+            div.innerHTML = `
+                <div class="forbidden-header">
+                    <h4>禁用词 #${forbiddenCount}</h4>
+                    <button class="remove-btn" onclick="removeForbidden(${forbiddenCount})">删除</button>
+                </div>
+                <div class="two-col">
+                    <div class="form-group">
+                        <label>禁用词/短语</label>
+                        <input type="text" placeholder="例如：最棒、第一、唯一" class="forbidden-term" data-id="${forbiddenCount}">
+                    </div>
+                    <div class="form-group">
+                        <label>严重度</label>
+                        <select class="forbidden-severity" data-id="${forbiddenCount}">
+                            <option value="high">高</option>
+                            <option value="medium" selected>中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>建议替换词（可选）</label>
+                    <input type="text" placeholder="例如：非常好、优秀" class="forbidden-replacement" data-id="${forbiddenCount}">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+        
+        function removeForbidden(id) {
+            const element = document.getElementById(`forbidden-${id}`);
+            if (element) {
+                element.remove();
+            }
+        }
+        
+        async function createProject() {
+            const name = document.getElementById('project-name').value.trim();
+            const transcript = document.getElementById('transcript').value.trim();
+            
+            if (!name || !transcript) {
+                showToast('请填写项目名称和转写稿内容', 'error');
+                return;
+            }
+            
+            const sponsorRequirements = collectSponsorRequirements();
+            const forbiddenTerms = collectForbiddenTerms();
+            
+            const btn = document.getElementById('create-project-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> 创建中...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        transcript,
+                        sponsorRequirements,
+                        forbiddenTerms
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentProject = result.project;
+                    
+                    const checkResponse = await fetch(`${API_BASE}/api/projects/${currentProject.id}/run-checks`, {
+                        method: 'POST'
+                    });
+                    
+                    const checkResult = await checkResponse.json();
+                    
+                    if (checkResult.success) {
+                        currentProject = checkResult.project;
+                        
+                        document.querySelectorAll('.nav-tab').forEach(tab => {
+                            if (tab.dataset.tab === 'details' || tab.dataset.tab === 'review') {
+                                tab.classList.remove('hidden');
+                            }
+                        });
+                        
+                        showToast('项目创建成功，已完成合规检查', 'success');
+                        switchTab('details');
+                        loadProjects();
+                    }
+                }
+            } catch (error) {
+                showToast('创建项目失败', 'error');
+                console.error(error);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+        
+        function collectSponsorRequirements() {
+            const requirements = [];
+            
+            document.querySelectorAll('.sponsor-item').forEach(item => {
+                const id = item.id.replace('sponsor-', '');
+                const name = document.querySelector(`.sponsor-name[data-id="${id}"]`)?.value.trim() || '';
+                const type = document.querySelector(`.sponsor-type[data-id="${id}"]`)?.value || 'keywords';
+                const keywordsText = document.querySelector(`.sponsor-keywords[data-id="${id}"]`)?.value || '';
+                const text = document.querySelector(`.sponsor-text[data-id="${id}"]`)?.value.trim() || '';
+                const duration = document.querySelector(`.sponsor-duration[data-id="${id}"]`)?.value;
+                const required = document.querySelector(`.sponsor-required[data-id="${id}"]`)?.checked;
+                const elementsText = document.querySelector(`.sponsor-elements[data-id="${id}"]`)?.value || '';
+                
+                if (name || keywordsText || text) {
+                    const keywords = keywordsText.split('\n').map(k => k.trim()).filter(k => k);
+                    const elements = elementsText.split('\n').map(e => e.trim()).filter(e => e);
+                    
+                    requirements.push({
+                        name,
+                        type,
+                        keywords: type === 'keywords' ? keywords : [],
+                        text: type === 'segment' ? text : '',
+                        expectedDuration: duration ? parseFloat(duration) : null,
+                        required: required !== false,
+                        elements: elements.length > 0 ? elements : null
+                    });
+                }
+            });
+            
+            return requirements;
+        }
+        
+        function collectForbiddenTerms() {
+            const terms = [];
+            
+            document.querySelectorAll('.forbidden-item').forEach(item => {
+                const id = item.id.replace('forbidden-', '');
+                const term = document.querySelector(`.forbidden-term[data-id="${id}"]`)?.value.trim() || '';
+                const severity = document.querySelector(`.forbidden-severity[data-id="${id}"]`)?.value || 'medium';
+                const replacement = document.querySelector(`.forbidden-replacement[data-id="${id}"]`)?.value.trim() || '';
+                
+                if (term) {
+                    terms.push({
+                        term,
+                        severity,
+                        replacement: replacement || null
+                    });
+                }
+            });
+            
+            return terms;
+        }
+        
+        function renderProjectDetails() {
+            if (!currentProject) return;
+            
+            document.getElementById('current-project-name').textContent = currentProject.name;
+            
+            const checks = currentProject.checks || [];
+            const reviews = currentProject.reviews || [];
+            
+            const high = checks.filter(c => c.severity === 'high').length;
+            const medium = checks.filter(c => c.severity === 'medium').length;
+            const low = checks.filter(c => c.severity === 'low').length;
+            const pending = reviews.filter(r => r.status === 'pending').length;
+            
+            document.getElementById('stats-grid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${checks.length}</div>
+                    <div class="stat-label">总检查项</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #c62828;">${high}</div>
+                    <div class="stat-label">高严重度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #ef6c00;">${medium}</div>
+                    <div class="stat-label">中严重度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #1565c0;">${low}</div>
+                    <div class="stat-label">低严重度</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #757575;">${pending}</div>
+                    <div class="stat-label">待复核</div>
+                </div>
+            `;
+            
+            document.getElementById('transcript-preview').textContent = currentProject.transcript.substring(0, 2000) + (currentProject.transcript.length > 2000 ? '...' : '');
+            
+            let configHtml = '';
+            
+            if (currentProject.sponsorRequirements && currentProject.sponsorRequirements.length > 0) {
+                configHtml += '<h4 style="margin-top: 0;">赞助商要求:</h4><ul style="margin-bottom: 16px;">';
+                currentProject.sponsorRequirements.forEach((req, idx) => {
+                    configHtml += `<li><strong>${req.name || `要求 ${idx + 1}`}</strong> (${req.type})${req.required ? ' - 必填' : ''}</li>`;
+                });
+                configHtml += '</ul>';
+            }
+            
+            if (currentProject.forbiddenTerms && currentProject.forbiddenTerms.length > 0) {
+                configHtml += '<h4>禁用词:</h4><ul>';
+                currentProject.forbiddenTerms.forEach(term => {
+                    configHtml += `<li><strong>${term.term}</strong> (${term.severity})</li>`;
+                });
+                configHtml += '</ul>';
+            }
+            
+            document.getElementById('config-preview').innerHTML = configHtml || '<p>暂无配置项</p>';
+        }
+        
+        async function runChecks() {
+            if (!currentProject) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/run-checks`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentProject = result.project;
+                    showToast('检查完成', 'success');
+                    renderProjectDetails();
+                }
+            } catch (error) {
+                showToast('运行检查失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        function renderReviewPage() {
+            if (!currentProject) return;
+            
+            const checks = currentProject.checks || [];
+            const reviews = currentProject.reviews || [];
+            
+            const confirmed = reviews.filter(r => r.status === 'confirmed').length;
+            const dismissed = reviews.filter(r => r.status === 'dismissed').length;
+            const resolved = reviews.filter(r => r.status === 'resolved').length;
+            const pending = reviews.filter(r => r.status === 'pending').length;
+            
+            document.getElementById('review-stats-grid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #757575;">${pending}</div>
+                    <div class="stat-label">待复核</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #2e7d32;">${confirmed}</div>
+                    <div class="stat-label">已确认问题</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #757575;">${dismissed}</div>
+                    <div class="stat-label">已驳回</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #0277bd;">${resolved}</div>
+                    <div class="stat-label">已修复</div>
+                </div>
+            `;
+            
+            renderChecksList();
+        }
+        
+        function renderChecksList() {
+            if (!currentProject) return;
+            
+            const checks = currentProject.checks || [];
+            const reviews = currentProject.reviews || [];
+            
+            const filterType = document.getElementById('filter-type').value;
+            const filterSeverity = document.getElementById('filter-severity').value;
+            const filterStatus = document.getElementById('filter-status').value;
+            
+            const filteredChecks = checks.filter(check => {
+                if (filterType !== 'all' && check.type !== filterType) return false;
+                if (filterSeverity !== 'all' && check.severity !== filterSeverity) return false;
+                
+                const review = reviews.find(r => r.checkId === check.id);
+                const status = review ? review.status : 'pending';
+                if (filterStatus !== 'all' && status !== filterStatus) return false;
+                
+                return true;
+            });
+            
+            const container = document.getElementById('checks-container');
+            
+            if (filteredChecks.length === 0) {
+                container.innerHTML = `
+                    <div class="card empty-state">
+                        <h3>没有符合条件的检查项</h3>
+                        <p>请尝试调整筛选条件</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const typeIcons = {
+                missing: '⚠️',
+                mismatch: '🔄',
+                forbidden: '🚫',
+                duration: '⏱️'
+            };
+            
+            const typeLabels = {
+                missing: '遗漏',
+                mismatch: '错读',
+                forbidden: '违规词',
+                duration: '时长偏差'
+            };
+            
+            const severityColors = {
+                high: '#c62828',
+                medium: '#ef6c00',
+                low: '#1565c0'
+            };
+            
+            const severityLabels = {
+                high: '高',
+                medium: '中',
+                low: '低'
+            };
+            
+            const statusLabels = {
+                pending: '待复核',
+                confirmed: '已确认问题',
+                dismissed: '已驳回',
+                resolved: '已修复'
+            };
+            
+            container.innerHTML = filteredChecks.map((check, idx) => {
+                const review = reviews.find(r => r.checkId === check.id);
+                const status = review ? review.status : 'pending';
+                
+                return `
+                    <div class="check-item" data-type="${check.type}" data-severity="${check.severity}" data-status="${status}">
+                        <div class="check-header" onclick="toggleCheckContent(this)">
+                            <div class="check-type">
+                                <div class="type-icon type-${check.type}">${typeIcons[check.type]}</div>
+                                <div class="check-info">
+                                    <h4>${idx + 1}. ${check.requirement || typeLabels[check.type]}</h4>
+                                    <p>类型: ${typeLabels[check.type]} | 严重度: <span style="color: ${severityColors[check.severity]}; font-weight: 600;">${severityLabels[check.severity]}</span>${check.similarity ? ` | 相似度: ${(check.similarity * 100).toFixed(1)}%` : ''}</p>
+                                </div>
+                            </div>
+                            <div class="check-status">
+                                <span class="status-badge status-${status}">${statusLabels[status]}</span>
+                                <span style="font-size: 1.2rem;">▼</span>
+                            </div>
+                        </div>
+                        <div class="check-content">
+                            ${check.expected ? `
+                            <div class="content-row">
+                                <div class="content-box">
+                                    <h5>预期内容</h5>
+                                    <p>${escapeHtml(check.expected)}</p>
+                                </div>
+                                ${check.found ? `
+                                <div class="content-box">
+                                    <h5>实际内容</h5>
+                                    <p style="color: ${check.type === 'forbidden' ? '#c62828' : '#ef6c00'};">${escapeHtml(check.found)}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                            ` : ''}
+                            
+                            ${check.context ? `
+                            <div class="content-box" style="margin-bottom: 16px;">
+                                <h5>上下文</h5>
+                                <p>${escapeHtml(check.context)}</p>
+                            </div>
+                            ` : ''}
+                            
+                            ${check.similarity !== undefined ? `
+                            <div style="margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                    <span>相似度</span>
+                                    <span style="font-weight: 600;">${(check.similarity * 100).toFixed(1)}%</span>
+                                </div>
+                                <div class="similarity-bar">
+                                    <div class="similarity-fill ${check.similarity >= 0.9 ? 'similarity-high' : check.similarity >= 0.7 ? 'similarity-medium' : 'similarity-low'}" style="width: ${check.similarity * 100}%;"></div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <div class="suggestion-box">
+                                <h5>💡 建议</h5>
+                                <p>${escapeHtml(check.suggestion)}</p>
+                            </div>
+                            
+                            <div class="review-section">
+                                <h5>复核操作</h5>
+                                <div class="review-actions">
+                                    <button class="review-btn ${status === 'confirmed' ? 'active confirmed' : ''}" onclick="setReviewStatus('${check.id}', 'confirmed', this)">✓ 确认问题</button>
+                                    <button class="review-btn ${status === 'dismissed' ? 'active dismissed' : ''}" onclick="setReviewStatus('${check.id}', 'dismissed', this)">✕ 驳回</button>
+                                    <button class="review-btn ${status === 'resolved' ? 'active resolved' : ''}" onclick="setReviewStatus('${check.id}', 'resolved', this)">✓ 已修复</button>
+                                </div>
+                                <div class="form-group">
+                                    <label>复核备注</label>
+                                    <textarea class="notes-input" id="notes-${check.id}" placeholder="输入复核备注...">${review?.notes || ''}</textarea>
+                                </div>
+                                <button class="btn btn-primary save-note-btn" onclick="saveReviewNotes('${check.id}')">保存备注</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function toggleCheckContent(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('expanded');
+            
+            const arrow = header.querySelector('.check-status span:last-child');
+            arrow.textContent = content.classList.contains('expanded') ? '▲' : '▼';
+        }
+        
+        function applyFilters() {
+            renderChecksList();
+        }
+        
+        async function setReviewStatus(checkId, status, button) {
+            if (!currentProject) return;
+            
+            const notesInput = document.getElementById(`notes-${checkId}`);
+            const notes = notesInput ? notesInput.value : '';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ checkId, status, notes })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const review = currentProject.reviews.find(r => r.checkId === checkId);
+                    if (review) {
+                        review.status = status;
+                        review.notes = notes;
+                    } else {
+                        currentProject.reviews.push({
+                            checkId,
+                            status,
+                            notes,
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+                    
+                    showToast('状态已更新', 'success');
+                    renderReviewPage();
+                }
+            } catch (error) {
+                showToast('更新状态失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function saveReviewNotes(checkId) {
+            const notesInput = document.getElementById(`notes-${checkId}`);
+            const notes = notesInput ? notesInput.value : '';
+            
+            const review = currentProject.reviews.find(r => r.checkId === checkId);
+            const status = review ? review.status : 'pending';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ checkId, status, notes })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (review) {
+                        review.notes = notes;
+                    }
+                    showToast('备注已保存', 'success');
+                }
+            } catch (error) {
+                showToast('保存备注失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function exportMarkdown() {
+            if (!currentProject) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/export/markdown`);
+                const blob = await response.blob();
+                downloadFile(blob, `${currentProject.name}_report.md`);
+                showToast('Markdown 报告已导出', 'success');
+            } catch (error) {
+                showToast('导出失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function exportCSV() {
+            if (!currentProject) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/export/csv`);
+                const blob = await response.blob();
+                downloadFile(blob, `${currentProject.name}_issues.csv`);
+                showToast('CSV 问题清单已导出', 'success');
+            } catch (error) {
+                showToast('导出失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function exportJSON() {
+            if (!currentProject) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/projects/${currentProject.id}/export/json`);
+                const blob = await response.blob();
+                downloadFile(blob, `${currentProject.name}_audit.json`);
+                showToast('JSON 审计包已导出', 'success');
+            } catch (error) {
+                showToast('导出失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        function downloadFile(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
