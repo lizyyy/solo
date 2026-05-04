@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}测试集回放结果{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=training.project_id) }}">{{ training.project.name }}</a></li>
+            <li class="breadcrumb-item active">回放结果</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-play-fill"></i> 测试集回放结果</h2>
+        <div>
+            {% if result.metrics %}
+            <button class="btn btn-outline-primary btn-sm" onclick="showJsonModal()">
+                <i class="bi bi-file-earmark-json"></i> 查看JSON
+            </button>
+            {% endif %}
+            <a href="{{ url_for('test_playback', training_id=training.id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-repeat"></i> 重新执行
+            </a>
+        </div>
+    </div>
+
+    {% if result.error %}
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i> {{ result.error }}
+    </div>
+    {% elif result.metrics %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> 回放指标</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="text-center">
+                                <div class="display-6 text-primary">{{ "%.4f"|format(result.metrics.accuracy) }}</div>
+                                <small class="text-muted">Accuracy</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="text-center">
+                                <div class="display-6 text-success">{{ "%.4f"|format(result.metrics.precision) }}</div>
+                                <small class="text-muted">Precision</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="text-center">
+                                <div class="display-6 text-info">{{ "%.4f"|format(result.metrics.recall) }}</div>
+                                <small class="text-muted">Recall</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="text-center">
+                                <div class="display-6 text-warning">{{ "%.4f"|format(result.metrics.f1_score) }}</div>
+                                <small class="text-muted">F1 Score</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> 回放配置</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>抽样比例:</strong> {{ result.sample_ratio }}%</p>
+                    <p><strong>样本数量:</strong> {{ result.total_samples }}</p>
+                    <p><strong>执行时间:</strong> {{ "%.2f"|format(result.execution_time) }}s</p>
+                    {% if result.threshold_override %}
+                    <p><strong>覆盖阈值:</strong> {{ result.threshold_override }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart"></i> 预测分布</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>类别</th>
+                                    <th>实际数量</th>
+                                    <th>预测数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if result.distribution %}
+                                    {% for cls, counts in result.distribution.items() %}
+                                    <tr>
+                                        <td>{{ cls }}</td>
+                                        <td>{{ counts.actual }}</td>
+                                        <td>{{ counts.predicted }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if result.comparison %}
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-arrow-left-right"></i> 与原始训练对比</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>指标</th>
+                            <th>原始训练</th>
+                            <th>回放结果</th>
+                            <th>差异</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric_name, values in result.comparison.items() %}
+                        <tr>
+                            <td><strong>{{ metric_name }}</strong></td>
+                            <td>{{ "%.4f"|format(values.original) }}</td>
+                            <td>{{ "%.4f"|format(values.replay) }}</td>
+                            <td>
+                                {% if values.diff > 0 %}
+                                <span class="text-success">+{{ "%.4f"|format(values.diff) }}</span>
+                                {% elif values.diff < 0 %}
+                                <span class="text-danger">{{ "%.4f"|format(values.diff) }}</span>
+                                {% else %}
+                                <span class="text-muted">0</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if values.status == 'passed' %}
+                                <span class="badge bg-success">稳定</span>
+                                {% elif values.status == 'warning' %}
+                                <span class="badge bg-warning">轻微变化</span>
+                                {% else %}
+                                <span class="badge bg-danger">显著变化</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card mt-4">
+        <div class="card-body text-center">
+            <a href="{{ url_for('training_detail', training_id=training.id) }}" class="btn btn-primary me-2">
+                <i class="bi bi-arrow-left"></i> 返回训练任务
+            </a>
+            <a href="{{ url_for('project_detail', project_id=training.project_id) }}" class="btn btn-outline-secondary">
+                返回项目
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if result %}
+<div class="modal fade" id="jsonModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-file-earmark-json"></i> JSON结果</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="jsonContent" class="bg-light p-3 rounded small" style="max-height: 60vh; overflow-y: auto;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="copyJson()">
+                    <i class="bi bi-clipboard"></i> 复制
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if result %}
+<script>
+const resultJson = {{ result|tojson }};
+
+function showJsonModal() {
+    const modal = new bootstrap.Modal(document.getElementById('jsonModal'));
+    document.getElementById('jsonContent').textContent = JSON.stringify(resultJson, null, 2);
+    modal.show();
+}
+
+function copyJson() {
+    navigator.clipboard.writeText(JSON.stringify(resultJson, null, 2)).then(() => {
+        alert('已复制到剪贴板');
+    });
+}
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}测试集回放{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=training.project_id) }}">{{ training.project.name }}</a></li>
+            <li class="breadcrumb-item active">测试集回放</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4"><i class="bi bi-play-fill"></i> 测试集回放</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> 训练任务信息</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>版本:</strong> {{ training.version }}</p>
+                    <p><strong>模型类型:</strong> {{ training.model_type or 'N/A' }}</p>
+                    <p><strong>训练样本:</strong> {{ training.train_rows or 'N/A' }}</p>
+                    <p><strong>测试样本:</strong> {{ training.test_rows or 'N/A' }}</p>
+                    <p><strong>状态:</strong> <span class="badge status-{{ training.status }}">{{ training.status }}</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> 回放配置</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="sample_ratio" class="form-label">抽样比例 (%)</label>
+                            <input type="number" class="form-control" id="sample_ratio" name="sample_ratio" 
+                                   value="100" min="1" max="100" step="1">
+                            <small class="text-muted">设置为100%以使用全部测试数据</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="threshold_override" class="form-label">覆盖阈值 (可选)</label>
+                            <input type="number" class="form-control" id="threshold_override" name="threshold_override" 
+                                   value="" step="0.01" placeholder="留空使用原始配置">
+                            <small class="text-muted">用于灰度上线模拟，测试不同阈值下的表现</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-play-fill"></i> 执行回放
+                            </button>
+                            <a href="{{ url_for('training_detail', training_id=training.id) }}" class="btn btn-outline-secondary">
+                                返回训练任务
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-lightbulb"></i> 关于测试集回放</h5>
+        </div>
+        <div class="card-body">
+            <p>测试集回放功能用于：</p>
+            <ul>
+                <li><strong>验证模型稳定性:</strong> 在已标记的测试集上重新运行预测，验证模型输出一致性</li>
+                <li><strong>灰度上线模拟:</strong> 通过调整阈值参数，模拟不同流量比例下的模型表现</li>
+                <li><strong>回归测试:</strong> 确保新版本模型没有破坏已知正确的预测结果</li>
+                <li><strong>A/B测试准备:</strong> 生成用于线上A/B测试的基准数据</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

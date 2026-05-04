@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="sidebar">
+    <h6 class="text-muted text-uppercase small">项目导航</h6>
+    <hr>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('upload_data', project_id=project.id) }}">
+                <i class="bi bi-cloud-upload"></i> 上传数据
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('create_cleaning_task', project_id=project.id) }}">
+                <i class="bi bi-brush"></i> 创建清洗任务
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('create_feature_version', project_id=project.id) }}">
+                <i class="bi bi-sliders"></i> 创建特征版本
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('create_training_run', project_id=project.id) }}">
+                <i class="bi bi-cpu"></i> 创建训练任务
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('create_deployment_request', project_id=project.id) }}">
+                <i class="bi bi-rocket-takeoff"></i> 申请上线
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <h6 class="text-muted text-uppercase small">工具</h6>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('compare_models_view', project_id=project.id) }}">
+                <i class="bi bi-bar-chart"></i> 模型对比
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('list_reports', project_id=project.id) }}">
+                <i class="bi bi-file-earmark-text"></i> 报告管理
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item active">{{ project.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3"></i> 流水线状态</h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-danger dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="bi bi-arrow-counterclockwise"></i> 回滚
+                        </button>
+                        <form method="POST" action="{{ url_for('rollback_pipeline', project_id=project.id) }}" id="rollbackForm" class="d-none">
+                            <input type="hidden" name="target_stage" id="rollbackStage">
+                            <input type="hidden" name="actor" value="user">
+                        </form>
+                        <ul class="dropdown-menu">
+                            {% for stage in stages %}
+                            <li><a class="dropdown-item" href="#" onclick="rollbackTo('{{ stage }}')">{{ stage }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="step-indicator">
+                        {% set stage_names = {
+                            'raw_data': '数据',
+                            'cleaning': '清洗',
+                            'feature_engineering': '特征',
+                            'training': '训练',
+                            'validation': '验证',
+                            'testing': '测试',
+                            'deployment_request': '申请',
+                            'deployed': '上线'
+                        } %}
+                        {% for stage in stages[:6] %}
+                            {% set completed = pipeline_status.stages[stage].completed %}
+                            <div class="step {% if completed %}completed{% endif %}">
+                                <div class="step-icon">
+                                    {% if completed %}<i class="bi bi-check"></i>{% else %}{{ loop.index }}{% endif %}
+                                </div>
+                                <div class="step-label">{{ stage_names.get(stage, stage) }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> 项目信息</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>名称:</strong> {{ project.name }}</p>
+                            <p><strong>描述:</strong> {{ project.description or '-' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>创建时间:</strong> {{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>更新时间:</strong> {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if project.updated_at else '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <form method="POST" action="{{ url_for('generate_report', project_id=project.id) }}" class="d-inline">
+                                <div class="btn-group">
+                                    <button type="submit" name="report_type" value="markdown" class="btn btn-outline-primary">
+                                        <i class="bi bi-file-earmark-markdown"></i> 生成 Markdown 报告
+                                    </button>
+                                    <button type="submit" name="report_type" value="json" class="btn btn-outline-secondary">
+                                        <i class="bi bi-filetype-json"></i> 生成 JSON 报告
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card stage-card">
+                <div class="card-header with-actions bg-light">
+                    <h6 class="mb-0"><i class="bi bi-database"></i> 数据集版本</h6>
+                    <a href="{{ url_for('upload_data', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if datasets %}
+                        <div class="list-group list-group-flush">
+                            {% for dataset in datasets %}
+                            <a href="{{ url_for('dataset_detail', dataset_id=dataset.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1"><span class="version-badge">{{ dataset.version }}</span></h6>
+                                    <span class="badge status-{{ dataset.quality_checks[0].status if dataset.quality_checks else 'info' }} status-badge">
+                                        {% if dataset.quality_checks %}
+                                            {% set has_errors = dataset.quality_checks|selectattr('status', 'equalto', 'danger')|list %}
+                                            {% if has_errors %}有问题{% else %}已检查{% endif %}
+                                        {% else %}待检查{% endif %}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    {{ dataset.row_count or '?' }} 行 × {{ dataset.column_count or '?' }} 列
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted small">
+                            <i class="bi bi-database" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">暂无数据集</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card stage-card">
+                <div class="card-header with-actions bg-light">
+                    <h6 class="mb-0"><i class="bi bi-brush"></i> 清洗任务</h6>
+                    <a href="{{ url_for('create_cleaning_task', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if cleaning_tasks %}
+                        <div class="list-group list-group-flush">
+                            {% for task in cleaning_tasks %}
+                            <a href="{{ url_for('cleaning_task_detail', cleaning_task_id=task.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1"><span class="version-badge">{{ task.version }}</span></h6>
+                                    <span class="badge status-{{ task.status }} status-badge">{{ task.status }}</span>
+                                </div>
+                                <small class="text-muted">
+                                    {% if task.row_count_before %}{{ task.row_count_before }} → {{ task.row_count_after }} 行{% endif %}
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted small">
+                            <i class="bi bi-brush" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">暂无清洗任务</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card stage-card">
+                <div class="card-header with-actions bg-light">
+                    <h6 class="mb-0"><i class="bi bi-sliders"></i> 特征版本</h6>
+                    <a href="{{ url_for('create_feature_version', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if feature_versions %}
+                        <div class="list-group list-group-flush">
+                            {% for fv in feature_versions %}
+                            <a href="{{ url_for('feature_detail', feature_id=fv.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1"><span class="version-badge">{{ fv.version }}</span></h6>
+                                    <span class="badge status-{{ fv.status }} status-badge">{{ fv.status }}</span>
+                                </div>
+                                <small class="text-muted">
+                                    {{ fv.feature_count or '?' }} 特征
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted small">
+                            <i class="bi bi-sliders" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">暂无特征版本</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card stage-card">
+                <div class="card-header with-actions bg-light">
+                    <h6 class="mb-0"><i class="bi bi-cpu"></i> 训练任务</h6>
+                    <a href="{{ url_for('create_training_run', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if training_runs %}
+                        <div class="list-group list-group-flush">
+                            {% for run in training_runs %}
+                            <a href="{{ url_for('training_detail', training_id=run.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1"><span class="version-badge">{{ run.version }}</span></h6>
+                                    <span class="badge status-{{ run.status }} status-badge">{{ run.status }}</span>
+                                </div>
+                                <small class="text-muted">
+                                    {{ run.model_type or 'Unknown' }}
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted small">
+                            <i class="bi bi-cpu" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">暂无训练任务</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card stage-card">
+                <div class="card-header with-actions bg-light">
+                    <h6 class="mb-0"><i class="bi bi-rocket-takeoff"></i> 上线申请</h6>
+                    <a href="{{ url_for('create_deployment_request', project_id=project.id) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if deployments %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>版本</th>
+                                        <th>标题</th>
+                                        <th>类型</th>
+                                        <th>流量</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in deployments %}
+                                    <tr>
+                                        <td><span class="version-badge">{{ d.version }}</span></td>
+                                        <td>{{ d.title }}</td>
+                                        <td>{{ d.deployment_type }}</td>
+                                        <td>{{ d.traffic_percentage }}%</td>
+                                        <td><span class="badge status-{{ d.status }} status-badge">{{ d.status }}</span></td>
+                                        <td>
+                                            <a href="{{ url_for('deployment_detail', deployment_id=d.id) }}" class="btn btn-sm btn-outline-secondary">
+                                                查看
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3 text-muted small">
+                            <i class="bi bi-rocket-takeoff" style="font-size: 2rem;"></i>
+                            <p class="mt-2 mb-0">暂无上线申请</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function rollbackTo(stage) {
+    if (confirm('确定要回滚到阶段: ' + stage + ' 吗？这将删除该阶段之后的所有数据。')) {
+        document.getElementById('rollbackStage').value = stage;
+        document.getElementById('rollbackForm').submit();
+    }
+}
+</script>
+{% endblock %}

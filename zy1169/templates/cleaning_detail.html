@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}清洗任务详情{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=task.project_id) }}">{{ task.project.name }}</a></li>
+            <li class="breadcrumb-item active">清洗任务 {{ task.version }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-brush"></i> 清洗任务信息</h5>
+                    <span class="version-badge">{{ task.version }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>规则文件:</strong> {{ task.rules_file_name }}</p>
+                            <p><strong>状态:</strong> <span class="badge status-{{ task.status }}">{{ task.status }}</span></p>
+                            <p><strong>行数变化:</strong> {{ task.row_count_before or '?' }} → {{ task.row_count_after or '?' }}</p>
+                            <p><strong>列数变化:</strong> {{ task.column_count_before or '?' }} → {{ task.column_count_after or '?' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>创建时间:</strong> {{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if task.started_at %}
+                            <p><strong>开始时间:</strong> {{ task.started_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                            {% if task.completed_at %}
+                            <p><strong>完成时间:</strong> {{ task.completed_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if task.error_message %}
+                    <div class="alert alert-danger mt-3">
+                        <strong>错误信息:</strong><br>
+                        {{ task.error_message }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> 清洗日志</h5>
+                </div>
+                <div class="card-body">
+                    {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>规则名称</th>
+                                    <th>列</th>
+                                    <th>操作</th>
+                                    <th>影响行数</th>
+                                    <th>消息</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.rule_name }}</td>
+                                    <td>{{ log.column_name or '-' }}</td>
+                                    <td>{{ log.action or '-' }}</td>
+                                    <td>{{ log.rows_affected or '-' }}</td>
+                                    <td class="small">{{ log.message or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">暂无清洗日志</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-gear"></i> 操作</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if task.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('run_cleaning', cleaning_task_id=task.id) }}">
+                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                <i class="bi bi-play-circle"></i> 执行清洗
+                            </button>
+                        </form>
+                        {% elif task.status == 'running' %}
+                        <button class="btn btn-warning btn-sm w-100" disabled>
+                            <i class="bi bi-hourglass-split"></i> 执行中...
+                        </button>
+                        {% elif task.status == 'completed' %}
+                        <a href="{{ url_for('create_feature_version', project_id=task.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-sliders"></i> 创建特征版本
+                        </a>
+                        {% elif task.status == 'failed' %}
+                        <a href="{{ url_for('create_cleaning_task', project_id=task.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-plus"></i> 重新创建清洗任务
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('project_detail', project_id=task.project_id) }}" class="btn btn-outline-secondary btn-sm">
+                            返回项目
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

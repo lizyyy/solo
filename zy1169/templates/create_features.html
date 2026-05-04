@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}创建特征版本{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></li>
+                    <li class="breadcrumb-item active">创建特征版本</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-sliders"></i> 创建特征版本</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="cleaning_task_id" class="form-label">选择清洗任务 <span class="text-danger">*</span></label>
+                            {% if cleaning_tasks %}
+                            <select class="form-select" id="cleaning_task_id" name="cleaning_task_id" required>
+                                {% for ct in cleaning_tasks %}
+                                <option value="{{ ct.id }}">
+                                    {{ ct.version }} ({{ ct.row_count_after or '?' }} 行 × {{ ct.column_count_after or '?' }} 列)
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                暂无已完成的清洗任务，请先<a href="{{ url_for('create_cleaning_task', project_id=project.id) }}">创建并执行清洗任务</a>。
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="spec_file" class="form-label">特征规格文件 (feature-spec.yaml) <span class="text-danger">*</span></label>
+                            <div class="file-upload-area" onclick="document.getElementById('spec_file').click()">
+                                <i class="bi bi-file-code" style="font-size: 3rem; color: #fd7e14;"></i>
+                                <p class="mt-3 mb-1">点击选择或拖拽 YAML 文件到此处</p>
+                                <p class="text-muted small">支持 .yaml / .yml 格式</p>
+                                <input type="file" id="spec_file" name="spec_file" accept=".yaml,.yml" style="display: none;" onchange="updateFileName(this)">
+                            </div>
+                            <div id="fileInfo" class="mt-3 d-none">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    <span id="selectedFileName">已选择文件</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-book"></i> 特征规格 YAML 格式示例</h6>
+                            </div>
+                            <div class="card-body">
+                                <pre class="small bg-light p-3 rounded mb-0" style="white-space: pre-wrap;">features:
+  - name: age
+    source_columns:
+      - age
+    transform: pass_through
+    
+  - name: gender_encoded
+    source_columns:
+      - gender
+    transform: label_encode
+    
+  - name: salary_scaled
+    source_columns:
+      - salary
+    transform: normalize
+    method: standard
+    
+  - name: age_salary_interaction
+    source_columns:
+      - age
+      - salary
+    transform: interaction
+    
+  - name: signup_year
+    source_columns:
+      - signup_date
+    transform: extract_datetime
+    components:
+      - year
+      - month
+
+target_column: churned</pre>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn" {% if not cleaning_tasks %}disabled{% endif %}>
+                                <i class="bi bi-check-lg"></i> 创建特征版本
+                            </button>
+                            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                                取消
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateFileName(input) {
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('selectedFileName');
+    
+    if (input.files.length > 0) {
+        fileName.textContent = input.files[0].name;
+        fileInfo.classList.remove('d-none');
+    } else {
+        fileInfo.classList.add('d-none');
+    }
+}
+
+const dropArea = document.querySelector('.file-upload-area');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight() {
+    dropArea.style.borderColor = '#fd7e14';
+    dropArea.style.backgroundColor = '#fff3e0';
+}
+
+function unhighlight() {
+    dropArea.style.borderColor = '#ccc';
+    dropArea.style.backgroundColor = 'white';
+}
+
+dropArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+        const fileInput = document.getElementById('spec_file');
+        fileInput.files = files;
+        updateFileName(fileInput);
+    }
+}
+</script>
+{% endblock %}

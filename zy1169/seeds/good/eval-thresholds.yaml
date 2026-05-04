@@ -1,0 +1,45 @@
+thresholds:
+  - metric: "accuracy"
+    min_value: 0.75
+    max_value: null
+    description: "准确率最低阈值"
+
+  - metric: "precision"
+    min_value: 0.70
+    max_value: null
+    description: "精确率最低阈值"
+
+  - metric: "recall"
+    min_value: 0.65
+    max_value: null
+    description: "召回率最低阈值"
+
+  - metric: "f1_score"
+    min_value: 0.70
+    max_value: null
+    description: "F1分数最低阈值"
+
+  - metric: "auc_roc"
+    min_value: 0.80
+    max_value: null
+    description: "AUC-ROC最低阈值"
+
+data_quality:
+  max_missing_ratio: 0.1
+  max_duplicate_ratio: 0.01
+  min_unique_ratio: 0.01
+
+feature_checks:
+  max_leakage_correlation: 0.95
+  min_feature_variance: 0.01
+  max_zero_variance_features: 0.05
+
+test_requirements:
+  min_test_samples: 10
+  required_test_cases:
+    - name: "edge_case_high_age"
+      description: "测试高龄用户预测"
+    - name: "edge_case_low_income"
+      description: "测试低收入用户预测"
+    - name: "edge_case_new_user"
+      description: "测试新用户预测"

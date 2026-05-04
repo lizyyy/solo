@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}上线申请详情{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=deployment.project_id) }}">{{ deployment.project.name }}</a></li>
+            <li class="breadcrumb-item active">上线申请 {{ deployment.version }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-rocket-takeoff"></i> 上线申请信息</h5>
+                    <div>
+                        <span class="version-badge me-2">{{ deployment.version }}</span>
+                        <span class="badge status-{{ deployment.status }}">{{ deployment.status }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>标题:</strong> {{ deployment.title }}</p>
+                            <p><strong>描述:</strong> {{ deployment.description or 'N/A' }}</p>
+                            <p><strong>申请人:</strong> {{ deployment.requester or 'system' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>上线类型:</strong> 
+                                {% if deployment.deployment_type == 'canary' %}
+                                <span class="badge bg-warning">灰度上线</span>
+                                {% else %}
+                                <span class="badge bg-success">全量上线</span>
+                                {% endif %}
+                            </p>
+                            {% if deployment.deployment_type == 'canary' %}
+                            <p><strong>流量比例:</strong> {{ deployment.traffic_percentage }}%</p>
+                            {% endif %}
+                            <p><strong>创建时间:</strong> {{ deployment.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if deployment.deployed_at %}
+                            <p><strong>上线时间:</strong> {{ deployment.deployed_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <strong>关联训练任务:</strong>
+                        <a href="{{ url_for('training_detail', training_id=deployment.training_run_id) }}" class="btn btn-sm btn-outline-secondary ms-2">
+                            {{ deployment.training_run.version }} - {{ deployment.training_run.model_type or 'Unknown' }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-check2-square"></i> 审批记录</h5>
+                </div>
+                <div class="card-body">
+                    {% if approvals %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>审批人</th>
+                                    <th>操作</th>
+                                    <th>时间</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for approval in approvals %}
+                                <tr>
+                                    <td>{{ approval.approver }}</td>
+                                    <td>
+                                        {% if approval.action == 'approve' %}
+                                        <span class="badge bg-success">批准</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">拒绝</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ approval.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>{{ approval.comment or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">暂无审批记录</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-gear"></i> 操作</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if deployment.status == 'pending' %}
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#approveModal">
+                            <i class="bi bi-check-circle"></i> 批准
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="bi bi-x-circle"></i> 拒绝
+                        </button>
+                        {% elif deployment.status == 'approved' %}
+                        <form method="POST" action="{{ url_for('deploy_model', deployment_id=deployment.id) }}">
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-rocket-takeoff"></i> 执行上线
+                            </button>
+                        </form>
+                        {% elif deployment.status == 'deployed' %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> 已上线
+                        </div>
+                        {% elif deployment.status == 'rejected' %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle"></i> 已拒绝
+                        </div>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('project_detail', project_id=deployment.project_id) }}" class="btn btn-outline-secondary btn-sm">
+                            返回项目
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if deployment.status == 'pending' %}
+<div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('approve_deployment', deployment_id=deployment.id) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-check-circle"></i> 批准上线</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="approver_approve" class="form-label">审批人</label>
+                        <input type="text" class="form-control" id="approver_approve" name="approver" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment_approve" class="form-label">备注</label>
+                        <textarea class="form-control" id="comment_approve" name="comment" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-success">确认批准</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('reject_deployment', deployment_id=deployment.id) }}">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-x-circle"></i> 拒绝上线</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="approver_reject" class="form-label">审批人</label>
+                        <input type="text" class="form-control" id="approver_reject" name="approver" value="admin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment_reject" class="form-label">拒绝原因 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="comment_reject" name="comment" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">确认拒绝</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

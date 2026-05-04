@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}模型版本对比{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></li>
+            <li class="breadcrumb-item active">模型版本对比</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4"><i class="bi bi-bar-chart"></i> 模型版本对比</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">选择要对比的训练任务</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row align-items-end">
+                <div class="col-md-5">
+                    <label for="run1" class="form-label">模型 A</label>
+                    <select class="form-select" id="run1" name="run1">
+                        <option value="">-- 选择 --</option>
+                        {% for run in training_runs %}
+                        <option value="{{ run.id }}" {% if run1 and run1.id == run.id %}selected{% endif %}>
+                            {{ run.version }} - {{ run.model_type or 'Unknown' }}
+                            ({{ run.created_at.strftime('%Y-%m-%d') }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="run2" class="form-label">模型 B</label>
+                    <select class="form-select" id="run2" name="run2">
+                        <option value="">-- 选择 --</option>
+                        {% for run in training_runs %}
+                        <option value="{{ run.id }}" {% if run2 and run2.id == run.id %}selected{% endif %}>
+                            {{ run.version }} - {{ run.model_type or 'Unknown' }}
+                            ({{ run.created_at.strftime('%Y-%m-%d') }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> 对比
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if comparison %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">对比结果</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>指标</th>
+                            <th>{{ run1.version }} ({{ run1.model_type or 'Unknown' }})</th>
+                            <th>{{ run2.version }} ({{ run2.model_type or 'Unknown' }})</th>
+                            <th>差异</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metric_name, values in comparison.items() %}
+                        <tr>
+                            <td><strong>{{ metric_name }}</strong></td>
+                            <td>{{ "%.4f"|format(values.value1) }}</td>
+                            <td>{{ "%.4f"|format(values.value2) }}</td>
+                            <td>
+                                {% if values.diff > 0 %}
+                                <span class="text-success"><i class="bi bi-arrow-up"></i> +{{ "%.4f"|format(values.diff) }} (+{{ "%.2f"|format(values.diff_pct) }}%)</span>
+                                {% elif values.diff < 0 %}
+                                <span class="text-danger"><i class="bi bi-arrow-down"></i> {{ "%.4f"|format(values.diff) }} ({{ "%.2f"|format(values.diff_pct) }}%)</span>
+                                {% else %}
+                                <span class="text-muted">无变化</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle"></i> 
+                <strong>提示:</strong> 正差异表示 {{ run1.version }} 优于 {{ run2.version }}，负差异表示 {{ run2.version }} 更优。
+            </div>
+        </div>
+    </div>
+    {% elif run1 or run2 %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i> 请选择两个已完成的训练任务进行对比
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

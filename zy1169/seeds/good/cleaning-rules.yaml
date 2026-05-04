@@ -1,0 +1,42 @@
+rules:
+  - name: drop_duplicates
+    description: "删除重复行"
+    action: drop_duplicates
+
+  - name: handle_missing_age
+    description: "使用中位数填充age缺失值"
+    action: fill_missing
+    column: "age"
+    method: "median"
+
+  - name: handle_missing_income
+    description: "使用均值填充monthly_income缺失值"
+    action: fill_missing
+    column: "monthly_income"
+    method: "mean"
+
+  - name: filter_valid_age
+    description: "过滤无效年龄（18-100岁）"
+    action: filter
+    condition: "age >= 18 and age <= 100"
+
+  - name: filter_valid_income
+    description: "过滤无效收入（>0）"
+    action: filter
+    condition: "monthly_income > 0"
+
+  - name: convert_boolean
+    description: "转换布尔列类型"
+    action: convert_type
+    columns:
+      - "has_cr_card"
+      - "is_active_member"
+      - "churned"
+    dtype: "int"
+
+  - name: drop_unused_columns
+    description: "删除不需要的列（如果存在）"
+    action: drop_column
+    columns:
+      - "unnamed_0"
+      - "row_id"

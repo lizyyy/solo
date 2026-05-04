@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}特征版本详情{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=feature.project_id) }}">{{ feature.project.name }}</a></li>
+            <li class="breadcrumb-item active">特征版本 {{ feature.version }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-sliders"></i> 特征版本信息</h5>
+                    <span class="version-badge">{{ feature.version }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>规格文件:</strong> {{ feature.spec_file_name }}</p>
+                            <p><strong>状态:</strong> <span class="badge status-{{ feature.status }}">{{ feature.status }}</span></p>
+                            <p><strong>特征数量:</strong> {{ feature.feature_count or 'N/A' }}</p>
+                            <p><strong>行数:</strong> {{ feature.row_count or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>创建时间:</strong> {{ feature.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if feature.started_at %}
+                            <p><strong>开始时间:</strong> {{ feature.started_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                            {% if feature.completed_at %}
+                            <p><strong>完成时间:</strong> {{ feature.completed_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if feature.feature_names %}
+                    <div class="mt-3">
+                        <strong>特征列表:</strong>
+                        <div class="mt-2">
+                            {% for feat in feature.feature_names.split(',') %}
+                            <span class="badge bg-primary me-1 mb-1">{{ feat }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if feature.error_message %}
+                    <div class="alert alert-danger mt-3">
+                        <strong>错误信息:</strong><br>
+                        {{ feature.error_message }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> 特征检查结果</h5>
+                </div>
+                <div class="card-body">
+                    {% if checks %}
+                    <div class="list-group list-group-flush">
+                        {% for check in checks %}
+                        <div class="list-group-item p-2">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ check.check_type }}</strong>
+                                    {% if check.feature_name %}
+                                    <span class="text-muted small"> ({{ check.feature_name }})</span>
+                                    {% endif %}
+                                </div>
+                                <span class="badge status-{{ check.status }} status-badge">{{ check.status }}</span>
+                            </div>
+                            <p class="mb-0 small text-muted">{{ check.message }}</p>
+                            {% if check.value is not none %}
+                            <p class="mb-0 small">检测值: {{ "%.4f"|format(check.value) }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">暂无特征检查结果</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-gear"></i> 操作</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if feature.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('run_feature_engineering', feature_id=feature.id) }}">
+                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                <i class="bi bi-play-circle"></i> 执行特征工程
+                            </button>
+                        </form>
+                        {% elif feature.status == 'running' %}
+                        <button class="btn btn-warning btn-sm w-100" disabled>
+                            <i class="bi bi-hourglass-split"></i> 执行中...
+                        </button>
+                        {% elif feature.status == 'completed' %}
+                        <a href="{{ url_for('create_training_run', project_id=feature.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-cpu"></i> 创建训练任务
+                        </a>
+                        {% elif feature.status == 'failed' %}
+                        <a href="{{ url_for('create_feature_version', project_id=feature.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-plus"></i> 重新创建特征版本
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('project_detail', project_id=feature.project_id) }}" class="btn btn-outline-secondary btn-sm">
+                            返回项目
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

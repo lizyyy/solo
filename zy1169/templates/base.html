@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ML Pipeline Studio{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            border-right: 1px solid #eee;
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+        }
+        .stage-card {
+            transition: all 0.3s ease;
+        }
+        .stage-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
+        .status-passed, .status-completed, .status-approved, .status-deployed {
+            background-color: #198754;
+            color: white;
+        }
+        .status-failed, .status-rejected {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-running, .status-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .status-warning {
+            background-color: #fd7e14;
+            color: white;
+        }
+        .status-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-info {
+            background-color: #0dcaf0;
+            color: #000;
+        }
+        .file-upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .file-upload-area:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+        .step.completed:not(:last-child)::after {
+            background-color: #198754;
+        }
+        .step.active:not(:last-child)::after {
+            background: linear-gradient(to right, #198754 50%, #ddd 50%);
+        }
+        .step-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .step.completed .step-icon {
+            background-color: #198754;
+            color: white;
+        }
+        .step.active .step-icon {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .step:not(.completed):not(.active) .step-icon {
+            background-color: #ddd;
+            color: #666;
+        }
+        .step-label {
+            margin-top: 8px;
+            font-size: 0.75em;
+            text-align: center;
+        }
+        .card-header.with-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .version-badge {
+            font-family: monospace;
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-diagram-3"></i> ML Pipeline Studio
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="bi bi-house"></i> 首页
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

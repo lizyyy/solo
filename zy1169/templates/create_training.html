@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}创建训练任务{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></li>
+                    <li class="breadcrumb-item active">创建训练任务</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-cpu"></i> 创建训练任务</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="feature_version_id" class="form-label">选择特征版本 <span class="text-danger">*</span></label>
+                            {% if feature_versions %}
+                            <select class="form-select" id="feature_version_id" name="feature_version_id" required>
+                                {% for fv in feature_versions %}
+                                <option value="{{ fv.id }}">
+                                    {{ fv.version }} ({{ fv.feature_count or '?' }} 特征 × {{ fv.row_count or '?' }} 行)
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                暂无已完成的特征版本，请先<a href="{{ url_for('create_feature_version', project_id=project.id) }}">创建并执行特征版本</a>。
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="config_file" class="form-label">训练配置文件 (train-config.yaml) <span class="text-danger">*</span></label>
+                            <div class="file-upload-area" onclick="document.getElementById('config_file').click()">
+                                <i class="bi bi-file-code" style="font-size: 3rem; color: #6f42c1;"></i>
+                                <p class="mt-3 mb-1">点击选择或拖拽 YAML 文件到此处</p>
+                                <p class="text-muted small">支持 .yaml / .yml 格式</p>
+                                <input type="file" id="config_file" name="config_file" accept=".yaml,.yml" style="display: none;" onchange="updateFileName(this)">
+                            </div>
+                            <div id="fileInfo" class="mt-3 d-none">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    <span id="selectedFileName">已选择文件</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-book"></i> 训练配置 YAML 格式示例</h6>
+                            </div>
+                            <div class="card-body">
+                                <pre class="small bg-light p-3 rounded mb-0" style="white-space: pre-wrap;">model_type: random_forest_classifier
+task_type: classification
+target_column: churned
+
+feature_columns:
+  - age
+  - gender_encoded
+  - salary_scaled
+  - tenure
+
+hyperparameters:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 2
+  random_state: 42
+
+test_size: 0.2
+random_state: 42
+
+validation_thresholds:
+  accuracy: 0.8
+  precision: 0.75
+  recall: 0.75
+  f1: 0.75</pre>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn" {% if not feature_versions %}disabled{% endif %}>
+                                <i class="bi bi-check-lg"></i> 创建训练任务
+                            </button>
+                            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                                取消
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateFileName(input) {
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('selectedFileName');
+    
+    if (input.files.length > 0) {
+        fileName.textContent = input.files[0].name;
+        fileInfo.classList.remove('d-none');
+    } else {
+        fileInfo.classList.add('d-none');
+    }
+}
+
+const dropArea = document.querySelector('.file-upload-area');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight() {
+    dropArea.style.borderColor = '#6f42c1';
+    dropArea.style.backgroundColor = '#f3e8ff';
+}
+
+function unhighlight() {
+    dropArea.style.borderColor = '#ccc';
+    dropArea.style.backgroundColor = 'white';
+}
+
+dropArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length > 0) {
+        const fileInput = document.getElementById('config_file');
+        fileInput.files = files;
+        updateFileName(fileInput);
+    }
+}
+</script>
+{% endblock %}

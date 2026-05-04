@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}申请上线{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></li>
+                    <li class="breadcrumb-item active">申请上线</li>
+                </ol>
+            </nav>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-rocket-takeoff"></i> 创建上线申请</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="training_run_id" class="form-label">选择训练任务 <span class="text-danger">*</span></label>
+                            {% if training_runs %}
+                            <select class="form-select" id="training_run_id" name="training_run_id" required>
+                                {% for tr in training_runs %}
+                                <option value="{{ tr.id }}">
+                                    {{ tr.version }} - {{ tr.model_type or 'Unknown' }}
+                                    {% set has_failed = tr.validations|selectattr('status', 'equalto', 'failed')|list %}
+                                    {% if has_failed %}
+                                    <span class="text-danger">(有未达标的验证指标)</span>
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                暂无已完成的训练任务，请先<a href="{{ url_for('create_training_run', project_id=project.id) }}">创建并执行训练任务</a>。
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">申请标题 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   placeholder="例如：客户流失预测模型 v2.0 上线申请" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">申请描述</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3" placeholder="描述模型变更、改进点、风险点等..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="deployment_type" class="form-label">上线类型</label>
+                            <select class="form-select" id="deployment_type" name="deployment_type">
+                                <option value="full">全量上线</option>
+                                <option value="canary">灰度上线</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3" id="trafficPercentageGroup">
+                            <label for="traffic_percentage" class="form-label">灰度流量比例 (%)</label>
+                            <input type="number" class="form-control" id="traffic_percentage" name="traffic_percentage" 
+                                   value="10" min="1" max="99" step="1">
+                            <small class="text-muted">仅灰度上线时有效</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="requester" class="form-label">申请人</label>
+                            <input type="text" class="form-control" id="requester" name="requester" 
+                                   placeholder="您的姓名或邮箱" value="system">
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" {% if not training_runs %}disabled{% endif %}>
+                                <i class="bi bi-send"></i> 提交上线申请
+                            </button>
+                            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-outline-secondary">
+                                取消
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const deploymentTypeSelect = document.getElementById('deployment_type');
+const trafficGroup = document.getElementById('trafficPercentageGroup');
+const trafficInput = document.getElementById('traffic_percentage');
+
+function updateTrafficVisibility() {
+    if (deploymentTypeSelect.value === 'canary') {
+        trafficGroup.style.display = 'block';
+    } else {
+        trafficGroup.style.display = 'none';
+    }
+}
+
+deploymentTypeSelect.addEventListener('change', updateTrafficVisibility);
+updateTrafficVisibility();
+</script>
+{% endblock %}

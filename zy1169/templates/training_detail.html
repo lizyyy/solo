@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}训练任务详情{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">首页</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('project_detail', project_id=training.project_id) }}">{{ training.project.name }}</a></li>
+            <li class="breadcrumb-item active">训练任务 {{ training.version }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-cpu"></i> 训练任务信息</h5>
+                    <span class="version-badge">{{ training.version }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>配置文件:</strong> {{ training.config_file_name }}</p>
+                            <p><strong>模型类型:</strong> {{ training.model_type or 'N/A' }}</p>
+                            <p><strong>训练样本数:</strong> {{ training.train_rows or 'N/A' }}</p>
+                            <p><strong>测试样本数:</strong> {{ training.test_rows or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>状态:</strong> <span class="badge status-{{ training.status }}">{{ training.status }}</span></p>
+                            <p><strong>创建时间:</strong> {{ training.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% if training.started_at %}
+                            <p><strong>开始时间:</strong> {{ training.started_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                            {% if training.completed_at %}
+                            <p><strong>完成时间:</strong> {{ training.completed_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if training.hyperparameters %}
+                    <div class="mt-3">
+                        <strong>超参数:</strong>
+                        <pre class="small bg-light p-2 rounded mt-2">{{ training.hyperparameters }}</pre>
+                    </div>
+                    {% endif %}
+                    
+                    {% if training.error_message %}
+                    <div class="alert alert-danger mt-3">
+                        <strong>错误信息:</strong><br>
+                        {{ training.error_message }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> 验证指标</h5>
+                </div>
+                <div class="card-body">
+                    {% if validations %}
+                    <div class="row">
+                        {% for v in validations %}
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-{% if v.status == 'passed' %}success{% elif v.status == 'failed' %}danger{% else %}warning{% endif %}">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted small">{{ v.metric_name }}</h6>
+                                    <h3 class="mb-0">{{ "%.4f"|format(v.value) }}</h3>
+                                    {% if v.threshold is not none %}
+                                    <small class="text-muted">阈值: {{ v.threshold }}</small>
+                                    {% endif %}
+                                    <div class="mt-1">
+                                        <span class="badge status-{{ v.status }}">{{ v.status }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">暂无验证指标</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-gear"></i> 操作</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if training.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('run_train_model', training_id=training.id) }}">
+                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                <i class="bi bi-play-circle"></i> 开始训练
+                            </button>
+                        </form>
+                        {% elif training.status == 'running' %}
+                        <button class="btn btn-warning btn-sm w-100" disabled>
+                            <i class="bi bi-hourglass-split"></i> 训练中...
+                        </button>
+                        {% elif training.status == 'completed' %}
+                        <a href="{{ url_for('test_playback', training_id=training.id) }}" class="btn btn-info btn-sm w-100">
+                            <i class="bi bi-play-fill"></i> 测试集回放
+                        </a>
+                        <a href="{{ url_for('create_deployment_request', project_id=training.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-rocket-takeoff"></i> 申请上线
+                        </a>
+                        {% elif training.status == 'failed' %}
+                        <a href="{{ url_for('create_training_run', project_id=training.project_id) }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-plus"></i> 重新创建训练任务
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('project_detail', project_id=training.project_id) }}" class="btn btn-outline-secondary btn-sm">
+                            返回项目
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

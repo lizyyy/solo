@@ -1,0 +1,39 @@
+model_type: "random_forest"
+task_type: "classification"
+
+target_column: "churned"
+
+feature_columns:
+  - "age"
+  - "monthly_income"
+  - "tenure"
+  - "num_products"
+  - "has_cr_card"
+  - "is_active_member"
+  - "estimated_salary"
+  - "income_age_interaction"
+  - "senior_citizen"
+
+hyperparameters:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 2
+  min_samples_leaf: 1
+  random_state: 42
+
+data_split:
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+
+training:
+  early_stopping: false
+  verbose: 1
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "auc_roc"

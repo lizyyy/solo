@@ -1,0 +1,41 @@
+features:
+  - name: "age"
+    transform: "normalize"
+    method: "minmax"
+
+  - name: "monthly_income"
+    transform: "normalize"
+    method: "standard"
+
+  - name: "tenure"
+    transform: "normalize"
+    method: "minmax"
+
+  - name: "num_products"
+    transform: "normalize"
+    method: "minmax"
+
+  - name: "has_cr_card"
+    transform: "none"
+
+  - name: "is_active_member"
+    transform: "none"
+
+  - name: "estimated_salary"
+    transform: "log_transform"
+
+  - name: "income_age_interaction"
+    transform: "interaction"
+    columns: ["monthly_income", "age"]
+
+  - name: "senior_citizen"
+    transform: "bin"
+    column: "age"
+    bins: [0, 40, 60, 200]
+    labels: ["young", "middle", "senior"]
+    encode: "label"
+
+exclude_features:
+  - "user_id"
+
+target_column: "churned"

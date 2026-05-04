@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}ML Pipeline Studio - 首页{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="jumbotron bg-light p-5 rounded mb-4">
+                <h1 class="display-4"><i class="bi bi-diagram-3"></i> ML Pipeline Studio</h1>
+                <p class="lead">一个完整的模型训练流水线演练平台，让你的ML流程可追踪、可复现、可审计。</p>
+                <hr class="my-4">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="bi bi-cloud-upload" style="font-size: 2rem; color: #0d6efd;"></i>
+                                <h5 class="card-title mt-2">数据上传</h5>
+                                <p class="card-text small">支持CSV和YAML配置文件</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="bi bi-gear-wide-connected" style="font-size: 2rem; color: #198754;"></i>
+                                <h5 class="card-title mt-2">阶段执行</h5>
+                                <p class="card-text small">清洗、特征、训练、验证</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="bi bi-arrow-counterclockwise" style="font-size: 2rem; color: #ffc107;"></i>
+                                <h5 class="card-title mt-2">版本回滚</h5>
+                                <p class="card-text small">支持任意阶段回滚</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="bi bi-file-earmark-text" style="font-size: 2rem; color: #6f42c1;"></i>
+                                <h5 class="card-title mt-2">报告导出</h5>
+                                <p class="card-text small">Markdown/JSON格式</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header with-actions">
+                    <h5 class="mb-0"><i class="bi bi-folder"></i> 项目列表</h5>
+                    <a href="{{ url_for('create_project') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus"></i> 新建项目
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if projects %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>项目名称</th>
+                                        <th>描述</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in projects %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ project.name }}</strong>
+                                        </td>
+                                        <td class="text-muted small">
+                                            {{ project.description|truncate(50) if project.description else '-' }}
+                                        </td>
+                                        <td class="small">{{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-eye"></i> 查看
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-folder-x" style="font-size: 3rem; color: #ccc;"></i>
+                            <p class="text-muted mt-3">暂无项目</p>
+                            <a href="{{ url_for('create_project') }}" class="btn btn-primary">
+                                <i class="bi bi-plus"></i> 创建第一个项目
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-book"></i> 快速开始</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 1</small>
+                            <p class="mb-0 small"><strong>创建项目</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 2</small>
+                            <p class="mb-0 small"><strong>上传 raw-data.csv</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 3</small>
+                            <p class="mb-0 small"><strong>应用 cleaning-rules.yaml</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 4</small>
+                            <p class="mb-0 small"><strong>生成特征 feature-spec.yaml</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 5</small>
+                            <p class="mb-0 small"><strong>训练 train-config.yaml</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 6</small>
+                            <p class="mb-0 small"><strong>验证 eval-thresholds.yaml</strong></p>
+                        </div>
+                        <div class="list-group-item p-2">
+                            <small class="text-muted">Step 7</small>
+                            <p class="mb-0 small"><strong>申请上线 & 审批</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> 检测能力</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 数据质量问题</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 特征缺失值</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 特征泄漏检测</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 阈值未达标</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 测试集回放</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 灰度上线模拟</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 模型版本对比</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
