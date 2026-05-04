@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物寄养店喂药与异常交接台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>宠物寄养店喂药与异常交接台</h1>
+            <div class="header-actions">
+                <button id="exportMdBtn" class="btn btn-success">导出 Markdown 交接单</button>
+                <button id="exportCsvBtn" class="btn btn-warning">导出 CSV 异常清单</button>
+                <button id="exportJsonBtn" class="btn btn-info">导出 JSON 审计包</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="import">数据导入</button>
+                <button class="tab-btn" data-tab="pets">宠物管理</button>
+                <button class="tab-btn" data-tab="medications">药品管理</button>
+                <button class="tab-btn" data-tab="shifts">班次管理</button>
+                <button class="tab-btn" data-tab="feedings">喂药记录</button>
+                <button class="tab-btn" data-tab="alerts">异常提醒</button>
+                <button class="tab-btn" data-tab="export">数据导出</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- 数据导入 -->
+                <div id="import-tab" class="tab-panel active">
+                    <div class="import-section">
+                        <h2>数据导入</h2>
+                        <p>请按顺序导入以下数据：寄养协议 → 宠物体重/过敏信息 → 笼位表 → 每日喂药计划</p>
+                        
+                        <div class="import-grid">
+                            <div class="import-card">
+                                <h3>1. 寄养协议</h3>
+                                <p>包含宠物基本信息、主人信息、寄养时间</p>
+                                <input type="file" id="agreementFile" accept=".csv,.json">
+                                <div class="file-info" id="agreementInfo"></div>
+                                <button class="btn btn-primary" id="previewAgreementBtn">预览数据</button>
+                                <button class="btn btn-success" id="importAgreementBtn" disabled>确认导入</button>
+                            </div>
+
+                            <div class="import-card">
+                                <h3>2. 宠物体重/过敏信息</h3>
+                                <p>包含宠物ID、体重、过敏原列表</p>
+                                <input type="file" id="healthFile" accept=".csv,.json">
+                                <div class="file-info" id="healthInfo"></div>
+                                <button class="btn btn-primary" id="previewHealthBtn">预览数据</button>
+                                <button class="btn btn-success" id="importHealthBtn" disabled>确认导入</button>
+                            </div>
+
+                            <div class="import-card">
+                                <h3>3. 笼位表</h3>
+                                <p>包含笼位编号、宠物ID、同笼宠物信息</p>
+                                <input type="file" id="cageFile" accept=".csv,.json">
+                                <div class="file-info" id="cageInfo"></div>
+                                <button class="btn btn-primary" id="previewCageBtn">预览数据</button>
+                                <button class="btn btn-success" id="importCageBtn" disabled>确认导入</button>
+                            </div>
+
+                            <div class="import-card">
+                                <h3>4. 每日喂药计划</h3>
+                                <p>包含宠物ID、药品名称、剂量、时间、班次</p>
+                                <input type="file" id="medicationFile" accept=".csv,.json">
+                                <div class="file-info" id="medicationInfo"></div>
+                                <button class="btn btn-primary" id="previewMedicationBtn">预览数据</button>
+                                <button class="btn btn-success" id="importMedicationBtn" disabled>确认导入</button>
+                            </div>
+                        </div>
+
+                        <div class="preview-section" id="previewSection">
+                            <h3>数据预览</h3>
+                            <div class="table-container" id="previewTableContainer"></div>
+                        </div>
+
+                        <div class="import-status">
+                            <h3>导入状态</h3>
+                            <div id="importStatusList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 宠物管理 -->
+                <div id="pets-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>宠物管理</h2>
+                        <button class="btn btn-primary" id="addPetBtn">添加宠物</button>
+                    </div>
+                    <div class="table-container" id="petsTableContainer"></div>
+                </div>
+
+                <!-- 药品管理 -->
+                <div id="medications-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>药品管理</h2>
+                        <button class="btn btn-primary" id="addMedicationBtn">添加药品</button>
+                    </div>
+                    <div class="table-container" id="medicationsTableContainer"></div>
+                </div>
+
+                <!-- 班次管理 -->
+                <div id="shifts-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>班次管理</h2>
+                        <div class="shift-controls">
+                            <select id="dateSelect" class="form-control">
+                                <option value="">选择日期</option>
+                            </select>
+                            <select id="shiftSelect" class="form-control">
+                                <option value="morning">早班</option>
+                                <option value="afternoon">中班</option>
+                                <option value="evening">晚班</option>
+                            </select>
+                            <button class="btn btn-primary" id="loadShiftBtn">加载班次</button>
+                            <button class="btn btn-success" id="completeShiftBtn">完成班次复核</button>
+                        </div>
+                    </div>
+                    
+                    <div class="shift-summary" id="shiftSummary"></div>
+                    
+                    <div class="table-container" id="shiftTasksContainer"></div>
+                </div>
+
+                <!-- 喂药记录 -->
+                <div id="feedings-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>喂药记录</h2>
+                        <div class="filter-controls">
+                            <select id="feedingDateFilter" class="form-control">
+                                <option value="">全部日期</option>
+                            </select>
+                            <select id="feedingShiftFilter" class="form-control">
+                                <option value="">全部班次</option>
+                                <option value="morning">早班</option>
+                                <option value="afternoon">中班</option>
+                                <option value="evening">晚班</option>
+                            </select>
+                            <select id="feedingStatusFilter" class="form-control">
+                                <option value="">全部状态</option>
+                                <option value="pending">待喂</option>
+                                <option value="completed">已喂</option>
+                                <option value="missed">漏喂</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container" id="feedingsTableContainer"></div>
+                </div>
+
+                <!-- 异常提醒 -->
+                <div id="alerts-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>异常提醒</h2>
+                        <div class="alert-stats" id="alertStats"></div>
+                    </div>
+                    
+                    <div class="alerts-container">
+                        <div class="alert-category">
+                            <h3>⚠️ 剂量超重警告</h3>
+                            <div id="doseAlertsContainer" class="alert-list"></div>
+                        </div>
+                        
+                        <div class="alert-category">
+                            <h3>🚨 过敏禁忌警告</h3>
+                            <div id="allergyAlertsContainer" class="alert-list"></div>
+                        </div>
+                        
+                        <div class="alert-category">
+                            <h3>🐾 同笼冲突警告</h3>
+                            <div id="cageAlertsContainer" class="alert-list"></div>
+                        </div>
+                        
+                        <div class="alert-category">
+                            <h3>⏰ 漏喂提醒</h3>
+                            <div id="missedAlertsContainer" class="alert-list"></div>
+                        </div>
+                        
+                        <div class="alert-category">
+                            <h3>🔴 异常观察未闭环</h3>
+                            <div id="observationAlertsContainer" class="alert-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据导出 -->
+                <div id="export-tab" class="tab-panel">
+                    <div class="section-header">
+                        <h2>数据导出</h2>
+                    </div>
+                    
+                    <div class="export-grid">
+                        <div class="export-card">
+                            <h3>Markdown 交接单</h3>
+                            <p>包含班次总结、喂药情况、异常记录、注意事项</p>
+                            <div class="export-options">
+                                <label>
+                                    <input type="checkbox" id="mdIncludeSummary" checked> 包含班次总结
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="mdIncludeFeedings" checked> 包含喂药记录
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="mdIncludeAlerts" checked> 包含异常记录
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="mdIncludeNotes" checked> 包含注意事项
+                                </label>
+                            </div>
+                            <button class="btn btn-success btn-lg" id="downloadMdBtn">下载 Markdown</button>
+                        </div>
+                        
+                        <div class="export-card">
+                            <h3>CSV 异常清单</h3>
+                            <p>包含所有未闭环的异常记录，便于统计和追踪</p>
+                            <div class="export-options">
+                                <label>
+                                    <input type="checkbox" id="csvIncludeDose" checked> 剂量超重
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="csvIncludeAllergy" checked> 过敏禁忌
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="csvIncludeCage" checked> 同笼冲突
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="csvIncludeMissed" checked> 漏喂记录
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="csvIncludeObservations" checked> 异常观察
+                                </label>
+                            </div>
+                            <button class="btn btn-warning btn-lg" id="downloadCsvBtn">下载 CSV</button>
+                        </div>
+                        
+                        <div class="export-card">
+                            <h3>JSON 审计包</h3>
+                            <p>包含所有数据的完整快照，用于审计和备份</p>
+                            <div class="export-options">
+                                <label>
+                                    <input type="checkbox" id="jsonIncludePets" checked> 宠物信息
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="jsonIncludeMedications" checked> 药品信息
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="jsonIncludeFeedings" checked> 喂药记录
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="jsonIncludeAlerts" checked> 异常记录
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="jsonIncludeShifts" checked> 班次信息
+                                </label>
+                            </div>
+                            <button class="btn btn-info btn-lg" id="downloadJsonBtn">下载 JSON</button>
+                        </div>
+                    </div>
+                    
+                    <div class="data-summary" id="dataSummary"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 模态框 -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">标题</h2>
+                <div id="modalBody"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>宠物寄养店喂药与异常交接台 &copy; 2026</p>
+            <p>数据本地存储，刷新不丢失</p>
+        </footer>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/import.js"></script>
+    <script src="js/validators.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
