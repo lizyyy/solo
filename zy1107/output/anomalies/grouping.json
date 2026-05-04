@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-05-04T11:11:42.486365",
+  "group_size": 6,
+  "slots": {
+    "周六上午": {
+      "groups": [
+        {
+          "group_name": "周六上午第1组",
+          "time_slot": "周六上午",
+          "total_people": 6,
+          "adults": 5,
+          "children": 1,
+          "child_ratio": "16.7%",
+          "members": [
+            {
+              "name": "吴九",
+              "phone": "13300133000",
+              "total_people": 3,
+              "adults": 2,
+              "children": 1,
+              "payment_status": "已付款",
+              "dietary_restrictions": []
+            },
+            {
+              "name": "孙七",
+              "phone": "13500135000",
+              "total_people": 3,
+              "adults": 3,
+              "children": 0,
+              "payment_status": "已付款",
+              "dietary_restrictions": []
+            }
+          ]
+        },
+        {
+          "group_name": "周六上午第2组",
+          "time_slot": "周六上午",
+          "total_people": 4,
+          "adults": 4,
+          "children": 0,
+          "child_ratio": "0.0%",
+          "members": [
+            {
+              "name": "王五",
+              "phone": "13700137000",
+              "total_people": 2,
+              "adults": 2,
+              "children": 0,
+              "payment_status": "未付款",
+              "dietary_restrictions": []
+            },
+            {
+              "name": "周八",
+              "phone": "13400134000",
+              "total_people": 1,
+              "adults": 1,
+              "children": 0,
+              "payment_status": "已付款",
+              "dietary_restrictions": []
+            },
+            {
+              "name": "陈十一",
+              "phone": "13100131000",
+              "total_people": 1,
+              "adults": 1,
+              "children": 0,
+              "payment_status": "疑似多付",
+              "dietary_restrictions": [
+                "忌口辣"
+              ]
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "total_people": 10,
+        "total_groups": 2
+      }
+    },
+    "周六下午": {
+      "groups": [
+        {
+          "group_name": "周六下午第1组",
+          "time_slot": "周六下午",
+          "total_people": 6,
+          "adults": 4,
+          "children": 2,
+          "child_ratio": "33.3%",
+          "members": [
+            {
+              "name": "赵六",
+              "phone": "13600136000",
+              "total_people": 4,
+              "adults": 2,
+              "children": 2,
+              "payment_status": "已付款",
+              "dietary_restrictions": []
+            },
+            {
+              "name": "李四",
+              "phone": "13900139000",
+              "total_people": 1,
+              "adults": 1,
+              "children": 0,
+              "payment_status": "疑似少付",
+              "dietary_restrictions": []
+            },
+            {
+              "name": "郑十",
+              "phone": "13200132000",
+              "total_people": 1,
+              "adults": 1,
+              "children": 0,
+              "payment_status": "已付款",
+              "dietary_restrictions": []
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "total_people": 6,
+        "total_groups": 1
+      }
+    }
+  },
+  "summary": {
+    "total_confirmed": 8,
+    "total_waitlist": 2,
+    "total_groups": 3
+  }
+}

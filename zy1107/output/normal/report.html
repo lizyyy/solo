@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动报名处理报告</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { color: #2980b9; margin-top: 30px; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid #3498db; }
+        h3 { color: #34495e; margin-top: 20px; margin-bottom: 10px; }
+        h4 { color: #5d6d7e; margin-top: 15px; margin-bottom: 8px; }
+        .meta-info { color: #7f8c8d; font-size: 14px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #3498db; color: white; font-weight: 600; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e8f4fc; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .stat-number { font-size: 32px; font-weight: bold; }
+        .stat-label { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+        
+        .issue { margin: 10px 0; padding: 15px; border-radius: 8px; border-left: 4px solid; }
+        .issue-error { background: #fef5f5; border-color: #e53e3e; }
+        .issue-warning { background: #fffbeb; border-color: #d69e2e; }
+        .issue-info { background: #ebf8ff; border-color: #3182ce; }
+        .issue-title { font-weight: bold; margin-bottom: 5px; }
+        .issue-suggestion { font-size: 14px; color: #666; margin-top: 5px; }
+        
+        .group-section { margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .group-card { background: white; padding: 15px; margin: 10px 0; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .group-name { font-weight: bold; font-size: 16px; color: #2c3e50; }
+        .group-stats { color: #7f8c8d; font-size: 14px; }
+        .member-list { list-style: none; }
+        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .member-item:last-child { border-bottom: none; }
+        .member-info { display: flex; align-items: center; gap: 10px; }
+        .paid-badge { background: #48bb78; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .unpaid-badge { background: #ed8936; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .dietary-tag { background: #fff3cd; color: #856404; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
+        
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #7f8c8d; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 活动报名处理报告</h1>
+        <div class="meta-info">
+            生成时间: 2026-05-04 11:11:13
+        </div>
+
+        <h2>一、整体统计</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">有效报名数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">已确认人数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">候补人数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1900</div>
+                <div class="stat-label">实付金额(元)</div>
+            </div>
+        </div>
+
+        <table>
+            <tr>
+                <th>指标</th>
+                <th>数值</th>
+            </tr>
+            <tr><td>原始报名条数</td><td>15</td></tr>
+            <tr><td>去重后记录数</td><td>15</td></tr>
+            <tr><td>已确认家庭数</td><td>12</td></tr>
+            <tr><td>已确认总人数</td><td>24</td></tr>
+            <tr><td>候补家庭数</td><td>3</td></tr>
+            <tr><td>候补总人数</td><td>12</td></tr>
+            <tr><td>已付款家庭数</td><td>10</td></tr>
+            <tr><td>应付总金额</td><td>2100 元</td></tr>
+            <tr><td>实付总金额</td><td>1900 元</td></tr>
+            <tr><td>差额</td><td>-200 元</td></tr>
+        </table>
+
+        <h2>二、验证问题</h2>
+
+        <div class="issue issue-error">
+            <div class="issue-title">🔴 [capacity_overflow] 时段 '周六上午' 报名人数超员: 报名 25 人，容量上限 15 人</div>
+            <div class="issue-suggestion">💡 建议: 将有 10 人进入候补名单，建议联系组织者协调</div>
+        </div>
+
+        <div class="issue issue-error">
+            <div class="issue-title">🔴 [total_capacity_overflow] 总报名人数超员: 报名 36 人，总容量上限 30 人</div>
+            <div class="issue-suggestion">💡 建议: 将有 6 人进入候补名单</div>
+        </div>
+
+        <div class="issue issue-info">
+            <div class="issue-title">🔵 [slot_under_capacity] 时段 '周六上午' 尚有剩余容量: 已确认 13 人，容量 15 人，剩余 2 个名额</div>
+        </div>
+
+        <div class="issue issue-info">
+            <div class="issue-title">🔵 [slot_under_capacity] 时段 '周六下午' 尚有剩余容量: 已确认 11 人，容量 15 人，剩余 4 个名额</div>
+        </div>
+
+        <h2>三、已确认名单</h2>
+
+        <table>
+            <tr>
+                <th>序号</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>人数</th>
+                <th>成人</th>
+                <th>儿童</th>
+                <th>时段</th>
+                <th>分组</th>
+                <th>付款状态</th>
+                <th>应付</th>
+                <th>实付</th>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td>张三</td>
+                <td>-</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>周六上午</td>
+                <td>周六上午第1组</td>
+                <td>已付款</td>
+                <td>250</td>
+                <td>250</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>李四</td>
+                <td>13800138000</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>周六下午</td>
+                <td>周六下午第2组</td>
+                <td>已付款</td>
+                <td>100</td>
+                <td>100</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>赵六</td>
+                <td>-</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>周六下午</td>
+                <td>周六下午第1组</td>
+                <td>已付款</td>
+                <td>200</td>
+                <td>200</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>孙七</td>
+                <td>13700137000</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>周六上午</td>
+                <td>周六上午第2组</td>
+                <td>已付款</td>
+                <td>200</td>
+                <td>200</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>周八</td>
+                <td>-</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>周六下午</td>
+                <td>周六下午第2组</td>
+                <td>已付款</td>
+                <td>100</td>
+                <td>100</td>
+            </tr>
+
+            <tr>
+                <td>6</td>
+                <td>吴九</td>
+                <td>13600136000</td>
+                <td>4</td>
+                <td>2</td>
+                <td>2</td>
+                <td>周六上午</td>
+                <td>周六上午第1组</td>
+                <td>已付款</td>
+                <td>300</td>
+                <td>300</td>
+            </tr>
+
+            <tr>
+                <td>7</td>
+                <td>郑十</td>
+                <td>-</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>周六下午</td>
+                <td>周六下午第1组</td>
+                <td>已付款</td>
+                <td>150</td>
+                <td>150</td>
+            </tr>
+
+            <tr>
+                <td>8</td>
+                <td>陈十一</td>
+                <td>-</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>周六上午</td>
+                <td>周六上午第1组</td>
+                <td>未付款</td>
+                <td>100</td>
+                <td>0</td>
+            </tr>
+
+            <tr>
+                <td>9</td>
+                <td>褚十二</td>
+                <td>13500135000</td>
+                <td>2</td>
+                <td>2</td>
+                <td>0</td>
+                <td>周六下午</td>
+                <td>周六下午第1组</td>
+                <td>已付款</td>
+                <td>200</td>
+                <td>200</td>
+            </tr>
+
+            <tr>
+                <td>10</td>
+                <td>蒋十四</td>
+                <td>-</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>周六下午</td>
+                <td>周六下午第2组</td>
+                <td>未付款</td>
+                <td>100</td>
+                <td>0</td>
+            </tr>
+
+            <tr>
+                <td>11</td>
+                <td>韩十六</td>
+                <td>-</td>
+                <td>2</td>
+                <td>1</td>
+                <td>1</td>
+                <td>周六下午</td>
+                <td>周六下午第1组</td>
+                <td>已付款</td>
+                <td>150</td>
+                <td>150</td>
+            </tr>
+
+            <tr>
+                <td>12</td>
+                <td>杨十七</td>
+                <td>-</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>周六上午</td>
+                <td>周六上午第2组</td>
+                <td>已付款</td>
+                <td>250</td>
+                <td>250</td>
+            </tr>
+        </table>
+
+        <h2>四、候补名单</h2>
+        <table>
+            <tr>
+                <th>序号</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>人数</th>
+                <th>原选时段</th>
+                <th>付款状态</th>
+                <th>候补原因</th>
+            </tr>
+
+            <tr>
+                <td>1</td>
+                <td>王五</td>
+                <td>13900139000</td>
+                <td>5</td>
+                <td>周六上午</td>
+                <td>已付款</td>
+                <td>容量限制</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>卫十三</td>
+                <td>-</td>
+                <td>3</td>
+                <td>周六上午</td>
+                <td>未付款</td>
+                <td>容量限制</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>沈十五</td>
+                <td>-</td>
+                <td>4</td>
+                <td>周六上午</td>
+                <td>未付款</td>
+                <td>容量限制</td>
+            </tr>
+        </table>
+
+        <h2>五、分组详情</h2>
+
+        <div class="group-section">
+            <h3>📍 周六上午 (共 13 人)</h3>
+
+            <div class="group-card">
+                <div class="group-header">
+                    <span class="group-name">👥 周六上午第1组</span>
+                    <span class="group-stats">8人 (5大3小)</span>
+                </div>
+                <ul class="member-list">
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>吴九</strong>
+                            <span>(4人: 2大2小)</span>
+                            <span class="dietary-tag">忌口海鲜</span>
+                        </div>
+                        <span>13600136000</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>张三</strong>
+                            <span>(3人: 2大1小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="unpaid-badge">未付款</span>
+                            <strong>陈十一</strong>
+                            <span>(1人: 1大0小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="group-card">
+                <div class="group-header">
+                    <span class="group-name">👥 周六上午第2组</span>
+                    <span class="group-stats">5人 (4大1小)</span>
+                </div>
+                <ul class="member-list">
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>杨十七</strong>
+                            <span>(3人: 2大1小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>孙七</strong>
+                            <span>(2人: 2大0小)</span>
+                            
+                        </div>
+                        <span>13700137000</span>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="group-section">
+            <h3>📍 周六下午 (共 11 人)</h3>
+
+            <div class="group-card">
+                <div class="group-header">
+                    <span class="group-name">👥 周六下午第1组</span>
+                    <span class="group-stats">8人 (6大2小)</span>
+                </div>
+                <ul class="member-list">
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>褚十二</strong>
+                            <span>(2人: 2大0小)</span>
+                            
+                        </div>
+                        <span>13500135000</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>赵六</strong>
+                            <span>(2人: 2大0小)</span>
+                            <span class="dietary-tag">忌口花生</span>
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>郑十</strong>
+                            <span>(2人: 1大1小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>韩十六</strong>
+                            <span>(2人: 1大1小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="group-card">
+                <div class="group-header">
+                    <span class="group-name">👥 周六下午第2组</span>
+                    <span class="group-stats">3人 (3大0小)</span>
+                </div>
+                <ul class="member-list">
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>周八</strong>
+                            <span>(1人: 1大0小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="paid-badge">已付款</span>
+                            <strong>李四</strong>
+                            <span>(1人: 1大0小)</span>
+                            
+                        </div>
+                        <span>13800138000</span>
+                    </li>
+
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="unpaid-badge">未付款</span>
+                            <strong>蒋十四</strong>
+                            <span>(1人: 1大0小)</span>
+                            
+                        </div>
+                        <span>-</span>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>本报告由接龙报名处理工具自动生成</p>
+            <p>如有疑问，请核对原始数据或联系技术支持</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "total_max_capacity": 15,
+  "price_per_adult": 100,
+  "price_per_child": 50,
+  "group_size": 5,
+  "prefer_same_time_together": true,
+  "allow_time_slot_conflict": false,
+  "time_slots": [
+    {
+      "name": "周六上午",
+      "max_capacity": 8,
+      "max_child_ratio": 0.4,
+      "priority": 2
+    },
+    {
+      "name": "周六下午",
+      "max_capacity": 7,
+      "max_child_ratio": 0.4,
+      "priority": 1
+    }
+  ]
+}
