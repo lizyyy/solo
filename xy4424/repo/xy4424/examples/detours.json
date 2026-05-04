@@ -1,0 +1,24 @@
+{
+  "detours": [
+    {
+      "detour_id": "DT001",
+      "route_id": "R001",
+      "route_name": "1路公交",
+      "effective_from": "2026-05-01T00:00:00",
+      "effective_to": "2026-05-10T23:59:59",
+      "affected_stations": ["阳光花园东门", "人民广场南"],
+      "detour_stations": ["临时站A", "临时站B"],
+      "reason": "阳光路道路施工，临时绕行"
+    },
+    {
+      "detour_id": "DT002",
+      "route_id": "R002",
+      "route_name": "2路公交",
+      "effective_from": "2026-05-03T00:00:00",
+      "effective_to": "2026-05-07T23:59:59",
+      "affected_stations": ["幸福小区西门"],
+      "detour_stations": ["幸福小区东门"],
+      "reason": "幸福街水管维修"
+    }
+  ]
+}

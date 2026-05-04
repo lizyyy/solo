@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "package_name": "公交电子墨水屏标准模板包",
+    "version": "1.0.0",
+    "created_at": "2026-05-01T00:00:00",
+    "author": "公交调度中心"
+  },
+  "templates": [
+    {
+      "template_id": "template_standard",
+      "template_name": "标准时刻表模板",
+      "required_fields": ["route_name", "station_name", "departure_time", "direction"],
+      "description": "标准时刻表显示模板，显示线路名、站点名、发车时间和方向"
+    },
+    {
+      "template_id": "template_detour",
+      "template_name": "绕行信息模板",
+      "required_fields": ["route_name", "station_name", "departure_time", "direction", "detour_info"],
+      "description": "显示绕行信息的扩展模板，包含绕行提示"
+    },
+    {
+      "template_id": "template_medical",
+      "template_name": "医院专线模板",
+      "required_fields": ["route_name", "station_name", "departure_time"],
+      "description": "医院专线专用模板，简化显示"
+    },
+    {
+      "template_id": "template_compact",
+      "template_name": "紧凑版模板",
+      "required_fields": ["route_name", "departure_time"],
+      "description": "小屏幕专用紧凑模板"
+    }
+  ]
+}
