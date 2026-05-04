@@ -1,0 +1,36 @@
+{
+  "data_dir": "./data",
+  "database": "./fridge_monitor.db",
+  "import_interval_minutes": 5,
+  "offline_threshold_minutes": 30,
+  "fridges": [
+    {
+      "id": "FRIDGE-001",
+      "name": "试剂冰箱1号",
+      "location": "实验室A区",
+      "min_temp": -20.0,
+      "max_temp": -10.0,
+      "sensor_id": "SENSOR-001"
+    },
+    {
+      "id": "FRIDGE-002",
+      "name": "试剂冰箱2号",
+      "location": "实验室A区",
+      "min_temp": -20.0,
+      "max_temp": -10.0,
+      "sensor_id": "SENSOR-002"
+    },
+    {
+      "id": "FRIDGE-003",
+      "name": "样本冰箱",
+      "location": "实验室B区",
+      "min_temp": 2.0,
+      "max_temp": 8.0,
+      "sensor_id": "SENSOR-003"
+    }
+  ],
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5000
+  }
+}
