@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "name": "示例沙盘铁路项目"
+  },
+  "project_data": {
+    "sections": [
+      {
+        "id": "sec_1",
+        "name": "主站-北环线",
+        "length": 50,
+        "feed_point_id": "fp_1",
+        "description": "连接主站和北环线"
+      },
+      {
+        "id": "sec_2",
+        "name": "北环线-东站",
+        "length": 80,
+        "feed_point_id": "fp_2",
+        "description": "北环线到东站（长区段，可能存在电压衰减）"
+      },
+      {
+        "id": "sec_3",
+        "name": "东站-南站",
+        "length": 60,
+        "feed_point_id": "fp_2",
+        "description": "东站到南站"
+      },
+      {
+        "id": "sec_4",
+        "name": "南站-西站",
+        "length": 70,
+        "feed_point_id": "fp_3",
+        "description": "南站到西站"
+      },
+      {
+        "id": "sec_5",
+        "name": "西站-主站",
+        "length": 55,
+        "feed_point_id": "fp_1",
+        "description": "西站返回主站"
+      }
+    ],
+    "feed_points": [
+      {
+        "id": "fp_1",
+        "name": "主站馈电点",
+        "power_supply_id": "ps_1",
+        "location": "主站",
+        "description": "主站区域馈电"
+      },
+      {
+        "id": "fp_2",
+        "name": "东站馈电点",
+        "power_supply_id": "ps_1",
+        "location": "东站",
+        "description": "东站区域馈电"
+      },
+      {
+        "id": "fp_3",
+        "name": "西站馈电点",
+        "power_supply_id": "ps_2",
+        "location": "西站",
+        "description": "西站区域馈电（由备用电源供电）"
+      }
+    ],
+    "consists": [
+      {
+        "id": "consist_1",
+        "name": "客运列车A",
+        "power": 30,
+        "description": "4节客车编组，标准功率"
+      },
+      {
+        "id": "consist_2",
+        "name": "货运列车B",
+        "power": 45,
+        "description": "6节货车编组，大功率（可能导致电压衰减）"
+      },
+      {
+        "id": "consist_3",
+        "name": "调车机C",
+        "power": 20,
+        "description": "单台调车机车，小功率"
+      }
+    ],
+    "power_supplies": [
+      {
+        "id": "ps_1",
+        "name": "主电源12V/100W",
+        "max_power": 100,
+        "voltage": 12,
+        "description": "主要供电电源，功率充足"
+      },
+      {
+        "id": "ps_2",
+        "name": "备用电源12V/50W",
+        "max_power": 50,
+        "voltage": 12,
+        "description": "辅助供电电源（总需求95W可能导致过载）"
+      }
+    ],
+    "settings": {
+      "voltage_threshold": 0.9,
+      "wire_resistance_per_meter": 0.01
+    }
+  }
+}

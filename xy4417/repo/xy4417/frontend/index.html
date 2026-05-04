@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沙盘铁路系统分析工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219a52;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+        
+        .sidebar {
+            width: 300px;
+            background-color: white;
+            border-right: 1px solid #ddd;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .sidebar-section h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.3rem;
+        }
+        
+        .project-list {
+            list-style: none;
+        }
+        
+        .project-list li {
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 0.3rem;
+            transition: background-color 0.2s;
+        }
+        
+        .project-list li:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .project-list li.active {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header h2 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .summary-item.warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+        
+        .summary-item.danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .summary-item.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .summary-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .risk-table th,
+        .risk-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .risk-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .risk-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-badge.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-badge.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-badge.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .track-diagram {
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 300px;
+            position: relative;
+        }
+        
+        .track-svg {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .track-section {
+            stroke: #3498db;
+            stroke-width: 4;
+            fill: none;
+            cursor: pointer;
+            transition: stroke 0.2s;
+        }
+        
+        .track-section:hover {
+            stroke: #2980b9;
+            stroke-width: 6;
+        }
+        
+        .track-section.warning {
+            stroke: #f39c12;
+        }
+        
+        .track-section.danger {
+            stroke: #e74c3c;
+        }
+        
+        .track-section.adjusted {
+            stroke: #27ae60;
+        }
+        
+        .feed-point {
+            fill: #9b59b6;
+            r: 6;
+            cursor: pointer;
+        }
+        
+        .feed-point:hover {
+            r: 8;
+        }
+        
+        .section-label {
+            font-size: 10px;
+            fill: #333;
+            pointer-events: none;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 4px;
+            border-radius: 2px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .review-record {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #3498db;
+        }
+        
+        .review-time {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .review-notes {
+            margin-bottom: 0.5rem;
+        }
+        
+        .adjusted-sections {
+            font-size: 0.9rem;
+            color: #27ae60;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+        
+        .empty-state p {
+            margin-bottom: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #666;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #333;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-editor {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                max-height: 300px;
+            }
+            
+            .data-editor {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🚂 沙盘铁路系统分析工具</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" id="newProjectBtn">新建项目</button>
+            <button class="btn btn-outline" id="importDataBtn">导入数据</button>
+            <button class="btn btn-success" id="exportMarkdownBtn" disabled>导出排查单</button>
+            <button class="btn btn-warning" id="exportJsonBtn" disabled>导出审计包</button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>项目列表</h3>
+                <ul class="project-list" id="projectList">
+                    <li class="empty-state">暂无项目</li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section" id="projectActions" style="display: none;">
+                <h3>项目操作</h3>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;" id="editDataBtn">编辑数据</button>
+                <button class="btn btn-success" style="width: 100%; margin-bottom: 0.5rem;" id="calculateBtn">执行计算</button>
+                <button class="btn btn-warning" style="width: 100%;" id="addReviewBtn">添加复核记录</button>
+            </div>
+        </aside>
+        
+        <main class="main-content" id="mainContent">
+            <div class="empty-state" id="emptyState">
+                <h2>欢迎使用沙盘铁路系统分析工具</h2>
+                <p>请选择一个项目或创建新项目开始使用</p>
+                <button class="btn btn-primary" id="startNewProjectBtn">创建新项目</button>
+            </div>
+            
+            <div id="projectContent" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 id="projectName">项目名称</h2>
+                        <span id="projectTime" class="status-badge info">创建时间</span>
+                    </div>
+                    
+                    <div class="summary-grid" id="summaryGrid">
+                        <div class="summary-item">
+                            <div class="summary-value" id="totalSections">0</div>
+                            <div class="summary-label">区段总数</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="totalFeedPoints">0</div>
+                            <div class="summary-label">馈电点总数</div>
+                        </div>
+                        <div class="summary-item" id="voltageSummary">
+                            <div class="summary-value">0</div>
+                            <div class="summary-label">电压衰减问题</div>
+                        </div>
+                        <div class="summary-item" id="overloadSummary">
+                            <div class="summary-value">0</div>
+                            <div class="summary-label">电源过载问题</div>
+                        </div>
+                        <div class="summary-item" id="conflictSummary">
+                            <div class="summary-value">0</div>
+                            <div class="summary-label">调度冲突问题</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="diagram">线路图</div>
+                    <div class="tab" data-tab="risks">风险列表</div>
+                    <div class="tab" data-tab="reviews">复核记录</div>
+                    <div class="tab" data-tab="details">详细数据</div>
+                </div>
+                
+                <div class="tab-content active" id="tab-diagram">
+                    <div class="card">
+                        <h3>线路图</h3>
+                        <div class="track-diagram">
+                            <svg class="track-svg" id="trackSvg">
+                                <text x="50%" y="50%" text-anchor="middle" fill="#999">请先添加数据并执行计算</text>
+                            </svg>
+                            <div class="legend">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #3498db;"></div>
+                                    <span>正常区段</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                                    <span>电压衰减</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                                    <span>严重问题</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: #27ae60;"></div>
+                                    <span>已调整</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-risks">
+                    <div class="card">
+                        <h3>电压衰减问题</h3>
+                        <table class="risk-table" id="voltageTable">
+                            <thead>
+                                <tr>
+                                    <th>区段</th>
+                                    <th>列车编组</th>
+                                    <th>距离(m)</th>
+                                    <th>电压比</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>电源过载问题</h3>
+                        <table class="risk-table" id="overloadTable">
+                            <thead>
+                                <tr>
+                                    <th>电源</th>
+                                    <th>额定功率(W)</th>
+                                    <th>需求功率(W)</th>
+                                    <th>功率比</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>调度冲突问题</h3>
+                        <table class="risk-table" id="conflictTable">
+                            <thead>
+                                <tr>
+                                    <th>路线1</th>
+                                    <th>路线2</th>
+                                    <th>公共区段</th>
+                                    <th>冲突时间</th>
+                                    <th>类型</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-reviews">
+                    <div class="card">
+                        <h3>复核记录</h3>
+                        <div id="reviewList">
+                            <div class="empty-state">暂无复核记录</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="tab-details">
+                    <div class="card">
+                        <h3>钢轨分段</h3>
+                        <table class="risk-table" id="sectionsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>名称</th>
+                                    <th>长度(m)</th>
+                                    <th>馈电点</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>馈电点</h3>
+                        <table class="risk-table" id="feedPointsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>名称</th>
+                                    <th>电源</th>
+                                    <th>位置</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>列车编组</h3>
+                        <table class="risk-table" id="consistsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>名称</th>
+                                    <th>功率(W)</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>电源</h3>
+                        <table class="risk-table" id="powerSuppliesTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>名称</th>
+                                    <th>额定功率(W)</th>
+                                    <th>电压(V)</th>
+                                    <th>描述</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="empty-state">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="newProjectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新建项目</h2>
+                <button class="modal-close" data-modal="newProjectModal">&times;</button>
+            </div>
+            <form id="newProjectForm">
+                <div class="form-group">
+                    <label for="projectNameInput">项目名称</label>
+                    <input type="text" id="projectNameInput" required placeholder="请输入项目名称">
+                </div>
+                <div class="form-group">
+                    <label for="useSampleData">使用示例数据</label>
+                    <select id="useSampleData">
+                        <option value="true">是 - 加载示例数据</option>
+                        <option value="false">否 - 空项目</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close" data-modal="newProjectModal">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="editDataModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>编辑数据</h2>
+                <button class="modal-close" data-modal="editDataModal">&times;</button>
+            </div>
+            <form id="editDataForm">
+                <div class="data-editor">
+                    <div>
+                        <h3>钢轨分段</h3>
+                        <div id="sectionsEditor" class="form-section"></div>
+                        <button type="button" class="btn btn-outline" style="margin-top: 0.5rem;" id="addSectionBtn">+ 添加区段</button>
+                    </div>
+                    <div>
+                        <h3>馈电点</h3>
+                        <div id="feedPointsEditor" class="form-section"></div>
+                        <button type="button" class="btn btn-outline" style="margin-top: 0.5rem;" id="addFeedPointBtn">+ 添加馈电点</button>
+                    </div>
+                    <div>
+                        <h3>列车编组</h3>
+                        <div id="consistsEditor" class="form-section"></div>
+                        <button type="button" class="btn btn-outline" style="margin-top: 0.5rem;" id="addConsistBtn">+ 添加列车编组</button>
+                    </div>
+                    <div>
+                        <h3>电源</h3>
+                        <div id="powerSuppliesEditor" class="form-section"></div>
+                        <button type="button" class="btn btn-outline" style="margin-top: 0.5rem;" id="addPowerSupplyBtn">+ 添加电源</button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close" data-modal="editDataModal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加复核记录</h2>
+                <button class="modal-close" data-modal="reviewModal">&times;</button>
+            </div>
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label for="reviewNotes">备注</label>
+                    <textarea id="reviewNotes" placeholder="请输入复核备注..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>已调整的区段</label>
+                    <div id="adjustedSectionsList"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close" data-modal="reviewModal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导入数据</h2>
+                <button class="modal-close" data-modal="importModal">&times;</button>
+            </div>
+            <form id="importForm">
+                <div class="form-group">
+                    <label for="importData">粘贴 JSON 数据</label>
+                    <textarea id="importData" style="min-height: 300px; font-family: monospace;" placeholder="粘贴 JSON 数据..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close" data-modal="importModal">取消</button>
+                    <button type="submit" class="btn btn-primary">导入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        let currentProjectId = null;
+        let currentProject = null;
+        let calculationResults = null;
+        let adjustedSections = new Set();
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProjects();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal');
+                    document.getElementById(modalId).classList.remove('active');
+                });
+            });
+            
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`tab-${tabId}`).classList.add('active');
+                });
+            });
+            
+            document.getElementById('newProjectBtn').addEventListener('click', () => {
+                document.getElementById('newProjectModal').classList.add('active');
+            });
+            
+            document.getElementById('startNewProjectBtn').addEventListener('click', () => {
+                document.getElementById('newProjectModal').classList.add('active');
+            });
+            
+            document.getElementById('importDataBtn').addEventListener('click', () => {
+                document.getElementById('importModal').classList.add('active');
+            });
+            
+            document.getElementById('editDataBtn').addEventListener('click', () => {
+                openEditDataModal();
+            });
+            
+            document.getElementById('calculateBtn').addEventListener('click', calculateProject);
+            
+            document.getElementById('addReviewBtn').addEventListener('click', () => {
+                openReviewModal();
+            });
+            
+            document.getElementById('exportMarkdownBtn').addEventListener('click', exportMarkdown);
+            document.getElementById('exportJsonBtn').addEventListener('click', exportJson);
+            
+            document.getElementById('newProjectForm').addEventListener('submit', createProject);
+            document.getElementById('editDataForm').addEventListener('submit', saveProjectData);
+            document.getElementById('reviewForm').addEventListener('submit', saveReview);
+            document.getElementById('importForm').addEventListener('submit', importData);
+            
+            document.getElementById('addSectionBtn').addEventListener('click', addSectionEditor);
+            document.getElementById('addFeedPointBtn').addEventListener('click', addFeedPointEditor);
+            document.getElementById('addConsistBtn').addEventListener('click', addConsistEditor);
+            document.getElementById('addPowerSupplyBtn').addEventListener('click', addPowerSupplyEditor);
+        }
+        
+        async function loadProjects() {
+            try {
+                const response = await fetch(`${API_BASE}/projects`);
+                const projects = await response.json();
+                
+                const list = document.getElementById('projectList');
+                
+                if (projects.length === 0) {
+                    list.innerHTML = '<li class="empty-state">暂无项目</li>';
+                    return;
+                }
+                
+                list.innerHTML = projects.map(p => `
+                    <li data-id="${p.id}" class="${p.id === currentProjectId ? 'active' : ''}">
+                        ${p.name}
+                    </li>
+                `).join('');
+                
+                list.querySelectorAll('li').forEach(li => {
+                    li.addEventListener('click', () => {
+                        selectProject(li.getAttribute('data-id'));
+                    });
+                });
+            } catch (error) {
+                console.error('加载项目失败:', error);
+            }
+        }
+        
+        async function selectProject(projectId) {
+            currentProjectId = projectId;
+            
+            try {
+                const [projectResponse, reviewsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/projects/${projectId}`),
+                    fetch(`${API_BASE}/projects/${projectId}/reviews`)
+                ]);
+                
+                currentProject = await projectResponse.json();
+                const reviews = await reviewsResponse.json();
+                
+                adjustedSections.clear();
+                reviews.forEach(review => {
+                    review.adjusted_sections.forEach(section => adjustedSections.add(section));
+                });
+                
+                updateUI();
+                loadProjects();
+                
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('projectContent').style.display = 'block';
+                document.getElementById('projectActions').style.display = 'block';
+                document.getElementById('exportMarkdownBtn').disabled = false;
+                document.getElementById('exportJsonBtn').disabled = false;
+                
+            } catch (error) {
+                console.error('加载项目失败:', error);
+            }
+        }
+        
+        async function createProject(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('projectNameInput').value;
+            const useSampleData = document.getElementById('useSampleData').value === 'true';
+            
+            let data = {};
+            if (useSampleData) {
+                data = getSampleData();
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        data: data
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.id) {
+                    document.getElementById('newProjectModal').classList.remove('active');
+                    document.getElementById('newProjectForm').reset();
+                    loadProjects();
+                    selectProject(result.id);
+                }
+            } catch (error) {
+                console.error('创建项目失败:', error);
+            }
+        }
+        
+        async function calculateProject() {
+            if (!currentProjectId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentProjectId}/calculate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                calculationResults = await response.json();
+                updateUI();
+                
+            } catch (error) {
+                console.error('计算失败:', error);
+            }
+        }
+        
+        function updateUI() {
+            if (!currentProject) return;
+            
+            document.getElementById('projectName').textContent = currentProject.name;
+            document.getElementById('projectTime').textContent = `创建于: ${currentProject.created_at}`;
+            
+            const data = currentProject.data || {};
+            const sections = data.sections || [];
+            const feedPoints = data.feed_points || [];
+            
+            document.getElementById('totalSections').textContent = sections.length;
+            document.getElementById('totalFeedPoints').textContent = feedPoints.length;
+            
+            if (calculationResults) {
+                const summary = calculationResults.summary;
+                
+                const voltageSummary = document.getElementById('voltageSummary');
+                const overloadSummary = document.getElementById('overloadSummary');
+                const conflictSummary = document.getElementById('conflictSummary');
+                
+                voltageSummary.querySelector('.summary-value').textContent = summary.voltage_issues;
+                overloadSummary.querySelector('.summary-value').textContent = summary.overload_issues;
+                conflictSummary.querySelector('.summary-value').textContent = summary.conflict_issues;
+                
+                voltageSummary.className = 'summary-item' + (summary.voltage_issues > 0 ? ' warning' : ' success');
+                overloadSummary.className = 'summary-item' + (summary.overload_issues > 0 ? ' danger' : ' success');
+                conflictSummary.className = 'summary-item' + (summary.conflict_issues > 0 ? ' warning' : ' success');
+                
+                updateRiskTables();
+                updateTrackDiagram();
+            }
+            
+            updateDetailTables();
+            loadReviews();
+        }
+        
+        function updateRiskTables() {
+            if (!calculationResults) return;
+            
+            const voltageTable = document.getElementById('voltageTable');
+            const voltageIssues = [];
+            
+            calculationResults.voltage_drops.forEach(section => {
+                section.calculations.forEach(calc => {
+                    voltageIssues.push({
+                        section: section.section_name,
+                        sectionId: section.section_id,
+                        consist: calc.consist_name,
+                        distance: calc.distance,
+                        voltageRatio: calc.voltage_ratio,
+                        isOverThreshold: calc.is_over_threshold,
+                        isAdjusted: adjustedSections.has(section.section_id)
+                    });
+                });
+            });
+            
+            if (voltageIssues.length === 0) {
+                voltageTable.querySelector('tbody').innerHTML = '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+            } else {
+                voltageTable.querySelector('tbody').innerHTML = voltageIssues.map(issue => `
+                    <tr>
+                        <td>${issue.section}</td>
+                        <td>${issue.consist}</td>
+                        <td>${issue.distance}</td>
+                        <td>${(issue.voltageRatio * 100).toFixed(1)}%</td>
+                        <td>
+                            <span class="status-badge ${issue.isAdjusted ? 'success' : issue.isOverThreshold ? 'warning' : 'info'}">
+                                ${issue.isAdjusted ? '已调整' : issue.isOverThreshold ? '超出阈值' : '正常'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline" onclick="toggleAdjusted('${issue.sectionId}')">
+                                ${adjustedSections.has(issue.sectionId) ? '取消标记' : '标记已调整'}
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            const overloadTable = document.getElementById('overloadTable');
+            if (calculationResults.power_overloads.length === 0) {
+                overloadTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="empty-state">暂无数据</td></tr>';
+            } else {
+                overloadTable.querySelector('tbody').innerHTML = calculationResults.power_overloads.map(ps => `
+                    <tr>
+                        <td>${ps.power_supply_name}</td>
+                        <td>${ps.rated_power}</td>
+                        <td>${ps.total_power_needed}</td>
+                        <td>${(ps.power_ratio * 100).toFixed(1)}%</td>
+                        <td>
+                            <span class="status-badge ${ps.is_overloaded ? 'danger' : 'success'}">
+                                ${ps.is_overloaded ? '过载' : '正常'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            const conflictTable = document.getElementById('conflictTable');
+            if (calculationResults.schedule_conflicts.length === 0) {
+                conflictTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="empty-state">暂无数据</td></tr>';
+            } else {
+                conflictTable.querySelector('tbody').innerHTML = calculationResults.schedule_conflicts.map(conflict => `
+                    <tr>
+                        <td>${conflict.route1_name}</td>
+                        <td>${conflict.route2_name}</td>
+                        <td>${conflict.common_sections.join(', ')}</td>
+                        <td>${conflict.time_overlap_start} - ${conflict.time_overlap_end}</td>
+                        <td>${conflict.conflict_type}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        function updateTrackDiagram() {
+            const svg = document.getElementById('trackSvg');
+            const data = currentProject.data || {};
+            const sections = data.sections || [];
+            const feedPoints = data.feed_points || [];
+            
+            if (sections.length === 0) {
+                svg.innerHTML = '<text x="50%" y="50%" text-anchor="middle" fill="#999">请先添加数据并执行计算</text>';
+                return;
+            }
+            
+            const width = 800;
+            const height = 400;
+            const padding = 50;
+            
+            let svgContent = '';
+            
+            const sectionPositions = {};
+            const totalSections = sections.length;
+            const sectionSpacing = (width - padding * 2) / Math.max(totalSections, 1);
+            
+            sections.forEach((section, index) => {
+                const x = padding + index * sectionSpacing + sectionSpacing / 2;
+                const y = height / 2;
+                
+                sectionPositions[section.id] = { x, y };
+                
+                const hasVoltageIssue = calculationResults?.voltage_drops?.find(
+                    s => s.section_id === section.id && s.is_over_threshold
+                );
+                const isAdjusted = adjustedSections.has(section.id);
+                
+                let className = 'track-section';
+                if (isAdjusted) {
+                    className += ' adjusted';
+                } else if (hasVoltageIssue) {
+                    className += ' warning';
+                }
+                
+                const nextSection = sections[index + 1];
+                if (nextSection) {
+                    const nextX = padding + (index + 1) * sectionSpacing + sectionSpacing / 2;
+                    svgContent += `
+                        <line 
+                            class="${className}" 
+                            x1="${x}" y1="${y}" 
+                            x2="${nextX}" y2="${y}"
+                            data-section-id="${section.id}"
+                        />
+                    `;
+                } else {
+                    svgContent += `
+                        <line 
+                            class="${className}" 
+                            x1="${x - sectionSpacing/4}" y1="${y}" 
+                            x2="${x + sectionSpacing/4}" y2="${y}"
+                            data-section-id="${section.id}"
+                        />
+                    `;
+                }
+                
+                svgContent += `
+                    <text 
+                        class="section-label" 
+                        x="${x}" y="${y - 15}" 
+                        text-anchor="middle"
+                    >${section.name}</text>
+                `;
+            });
+            
+            feedPoints.forEach(fp => {
+                const section = sections.find(s => s.feed_point_id === fp.id);
+                if (section && sectionPositions[section.id]) {
+                    const pos = sectionPositions[section.id];
+                    svgContent += `
+                        <circle 
+                            class="feed-point" 
+                            cx="${pos.x}" cy="${pos.y - 20}" 
+                            r="6"
+                            title="${fp.name}"
+                        />
+                        <text 
+                            class="section-label" 
+                            x="${pos.x}" y="${pos.y - 30}" 
+                            text-anchor="middle"
+                            fill="#9b59b6"
+                        >${fp.name}</text>
+                    `;
+                }
+            });
+            
+            svg.innerHTML = svgContent;
+        }
+        
+        function updateDetailTables() {
+            const data = currentProject.data || {};
+            
+            const sectionsTable = document.getElementById('sectionsTable');
+            const sections = data.sections || [];
+            if (sections.length === 0) {
+                sectionsTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="empty-state">暂无数据</td></tr>';
+            } else {
+                sectionsTable.querySelector('tbody').innerHTML = sections.map(s => `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.name}</td>
+                        <td>${s.length}</td>
+                        <td>${s.feed_point_id || '-'}</td>
+                        <td>${s.description || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            const feedPointsTable = document.getElementById('feedPointsTable');
+            const feedPoints = data.feed_points || [];
+            if (feedPoints.length === 0) {
+                feedPointsTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="empty-state">暂无数据</td></tr>';
+            } else {
+                feedPointsTable.querySelector('tbody').innerHTML = feedPoints.map(fp => `
+                    <tr>
+                        <td>${fp.id}</td>
+                        <td>${fp.name}</td>
+                        <td>${fp.power_supply_id || '-'}</td>
+                        <td>${fp.location || '-'}</td>
+                        <td>${fp.description || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            const consistsTable = document.getElementById('consistsTable');
+            const consists = data.consists || [];
+            if (consists.length === 0) {
+                consistsTable.querySelector('tbody').innerHTML = '<tr><td colspan="4" class="empty-state">暂无数据</td></tr>';
+            } else {
+                consistsTable.querySelector('tbody').innerHTML = consists.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.power}</td>
+                        <td>${c.description || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            const powerSuppliesTable = document.getElementById('powerSuppliesTable');
+            const powerSupplies = data.power_supplies || [];
+            if (powerSupplies.length === 0) {
+                powerSuppliesTable.querySelector('tbody').innerHTML = '<tr><td colspan="5" class="empty-state">暂无数据</td></tr>';
+            } else {
+                powerSuppliesTable.querySelector('tbody').innerHTML = powerSupplies.map(ps => `
+                    <tr>
+                        <td>${ps.id}</td>
+                        <td>${ps.name}</td>
+                        <td>${ps.max_power}</td>
+                        <td>${ps.voltage}</td>
+                        <td>${ps.description || '-'}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadReviews() {
+            if (!currentProjectId) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/projects/${currentProjectId}/reviews`);
+                const reviews = await response.json();
+                
+                const list = document.getElementById('reviewList');
+                
+                if (reviews.length === 0) {
+                    list.innerHTML = '<div class="empty-state">暂无复核记录</div>';
+                    return;
+                }
+                
+                list.innerHTML = reviews.map((review, index) => `
+                    <div class="review-record">
+                        <div class="review-time">复核记录 #${reviews.length - index} - ${review.created_at}</div>
+                        <div class="review-notes">${review.notes || '无备注'}</div>
+                        ${review.adjusted_sections && review.adjusted_sections.length > 0 ? 
+                            `<div class="adjusted-sections">✓ 已调整区段: ${review.adjusted_sections.join(', ')}</div>` : ''
+                        }
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('加载复核记录失败:', error);
+            }
+        }
+        
+        function openEditDataModal() {
+            const data = currentProject.data || {};
+            
+            document.getElementById('sectionsEditor').innerHTML = '';
+            document.getElementById('feedPointsEditor').innerHTML = '';
+            document.getElementById('consistsEditor').innerHTML = '';
+            document.getElementById('powerSuppliesEditor').innerHTML = '';
+            
+            (data.sections || []).forEach(section => addSectionEditor(section));
+            (data.feed_points || []).forEach(fp => addFeedPointEditor(fp));
+            (data.consists || []).forEach(c => addConsistEditor(c));
+            (data.power_supplies || []).forEach(ps => addPowerSupplyEditor(ps));
+            
+            document.getElementById('editDataModal').classList.add('active');
+        }
+        
+        function addSectionEditor(data = {}) {
+            const container = document.getElementById('sectionsEditor');
+            const id = data.id || `sec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            const div = document.createElement('div');
+            div.className = 'form-item';
+            div.innerHTML = `
+                <div class="form-row">
+                    <input type="text" name="section_id" value="${id}" hidden>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="section_name" value="${data.name || ''}" placeholder="区段名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label>长度(m)</label>
+                        <input type="number" name="section_length" value="${data.length || 0}" placeholder="0" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>馈电点ID</label>
+                    <input type="text" name="section_feed_point" value="${data.feed_point_id || ''}" placeholder="关联的馈电点ID">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" name="section_desc" value="${data.description || ''}" placeholder="可选描述">
+                </div>
+                <button type="button" class="btn btn-danger" style="margin-bottom: 1rem;" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        function addFeedPointEditor(data = {}) {
+            const container = document.getElementById('feedPointsEditor');
+            const id = data.id || `fp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            const div = document.createElement('div');
+            div.className = 'form-item';
+            div.innerHTML = `
+                <div class="form-row">
+                    <input type="text" name="fp_id" value="${id}" hidden>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="fp_name" value="${data.name || ''}" placeholder="馈电点名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label>电源ID</label>
+                        <input type="text" name="fp_power_supply" value="${data.power_supply_id || ''}" placeholder="关联的电源ID">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>位置</label>
+                    <input type="text" name="fp_location" value="${data.location || ''}" placeholder="位置描述">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" name="fp_desc" value="${data.description || ''}" placeholder="可选描述">
+                </div>
+                <button type="button" class="btn btn-danger" style="margin-bottom: 1rem;" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        function addConsistEditor(data = {}) {
+            const container = document.getElementById('consistsEditor');
+            const id = data.id || `consist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            const div = document.createElement('div');
+            div.className = 'form-item';
+            div.innerHTML = `
+                <div class="form-row">
+                    <input type="text" name="consist_id" value="${id}" hidden>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="consist_name" value="${data.name || ''}" placeholder="列车编组名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label>功率(W)</label>
+                        <input type="number" name="consist_power" value="${data.power || 0}" placeholder="0" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" name="consist_desc" value="${data.description || ''}" placeholder="可选描述">
+                </div>
+                <button type="button" class="btn btn-danger" style="margin-bottom: 1rem;" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        function addPowerSupplyEditor(data = {}) {
+            const container = document.getElementById('powerSuppliesEditor');
+            const id = data.id || `ps_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
+            const div = document.createElement('div');
+            div.className = 'form-item';
+            div.innerHTML = `
+                <div class="form-row">
+                    <input type="text" name="ps_id" value="${id}" hidden>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" name="ps_name" value="${data.name || ''}" placeholder="电源名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label>额定功率(W)</label>
+                        <input type="number" name="ps_max_power" value="${data.max_power || 0}" placeholder="0" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>电压(V)</label>
+                        <input type="number" name="ps_voltage" value="${data.voltage || 12}" placeholder="12" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <input type="text" name="ps_desc" value="${data.description || ''}" placeholder="可选描述">
+                </div>
+                <button type="button" class="btn btn-danger" style="margin-bottom: 1rem;" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        async function saveProjectData(e) {
+            e.preventDefault();
+            
+            const sections = [];
+            document.querySelectorAll('#sectionsEditor .form-item').forEach(item => {
+                sections.push({
+                    id: item.querySelector('[name="section_id"]').value,
+                    name: item.querySelector('[name="section_name"]').value,
+                    length: parseFloat(item.querySelector('[name="section_length"]').value) || 0,
+                    feed_point_id: item.querySelector('[name="section_feed_point"]').value,
+                    description: item.querySelector('[name="section_desc"]').value
+                });
+            });
+            
+            const feedPoints = [];
+            document.querySelectorAll('#feedPointsEditor .form-item').forEach(item => {
+                feedPoints.push({
+                    id: item.querySelector('[name="fp_id"]').value,
+                    name: item.querySelector('[name="fp_name"]').value,
+                    power_supply_id: item.querySelector('[name="fp_power_supply"]').value,
+                    location: item.querySelector('[name="fp_location"]').value,
+                    description: item.querySelector('[name="fp_desc"]').value
+                });
+            });
+            
+            const consists = [];
+            document.querySelectorAll('#consistsEditor .form-item').forEach(item => {
+                consists.push({
+                    id: item.querySelector('[name="consist_id"]').value,
+                    name: item.querySelector('[name="consist_name"]').value,
+                    power: parseFloat(item.querySelector('[name="consist_power"]').value) || 0,
+                    description: item.querySelector('[name="consist_desc"]').value
+                });
+            });
+            
+            const powerSupplies = [];
+            document.querySelectorAll('#powerSuppliesEditor .form-item').forEach(item => {
+                powerSupplies.push({
+                    id: item.querySelector('[name="ps_id"]').value,
+                    name: item.querySelector('[name="ps_name"]').value,
+                    max_power: parseFloat(item.querySelector('[name="ps_max_power"]').value) || 0,
+                    voltage: parseFloat(item.querySelector('[name="ps_voltage"]').value) || 12,
+                    description: item.querySelector('[name="ps_desc"]').value
+                });
+            });
+            
+            const newData = {
+                sections,
+                feed_points: feedPoints,
+                consists,
+                power_supplies: powerSupplies,
+                settings: currentProject.data?.settings || {
+                    voltage_threshold: 0.9,
+                    wire_resistance_per_meter: 0.01
+                }
+            };
+            
+            try {
+                await fetch(`${API_BASE}/projects/${currentProjectId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: currentProject.name,
+                        data: newData
+                    })
+                });
+                
+                document.getElementById('editDataModal').classList.remove('active');
+                selectProject(currentProjectId);
+                
+            } catch (error) {
+                console.error('保存失败:', error);
+            }
+        }
+        
+        function openReviewModal() {
+            const data = currentProject.data || {};
+            const sections = data.sections || [];
+            
+            const list = document.getElementById('adjustedSectionsList');
+            list.innerHTML = sections.map(s => `
+                <label style="display: block; margin: 0.5rem 0;">
+                    <input type="checkbox" name="adjusted_section" value="${s.id}" 
+                        ${adjustedSections.has(s.id) ? 'checked' : ''}>
+                    ${s.name}
+                </label>
+            `).join('');
+            
+            document.getElementById('reviewNotes').value = '';
+            document.getElementById('reviewModal').classList.add('active');
+        }
+        
+        async function saveReview(e) {
+            e.preventDefault();
+            
+            const notes = document.getElementById('reviewNotes').value;
+            const adjustedSectionsList = [];
+            
+            document.querySelectorAll('[name="adjusted_section"]:checked').forEach(cb => {
+                adjustedSectionsList.push(cb.value);
+                adjustedSections.add(cb.value);
+            });
+            
+            try {
+                await fetch(`${API_BASE}/projects/${currentProjectId}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        notes: notes,
+                        adjusted_sections: adjustedSectionsList
+                    })
+                });
+                
+                document.getElementById('reviewModal').classList.remove('active');
+                updateUI();
+                
+            } catch (error) {
+                console.error('保存复核记录失败:', error);
+            }
+        }
+        
+        function toggleAdjusted(sectionId) {
+            if (adjustedSections.has(sectionId)) {
+                adjustedSections.delete(sectionId);
+            } else {
+                adjustedSections.add(sectionId);
+            }
+            updateRiskTables();
+            updateTrackDiagram();
+        }
+        
+        async function importData(e) {
+            e.preventDefault();
+            
+            const jsonText = document.getElementById('importData').value;
+            
+            try {
+                const data = JSON.parse(jsonText);
+                
+                const name = data.project_info?.name || '导入的项目';
+                const projectData = data.project_data || data;
+                
+                const response = await fetch(`${API_BASE}/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        data: projectData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.id) {
+                    document.getElementById('importModal').classList.remove('active');
+                    document.getElementById('importForm').reset();
+                    loadProjects();
+                    selectProject(result.id);
+                }
+                
+            } catch (error) {
+                console.error('导入失败:', error);
+                alert('导入失败，请检查 JSON 格式');
+            }
+        }
+        
+        function exportMarkdown() {
+            if (!currentProjectId) return;
+            window.open(`${API_BASE}/projects/${currentProjectId}/export/markdown`, '_blank');
+        }
+        
+        function exportJson() {
+            if (!currentProjectId) return;
+            window.open(`${API_BASE}/projects/${currentProjectId}/export/json`, '_blank');
+        }
+        
+        function getSampleData() {
+            return {
+                sections: [
+                    { id: 'sec_1', name: '主站-北环线', length: 50, feed_point_id: 'fp_1', description: '连接主站和北环线' },
+                    { id: 'sec_2', name: '北环线-东站', length: 80, feed_point_id: 'fp_2', description: '北环线到东站' },
+                    { id: 'sec_3', name: '东站-南站', length: 60, feed_point_id: 'fp_2', description: '东站到南站' },
+                    { id: 'sec_4', name: '南站-西站', length: 70, feed_point_id: 'fp_3', description: '南站到西站' },
+                    { id: 'sec_5', name: '西站-主站', length: 55, feed_point_id: 'fp_1', description: '西站返回主站' }
+                ],
+                feed_points: [
+                    { id: 'fp_1', name: '主站馈电点', power_supply_id: 'ps_1', location: '主站', description: '主站区域馈电' },
+                    { id: 'fp_2', name: '东站馈电点', power_supply_id: 'ps_1', location: '东站', description: '东站区域馈电' },
+                    { id: 'fp_3', name: '西站馈电点', power_supply_id: 'ps_2', location: '西站', description: '西站区域馈电' }
+                ],
+                consists: [
+                    { id: 'consist_1', name: '客运列车A', power: 30, description: '4节客车编组' },
+                    { id: 'consist_2', name: '货运列车B', power: 45, description: '6节货车编组' },
+                    { id: 'consist_3', name: '调车机C', power: 20, description: '单台调车机车' }
+                ],
+                power_supplies: [
+                    { id: 'ps_1', name: '主电源12V/100W', max_power: 100, voltage: 12, description: '主要供电电源' },
+                    { id: 'ps_2', name: '备用电源12V/50W', max_power: 50, voltage: 12, description: '辅助供电电源' }
+                ],
+                settings: {
+                    voltage_threshold: 0.9,
+                    wire_resistance_per_meter: 0.01
+                }
+            };
+        }
+    </script>
+</body>
+</html>
