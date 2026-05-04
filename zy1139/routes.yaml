@@ -1,0 +1,76 @@
+routes:
+  - name: "get-user-profile"
+    path: "/api/v1/users/{id}"
+    method: "GET"
+    description: "获取用户详情接口"
+    tags: ["user", "read"]
+    budget:
+      p95_latency_ms: 200.0
+      p99_latency_ms: 500.0
+      max_error_rate: 0.01
+      max_rps: 1000
+      max_concurrent: 200
+      cpu_budget_percent: 30.0
+      memory_budget_mb: 256
+    dependencies:
+      - name: "user-db"
+        factor: 1.0
+      - name: "profile-cache"
+        factor: 0.8
+
+  - name: "create-order"
+    path: "/api/v1/orders"
+    method: "POST"
+    description: "创建订单接口"
+    tags: ["order", "write"]
+    budget:
+      p95_latency_ms: 300.0
+      p99_latency_ms: 800.0
+      max_error_rate: 0.005
+      max_rps: 500
+      max_concurrent: 100
+      cpu_budget_percent: 45.0
+      memory_budget_mb: 512
+    dependencies:
+      - name: "order-db"
+        factor: 1.0
+      - name: "inventory-service"
+        factor: 1.0
+      - name: "payment-gateway"
+        factor: 1.0
+
+  - name: "search-products"
+    path: "/api/v1/products/search"
+    method: "GET"
+    description: "商品搜索接口"
+    tags: ["product", "search", "read"]
+    budget:
+      p95_latency_ms: 150.0
+      p99_latency_ms: 300.0
+      max_error_rate: 0.02
+      max_rps: 2000
+      max_concurrent: 500
+      cpu_budget_percent: 60.0
+      memory_budget_mb: 384
+    dependencies:
+      - name: "search-engine"
+        factor: 1.0
+
+  - name: "update-stock"
+    path: "/api/v1/inventory/stock"
+    method: "PATCH"
+    description: "更新库存接口"
+    tags: ["inventory", "write"]
+    budget:
+      p95_latency_ms: 100.0
+      p99_latency_ms: 200.0
+      max_error_rate: 0.001
+      max_rps: 800
+      max_concurrent: 150
+      cpu_budget_percent: 25.0
+      memory_budget_mb: 128
+    dependencies:
+      - name: "inventory-db"
+        factor: 1.0
+      - name: "stock-cache"
+        factor: 0.5

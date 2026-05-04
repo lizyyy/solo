@@ -1,0 +1,122 @@
+{
+  "version": "1.0",
+  "plan_name": "release-capacity-test",
+  "description": "上线前容量测试计划",
+  "routes": [
+    {
+      "name": "get-user-profile",
+      "weight": 0.4,
+      "steps": [
+        {
+          "duration_sec": 60,
+          "target_rps": 500,
+          "concurrent_users": 100
+        },
+        {
+          "duration_sec": 120,
+          "target_rps": 800,
+          "concurrent_users": 160
+        },
+        {
+          "duration_sec": 60,
+          "target_rps": 1000,
+          "concurrent_users": 200
+        }
+      ]
+    },
+    {
+      "name": "create-order",
+      "weight": 0.2,
+      "steps": [
+        {
+          "duration_sec": 60,
+          "target_rps": 200,
+          "concurrent_users": 50
+        },
+        {
+          "duration_sec": 120,
+          "target_rps": 400,
+          "concurrent_users": 80
+        },
+        {
+          "duration_sec": 60,
+          "target_rps": 500,
+          "concurrent_users": 100
+        }
+      ]
+    },
+    {
+      "name": "search-products",
+      "weight": 0.3,
+      "steps": [
+        {
+          "duration_sec": 60,
+          "target_rps": 1000,
+          "concurrent_users": 250
+        },
+        {
+          "duration_sec": 120,
+          "target_rps": 1500,
+          "concurrent_users": 375
+        },
+        {
+          "duration_sec": 60,
+          "target_rps": 2000,
+          "concurrent_users": 500
+        }
+      ]
+    },
+    {
+      "name": "update-stock",
+      "weight": 0.1,
+      "steps": [
+        {
+          "duration_sec": 60,
+          "target_rps": 300,
+          "concurrent_users": 60
+        },
+        {
+          "duration_sec": 120,
+          "target_rps": 600,
+          "concurrent_users": 120
+        },
+        {
+          "duration_sec": 60,
+          "target_rps": 800,
+          "concurrent_users": 150
+        }
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "cache-miss-simulation",
+      "description": "模拟缓存全命中到全未命中",
+      "type": "cache_miss",
+      "params": {
+        "hit_rate_start": 0.9,
+        "hit_rate_end": 0.1
+      },
+      "apply_routes": ["get-user-profile", "update-stock"]
+    },
+    {
+      "name": "downstream-slow",
+      "description": "模拟下游服务响应变慢",
+      "type": "downstream_slow",
+      "params": {
+        "latency_multiplier": 2.5,
+        "timeout_chance": 0.05
+      },
+      "apply_routes": ["create-order"]
+    },
+    {
+      "name": "circuit-breaker-open",
+      "description": "模拟熔断器打开",
+      "type": "circuit_open",
+      "params": {
+        "error_rate": 0.5
+      },
+      "apply_routes": ["search-products"]
+    }
+  ]
+}

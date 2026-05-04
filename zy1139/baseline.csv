@@ -1,0 +1,5 @@
+route_name,p50_latency_ms,p95_latency_ms,p99_latency_ms,avg_latency_ms,throughput_rps,error_rate,max_concurrent,cpu_peak_percent,memory_peak_mb
+get-user-profile,45.0,120.0,180.0,55.0,950.0,0.005,180,28.5,220
+create-order,80.0,200.0,350.0,95.0,480.0,0.002,95,42.0,480
+search-products,30.0,80.0,120.0,35.0,1900.0,0.01,450,55.0,360
+update-stock,25.0,60.0,90.0,28.0,780.0,0.001,140,22.0,115
