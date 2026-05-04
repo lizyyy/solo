@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-05-04T03:07:22.072Z",
+  "passed": true,
+  "issues": [
+    {
+      "type": "version-inconsistency",
+      "severity": "low",
+      "package": "left-pad",
+      "message": "依赖 left-pad 版本不一致",
+      "packageJsonVersion": "^1.1.0",
+      "resolvedVersion": "9.9.9",
+      "evidence": "package.json (package.json) vs lock file",
+      "explanation": "package.json 中的版本范围与锁文件中实际解析的版本不一致。这可能导致开发环境和生产环境使用不同版本的依赖。\n\n建议：运行 `npm install` 或 `pnpm install` 同步依赖版本"
+    },
+    {
+      "type": "missing-license-file",
+      "severity": "info",
+      "packages": [
+        "left-pad"
+      ],
+      "message": "发现 1 个需要归因的依赖，但项目根目录缺少 LICENSE 文件",
+      "evidence": "项目根目录未检测到 LICENSE 文件",
+      "explanation": "大多数开源许可证要求保留原有的许可证声明。建议在项目根目录创建 LICENSE 文件说明您的项目许可证。"
+    }
+  ],
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 1,
+    "info": 1
+  },
+  "dependencies": [
+    {
+      "name": "left-pad",
+      "version": "^1.1.0",
+      "license": "MIT",
+      "normalizedLicense": "MIT",
+      "riskLevel": "SAFE",
+      "issues": [],
+      "isCopyleft": false,
+      "isNetworkServiceRisk": false,
+      "requiresNotice": false,
+      "requiresAttribution": true
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "info",
+      "title": "许可证合规状态良好",
+      "description": "未发现高风险问题。继续保持良好的依赖管理实践。",
+      "actions": [
+        "定期运行许可证检查",
+        "及时更新 third_party.csv",
+        "新依赖引入前评估许可证风险"
+      ]
+    }
+  ],
+  "overallRisk": "LOW",
+  "statistics": {
+    "totalDependencies": 1,
+    "byRiskLevel": {
+      "SAFE": 1,
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 0,
+      "UNKNOWN": 0
+    },
+    "issues": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1,
+      "info": 1
+    }
+  }
+}

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>许可证合规检查报告 - sample-project</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
+    h1, h2, h3, h4 { margin-top: 1.5em; margin-bottom: 0.5em; color: #2c3e50; }
+    h1 { font-size: 2em; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+    h2 { font-size: 1.5em; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+    .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+    .risk-safe { background: #d4edda; color: #155724; }
+    .risk-low { background: #fff3cd; color: #856404; }
+    .risk-medium { background: #ffeaa7; color: #d35400; }
+    .risk-high { background: #f8d7da; color: #721c24; }
+    .risk-unknown { background: #e9ecef; color: #495057; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f8f9fa; font-weight: 600; }
+    tr:hover { background: #f8f9fa; }
+    .issue-card { border-left: 4px solid; margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 0 5px 5px 0; }
+    .issue-critical { border-color: #721c24; }
+    .issue-high { border-color: #dc3545; }
+    .issue-medium { border-color: #fd7e14; }
+    .issue-low { border-color: #ffc107; }
+    .issue-info { border-color: #17a2b8; }
+    .explanation { background: #fff; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin: 10px 0; font-size: 0.95em; }
+    .meta-info { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .meta-info p { margin: 5px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
+    .stat-card { background: white; border: 1px solid #dee2e6; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .stat-card .number { font-size: 2em; font-weight: bold; display: block; }
+    .stat-card .label { font-size: 0.9em; color: #6c757d; }
+    .recommendation { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; margin: 10px 0; }
+    .priority-high { border-left: 4px solid #dc3545; }
+    .priority-medium { border-left: 4px solid #fd7e14; }
+    .priority-low { border-left: 4px solid #ffc107; }
+    .priority-info { border-left: 4px solid #17a2b8; }
+    ul, ol { margin-left: 25px; margin-top: 10px; margin-bottom: 10px; }
+    li { margin: 5px 0; }
+    .dep-section { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+    .dep-item { background: white; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin: 10px 0; }
+    .dep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .dep-name { font-weight: bold; font-size: 1.1em; }
+    code { background: #f1f3f5; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; }
+  </style>
+</head>
+<body>
+  <h1>🔍 许可证合规检查报告</h1>
+  
+  <div class="meta-info">
+    <p><strong>项目:</strong> sample-project</p>
+    <p><strong>版本:</strong> 1.0.0</p>
+    <p><strong>检查时间:</strong> 2026/5/4 11:02:33</p>
+    <p><strong>整体风险:</strong> <span class="risk-badge risk-high">高风险</span></p>
+  </div>
+
+  <h2>📊 统计概览</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="number">20</span>
+      <span class="label">总依赖数</span>
+    </div>
+    <div class="stat-card">
+      <span class="number" style="color: #155724;">9</span>
+      <span class="label">安全</span>
+    </div>
+    <div class="stat-card">
+      <span class="number" style="color: #856404;">1</span>
+      <span class="label">低风险</span>
+    </div>
+    <div class="stat-card">
+      <span class="number" style="color: #d35400;">0</span>
+      <span class="label">中风险</span>
+    </div>
+    <div class="stat-card">
+      <span class="number" style="color: #721c24;">2</span>
+      <span class="label">高风险</span>
+    </div>
+    <div class="stat-card">
+      <span class="number" style="color: #495057;">8</span>
+      <span class="label">未知</span>
+    </div>
+  </div>
+
+  <h2>⚠️ 发现的问题</h2>
+<h3>高优先级 (10)</h3>
+<div class="issue-card issue-high">
+<h4>依赖 flask 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>flask</code> | <strong>版本:</strong> <code>2.3.3</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 2)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 django 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>django</code> | <strong>版本:</strong> <code>4.2.7</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 3)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 pandas 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>pandas</code> | <strong>版本:</strong> <code>2.1.3</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 6)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 numpy 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>numpy</code> | <strong>版本:</strong> <code>1.26.2</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 7)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 requests 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>requests</code> | <strong>版本:</strong> <code>2.31.0</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 10)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 urllib3 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>urllib3</code> | <strong>版本:</strong> <code>2.0.7</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 11)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 click 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>click</code> | <strong>版本:</strong> <code>8.1.7</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 14)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 rich 缺少许可证信息</h4>
+<p><strong>包名:</strong> <code>rich</code> | <strong>版本:</strong> <code>13.7.0</code> | <strong>证据:</strong> requirements.txt | <strong>文件:</strong> requirements.txt (行 15)</p>
+<div class="explanation"><strong>说明:</strong><br>没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案</div>
+</div>
+<div class="issue-card issue-high">
+<h4>依赖 some-agpl-service 使用 AGPL 许可证，存在网络服务感染风险</h4>
+<p><strong>包名:</strong> <code>some-agpl-service</code> | <strong>版本:</strong> <code>1.5.0</code> | <strong>许可证:</strong> <code>AGPL-3.0</code> | <strong>证据:</strong> pypi | <strong>文件:</strong> third_party.csv (行 3)</p>
+<div class="explanation"><strong>说明:</strong><br>AGPL (Affero General Public License) 是强 Copyleft 许可证，即使您只是通过网络提供服务（如 SaaS），也需要向用户提供完整的源代码。这可能导致您的整个项目被迫开源。<br><br>建议行动：<br>1) 评估是否真的需要使用 AGPL 库<br>2) 寻找许可证更宽松的替代方案（如 MIT/Apache）<br>3) 如果必须使用，请咨询法律专家<br>4) 确保完全理解并遵守许可证条款</div>
+</div>
+<div class="issue-card issue-high">
+<h4>发现 8 个许可证未知的依赖</h4>
+<p><strong>涉及包:</strong> <code>flask</code>, <code>django</code>, <code>pandas</code>, <code>numpy</code>, <code>requests</code>, <code>urllib3</code>, <code>click</code>, <code>rich</code> | <strong>证据:</strong> 许可证扫描结果</p>
+<div class="explanation"><strong>说明:</strong><br>许可证未知的依赖存在法律风险，无法确认是否可商用。<br><br>建议行动：<br>1) 检查包的官方文档或源代码仓库<br>2) 查看 node_modules 中的 LICENSE 文件<br>3) 使用 overrides.json 手动指定许可证<br>4) 考虑寻找有明确许可证的替代方案</div>
+</div>
+<h3>中优先级 (1)</h3>
+<div class="issue-card issue-medium">
+<h4>依赖 some-gpl-library 使用 Copyleft 许可证: GPL-3.0</h4>
+<p><strong>包名:</strong> <code>some-gpl-library</code> | <strong>版本:</strong> <code>2.0.0</code> | <strong>许可证:</strong> <code>GPL-3.0</code> | <strong>证据:</strong> npm | <strong>文件:</strong> third_party.csv (行 2)</p>
+<div class="explanation"><strong>说明:</strong><br>GPL-3.0 是强 Copyleft 许可证。包含额外的反 tivoization 条款，防止在嵌入式设备中锁定 GPL 软件。整个衍生作品必须以 GPL-3.0 分发。</div>
+<p><strong>许可证要求:</strong></p>
+<ul>
+<li>保留原许可证声明</li>
+<li>公开全部源码</li>
+<li>相同许可证分发</li>
+<li>安装信息提供</li>
+</ul>
+<p><strong>风险:</strong></p>
+<ul>
+<li>⚠️ 整个项目必须以 GPL 开源</li>
+<li>⚠️ 无法闭源商用分发</li>
+</ul>
+</div>
+<h3>低优先级 (1)</h3>
+<div class="issue-card issue-low">
+<h4>NOTICE 文件可能缺少 1 个 Apache-2.0 依赖的声明</h4>
+<p><strong>涉及包:</strong> <code>some-apache-tool</code> | <strong>证据:</strong> NOTICE 文件内容分析</p>
+<div class="explanation"><strong>说明:</strong><br>建议在 NOTICE 文件中明确列出所有 Apache-2.0 依赖的版权信息</div>
+</div>
+
+  <h2>💡 建议</h2>
+<div class="recommendation priority-high">
+<h4>高优先级: 立即处理高风险问题</h4>
+<p>发现 10 个高风险问题，建议在商用前优先解决。</p>
+<p><strong>行动项:</strong></p>
+<ul>
+<li>☐ 检查并解决所有 AGPL 许可证依赖</li>
+<li>☐ 确认所有未知许可证的依赖</li>
+<li>☐ 修复所有扫描错误</li>
+</ul>
+</div>
+<div class="recommendation priority-medium">
+<h4>中优先级: 评估 Copyleft 许可证影响</h4>
+<p>发现 1 个 Copyleft 许可证依赖。</p>
+<p><strong>行动项:</strong></p>
+<ul>
+<li>☐ 确认链接方式（静态 vs 动态）</li>
+<li>☐ 评估对项目整体许可证的影响</li>
+<li>☐ 咨询法律专家确认合规性</li>
+</ul>
+</div>
+
+  <h2>📦 依赖列表</h2>
+<div class="dep-section">
+<h3>🔴 高风险 (2)</h3>
+<table>
+<tr><th>包名</th><th>版本</th><th>许可证</th><th>来源</th></tr>
+<tr><td><code>some-gpl-library</code></td><td>2.0.0</td><td><span class="risk-badge risk-high">GPL-3.0</span></td><td>npm</td></tr>
+<tr><td><code>some-agpl-service</code></td><td>1.5.0</td><td><span class="risk-badge risk-high">AGPL-3.0</span></td><td>pypi</td></tr>
+</table>
+</div>
+<div class="dep-section">
+<h3>🟡 低风险 (1)</h3>
+<table>
+<tr><th>包名</th><th>版本</th><th>许可证</th><th>来源</th></tr>
+<tr><td><code>some-apache-tool</code></td><td>3.2.1</td><td><span class="risk-badge risk-low">Apache-2.0</span></td><td>npm</td></tr>
+</table>
+</div>
+<div class="dep-section">
+<h3>🟢 安全 (9)</h3>
+<table>
+<tr><th>包名</th><th>版本</th><th>许可证</th><th>来源</th></tr>
+<tr><td><code>express</code></td><td>^4.18.2</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>lodash</code></td><td>^4.17.21</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>react</code></td><td>^18.2.0</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>axios</code></td><td>^1.6.0</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>moment</code></td><td>^2.29.4</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>jest</code></td><td>^29.7.0</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>eslint</code></td><td>^8.52.0</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>typescript</code></td><td>^5.2.2</td><td><span class="risk-badge risk-safe">MIT</span></td><td>package.json</td></tr>
+<tr><td><code>some-lodash-fork</code></td><td>4.17.21</td><td><span class="risk-badge risk-safe">MIT</span></td><td>github</td></tr>
+</table>
+</div>
+<div class="dep-section">
+<h3>⚪ 未知 (8)</h3>
+<table>
+<tr><th>包名</th><th>版本</th><th>许可证</th><th>来源</th></tr>
+<tr><td><code>flask</code></td><td>2.3.3</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>django</code></td><td>4.2.7</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>pandas</code></td><td>2.1.3</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>numpy</code></td><td>1.26.2</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>requests</code></td><td>2.31.0</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>urllib3</code></td><td>2.0.7</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>click</code></td><td>8.1.7</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+<tr><td><code>rich</code></td><td>13.7.0</td><td><span class="risk-badge risk-unknown">UNKNOWN</span></td><td>requirements.txt</td></tr>
+</table>
+</div>
+
+
+</body>
+</html>

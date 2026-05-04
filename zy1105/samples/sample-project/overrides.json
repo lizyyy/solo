@@ -1,0 +1,29 @@
+{
+  "licenseOverrides": {
+    "some-internal-package": {
+      "license": "MIT",
+      "version": "1.0.0",
+      "source": "内部开发，MIT 许可"
+    }
+  },
+  "riskOverrides": {
+    "UnknownLicense": "LOW"
+  },
+  "ignorePackages": [],
+  "exclusions": {
+    "devDependencies": false,
+    "testDependencies": false,
+    "optionalDependencies": false,
+    "packages": []
+  },
+  "requirements": {
+    "requireNoticeForApache": true,
+    "requireAttribution": true,
+    "checkCopyleft": true,
+    "checkNetworkService": true
+  },
+  "notes": {
+    "some-gpl-library": "此库通过独立进程使用，不影响主项目许可证",
+    "some-agpl-service": "仅用于内部开发环境，生产环境使用 MIT 替代方案"
+  }
+}

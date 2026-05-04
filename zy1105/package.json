@@ -1,0 +1,28 @@
+{
+  "name": "license-risk-checker",
+  "version": "1.0.0",
+  "description": "本地依赖许可证和商用风险体检 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "license-check": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/test-license-risk-assessor.js tests/test-parsers.js",
+    "lint": "standard"
+  },
+  "keywords": [
+    "license",
+    "dependency",
+    "cli",
+    "compliance",
+    "opensource"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "standard": "^17.1.0"
+  }
+}

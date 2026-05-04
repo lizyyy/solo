@@ -1,0 +1,1624 @@
+{
+  "meta": {
+    "exportedAt": "2026-05-04T03:02:33.146Z",
+    "projectName": "sample-project",
+    "projectVersion": "1.0.0",
+    "tool": "license-risk-checker",
+    "version": "1.0.0"
+  },
+  "scanResult": {
+    "timestamp": "2026-05-04T03:02:33.137Z",
+    "projectDir": "/Users/lzy/pro/solocoder/pro/zy1105/repo/zy1105/samples/sample-project",
+    "projectInfo": {
+      "hasPackageJson": true,
+      "hasRequirements": true,
+      "hasThirdPartyCsv": true,
+      "hasLicenseFile": true,
+      "hasNoticeFile": true,
+      "hasOverridesJson": true,
+      "name": "sample-project",
+      "version": "1.0.0",
+      "license": "MIT",
+      "description": "示例项目 - 用于测试许可证风险检查工具"
+    },
+    "dependencies": [
+      {
+        "name": "express",
+        "version": "^4.18.2",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "production",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "lodash",
+        "version": "^4.17.21",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "production",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "react",
+        "version": "^18.2.0",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "production",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "axios",
+        "version": "^1.6.0",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "production",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "moment",
+        "version": "^2.29.4",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "production",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "jest",
+        "version": "^29.7.0",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "development",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "eslint",
+        "version": "^8.52.0",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "development",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "typescript",
+        "version": "^5.2.2",
+        "resolvedVersion": null,
+        "license": "MIT",
+        "source": "package.json",
+        "type": "development",
+        "sourceType": "npm",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "flask",
+        "originalName": "flask",
+        "version": "2.3.3",
+        "resolvedVersion": null,
+        "versionSpec": "==2.3.3",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 2,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "django",
+        "originalName": "django",
+        "version": "4.2.7",
+        "resolvedVersion": null,
+        "versionSpec": "==4.2.7",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 3,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "pandas",
+        "originalName": "pandas",
+        "version": "2.1.3",
+        "resolvedVersion": null,
+        "versionSpec": "==2.1.3",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 6,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "numpy",
+        "originalName": "numpy",
+        "version": "1.26.2",
+        "resolvedVersion": null,
+        "versionSpec": "==1.26.2",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 7,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "requests",
+        "originalName": "requests",
+        "version": "2.31.0",
+        "resolvedVersion": null,
+        "versionSpec": "==2.31.0",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 10,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "urllib3",
+        "originalName": "urllib3",
+        "version": "2.0.7",
+        "resolvedVersion": null,
+        "versionSpec": "==2.0.7",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 11,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "click",
+        "originalName": "click",
+        "version": "8.1.7",
+        "resolvedVersion": null,
+        "versionSpec": "==8.1.7",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 14,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "rich",
+        "originalName": "rich",
+        "version": "13.7.0",
+        "resolvedVersion": null,
+        "versionSpec": "==13.7.0",
+        "extras": null,
+        "license": null,
+        "source": "requirements.txt",
+        "line": 15,
+        "type": "unknown",
+        "specType": "pypi",
+        "sourceType": "python",
+        "riskLevel": "UNKNOWN",
+        "riskInfo": {
+          "level": "UNKNOWN",
+          "color": "gray",
+          "displayName": "未知",
+          "description": "许可证未知，需要手动核实"
+        },
+        "licenseInfo": {
+          "summary": "许可证未知",
+          "requirements": [
+            "需要手动核实"
+          ],
+          "risks": [
+            "无法确认是否可商用",
+            "可能存在法律风险"
+          ],
+          "commercialUse": null,
+          "modification": null,
+          "distribution": null,
+          "privateUse": null,
+          "patentGrant": null
+        },
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "UNKNOWN",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "some-gpl-library",
+        "originalName": "some-gpl-library",
+        "version": "2.0.0",
+        "resolvedVersion": "2.0.0",
+        "license": "GPL-3.0",
+        "source": "npm",
+        "sourceFile": "third_party.csv",
+        "line": 2,
+        "type": "third-party",
+        "specType": "manual",
+        "url": "https://github.com/example/gpl-lib",
+        "notes": "需要注意 copyleft 影响",
+        "notice": null,
+        "copyright": null,
+        "sourceType": "third-party",
+        "riskLevel": "HIGH",
+        "riskInfo": {
+          "level": "HIGH",
+          "color": "red",
+          "displayName": "高风险",
+          "description": "强 copyleft 或网络服务感染，可能导致整个项目开源"
+        },
+        "licenseInfo": {
+          "summary": "强 copyleft，版本 3，增加反 tivoization",
+          "requirements": [
+            "保留原许可证声明",
+            "公开全部源码",
+            "相同许可证分发",
+            "安装信息提供"
+          ],
+          "risks": [
+            "整个项目必须以 GPL 开源",
+            "无法闭源商用分发"
+          ],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": true
+        },
+        "issues": [
+          {
+            "type": "copyleft",
+            "severity": "medium",
+            "message": "Copyleft 许可证 - 可能需要公开源码",
+            "license": "GPL-3.0",
+            "evidence": "npm"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "GPL-3.0",
+        "isCopyleft": true,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-agpl-service",
+        "originalName": "some-agpl-service",
+        "version": "1.5.0",
+        "resolvedVersion": "1.5.0",
+        "license": "AGPL-3.0",
+        "source": "pypi",
+        "sourceFile": "third_party.csv",
+        "line": 3,
+        "type": "third-party",
+        "specType": "manual",
+        "url": "https://github.com/example/agpl-lib",
+        "notes": "高风险 - 网络服务感染",
+        "notice": null,
+        "copyright": null,
+        "sourceType": "third-party",
+        "riskLevel": "HIGH",
+        "riskInfo": {
+          "level": "HIGH",
+          "color": "red",
+          "displayName": "高风险",
+          "description": "强 copyleft 或网络服务感染，可能导致整个项目开源"
+        },
+        "licenseInfo": {
+          "summary": "网络服务感染，即使不分发也可能触发",
+          "requirements": [
+            "保留原许可证声明",
+            "公开全部源码",
+            "相同许可证分发",
+            "网络访问用户可获取源码"
+          ],
+          "risks": [
+            "网络服务场景也需开源",
+            "即使不分发也可能触发 copyleft"
+          ],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": true
+        },
+        "issues": [
+          {
+            "type": "copyleft",
+            "severity": "high",
+            "message": "AGPL 许可证 - 网络服务场景也需开源",
+            "license": "AGPL-3.0",
+            "evidence": "pypi"
+          },
+          {
+            "type": "agpl-risk",
+            "severity": "high"
+          }
+        ],
+        "overridden": false,
+        "normalizedLicense": "AGPL-3.0",
+        "isCopyleft": true,
+        "isNetworkServiceRisk": true,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-lodash-fork",
+        "originalName": "some-lodash-fork",
+        "version": "4.17.21",
+        "resolvedVersion": "4.17.21",
+        "license": "MIT",
+        "source": "github",
+        "sourceFile": "third_party.csv",
+        "line": 4,
+        "type": "third-party",
+        "specType": "manual",
+        "url": "https://github.com/example/lodash",
+        "notes": "从 lodash fork 出来的内部库",
+        "notice": null,
+        "copyright": null,
+        "sourceType": "third-party",
+        "riskLevel": "SAFE",
+        "riskInfo": {
+          "level": "SAFE",
+          "color": "green",
+          "displayName": "安全",
+          "description": "可以安全商用，几乎没有约束或约束很宽松"
+        },
+        "licenseInfo": {
+          "summary": "最宽松的许可证之一",
+          "requirements": [
+            "保留原许可证声明"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": false
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "MIT",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-apache-tool",
+        "originalName": "some-apache-tool",
+        "version": "3.2.1",
+        "resolvedVersion": "3.2.1",
+        "license": "Apache-2.0",
+        "source": "npm",
+        "sourceFile": "third_party.csv",
+        "line": 5,
+        "type": "third-party",
+        "specType": "manual",
+        "url": "https://github.com/example/apache-tool",
+        "notes": "需要 NOTICE 文件声明",
+        "notice": null,
+        "copyright": null,
+        "sourceType": "third-party",
+        "riskLevel": "LOW",
+        "riskInfo": {
+          "level": "LOW",
+          "color": "yellow",
+          "displayName": "低风险",
+          "description": "需要保留许可证声明或归因信息"
+        },
+        "licenseInfo": {
+          "summary": "商业友好，包含专利授权",
+          "requirements": [
+            "保留原许可证声明",
+            "说明修改内容",
+            "包含 NOTICE 文件"
+          ],
+          "risks": [],
+          "commercialUse": true,
+          "modification": true,
+          "distribution": true,
+          "privateUse": true,
+          "patentGrant": true
+        },
+        "issues": [],
+        "overridden": false,
+        "normalizedLicense": "Apache-2.0",
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": true,
+        "requiresAttribution": true
+      }
+    ],
+    "licenseFiles": [
+      {
+        "file": "LICENSE",
+        "fullPath": "/Users/lzy/pro/solocoder/pro/zy1105/repo/zy1105/samples/sample-project/LICENSE",
+        "content": "MIT License\n\nCopyright (c) 2024 Sample Project\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+        "detectedLicense": "MIT",
+        "confidence": 1
+      },
+      {
+        "file": "LICENSE",
+        "fullPath": "/Users/lzy/pro/solocoder/pro/zy1105/repo/zy1105/samples/sample-project/LICENSE",
+        "detectedLicense": "MIT",
+        "contentLength": 1071
+      }
+    ],
+    "noticeFile": {
+      "file": "NOTICE",
+      "fullPath": "/Users/lzy/pro/solocoder/pro/zy1105/repo/zy1105/samples/sample-project/NOTICE",
+      "content": "NOTICE\n======\n\nSample Project\nCopyright 2024\n\n==============================================================================\n\n第三方组件声明\n------------------\n\n以下组件随此软件分发，请注意各自的许可证条款：\n\n## some-apache-tool\n版本: 3.2.1\n许可证: Apache-2.0\n来源: npm\n版权所有: 2024 Apache Software Foundation\n\n根据 Apache-2.0 许可证第 4 节，特此声明：\n本产品包含 some-apache-tool 软件的组件。\n\n==============================================================================\n\n许可证摘要\n------------\n\n此项目包含以下许可证类型的第三方组件：\n- MIT: 5 个\n- Apache-2.0: 1 个\n- GPL-3.0: 1 个 (注意: copyleft)\n- AGPL-3.0: 1 个 (注意: 高风险)\n\n==============================================================================\n\n注意事项\n--------\n\n1. GPL-3.0 和 AGPL-3.0 许可证的组件存在 copyleft 影响\n2. AGPL-3.0 组件在网络服务场景下也需要开源\n3. Apache-2.0 组件需要保留此 NOTICE 文件\n4. 所有 MIT 许可组件需要保留原许可证声明\n",
+      "thirdPartyMentions": [
+        {
+          "content": "Copyright 2024",
+          "startLine": 5,
+          "endLine": 5
+        }
+      ],
+      "mentionsCount": 1
+    },
+    "overrides": {
+      "ignorePackages": [],
+      "licenseOverrides": {
+        "some-internal-package": {
+          "license": "MIT",
+          "version": "1.0.0",
+          "source": "内部开发，MIT 许可"
+        }
+      },
+      "riskOverrides": {
+        "UnknownLicense": "LOW"
+      },
+      "additionalLicenses": [],
+      "exclusions": {
+        "devDependencies": false,
+        "testDependencies": false,
+        "optionalDependencies": false,
+        "packages": []
+      },
+      "requirements": {
+        "requireNoticeForApache": true,
+        "requireAttribution": true,
+        "checkCopyleft": true,
+        "checkNetworkService": true
+      },
+      "customRiskLevels": {},
+      "notes": {
+        "some-gpl-library": "此库通过独立进程使用，不影响主项目许可证",
+        "some-agpl-service": "仅用于内部开发环境，生产环境使用 MIT 替代方案"
+      }
+    },
+    "errors": [],
+    "warnings": [],
+    "statistics": {
+      "totalDependencies": 20,
+      "byRiskLevel": {
+        "SAFE": 9,
+        "LOW": 1,
+        "MEDIUM": 0,
+        "HIGH": 2,
+        "UNKNOWN": 8
+      },
+      "byLicense": {
+        "MIT": 9,
+        "UNKNOWN": 8,
+        "GPL-3.0": 1,
+        "AGPL-3.0": 1,
+        "Apache-2.0": 1
+      },
+      "bySource": {
+        "npm": 8,
+        "python": 8,
+        "third-party": 4
+      }
+    }
+  },
+  "checkResult": {
+    "timestamp": "2026-05-04T03:02:33.145Z",
+    "passed": true,
+    "issues": [
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "flask",
+        "version": "2.3.3",
+        "message": "依赖 flask 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 2,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "django",
+        "version": "4.2.7",
+        "message": "依赖 django 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 3,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "pandas",
+        "version": "2.1.3",
+        "message": "依赖 pandas 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 6,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "numpy",
+        "version": "1.26.2",
+        "message": "依赖 numpy 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 7,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "requests",
+        "version": "2.31.0",
+        "message": "依赖 requests 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 10,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "urllib3",
+        "version": "2.0.7",
+        "message": "依赖 urllib3 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 11,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "click",
+        "version": "8.1.7",
+        "message": "依赖 click 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 14,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "missing-license",
+        "severity": "high",
+        "package": "rich",
+        "version": "13.7.0",
+        "message": "依赖 rich 缺少许可证信息",
+        "evidence": "requirements.txt",
+        "file": "requirements.txt",
+        "line": 15,
+        "explanation": "没有许可证信息的依赖无法确认是否可商用。建议：1) 检查包的官方文档 2) 使用 overrides.json 手动指定许可证 3) 考虑移除该依赖或寻找替代方案"
+      },
+      {
+        "type": "copyleft-license",
+        "severity": "medium",
+        "package": "some-gpl-library",
+        "version": "2.0.0",
+        "license": "GPL-3.0",
+        "message": "依赖 some-gpl-library 使用 Copyleft 许可证: GPL-3.0",
+        "evidence": "npm",
+        "file": "third_party.csv",
+        "line": 2,
+        "explanation": "GPL-3.0 是强 Copyleft 许可证。包含额外的反 tivoization 条款，防止在嵌入式设备中锁定 GPL 软件。整个衍生作品必须以 GPL-3.0 分发。",
+        "requirements": [
+          "保留原许可证声明",
+          "公开全部源码",
+          "相同许可证分发",
+          "安装信息提供"
+        ],
+        "risks": [
+          "整个项目必须以 GPL 开源",
+          "无法闭源商用分发"
+        ],
+        "riskLevel": "HIGH"
+      },
+      {
+        "type": "network-service-risk",
+        "severity": "high",
+        "package": "some-agpl-service",
+        "version": "1.5.0",
+        "license": "AGPL-3.0",
+        "message": "依赖 some-agpl-service 使用 AGPL 许可证，存在网络服务感染风险",
+        "evidence": "pypi",
+        "file": "third_party.csv",
+        "line": 3,
+        "explanation": "AGPL (Affero General Public License) 是强 Copyleft 许可证，即使您只是通过网络提供服务（如 SaaS），也需要向用户提供完整的源代码。这可能导致您的整个项目被迫开源。\n\n建议行动：\n1) 评估是否真的需要使用 AGPL 库\n2) 寻找许可证更宽松的替代方案（如 MIT/Apache）\n3) 如果必须使用，请咨询法律专家\n4) 确保完全理解并遵守许可证条款",
+        "impact": "高 - 可能导致整个项目被迫开源",
+        "mitigation": [
+          "寻找 MIT/Apache 许可的替代库",
+          "使用动态链接（不适用于 AGPL）",
+          "隔离该组件为独立服务",
+          "咨询法律专家"
+        ]
+      },
+      {
+        "type": "notice-incomplete",
+        "severity": "low",
+        "packages": [
+          {
+            "name": "some-apache-tool",
+            "version": "3.2.1"
+          }
+        ],
+        "message": "NOTICE 文件可能缺少 1 个 Apache-2.0 依赖的声明",
+        "evidence": "NOTICE 文件内容分析",
+        "explanation": "建议在 NOTICE 文件中明确列出所有 Apache-2.0 依赖的版权信息"
+      },
+      {
+        "type": "unknown-licenses",
+        "severity": "high",
+        "packages": [
+          {
+            "name": "flask",
+            "version": "2.3.3",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "django",
+            "version": "4.2.7",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "pandas",
+            "version": "2.1.3",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "numpy",
+            "version": "1.26.2",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "requests",
+            "version": "2.31.0",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "urllib3",
+            "version": "2.0.7",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "click",
+            "version": "8.1.7",
+            "source": "requirements.txt"
+          },
+          {
+            "name": "rich",
+            "version": "13.7.0",
+            "source": "requirements.txt"
+          }
+        ],
+        "message": "发现 8 个许可证未知的依赖",
+        "evidence": "许可证扫描结果",
+        "explanation": "许可证未知的依赖存在法律风险，无法确认是否可商用。\n\n建议行动：\n1) 检查包的官方文档或源代码仓库\n2) 查看 node_modules 中的 LICENSE 文件\n3) 使用 overrides.json 手动指定许可证\n4) 考虑寻找有明确许可证的替代方案",
+        "recommendation": "在确认许可证前，谨慎使用这些依赖进行商用分发"
+      }
+    ],
+    "summary": {
+      "critical": 0,
+      "high": 10,
+      "medium": 1,
+      "low": 1,
+      "info": 0
+    },
+    "dependencies": [
+      {
+        "name": "express",
+        "version": "^4.18.2",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "lodash",
+        "version": "^4.17.21",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "react",
+        "version": "^18.2.0",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "axios",
+        "version": "^1.6.0",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "moment",
+        "version": "^2.29.4",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "jest",
+        "version": "^29.7.0",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "eslint",
+        "version": "^8.52.0",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "typescript",
+        "version": "^5.2.2",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "flask",
+        "version": "2.3.3",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "django",
+        "version": "4.2.7",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "pandas",
+        "version": "2.1.3",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "numpy",
+        "version": "1.26.2",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "requests",
+        "version": "2.31.0",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "urllib3",
+        "version": "2.0.7",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "click",
+        "version": "8.1.7",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "rich",
+        "version": "13.7.0",
+        "license": null,
+        "normalizedLicense": "UNKNOWN",
+        "riskLevel": "UNKNOWN",
+        "issues": [
+          {
+            "type": "missing-license",
+            "severity": "high",
+            "message": "未找到许可证信息",
+            "evidence": "requirements.txt"
+          },
+          {
+            "type": "missing-license",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": false
+      },
+      {
+        "name": "some-gpl-library",
+        "version": "2.0.0",
+        "license": "GPL-3.0",
+        "normalizedLicense": "GPL-3.0",
+        "riskLevel": "HIGH",
+        "issues": [
+          {
+            "type": "copyleft",
+            "severity": "medium",
+            "message": "Copyleft 许可证 - 可能需要公开源码",
+            "license": "GPL-3.0",
+            "evidence": "npm"
+          }
+        ],
+        "isCopyleft": true,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-agpl-service",
+        "version": "1.5.0",
+        "license": "AGPL-3.0",
+        "normalizedLicense": "AGPL-3.0",
+        "riskLevel": "HIGH",
+        "issues": [
+          {
+            "type": "copyleft",
+            "severity": "high",
+            "message": "AGPL 许可证 - 网络服务场景也需开源",
+            "license": "AGPL-3.0",
+            "evidence": "pypi"
+          },
+          {
+            "type": "agpl-risk",
+            "severity": "high"
+          }
+        ],
+        "isCopyleft": true,
+        "isNetworkServiceRisk": true,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-lodash-fork",
+        "version": "4.17.21",
+        "license": "MIT",
+        "normalizedLicense": "MIT",
+        "riskLevel": "SAFE",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": false,
+        "requiresAttribution": true
+      },
+      {
+        "name": "some-apache-tool",
+        "version": "3.2.1",
+        "license": "Apache-2.0",
+        "normalizedLicense": "Apache-2.0",
+        "riskLevel": "LOW",
+        "issues": [],
+        "isCopyleft": false,
+        "isNetworkServiceRisk": false,
+        "requiresNotice": true,
+        "requiresAttribution": true
+      }
+    ],
+    "recommendations": [
+      {
+        "priority": "high",
+        "title": "立即处理高风险问题",
+        "description": "发现 10 个高风险问题，建议在商用前优先解决。",
+        "actions": [
+          "检查并解决所有 AGPL 许可证依赖",
+          "确认所有未知许可证的依赖",
+          "修复所有扫描错误"
+        ]
+      },
+      {
+        "priority": "medium",
+        "title": "评估 Copyleft 许可证影响",
+        "description": "发现 1 个 Copyleft 许可证依赖。",
+        "actions": [
+          "确认链接方式（静态 vs 动态）",
+          "评估对项目整体许可证的影响",
+          "咨询法律专家确认合规性"
+        ]
+      }
+    ],
+    "overallRisk": "HIGH",
+    "statistics": {
+      "totalDependencies": 20,
+      "byRiskLevel": {
+        "SAFE": 9,
+        "LOW": 1,
+        "MEDIUM": 0,
+        "HIGH": 2,
+        "UNKNOWN": 8
+      },
+      "issues": {
+        "critical": 0,
+        "high": 10,
+        "medium": 1,
+        "low": 1,
+        "info": 0
+      }
+    }
+  }
+}

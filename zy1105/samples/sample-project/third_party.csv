@@ -1,0 +1,5 @@
+name,version,license,source,url,notes
+some-gpl-library,2.0.0,GPL-3.0,npm,https://github.com/example/gpl-lib,需要注意 copyleft 影响
+some-agpl-service,1.5.0,AGPL-3.0,pypi,https://github.com/example/agpl-lib,高风险 - 网络服务感染
+some-lodash-fork,4.17.21,MIT,github,https://github.com/example/lodash,从 lodash fork 出来的内部库
+some-apache-tool,3.2.1,Apache-2.0,npm,https://github.com/example/apache-tool,需要 NOTICE 文件声明
