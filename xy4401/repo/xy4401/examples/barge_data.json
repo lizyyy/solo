@@ -1,0 +1,54 @@
+{
+  "barges": [
+    {
+      "id": "ship001",
+      "name": "东方号",
+      "draft": 3.5,
+      "length": 85,
+      "cargoType": "煤炭",
+      "loadingTime": 180,
+      "preferredTime": null,
+      "notes": "装载动力煤，需要防爆措施"
+    },
+    {
+      "id": "ship002",
+      "name": "远航号",
+      "draft": 4.0,
+      "length": 95,
+      "cargoType": "粮食",
+      "loadingTime": 240,
+      "preferredTime": null,
+      "notes": "装载小麦，注意防潮"
+    },
+    {
+      "id": "ship003",
+      "name": "明珠号",
+      "draft": 3.0,
+      "length": 70,
+      "cargoType": "杂货",
+      "loadingTime": 120,
+      "preferredTime": null,
+      "notes": "装载五金建材"
+    },
+    {
+      "id": "ship004",
+      "name": "顺达号",
+      "draft": 3.2,
+      "length": 75,
+      "cargoType": "集装箱",
+      "loadingTime": 150,
+      "preferredTime": null,
+      "notes": "装载12个标准集装箱"
+    },
+    {
+      "id": "ship005",
+      "name": "启航号",
+      "draft": 3.8,
+      "length": 90,
+      "cargoType": "矿石",
+      "loadingTime": 200,
+      "preferredTime": null,
+      "notes": "装载铁矿石，需要除尘设备"
+    }
+  ]
+}

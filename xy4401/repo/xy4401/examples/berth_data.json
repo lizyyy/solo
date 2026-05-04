@@ -1,0 +1,44 @@
+{
+  "config": {
+    "workStartHour": 8,
+    "workEndHour": 18,
+    "nightStartHour": 18,
+    "nightEndHour": 6,
+    "underKeelClearance": 0.5,
+    "maxCurrentSpeed": 2.0
+  },
+  "berths": [
+    {
+      "id": "b1",
+      "name": "1号泊位",
+      "maxDraft": 5.0,
+      "maxLength": 120,
+      "allowedCargoTypes": ["煤炭", "矿石", "粮食"],
+      "description": "深水泊位，可停靠大型驳船"
+    },
+    {
+      "id": "b2",
+      "name": "2号泊位",
+      "maxDraft": 4.0,
+      "maxLength": 100,
+      "allowedCargoTypes": ["杂货", "集装箱"],
+      "description": "通用泊位，适合中小型船舶"
+    },
+    {
+      "id": "b3",
+      "name": "3号泊位",
+      "maxDraft": 3.5,
+      "maxLength": 80,
+      "allowedCargoTypes": ["石油", "化工"],
+      "description": "液货专用泊位"
+    },
+    {
+      "id": "b4",
+      "name": "4号泊位",
+      "maxDraft": 4.5,
+      "maxLength": 110,
+      "allowedCargoTypes": [],
+      "description": "备用泊位，无货种限制"
+    }
+  ]
+}
