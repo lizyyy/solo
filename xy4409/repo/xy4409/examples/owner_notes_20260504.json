@@ -1,0 +1,26 @@
+[
+    {
+        "pet_name": "旺财",
+        "type": "owner_note",
+        "content": "主人说旺财最近食欲不太好，可能需要少食多餐，注意观察便便情况。",
+        "created_by": "王女士",
+        "created_at": "2026-05-04 08:30:00",
+        "is_confirmed": false
+    },
+    {
+        "pet_name": "咪咪",
+        "type": "vet_note",
+        "content": "兽医检查发现咪咪左眼有轻微炎症，需要每天滴眼药水3次，连续5天。注意不要让它用爪子抓眼睛。",
+        "created_by": "宠物医院",
+        "created_at": "2026-05-04 09:00:00",
+        "is_confirmed": false
+    },
+    {
+        "pet_name": "豆豆",
+        "type": "owner_note",
+        "content": "豆豆今天早上有点拉稀，主人带来的时候状态还可以，需要监控体温和进食情况。",
+        "created_by": "李先生",
+        "created_at": "2026-05-04 10:00:00",
+        "is_confirmed": false
+    }
+]

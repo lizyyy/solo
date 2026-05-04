@@ -1,0 +1,28 @@
+server:
+  host: "localhost"
+  port: 5000
+  debug: true
+
+paths:
+  incoming_dir: "./data/incoming"
+  archive_dir: "./data/archive"
+  database_path: "./database/pet_boarding.db"
+  export_dir: "./exports"
+
+processing:
+  scan_interval: 300
+  risk_check_hours: [22, 23, 0, 1, 2, 3, 4, 5]
+  night_start_hour: 22
+  night_end_hour: 6
+
+risk:
+  missed_medication_threshold: 1
+  unconfirmed_note_hours: 4
+  mixed_cage_threshold: 3
+  night_abnormal_calls_threshold: 5
+
+pets:
+  default_medication_times:
+    - "08:00"
+    - "12:00"
+    - "18:00"
