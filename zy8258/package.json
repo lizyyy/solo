@@ -1,0 +1,35 @@
+{
+  "name": "case-validator",
+  "version": "1.0.0",
+  "description": "法院电子卷宗刻录/移交前离线校验工具",
+  "main": "dist/index.js",
+  "bin": {
+    "case-validator": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test-sample": "npm run build && node dist/index.js validate ./sample && node dist/index.js report ./sample"
+  },
+  "keywords": [
+    "court",
+    "case",
+    "validator",
+    "e-dossier"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "js-yaml": "^4.1.0",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.11.0",
+    "@types/js-yaml": "^4.0.9",
+    "ts-node": "^10.9.2"
+  }
+}

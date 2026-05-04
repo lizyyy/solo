@@ -1,0 +1,74 @@
+requiredDocuments:
+  - caseType: 民事
+    documents:
+      - 起诉状
+      - 答辩状
+      - 证据清单
+      - 庭审笔录
+      - 判决书
+  - caseType: 刑事
+    documents:
+      - 起诉书
+      - 辩护词
+      - 证据清单
+      - 庭审笔录
+      - 判决书
+  - caseType: 行政
+    documents:
+      - 起诉状
+      - 答辩状
+      - 证据清单
+      - 庭审笔录
+      - 判决书
+  - caseType: 执行
+    documents:
+      - 执行申请书
+      - 执行裁定书
+      - 结案通知书
+
+secretLevelRules:
+  - level: 公开
+    allowedDirectories:
+      - 公开
+      - public
+      - 卷宗
+    forbiddenDirectories:
+      - 内部
+      - 秘密
+      - 机密
+  - level: 内部
+    allowedDirectories:
+      - 内部
+      - 卷宗
+    forbiddenDirectories:
+      - 公开
+      - public
+      - 秘密
+      - 机密
+  - level: 秘密
+    allowedDirectories:
+      - 秘密
+      - 卷宗
+    forbiddenDirectories:
+      - 公开
+      - public
+      - 内部
+      - 机密
+  - level: 机密
+    allowedDirectories:
+      - 机密
+      - 卷宗
+    forbiddenDirectories:
+      - 公开
+      - public
+      - 内部
+      - 秘密
+
+duplicateCheckRules:
+  enabled: true
+  ignoreDirectories:
+    - 目录文件
+    - 索引
+
+caseSensitivityCheck: true
+batchAppendCheck: true
