@@ -1,0 +1,12 @@
+db_path: backup_checker.db
+reports_dir: reports
+hash_type: md5
+parallel: true
+max_workers: 4
+
+tasks:
+  - name: sample_photos_check
+    source_dir: ./sample_data/source
+    target_dir: ./sample_data/target
+    retention_days: 90
+    enabled: true

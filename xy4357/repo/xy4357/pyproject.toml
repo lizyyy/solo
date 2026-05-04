@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "backup-checker"
+version = "0.1.0"
+description = "本地备份巡检自动化工具 - 扫描文件指纹、比较差异、维护巡检记录"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pyyaml>=6.0",
+    "click>=8.0",
+    "rich>=13.0",
+    "flask>=2.0",
+]
+
+[project.scripts]
+backup-checker = "backup_checker.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backup_checker"]

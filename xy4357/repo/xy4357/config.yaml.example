@@ -1,0 +1,31 @@
+db_path: backup_checker.db
+reports_dir: reports
+hash_type: md5
+parallel: true
+max_workers: 4
+
+tasks:
+  - name: sample_photos_check
+    source_dir: ./sample_data/source
+    target_dir: ./sample_data/target
+    retention_days: 90
+    enabled: true
+
+  - name: family_photos_to_nas
+    source_dir: ~/Photos/Family
+    target_dir: /Volumes/NAS/Backup/FamilyPhotos
+    retention_days: 90
+    enabled: false
+
+  - name: travel_photos_to_external
+    source_dir: ~/Photos/Travel
+    target_dir: /Volumes/ExternalHD/Backup/TravelPhotos
+    retention_days: 0
+    enabled: false
+    extensions:
+      - .jpg
+      - .jpeg
+      - .png
+      - .raw
+      - .nef
+      - .cr2
