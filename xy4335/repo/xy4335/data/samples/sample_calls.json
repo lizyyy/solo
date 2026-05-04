@@ -1,0 +1,80 @@
+[
+    {
+        "call_id": "CALL_001",
+        "caller_id": "C_1001",
+        "call_time": "2026-05-03 23:15:00",
+        "duration_minutes": 45,
+        "summary_text": "来电者表示最近压力很大，经常失眠，感觉活着没有意义。提到之前有过割腕的想法，现在家里有刀片。接线员询问是否有具体计划，来电者沉默了一会儿说还没想好，但感觉很难受，不想继续了。接线员尝试稳定情绪并建议转介危机干预中心。",
+        "initial_risk_level": "orange",
+        "operator_id": "OP_001",
+        "operator_name": "张接线员",
+        "has_referral": true,
+        "referral_to": "市危机干预中心",
+        "referral_time": "2026-05-03 23:50:00"
+    },
+    {
+        "call_id": "CALL_002",
+        "caller_id": "C_1002",
+        "call_time": "2026-05-03 20:30:00",
+        "duration_minutes": 25,
+        "summary_text": "来电者因工作问题感到焦虑，近期经常加班，担心被裁员。提到最近胃口不好，睡眠质量下降。接线员倾听并提供情绪支持，建议来电者如果情况持续可以考虑寻求专业帮助。",
+        "initial_risk_level": "green",
+        "operator_id": "OP_002",
+        "operator_name": "李接线员",
+        "has_referral": false,
+        "referral_to": null,
+        "referral_time": null
+    },
+    {
+        "call_id": "CALL_003",
+        "caller_id": "C_1001",
+        "call_time": "2026-05-02 19:45:00",
+        "duration_minutes": 30,
+        "summary_text": "同一来电者（C_1001）再次来电，情绪比上次更激动，表示已经准备好了刀片，就等家人睡熟了。说已经尝试过一次割腕但没有成功，这次一定要成功。接线员立即启动危机干预流程。",
+        "initial_risk_level": "red",
+        "operator_id": "OP_001",
+        "operator_name": "张接线员",
+        "has_referral": true,
+        "referral_to": "市精神卫生中心急诊科",
+        "referral_time": "2026-05-02 20:10:00"
+    },
+    {
+        "call_id": "CALL_004",
+        "caller_id": "C_1003",
+        "call_time": "2026-05-01 14:20:00",
+        "duration_minutes": 35,
+        "summary_text": "来电者因感情问题感到抑郁，提到最近经常想到自杀，但还没有具体计划。说自己有抑郁症病史，正在服药但感觉效果不好。接线员建议来电者联系医生调整用药，并安排了回访。",
+        "initial_risk_level": "yellow",
+        "operator_id": "OP_003",
+        "operator_name": "王接线员",
+        "has_referral": false,
+        "referral_to": null,
+        "referral_time": null
+    },
+    {
+        "call_id": "CALL_005",
+        "caller_id": "C_1004",
+        "call_time": "2026-04-30 16:10:00",
+        "duration_minutes": 20,
+        "summary_text": "来电者咨询如何帮助有抑郁情绪的朋友。朋友最近经常说不想活了，来电者很担心。接线员提供了危机干预的基本技巧，并建议来电者鼓励朋友寻求专业帮助。",
+        "initial_risk_level": "green",
+        "operator_id": "OP_002",
+        "operator_name": "李接线员",
+        "has_referral": false,
+        "referral_to": null,
+        "referral_time": null
+    },
+    {
+        "call_id": "CALL_006",
+        "caller_id": "C_1005",
+        "call_time": "2026-04-29 21:05:00",
+        "duration_minutes": 50,
+        "summary_text": "来电者表达了强烈的自杀意念，说已经准备了农药，就想一了百了。提到因为欠债压力太大，家人也不理解。接线员使用危机干预技术，成功将来电者的注意力转移，并获得了地址信息。已联系警方介入。",
+        "initial_risk_level": "red",
+        "operator_id": "OP_004",
+        "operator_name": "陈接线员（督导）",
+        "has_referral": true,
+        "referral_to": "当地派出所 + 精神卫生中心",
+        "referral_time": "2026-04-29 21:45:00"
+    }
+]
