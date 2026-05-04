@@ -1,0 +1,139 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created_at": "2026-05-04",
+    "description": "道路规则配置：限行、午休、特殊时段等"
+  },
+  "restriction_zones": [
+    {
+      "id": "Z001",
+      "name": "市中心限行区",
+      "lat_min": 39.8950,
+      "lat_max": 39.9200,
+      "lng_min": 116.3950,
+      "lng_max": 116.4200,
+      "restrictions": [
+        {
+          "vehicle_type": "car",
+          "weekday_restrictions": {
+            "1": ["07:00-09:00", "17:00-19:00"],
+            "2": ["07:00-09:00", "17:00-19:00"],
+            "3": ["07:00-09:00", "17:00-19:00"],
+            "4": ["07:00-09:00", "17:00-19:00"],
+            "5": ["07:00-09:00", "17:00-19:00"]
+          },
+          "description": "工作日早晚高峰限行"
+        }
+      ]
+    },
+    {
+      "id": "Z002",
+      "name": "老城区限行区",
+      "lat_min": 39.8900,
+      "lat_max": 39.9000,
+      "lng_min": 116.3900,
+      "lng_max": 116.4000,
+      "restrictions": [
+        {
+          "vehicle_type": "car",
+          "weekday_restrictions": {
+            "1": ["08:00-20:00"],
+            "2": ["08:00-20:00"],
+            "3": ["08:00-20:00"],
+            "4": ["08:00-20:00"],
+            "5": ["08:00-20:00"],
+            "6": ["08:00-20:00"],
+            "7": ["08:00-20:00"]
+          },
+          "description": "全天限行（除电动车）"
+        }
+      ]
+    }
+  ],
+  "break_rules": {
+    "default_lunch": {
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "duration_minutes": 60,
+      "description": "默认午休时间"
+    },
+    "mandatory_breaks": [
+      {
+        "after_minutes": 240,
+        "duration_minutes": 30,
+        "description": "连续工作4小时后需休息30分钟"
+      }
+    ]
+  },
+  "time_slots": [
+    {
+      "id": "morning_peak",
+      "name": "早高峰",
+      "start_time": "07:00",
+      "end_time": "09:00",
+      "travel_time_multiplier": 1.5,
+      "affected_vehicle_types": ["car", "electric_bike"]
+    },
+    {
+      "id": "evening_peak",
+      "name": "晚高峰",
+      "start_time": "17:00",
+      "end_time": "19:00",
+      "travel_time_multiplier": 1.5,
+      "affected_vehicle_types": ["car", "electric_bike"]
+    },
+    {
+      "id": "noon",
+      "name": "午间",
+      "start_time": "11:30",
+      "end_time": "13:30",
+      "travel_time_multiplier": 0.9,
+      "affected_vehicle_types": ["car", "electric_bike"]
+    }
+  ],
+  "skill_mappings": {
+    "repair": {
+      "name": "维修服务",
+      "required_skill": "repair",
+      "typical_duration_minutes": 60
+    },
+    "cleaning": {
+      "name": "家政清洁",
+      "required_skill": "cleaning",
+      "typical_duration_minutes": 45
+    },
+    "laundry": {
+      "name": "取送洗衣",
+      "required_skill": "laundry",
+      "typical_duration_minutes": 30
+    }
+  },
+  "priority_weights": {
+    "high": {
+      "name": "高优先级",
+      "weight": 3.0,
+      "late_penalty": 100,
+      "description": "如漏水、断电等紧急情况"
+    },
+    "medium": {
+      "name": "中优先级",
+      "weight": 1.5,
+      "late_penalty": 50,
+      "description": "常规服务"
+    },
+    "low": {
+      "name": "低优先级",
+      "weight": 1.0,
+      "late_penalty": 20,
+      "description": "如取送洗衣等可灵活调整的服务"
+    }
+  },
+  "constraints": {
+    "max_service_hours_per_day": 10,
+    "max_travel_distance_per_day_km": 50,
+    "min_time_between_jobs_minutes": 5,
+    "late_threshold_minutes": 15,
+    "overtime_threshold_minutes": 30,
+    "description": "全局约束配置"
+  }
+}
