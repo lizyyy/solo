@@ -1,0 +1,8 @@
+version,min_schema,max_schema,supported,deprecated,description
+1.0.0,1.0,1.0,true,false,"Initial release - only supports v1 schema"
+1.1.0,1.0,1.1,true,false,"Added support for new fields"
+1.2.0,1.0,1.2,true,false,"Backward compatible changes"
+1.3.0,1.1,1.3,true,false,"Dropped support for very old schema"
+2.0.0,2.0,2.0,true,false,"Major release - requires v2 schema"
+2.1.0,2.0,2.1,true,false,"Enhanced v2 support"
+0.9.0,1.0,1.0,false,true,"Beta release - no longer supported"

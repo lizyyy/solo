@@ -1,0 +1,28 @@
+compatibility_checks:
+  field_deletion: true
+  field_renaming: true
+  type_narrowing: true
+  required_fields: true
+  unknown_fields: true
+  default_value_drift: true
+  enum_extension: true
+  timestamp_precision: true
+  repeated_change: true
+
+performance_checks:
+  compare_json: true
+  compare_protobuf: true
+  compare_msgpack: true
+  sample_size: 100
+  iterations: 10
+
+ignored_fields:
+  - internal_id
+  - debug_info
+  - trace_id
+  - correlation_id
+
+custom_mappings:
+  - old_field: legacy_id
+    new_field: user_id
+    transformation: string

@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package user_service;
+
+option go_package = "github.com/yourname/pcheck/proto";
+
+enum UserStatus {
+  USER_STATUS_UNKNOWN = 0;
+  USER_STATUS_ACTIVE = 1;
+  USER_STATUS_INACTIVE = 2;
+  USER_STATUS_SUSPENDED = 3;
+  USER_STATUS_DELETED = 4;
+}
+
+message UserPreferences {
+  string theme = 1;
+  bool notifications_enabled = 2;
+  string language = 3;
+}
+
+message UserCreated {
+  string user_id = 1;
+  string email = 2;
+  string username = 3;
+  UserStatus status = 4;
+  int64 created_at = 5;
+  map<string, string> metadata = 6;
+  UserPreferences preferences = 7;
+  repeated string roles = 8;
+}
+
+message UserUpdated {
+  string user_id = 1;
+  repeated string updated_fields = 2;
+  map<string, string> old_values = 3;
+  map<string, string> new_values = 4;
+  int64 updated_at = 5;
+}

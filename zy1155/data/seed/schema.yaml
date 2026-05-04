@@ -1,0 +1,131 @@
+name: user_service
+version: "2.0"
+
+messages:
+  - name: UserCreated
+    description: Event emitted when a new user is created
+    fields:
+      - name: user_id
+        number: 1
+        type: string
+        required: true
+        description: Unique identifier for the user
+      
+      - name: email
+        number: 2
+        type: string
+        required: true
+        description: User email address
+      
+      - name: username
+        number: 3
+        type: string
+        required: true
+        description: User display name
+      
+      - name: status
+        number: 4
+        type: enum
+        required: true
+        enum_ref: UserStatus
+        default: "ACTIVE"
+        description: User account status
+      
+      - name: created_at
+        number: 5
+        type: timestamp
+        required: true
+        description: Timestamp when user was created (seconds since epoch)
+      
+      - name: metadata
+        number: 6
+        type: object
+        required: false
+        description: Additional user metadata
+      
+      - name: preferences
+        number: 7
+        type: message
+        message_ref: UserPreferences
+        required: false
+        description: User preferences
+      
+      - name: roles
+        number: 8
+        type: string
+        repeated: true
+        required: false
+        description: User roles
+
+  - name: UserUpdated
+    description: Event emitted when user information is updated
+    fields:
+      - name: user_id
+        number: 1
+        type: string
+        required: true
+        description: Unique identifier for the user
+      
+      - name: updated_fields
+        number: 2
+        type: string
+        repeated: true
+        required: true
+        description: List of fields that were updated
+      
+      - name: old_values
+        number: 3
+        type: object
+        required: false
+        description: Old values of updated fields
+      
+      - name: new_values
+        number: 4
+        type: object
+        required: false
+        description: New values of updated fields
+      
+      - name: updated_at
+        number: 5
+        type: timestamp
+        required: true
+        description: Timestamp when update occurred
+
+  - name: UserPreferences
+    description: User preferences settings
+    fields:
+      - name: theme
+        number: 1
+        type: string
+        required: false
+        default: "light"
+        description: UI theme preference
+      
+      - name: notifications_enabled
+        number: 2
+        type: bool
+        required: false
+        default: true
+        description: Whether push notifications are enabled
+      
+      - name: language
+        number: 3
+        type: string
+        required: false
+        default: "en"
+        description: Preferred language code
+
+enums:
+  - name: UserStatus
+    description: User account status values
+    values:
+      - name: UNKNOWN
+        number: 0
+      - name: ACTIVE
+        number: 1
+      - name: INACTIVE
+        number: 2
+      - name: SUSPENDED
+        number: 3
+      - name: DELETED
+        number: 4

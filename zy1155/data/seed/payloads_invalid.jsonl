@@ -1,0 +1,8 @@
+{"user_id": "usr_invalid_1", "email": "missing.fields@example.com", "created_at": 1746326400000}
+{"user_id": "usr_invalid_2", "email": "type.mismatch@example.com", "username": "Type Mismatch", "status": "UNKNOWN_STATUS", "created_at": 1746326400}
+{"user_id": "usr_invalid_3", "email": "extra.field@example.com", "username": "Extra Field", "status": "ACTIVE", "created_at": 1746326400, "unknown_field_1": "value", "unknown_field_2": 12345}
+{"user_id": "usr_invalid_4", "email": "timestamp.ms@example.com", "username": "Timestamp MS", "status": "ACTIVE", "created_at": 1746326400000, "metadata": {"created_at_ms": 1746326400000}}
+{"user_id": "usr_invalid_5", "email": "enum.invalid@example.com", "username": "Enum Invalid", "status": "BANNED", "created_at": 1746326400}
+{"user_id": "usr_invalid_6", "email": "nested.type@example.com", "username": "Nested Type", "status": "ACTIVE", "created_at": 1746326400, "preferences": {"theme": 123, "notifications_enabled": "true"}}
+{"user_id": "usr_invalid_7", "email": "array.type@example.com", "username": "Array Type", "status": "ACTIVE", "created_at": 1746326400, "roles": "not_an_array"}
+{"user_id": "usr_invalid_8", "username": "Missing Email", "status": "ACTIVE", "created_at": 1746326400}

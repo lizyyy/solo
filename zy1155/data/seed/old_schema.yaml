@@ -1,0 +1,100 @@
+name: user_service
+version: "1.0"
+
+messages:
+  - name: UserCreated
+    description: Event emitted when a new user is created (v1)
+    fields:
+      - name: user_id
+        number: 1
+        type: string
+        required: true
+        description: Unique identifier for the user
+      
+      - name: email
+        number: 2
+        type: string
+        required: true
+        description: User email address
+      
+      - name: username
+        number: 3
+        type: string
+        required: true
+        description: User display name
+      
+      - name: status
+        number: 4
+        type: string
+        required: true
+        default: "ACTIVE"
+        description: User account status (string in v1)
+      
+      - name: created_at
+        number: 5
+        type: int64
+        required: true
+        description: Timestamp when user was created (milliseconds in v1)
+      
+      - name: metadata
+        number: 6
+        type: object
+        required: false
+        description: Additional user metadata
+      
+      - name: legacy_id
+        number: 9
+        type: int64
+        required: true
+        description: Legacy integer ID (will be removed in v2)
+      
+      - name: phone
+        number: 10
+        type: string
+        required: false
+        description: User phone number (optional in v1)
+
+  - name: UserUpdated
+    description: Event emitted when user information is updated (v1)
+    fields:
+      - name: user_id
+        number: 1
+        type: string
+        required: true
+        description: Unique identifier for the user
+      
+      - name: updated_fields
+        number: 2
+        type: string
+        repeated: true
+        required: true
+        description: List of fields that were updated
+      
+      - name: old_values
+        number: 3
+        type: object
+        required: false
+        description: Old values of updated fields
+      
+      - name: new_values
+        number: 4
+        type: object
+        required: false
+        description: New values of updated fields
+      
+      - name: updated_at
+        number: 5
+        type: int64
+        required: true
+        description: Timestamp when update occurred
+
+enums:
+  - name: UserStatusV1
+    description: User account status values (v1 - not used directly)
+    values:
+      - name: UNKNOWN
+        number: 0
+      - name: ACTIVE
+        number: 1
+      - name: INACTIVE
+        number: 2
