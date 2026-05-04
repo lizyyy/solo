@@ -1,0 +1,106 @@
+import { PhysicsProblem, PhysicsProblemType } from '../../../shared/types';
+
+export const seedProblems: PhysicsProblem[] = [
+  {
+    id: 'seed-incline-001',
+    type: 'incline',
+    title: '经典斜面滑块问题',
+    description: '一个质量为2kg的滑块从静止开始沿倾角为30°的斜面下滑，斜面长度为10m，滑块与斜面的动摩擦系数为0.1。求滑块的加速度、末速度和下滑时间。',
+    parameters: [
+      { name: 'mass', label: '质量', unit: 'kg', value: 2, description: '滑块的质量' },
+      { name: 'angle', label: '斜面角度', unit: 'deg', value: 30, description: '斜面与水平面的夹角' },
+      { name: 'frictionCoeff', label: '摩擦系数', unit: '', value: 0.1, description: '滑块与斜面的摩擦系数' },
+      { name: 'hasFriction', label: '有摩擦', unit: '', value: 1, description: '是否考虑摩擦力' },
+      { name: 'initialVelocity', label: '初速度', unit: 'm/s', value: 0, description: '滑块的初始速度' },
+      { name: 'slideLength', label: '斜面长度', unit: 'm', value: 10, description: '滑块滑动的距离' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '这是一个经典的斜面滑块问题，用于演示牛顿第二定律的应用。学生需要掌握力的分解、摩擦力计算以及匀变速直线运动公式。',
+  },
+  {
+    id: 'seed-incline-002',
+    type: 'incline',
+    title: '光滑斜面滑块（无摩擦）',
+    description: '一个质量为5kg的滑块从静止开始沿倾角为45°的光滑斜面下滑，斜面长度为5m。忽略摩擦力，求滑块的加速度、末速度和下滑时间。',
+    parameters: [
+      { name: 'mass', label: '质量', unit: 'kg', value: 5, description: '滑块的质量' },
+      { name: 'angle', label: '斜面角度', unit: 'deg', value: 45, description: '斜面与水平面的夹角' },
+      { name: 'frictionCoeff', label: '摩擦系数', unit: '', value: 0, description: '滑块与斜面的摩擦系数' },
+      { name: 'hasFriction', label: '有摩擦', unit: '', value: 0, description: '是否考虑摩擦力（0=不考虑）' },
+      { name: 'initialVelocity', label: '初速度', unit: 'm/s', value: 0, description: '滑块的初始速度' },
+      { name: 'slideLength', label: '斜面长度', unit: 'm', value: 5, description: '滑块滑动的距离' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '这是一个无摩擦的理想化斜面问题。在这种情况下，加速度只与斜面角度有关，与质量无关（a = g sinθ）。这是理解伽利略斜面实验的关键。',
+  },
+  {
+    id: 'seed-projectile-001',
+    type: 'projectile',
+    title: '水平地面抛射运动',
+    description: '从地面以20m/s的初速度、45°角抛射一个小球，忽略空气阻力。求最大高度、飞行时间、射程和落地速度。',
+    parameters: [
+      { name: 'initialVelocity', label: '初速度', unit: 'm/s', value: 20, description: '抛射初速度' },
+      { name: 'angle', label: '抛射角度', unit: 'deg', value: 45, description: '初速度与水平方向的夹角' },
+      { name: 'initialHeight', label: '初始高度', unit: 'm', value: 0, description: '发射点的高度（相对于地面）' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '这是一个经典的抛体运动问题。45°角时射程最大。学生需要掌握速度分解、竖直上抛运动和平抛运动的合成。',
+  },
+  {
+    id: 'seed-projectile-002',
+    type: 'projectile',
+    title: '高台抛射运动',
+    description: '从高度为20m的平台上以15m/s的初速度、30°角水平向上抛射一个小球，忽略空气阻力。求最大高度、飞行时间、射程和落地速度。',
+    parameters: [
+      { name: 'initialVelocity', label: '初速度', unit: 'm/s', value: 15, description: '抛射初速度' },
+      { name: 'angle', label: '抛射角度', unit: 'deg', value: 30, description: '初速度与水平方向的夹角' },
+      { name: 'initialHeight', label: '初始高度', unit: 'm', value: 20, description: '发射点的高度（相对于地面）' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '这是一个从高台抛射的问题，初末高度不同。求解时需要注意竖直方向的位移方程包含初始高度项。',
+  },
+  {
+    id: 'seed-spring-001',
+    type: 'spring',
+    title: '水平弹簧振子（无阻尼）',
+    description: '一个质量为1kg的物体系在劲度系数为100N/m的水平弹簧上，从平衡位置被拉到0.1m处然后释放。不计摩擦和空气阻力，求振动周期、频率、角频率、最大速度和最大加速度。',
+    parameters: [
+      { name: 'mass', label: '振子质量', unit: 'kg', value: 1, description: '振子的质量' },
+      { name: 'springConstant', label: '劲度系数', unit: 'N/m', value: 100, description: '弹簧的劲度系数' },
+      { name: 'amplitude', label: '振幅', unit: 'm', value: 0.1, description: '最大位移' },
+      { name: 'initialDisplacement', label: '初始位移', unit: 'm', value: 0.1, description: 't=0时的位移' },
+      { name: 'initialVelocity', label: '初始速度', unit: 'm/s', value: 0, description: 't=0时的速度' },
+      { name: 'dampingCoeff', label: '阻尼系数', unit: '', value: 0, description: '阻尼系数' },
+      { name: 'hasDamping', label: '有阻尼', unit: '', value: 0, description: '是否考虑阻尼（0=不考虑）' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '这是一个理想的简谐运动问题。学生需要理解：简谐运动的周期只与质量和劲度系数有关，与振幅无关；平衡位置时速度最大，最大位移处加速度最大；系统机械能守恒。',
+  },
+  {
+    id: 'seed-spring-002',
+    type: 'spring',
+    title: '垂直弹簧振子',
+    description: '一个质量为2kg的物体系在劲度系数为200N/m的竖直弹簧下端，从静止开始释放。求振动的平衡位置、周期、频率和最大速度。',
+    parameters: [
+      { name: 'mass', label: '振子质量', unit: 'kg', value: 2, description: '振子的质量' },
+      { name: 'springConstant', label: '劲度系数', unit: 'N/m', value: 200, description: '弹簧的劲度系数' },
+      { name: 'amplitude', label: '振幅', unit: 'm', value: 0.1, description: '最大位移（从平衡位置算起）' },
+      { name: 'initialDisplacement', label: '初始位移', unit: 'm', value: 0.1, description: 't=0时的位移（相对于平衡位置）' },
+      { name: 'initialVelocity', label: '初始速度', unit: 'm/s', value: 0, description: 't=0时的速度' },
+      { name: 'dampingCoeff', label: '阻尼系数', unit: '', value: 0, description: '阻尼系数' },
+      { name: 'hasDamping', label: '有阻尼', unit: '', value: 0, description: '是否考虑阻尼（0=不考虑）' },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    notes: '垂直弹簧振子的运动规律与水平弹簧振子相同，但需要注意：平衡位置不是弹簧原长位置，而是弹簧伸长量为Δx = mg/k的位置。重力只改变平衡位置，不改变振动周期。',
+  },
+];
+
+export function getSeedProblem(type: PhysicsProblemType): PhysicsProblem | undefined {
+  return seedProblems.find(p => p.type === type);
+}
