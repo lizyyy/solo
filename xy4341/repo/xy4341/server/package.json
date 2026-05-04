@@ -1,0 +1,28 @@
+{
+  "name": "fire-evacuation-simulator-server",
+  "version": "1.0.0",
+  "description": "Fire Evacuation 3D Drill Platform - Backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "init-db": "node database/init.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["fire", "evacuation", "simulator", "drill"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sql.js": "^1.8.0",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "archiver": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
