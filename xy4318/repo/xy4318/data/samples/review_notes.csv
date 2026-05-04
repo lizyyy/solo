@@ -1,0 +1,6 @@
+batch_number,sample_id,review_time,reviewer,temperature_check,packaging_check,documentation_check,overall_status,comments
+BATCH-2024-001,SAMPLE-001,2024-05-01 10:30:00,质检员A,合格,合格,合格,合格,样本外观正常，温度记录完整
+BATCH-2024-001,SAMPLE-002,2024-05-01 10:35:00,质检员A,合格,合格,合格,合格,交接记录清晰，无异常
+BATCH-2024-001,SAMPLE-003,2024-05-01 10:40:00,质检员B,需关注,合格,需关注,需关注,样本编号与其他批次重复，建议核实
+BATCH-2024-001,SAMPLE-004,2024-05-01 10:45:00,质检员B,合格,合格,合格,合格,复核完成，无问题
+BATCH-2024-002,SAMPLE-003,2024-05-01 11:00:00,质检员A,合格,合格,合格,合格,样本状态良好，但注意编号重复问题

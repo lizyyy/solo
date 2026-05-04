@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冷链实验室质检助手</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">冷链实验室质检助手</h1>
+                <p class="app-subtitle">温控记录 · 样本交接 · 风险分析 · 报告导出</p>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="import">数据导入</button>
+            <button class="nav-tab" data-tab="analysis">风险分析</button>
+            <button class="nav-tab" data-tab="report">报告导出</button>
+            <button class="nav-tab" data-tab="history">导入历史</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="import-section" class="tab-section active">
+                <div class="section-header">
+                    <h2>数据导入</h2>
+                    <div class="batch-selector">
+                        <label for="import-batch">批次号（可选）：</label>
+                        <input type="text" id="import-batch" placeholder="如：BATCH-2024-001">
+                    </div>
+                </div>
+
+                <div class="import-cards">
+                    <div class="import-card">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <h3>温控记录 CSV</h3>
+                        </div>
+                        <p class="card-desc">导入冰箱探头温度记录数据</p>
+                        <div class="file-upload" data-type="temperature">
+                            <input type="file" id="temp-file" accept=".csv,.txt">
+                            <label for="temp-file" class="upload-btn">选择文件</label>
+                            <span class="file-name">未选择文件</span>
+                        </div>
+                        <button class="import-btn" data-type="temperature">导入</button>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="card-header">
+                            <span class="card-icon">📦</span>
+                            <h3>样本交接 JSON</h3>
+                        </div>
+                        <p class="card-desc">导入样本交接流转记录</p>
+                        <div class="file-upload" data-type="transfer">
+                            <input type="file" id="transfer-file" accept=".json,.txt">
+                            <label for="transfer-file" class="upload-btn">选择文件</label>
+                            <span class="file-name">未选择文件</span>
+                        </div>
+                        <button class="import-btn" data-type="transfer">导入</button>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="card-header">
+                            <span class="card-icon">🚨</span>
+                            <h3>冰箱探头告警</h3>
+                        </div>
+                        <p class="card-desc">导入异常告警记录</p>
+                        <div class="file-upload" data-type="alarm">
+                            <input type="file" id="alarm-file" accept=".csv,.txt">
+                            <label for="alarm-file" class="upload-btn">选择文件</label>
+                            <span class="file-name">未选择文件</span>
+                        </div>
+                        <button class="import-btn" data-type="alarm">导入</button>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="card-header">
+                            <span class="card-icon">📝</span>
+                            <h3>人工复核备注</h3>
+                        </div>
+                        <p class="card-desc">导入人工检查备注</p>
+                        <div class="file-upload" data-type="review">
+                            <input type="file" id="review-file" accept=".csv,.txt">
+                            <label for="review-file" class="upload-btn">选择文件</label>
+                            <span class="file-name">未选择文件</span>
+                        </div>
+                        <button class="import-btn" data-type="review">导入</button>
+                    </div>
+                </div>
+
+                <div class="sample-data-section">
+                    <h3>示例数据下载</h3>
+                    <div id="sample-files" class="sample-files">
+                        <p>加载中...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="analysis-section" class="tab-section">
+                <div class="section-header">
+                    <h2>风险分析</h2>
+                    <div class="analysis-controls">
+                        <select id="analysis-batch">
+                            <option value="">所有批次</option>
+                        </select>
+                        <button id="run-analysis-btn" class="btn-primary">运行分析</button>
+                    </div>
+                </div>
+
+                <div class="analysis-stats" id="analysis-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">总风险数</div>
+                        <div class="stat-value" id="stat-total">-</div>
+                    </div>
+                    <div class="stat-card critical">
+                        <div class="stat-label">严重</div>
+                        <div class="stat-value" id="stat-critical">-</div>
+                    </div>
+                    <div class="stat-card high">
+                        <div class="stat-label">高风险</div>
+                        <div class="stat-value" id="stat-high">-</div>
+                    </div>
+                    <div class="stat-card medium">
+                        <div class="stat-label">中风险</div>
+                        <div class="stat-value" id="stat-medium">-</div>
+                    </div>
+                </div>
+
+                <div class="risk-list-container">
+                    <div class="risk-filter">
+                        <select id="risk-filter-type">
+                            <option value="">所有类型</option>
+                            <option value="continuous_overtemperature">连续超温</option>
+                            <option value="transfer_breakpoint">交接断点</option>
+                            <option value="duplicate_sample_id">重复样本ID</option>
+                            <option value="duplicate_in_batch">批次内重复</option>
+                        </select>
+                        <select id="risk-filter-level">
+                            <option value="">所有等级</option>
+                            <option value="critical">严重</option>
+                            <option value="high">高风险</option>
+                            <option value="medium">中风险</option>
+                            <option value="low">低风险</option>
+                        </select>
+                        <select id="risk-filter-status">
+                            <option value="">所有状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="reviewing">复核中</option>
+                            <option value="resolved">已解决</option>
+                            <option value="closed">已关闭</option>
+                        </select>
+                    </div>
+                    <div id="risk-list" class="risk-list">
+                        <p class="empty-state">请先运行风险分析</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="report-section" class="tab-section">
+                <div class="section-header">
+                    <h2>报告导出</h2>
+                    <div class="report-controls">
+                        <select id="report-batch">
+                            <option value="">所有批次</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="export-cards">
+                    <div class="export-card">
+                        <div class="card-icon-lg">📄</div>
+                        <h3>Markdown 质检报告</h3>
+                        <p>生成完整的质检分析报告，包含数据摘要、风险详情、复核结论、整改待办等</p>
+                        <div class="export-actions">
+                            <button id="preview-markdown-btn" class="btn-secondary">预览</button>
+                            <button id="export-markdown-btn" class="btn-primary">导出下载</button>
+                        </div>
+                    </div>
+
+                    <div class="export-card">
+                        <div class="card-icon-lg">📋</div>
+                        <h3>CSV 问题清单</h3>
+                        <p>导出所有检测到的风险问题列表，可用于追踪和统计</p>
+                        <div class="export-actions">
+                            <button id="export-csv-btn" class="btn-primary">导出下载</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="markdown-preview" class="markdown-preview hidden">
+                    <div class="preview-header">
+                        <h3>报告预览</h3>
+                        <button id="close-preview-btn" class="btn-secondary">关闭</button>
+                    </div>
+                    <div id="preview-content" class="preview-content"></div>
+                </div>
+            </section>
+
+            <section id="history-section" class="tab-section">
+                <div class="section-header">
+                    <h2>导入历史</h2>
+                </div>
+                <div id="history-list" class="history-list">
+                    <p class="empty-state">暂无导入记录</p>
+                </div>
+            </section>
+        </main>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

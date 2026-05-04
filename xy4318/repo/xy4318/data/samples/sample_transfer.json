@@ -1,0 +1,122 @@
+[
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-001",
+        "sample_name": "新冠病毒样本A1",
+        "from_location": "采样点A",
+        "to_location": "运输箱A",
+        "transfer_time": "2024-05-01 08:00:00",
+        "transfer_person": "张三",
+        "temperature": -19.5,
+        "status": "完成",
+        "notes": "样本状态良好"
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-001",
+        "sample_name": "新冠病毒样本A1",
+        "from_location": "超低温冰箱1号",
+        "to_location": "实验室检测区",
+        "transfer_time": "2024-05-01 09:30:00",
+        "transfer_person": "李四",
+        "temperature": -18.0,
+        "status": "完成",
+        "notes": "交接断点示例：上一次交接到运输箱A，但这次从冰箱1号取出"
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-002",
+        "sample_name": "新冠病毒样本A2",
+        "from_location": "采样点A",
+        "to_location": "运输箱A",
+        "transfer_time": "2024-05-01 08:05:00",
+        "transfer_person": "张三",
+        "temperature": -19.8,
+        "status": "完成",
+        "notes": ""
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-002",
+        "sample_name": "新冠病毒样本A2",
+        "from_location": "运输箱A",
+        "to_location": "超低温冰箱1号",
+        "transfer_time": "2024-05-01 08:30:00",
+        "transfer_person": "王五",
+        "temperature": -18.0,
+        "status": "完成",
+        "notes": ""
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-003",
+        "sample_name": "新冠病毒样本A3",
+        "from_location": "采样点B",
+        "to_location": "运输箱B",
+        "transfer_time": "2024-05-01 08:10:00",
+        "transfer_person": "赵六",
+        "temperature": -19.0,
+        "status": "完成",
+        "notes": "重复编号示例：同SAMPLE-003在另一个批次也出现"
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-003",
+        "sample_name": "新冠病毒样本A3",
+        "from_location": "运输箱B",
+        "to_location": "超低温冰箱2号",
+        "transfer_time": "2024-05-01 08:45:00",
+        "transfer_person": "钱七",
+        "temperature": -18.5,
+        "status": "完成",
+        "notes": ""
+    },
+    {
+        "batch_number": "BATCH-2024-002",
+        "sample_id": "SAMPLE-003",
+        "sample_name": "流感病毒样本B1",
+        "from_location": "采样点C",
+        "to_location": "运输箱C",
+        "transfer_time": "2024-05-01 09:00:00",
+        "transfer_person": "孙八",
+        "temperature": -19.2,
+        "status": "完成",
+        "notes": "重复编号示例：与BATCH-2024-001中的SAMPLE-003重名"
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-004",
+        "sample_name": "新冠病毒样本A4",
+        "from_location": "采样点A",
+        "to_location": "运输箱A",
+        "transfer_time": "2024-05-01 08:15:00",
+        "transfer_person": "张三",
+        "temperature": -18.5,
+        "status": "完成",
+        "notes": ""
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-004",
+        "sample_name": "新冠病毒样本A4",
+        "from_location": "运输箱A",
+        "to_location": "超低温冰箱1号",
+        "transfer_time": "2024-05-01 08:35:00",
+        "transfer_person": "王五",
+        "temperature": -17.0,
+        "status": "完成",
+        "notes": ""
+    },
+    {
+        "batch_number": "BATCH-2024-001",
+        "sample_id": "SAMPLE-004",
+        "sample_name": "新冠病毒样本A4",
+        "from_location": "实验室检测区",
+        "to_location": "超低温冰箱1号",
+        "transfer_time": "2024-05-01 10:00:00",
+        "transfer_person": "周九",
+        "temperature": -19.0,
+        "status": "完成",
+        "notes": "批次内重复示例：同一样本在同一批次多次记录"
+    }
+]

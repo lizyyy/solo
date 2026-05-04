@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风险详情 - 冷链实验室质检助手</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">冷链实验室质检助手</h1>
+                <a href="/" class="back-link">← 返回主页</a>
+            </div>
+        </header>
+
+        <main class="main-content detail-page">
+            <div class="detail-header">
+                <div class="detail-meta">
+                    <span id="detail-risk-type" class="risk-type-badge"></span>
+                    <span id="detail-risk-level" class="risk-level-badge"></span>
+                    <span id="detail-risk-status" class="status-badge"></span>
+                </div>
+                <div class="detail-actions">
+                    <select id="detail-status-select">
+                        <option value="pending">待处理</option>
+                        <option value="reviewing">复核中</option>
+                        <option value="resolved">已解决</option>
+                        <option value="closed">已关闭</option>
+                    </select>
+                    <button id="update-status-btn" class="btn-secondary">更新状态</button>
+                </div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-section">
+                    <h2>风险详情</h2>
+                    <div class="detail-info-grid">
+                        <div class="info-item">
+                            <label>批次号</label>
+                            <span id="detail-batch"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>位置</label>
+                            <span id="detail-location"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>开始时间</label>
+                            <span id="detail-start-time"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>结束时间</label>
+                            <span id="detail-end-time"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>持续时间</label>
+                            <span id="detail-duration"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>温度</label>
+                            <span id="detail-temperature"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>样本/探头ID</label>
+                            <span id="detail-sample-ids"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>创建时间</label>
+                            <span id="detail-created"></span>
+                        </div>
+                    </div>
+                    <div class="detail-description">
+                        <h3>描述</h3>
+                        <p id="detail-description"></p>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-header-inline">
+                        <h2>复核结论</h2>
+                        <button id="add-conclusion-btn" class="btn-primary">添加结论</button>
+                    </div>
+                    <div id="conclusions-list" class="conclusions-list">
+                        <p class="empty-state">暂无复核结论</p>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="section-header-inline">
+                        <h2>整改待办</h2>
+                        <button id="add-todo-btn" class="btn-primary">添加待办</button>
+                    </div>
+                    <div id="todos-list" class="todos-list">
+                        <p class="empty-state">暂无整改待办</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div id="conclusion-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加复核结论</h3>
+                    <button id="close-conclusion-modal" class="modal-close">&times;</button>
+                </div>
+                <form id="conclusion-form" class="modal-form">
+                    <div class="form-group">
+                        <label>复核人</label>
+                        <input type="text" id="conclusion-reviewer" placeholder="请输入复核人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>结论类型</label>
+                        <select id="conclusion-type">
+                            <option value="">请选择</option>
+                            <option value="确认风险">确认风险</option>
+                            <option value="误报">误报</option>
+                            <option value="已整改">已整改</option>
+                            <option value="需进一步调查">需进一步调查</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>根本原因</label>
+                        <textarea id="conclusion-root-cause" rows="3" placeholder="请描述问题的根本原因"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>纠正措施</label>
+                        <textarea id="conclusion-corrective" rows="3" placeholder="请描述已采取的纠正措施"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>预防措施</label>
+                        <textarea id="conclusion-preventive" rows="3" placeholder="请描述预防此类问题的措施"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>责任部门/人员</label>
+                        <input type="text" id="conclusion-responsibility" placeholder="请输入责任部门或人员">
+                    </div>
+                    <div class="form-group">
+                        <label>截止日期</label>
+                        <input type="datetime-local" id="conclusion-deadline">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="conclusion-status">
+                            <option value="pending">待处理</option>
+                            <option value="in_progress">进行中</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="conclusion-comments" rows="2" placeholder="其他备注信息"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-conclusion" class="btn-secondary">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="todo-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加整改待办</h3>
+                    <button id="close-todo-modal" class="modal-close">&times;</button>
+                </div>
+                <form id="todo-form" class="modal-form">
+                    <div class="form-group">
+                        <label>标题 *</label>
+                        <input type="text" id="todo-title" placeholder="请输入待办事项标题" required>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea id="todo-description" rows="3" placeholder="请详细描述待办事项"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>负责人</label>
+                        <input type="text" id="todo-assignee" placeholder="请输入负责人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>截止日期</label>
+                        <input type="datetime-local" id="todo-due-date">
+                    </div>
+                    <div class="form-group">
+                        <label>优先级</label>
+                        <select id="todo-priority">
+                            <option value="critical">严重</option>
+                            <option value="high">高</option>
+                            <option value="medium" selected>中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="todo-status">
+                            <option value="pending">待处理</option>
+                            <option value="in_progress">进行中</option>
+                            <option value="completed">已完成</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" id="cancel-todo" class="btn-secondary">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script>
+        const riskId = window.location.pathname.split('/').pop();
+        
+        const riskTypeMap = {
+            'continuous_overtemperature': '连续超温',
+            'transfer_breakpoint': '交接断点',
+            'duplicate_sample_id': '重复样本ID',
+            'duplicate_in_batch': '批次内重复'
+        };
+        
+        const riskLevelMap = {
+            'critical': { label: '严重', class: 'critical' },
+            'high': { label: '高风险', class: 'high' },
+            'medium': { label: '中风险', class: 'medium' },
+            'low': { label: '低风险', class: 'low' }
+        };
+        
+        const statusMap = {
+            'pending': '待处理',
+            'reviewing': '复核中',
+            'resolved': '已解决',
+            'closed': '已关闭'
+        };
+        
+        async function loadRiskDetail() {
+            try {
+                const response = await fetch(`/api/risks/${riskId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderRiskDetail(data.risk);
+                } else {
+                    showToast('加载风险详情失败', 'error');
+                }
+            } catch (error) {
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        function renderRiskDetail(risk) {
+            document.getElementById('detail-risk-type').textContent = riskTypeMap[risk.risk_type] || risk.risk_type;
+            
+            const levelInfo = riskLevelMap[risk.risk_level] || { label: risk.risk_level, class: '' };
+            const levelBadge = document.getElementById('detail-risk-level');
+            levelBadge.textContent = levelInfo.label;
+            levelBadge.className = `risk-level-badge ${levelInfo.class}`;
+            
+            document.getElementById('detail-risk-status').textContent = statusMap[risk.status] || risk.status;
+            document.getElementById('detail-status-select').value = risk.status;
+            
+            document.getElementById('detail-batch').textContent = risk.batch_number || '-';
+            document.getElementById('detail-location').textContent = risk.location || '-';
+            document.getElementById('detail-start-time').textContent = risk.start_time ? new Date(risk.start_time).toLocaleString('zh-CN') : '-';
+            document.getElementById('detail-end-time').textContent = risk.end_time ? new Date(risk.end_time).toLocaleString('zh-CN') : '-';
+            document.getElementById('detail-duration').textContent = risk.duration_minutes ? `${risk.duration_minutes} 分钟` : '-';
+            document.getElementById('detail-temperature').textContent = risk.temperature !== null ? `${risk.temperature}°C` : '-';
+            document.getElementById('detail-sample-ids').textContent = risk.sample_ids || '-';
+            document.getElementById('detail-created').textContent = risk.created_at ? new Date(risk.created_at).toLocaleString('zh-CN') : '-';
+            document.getElementById('detail-description').textContent = risk.description || '-';
+            
+            renderConclusions(risk.conclusions || []);
+            renderTodos(risk.todos || []);
+        }
+        
+        function renderConclusions(conclusions) {
+            const list = document.getElementById('conclusions-list');
+            
+            if (!conclusions || conclusions.length === 0) {
+                list.innerHTML = '<p class="empty-state">暂无复核结论</p>';
+                return;
+            }
+            
+            list.innerHTML = conclusions.map(c => `
+                <div class="conclusion-item">
+                    <div class="conclusion-header">
+                        <span class="conclusion-type">${c.conclusion_type || '结论'}</span>
+                        <span class="conclusion-meta">
+                            ${c.reviewer ? '复核人: ' + c.reviewer : ''}
+                            ${c.review_time ? ' | ' + new Date(c.review_time).toLocaleString('zh-CN') : ''}
+                        </span>
+                    </div>
+                    ${c.root_cause ? `<div class="conclusion-field"><label>根本原因:</label> ${c.root_cause}</div>` : ''}
+                    ${c.corrective_action ? `<div class="conclusion-field"><label>纠正措施:</label> ${c.corrective_action}</div>` : ''}
+                    ${c.preventive_action ? `<div class="conclusion-field"><label>预防措施:</label> ${c.preventive_action}</div>` : ''}
+                    ${c.responsibility ? `<div class="conclusion-field"><label>责任:</label> ${c.responsibility}</div>` : ''}
+                    ${c.comments ? `<div class="conclusion-field"><label>备注:</label> ${c.comments}</div>` : ''}
+                    <div class="conclusion-status">状态: ${statusMap[c.status] || c.status}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderTodos(todos) {
+            const list = document.getElementById('todos-list');
+            
+            if (!todos || todos.length === 0) {
+                list.innerHTML = '<p class="empty-state">暂无整改待办</p>';
+                return;
+            }
+            
+            const priorityLabels = { 'critical': '严重', 'high': '高', 'medium': '中', 'low': '低' };
+            
+            list.innerHTML = todos.map(t => `
+                <div class="todo-item ${t.status}">
+                    <div class="todo-main">
+                        <div class="todo-title">${t.title}</div>
+                        ${t.description ? `<div class="todo-desc">${t.description}</div>` : ''}
+                    </div>
+                    <div class="todo-meta">
+                        <span class="todo-priority ${t.priority}">${priorityLabels[t.priority] || t.priority}</span>
+                        <span class="todo-status">${statusMap[t.status] || t.status}</span>
+                        ${t.assignee ? `<span class="todo-assignee">负责: ${t.assignee}</span>` : ''}
+                        ${t.due_date ? `<span class="todo-due">截止: ${new Date(t.due_date).toLocaleString('zh-CN')}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function updateStatus() {
+            const status = document.getElementById('detail-status-select').value;
+            
+            try {
+                const response = await fetch(`/api/risks/${riskId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('状态更新成功', 'success');
+                    document.getElementById('detail-risk-status').textContent = statusMap[status] || status;
+                } else {
+                    showToast(data.error || '更新失败', 'error');
+                }
+            } catch (error) {
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        async function submitConclusion(e) {
+            e.preventDefault();
+            
+            const data = {
+                reviewer: document.getElementById('conclusion-reviewer').value,
+                conclusion_type: document.getElementById('conclusion-type').value,
+                root_cause: document.getElementById('conclusion-root-cause').value,
+                corrective_action: document.getElementById('conclusion-corrective').value,
+                preventive_action: document.getElementById('conclusion-preventive').value,
+                responsibility: document.getElementById('conclusion-responsibility').value,
+                deadline: document.getElementById('conclusion-deadline').value,
+                status: document.getElementById('conclusion-status').value,
+                comments: document.getElementById('conclusion-comments').value
+            };
+            
+            try {
+                const response = await fetch(`/api/risks/${riskId}/conclusions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('结论添加成功', 'success');
+                    closeConclusionModal();
+                    loadRiskDetail();
+                } else {
+                    showToast(result.error || '添加失败', 'error');
+                }
+            } catch (error) {
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        async function submitTodo(e) {
+            e.preventDefault();
+            
+            const data = {
+                title: document.getElementById('todo-title').value,
+                description: document.getElementById('todo-description').value,
+                assignee: document.getElementById('todo-assignee').value,
+                due_date: document.getElementById('todo-due-date').value,
+                priority: document.getElementById('todo-priority').value,
+                status: document.getElementById('todo-status').value
+            };
+            
+            try {
+                const response = await fetch(`/api/risks/${riskId}/todos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast('待办添加成功', 'success');
+                    closeTodoModal();
+                    loadRiskDetail();
+                } else {
+                    showToast(result.error || '添加失败', 'error');
+                }
+            } catch (error) {
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        function openConclusionModal() {
+            document.getElementById('conclusion-modal').classList.remove('hidden');
+        }
+        
+        function closeConclusionModal() {
+            document.getElementById('conclusion-modal').classList.add('hidden');
+            document.getElementById('conclusion-form').reset();
+        }
+        
+        function openTodoModal() {
+            document.getElementById('todo-modal').classList.remove('hidden');
+        }
+        
+        function closeTodoModal() {
+            document.getElementById('todo-modal').classList.add('hidden');
+            document.getElementById('todo-form').reset();
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRiskDetail();
+            
+            document.getElementById('update-status-btn').addEventListener('click', updateStatus);
+            document.getElementById('add-conclusion-btn').addEventListener('click', openConclusionModal);
+            document.getElementById('add-todo-btn').addEventListener('click', openTodoModal);
+            
+            document.getElementById('close-conclusion-modal').addEventListener('click', closeConclusionModal);
+            document.getElementById('cancel-conclusion').addEventListener('click', closeConclusionModal);
+            document.getElementById('conclusion-form').addEventListener('submit', submitConclusion);
+            
+            document.getElementById('close-todo-modal').addEventListener('click', closeTodoModal);
+            document.getElementById('cancel-todo').addEventListener('click', closeTodoModal);
+            document.getElementById('todo-form').addEventListener('submit', submitTodo);
+            
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
