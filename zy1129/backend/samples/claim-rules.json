@@ -1,0 +1,81 @@
+{
+  "rules": [
+    {
+      "rule_name": "医疗险等待期检查",
+      "rule_type": "waiting_period",
+      "policy_type": "medical",
+      "conditions": {
+        "waiting_period_days_gt": 0
+      },
+      "actions": {
+        "add_risk": {
+          "type": "waiting_period",
+          "message": "医疗险存在等待期，请注意查看等待期是否已过",
+          "severity": "medium"
+        }
+      },
+      "is_active": true,
+      "priority": 10
+    },
+    {
+      "rule_name": "意外险无等待期",
+      "rule_type": "waiting_period",
+      "policy_type": "accident",
+      "conditions": {
+        "waiting_period_days_eq": 0
+      },
+      "actions": {},
+      "is_active": true,
+      "priority": 5
+    },
+    {
+      "rule_name": "车险需事故认定书",
+      "rule_type": "document",
+      "policy_type": "auto",
+      "conditions": {
+        "incident_type_contains": ["事故", "刮蹭", "碰撞"]
+      },
+      "actions": {
+        "add_todo": {
+          "action": "准备事故认定书",
+          "description": "车险理赔需要交警出具的事故认定书",
+          "priority": "high"
+        }
+      },
+      "is_active": true,
+      "priority": 8
+    },
+    {
+      "rule_name": "家财险需现场照片",
+      "rule_type": "document",
+      "policy_type": "property",
+      "conditions": {
+        "incident_type_contains": ["损失", "损坏", "漏水", "火灾"]
+      },
+      "actions": {
+        "add_todo": {
+          "action": "准备现场照片",
+          "description": "家财险理赔需要事故现场照片",
+          "priority": "high"
+        }
+      },
+      "is_active": true,
+      "priority": 8
+    },
+    {
+      "rule_name": "重疾险需诊断证明",
+      "rule_type": "document",
+      "coverage_type": "重疾",
+      "conditions": {},
+      "actions": {
+        "add_todo": {
+          "action": "准备重疾诊断证明",
+          "description": "重疾险理赔需要二级及以上医院出具的确诊证明",
+          "priority": "high"
+        }
+      },
+      "is_active": true,
+      "priority": 9
+    }
+  ]
+}

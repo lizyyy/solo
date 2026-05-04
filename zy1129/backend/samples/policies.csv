@@ -1,0 +1,6 @@
+policy_number,insurance_company,policy_type,insured_member_name,start_date,end_date,waiting_period_days,deductible_amount,deductible_period,premium_amount,payment_frequency,next_renewal_date,coverage_type,coverage_limit,reimbursement_ratio,coverage_deductible,coverage_waiting_period,is_active,notes
+MED-SAMPLE-001,平安保险,medical,张三,2024-01-01,2025-01-01,30,10000,annual,5000,annual,2025-01-01,住院医疗,200000,0.9,0,30,true,百万医疗险
+MED-SAMPLE-001,平安保险,medical,张三,2024-01-01,2025-01-01,30,10000,annual,5000,annual,2025-01-01,门诊医疗,20000,0.7,0,30,true,门诊责任
+ACC-SAMPLE-001,友邦保险,accident,李四,2023-06-01,2033-06-01,0,0,per_claim,800,annual,2024-06-01,意外身故,1000000,1.0,0,0,true,终身意外险
+ACC-SAMPLE-001,友邦保险,accident,李四,2023-06-01,2033-06-01,0,0,per_claim,800,annual,2024-06-01,意外医疗,50000,1.0,0,0,true,意外医疗责任
+AUTO-SAMPLE-001,人保财险,auto,,2024-03-15,2025-03-15,0,2000,per_claim,4500,annual,2025-03-15,交强险,200000,1.0,2000,0,true,京A12345
