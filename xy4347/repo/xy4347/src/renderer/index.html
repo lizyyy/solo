@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>室内攀岩馆线路定线复盘器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <h1>🧗 室内攀岩馆线路定线复盘器</h1>
+      <div class="header-actions">
+        <button id="refreshBtn" class="btn btn-secondary">🔄 刷新数据</button>
+        <button id="detectRisksBtn" class="btn btn-warning">⚠️ 检测风险</button>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">📊 概览</button>
+      <button class="tab-btn" data-tab="import">📥 数据导入</button>
+      <button class="tab-btn" data-tab="routes">🧗 线路管理</button>
+      <button class="tab-btn" data-tab="wall">🗺️ 墙面视图</button>
+      <button class="tab-btn" data-tab="risks">⚠️ 风险检测</button>
+      <button class="tab-btn" data-tab="review">📝 复核意见</button>
+      <button class="tab-btn" data-tab="export">📤 导出数据</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Dashboard Tab -->
+      <div id="dashboard-tab" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🗺️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="zoneCount">0</div>
+              <div class="stat-label">墙面区域</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🧗</div>
+            <div class="stat-info">
+              <div class="stat-value" id="routeCount">0</div>
+              <div class="stat-label">线路总数</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔩</div>
+            <div class="stat-info">
+              <div class="stat-value" id="holdCount">0</div>
+              <div class="stat-label">抓点总数</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-info">
+              <div class="stat-value" id="feedbackCount">0</div>
+              <div class="stat-label">会员反馈</div>
+            </div>
+          </div>
+          <div class="stat-card stat-risk">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="riskCount">0</div>
+              <div class="stat-label">待处理风险</div>
+            </div>
+          </div>
+          <div class="stat-card stat-review">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <div class="stat-value" id="reviewCount">0</div>
+              <div class="stat-label">待复核</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <h3>📈 最近风险概览</h3>
+            <div id="recentRisks"></div>
+          </div>
+          <div class="card">
+            <h3>🎯 线路难度分布</h3>
+            <div id="difficultyChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import Tab -->
+      <div id="import-tab" class="tab-content">
+        <div class="import-section">
+          <h3>📥 数据导入</h3>
+          <p class="section-description">选择要导入的数据文件，支持多种格式</p>
+          
+          <div class="import-grid">
+            <div class="import-card">
+              <div class="import-icon">📋</div>
+              <h4>墙面分区 JSON</h4>
+              <p>导入攀岩墙区域划分定义，包含位置、大小和难度范围</p>
+              <input type="file" id="wallJsonInput" accept=".json" hidden>
+              <button class="btn btn-primary" onclick="document.getElementById('wallJsonInput').click()">
+                选择 JSON 文件
+              </button>
+              <div class="import-result" id="wallJsonResult"></div>
+            </div>
+
+            <div class="import-card">
+              <div class="import-icon">🧗</div>
+              <h4>线路数据 CSV</h4>
+              <p>导入每条线路的点位、颜色、难度等信息</p>
+              <input type="file" id="routesCsvInput" accept=".csv" hidden>
+              <button class="btn btn-primary" onclick="document.getElementById('routesCsvInput').click()">
+                选择 CSV 文件
+              </button>
+              <div class="import-result" id="routesCsvResult"></div>
+            </div>
+
+            <div class="import-card">
+              <div class="import-icon">🔩</div>
+              <h4>抓点磨损记录 CSV</h4>
+              <p>导入抓点使用次数、磨损等级等维护记录</p>
+              <input type="file" id="wearCsvInput" accept=".csv" hidden>
+              <button class="btn btn-primary" onclick="document.getElementById('wearCsvInput').click()">
+                选择 CSV 文件
+              </button>
+              <div class="import-result" id="wearCsvResult"></div>
+            </div>
+
+            <div class="import-card">
+              <div class="import-icon">💬</div>
+              <h4>会员反馈 CSV</h4>
+              <p>导入会员对线路的难度评分、满意度和问题反馈</p>
+              <input type="file" id="feedbackCsvInput" accept=".csv" hidden>
+              <button class="btn btn-primary" onclick="document.getElementById('feedbackCsvInput').click()">
+                选择 CSV 文件
+              </button>
+              <div class="import-result" id="feedbackCsvResult"></div>
+            </div>
+          </div>
+
+          <div class="import-templates">
+            <h4>📄 数据格式示例</h4>
+            <div class="template-grid">
+              <details class="template-details">
+                <summary>墙面分区 JSON 格式</summary>
+                <pre><code>[{
+  "name": "初学者区",
+  "code": "ZONE_A",
+  "description": "适合新手的区域",
+  "x": 0, "y": 0,
+  "width": 200, "height": 300,
+  "difficultyRangeMin": 1,
+  "difficultyRangeMax": 6
+}]</code></pre>
+              </details>
+              <details class="template-details">
+                <summary>线路数据 CSV 格式</summary>
+                <pre><code>name,code,color,difficulty,zoneCode,holdPositions
+初级线A,R001,#FF0000,3,ZONE_A,"[{""x"":50,""y"":280}]"
+中级线B,R002,#00FF00,6,ZONE_B,"[{""x"":100,""y"":250}]"</code></pre>
+              </details>
+              <details class="template-details">
+                <summary>磨损记录 CSV 格式</summary>
+                <pre><code>holdCode,recordDate,wearLevel,useCount,inspector
+H001,2024-01-15,750,900,张三
+H002,2024-01-15,50,50,李四</code></pre>
+              </details>
+              <details class="template-details">
+                <summary>会员反馈 CSV 格式</summary>
+                <pre><code>memberName,routeCode,difficultyRating,enjoymentRating,comments,hasIssues
+会员A,R001,3,5,"线路很棒",false
+会员B,R002,5,2,"太难了",true</code></pre>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Routes Tab -->
+      <div id="routes-tab" class="tab-content">
+        <div class="routes-header">
+          <h3>🧗 线路管理</h3>
+          <div class="routes-filters">
+            <select id="zoneFilter">
+              <option value="">所有区域</option>
+            </select>
+            <select id="difficultyFilter">
+              <option value="">所有难度</option>
+            </select>
+            <label>
+              <input type="checkbox" id="childrenOnly"> 仅显示儿童线路
+            </label>
+            <button id="addRouteBtn" class="btn btn-primary">➕ 新增线路</button>
+          </div>
+        </div>
+        <div id="routesList" class="routes-grid"></div>
+      </div>
+
+      <!-- Wall Tab -->
+      <div id="wall-tab" class="tab-content">
+        <div class="wall-container">
+          <div class="wall-controls">
+            <h3>🗺️ 墙面视图</h3>
+            <div class="control-group">
+              <label>
+                <input type="checkbox" id="showRoutes" checked> 显示线路
+              </label>
+              <label>
+                <input type="checkbox" id="showRisks" checked> 显示风险
+              </label>
+              <label>
+                <input type="checkbox" id="showHolds"> 显示抓点
+              </label>
+            </div>
+          </div>
+          <div class="wall-canvas-container">
+            <canvas id="wallCanvas"></canvas>
+          </div>
+          <div class="wall-legend">
+            <h4>图例</h4>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #4CAF50"></span>
+              <span>正常区域</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #FF9800"></span>
+              <span>中等风险</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #F44336"></span>
+              <span>高风险</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #2196F3"></span>
+              <span>儿童线路</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Risks Tab -->
+      <div id="risks-tab" class="tab-content">
+        <div class="risks-header">
+          <h3>⚠️ 风险检测</h3>
+          <div class="risks-summary" id="risksSummary"></div>
+        </div>
+        <div class="risks-filters">
+          <select id="riskTypeFilter">
+            <option value="">所有类型</option>
+            <option value="difficulty_gap">难度断层</option>
+            <option value="hold_expired">抓点过期</option>
+            <option value="children_conflict">儿童冲突</option>
+          </select>
+          <select id="riskSeverityFilter">
+            <option value="">所有级别</option>
+            <option value="critical">🔴 严重</option>
+            <option value="high">🟠 高</option>
+            <option value="medium">🟡 中</option>
+            <option value="low">🟢 低</option>
+          </select>
+        </div>
+        <div id="risksList" class="risks-list"></div>
+      </div>
+
+      <!-- Review Tab -->
+      <div id="review-tab" class="tab-content">
+        <div class="review-header">
+          <h3>📝 复核意见</h3>
+          <button id="addReviewBtn" class="btn btn-primary">➕ 新增复核</button>
+        </div>
+        <div class="review-tabs">
+          <button class="review-tab-btn active" data-status="unresolved">待处理</button>
+          <button class="review-tab-btn" data-status="resolved">已处理</button>
+          <button class="review-tab-btn" data-status="all">全部</button>
+        </div>
+        <div id="reviewsList" class="reviews-list"></div>
+      </div>
+
+      <!-- Export Tab -->
+      <div id="export-tab" class="tab-content">
+        <h3>📤 数据导出</h3>
+        <p class="section-description">导出复盘报告、维护清单或完整审计数据包</p>
+        
+        <div class="export-grid">
+          <div class="export-card">
+            <div class="export-icon">📄</div>
+            <h4>Markdown 复盘报告</h4>
+            <p>包含风险分析、区域统计、抓点状态和会员反馈的完整报告</p>
+            <button class="btn btn-primary" id="exportMarkdownBtn">
+              导出 Markdown
+            </button>
+          </div>
+
+          <div class="export-card">
+            <div class="export-icon">📊</div>
+            <h4>CSV 维护清单</h4>
+            <p>需要关注或更换的抓点清单，包含风险等级和建议行动</p>
+            <button class="btn btn-primary" id="exportCsvBtn">
+              导出 CSV
+            </button>
+          </div>
+
+          <div class="export-card">
+            <div class="export-icon">📦</div>
+            <h4>JSON 审计包</h4>
+            <p>包含所有数据和统计信息的完整数据包，用于审计或备份</p>
+            <button class="btn btn-primary" id="exportJsonBtn">
+              导出 JSON
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="routeModal" class="modal" hidden>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="routeModalTitle">新增线路</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="routeForm" class="form-grid">
+          <input type="hidden" id="routeId">
+          <div class="form-group">
+            <label>线路名称 *</label>
+            <input type="text" id="routeName" required>
+          </div>
+          <div class="form-group">
+            <label>线路代码 *</label>
+            <input type="text" id="routeCode" required>
+          </div>
+          <div class="form-group">
+            <label>线路颜色</label>
+            <input type="color" id="routeColor" value="#FF0000">
+          </div>
+          <div class="form-group">
+            <label>难度等级</label>
+            <input type="number" id="routeDifficulty" min="0" max="20" value="0">
+          </div>
+          <div class="form-group">
+            <label>难度标签</label>
+            <input type="text" id="routeDifficultyLabel" placeholder="如: V3, 5.10a">
+          </div>
+          <div class="form-group">
+            <label>所属区域</label>
+            <select id="routeZone"></select>
+          </div>
+          <div class="form-group">
+            <label>定线日期</label>
+            <input type="date" id="routeSetDate">
+          </div>
+          <div class="form-group full-width">
+            <label>抓点位置 (JSON数组)</label>
+            <textarea id="routeHoldPositions" rows="3" placeholder='[{"x": 50, "y": 100}, ...]'></textarea>
+          </div>
+          <div class="form-group">
+            <label>起点位置</label>
+            <input type="text" id="routeStartPosition" placeholder="x,y">
+          </div>
+          <div class="form-group">
+            <label>终点位置</label>
+            <input type="text" id="routeEndPosition" placeholder="x,y">
+          </div>
+          <div class="form-group full-width">
+            <label>
+              <input type="checkbox" id="routeIsChildren"> 儿童线路
+            </label>
+          </div>
+          <div class="form-group full-width">
+            <label>备注</label>
+            <textarea id="routeNotes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">取消</button>
+        <button class="btn btn-primary" id="saveRouteBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="reviewModal" class="modal" hidden>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="reviewModalTitle">新增复核意见</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm" class="form-grid">
+          <input type="hidden" id="reviewId">
+          <div class="form-group">
+            <label>复核人 *</label>
+            <input type="text" id="reviewReviewer" required>
+          </div>
+          <div class="form-group">
+            <label>复核类型</label>
+            <select id="reviewType">
+              <option value="线路检查">线路检查</option>
+              <option value="抓点检查">抓点检查</option>
+              <option value="安全复核">安全复核</option>
+              <option value="其他">其他</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>涉及线路</label>
+            <select id="reviewRoute"></select>
+          </div>
+          <div class="form-group">
+            <label>涉及抓点</label>
+            <input type="text" id="reviewHold" placeholder="抓点代码">
+          </div>
+          <div class="form-group">
+            <label>优先级</label>
+            <select id="reviewPriority">
+              <option value="low">低</option>
+              <option value="medium" selected>中</option>
+              <option value="high">高</option>
+              <option value="critical">严重</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>发现的问题</label>
+            <textarea id="reviewFindings" rows="3" required></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label>建议措施</label>
+            <textarea id="reviewRecommendations" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">取消</button>
+        <button class="btn btn-primary" id="saveReviewBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="riskDetailModal" class="modal" hidden>
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h3 id="riskDetailTitle">风险详情</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="riskDetailContent"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">关闭</button>
+        <button class="btn btn-primary" id="createReviewFromRiskBtn">创建复核意见</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

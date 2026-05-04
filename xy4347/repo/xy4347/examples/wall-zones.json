@@ -1,0 +1,46 @@
+[
+  {
+    "name": "初学者区",
+    "code": "ZONE_A",
+    "description": "适合新手的区域，难度从1到6级",
+    "x": 0,
+    "y": 0,
+    "width": 250,
+    "height": 500,
+    "difficultyRangeMin": 1,
+    "difficultyRangeMax": 6
+  },
+  {
+    "name": "进阶区",
+    "code": "ZONE_B",
+    "description": "适合有经验的攀岩者，难度从5到12级",
+    "x": 250,
+    "y": 0,
+    "width": 250,
+    "height": 500,
+    "difficultyRangeMin": 5,
+    "difficultyRangeMax": 12
+  },
+  {
+    "name": "高级区",
+    "code": "ZONE_C",
+    "description": "高级难度区域，难度从10到18级",
+    "x": 500,
+    "y": 0,
+    "width": 250,
+    "height": 500,
+    "difficultyRangeMin": 10,
+    "difficultyRangeMax": 18
+  },
+  {
+    "name": "儿童区",
+    "code": "ZONE_KIDS",
+    "description": "专门为儿童设计的攀岩区域",
+    "x": 0,
+    "y": 500,
+    "width": 750,
+    "height": 100,
+    "difficultyRangeMin": 1,
+    "difficultyRangeMax": 4
+  }
+]
