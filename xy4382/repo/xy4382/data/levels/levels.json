@@ -1,0 +1,322 @@
+[
+  {
+    "id": "level1",
+    "name": "初级演练",
+    "description": "博物馆夜间基础安防事件处理",
+    "difficulty": 1,
+    "timeLimit": 180,
+    "mapConfig": {
+      "width": 800,
+      "height": 600,
+      "rooms": [
+        {
+          "id": "r1",
+          "name": "主展厅",
+          "x": 100,
+          "y": 100,
+          "width": 200,
+          "height": 150,
+          "type": "exhibition"
+        },
+        {
+          "id": "r2",
+          "name": "古画展厅",
+          "x": 350,
+          "y": 100,
+          "width": 180,
+          "height": 150,
+          "type": "exhibition"
+        },
+        {
+          "id": "r3",
+          "name": "雕塑展厅",
+          "x": 100,
+          "y": 300,
+          "width": 200,
+          "height": 150,
+          "type": "exhibition"
+        },
+        {
+          "id": "r4",
+          "name": "控制室",
+          "x": 350,
+          "y": 300,
+          "width": 150,
+          "height": 120,
+          "type": "control"
+        },
+        {
+          "id": "r5",
+          "name": "休息室",
+          "x": 550,
+          "y": 100,
+          "width": 150,
+          "height": 120,
+          "type": "staff"
+        },
+        {
+          "id": "r6",
+          "name": "走廊",
+          "x": 320,
+          "y": 260,
+          "width": 280,
+          "height": 30,
+          "type": "corridor"
+        }
+      ],
+      "doors": [
+        {
+          "id": "d1",
+          "name": "主展厅东门",
+          "x": 290,
+          "y": 175,
+          "width": 10,
+          "height": 50,
+          "roomA": "r1",
+          "roomB": "r2",
+          "status": "closed"
+        },
+        {
+          "id": "d2",
+          "name": "古画展厅南门",
+          "x": 430,
+          "y": 250,
+          "width": 60,
+          "height": 10,
+          "roomA": "r2",
+          "roomB": "r6",
+          "status": "closed"
+        },
+        {
+          "id": "d3",
+          "name": "主展厅南门",
+          "x": 180,
+          "y": 250,
+          "width": 60,
+          "height": 10,
+          "roomA": "r1",
+          "roomB": "r3",
+          "status": "closed"
+        },
+        {
+          "id": "d4",
+          "name": "雕塑展厅东门",
+          "x": 300,
+          "y": 375,
+          "width": 10,
+          "height": 50,
+          "roomA": "r3",
+          "roomB": "r4",
+          "status": "closed"
+        },
+        {
+          "id": "d5",
+          "name": "休息室南门",
+          "x": 620,
+          "y": 220,
+          "width": 60,
+          "height": 10,
+          "roomA": "r5",
+          "roomB": "r6",
+          "status": "closed"
+        }
+      ],
+      "cameras": [
+        {
+          "id": "c1",
+          "name": "主展厅摄像头",
+          "x": 200,
+          "y": 175,
+          "room": "r1",
+          "status": "online"
+        },
+        {
+          "id": "c2",
+          "name": "古画展厅摄像头",
+          "x": 440,
+          "y": 175,
+          "room": "r2",
+          "status": "online"
+        },
+        {
+          "id": "c3",
+          "name": "雕塑展厅摄像头",
+          "x": 200,
+          "y": 375,
+          "room": "r3",
+          "status": "online"
+        },
+        {
+          "id": "c4",
+          "name": "走廊摄像头",
+          "x": 460,
+          "y": 275,
+          "room": "r6",
+          "status": "online"
+        },
+        {
+          "id": "c5",
+          "name": "休息室摄像头",
+          "x": 625,
+          "y": 160,
+          "room": "r5",
+          "status": "online"
+        }
+      ],
+      "sensors": [
+        {
+          "id": "s1",
+          "name": "主展厅温湿度",
+          "x": 150,
+          "y": 140,
+          "room": "r1",
+          "type": "temp_humidity",
+          "status": "normal"
+        },
+        {
+          "id": "s2",
+          "name": "古画展厅温湿度",
+          "x": 400,
+          "y": 140,
+          "room": "r2",
+          "type": "temp_humidity",
+          "status": "normal"
+        },
+        {
+          "id": "s3",
+          "name": "雕塑展厅温湿度",
+          "x": 150,
+          "y": 340,
+          "room": "r3",
+          "type": "temp_humidity",
+          "status": "normal"
+        }
+      ],
+      "guards": [
+        {
+          "id": "g1",
+          "name": "保安小张",
+          "x": 425,
+          "y": 360,
+          "room": "r4",
+          "status": "idle"
+        },
+        {
+          "id": "g2",
+          "name": "保安小李",
+          "x": 625,
+          "y": 160,
+          "room": "r5",
+          "status": "idle"
+        }
+      ]
+    },
+    "events": [
+      {
+        "id": "e1",
+        "time": 10,
+        "type": "door_alarm",
+        "title": "门磁报警",
+        "description": "古画展厅东门门磁异常触发",
+        "location": {
+          "room": "r2",
+          "door": "d1"
+        },
+        "severity": "high",
+        "isMisleading": false,
+        "requiredAction": "dispatch_guard",
+        "deadline": 30
+      },
+      {
+        "id": "e2",
+        "time": 25,
+        "type": "temp_alarm",
+        "title": "温度异常",
+        "description": "主展厅温度传感器检测到异常升高",
+        "location": {
+          "room": "r1",
+          "sensor": "s1"
+        },
+        "severity": "medium",
+        "isMisleading": false,
+        "requiredAction": "check_sensor",
+        "deadline": 45
+      },
+      {
+        "id": "e3",
+        "time": 40,
+        "type": "camera_offline",
+        "title": "摄像头离线",
+        "description": "走廊摄像头显示离线状态",
+        "location": {
+          "room": "r6",
+          "camera": "c4"
+        },
+        "severity": "high",
+        "isMisleading": true,
+        "requiredAction": "ignore",
+        "deadline": 60,
+        "misleadingReason": "摄像头临时维护，系统自动恢复"
+      },
+      {
+        "id": "e4",
+        "time": 60,
+        "type": "intruder",
+        "title": "人员闯入",
+        "description": "雕塑展厅检测到非法入侵人员",
+        "location": {
+          "room": "r3"
+        },
+        "severity": "critical",
+        "isMisleading": false,
+        "requiredAction": "dispatch_guard",
+        "deadline": 75
+      },
+      {
+        "id": "e5",
+        "time": 90,
+        "type": "door_alarm",
+        "title": "门磁报警",
+        "description": "休息室南门门磁异常触发",
+        "location": {
+          "room": "r5",
+          "door": "d5"
+        },
+        "severity": "high",
+        "isMisleading": true,
+        "requiredAction": "ignore",
+        "deadline": 110,
+        "misleadingReason": "保洁人员忘带钥匙，申请临时开门"
+      },
+      {
+        "id": "e6",
+        "time": 120,
+        "type": "humidity_alarm",
+        "title": "湿度异常",
+        "description": "古画展厅湿度超出警戒范围",
+        "location": {
+          "room": "r2",
+          "sensor": "s2"
+        },
+        "severity": "high",
+        "isMisleading": false,
+        "requiredAction": "check_sensor",
+        "deadline": 140
+      },
+      {
+        "id": "e7",
+        "time": 150,
+        "type": "intruder",
+        "title": "人员闯入",
+        "description": "主展厅检测到非法入侵人员",
+        "location": {
+          "room": "r1"
+        },
+        "severity": "critical",
+        "isMisleading": false,
+        "requiredAction": "dispatch_guard",
+        "deadline": 165
+      }
+    ]
+  }
+]

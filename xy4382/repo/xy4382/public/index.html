@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆夜间安防联动演练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+        
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        
+        .header { background: #16213e; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f3460; }
+        .header h1 { font-size: 1.2rem; color: #e94560; }
+        .header-info { display: flex; gap: 20px; font-size: 0.9rem; }
+        .header-info span { color: #aaa; }
+        .header-info strong { color: #fff; }
+        
+        .main-content { display: flex; flex: 1; overflow: hidden; }
+        
+        .map-container { flex: 1; position: relative; background: #0d1b2a; overflow: hidden; }
+        #gameCanvas { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        
+        .sidebar { width: 380px; background: #16213e; display: flex; flex-direction: column; border-left: 2px solid #0f3460; }
+        
+        .panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .panel-header { background: #0f3460; padding: 12px 15px; font-weight: bold; color: #e94560; border-bottom: 1px solid #1a1a2e; }
+        
+        .events-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .event-item { background: #1a1a2e; border-radius: 8px; margin-bottom: 10px; padding: 12px; border-left: 4px solid #666; transition: all 0.3s; }
+        .event-item.active { border-left-color: #e94560; animation: pulse 1s infinite; }
+        .event-item.high { border-left-color: #ff6b6b; }
+        .event-item.critical { border-left-color: #e94560; }
+        .event-item.medium { border-left-color: #ffd93d; }
+        .event-item.handled { border-left-color: #6bcb77; opacity: 0.7; }
+        .event-item.ignored { border-left-color: #666; opacity: 0.5; }
+        
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 5px rgba(233, 69, 96, 0.5); } 50% { box-shadow: 0 0 15px rgba(233, 69, 96, 0.8); } }
+        
+        .event-title { font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .event-time { font-size: 0.8rem; color: #888; }
+        .event-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 8px; }
+        .event-severity { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-right: 5px; }
+        .severity-critical { background: #e94560; color: white; }
+        .severity-high { background: #ff6b6b; color: white; }
+        .severity-medium { background: #ffd93d; color: #333; }
+        .severity-low { background: #6bcb77; color: white; }
+        
+        .event-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .event-actions button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+        .btn-dispatch { background: #e94560; color: white; }
+        .btn-dispatch:hover { background: #c73e54; }
+        .btn-check { background: #4d96ff; color: white; }
+        .btn-check:hover { background: #3a7bd5; }
+        .btn-ignore { background: #666; color: white; }
+        .btn-ignore:hover { background: #555; }
+        
+        .guard-selector { display: none; margin-top: 8px; padding: 8px; background: #0f3460; border-radius: 4px; }
+        .guard-selector.show { display: block; }
+        .guard-option { display: flex; align-items: center; padding: 6px; margin-bottom: 4px; background: #1a1a2e; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
+        .guard-option:hover { background: #2a2a4e; }
+        .guard-option.busy { opacity: 0.5; cursor: not-allowed; }
+        .guard-avatar { width: 24px; height: 24px; border-radius: 50%; background: #4d96ff; margin-right: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+        .guard-info { flex: 1; }
+        .guard-name { font-size: 0.85rem; }
+        .guard-status { font-size: 0.7rem; color: #888; }
+        .guard-status.idle { color: #6bcb77; }
+        .guard-status.busy { color: #ffd93d; }
+        
+        .controls { background: #0f3460; padding: 15px; border-top: 2px solid #1a1a2e; }
+        .time-display { text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 10px; color: #e94560; font-family: monospace; }
+        .time-display small { font-size: 0.8rem; color: #888; margin-left: 10px; }
+        .control-buttons { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .control-buttons button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .btn-play { background: #6bcb77; color: white; }
+        .btn-play:hover { background: #5ab868; }
+        .btn-pause { background: #ffd93d; color: #333; }
+        .btn-pause:hover { background: #e6c336; }
+        .btn-finish { background: #e94560; color: white; }
+        .btn-finish:hover { background: #c73e54; }
+        .speed-control { display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .speed-control label { font-size: 0.85rem; color: #aaa; }
+        .speed-control select { padding: 5px 10px; border-radius: 4px; border: none; background: #1a1a2e; color: white; cursor: pointer; }
+        
+        .start-screen, .result-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .start-screen.hidden, .result-screen.hidden { display: none; }
+        .screen-content { background: #16213e; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; border: 2px solid #0f3460; }
+        .screen-content h2 { color: #e94560; margin-bottom: 20px; font-size: 1.8rem; }
+        .screen-content p { color: #aaa; margin-bottom: 15px; line-height: 1.6; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; color: #ccc; font-size: 0.9rem; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #0f3460; background: #1a1a2e; color: white; font-size: 1rem; }
+        .btn-primary { padding: 15px 40px; border: none; border-radius: 8px; background: #e94560; color: white; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background: #c73e54; }
+        
+        .result-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #1a1a2e; padding: 15px; border-radius: 8px; }
+        .stat-label { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #e94560; }
+        .stat-value.good { color: #6bcb77; }
+        .stat-value.bad { color: #e94560; }
+        
+        .grade-display { font-size: 4rem; font-weight: bold; margin: 20px 0; }
+        .grade-s { color: #ffd700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .grade-a { color: #6bcb77; }
+        .grade-b { color: #4d96ff; }
+        .grade-c { color: #ffd93d; }
+        .grade-d, .grade-f { color: #e94560; }
+        
+        .result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .result-actions button { padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .btn-export { background: #4d96ff; color: white; }
+        .btn-export:hover { background: #3a7bd5; }
+        .btn-restart { background: #6bcb77; color: white; }
+        .btn-restart:hover { background: #5ab868; }
+        
+        .analysis-section { text-align: left; margin-top: 20px; padding-top: 20px; border-top: 1px solid #0f3460; max-height: 300px; overflow-y: auto; }
+        .analysis-section h3 { color: #e94560; margin-bottom: 15px; }
+        .analysis-item { background: #1a1a2e; padding: 10px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid #666; }
+        .analysis-item.correct { border-left-color: #6bcb77; }
+        .analysis-item.wrong { border-left-color: #e94560; }
+        .analysis-item.slow { border-left-color: #ffd93d; }
+        .analysis-title { font-weight: bold; margin-bottom: 5px; }
+        .analysis-detail { font-size: 0.85rem; color: #888; }
+        
+        .legend { position: absolute; bottom: 20px; left: 20px; background: rgba(22, 33, 62, 0.9); padding: 10px; border-radius: 8px; font-size: 0.8rem; z-index: 10; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .legend-color { width: 16px; height: 16px; margin-right: 8px; border-radius: 3px; }
+        
+        .notification { position: fixed; top: 80px; right: 20px; background: #e94560; color: white; padding: 15px 25px; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .notification.success { background: #6bcb77; }
+        .notification.warning { background: #ffd93d; color: #333; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🏛️ 博物馆夜间安防联动演练系统</h1>
+            <div class="header-info">
+                <div><span>关卡:</span> <strong id="levelName">-</strong></div>
+                <div><span>玩家:</span> <strong id="playerName">-</strong></div>
+                <div><span>状态:</span> <strong id="gameStatus">准备中</strong></div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="map-container">
+                <canvas id="gameCanvas" width="800" height="600"></canvas>
+                <div class="legend" id="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4a5568;"></div>
+                        <span>展厅</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #2d3748;"></div>
+                        <span>走廊</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4d96ff;"></div>
+                        <span>保安</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e94560;"></div>
+                        <span>警报区域</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="panel-header">📋 事件时间线</div>
+                    <div class="events-list" id="eventsList"></div>
+                </div>
+                
+                <div class="controls">
+                    <div class="time-display">
+                        <span id="timeDisplay">00:00</span>
+                        <small>/ <span id="totalTime">03:00</span></small>
+                    </div>
+                    <div class="control-buttons">
+                        <button class="btn-play" id="btnPlay" onclick="game.togglePause()">▶ 开始</button>
+                        <button class="btn-finish" id="btnFinish" onclick="game.forceFinish()">⏹ 结束演练</button>
+                    </div>
+                    <div class="speed-control">
+                        <label>播放速度:</label>
+                        <select id="speedSelect" onchange="game.setSpeed(this.value)">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1x</option>
+                            <option value="2">2x</option>
+                            <option value="4">4x</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="start-screen" id="startScreen">
+        <div class="screen-content">
+            <h2>🏛️ 博物馆夜间安防演练</h2>
+            <p>你是博物馆的夜间值班员，需要在平面图上监控各种安防事件。<br>
+            正确处理门磁报警、温湿度异常、摄像头离线和人员闯入等事件。</p>
+            <p><strong>游戏规则：</strong><br>
+            • 真实事件需要及时派遣保安或检查传感器<br>
+            • 误报事件应该忽略（不要采取行动）<br>
+            • 注意事件的优先级和处理时限<br>
+            • 正确区分真实警报和误报是关键</p>
+            
+            <div class="form-group">
+                <label>玩家名称</label>
+                <input type="text" id="inputPlayerName" placeholder="请输入你的名字" value="值班员">
+            </div>
+            
+            <div class="form-group">
+                <label>选择关卡</label>
+                <select id="levelSelect"></select>
+            </div>
+            
+            <button class="btn-primary" onclick="game.startGame()">开始演练</button>
+        </div>
+    </div>
+    
+    <div class="result-screen hidden" id="resultScreen">
+        <div class="screen-content">
+            <h2>演练结束</h2>
+            <div class="grade-display" id="gradeDisplay">A</div>
+            
+            <div class="result-stats">
+                <div class="stat-card">
+                    <div class="stat-label">总分</div>
+                    <div class="stat-value" id="scoreDisplay">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">准确率</div>
+                    <div class="stat-value" id="accuracyDisplay">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">正确处理</div>
+                    <div class="stat-value good" id="correctDisplay">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">误报处理</div>
+                    <div class="stat-value bad" id="falsePositiveDisplay">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">漏报</div>
+                    <div class="stat-value bad" id="falseNegativeDisplay">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">平均反应时间</div>
+                    <div class="stat-value" id="reactionTimeDisplay">0s</div>
+                </div>
+            </div>
+            
+            <div class="analysis-section" id="analysisSection"></div>
+            
+            <div class="result-actions">
+                <button class="btn-export" onclick="game.exportMarkdown()">📝 导出复盘报告</button>
+                <button class="btn-export" onclick="game.exportJson()">📦 导出JSON回放</button>
+                <button class="btn-restart" onclick="game.restart()">🔄 重新开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        
+        class MuseumSecurityGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.sessionId = null;
+                this.levelId = null;
+                this.levelData = null;
+                this.playerName = '';
+                
+                this.currentTime = 0;
+                this.isPaused = true;
+                this.isFinished = false;
+                this.speed = 1;
+                this.lastTimestamp = 0;
+                
+                this.activeEvents = [];
+                this.handledEvents = new Set();
+                this.guards = [];
+                this.guardPatrols = new Map();
+                
+                this.levels = [];
+                this.scores = null;
+                
+                this.init();
+            }
+            
+            async init() {
+                await this.loadLevels();
+                this.setupCanvas();
+                this.checkSavedSession();
+            }
+            
+            async loadLevels() {
+                try {
+                    const res = await fetch(`${API_BASE}/api/levels`);
+                    const data = await res.json();
+                    if (data.success) {
+                        this.levels = data.data;
+                        this.populateLevelSelect();
+                    }
+                } catch (e) {
+                    console.error('加载关卡失败:', e);
+                }
+            }
+            
+            populateLevelSelect() {
+                const select = document.getElementById('levelSelect');
+                select.innerHTML = '';
+                this.levels.forEach(level => {
+                    const option = document.createElement('option');
+                    option.value = level.id;
+                    option.textContent = `${level.name} - ${level.description}`;
+                    select.appendChild(option);
+                });
+            }
+            
+            checkSavedSession() {
+                const savedSessionId = localStorage.getItem('museumGame_sessionId');
+                const savedLevelId = localStorage.getItem('museumGame_levelId');
+                if (savedSessionId && savedLevelId) {
+                    this.showNotification('检测到未完成的演练，正在恢复...', 'warning');
+                    this.resumeSession(savedSessionId, savedLevelId);
+                }
+            }
+            
+            async resumeSession(sessionId, levelId) {
+                try {
+                    const sessionRes = await fetch(`${API_BASE}/api/sessions/${sessionId}`);
+                    const sessionData = await sessionRes.json();
+                    if (sessionData.success && sessionData.data.status !== 'finished') {
+                        const levelRes = await fetch(`${API_BASE}/api/levels/${levelId}`);
+                        const levelData = await levelRes.json();
+                        if (levelData.success) {
+                            this.sessionId = sessionId;
+                            this.levelId = levelId;
+                            this.levelData = levelData.data;
+                            this.playerName = sessionData.data.playerName;
+                            this.currentTime = sessionData.data.currentTime;
+                            this.speed = sessionData.data.playbackSpeed || 1;
+                            this.isPaused = sessionData.data.isPaused;
+                            
+                            sessionData.data.actions.forEach(action => {
+                                this.handledEvents.add(action.eventId);
+                            });
+                            
+                            this.startGameUI();
+                            this.showNotification('演练已恢复！', 'success');
+                        }
+                    } else {
+                        localStorage.removeItem('museumGame_sessionId');
+                        localStorage.removeItem('museumGame_levelId');
+                    }
+                } catch (e) {
+                    console.error('恢复会话失败:', e);
+                }
+            }
+            
+            setupCanvas() {
+                this.render();
+            }
+            
+            async startGame() {
+                const playerName = document.getElementById('inputPlayerName').value.trim() || '匿名值班员';
+                const levelSelect = document.getElementById('levelSelect');
+                const levelId = levelSelect.value;
+                
+                if (!levelId) {
+                    this.showNotification('请选择关卡', 'warning');
+                    return;
+                }
+                
+                this.playerName = playerName;
+                this.levelId = levelId;
+                
+                try {
+                    const levelRes = await fetch(`${API_BASE}/api/levels/${levelId}`);
+                    const levelData = await levelRes.json();
+                    if (!levelData.success) throw new Error('加载关卡失败');
+                    this.levelData = levelData.data;
+                    
+                    const sessionRes = await fetch(`${API_BASE}/api/sessions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ levelId, playerName })
+                    });
+                    const sessionData = await sessionRes.json();
+                    if (!sessionData.success) throw new Error('创建会话失败');
+                    
+                    this.sessionId = sessionData.data.id;
+                    localStorage.setItem('museumGame_sessionId', this.sessionId);
+                    localStorage.setItem('museumGame_levelId', this.levelId);
+                    
+                    this.startGameUI();
+                } catch (e) {
+                    console.error('启动游戏失败:', e);
+                    this.showNotification('启动游戏失败: ' + e.message, 'error');
+                }
+            }
+            
+            startGameUI() {
+                document.getElementById('startScreen').classList.add('hidden');
+                document.getElementById('levelName').textContent = this.levelData.name;
+                document.getElementById('playerName').textContent = this.playerName;
+                document.getElementById('totalTime').textContent = this.formatTime(this.levelData.timeLimit);
+                
+                this.guards = JSON.parse(JSON.stringify(this.levelData.mapConfig.guards));
+                this.activeEvents = [];
+                this.renderEvents();
+                
+                this.isPaused = true;
+                this.updatePauseButton();
+                this.lastTimestamp = performance.now();
+                requestAnimationFrame(t => this.gameLoop(t));
+            }
+            
+            gameLoop(timestamp) {
+                if (this.isFinished) return;
+                
+                const deltaTime = (timestamp - this.lastTimestamp) / 1000;
+                this.lastTimestamp = timestamp;
+                
+                if (!this.isPaused) {
+                    const prevTime = Math.floor(this.currentTime);
+                    this.currentTime += deltaTime * this.speed;
+                    const newTime = Math.floor(this.currentTime);
+                    
+                    if (newTime !== prevTime) {
+                        this.checkTimeEvents(newTime);
+                        this.updateGuardPatrols(deltaTime * this.speed);
+                        this.saveProgress();
+                    }
+                }
+                
+                document.getElementById('timeDisplay').textContent = this.formatTime(Math.floor(this.currentTime));
+                this.render();
+                
+                if (this.currentTime >= this.levelData.timeLimit) {
+                    this.finishGame();
+                    return;
+                }
+                
+                requestAnimationFrame(t => this.gameLoop(t));
+            }
+            
+            checkTimeEvents(currentSecond) {
+                this.levelData.events.forEach(event => {
+                    if (event.time === currentSecond && !this.handledEvents.has(event.id)) {
+                        this.activeEvents.push({ ...event, triggeredAt: currentSecond });
+                        this.renderEvents();
+                        this.showNotification(`新事件: ${event.title}`, 'warning');
+                        
+                        if (event.location) {
+                            if (event.location.room) {
+                                const room = this.levelData.mapConfig.rooms.find(r => r.id === event.location.room);
+                                if (room) room.hasAlarm = true;
+                            }
+                        }
+                    }
+                });
+                
+                this.activeEvents.forEach(event => {
+                    if (currentSecond >= event.deadline && !this.handledEvents.has(event.id)) {
+                        if (!event.missedNotified) {
+                            event.missedNotified = true;
+                            if (!event.isMisleading) {
+                                this.showNotification(`事件超时: ${event.title}`, 'error');
+                            }
+                        }
+                    }
+                });
+            }
+            
+            updateGuardPatrols(deltaTime) {
+                this.guards.forEach(guard => {
+                    if (guard.patrolTarget && guard.status === 'busy') {
+                        const dx = guard.patrolTarget.x - guard.x;
+                        const dy = guard.patrolTarget.y - guard.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < 5) {
+                            guard.status = 'idle';
+                            guard.patrolTarget = null;
+                        } else {
+                            const speed = 100 * deltaTime;
+                            guard.x += (dx / dist) * speed;
+                            guard.y += (dy / dist) * speed;
+                        }
+                    }
+                });
+            }
+            
+            renderEvents() {
+                const container = document.getElementById('eventsList');
+                container.innerHTML = '';
+                
+                const sortedEvents = [...this.activeEvents].sort((a, b) => a.time - b.time);
+                
+                sortedEvents.forEach(event => {
+                    const isHandled = this.handledEvents.has(event.id);
+                    const isExpired = this.currentTime >= event.deadline;
+                    const remaining = Math.max(0, event.deadline - this.currentTime);
+                    
+                    const div = document.createElement('div');
+                    div.className = `event-item ${event.severity} ${isHandled ? 'handled' : ''} ${!isHandled && !isExpired ? 'active' : ''}`;
+                    div.id = `event-${event.id}`;
+                    
+                    const severityClass = `severity-${event.severity}`;
+                    const severityText = event.severity === 'critical' ? '紧急' : 
+                                          event.severity === 'high' ? '高' : 
+                                          event.severity === 'medium' ? '中' : '低';
+                    
+                    let actionButtons = '';
+                    if (!isHandled) {
+                        if (event.requiredAction === 'dispatch_guard') {
+                            actionButtons = `
+                                <button class="btn-dispatch" onclick="game.showGuardSelector('${event.id}')">
+                                    🚔 派遣保安
+                                </button>
+                                <button class="btn-ignore" onclick="game.ignoreEvent('${event.id}')">
+                                    ⏭ 标记忽略
+                                </button>
+                            `;
+                        } else if (event.requiredAction === 'check_sensor') {
+                            actionButtons = `
+                                <button class="btn-check" onclick="game.checkSensor('${event.id}')">
+                                    🔍 检查传感器
+                                </button>
+                                <button class="btn-ignore" onclick="game.ignoreEvent('${event.id}')">
+                                    ⏭ 标记忽略
+                                </button>
+                            `;
+                        } else {
+                            actionButtons = `
+                                <button class="btn-ignore" onclick="game.ignoreEvent('${event.id}')">
+                                    ⏭ 确认忽略
+                                </button>
+                            `;
+                        }
+                    }
+                    
+                    const statusText = isHandled ? '已处理' : (isExpired ? '已超时' : `剩余 ${Math.floor(remaining)}s`);
+                    const statusClass = isHandled ? 'color: #6bcb77' : (isExpired ? 'color: #e94560' : '');
+                    
+                    div.innerHTML = `
+                        <div class="event-title">
+                            <span>${event.title}</span>
+                            <span class="event-time" style="${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="event-desc">
+                            <span class="event-severity ${severityClass}">${severityText}</span>
+                            ${event.description}
+                        </div>
+                        ${actionButtons}
+                        <div class="guard-selector" id="guard-selector-${event.id}">
+                            <div style="font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">选择要派遣的保安:</div>
+                            ${this.renderGuardOptions(event.id)}
+                        </div>
+                    `;
+                    
+                    container.appendChild(div);
+                });
+            }
+            
+            renderGuardOptions(eventId) {
+                return this.guards.map(guard => {
+                    const isBusy = guard.status === 'busy';
+                    return `
+                        <div class="guard-option ${isBusy ? 'busy' : ''}" 
+                             onclick="${isBusy ? '' : `game.dispatchGuard('${guard.id}', '${eventId}')`}">
+                            <div class="guard-avatar">${guard.name.charAt(2)}</div>
+                            <div class="guard-info">
+                                <div class="guard-name">${guard.name}</div>
+                                <div class="guard-status ${guard.status}">
+                                    ${guard.status === 'idle' ? '✓ 待命' : '⏳ 巡逻中'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            showGuardSelector(eventId) {
+                const selector = document.getElementById(`guard-selector-${eventId}`);
+                if (selector) {
+                    selector.innerHTML = `
+                        <div style="font-size: 0.85rem; margin-bottom: 8px; color: #aaa;">选择要派遣的保安:</div>
+                        ${this.renderGuardOptions(eventId)}
+                    `;
+                    selector.classList.toggle('show');
+                }
+            }
+            
+            async dispatchGuard(guardId, eventId) {
+                const guard = this.guards.find(g => g.id === guardId);
+                const event = this.activeEvents.find(e => e.id === eventId);
+                
+                if (!guard || !event || guard.status === 'busy') return;
+                
+                let targetX = guard.x;
+                let targetY = guard.y;
+                
+                if (event.location && event.location.room) {
+                    const room = this.levelData.mapConfig.rooms.find(r => r.id === event.location.room);
+                    if (room) {
+                        targetX = room.x + room.width / 2;
+                        targetY = room.y + room.height / 2;
+                    }
+                }
+                
+                guard.status = 'busy';
+                guard.patrolTarget = { x: targetX, y: targetY };
+                guard.currentEvent = eventId;
+                
+                try {
+                    await fetch(`${API_BASE}/api/sessions/${this.sessionId}/actions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'dispatch_guard',
+                            eventId: eventId,
+                            guardId: guardId,
+                            targetX: targetX,
+                            targetY: targetY
+                        })
+                    });
+                } catch (e) {
+                    console.error('记录操作失败:', e);
+                }
+                
+                this.handledEvents.add(eventId);
+                this.activeEvents = this.activeEvents.filter(e => e.id !== eventId);
+                
+                if (event.location && event.location.room) {
+                    const room = this.levelData.mapConfig.rooms.find(r => r.id === event.location.room);
+                    if (room) room.hasAlarm = false;
+                }
+                
+                this.renderEvents();
+                this.showNotification(`已派遣 ${guard.name} 前往处理`, 'success');
+            }
+            
+            async checkSensor(eventId) {
+                const event = this.activeEvents.find(e => e.id === eventId);
+                if (!event) return;
+                
+                try {
+                    await fetch(`${API_BASE}/api/sessions/${this.sessionId}/actions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'check_sensor',
+                            eventId: eventId
+                        })
+                    });
+                } catch (e) {
+                    console.error('记录操作失败:', e);
+                }
+                
+                this.handledEvents.add(eventId);
+                this.activeEvents = this.activeEvents.filter(e => e.id !== eventId);
+                
+                if (event.location && event.location.room) {
+                    const room = this.levelData.mapConfig.rooms.find(r => r.id === event.location.room);
+                    if (room) room.hasAlarm = false;
+                }
+                
+                this.renderEvents();
+                this.showNotification('已检查传感器数据', 'success');
+            }
+            
+            async ignoreEvent(eventId) {
+                const event = this.activeEvents.find(e => e.id === eventId);
+                if (!event) return;
+                
+                try {
+                    await fetch(`${API_BASE}/api/sessions/${this.sessionId}/actions`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'ignore',
+                            eventId: eventId
+                        })
+                    });
+                    
+                    await fetch(`${API_BASE}/api/sessions/${this.sessionId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            eventStatus: { [eventId]: 'ignored' }
+                        })
+                    });
+                } catch (e) {
+                    console.error('记录操作失败:', e);
+                }
+                
+                this.handledEvents.add(eventId);
+                this.activeEvents = this.activeEvents.filter(e => e.id !== eventId);
+                
+                if (event.location && event.location.room) {
+                    const room = this.levelData.mapConfig.rooms.find(r => r.id === event.location.room);
+                    if (room) room.hasAlarm = false;
+                }
+                
+                this.renderEvents();
+                this.showNotification('已标记为忽略', 'warning');
+            }
+            
+            async saveProgress() {
+                if (!this.sessionId) return;
+                
+                try {
+                    await fetch(`${API_BASE}/api/sessions/${this.sessionId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            currentTime: this.currentTime,
+                            isPaused: this.isPaused,
+                            playbackSpeed: this.speed,
+                            status: 'playing'
+                        })
+                    });
+                } catch (e) {
+                    console.error('保存进度失败:', e);
+                }
+            }
+            
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                this.lastTimestamp = performance.now();
+                this.updatePauseButton();
+                this.saveProgress();
+            }
+            
+            updatePauseButton() {
+                const btn = document.getElementById('btnPlay');
+                const statusEl = document.getElementById('gameStatus');
+                if (this.isPaused) {
+                    btn.textContent = '▶ 继续';
+                    btn.className = 'btn-play';
+                    statusEl.textContent = '已暂停';
+                } else {
+                    btn.textContent = '⏸ 暂停';
+                    btn.className = 'btn-pause';
+                    statusEl.textContent = '进行中';
+                }
+            }
+            
+            setSpeed(value) {
+                this.speed = parseFloat(value);
+                this.saveProgress();
+            }
+            
+            async forceFinish() {
+                if (confirm('确定要提前结束演练吗？')) {
+                    await this.finishGame();
+                }
+            }
+            
+            async finishGame() {
+                this.isFinished = true;
+                this.isPaused = true;
+                
+                try {
+                    const res = await fetch(`${API_BASE}/api/sessions/${this.sessionId}/finish`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        this.scores = data.data.scores;
+                        this.showResults();
+                    }
+                } catch (e) {
+                    console.error('结束游戏失败:', e);
+                }
+                
+                localStorage.removeItem('museumGame_sessionId');
+                localStorage.removeItem('museumGame_levelId');
+            }
+            
+            showResults() {
+                document.getElementById('resultScreen').classList.remove('hidden');
+                
+                const scores = this.scores;
+                document.getElementById('scoreDisplay').textContent = scores.totalScore;
+                document.getElementById('accuracyDisplay').textContent = scores.accuracy + '%';
+                document.getElementById('correctDisplay').textContent = scores.correctActions;
+                document.getElementById('falsePositiveDisplay').textContent = scores.falsePositives;
+                document.getElementById('falseNegativeDisplay').textContent = scores.falseNegatives;
+                document.getElementById('reactionTimeDisplay').textContent = scores.avgReactionTime + 's';
+                
+                const gradeEl = document.getElementById('gradeDisplay');
+                gradeEl.textContent = scores.grade;
+                gradeEl.className = `grade-display grade-${scores.grade.toLowerCase()}`;
+                
+                const analysisSection = document.getElementById('analysisSection');
+                let analysisHtml = '<h3>事件详细分析</h3>';
+                
+                scores.eventAnalysis.forEach((analysis, index) => {
+                    let itemClass = '';
+                    let resultText = '';
+                    
+                    if (analysis.result === 'correct_handled' || analysis.result === 'correct_ignored') {
+                        itemClass = 'correct';
+                        resultText = analysis.result === 'correct_handled' 
+                            ? `✅ 正确处理 (反应时间: ${analysis.reactionTime}s)` 
+                            : '✅ 正确忽略';
+                    } else if (analysis.result === 'false_positive') {
+                        itemClass = 'wrong';
+                        resultText = `❌ 误报处理 - ${analysis.falsePositiveReason || '对误报采取了行动'}`;
+                    } else if (analysis.result === 'false_negative') {
+                        itemClass = 'wrong';
+                        resultText = `❌ 漏报 - ${analysis.falseNegativeReason || '未采取任何行动'}`;
+                    } else if (analysis.result === 'missed_deadline') {
+                        itemClass = 'slow';
+                        resultText = `⚠️ 超时处理 - 用时 ${analysis.actualTime}s，时限 ${analysis.deadline}s`;
+                    }
+                    
+                    const eventTypeText = analysis.isMisleading ? '【误报】' : '【真实事件】';
+                    
+                    analysisHtml += `
+                        <div class="analysis-item ${itemClass}">
+                            <div class="analysis-title">
+                                ${index + 1}. ${analysis.eventTitle} ${eventTypeText}
+                            </div>
+                            <div class="analysis-detail">
+                                发生时间: 第 ${analysis.eventTime}s | 采取行动: ${analysis.actionsTaken} 次<br>
+                                ${resultText}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                analysisSection.innerHTML = analysisHtml;
+            }
+            
+            exportMarkdown() {
+                if (this.sessionId) {
+                    window.open(`${API_BASE}/api/sessions/${this.sessionId}/export/markdown`, '_blank');
+                }
+            }
+            
+            exportJson() {
+                if (this.sessionId) {
+                    window.open(`${API_BASE}/api/sessions/${this.sessionId}/export/json`, '_blank');
+                }
+            }
+            
+            restart() {
+                location.reload();
+            }
+            
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            showNotification(message, type = 'info') {
+                const existing = document.querySelector('.notification');
+                if (existing) existing.remove();
+                
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.remove(), 3000);
+            }
+            
+            render() {
+                if (!this.levelData) return;
+                
+                const ctx = this.ctx;
+                const config = this.levelData.mapConfig;
+                
+                ctx.fillStyle = '#0d1b2a';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < this.canvas.width; x += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, this.canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < this.canvas.height; y += 20) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(this.canvas.width, y);
+                    ctx.stroke();
+                }
+                
+                config.rooms.forEach(room => {
+                    let fillColor = '#2d3748';
+                    let strokeColor = '#4a5568';
+                    
+                    if (room.type === 'exhibition') fillColor = '#3d4a5c';
+                    else if (room.type === 'control') fillColor = '#2a4365';
+                    else if (room.type === 'staff') fillColor = '#2c5282';
+                    else if (room.type === 'corridor') fillColor = '#1a202c';
+                    
+                    if (room.hasAlarm) {
+                        const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+                        ctx.fillStyle = `rgba(233, 69, 96, ${pulse * 0.3})`;
+                        ctx.fillRect(room.x - 5, room.y - 5, room.width + 10, room.height + 10);
+                    }
+                    
+                    ctx.fillStyle = fillColor;
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = 2;
+                    
+                    ctx.beginPath();
+                    ctx.roundRect(room.x, room.y, room.width, room.height, 4);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = 'bold 12px Microsoft YaHei';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(room.name, room.x + room.width / 2, room.y + room.height / 2);
+                });
+                
+                config.doors.forEach(door => {
+                    ctx.fillStyle = door.status === 'open' ? '#6bcb77' : '#4a5568';
+                    ctx.fillRect(door.x, door.y, door.width, door.height);
+                    
+                    const activeEvent = this.activeEvents.find(e => 
+                        e.location && e.location.door === door.id
+                    );
+                    if (activeEvent && !this.handledEvents.has(activeEvent.id)) {
+                        const pulse = Math.sin(Date.now() / 150) * 0.5 + 0.5;
+                        ctx.fillStyle = `rgba(233, 69, 96, ${pulse})`;
+                        ctx.fillRect(door.x - 2, door.y - 2, door.width + 4, door.height + 4);
+                    }
+                });
+                
+                config.cameras.forEach(camera => {
+                    const isOffline = this.activeEvents.some(e => 
+                        e.type === 'camera_offline' && 
+                        e.location && e.location.camera === camera.id &&
+                        !this.handledEvents.has(e.id)
+                    );
+                    
+                    ctx.fillStyle = isOffline ? '#e94560' : '#6bcb77';
+                    ctx.beginPath();
+                    ctx.arc(camera.x, camera.y, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = isOffline ? '#ff6b6b' : '#4ade80';
+                    ctx.beginPath();
+                    ctx.arc(camera.x, camera.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    if (isOffline) {
+                        ctx.fillStyle = '#e94560';
+                        ctx.font = '10px Microsoft YaHei';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('离线', camera.x, camera.y + 20);
+                    }
+                });
+                
+                config.sensors.forEach(sensor => {
+                    const hasAlarm = this.activeEvents.some(e => 
+                        (e.type === 'temp_alarm' || e.type === 'humidity_alarm') &&
+                        e.location && e.location.sensor === sensor.id &&
+                        !this.handledEvents.has(e.id)
+                    );
+                    
+                    ctx.fillStyle = hasAlarm ? '#e94560' : '#4d96ff';
+                    ctx.beginPath();
+                    ctx.arc(sensor.x, sensor.y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(sensor.x - 5, sensor.y);
+                    ctx.lineTo(sensor.x + 5, sensor.y);
+                    ctx.moveTo(sensor.x, sensor.y - 5);
+                    ctx.lineTo(sensor.x, sensor.y + 5);
+                    ctx.stroke();
+                    
+                    if (hasAlarm) {
+                        const pulse = Math.sin(Date.now() / 150) * 0.5 + 0.5;
+                        ctx.strokeStyle = `rgba(233, 69, 96, ${pulse})`;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(sensor.x, sensor.y, 15 + pulse * 5, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                });
+                
+                this.guards.forEach(guard => {
+                    if (guard.patrolTarget && guard.status === 'busy') {
+                        ctx.strokeStyle = 'rgba(77, 150, 255, 0.5)';
+                        ctx.lineWidth = 3;
+                        ctx.setLineDash([10, 5]);
+                        ctx.beginPath();
+                        ctx.moveTo(guard.x, guard.y);
+                        ctx.lineTo(guard.patrolTarget.x, guard.patrolTarget.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                });
+                
+                this.guards.forEach(guard => {
+                    const isBusy = guard.status === 'busy';
+                    
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(guard.x, guard.y + 15, 15, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    const gradient = ctx.createRadialGradient(guard.x - 5, guard.y - 5, 0, guard.x, guard.y, 20);
+                    gradient.addColorStop(0, isBusy ? '#ffd93d' : '#4d96ff');
+                    gradient.addColorStop(1, isBusy ? '#b8860b' : '#2563eb');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(guard.x, guard.y, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = isBusy ? '#ffd93d' : '#60a5fa';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(guard.x, guard.y, 18, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 14px Microsoft YaHei';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(guard.name.charAt(2), guard.x, guard.y);
+                    
+                    ctx.fillStyle = '#e2e8f0';
+                    ctx.font = '10px Microsoft YaHei';
+                    ctx.fillText(guard.name, guard.x, guard.y + 30);
+                    
+                    if (isBusy) {
+                        const pulse = Math.sin(Date.now() / 200) * 0.5 + 0.5;
+                        ctx.strokeStyle = `rgba(255, 217, 61, ${pulse})`;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(guard.x, guard.y, 22 + pulse * 5, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                });
+                
+                const intruderEvents = this.activeEvents.filter(e => 
+                    e.type === 'intruder' && !this.handledEvents.has(e.id)
+                );
+                intruderEvents.forEach(event => {
+                    if (event.location && event.location.room) {
+                        const room = config.rooms.find(r => r.id === event.location.room);
+                        if (room) {
+                            const pulse = Math.sin(Date.now() / 150) * 0.5 + 0.5;
+                            const intruderX = room.x + room.width * (0.3 + pulse * 0.2);
+                            const intruderY = room.y + room.height * (0.3 + (1 - pulse) * 0.2);
+                            
+                            ctx.fillStyle = 'rgba(233, 69, 96, 0.8)';
+                            ctx.beginPath();
+                            ctx.arc(intruderX, intruderY, 12, 0, Math.PI * 2);
+                            ctx.fill();
+                            
+                            ctx.fillStyle = '#fff';
+                            ctx.font = 'bold 10px Microsoft YaHei';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('?', intruderX, intruderY);
+                            
+                            ctx.strokeStyle = `rgba(233, 69, 96, ${pulse * 0.5})`;
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.arc(intruderX, intruderY, 20 + pulse * 10, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+                });
+            }
+        }
+        
+        const game = new MuseumSecurityGame();
+    </script>
+</body>
+</html>
