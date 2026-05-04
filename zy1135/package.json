@@ -1,0 +1,30 @@
+{
+  "name": "robinson-crusoe-game",
+  "version": "1.0.0",
+  "description": "鲁滨逊漂流记生存策略游戏",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspace=backend",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "robinson",
+    "survival",
+    "game",
+    "strategy"
+  ],
+  "author": "",
+  "license": "MIT"
+}

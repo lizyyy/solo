@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-sand text-gray-800 min-h-screen;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ocean hover:bg-ocean-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6 border border-gray-100;
+  }
+
+  .resource-bar {
+    @apply h-4 rounded-full bg-gray-200 overflow-hidden;
+  }
+
+  .resource-fill {
+    @apply h-full rounded-full transition-all duration-300;
+  }
+
+  .action-card {
+    @apply bg-white rounded-lg shadow p-4 border border-gray-200 hover:border-ocean hover:shadow-md transition-all duration-200 cursor-pointer;
+  }
+
+  .action-card-disabled {
+    @apply bg-gray-100 rounded-lg shadow p-4 border border-gray-300 opacity-60 cursor-not-allowed;
+  }
+
+  .location-card {
+    @apply bg-white rounded-lg shadow p-4 border border-gray-200 hover:border-forest hover:shadow-md transition-all duration-200 cursor-pointer;
+  }
+
+  .location-card-discovered {
+    @apply bg-gray-50 rounded-lg shadow p-4 border border-gray-300 cursor-not-allowed;
+  }
+
+  .event-modal {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4;
+  }
+
+  .event-content {
+    @apply bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto;
+  }
+
+  .log-entry {
+    @apply border-l-4 pl-4 py-2 my-2;
+  }
+
+  .log-action {
+    @apply border-blue-400 bg-blue-50;
+  }
+
+  .log-event {
+    @apply border-amber-400 bg-amber-50;
+  }
+
+  .log-settlement {
+    @apply border-green-400 bg-green-50;
+  }
+
+  .log-end {
+    @apply border-red-400 bg-red-50;
+  }
+
+  .tab-active {
+    @apply border-b-2 border-ocean text-ocean font-semibold;
+  }
+
+  .tab-inactive {
+    @apply text-gray-500 hover:text-gray-700;
+  }
+
+  .progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+}
