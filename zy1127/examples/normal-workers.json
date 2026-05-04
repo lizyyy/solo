@@ -1,0 +1,24 @@
+[
+  {
+    "queue_name": "healthy_request_queue",
+    "worker_count": 8,
+    "queue_capacity": 1000,
+    "queue_length": 45,
+    "pending_tasks": 30,
+    "failed_tasks": 2,
+    "completed_tasks": 12500,
+    "last_task_duration_ms": 50000000,
+    "timestamp": "2026-05-04T10:00:00Z"
+  },
+  {
+    "queue_name": "data_processing_queue",
+    "worker_count": 4,
+    "queue_capacity": 500,
+    "queue_length": 120,
+    "pending_tasks": 80,
+    "failed_tasks": 0,
+    "completed_tasks": 5600,
+    "last_task_duration_ms": 150000000,
+    "timestamp": "2026-05-04T10:00:00Z"
+  }
+]

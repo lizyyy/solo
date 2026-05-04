@@ -1,0 +1,10 @@
+{"map_name": "safe_cache", "key": "item_1", "operation": "READ", "goroutine_id": 1, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.001Z", "stack_frame": "main.(*SafeCache).Get"}
+{"map_name": "safe_cache", "key": "item_2", "operation": "WRITE", "goroutine_id": 1, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.002Z", "stack_frame": "main.(*SafeCache).Set"}
+{"map_name": "safe_cache", "key": "item_1", "operation": "READ", "goroutine_id": 2, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.010Z", "stack_frame": "main.(*SafeCache).Get"}
+{"map_name": "safe_cache", "key": "item_3", "operation": "WRITE", "goroutine_id": 2, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.011Z", "stack_frame": "main.(*SafeCache).Set"}
+{"map_name": "config_store", "key": "setting_1", "operation": "READ", "goroutine_id": 3, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.020Z", "stack_frame": "main.(*ConfigStore).Get"}
+{"map_name": "config_store", "key": "setting_2", "operation": "READ", "goroutine_id": 4, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.021Z", "stack_frame": "main.(*ConfigStore).Get"}
+{"map_name": "config_store", "key": "setting_3", "operation": "READ", "goroutine_id": 5, "has_lock": true, "lock_type": "RWMutex", "timestamp": "2026-05-04T10:00:00.022Z", "stack_frame": "main.(*ConfigStore).Get"}
+{"map_name": "user_session", "key": "session_abc123", "operation": "READ", "goroutine_id": 10, "has_lock": true, "lock_type": "Mutex", "timestamp": "2026-05-04T10:00:00.100Z", "stack_frame": "main.(*SessionManager).GetSession"}
+{"map_name": "user_session", "key": "session_abc123", "operation": "WRITE", "goroutine_id": 10, "has_lock": true, "lock_type": "Mutex", "timestamp": "2026-05-04T10:00:00.101Z", "stack_frame": "main.(*SessionManager).UpdateSession"}
+{"map_name": "user_session", "key": "session_def456", "operation": "READ", "goroutine_id": 11, "has_lock": true, "lock_type": "Mutex", "timestamp": "2026-05-04T10:00:00.110Z", "stack_frame": "main.(*SessionManager).GetSession"}
