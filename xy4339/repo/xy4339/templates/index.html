@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>裁纸报价助手</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>裁纸报价助手</h1>
+            <p class="subtitle">社区印刷店智能报价系统</p>
+        </header>
+
+        <nav class="app-nav">
+            <button class="nav-btn active" data-view="orders">订单列表</button>
+            <button class="nav-btn" data-view="new-order">新建订单</button>
+            <button class="nav-btn" data-view="stock">库存管理</button>
+            <button class="nav-btn" data-view="calculator">快速计算</button>
+        </nav>
+
+        <main class="app-main">
+            <div id="orders-view" class="view active">
+                <div class="view-header">
+                    <h2>订单列表</h2>
+                    <button class="btn btn-primary" id="btn-refresh-orders">刷新</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>客户</th>
+                                <th>状态</th>
+                                <th>加急</th>
+                                <th>金额</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body">
+                            <tr>
+                                <td colspan="7" class="loading">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="new-order-view" class="view">
+                <div class="view-header">
+                    <h2>新建订单</h2>
+                </div>
+                
+                <div class="form-section">
+                    <h3>基本信息</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>订单号 (自动生成)</label>
+                            <input type="text" id="order-number" readonly placeholder="自动生成">
+                        </div>
+                        <div class="form-group">
+                            <label>客户名称</label>
+                            <input type="text" id="customer-name" placeholder="请输入客户名称">
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话</label>
+                            <input type="text" id="customer-phone" placeholder="请输入联系电话">
+                        </div>
+                        <div class="form-group">
+                            <label>公司名称</label>
+                            <input type="text" id="customer-company" placeholder="请输入公司名称">
+                        </div>
+                        <div class="form-group">
+                            <label>要求交货日期</label>
+                            <input type="date" id="required-date">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" id="is-urgent">
+                                <span>加急订单</span>
+                            </label>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>备注</label>
+                            <textarea id="order-notes" rows="2" placeholder="订单备注"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3>订单项</h3>
+                        <button class="btn btn-secondary" id="btn-add-item">添加订单项</button>
+                    </div>
+                    
+                    <div id="order-items-container">
+                        <div class="empty-state">
+                            <p>暂无订单项，点击"添加订单项"开始录入</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-secondary" id="btn-import-csv">导入CSV</button>
+                    <input type="file" id="csv-import-input" accept=".csv" style="display: none;">
+                    <button class="btn btn-primary" id="btn-save-order">保存订单</button>
+                </div>
+            </div>
+
+            <div id="order-detail-view" class="view">
+                <div class="view-header">
+                    <button class="btn btn-secondary" id="btn-back-to-orders">返回列表</button>
+                    <h2 id="detail-order-number">订单详情</h2>
+                    <div class="order-status-badge" id="detail-status-badge"></div>
+                </div>
+
+                <div class="detail-content" id="order-detail-content">
+                </div>
+            </div>
+
+            <div id="stock-view" class="view">
+                <div class="view-header">
+                    <h2>库存管理</h2>
+                    <button class="btn btn-primary" id="btn-refresh-stock">刷新</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>纸张规格</th>
+                                <th>尺寸 (mm)</th>
+                                <th>纸质</th>
+                                <th>克重 (g)</th>
+                                <th>颜色</th>
+                                <th>单价 (元)</th>
+                                <th>库存</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body">
+                            <tr>
+                                <td colspan="8" class="loading">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="calculator-view" class="view">
+                <div class="view-header">
+                    <h2>快速计算</h2>
+                </div>
+                
+                <div class="calculator-grid">
+                    <div class="form-section">
+                        <h3>成品参数</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>成品宽度 (mm)</label>
+                                <input type="number" id="calc-piece-width" value="210" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>成品高度 (mm)</label>
+                                <input type="number" id="calc-piece-height" value="297" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>数量</label>
+                                <input type="number" id="calc-quantity" value="1000" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>纹理方向</label>
+                                <select id="calc-grain">
+                                    <option value="any">不限</option>
+                                    <option value="short">短边</option>
+                                    <option value="long">长边</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>克重 (g)</label>
+                                <input type="number" id="calc-weight" value="157" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>纸质</label>
+                                <select id="calc-paper-type">
+                                    <option value="">不限</option>
+                                    <option value="coated">铜版纸</option>
+                                    <option value="uncoated">胶版纸</option>
+                                    <option value="art">特种纸</option>
+                                    <option value="cardboard">卡纸</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" id="btn-calculate-quick">查找最优方案</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>计算结果</h3>
+                        <div id="calc-results">
+                            <div class="empty-state">
+                                <p>输入参数后点击计算</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>裁纸报价助手 &copy; 2024 | 社区印刷店专用</p>
+        </footer>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <template id="order-item-template">
+        <div class="order-item-card" data-item-index="0">
+            <div class="item-header">
+                <h4>订单项 <span class="item-number">#1</span></h4>
+                <button type="button" class="btn-remove-item">删除</button>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>产品名称</label>
+                    <input type="text" class="item-product-name" placeholder="产品名称">
+                </div>
+                <div class="form-group">
+                    <label>成品宽度 (mm)</label>
+                    <input type="number" class="item-width" placeholder="宽度" min="1">
+                </div>
+                <div class="form-group">
+                    <label>成品高度 (mm)</label>
+                    <input type="number" class="item-height" placeholder="高度" min="1">
+                </div>
+                <div class="form-group">
+                    <label>数量</label>
+                    <input type="number" class="item-quantity" placeholder="数量" min="1">
+                </div>
+                <div class="form-group">
+                    <label>纸质</label>
+                    <select class="item-paper-type">
+                        <option value="">选择纸质</option>
+                        <option value="coated">铜版纸</option>
+                        <option value="uncoated">胶版纸</option>
+                        <option value="art">特种纸</option>
+                        <option value="cardboard">卡纸</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>克重 (g)</label>
+                    <input type="number" class="item-weight" placeholder="克重" min="1">
+                </div>
+                <div class="form-group">
+                    <label>颜色</label>
+                    <input type="text" class="item-color" value="白色" placeholder="颜色">
+                </div>
+                <div class="form-group">
+                    <label>纹理方向</label>
+                    <select class="item-grain">
+                        <option value="any">不限</option>
+                        <option value="short">短边</option>
+                        <option value="long">长边</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" class="item-double-sided">
+                        <span>双面印刷</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>出血 (mm)</label>
+                    <input type="number" class="item-bleed" value="3" min="0" placeholder="出血">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>备注</label>
+                    <input type="text" class="item-notes" placeholder="订单项备注">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
