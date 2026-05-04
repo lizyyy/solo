@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区共享厨房 - 食品安全管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🍳 社区共享厨房 - 食品安全管理系统</h1>
+            <div class="header-actions">
+                <input type="date" id="currentDate" value="">
+                <button onclick="refreshData()" class="btn btn-primary">🔄 刷新数据</button>
+                <button onclick="runSafetyChecks()" class="btn btn-warning">⚠️ 运行安全检查</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">📊 仪表板</button>
+            <button class="tab-btn" data-tab="import">📥 数据导入</button>
+            <button class="tab-btn" data-tab="review">✅ 复核管理</button>
+            <button class="tab-btn" data-tab="risks">🚨 风险清单</button>
+            <button class="tab-btn" data-tab="export">📤 导出报表</button>
+            <button class="tab-btn" data-tab="settings">⚙️ 基础设置</button>
+        </nav>
+
+        <main>
+            <div id="dashboard-tab" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card" id="stat-stalls">
+                        <div class="stat-value">-</div>
+                        <div class="stat-label">今日摊位</div>
+                    </div>
+                    <div class="stat-card" id="stat-dishes">
+                        <div class="stat-value">-</div>
+                        <div class="stat-label">菜品总数</div>
+                    </div>
+                    <div class="stat-card" id="stat-risks">
+                        <div class="stat-value risk-high">-</div>
+                        <div class="stat-label">风险项</div>
+                    </div>
+                    <div class="stat-card" id="stat-review">
+                        <div class="stat-value">-</div>
+                        <div class="stat-label">已复核/待复核</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>🏪 今日摊位列表</h3>
+                        <div id="stalls-list" class="list-container">
+                            <p class="empty-text">暂无数据</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📋 今日菜单</h3>
+                        <div id="menus-list" class="list-container">
+                            <p class="empty-text">暂无数据</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="import-tab" class="tab-content">
+                <div class="card">
+                    <h3>📥 数据导入</h3>
+                    <p class="help-text">支持通过 CSV/Excel 文件导入，或直接粘贴数据。格式参考下方示例。</p>
+                    
+                    <div class="import-section">
+                        <div class="import-type-selector">
+                            <button class="import-type-btn active" data-type="menu">📋 当日菜单</button>
+                            <button class="import-type-btn" data-type="batch">📦 原料批次</button>
+                            <button class="import-type-btn" data-type="temperature">🌡️ 温度记录</button>
+                            <button class="import-type-btn" data-type="sample">📷 留样清单</button>
+                        </div>
+
+                        <div id="import-menu" class="import-form active">
+                            <div class="form-group">
+                                <label>选择日期</label>
+                                <input type="date" id="import-menu-date">
+                            </div>
+                            <div class="form-group">
+                                <label>选择摊位（可选，用于识别）</label>
+                                <select id="import-menu-stall">
+                                    <option value="">-- 不指定 --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>粘贴数据（格式：菜品名,数量,备注,过敏源 | 一行一条）</label>
+                                <textarea id="import-menu-text" rows="8" placeholder="示例：
+宫保鸡丁,50,午市套餐,花生,大豆
+西红柿炒蛋,30,家常菜,蛋类
+红烧肉,40,招牌菜,含麸质的谷物"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>或上传文件</label>
+                                <input type="file" id="import-menu-file" accept=".csv,.xlsx,.xls">
+                            </div>
+                            <button onclick="importMenus()" class="btn btn-primary">导入菜单</button>
+                        </div>
+
+                        <div id="import-batch" class="import-form">
+                            <div class="form-group">
+                                <label>粘贴数据（格式：原料名,批次号,供应商,有效期,数量,单位,菜品名 | 一行一条）</label>
+                                <textarea id="import-batch-text" rows="8" placeholder="示例：
+鸡胸肉,B2024050101,正大食品,2024-06-01,50,kg,宫保鸡丁
+花生油,Y20240415,金龙鱼,2025-04-15,10,L,宫保鸡丁"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>或上传文件</label>
+                                <input type="file" id="import-batch-file" accept=".csv,.xlsx,.xls">
+                            </div>
+                            <button onclick="importBatches()" class="btn btn-primary">导入原料批次</button>
+                        </div>
+
+                        <div id="import-temperature" class="import-form">
+                            <div class="form-group">
+                                <label>记录类型</label>
+                                <select id="import-temp-type">
+                                    <option value="hot_out">热菜出锅</option>
+                                    <option value="cooling">冷却中</option>
+                                    <option value="cold_ready">冷却完成</option>
+                                    <option value="storage">储存温度</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>粘贴数据（格式：菜品名,温度(°C),记录时间,备注 | 一行一条）</label>
+                                <textarea id="import-temp-text" rows="8" placeholder="示例：
+宫保鸡丁,95,2024-05-04 11:30:00,出锅温度
+宫保鸡丁,25,2024-05-04 12:30:00,冷却30分钟
+宫保鸡丁,6,2024-05-04 13:15:00,冷却完成"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>或上传文件</label>
+                                <input type="file" id="import-temp-file" accept=".csv,.xlsx,.xls">
+                            </div>
+                            <button onclick="importTemperatures()" class="btn btn-primary">导入温度记录</button>
+                        </div>
+
+                        <div id="import-sample" class="import-form">
+                            <div class="form-group">
+                                <label>粘贴数据（格式：菜品名,留样时间,留样量,保管人,存放位置,照片文件名 | 一行一条）</label>
+                                <textarea id="import-sample-text" rows="8" placeholder="示例：
+宫保鸡丁,2024-05-04 11:35:00,100g,张三,冷藏柜A层,sample_001.jpg
+西红柿炒蛋,2024-05-04 11:40:00,100g,张三,冷藏柜A层,sample_002.jpg"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>或上传文件</label>
+                                <input type="file" id="import-sample-file" accept=".csv,.xlsx,.xls">
+                            </div>
+                            <div class="form-group">
+                                <label>上传留样照片（可选）</label>
+                                <input type="file" id="sample-photos" multiple accept="image/*">
+                            </div>
+                            <button onclick="importSamples()" class="btn btn-primary">导入留样记录</button>
+                        </div>
+
+                        <div id="import-preview" class="import-preview" style="display:none;">
+                            <h4>数据预览</h4>
+                            <div class="preview-table-container">
+                                <table id="preview-table">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <p id="preview-count">共 0 条数据</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="review-tab" class="tab-content">
+                <div class="review-controls">
+                    <div class="form-group">
+                        <label>筛选摊位</label>
+                        <select id="review-stall-filter">
+                            <option value="">全部摊位</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>筛选状态</label>
+                        <select id="review-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="pending">待复核</option>
+                            <option value="passed">已通过</option>
+                            <option value="failed">不通过</option>
+                        </select>
+                    </div>
+                    <button onclick="loadReviews()" class="btn btn-secondary">筛选</button>
+                </div>
+
+                <div id="reviews-container">
+                    <p class="empty-text">暂无复核数据</p>
+                </div>
+            </div>
+
+            <div id="risks-tab" class="tab-content">
+                <div class="risk-controls">
+                    <div class="form-group">
+                        <label>风险等级</label>
+                        <select id="risk-level-filter">
+                            <option value="">全部等级</option>
+                            <option value="critical">🔴 严重</option>
+                            <option value="high">🟠 高</option>
+                            <option value="medium">🟡 中</option>
+                            <option value="low">🟢 低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>处理状态</label>
+                        <select id="risk-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="open">待处理</option>
+                            <option value="processing">处理中</option>
+                            <option value="resolved">已解决</option>
+                            <option value="dismissed">已忽略</option>
+                        </select>
+                    </div>
+                    <button onclick="loadRisks()" class="btn btn-secondary">筛选</button>
+                </div>
+
+                <div id="risks-container">
+                    <p class="empty-text">暂无风险记录</p>
+                </div>
+            </div>
+
+            <div id="export-tab" class="tab-content">
+                <div class="card">
+                    <h3>📤 导出报表</h3>
+                    <div class="export-options">
+                        <div class="export-section">
+                            <h4>📋 食安交接单 (Markdown)</h4>
+                            <p>生成标准化的食品安全交接单，包含当日所有菜品、复核结果和风险项</p>
+                            <button onclick="exportMarkdown()" class="btn btn-primary">生成并下载</button>
+                            <div id="markdown-preview" class="export-preview" style="display:none;">
+                                <h5>预览</h5>
+                                <pre><code id="markdown-content"></code></pre>
+                            </div>
+                        </div>
+
+                        <div class="export-section">
+                            <h4>📊 风险清单 (CSV)</h4>
+                            <p>导出当前所有风险项的详细清单，便于后续跟进和统计</p>
+                            <button onclick="exportCSV()" class="btn btn-primary">生成并下载</button>
+                        </div>
+
+                        <div class="export-section">
+                            <h4>💾 审计包 (JSON)</h4>
+                            <p>导出当日完整数据，包含菜单、批次、温度、留样、复核和风险记录，用于审计归档</p>
+                            <button onclick="exportJSON()" class="btn btn-primary">生成并下载</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-tab" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>🏪 摊位管理</h3>
+                        <div class="form-group">
+                            <label>摊位名称</label>
+                            <input type="text" id="stall-name" placeholder="输入摊位名称">
+                        </div>
+                        <div class="form-group">
+                            <label>联系人</label>
+                            <input type="text" id="stall-contact" placeholder="输入联系人">
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话</label>
+                            <input type="text" id="stall-phone" placeholder="输入联系电话">
+                        </div>
+                        <button onclick="addStall()" class="btn btn-primary">添加摊位</button>
+                        
+                        <div class="list-container" id="stalls-manage-list">
+                            <h4>已添加的摊位</h4>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>🍽️ 菜品管理</h3>
+                        <div class="form-group">
+                            <label>所属摊位</label>
+                            <select id="dish-stall">
+                                <option value="">请选择摊位</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>菜品名称</label>
+                            <input type="text" id="dish-name" placeholder="输入菜品名称">
+                        </div>
+                        <div class="form-group">
+                            <label>过敏源（可多选）</label>
+                            <div id="allergen-checkboxes" class="checkbox-group">
+                            </div>
+                        </div>
+                        <button onclick="addDish()" class="btn btn-primary">添加菜品</button>
+                        
+                        <div class="list-container" id="dishes-manage-list">
+                            <h4>已添加的菜品</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📋 标准过敏源列表</h3>
+                    <p class="help-text">系统使用国家标准的过敏源分类，请确保标注时使用以下术语：</p>
+                    <div id="standard-allergens" class="allergens-list">
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>社区共享厨房食品安全管理系统 v1.0</p>
+        </footer>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">详情</h3>
+                <button onclick="closeModal()" class="btn btn-secondary">✕</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+            </div>
+            <div id="modal-footer" class="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" style="display:none;">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>

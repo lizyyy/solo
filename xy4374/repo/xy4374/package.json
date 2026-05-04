@@ -1,0 +1,29 @@
+{
+  "name": "food-safety-manager",
+  "version": "1.0.0",
+  "description": "社区共享厨房食品安全管理工具",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "food-safety",
+    "kitchen-management",
+    "community-kitchen"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.10",
+    "xlsx": "^0.18.5",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
