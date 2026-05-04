@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+</head>
+<body>
+    <h1>User Profile</h1>
+    
+    <div class="profile">
+        {{ user.name }}
+        {{ user.bio }}
+    </div>
+
+    <div class="content">
+        {{ sanitized_content }}
+    </div>
+
+    <form method="POST">
+        {{ csrf_token() | raw }}
+        <input type="text" name="name" value="{{ old('name') | e }}">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

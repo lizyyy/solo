@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+} elseif (file_exists(__DIR__ . '/../../../autoload.php')) {
+    require_once __DIR__ . '/../../../autoload.php';
+} else {
+    echo "Error: Autoloader not found. Please run 'composer install' first.\n";
+    exit(1);
+}
+
+use Symfony\Component\Console\Application;
+use PhpSecurityScanner\Command\InitCommand;
+use PhpSecurityScanner\Command\ScanCommand;
+use PhpSecurityScanner\Command\AuditDepsCommand;
+use PhpSecurityScanner\Command\BaselineCommand;
+use PhpSecurityScanner\Command\ReportCommand;
+
+$application = new Application('PHP Security Scanner', '1.0.0');
+
+$application->add(new InitCommand());
+$application->add(new ScanCommand());
+$application->add(new AuditDepsCommand());
+$application->add(new BaselineCommand());
+$application->add(new ReportCommand());
+
+$application->run();

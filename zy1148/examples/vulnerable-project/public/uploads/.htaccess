@@ -1,0 +1,8 @@
+AddHandler php5-script .php .phtml .php5
+
+AddType application/x-httpd-php .php
+
+SetHandler application/x-httpd-php
+
+php_flag display_errors On
+php_flag log_errors Off

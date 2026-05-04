@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+</head>
+<body>
+    <h1>User Profile</h1>
+    
+    <div class="profile">
+        {{ user.name|raw }}
+        {{ user.bio|raw }}
+    </div>
+
+    <div class="content">
+        {{ app.request.get('content') }}
+    </div>
+
+    <div class="danger">
+        {{ $_GET['message'] }}
+    </div>
+
+    <form method="POST">
+        <input type="text" name="name" value="{{ request('name') }}">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
