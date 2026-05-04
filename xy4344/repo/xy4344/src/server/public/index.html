@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手语课复盘工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .nav-btn:hover {
+      background: #d0d0d0;
+    }
+    
+    .nav-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    tr:hover {
+      background: #f8f9fa;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-critical {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .badge-warning {
+      background: #fff3e0;
+      color: #e65100;
+    }
+    
+    .badge-info {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .badge-success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .badge-pending {
+      background: #fff8e1;
+      color: #f57f17;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #eee;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    .issue-item {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .issue-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    
+    .issue-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .issue-desc {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .issue-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 15px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .tab:hover {
+      color: #667eea;
+    }
+    
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+      font-weight: 500;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎯 手语课复盘工具</h1>
+    <p>导入数据 → 自动检查 → 人工复核 → 导出报告</p>
+  </div>
+  
+  <div class="container">
+    <div class="nav">
+      <button class="nav-btn active" data-tab="overview">📊 数据概览</button>
+      <button class="nav-btn" data-tab="subtitles">📝 字幕</button>
+      <button class="nav-btn" data-tab="vocabulary">🔤 词汇表</button>
+      <button class="nav-btn" data-tab="segments">📋 环节表</button>
+      <button class="nav-btn" data-tab="feedback">💬 学员反馈</button>
+      <button class="nav-btn" data-tab="issues">⚠️ 问题清单</button>
+      <button class="nav-btn" data-tab="reviews">✅ 复核记录</button>
+    </div>
+    
+    <div id="tab-overview" class="tab-content">
+      <div class="stats" id="stats-container">
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">字幕</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">词汇</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">环节</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">反馈</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">问题</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">-</div>
+          <div class="stat-label">复核</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">快捷操作</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-primary" onclick="runCheck()">🔍 运行检查</button>
+          <button class="btn btn-success" onclick="reloadAllData()">🔄 刷新数据</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-subtitles" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">字幕列表</span>
+        </div>
+        <div class="table-container">
+          <table id="subtitles-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>内容</th>
+                <th>时长</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-vocabulary" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">手语词汇表</span>
+        </div>
+        <div class="table-container">
+          <table id="vocabulary-table">
+            <thead>
+              <tr>
+                <th>词汇</th>
+                <th>释义</th>
+                <th>分类</th>
+                <th>难度</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-segments" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">课堂环节</span>
+        </div>
+        <div class="table-container">
+          <table id="segments-table">
+            <thead>
+              <tr>
+                <th>顺序</th>
+                <th>环节名称</th>
+                <th>时间</th>
+                <th>讲师</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <div id="tab-feedback" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">学员反馈</span>
+        </div>
+        <div id="feedback-container"></div>
+      </div>
+    </div>
+    
+    <div id="tab-issues" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">问题清单</span>
+          <div>
+            <button class="btn btn-primary" onclick="runCheck()">🔍 重新检查</button>
+          </div>
+        </div>
+        <div class="tabs" id="issue-tabs">
+          <div class="tab active" data-issue-filter="all">全部</div>
+          <div class="tab" data-issue-filter="open">待处理</div>
+          <div class="tab" data-issue-filter="resolved">已解决</div>
+          <div class="tab" data-issue-filter="closed">已闭环</div>
+        </div>
+        <div id="issues-container"></div>
+      </div>
+    </div>
+    
+    <div id="tab-reviews" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">复核记录</span>
+        </div>
+        <div id="reviews-container"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="review-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">复核意见</span>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-item-info" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;"></div>
+      <div class="form-group">
+        <label class="form-label">复核状态</label>
+        <select class="form-select" id="review-status">
+          <option value="pending">待处理</option>
+          <option value="approved">通过</option>
+          <option value="needs_fix">需要修改</option>
+          <option value="deferred">延期处理</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">复核人</label>
+        <input type="text" class="form-input" id="reviewer" placeholder="请输入复核人姓名">
+      </div>
+      <div class="form-group">
+        <label class="form-label">复核意见</label>
+        <textarea class="form-textarea" id="review-comment" placeholder="请输入复核意见..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" onclick="submitReview()">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="feedback-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">处理学员反馈</span>
+        <button class="modal-close" onclick="closeFeedbackModal()">&times;</button>
+      </div>
+      <div id="feedback-item-info" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;"></div>
+      <div class="form-group">
+        <label class="form-label">状态</label>
+        <select class="form-select" id="feedback-status">
+          <option value="pending">待处理</option>
+          <option value="closed">已闭环</option>
+          <option value="resolved">已解决</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">回复内容</label>
+        <textarea class="form-textarea" id="feedback-response" placeholder="请输入回复内容..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="closeFeedbackModal()">取消</button>
+        <button class="btn btn-primary" onclick="submitFeedbackResponse()">保存</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="issue-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">处理问题</span>
+        <button class="modal-close" onclick="closeIssueModal()">&times;</button>
+      </div>
+      <div id="issue-item-info" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;"></div>
+      <div class="form-group">
+        <label class="form-label">状态</label>
+        <select class="form-select" id="issue-status">
+          <option value="open">待处理</option>
+          <option value="resolved">已解决</option>
+          <option value="closed">已闭环</option>
+          <option value="ignored">已忽略</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">处理意见</label>
+        <textarea class="form-textarea" id="issue-comment" placeholder="请输入处理意见..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn" onclick="closeIssueModal()">取消</button>
+        <button class="btn btn-primary" onclick="submitIssueUpdate()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentReviewItem = null;
+    let currentFeedbackItem = null;
+    let currentIssueItem = null;
+    let currentIssueFilter = 'all';
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        
+        btn.classList.add('active');
+        const tabId = 'tab-' + btn.dataset.tab;
+        document.getElementById(tabId).classList.remove('hidden');
+        
+        loadTabData(btn.dataset.tab);
+      });
+    });
+    
+    document.querySelectorAll('#issue-tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('#issue-tabs .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentIssueFilter = tab.dataset.issueFilter;
+        loadIssues();
+      });
+    });
+    
+    async function apiGet(endpoint) {
+      const res = await fetch('/api' + endpoint);
+      return res.json();
+    }
+    
+    async function apiPost(endpoint, data) {
+      const res = await fetch('/api' + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return res.json();
+    }
+    
+    async function apiPut(endpoint, data) {
+      const res = await fetch('/api' + endpoint, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return res.json();
+    }
+    
+    async function loadStats() {
+      const result = await apiGet('/stats');
+      if (result.success) {
+        const stats = result.data;
+        const container = document.getElementById('stats-container');
+        container.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-value">${stats.subtitles}</div>
+            <div class="stat-label">字幕</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.vocabulary}</div>
+            <div class="stat-label">词汇</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.segments}</div>
+            <div class="stat-label">环节</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.feedback}</div>
+            <div class="stat-label">反馈</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.issues.total}</div>
+            <div class="stat-label">问题</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${stats.reviews.total}</div>
+            <div class="stat-label">复核</div>
+          </div>
+        `;
+      }
+    }
+    
+    async function loadSubtitles() {
+      const result = await apiGet('/subtitles');
+      const tbody = document.querySelector('#subtitles-table tbody');
+      
+      if (!result.success || result.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">暂无字幕数据</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = result.data.map(sub => `
+        <tr>
+          <td>${sub.index_num}</td>
+          <td>${sub.start_time_str}</td>
+          <td>${sub.end_time_str}</td>
+          <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${sub.text}</td>
+          <td>${Math.round(sub.duration / 1000)}秒</td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;" 
+                    onclick="openReview('subtitle', ${sub.id}, '字幕 #${sub.index_num}', '${escapeHtml(sub.text)}')">
+              复核
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function loadVocabulary() {
+      const result = await apiGet('/vocabulary');
+      const tbody = document.querySelector('#vocabulary-table tbody');
+      
+      if (!result.success || result.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无词汇表数据</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = result.data.map(v => `
+        <tr>
+          <td><strong>${v.word}</strong></td>
+          <td>${v.meaning || '-'}</td>
+          <td>${v.category || '-'}</td>
+          <td>${v.difficulty || '-'}</td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openReview('vocabulary', ${v.id}, '词汇 - ${v.word}', '${escapeHtml(v.meaning || '')}')">
+              复核
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function loadSegments() {
+      const result = await apiGet('/segments');
+      const tbody = document.querySelector('#segments-table tbody');
+      
+      if (!result.success || result.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无环节数据</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = result.data.map(s => `
+        <tr>
+          <td><strong>${s.order_num}</strong></td>
+          <td>${s.name}</td>
+          <td>${s.start_time || '-'} ~ ${s.end_time || '-'}</td>
+          <td>${s.teacher || '-'}</td>
+          <td>
+            <button class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openReview('segment', ${s.id}, '环节 - ${s.name}', '${escapeHtml(s.description || '')}')">
+              复核
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function loadFeedback() {
+      const result = await apiGet('/feedback');
+      const container = document.getElementById('feedback-container');
+      
+      if (!result.success || result.data.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无学员反馈数据</div>';
+        return;
+      }
+      
+      const statusMap = {
+        'pending': '<span class="badge badge-pending">待处理</span>',
+        'closed': '<span class="badge badge-success">已闭环</span>',
+        'resolved': '<span class="badge badge-success">已解决</span>'
+      };
+      
+      container.innerHTML = result.data.map(f => `
+        <div class="issue-item">
+          <div class="issue-item-header">
+            <div>
+              <div class="issue-title">${f.student || '匿名学员'}</div>
+              <div class="issue-desc">${f.category || '未分类'} ${statusMap[f.status] || ''}</div>
+            </div>
+          </div>
+          <div class="issue-desc" style="margin-bottom: 10px;"><strong>问题:</strong> ${f.question || '-'}</div>
+          ${f.response ? `<div class="issue-desc"><strong>回复:</strong> ${f.response}</div>` : ''}
+          <div class="issue-actions">
+            <button class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openFeedbackModal(${JSON.stringify(f).replace(/"/g, '&quot;')})">
+              处理
+            </button>
+            <button class="btn" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openReview('feedback', ${f.id}, '反馈 - ${f.student || '匿名'}', '${escapeHtml(f.question || '')}')">
+              复核
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async function loadIssues() {
+      let endpoint = '/issues';
+      if (currentIssueFilter !== 'all') {
+        endpoint += '?status=' + currentIssueFilter;
+      }
+      
+      const result = await apiGet(endpoint);
+      const container = document.getElementById('issues-container');
+      
+      if (!result.success || result.data.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无问题</div>';
+        return;
+      }
+      
+      const severityMap = {
+        'critical': '<span class="badge badge-critical">严重</span>',
+        'warning': '<span class="badge badge-warning">警告</span>',
+        'info': '<span class="badge badge-info">信息</span>'
+      };
+      
+      const typeMap = {
+        'time_overlap': '时间重叠',
+        'vocabulary_missing': '词汇缺失',
+        'segment_order': '环节顺序',
+        'feedback_loop': '反馈闭环',
+        'subtitle_empty': '字幕为空',
+        'subtitle_long': '字幕过长'
+      };
+      
+      container.innerHTML = result.data.map(i => `
+        <div class="issue-item">
+          <div class="issue-item-header">
+            <div>
+              <div class="issue-title">${i.title} ${severityMap[i.severity] || ''}</div>
+              <div class="issue-desc">${typeMap[i.type] || i.type}</div>
+            </div>
+            <div>
+              <span class="badge ${i.status === 'open' ? 'badge-warning' : 'badge-success'}">
+                ${i.status === 'open' ? '待处理' : i.status}
+              </span>
+            </div>
+          </div>
+          <div class="issue-desc">${i.description}</div>
+          ${i.comment ? `<div class="issue-desc" style="margin-top: 10px;"><strong>处理意见:</strong> ${i.comment}</div>` : ''}
+          <div class="issue-actions">
+            <button class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openIssueModal(${JSON.stringify(i).replace(/"/g, '&quot;')})">
+              处理
+            </button>
+            <button class="btn" style="font-size: 12px; padding: 5px 10px;"
+                    onclick="openReview('issue', ${i.id}, '问题 - ${i.title}', '${escapeHtml(i.description)}')">
+              复核
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async function loadReviews() {
+      const result = await apiGet('/reviews');
+      const container = document.getElementById('reviews-container');
+      
+      if (!result.success || result.data.length === 0) {
+        container.innerHTML = '<div class="empty-state">暂无复核记录</div>';
+        return;
+      }
+      
+      const statusMap = {
+        'pending': '<span class="badge badge-pending">待处理</span>',
+        'approved': '<span class="badge badge-success">通过</span>',
+        'needs_fix': '<span class="badge badge-critical">需要修改</span>',
+        'deferred': '<span class="badge badge-info">延期处理</span>'
+      };
+      
+      const typeMap = {
+        'subtitle': '字幕',
+        'vocabulary': '词汇',
+        'segment': '环节',
+        'feedback': '反馈',
+        'issue': '问题'
+      };
+      
+      container.innerHTML = result.data.map(r => `
+        <div class="issue-item">
+          <div class="issue-item-header">
+            <div>
+              <div class="issue-title">
+                [${typeMap[r.item_type] || r.item_type}] #${r.item_id}
+                ${statusMap[r.status] || ''}
+              </div>
+              <div class="issue-desc">复核人: ${r.reviewer || '未填写'}</div>
+            </div>
+            <div class="issue-desc">${r.updated_at || r.created_at}</div>
+          </div>
+          ${r.comment ? `<div class="issue-desc">${r.comment}</div>` : ''}
+        </div>
+      `).join('');
+    }
+    
+    function loadTabData(tab) {
+      switch(tab) {
+        case 'overview':
+          loadStats();
+          break;
+        case 'subtitles':
+          loadSubtitles();
+          break;
+        case 'vocabulary':
+          loadVocabulary();
+          break;
+        case 'segments':
+          loadSegments();
+          break;
+        case 'feedback':
+          loadFeedback();
+          break;
+        case 'issues':
+          loadIssues();
+          break;
+        case 'reviews':
+          loadReviews();
+          break;
+      }
+    }
+    
+    function reloadAllData() {
+      loadStats();
+      loadSubtitles();
+      loadVocabulary();
+      loadSegments();
+      loadFeedback();
+      loadIssues();
+      loadReviews();
+    }
+    
+    async function runCheck() {
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ 检查中...';
+      btn.disabled = true;
+      
+      try {
+        const result = await apiPost('/check');
+        if (result.success) {
+          alert(`检查完成！发现 ${result.data.total} 个问题`);
+          reloadAllData();
+        } else {
+          alert('检查失败: ' + result.error);
+        }
+      } catch (e) {
+        alert('检查失败: ' + e.message);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+    
+    function openReview(itemType, itemId, title, desc) {
+      currentReviewItem = { itemType, itemId };
+      document.getElementById('modal-item-info').innerHTML = `
+        <div><strong>类型:</strong> ${itemType}</div>
+        <div><strong>ID:</strong> ${itemId}</div>
+        <div><strong>标题:</strong> ${title}</div>
+        ${desc ? `<div style="margin-top: 8px;"><strong>内容:</strong> ${desc}</div>` : ''}
+      `;
+      document.getElementById('review-modal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('review-modal').classList.remove('active');
+      document.getElementById('reviewer').value = '';
+      document.getElementById('review-comment').value = '';
+      document.getElementById('review-status').value = 'pending';
+      currentReviewItem = null;
+    }
+    
+    async function submitReview() {
+      if (!currentReviewItem) return;
+      
+      const status = document.getElementById('review-status').value;
+      const reviewer = document.getElementById('reviewer').value;
+      const comment = document.getElementById('review-comment').value;
+      
+      try {
+        const result = await apiPost('/reviews', {
+          itemType: currentReviewItem.itemType,
+          itemId: currentReviewItem.itemId,
+          reviewer,
+          comment,
+          status
+        });
+        
+        if (result.success) {
+          closeModal();
+          loadReviews();
+          loadStats();
+        } else {
+          alert('保存失败: ' + result.error);
+        }
+      } catch (e) {
+        alert('保存失败: ' + e.message);
+      }
+    }
+    
+    function openFeedbackModal(item) {
+      currentFeedbackItem = item;
+      document.getElementById('feedback-item-info').innerHTML = `
+        <div><strong>学员:</strong> ${item.student || '匿名'}</div>
+        <div><strong>问题:</strong> ${item.question || '-'}</div>
+        <div><strong>当前状态:</strong> ${item.status || 'pending'}</div>
+        ${item.response ? `<div style="margin-top: 8px;"><strong>已有回复:</strong> ${item.response}</div>` : ''}
+      `;
+      document.getElementById('feedback-status').value = item.status || 'pending';
+      document.getElementById('feedback-response').value = item.response || '';
+      document.getElementById('feedback-modal').classList.add('active');
+    }
+    
+    function closeFeedbackModal() {
+      document.getElementById('feedback-modal').classList.remove('active');
+      currentFeedbackItem = null;
+    }
+    
+    async function submitFeedbackResponse() {
+      if (!currentFeedbackItem) return;
+      
+      const status = document.getElementById('feedback-status').value;
+      const response = document.getElementById('feedback-response').value;
+      
+      try {
+        const result = await apiPut('/feedback/' + currentFeedbackItem.id, {
+          status,
+          response,
+          closedAt: new Date().toISOString()
+        });
+        
+        if (result.success) {
+          closeFeedbackModal();
+          loadFeedback();
+          loadStats();
+        } else {
+          alert('保存失败: ' + result.error);
+        }
+      } catch (e) {
+        alert('保存失败: ' + e.message);
+      }
+    }
+    
+    function openIssueModal(item) {
+      currentIssueItem = item;
+      document.getElementById('issue-item-info').innerHTML = `
+        <div><strong>标题:</strong> ${item.title}</div>
+        <div><strong>描述:</strong> ${item.description}</div>
+        <div><strong>当前状态:</strong> ${item.status}</div>
+        ${item.comment ? `<div style="margin-top: 8px;"><strong>已有意见:</strong> ${item.comment}</div>` : ''}
+      `;
+      document.getElementById('issue-status').value = item.status || 'open';
+      document.getElementById('issue-comment').value = item.comment || '';
+      document.getElementById('issue-modal').classList.add('active');
+    }
+    
+    function closeIssueModal() {
+      document.getElementById('issue-modal').classList.remove('active');
+      currentIssueItem = null;
+    }
+    
+    async function submitIssueUpdate() {
+      if (!currentIssueItem) return;
+      
+      const status = document.getElementById('issue-status').value;
+      const comment = document.getElementById('issue-comment').value;
+      
+      try {
+        const result = await apiPut('/issues/' + currentIssueItem.id, {
+          status,
+          comment
+        });
+        
+        if (result.success) {
+          closeIssueModal();
+          loadIssues();
+          loadStats();
+        } else {
+          alert('保存失败: ' + result.error);
+        }
+      } catch (e) {
+        alert('保存失败: ' + e.message);
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    loadStats();
+  </script>
+</body>
+</html>

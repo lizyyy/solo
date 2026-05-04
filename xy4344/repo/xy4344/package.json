@@ -1,0 +1,33 @@
+{
+  "name": "sign-language-review-tool",
+  "version": "1.0.0",
+  "description": "公益手语课复盘视频检查工具 - 导入SRT字幕、词汇表、环节表和学员反馈，自动检查问题并提供Web界面复核",
+  "main": "src/cli.js",
+  "bin": {
+    "sl-review": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node src/cli.js --import examples && node src/cli.js --check && node src/cli.js --export all"
+  },
+  "keywords": [
+    "sign-language",
+    "subtitle",
+    "review",
+    "srt",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "open": "^9.1.0"
+  }
+}
