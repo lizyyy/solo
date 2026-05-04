@@ -1,0 +1,37 @@
+title: 有问题的发布计划
+description: 这个发布计划包含多个问题，用于测试
+date: 2024-06-15
+
+batches:
+  - name: batch-1
+    order: 1
+    services:
+      - order-service
+      - payment-service
+    delay_minutes: 30
+    pre_checks:
+      - health_check
+    canary: true
+    canary_percent: 150
+
+  - name: batch-2
+    order: 1
+    services:
+      - user-service
+    delay_minutes: 20
+    canary: false
+
+  - name: batch-3
+    order: -1
+    services:
+      - product-service
+      - order-service
+    delay_minutes: 30
+    canary: true
+    canary_percent: -10
+
+rollback_plan:
+  strategy: manual
+  max_retries: 2
+  checkpoints:
+    - after_batch_1

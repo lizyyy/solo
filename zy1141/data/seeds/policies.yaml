@@ -1,0 +1,80 @@
+policies:
+  - service_name: user-service
+    slo:
+      availability: 0.999
+      latency_p99_ms: 200
+      latency_p95_ms: 100
+      error_budget: 0.001
+    rate_limit:
+      max_requests: 10000
+      window_seconds: 60
+      burst: 5000
+    tags:
+      - core
+
+  - service_name: order-service
+    slo:
+      availability: 0.9995
+      latency_p99_ms: 500
+      latency_p95_ms: 200
+      error_budget: 0.0005
+    rate_limit:
+      max_requests: 5000
+      window_seconds: 60
+      burst: 2000
+    tags:
+      - core
+      - transaction
+
+  - service_name: product-service
+    slo:
+      availability: 0.999
+      latency_p99_ms: 300
+      latency_p95_ms: 150
+      error_budget: 0.001
+    rate_limit:
+      max_requests: 8000
+      window_seconds: 60
+      burst: 4000
+    tags:
+      - core
+
+  - service_name: payment-service
+    slo:
+      availability: 0.9999
+      latency_p99_ms: 1000
+      latency_p95_ms: 500
+      error_budget: 0.0001
+    rate_limit:
+      max_requests: 2000
+      window_seconds: 60
+      burst: 1000
+    tags:
+      - core
+      - transaction
+
+  - service_name: notification-service
+    slo:
+      availability: 0.995
+      latency_p99_ms: 1000
+      latency_p95_ms: 500
+      error_budget: 0.005
+    rate_limit:
+      max_requests: 3000
+      window_seconds: 60
+      burst: 1500
+    tags:
+      - support
+
+  - service_name: analytics-service
+    slo:
+      availability: 0.99
+      latency_p99_ms: 5000
+      latency_p95_ms: 2000
+      error_budget: 0.01
+    rate_limit:
+      max_requests: 1000
+      window_seconds: 60
+      burst: 500
+    tags:
+      - analytics

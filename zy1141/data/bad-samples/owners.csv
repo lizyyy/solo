@@ -1,0 +1,6 @@
+service_name,primary,secondary,team,slack_channel,email
+user-service,zhang_san,li_si,user-team,#team-user,user-team@example.com
+order-service,wang_wu,,order-team,#team-order,order-team@example.com
+product-service,,,product-team,#team-product,product-team@example.com
+payment-service,zhou_jiu,wu_shi,payment-team,,
+config-service,,,#team-config,

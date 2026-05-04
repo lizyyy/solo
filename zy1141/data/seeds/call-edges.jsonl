@@ -1,0 +1,11 @@
+{"source_service": "order-service", "target_service": "user-service", "method": "GET", "path": "/api/v1/users/{id}", "operation_id": "getUser", "protocol": "http", "tags": ["internal"]}
+{"source_service": "order-service", "target_service": "product-service", "method": "GET", "path": "/api/v1/products/{id}", "operation_id": "getProduct", "protocol": "http", "tags": ["internal"]}
+{"source_service": "order-service", "target_service": "product-service", "method": "PATCH", "path": "/api/v1/products/{id}/stock", "operation_id": "updateStock", "protocol": "http", "tags": ["internal", "transaction"]}
+{"source_service": "order-service", "target_service": "payment-service", "method": "POST", "path": "/api/v1/payments", "operation_id": "createPayment", "protocol": "http", "tags": ["internal", "transaction"]}
+{"source_service": "order-service", "target_service": "notification-service", "method": "POST", "path": "/api/v1/notifications/sms", "operation_id": "sendSMS", "protocol": "http", "tags": ["internal"]}
+{"source_service": "payment-service", "target_service": "order-service", "method": "POST", "path": "/api/v1/orders/{id}/pay", "operation_id": "payOrder", "protocol": "http", "tags": ["internal", "callback"]}
+{"source_service": "payment-service", "target_service": "notification-service", "method": "POST", "path": "/api/v1/notifications/sms", "operation_id": "sendSMS", "protocol": "http", "tags": ["internal"]}
+{"source_service": "analytics-service", "target_service": "order-service", "method": "GET", "path": "/api/v1/orders", "operation_id": "listOrders", "protocol": "http", "tags": ["internal", "analytics"]}
+{"source_service": "analytics-service", "target_service": "product-service", "method": "GET", "path": "/api/v1/products", "operation_id": "searchProducts", "protocol": "http", "tags": ["internal", "analytics"]}
+{"source_service": "user-service", "target_service": "notification-service", "method": "POST", "path": "/api/v1/notifications/sms", "operation_id": "sendSMS", "protocol": "http", "tags": ["internal"]}
+{"source_service": "user-service", "target_service": "notification-service", "method": "POST", "path": "/api/v1/notifications/email", "operation_id": "sendEmail", "protocol": "http", "tags": ["internal"]}

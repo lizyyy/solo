@@ -1,0 +1,76 @@
+title: v2.3.0 版本发布计划
+description: 2024年Q2版本发布，包含用户服务、订单服务、商品服务的更新
+date: 2024-06-15
+
+batches:
+  - name: batch-1
+    order: 1
+    services:
+      - payment-service
+    delay_minutes: 30
+    pre_checks:
+      - health_check
+      - database_migration
+    post_checks:
+      - smoke_test
+    canary: true
+    canary_percent: 10
+
+  - name: batch-2
+    order: 2
+    services:
+      - product-service
+    delay_minutes: 30
+    pre_checks:
+      - health_check
+    post_checks:
+      - smoke_test
+      - integration_test
+    canary: true
+    canary_percent: 20
+
+  - name: batch-3
+    order: 3
+    services:
+      - user-service
+    delay_minutes: 20
+    pre_checks:
+      - health_check
+      - cache_warmup
+    post_checks:
+      - smoke_test
+    canary: false
+
+  - name: batch-4
+    order: 4
+    services:
+      - order-service
+    delay_minutes: 30
+    pre_checks:
+      - health_check
+      - database_migration
+    post_checks:
+      - smoke_test
+      - end_to_end_test
+    canary: true
+    canary_percent: 30
+
+  - name: batch-5
+    order: 5
+    services:
+      - notification-service
+      - analytics-service
+    delay_minutes: 15
+    pre_checks:
+      - health_check
+    post_checks:
+      - smoke_test
+    canary: false
+
+rollback_plan:
+  strategy: automated
+  max_retries: 2
+  checkpoints:
+    - after_batch_1
+    - after_batch_3
+    - after_batch_5

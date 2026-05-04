@@ -1,0 +1,15 @@
+{"source_service": "order-service", "target_service": "user-service", "method": "GET", "path": "/api/v1/users/{id}", "operation_id": "getUser", "protocol": "http"}
+{"source_service": "order-service", "target_service": "product-service", "method": "GET", "path": "/api/v1/products/{id}", "operation_id": "getProduct", "protocol": "http"}
+{"source_service": "order-service", "target_service": "product-service", "method": "PATCH", "path": "/api/v1/products/{id}/stock", "operation_id": "updateStock", "protocol": "http"}
+{"source_service": "order-service", "target_service": "payment-service", "method": "POST", "path": "/api/v1/payments", "operation_id": "createPayment", "protocol": "http"}
+{"source_service": "order-service", "target_service": "notification-service", "method": "POST", "path": "/api/v1/notifications/sms", "operation_id": "sendSMS", "protocol": "http"}
+{"source_service": "payment-service", "target_service": "order-service", "method": "POST", "path": "/api/v1/orders/{id}/pay", "operation_id": "payOrder", "protocol": "http"}
+{"source_service": "user-service", "target_service": "order-service", "method": "GET", "path": "/api/v1/orders", "operation_id": "listOrders", "protocol": "http"}
+{"source_service": "order-service", "target_service": "config-service", "method": "GET", "path": "/api/v1/config/order.timeout", "operation_id": "getConfig", "protocol": "http"}
+{"source_service": "config-service", "target_service": "cache-service", "method": "GET", "path": "/api/v1/cache/config", "operation_id": "getCache", "protocol": "http"}
+{"source_service": "cache-service", "target_service": "order-service", "method": "GET", "path": "/api/v1/orders/stats", "operation_id": "getOrderStats", "protocol": "http"}
+{"source_service": "product-service", "target_service": "nonexistent-service", "method": "GET", "path": "/api/v1/nonexistent", "operation_id": "nonexistent", "protocol": "http"}
+{"source_service": "order-service", "target_service": "user-service", "method": "DELETE", "path": "/api/v1/users/{id}/admin", "operation_id": "adminDeleteUser", "protocol": "http"}
+{"source_service": "analytics-service", "target_service": "order-service", "method": "GET", "path": "/api/v1/orders", "operation_id": "listOrders", "protocol": "http"}
+{"source_service": "config-service", "target_service": "payment-service", "method": "GET", "path": "/api/v1/payments/config", "operation_id": "getPaymentConfig", "protocol": "http"}
+{"source_service": "payment-service", "target_service": "config-service", "method": "GET", "path": "/api/v1/config/payment.rules", "operation_id": "getConfig", "protocol": "http"}
