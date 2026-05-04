@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地铁站早高峰限流调度</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      overflow: hidden;
+    }
+    
+    #app {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      height: 60px;
+      background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 2px solid #0f3460;
+    }
+    
+    .game-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #e94560;
+      text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+    }
+    
+    .status-bar {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+    }
+    
+    .status-label {
+      font-size: 12px;
+      color: #888;
+    }
+    
+    .status-value {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .score { color: #4ade80; }
+    .time { color: #60a5fa; }
+    .passengers { color: #fbbf24; }
+    .risk { color: #f87171; }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #e94560;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #ff6b6b;
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: #0f3460;
+      color: white;
+      border: 1px solid #16213e;
+    }
+    
+    .btn-secondary:hover {
+      background: #16213e;
+    }
+    
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .game-canvas-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #0f0f23;
+    }
+    
+    #gameCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    .sidebar {
+      width: 320px;
+      background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+      border-left: 2px solid #0f3460;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .sidebar-section {
+      padding: 15px;
+      border-bottom: 1px solid #0f3460;
+    }
+    
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #e94560;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #0f3460;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .info-card {
+      background: rgba(15, 52, 96, 0.5);
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    
+    .info-card-label {
+      font-size: 11px;
+      color: #888;
+    }
+    
+    .info-card-value {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+    
+    .tool-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .tool-btn {
+      width: 60px;
+      height: 60px;
+      background: rgba(15, 52, 96, 0.8);
+      border: 2px solid #16213e;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      color: #aaa;
+    }
+    
+    .tool-btn:hover {
+      border-color: #e94560;
+      background: rgba(233, 69, 96, 0.2);
+      color: #e94560;
+    }
+    
+    .tool-btn.active {
+      border-color: #e94560;
+      background: rgba(233, 69, 96, 0.3);
+      color: #e94560;
+    }
+    
+    .tool-icon {
+      font-size: 20px;
+    }
+    
+    .tool-label {
+      font-size: 10px;
+      margin-top: 4px;
+    }
+    
+    .alert-panel {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 100px;
+    }
+    
+    .alert-item {
+      background: rgba(248, 113, 113, 0.1);
+      border-left: 3px solid #f87171;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 0 4px 4px 0;
+      font-size: 12px;
+    }
+    
+    .alert-item.warning {
+      background: rgba(251, 191, 36, 0.1);
+      border-left-color: #fbbf24;
+    }
+    
+    .alert-item.danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-left-color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .alert-time {
+      color: #888;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    
+    .alert-message {
+      color: #eee;
+    }
+    
+    .footer {
+      height: 50px;
+      background: #16213e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid #0f3460;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    .overlay.hidden {
+      display: none;
+    }
+    
+    .modal {
+      background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+      border: 2px solid #0f3460;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    .modal-title {
+      font-size: 28px;
+      color: #e94560;
+      margin-bottom: 20px;
+    }
+    
+    .modal-content {
+      color: #ccc;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    
+    .modal-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-item {
+      background: rgba(15, 52, 96, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #888;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="game-title">🚇 地铁站早高峰限流调度</div>
+      <div class="status-bar">
+        <div class="status-item">
+          <span class="status-label">得分</span>
+          <span class="status-value score" id="scoreDisplay">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">时间</span>
+          <span class="status-value time" id="timeDisplay">07:00</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">当前乘客</span>
+          <span class="status-value passengers" id="passengerDisplay">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">风险等级</span>
+          <span class="status-value risk" id="riskDisplay">正常</span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-primary" id="startBtn">开始游戏</button>
+        <button class="btn btn-secondary" id="pauseBtn" disabled>暂停</button>
+        <button class="btn btn-secondary" id="replayBtn" disabled>复盘导出</button>
+        <button class="btn btn-secondary" id="restartBtn" disabled>重新开始</button>
+      </div>
+    </div>
+    
+    <div class="main-container">
+      <div class="game-canvas-container">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="overlay hidden" id="startOverlay">
+          <div class="modal">
+            <div class="modal-title">🚇 地铁站早高峰限流调度</div>
+            <div class="modal-content">
+              <p>你是今天的值班站长，需要在早高峰期间管理地铁站的客流。</p>
+              <p><strong>操作说明：</strong></p>
+              <p>• 点击闸机：打开/关闭</p>
+              <p>• 点击扶梯：改变运行方向</p>
+              <p>• 点击临时围栏：放置/移除</p>
+              <p><strong>目标：</strong></p>
+              <p>• 确保乘客安全，避免踩踏事故</p>
+              <p>• 引导乘客高效换乘</p>
+              <p>• 注意：无障碍通道必须保持畅通！</p>
+            </div>
+            <button class="btn btn-primary" id="playBtn">开始游戏</button>
+          </div>
+        </div>
+        
+        <div class="overlay hidden" id="gameOverOverlay">
+          <div class="modal">
+            <div class="modal-title" id="gameOverTitle">游戏结束</div>
+            <div class="modal-stats">
+              <div class="stat-item">
+                <div class="stat-label">最终得分</div>
+                <div class="stat-value" id="finalScore" style="color: #4ade80;">0</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">疏散乘客</div>
+                <div class="stat-value" id="totalPassengers" style="color: #fbbf24;">0</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">最高风险</div>
+                <div class="stat-value" id="maxRisk" style="color: #f87171;">0</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-label">安全事件</div>
+                <div class="stat-value" id="incidents" style="color: #ef4444;">0</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="playAgainBtn">再来一局</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">⚡ 快速操作</div>
+          <div class="tool-panel">
+            <div class="tool-btn active" id="toolSelect">
+              <span class="tool-icon">👆</span>
+              <span class="tool-label">选择</span>
+            </div>
+            <div class="tool-btn" id="toolGate">
+              <span class="tool-icon">🚪</span>
+              <span class="tool-label">闸机</span>
+            </div>
+            <div class="tool-btn" id="toolEscalator">
+              <span class="tool-icon">⬆️</span>
+              <span class="tool-label">扶梯</span>
+            </div>
+            <div class="tool-btn" id="toolBarrier">
+              <span class="tool-icon">🚧</span>
+              <span class="tool-label">围栏</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sidebar-section">
+          <div class="sidebar-title">📊 区域状态</div>
+          <div class="info-grid" id="areaStatus">
+            <div class="info-card">
+              <div class="info-card-label">入口A</div>
+              <div class="info-card-value" style="color: #4ade80;">正常</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">入口B</div>
+              <div class="info-card-value" style="color: #4ade80;">正常</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">站厅</div>
+              <div class="info-card-value" style="color: #4ade80;">正常</div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-label">站台</div>
+              <div class="info-card-value" style="color: #4ade80;">正常</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sidebar-section alert-panel">
+          <div class="sidebar-title">⚠️ 风险预警</div>
+          <div id="alertList">
+            <div class="alert-item">
+              <div class="alert-time">系统</div>
+              <div class="alert-message">游戏已就绪，等待开始...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      🚇 地铁站早高峰限流调度模拟器 | 提示：注意无障碍通道必须保持畅通！
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
