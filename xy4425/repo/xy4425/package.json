@@ -1,0 +1,21 @@
+{
+  "name": "stone-factory-tool",
+  "version": "1.0.0",
+  "description": "小型石材加工厂本地全栈管理工具",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0"
+  },
+  "keywords": ["stone", "factory", "management", "sqlite"],
+  "author": "",
+  "license": "MIT"
+}
