@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>样本交接核对工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 24px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #FF9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 800px;
+        }
+        .form-section {
+            background: #f8f9fa;
+            padding: 24px;
+            border-right: 1px solid #e0e0e0;
+        }
+        .form-section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2196F3;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+        .form-group label .required {
+            color: #f44336;
+            margin-left: 2px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .form-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+        }
+        .import-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .import-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-label:hover {
+            border-color: #2196F3;
+            background: #f0f7ff;
+        }
+        .list-section {
+            padding: 24px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 12px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .tab:hover {
+            background: #e0e0e0;
+        }
+        .tab.active {
+            background: #1e3c72;
+            color: white;
+        }
+        .tab .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f44336;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .tab.active .badge {
+            background: #ff9800;
+        }
+        .list-container {
+            display: none;
+        }
+        .list-container.active {
+            display: block;
+        }
+        .card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .risk-normal {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .risk-medium {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        .risk-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        .status-pending {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .status-released {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-review {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .card-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .card-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .card-item-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .card-item-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        .issues-section {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        .issues-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .issues-section li {
+            font-size: 13px;
+            color: #e65100;
+            padding: 4px 0;
+        }
+        .issues-section li::before {
+            content: "⚠️ ";
+        }
+        .card-footer {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success {
+            background: #4CAF50;
+        }
+        .toast.error {
+            background: #f44336;
+        }
+        .toast.warning {
+            background: #ff9800;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .empty-state p {
+            font-size: 16px;
+        }
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 样本交接核对工具</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">🔄 刷新数据</button>
+                <button class="btn btn-warning" onclick="exportToday()">📊 导出今日报告</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2>📝 录入样本交接</h2>
+                <form id="transferForm">
+                    <div class="form-group">
+                        <label>批次编号<span class="required">*</span></label>
+                        <input type="text" id="batch_number" placeholder="例如: SAMPLE-2024001" required>
+                        <div class="hint">批次编号不能重复</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>交接人<span class="required">*</span></label>
+                        <input type="text" id="transfer_person" placeholder="请输入交接人姓名" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>冷链温度 (°C)<span class="required">*</span></label>
+                        <input type="number" id="temperature" step="0.1" placeholder="例如: 4.0" required>
+                        <div class="hint">正常范围: 2°C - 8°C</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>截止时间<span class="required">*</span></label>
+                        <input type="datetime-local" id="deadline" required>
+                        <div class="hint">距离截止时间不足24小时会触发超时风险</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="notes" rows="3" placeholder="其他说明信息..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">✅ 提交</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 重置</button>
+                    </div>
+                </form>
+                
+                <div class="import-section">
+                    <h3>📥 批量导入 (JSON)</h3>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="importFile" accept=".json" onchange="handleImport(event)">
+                        <label for="importFile" class="file-label">
+                            📁 点击选择JSON文件或拖拽到此处
+                        </label>
+                    </div>
+                    <div class="hint" style="margin-top: 8px;">
+                        JSON格式示例: 
+                        <pre style="background: #fff; padding: 8px; border-radius: 4px; margin-top: 4px; font-size: 11px; overflow-x: auto;">
+[
+  {
+    "batch_number": "SAMPLE-001",
+    "transfer_person": "张三",
+    "temperature": 4.5,
+    "deadline": "2024-12-31T18:00:00",
+    "notes": "备注信息"
+  }
+]
+                        </pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="list-section">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('pending')">
+                        待处理
+                        <span class="badge" id="pendingCount">0</span>
+                    </button>
+                    <button class="tab" onclick="switchTab('review')">
+                        需复核
+                        <span class="badge" id="reviewCount">0</span>
+                    </button>
+                    <button class="tab" onclick="switchTab('released')">
+                        已放行
+                        <span class="badge" id="releasedCount">0</span>
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 搜索批次编号或交接人..." oninput="filterList()">
+                </div>
+                
+                <div id="pendingList" class="list-container active"></div>
+                <div id="reviewList" class="list-container"></div>
+                <div id="releasedList" class="list-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>✏️ 编辑交接记录</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="edit_id">
+                <div class="form-group">
+                    <label>批次编号<span class="required">*</span></label>
+                    <input type="text" id="edit_batch_number" required>
+                </div>
+                <div class="form-group">
+                    <label>交接人<span class="required">*</span></label>
+                    <input type="text" id="edit_transfer_person" required>
+                </div>
+                <div class="form-group">
+                    <label>冷链温度 (°C)<span class="required">*</span></label>
+                    <input type="number" id="edit_temperature" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>截止时间<span class="required">*</span></label>
+                    <input type="datetime-local" id="edit_deadline" required>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="edit_notes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">💾 保存并重新计算风险</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let allTransfers = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            setupEventListeners();
+            setDefaultDeadline();
+        });
+        
+        function setDefaultDeadline() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(23, 59, 59);
+            
+            const deadlineInput = document.getElementById('deadline');
+            if (deadlineInput) {
+                deadlineInput.value = formatDateTimeLocal(tomorrow);
+            }
+        }
+        
+        function formatDateTimeLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('transferForm').addEventListener('submit', handleSubmit);
+            document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
+        }
+        
+        async function refreshData() {
+            try {
+                const response = await fetch(`${API_BASE}/transfers`);
+                allTransfers = await response.json();
+                updateLists();
+                updateCounts();
+            } catch (error) {
+                showToast('获取数据失败: ' + error.message, 'error');
+            }
+        }
+        
+        function updateCounts() {
+            const pending = allTransfers.filter(t => t.status === 'pending').length;
+            const review = allTransfers.filter(t => t.status === 'review').length;
+            const released = allTransfers.filter(t => t.status === 'released').length;
+            
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('reviewCount').textContent = review;
+            document.getElementById('releasedCount').textContent = released;
+        }
+        
+        function updateLists() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allTransfers.filter(t => 
+                t.batch_number.toLowerCase().includes(searchTerm) ||
+                t.transfer_person.toLowerCase().includes(searchTerm)
+            );
+            
+            renderList('pending', filtered.filter(t => t.status === 'pending'));
+            renderList('review', filtered.filter(t => t.status === 'review'));
+            renderList('released', filtered.filter(t => t.status === 'released'));
+        }
+        
+        function renderList(status, transfers) {
+            const container = document.getElementById(status + 'List');
+            
+            if (transfers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">${status === 'released' ? '✅' : status === 'review' ? '⚠️' : '📋'}</div>
+                        <p>暂无${status === 'pending' ? '待处理' : status === 'review' ? '需复核' : '已放行'}的记录</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = transfers.map(transfer => createCard(transfer)).join('');
+        }
+        
+        function createCard(transfer) {
+            const riskClass = `risk-${transfer.risk_level}`;
+            const riskText = transfer.risk_level === 'normal' ? '正常' : 
+                            transfer.risk_level === 'medium' ? '中等风险' : '高风险';
+            
+            const statusClass = `status-${transfer.status}`;
+            const statusText = transfer.status === 'pending' ? '待处理' :
+                               transfer.status === 'review' ? '需复核' : '已放行';
+            
+            const issuesHtml = transfer.issues && transfer.issues.length > 0 ? `
+                <div class="issues-section">
+                    <ul>
+                        ${transfer.issues.map(issue => `<li>${issue}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : '';
+            
+            const actionButtons = transfer.status !== 'released' ? `
+                <button class="btn btn-small btn-primary" onclick="releaseTransfer(${transfer.id})">✅ 放行</button>
+                <button class="btn btn-small btn-warning" onclick="openEditModal(${transfer.id})">✏️ 编辑</button>
+                <button class="btn btn-small btn-danger" onclick="deleteTransfer(${transfer.id})">🗑️ 删除</button>
+            ` : `
+                <button class="btn btn-small btn-danger" onclick="deleteTransfer(${transfer.id})">🗑️ 删除</button>
+            `;
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <span class="card-title">${transfer.batch_number}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <span class="risk-badge ${riskClass}">${riskText}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="card-item">
+                            <span class="card-item-label">交接人</span>
+                            <span class="card-item-value">${transfer.transfer_person}</span>
+                        </div>
+                        <div class="card-item">
+                            <span class="card-item-label">冷链温度</span>
+                            <span class="card-item-value">${transfer.temperature}°C</span>
+                        </div>
+                        <div class="card-item">
+                            <span class="card-item-label">截止时间</span>
+                            <span class="card-item-value">${formatDateTime(transfer.deadline)}</span>
+                        </div>
+                        <div class="card-item">
+                            <span class="card-item-label">创建时间</span>
+                            <span class="card-item-value">${formatDateTime(transfer.created_at)}</span>
+                        </div>
+                    </div>
+                    
+                    ${issuesHtml}
+                    
+                    ${transfer.notes ? `
+                        <div class="card-item">
+                            <span class="card-item-label">备注</span>
+                            <span class="card-item-value">${transfer.notes}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="card-footer">
+                        ${actionButtons}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function formatDateTime(isoString) {
+            if (!isoString) return '-';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const data = {
+                batch_number: document.getElementById('batch_number').value.trim(),
+                transfer_person: document.getElementById('transfer_person').value.trim(),
+                temperature: parseFloat(document.getElementById('temperature').value),
+                deadline: document.getElementById('deadline').value,
+                notes: document.getElementById('notes').value.trim()
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/transfers`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(result.message, 'success');
+                    resetForm();
+                    refreshData();
+                    
+                    if (result.issues && result.issues.length > 0) {
+                        showToast('⚠️ 存在问题: ' + result.issues.join('; '), 'warning');
+                    }
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('提交失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function handleEditSubmit(e) {
+            e.preventDefault();
+            
+            const id = parseInt(document.getElementById('edit_id').value);
+            const data = {
+                batch_number: document.getElementById('edit_batch_number').value.trim(),
+                transfer_person: document.getElementById('edit_transfer_person').value.trim(),
+                temperature: parseFloat(document.getElementById('edit_temperature').value),
+                deadline: document.getElementById('edit_deadline').value,
+                notes: document.getElementById('edit_notes').value.trim(),
+                status: 'pending'
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/transfers/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast('更新成功，风险已重新计算', 'success');
+                    closeEditModal();
+                    refreshData();
+                    
+                    if (result.issues && result.issues.length > 0) {
+                        showToast('⚠️ 当前问题: ' + result.issues.join('; '), 'warning');
+                    }
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('更新失败: ' + error.message, 'error');
+            }
+        }
+        
+        function openEditModal(id) {
+            const transfer = allTransfers.find(t => t.id === id);
+            if (!transfer) return;
+            
+            document.getElementById('edit_id').value = transfer.id;
+            document.getElementById('edit_batch_number').value = transfer.batch_number;
+            document.getElementById('edit_transfer_person').value = transfer.transfer_person;
+            document.getElementById('edit_temperature').value = transfer.temperature;
+            document.getElementById('edit_deadline').value = transfer.deadline.replace(':00Z', '').replace('.000Z', '');
+            document.getElementById('edit_notes').value = transfer.notes || '';
+            
+            document.getElementById('editModal').classList.add('active');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+        
+        async function releaseTransfer(id) {
+            if (!confirm('确定要放行这个样本吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/transfers/${id}/release`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(result.message, 'success');
+                    refreshData();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('放行失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function deleteTransfer(id) {
+            if (!confirm('确定要删除这个记录吗？此操作不可恢复。')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/transfers/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(result.message, 'success');
+                    refreshData();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('删除失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function handleImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_BASE}/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showToast(result.message, 'success');
+                    refreshData();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            } catch (error) {
+                showToast('导入失败: ' + error.message, 'error');
+            }
+            
+            e.target.value = '';
+        }
+        
+        async function exportToday() {
+            try {
+                window.location.href = `${API_BASE}/export/today`;
+                showToast('正在导出报告...', 'success');
+            } catch (error) {
+                showToast('导出失败: ' + error.message, 'error');
+            }
+        }
+        
+        function resetForm() {
+            document.getElementById('transferForm').reset();
+            setDefaultDeadline();
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.list-container').forEach(list => list.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'List').classList.add('active');
+        }
+        
+        function filterList() {
+            updateLists();
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>
