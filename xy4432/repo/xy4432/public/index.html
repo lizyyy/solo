@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>攀岩馆路线复盘工具</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>🧗 攀岩馆路线复盘工具</h1>
+      <div class="header-actions">
+        <button id="btnAnalyze" class="btn btn-primary">
+          <span>🔍</span> 风险分析
+        </button>
+        <button id="btnExportMarkdown" class="btn btn-secondary">
+          <span>📄</span> 导出报告
+        </button>
+        <button id="btnExportJson" class="btn btn-secondary">
+          <span>📋</span> 导出JSON
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar left-sidebar">
+        <div class="sidebar-section">
+          <h3>墙面管理</h3>
+          <div class="wall-list" id="wallList">
+            <div class="empty-state">暂无墙面</div>
+          </div>
+          <button id="btnAddWall" class="btn btn-outline btn-full">+ 添加墙面</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>数据导入</h3>
+          <div class="import-buttons">
+            <button id="btnImportHolds" class="btn btn-outline btn-full">导入岩点数据</button>
+            <button id="btnImportHeatmap" class="btn btn-outline btn-full">导入热区数据</button>
+            <button id="btnImportFeedback" class="btn btn-outline btn-full">导入会员反馈</button>
+          </div>
+          <input type="file" id="fileInput" accept=".json" style="display: none;">
+        </div>
+
+        <div class="sidebar-section">
+          <h3>路线管理</h3>
+          <div class="route-list" id="routeList">
+            <div class="empty-state">暂无路线</div>
+          </div>
+          <button id="btnAddRoute" class="btn btn-outline btn-full">+ 创建路线</button>
+        </div>
+      </aside>
+
+      <main class="canvas-container">
+        <canvas id="threeCanvas"></canvas>
+        <div class="canvas-overlay">
+          <div class="tool-bar">
+            <button id="toolSelect" class="tool-btn active" data-tool="select" title="选择">
+              <span>🖱️</span>
+            </button>
+            <button id="toolAddHold" class="tool-btn" data-tool="addHold" title="添加岩点">
+              <span>➕</span>
+            </button>
+            <button id="toolCreateRoute" class="tool-btn" data-tool="createRoute" title="创建路线">
+              <span>🧭</span>
+            </button>
+          </div>
+          <div class="info-panel" id="infoPanel">
+            <h4>选中信息</h4>
+            <div id="selectedInfo">点击岩点或路线查看详情</div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar right-sidebar">
+        <div class="sidebar-section risk-section">
+          <h3>风险分析结果</h3>
+          <div class="risk-summary" id="riskSummary">
+            <div class="risk-stats">
+              <div class="stat-item high">
+                <span class="stat-value" id="highRiskCount">0</span>
+                <span class="stat-label">高风险</span>
+              </div>
+              <div class="stat-item medium">
+                <span class="stat-value" id="mediumRiskCount">0</span>
+                <span class="stat-label">中风险</span>
+              </div>
+              <div class="stat-item low">
+                <span class="stat-value" id="lowRiskCount">0</span>
+                <span class="stat-label">低风险</span>
+              </div>
+            </div>
+          </div>
+          <div class="risk-list" id="riskList">
+            <div class="empty-state">请先执行风险分析</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>编辑面板</h3>
+          <div id="editPanel">
+            <div class="empty-state">选择岩点或路线进行编辑</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>复核备注</h3>
+          <textarea id="reviewNotes" placeholder="在此输入复核备注..."></textarea>
+          <button id="btnSaveNotes" class="btn btn-primary btn-full">保存备注</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay"></div>
+  
+  <div id="addWallModal" class="modal">
+    <div class="modal-header">
+      <h3>添加墙面</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>墙面名称</label>
+        <input type="text" id="wallName" placeholder="例如：主墙面A">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>宽度 (m)</label>
+          <input type="number" id="wallWidth" value="8" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>高度 (m)</label>
+          <input type="number" id="wallHeight" value="4" step="0.1">
+        </div>
+      </div>
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="isKidsArea">
+          儿童区域
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-action="cancel">取消</button>
+      <button class="btn btn-primary" data-action="saveWall">保存</button>
+    </div>
+  </div>
+
+  <div id="addRouteModal" class="modal">
+    <div class="modal-header">
+      <h3>创建路线</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>路线名称</label>
+        <input type="text" id="routeName" placeholder="例如：红色V2路线">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>难度等级</label>
+          <select id="routeDifficulty">
+            <option value="V0">V0</option>
+            <option value="V1">V1</option>
+            <option value="V2">V2</option>
+            <option value="V3">V3</option>
+            <option value="V4">V4</option>
+            <option value="V5">V5</option>
+            <option value="V6">V6</option>
+            <option value="V7">V7</option>
+            <option value="V8">V8</option>
+            <option value="V9">V9</option>
+            <option value="V10+">V10+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>颜色</label>
+          <input type="color" id="routeColor" value="#ff4444">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="routeNotes" placeholder="路线描述或备注..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>选择岩点 (点击墙面后再点击此对话框添加)</label>
+        <div id="selectedHoldsList" class="tag-container">
+          <span class="empty-tag">尚未选择岩点</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-action="cancel">取消</button>
+      <button class="btn btn-primary" data-action="saveRoute">保存</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/visualizer.js"></script>
+</body>
+</html>
