@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口述影像检查工具 - 复核页面</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .card .number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .card.high .number { color: #e53e3e; }
+        .card.medium .number { color: #ed8936; }
+        .card.low .number { color: #38a169; }
+        .card.pending .number { color: #805ad5; }
+        
+        .toolbar {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .toolbar select,
+        .toolbar button {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        .toolbar button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toolbar button:hover {
+            background: #5a67d8;
+        }
+        
+        .toolbar button.secondary {
+            background: #718096;
+        }
+        
+        .toolbar button.secondary:hover {
+            background: #4a5568;
+        }
+        
+        .toolbar button.success {
+            background: #38a169;
+        }
+        
+        .toolbar button.success:hover {
+            background: #2f855a;
+        }
+        
+        .results-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .result-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .result-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .type-dialogue { background: #fed7d7; color: #9b2c2c; }
+        .type-missing { background: #feebc8; color: #9c4221; }
+        .type-conflict { background: #e9d8fd; color: #6b46c1; }
+        
+        .result-severity {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        
+        .severity-high { background: #fc8181; color: white; }
+        .severity-medium { background: #f6ad55; color: white; }
+        .severity-low { background: #68d391; color: white; }
+        
+        .result-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending { background: #cbd5e0; color: #2d3748; }
+        .status-confirmed { background: #48bb78; color: white; }
+        .status-dismissed { background: #a0aec0; color: white; }
+        
+        .result-description {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .result-actions select,
+        .result-actions input,
+        .result-actions button {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .result-actions input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .result-actions button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .result-actions button:hover {
+            background: #5a67d8;
+        }
+        
+        .result-actions button.confirm {
+            background: #38a169;
+        }
+        
+        .result-actions button.confirm:hover {
+            background: #2f855a;
+        }
+        
+        .result-actions button.dismiss {
+            background: #718096;
+        }
+        
+        .result-actions button.dismiss:hover {
+            background: #4a5568;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .modal-actions .cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .modal-actions .submit {
+            background: #667eea;
+            color: white;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .toast.success { background: #38a169; }
+        .toast.error { background: #e53e3e; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>口述影像检查工具</h1>
+            <p>无障碍电影放映前的质量检查与复核平台</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="card pending">
+                <h3>待复核问题</h3>
+                <div class="number" id="stat-pending">-</div>
+            </div>
+            <div class="card high">
+                <h3>高严重度问题</h3>
+                <div class="number" id="stat-high">-</div>
+            </div>
+            <div class="card medium">
+                <h3>中严重度问题</h3>
+                <div class="number" id="stat-medium">-</div>
+            </div>
+            <div class="card low">
+                <h3>低严重度问题</h3>
+                <div class="number" id="stat-low">-</div>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <select id="screening-select">
+                <option value="">请选择场次...</option>
+            </select>
+            
+            <button onclick="openCreateModal()">+ 新建场次</button>
+            <button onclick="openImportModal('subtitles')">导入字幕</button>
+            <button onclick="openImportModal('script')">导入口述稿</button>
+            <button onclick="openImportModal('volunteers')">导入排班</button>
+            <button class="success" onclick="runChecks()">运行检查</button>
+            <button class="secondary" onclick="exportResults('markdown')">导出 Markdown</button>
+            <button class="secondary" onclick="exportResults('csv')">导出 CSV</button>
+            <button class="secondary" onclick="exportResults('json')">导出 JSON</button>
+        </div>
+        
+        <div class="toolbar">
+            <strong>筛选：</strong>
+            <select id="filter-type" onchange="loadResults()">
+                <option value="">所有类型</option>
+                <option value="dialogue_overlap">口述压住对白</option>
+                <option value="missing_scene">关键场景问题</option>
+                <option value="volunteer_conflict">志愿者冲突</option>
+            </select>
+            <select id="filter-status" onchange="loadResults()">
+                <option value="">所有状态</option>
+                <option value="pending">待复核</option>
+                <option value="confirmed">已确认</option>
+                <option value="dismissed">已驳回</option>
+            </select>
+            <select id="filter-severity" onchange="loadResults()">
+                <option value="">所有严重度</option>
+                <option value="high">高</option>
+                <option value="medium">中</option>
+                <option value="low">低</option>
+            </select>
+        </div>
+        
+        <div class="results-list" id="results-container">
+            <div class="empty-state">
+                <h3>暂无检查结果</h3>
+                <p>请先选择场次并运行检查</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="create-modal">
+        <div class="modal-content">
+            <h2>新建场次</h2>
+            <div class="form-group">
+                <label>电影名称</label>
+                <input type="text" id="create-movie" placeholder="如：肖申克的救赎">
+            </div>
+            <div class="form-group">
+                <label>放映时间</label>
+                <input type="datetime-local" id="create-time">
+            </div>
+            <div class="form-group">
+                <label>时长（分钟）</label>
+                <input type="number" id="create-duration" placeholder="如：120">
+            </div>
+            <div class="form-group">
+                <label>放映地点（可选）</label>
+                <input type="text" id="create-location" placeholder="如：影院A厅">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal('create-modal')">取消</button>
+                <button class="submit" onclick="createScreening()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <h2 id="import-title">导入数据</h2>
+            <div class="form-group">
+                <label>选择文件</label>
+                <input type="file" id="import-file" accept=".srt,.json,.csv">
+            </div>
+            <div class="modal-actions">
+                <button class="cancel" onclick="closeModal('import-modal')">取消</button>
+                <button class="submit" onclick="importData()">导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        let currentScreeningId = null;
+        let currentImportType = null;
+        
+        const typeLabels = {
+            'dialogue_overlap': '口述压住对白',
+            'missing_scene': '关键场景问题',
+            'volunteer_conflict': '志愿者冲突'
+        };
+        
+        const typeClasses = {
+            'dialogue_overlap': 'type-dialogue',
+            'missing_scene': 'type-missing',
+            'volunteer_conflict': 'type-conflict'
+        };
+        
+        const severityLabels = {
+            'high': '高',
+            'medium': '中',
+            'low': '低'
+        };
+        
+        const statusLabels = {
+            'pending': '待复核',
+            'confirmed': '已确认',
+            'dismissed': '已驳回'
+        };
+        
+        async function loadScreenings() {
+            try {
+                const response = await fetch('/api/screenings');
+                const screenings = await response.json();
+                
+                const select = document.getElementById('screening-select');
+                select.innerHTML = '<option value="">请选择场次...</option>';
+                
+                screenings.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = `${s.movie_name} (${s.screening_time.slice(0, 16)})`;
+                    select.appendChild(option);
+                });
+                
+                select.onchange = function() {
+                    currentScreeningId = this.value ? parseInt(this.value) : null;
+                    loadResults();
+                    loadStatistics();
+                };
+            } catch (err) {
+                showToast('加载场次失败', 'error');
+            }
+        }
+        
+        async function loadStatistics() {
+            if (!currentScreeningId) {
+                document.getElementById('stat-pending').textContent = '-';
+                document.getElementById('stat-high').textContent = '-';
+                document.getElementById('stat-medium').textContent = '-';
+                document.getElementById('stat-low').textContent = '-';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/screenings/${currentScreeningId}/statistics`);
+                const stats = await response.json();
+                
+                document.getElementById('stat-pending').textContent = stats.by_status.pending || 0;
+                document.getElementById('stat-high').textContent = stats.by_severity.high || 0;
+                document.getElementById('stat-medium').textContent = stats.by_severity.medium || 0;
+                document.getElementById('stat-low').textContent = stats.by_severity.low || 0;
+            } catch (err) {
+                console.error('加载统计失败', err);
+            }
+        }
+        
+        async function loadResults() {
+            const container = document.getElementById('results-container');
+            
+            if (!currentScreeningId) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>暂无检查结果</h3>
+                        <p>请先选择场次并运行检查</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                let url = `/api/screenings/${currentScreeningId}/checks`;
+                const params = new URLSearchParams();
+                
+                const type = document.getElementById('filter-type').value;
+                const status = document.getElementById('filter-status').value;
+                const severity = document.getElementById('filter-severity').value;
+                
+                if (type) params.append('check_type', type);
+                if (status) params.append('status', status);
+                if (severity) params.append('severity', severity);
+                
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+                
+                const response = await fetch(url);
+                const results = await response.json();
+                
+                if (results.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>暂无检查结果</h3>
+                            <p>点击"运行检查"按钮开始检查</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = results.map(r => `
+                    <div class="result-item" data-id="${r.id}">
+                        <div class="result-header">
+                            <div>
+                                <span class="result-type ${typeClasses[r.check_type]}">${typeLabels[r.check_type]}</span>
+                                <span class="result-severity severity-${r.severity}">${severityLabels[r.severity]}</span>
+                                <span class="result-status status-${r.status}">${statusLabels[r.status]}</span>
+                            </div>
+                            <small>ID: ${r.id}</small>
+                        </div>
+                        <div class="result-description">${escapeHtml(r.description)}</div>
+                        ${r.notes ? `<div class="result-description" style="background: #e6fffa;"><strong>备注：</strong>${escapeHtml(r.notes)}</div>` : ''}
+                        <div class="result-actions">
+                            <select id="status-${r.id}">
+                                <option value="pending" ${r.status === 'pending' ? 'selected' : ''}>待复核</option>
+                                <option value="confirmed" ${r.status === 'confirmed' ? 'selected' : ''}>已确认</option>
+                                <option value="dismissed" ${r.status === 'dismissed' ? 'selected' : ''}>已驳回</option>
+                            </select>
+                            <input type="text" id="notes-${r.id}" placeholder="添加备注..." value="${r.notes || ''}">
+                            <button onclick="updateResult(${r.id})">更新</button>
+                            <button class="confirm" onclick="quickUpdate(${r.id}, 'confirmed')">确认</button>
+                            <button class="dismiss" onclick="quickUpdate(${r.id}, 'dismissed')">驳回</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (err) {
+                showToast('加载结果失败', 'error');
+                console.error(err);
+            }
+        }
+        
+        async function updateResult(id) {
+            const status = document.getElementById(`status-${id}`).value;
+            const notes = document.getElementById(`notes-${id}`).value;
+            
+            try {
+                const response = await fetch(`/api/checks/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, notes })
+                });
+                
+                if (response.ok) {
+                    showToast('更新成功', 'success');
+                    loadResults();
+                    loadStatistics();
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } catch (err) {
+                showToast('更新失败', 'error');
+            }
+        }
+        
+        async function quickUpdate(id, status) {
+            const notes = document.getElementById(`notes-${id}`).value;
+            
+            try {
+                const response = await fetch(`/api/checks/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, notes })
+                });
+                
+                if (response.ok) {
+                    showToast(status === 'confirmed' ? '已确认' : '已驳回', 'success');
+                    loadResults();
+                    loadStatistics();
+                } else {
+                    showToast('操作失败', 'error');
+                }
+            } catch (err) {
+                showToast('操作失败', 'error');
+            }
+        }
+        
+        async function runChecks() {
+            if (!currentScreeningId) {
+                showToast('请先选择场次', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/screenings/${currentScreeningId}/checks`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                showToast(`检查完成，发现 ${data.count} 个问题`, 'success');
+                loadResults();
+                loadStatistics();
+            } catch (err) {
+                showToast('检查失败', 'error');
+            }
+        }
+        
+        async function exportResults(format) {
+            if (!currentScreeningId) {
+                showToast('请先选择场次', 'error');
+                return;
+            }
+            
+            const formats = {
+                'markdown': 'markdown',
+                'csv': 'csv',
+                'json': 'json'
+            };
+            
+            window.open(`/api/screenings/${currentScreeningId}/export/${formats[format]}`, '_blank');
+        }
+        
+        function openCreateModal() {
+            document.getElementById('create-modal').classList.add('show');
+        }
+        
+        function openImportModal(type) {
+            if (!currentScreeningId) {
+                showToast('请先选择场次', 'error');
+                return;
+            }
+            
+            currentImportType = type;
+            const titles = {
+                'subtitles': '导入 SRT 字幕',
+                'script': '导入口述稿 JSON',
+                'volunteers': '导入志愿者排班 CSV'
+            };
+            const accepts = {
+                'subtitles': '.srt',
+                'script': '.json',
+                'volunteers': '.csv'
+            };
+            
+            document.getElementById('import-title').textContent = titles[type];
+            document.getElementById('import-file').accept = accepts[type];
+            document.getElementById('import-file').value = '';
+            document.getElementById('import-modal').classList.add('show');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        async function createScreening() {
+            const movie = document.getElementById('create-movie').value.trim();
+            const time = document.getElementById('create-time').value;
+            const duration = document.getElementById('create-duration').value;
+            const location = document.getElementById('create-location').value.trim();
+            
+            if (!movie || !time || !duration) {
+                showToast('请填写必填字段', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/screenings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        movie_name: movie,
+                        screening_time: new Date(time).toISOString(),
+                        duration: parseFloat(duration),
+                        location: location || null
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('场次创建成功', 'success');
+                    closeModal('create-modal');
+                    loadScreenings();
+                } else {
+                    showToast('创建失败', 'error');
+                }
+            } catch (err) {
+                showToast('创建失败', 'error');
+            }
+        }
+        
+        async function importData() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showToast('请选择文件', 'error');
+                return;
+            }
+            
+            const endpoints = {
+                'subtitles': 'subtitles',
+                'script': 'script',
+                'volunteers': 'volunteers'
+            };
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`/api/screenings/${currentScreeningId}/import/${endpoints[currentImportType]}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                showToast(data.message, 'success');
+                closeModal('import-modal');
+            } catch (err) {
+                showToast('导入失败', 'error');
+            }
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+        
+        loadScreenings();
+    </script>
+</body>
+</html>
