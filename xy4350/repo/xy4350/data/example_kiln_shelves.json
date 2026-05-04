@@ -1,0 +1,44 @@
+[
+  {
+    "shelf_number": 1,
+    "max_height": 35,
+    "temperature_zone": "高温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "下层"
+  },
+  {
+    "shelf_number": 2,
+    "max_height": 35,
+    "temperature_zone": "高温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "中下层"
+  },
+  {
+    "shelf_number": 3,
+    "max_height": 35,
+    "temperature_zone": "高温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "中层"
+  },
+  {
+    "shelf_number": 4,
+    "max_height": 30,
+    "temperature_zone": "中温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "中上层"
+  },
+  {
+    "shelf_number": 5,
+    "max_height": 30,
+    "temperature_zone": "中温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "上层"
+  },
+  {
+    "shelf_number": 6,
+    "max_height": 25,
+    "temperature_zone": "低温",
+    "shelf_type": "特殊层板",
+    "position_in_kiln": "顶层"
+  }
+]

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入数据 - 窑烧排窑预检器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            opacity: 0.9;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 8px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        .card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        .import-section {
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px dashed #cbd5e0;
+        }
+        
+        .import-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .file-info {
+            font-size: 0.85em;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        .format-example {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+        }
+        
+        .format-example pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        .submit-area {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: #ebf8ff;
+            border: 1px solid #90cdf4;
+            color: #2b6cb0;
+        }
+        
+        .alert-warning {
+            background: #fffaf0;
+            border: 1px solid #fbd38d;
+            color: #c05621;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 导入数据</h1>
+            <p>导入作品数据、窑炉层板配置和釉药禁忌表</p>
+        </header>
+        
+        <div class="nav-bar">
+            <a href="/" class="btn btn-secondary">← 返回首页</a>
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>提示：</strong>请按以下格式准备数据文件，支持中文或英文列名。
+        </div>
+        
+        <form action="/import" method="POST" enctype="multipart/form-data">
+            <!-- 作品CSV -->
+            <div class="card">
+                <h2>作品数据 (CSV)</h2>
+                <p style="color: #718096; margin-bottom: 15px;">
+                    包含作品编号、作者、尺寸、泥料、釉药、温区、付款状态等信息。
+                </p>
+                
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="pieces_file">选择作品CSV文件</label>
+                        <input type="file" id="pieces_file" name="pieces_file" accept=".csv">
+                        <div class="file-info">支持格式: .csv</div>
+                    </div>
+                </div>
+                
+                <h3>CSV格式示例</h3>
+                <div class="format-example">
+                    <pre>作品编号,作者姓名,高度(cm),宽度(cm),深度(cm),泥料类型,釉药类型,温区,付款状态,取件信息,备注
+P001,张三,25,15,15,紫砂,青瓷釉,高温,已付款,周三下午取,手工捏制
+P002,李四,30,20,20,陶土,透明釉,中温,未付款,,需要特别注意
+P003,王五,18,12,12,瓷土,裂纹釉,高温,已付款,周五取,</pre>
+                </div>
+            </div>
+            
+            <!-- 窑炉层板JSON -->
+            <div class="card">
+                <h2>窑炉层板配置 (JSON)</h2>
+                <p style="color: #718096; margin-bottom: 15px;">
+                    定义窑炉的层板数量、每层高度限制和温区分布。
+                </p>
+                
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="shelves_file">选择层板JSON文件</label>
+                        <input type="file" id="shelves_file" name="shelves_file" accept=".json">
+                        <div class="file-info">支持格式: .json</div>
+                    </div>
+                </div>
+                
+                <h3>JSON格式示例</h3>
+                <div class="format-example">
+                    <pre>[
+  {
+    "shelf_number": 1,
+    "max_height": 40,
+    "temperature_zone": "高温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "下层"
+  },
+  {
+    "shelf_number": 2,
+    "max_height": 35,
+    "temperature_zone": "高温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "中层"
+  },
+  {
+    "shelf_number": 3,
+    "max_height": 40,
+    "temperature_zone": "中温",
+    "shelf_type": "标准层板",
+    "position_in_kiln": "上层"
+  }
+]</pre>
+                </div>
+            </div>
+            
+            <!-- 釉药禁忌表JSON -->
+            <div class="card">
+                <h2>釉药禁忌表 (JSON)</h2>
+                <p style="color: #718096; margin-bottom: 15px;">
+                    定义哪些釉药不能放在同一层板，避免碰釉反应。
+                </p>
+                
+                <div class="import-section">
+                    <div class="form-group">
+                        <label for="glazes_file">选择釉药禁忌JSON文件</label>
+                        <input type="file" id="glazes_file" name="glazes_file" accept=".json">
+                        <div class="file-info">支持格式: .json</div>
+                    </div>
+                </div>
+                
+                <h3>JSON格式示例</h3>
+                <div class="format-example">
+                    <pre>[
+  {
+    "glaze_a": "青瓷釉",
+    "glaze_b": "铜红釉",
+    "conflict_severity": "high",
+    "conflict_description": "两者会发生化学反应，产生气泡和裂纹",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "透明釉",
+    "glaze_b": "裂纹釉",
+    "conflict_severity": "medium",
+    "conflict_description": "可能会影响裂纹效果，建议分开摆放",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "釉下彩",
+    "glaze_b": "釉上彩",
+    "conflict_severity": "high",
+    "conflict_description": "烧制温度不同，会导致颜色变化",
+    "is_mutual": true
+  }
+]</pre>
+                </div>
+                
+                <div class="alert alert-warning" style="margin-top: 15px;">
+                    <strong>风险等级说明：</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li><strong>high (高风险)</strong>: 绝对不能放在同一层板，会导致作品报废</li>
+                        <li><strong>medium (中风险)</strong>: 尽量避免，可能影响效果</li>
+                        <li><strong>low (低风险)</strong>: 轻微影响，可根据情况调整</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card submit-area">
+                <button type="submit" class="btn btn-primary" style="font-size: 16px; padding: 15px 40px;">
+                    🚀 开始导入
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

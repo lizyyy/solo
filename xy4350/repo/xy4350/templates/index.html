@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>窑烧排窑预检器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        
+        .batch-list {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .batch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.2s ease;
+        }
+        
+        .batch-item:hover {
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+        
+        .batch-info h3 {
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+        
+        .batch-info p {
+            color: #718096;
+            font-size: 0.9em;
+        }
+        
+        .batch-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .status-completed {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .status-in-progress {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        
+        .create-batch-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #718096;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏺 窑烧排窑预检器</h1>
+            <p>专业陶艺工作室窑烧排窑管理工具 - 智能校验，避免碰釉、温区不匹配等问题</p>
+        </header>
+        
+        <div class="nav-bar">
+            <a href="/import" class="btn btn-secondary">📥 导入数据</a>
+            <a href="#" class="btn btn-secondary" onclick="document.getElementById('create-form').scrollIntoView({behavior: 'smooth'})">➕ 新建窑次</a>
+        </div>
+        
+        <div class="card">
+            <h2>窑次列表</h2>
+            
+            {% if batches %}
+                <div class="batch-list">
+                    {% for batch in batches %}
+                        <div class="batch-item">
+                            <div class="batch-info">
+                                <h3>{{ batch.batch_code }} - {{ batch.batch_name or '未命名' }}</h3>
+                                <p>温区: {{ batch.target_temperature_zone }} | 状态: 
+                                    <span class="batch-status status-{{ batch.status }}">
+                                        {% if batch.status == 'pending' %}待处理
+                                        {% elif batch.status == 'in_progress' %}进行中
+                                        {% elif batch.status == 'completed' %}已完成
+                                        {% else %}{{ batch.status }}{% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                <a href="/batch/{{ batch.id }}" class="btn btn-primary">查看详情</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>暂无窑次</h3>
+                    <p>请先导入作品数据，然后创建新窑次开始排窑</p>
+                    <a href="/import" class="btn btn-primary">开始导入</a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="card" id="create-form">
+            <h2>创建新窑次</h2>
+            <form action="/batch/create" method="POST" class="create-batch-form">
+                <div class="form-group">
+                    <label for="batch_code">窑次编号 *</label>
+                    <input type="text" id="batch_code" name="batch_code" placeholder="例如: 2026-05-04-01" required>
+                </div>
+                <div class="form-group">
+                    <label for="batch_name">窑次名称</label>
+                    <input type="text" id="batch_name" name="batch_name" placeholder="例如: 五月第一窑高温">
+                </div>
+                <div class="form-group">
+                    <label for="target_temperature_zone">目标温区 *</label>
+                    <select id="target_temperature_zone" name="target_temperature_zone" required>
+                        <option value="">请选择温区</option>
+                        <option value="低温">低温</option>
+                        <option value="中温">中温</option>
+                        <option value="高温">高温</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">创建窑次</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>窑烧排窑预检器 - 让每一次烧窑都安心</p>
+        </div>
+    </div>
+</body>
+</html>

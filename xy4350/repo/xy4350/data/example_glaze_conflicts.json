@@ -1,0 +1,37 @@
+[
+  {
+    "glaze_a": "青瓷釉",
+    "glaze_b": "铜红釉",
+    "conflict_severity": "high",
+    "conflict_description": "两者会发生化学反应，产生气泡和裂纹，严重影响作品外观",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "透明釉",
+    "glaze_b": "裂纹釉",
+    "conflict_severity": "medium",
+    "conflict_description": "透明釉可能会填充裂纹釉的裂纹，影响裂纹效果",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "釉下彩",
+    "glaze_b": "釉上彩",
+    "conflict_severity": "high",
+    "conflict_description": "烧制温度不同，会导致颜色变化甚至脱落",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "铜红釉",
+    "glaze_b": "裂纹釉",
+    "conflict_severity": "medium",
+    "conflict_description": "铜红釉的金属成分可能影响裂纹釉的开裂效果",
+    "is_mutual": true
+  },
+  {
+    "glaze_a": "青瓷釉",
+    "glaze_b": "透明釉",
+    "conflict_severity": "low",
+    "conflict_description": "轻微影响，建议保持一定距离",
+    "is_mutual": true
+  }
+]

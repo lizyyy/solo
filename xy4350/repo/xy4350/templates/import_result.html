@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入结果 - 窑烧排窑预检器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 8px;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #2d3748;
+            text-align: center;
+        }
+        
+        .result-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-success {
+            color: #48bb78;
+        }
+        
+        .result-partial {
+            color: #ed8936;
+        }
+        
+        .result-item {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-item.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        
+        .result-item.warning {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+        
+        .result-item h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        .result-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 6px;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📥 导入结果</h1>
+            <p>数据导入完成</p>
+        </header>
+        
+        <div class="nav-bar">
+            <a href="/" class="btn btn-secondary">← 返回首页</a>
+            <a href="/import" class="btn btn-secondary">继续导入</a>
+        </div>
+        
+        <div class="card">
+            {% if results %}
+                {% set total_imported = (results.pieces and results.pieces.total or 0) + 
+                                         (results.shelves and results.shelves.total or 0) + 
+                                         (results.conflicts and results.conflicts.total or 0) %}
+                
+                <div class="result-icon {{ 'result-success' if total_imported > 0 else 'result-partial' }}">
+                    {{ '✅' if total_imported > 0 else '⚠️' }}
+                </div>
+                
+                <h2>{{ '导入成功' if total_imported > 0 else '无数据导入' }}</h2>
+                
+                <!-- 作品导入结果 -->
+                {% if results.pieces %}
+                    <div class="result-item {{ 'success' if results.pieces.total > 0 else 'warning' }}">
+                        <h3>🎨 作品数据</h3>
+                        <div class="result-stats">
+                            <div class="stat">
+                                <div class="stat-value">{{ results.pieces.imported }}</div>
+                                <div class="stat-label">新增作品</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">{{ results.pieces.updated }}</div>
+                                <div class="stat-label">更新作品</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">{{ results.pieces.total }}</div>
+                                <div class="stat-label">总计</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- 层板导入结果 -->
+                {% if results.shelves %}
+                    <div class="result-item {{ 'success' if results.shelves.total > 0 else 'warning' }}">
+                        <h3>🏗️ 窑炉层板</h3>
+                        <div class="result-stats">
+                            <div class="stat">
+                                <div class="stat-value">{{ results.shelves.imported }}</div>
+                                <div class="stat-label">导入层板</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">
+                            注意：层板数据会覆盖现有配置
+                        </p>
+                    </div>
+                {% endif %}
+                
+                <!-- 釉药禁忌导入结果 -->
+                {% if results.conflicts %}
+                    <div class="result-item {{ 'success' if results.conflicts.total > 0 else 'warning' }}">
+                        <h3>⚠️ 釉药禁忌</h3>
+                        <div class="result-stats">
+                            <div class="stat">
+                                <div class="stat-value">{{ results.conflicts.imported }}</div>
+                                <div class="stat-label">导入禁忌规则</div>
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px; color: #718096; font-size: 0.9em;">
+                            注意：禁忌规则会覆盖现有配置
+                        </p>
+                    </div>
+                {% endif %}
+                
+                <div class="action-buttons">
+                    <a href="/" class="btn btn-primary">
+                        🏠 去首页创建窑次
+                    </a>
+                </div>
+                
+            {% else %}
+                <div class="no-results">
+                    <p>没有导入任何数据</p>
+                    <p style="margin-top: 10px;">请确保选择了正确的文件格式</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <a href="/import" class="btn btn-primary">
+                        重新导入
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

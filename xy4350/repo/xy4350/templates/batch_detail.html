@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>窑次详情 - 窑烧排窑预检器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            opacity: 0.9;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f4ff;
+        }
+        
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #f56565;
+        }
+        
+        .btn-success {
+            background: #68d391;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #48bb78;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        .card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .summary-item .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .summary-item .label {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 5px;
+        }
+        
+        .summary-item.warning .number {
+            color: #ed8936;
+        }
+        
+        .summary-item.danger .number {
+            color: #e53e3e;
+        }
+        
+        .summary-item.success .number {
+            color: #38a169;
+        }
+        
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .shelf-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .shelf-header {
+            background: #edf2f7;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .shelf-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .shelf-info {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .shelf-content {
+            padding: 15px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-content: flex-start;
+        }
+        
+        .shelf-content.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
+        .piece-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            min-width: 180px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .piece-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .piece-card.warning {
+            border-color: #ed8936;
+            background: #fffaf0;
+        }
+        
+        .piece-card.danger {
+            border-color: #e53e3e;
+            background: #fff5f5;
+        }
+        
+        .piece-card.overridden {
+            border-color: #805ad5;
+            background: #faf5ff;
+        }
+        
+        .piece-code {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .piece-owner {
+            font-size: 0.9em;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .piece-details {
+            font-size: 0.8em;
+            color: #4a5568;
+        }
+        
+        .piece-badges {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+        }
+        
+        .badge-warning {
+            background: #feebc8;
+            color: #c05621;
+        }
+        
+        .badge-danger {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        
+        .badge-info {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        
+        .badge-success {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        
+        .badge-overridden {
+            background: #e9d8fd;
+            color: #6b46c1;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .unplaced-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        
+        .unplaced-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .unplaced-item:last-child {
+            border-bottom: none;
+        }
+        
+        .unplaced-item:hover {
+            background: #f7fafc;
+        }
+        
+        .unplaced-item .code {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .unplaced-item .info {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.3em;
+            color: #2d3748;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .validation-item {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .validation-item.valid {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+        }
+        
+        .validation-item.invalid {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+        }
+        
+        .validation-item.overridden {
+            background: #faf5ff;
+            border-left: 4px solid #9f7aea;
+        }
+        
+        .validation-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .validation-message {
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .override-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .override-section textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 80px;
+            margin-bottom: 10px;
+        }
+        
+        .override-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .glaze-conflict {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .glaze-conflict.high {
+            border-left: 4px solid #e53e3e;
+        }
+        
+        .glaze-conflict.medium {
+            border-left: 4px solid #ed8936;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #fed7d7;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #c53030;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .piece-card:hover .remove-btn {
+            display: flex;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏺 窑次详情: {{ batch.batch_code }}</h1>
+            <p>{{ batch.batch_name or '未命名' }} | 温区: {{ batch.target_temperature_zone }} | 状态: {{ batch.status }}</p>
+        </header>
+        
+        <div class="nav-bar">
+            <a href="/" class="btn btn-secondary">← 返回列表</a>
+            <a href="/import" class="btn btn-secondary">📥 导入数据</a>
+            <button class="btn btn-primary" onclick="refreshValidation()">🔄 重新校验</button>
+            <div class="export-buttons">
+                <button class="btn btn-success" onclick="exportAll()">📦 全部导出</button>
+                <button class="btn btn-secondary" onclick="exportFormat('markdown')">📄 Markdown</button>
+                <button class="btn btn-secondary" onclick="exportFormat('csv')">📊 CSV</button>
+                <button class="btn btn-secondary" onclick="exportFormat('json')">📋 JSON</button>
+            </div>
+        </div>
+        
+        <!-- 校验摘要 -->
+        <div class="card">
+            <h2>校验摘要</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="number">{{ validation.total_pieces }}</div>
+                    <div class="label">作品总数</div>
+                </div>
+                <div class="summary-item {{ 'warning' if validation.summary.height_issues > 0 else 'success' }}">
+                    <div class="number">{{ validation.summary.height_issues }}</div>
+                    <div class="label">高度问题</div>
+                </div>
+                <div class="summary-item {{ 'warning' if validation.summary.temperature_issues > 0 else 'success' }}">
+                    <div class="number">{{ validation.summary.temperature_issues }}</div>
+                    <div class="label">温区问题</div>
+                </div>
+                <div class="summary-item {{ 'warning' if validation.summary.payment_issues > 0 else 'success' }}">
+                    <div class="number">{{ validation.summary.payment_issues }}</div>
+                    <div class="label">付款问题</div>
+                </div>
+                <div class="summary-item {{ 'danger' if validation.summary.high_glaze_conflicts > 0 else 'success' }}">
+                    <div class="number">{{ validation.summary.high_glaze_conflicts }}</div>
+                    <div class="label">高风险釉药冲突</div>
+                </div>
+                <div class="summary-item {{ 'warning' if validation.summary.medium_glaze_conflicts > 0 else 'success' }}">
+                    <div class="number">{{ validation.summary.medium_glaze_conflicts }}</div>
+                    <div class="label">中风险釉药冲突</div>
+                </div>
+            </div>
+            
+            {% if validation.glaze_conflicts %}
+                <h3>釉药冲突详情</h3>
+                {% for conflict in validation.glaze_conflicts %}
+                    <div class="glaze-conflict {{ conflict.severity }}">
+                        <strong>层板 {{ conflict.shelf_number }}:</strong>
+                        {{ conflict.piece1_code }}({{ conflict.glaze1 }}) 与 
+                        {{ conflict.piece2_code }}({{ conflict.glaze2 }}) - 
+                        {{ conflict.message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="layout-grid">
+            <!-- 层板区域 -->
+            <div>
+                <div class="card">
+                    <h2>层板安排</h2>
+                    
+                    {% for shelf in shelves %}
+                        <div class="shelf-container">
+                            <div class="shelf-header">
+                                <span class="shelf-title">层板 {{ shelf.shelf_number }}</span>
+                                <span class="shelf-info">
+                                    最大高度: {{ shelf.max_height }}cm | 
+                                    温区: {{ shelf.temperature_zone }}
+                                    {% if shelf.shelf_type %} | {{ shelf.shelf_type }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="shelf-content {% if shelf.id not in placements_by_shelf %}empty{% endif %}" 
+                                 data-shelf-id="{{ shelf.id }}" 
+                                 data-shelf-number="{{ shelf.shelf_number }}">
+                                
+                                {% if shelf.id in placements_by_shelf %}
+                                    {% for placement in placements_by_shelf[shelf.id] %}
+                                        {% set piece_val = validation.validations | selectattr('placement_id', 'equalto', placement.id) | first %}
+                                        {% set has_issues = piece_val and not piece_val.valid %}
+                                        {% set has_overridden = piece_val and piece_val.validations | selectattr('overridden') | list | length > 0 %}
+                                        
+                                        <div class="piece-card 
+                                            {% if has_overridden %}overridden
+                                            {% elif has_issues %}
+                                                {% set severity = piece_val.validations | rejectattr('valid') | map(attribute='severity') | list %}
+                                                {% if 'high' in severity %}danger{% else %}warning{% endif %}
+                                            {% endif %}"
+                                             data-placement-id="{{ placement.id }}"
+                                             data-piece-id="{{ placement.piece_id }}"
+                                             data-piece-code="{{ placement.piece_code }}"
+                                             onclick="showPieceDetail({{ placement.piece_id }}, {{ placement.id }})">
+                                            
+                                            <button class="remove-btn" onclick="event.stopPropagation(); removePlacement({{ placement.id }})">×</button>
+                                            
+                                            <div class="piece-code">{{ placement.piece_code }}</div>
+                                            <div class="piece-owner">{{ placement.owner_name }}</div>
+                                            <div class="piece-details">
+                                                {{ placement.height }}×{{ placement.width }}×{{ placement.depth }}cm | 
+                                                {{ placement.glaze_type }}
+                                            </div>
+                                            
+                                            <div class="piece-badges">
+                                                {% if piece_val %}
+                                                    {% for check in piece_val.validations %}
+                                                        {% if not check.valid and not check.get('overridden') %}
+                                                            <span class="badge 
+                                                                {% if check.severity == 'high' %}badge-danger
+                                                                {% else %}badge-warning{% endif %}">
+                                                                {{ check.check_type }}
+                                                            </span>
+                                                        {% elif check.get('overridden') %}
+                                                            <span class="badge badge-overridden">
+                                                                {{ check.check_type }}(已改判)
+                                                            </span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    点击右侧作品或拖拽到此处
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div>
+                <!-- 安排作品 -->
+                <div class="card sidebar-section">
+                    <h2>安排作品</h2>
+                    <form id="place-form">
+                        <div class="form-group">
+                            <label for="piece-select">选择作品</label>
+                            <select id="piece-select">
+                                <option value="">-- 请选择作品 --</option>
+                                {% for piece in unplaced_pieces %}
+                                    <option value="{{ piece.piece_code }}">
+                                        {{ piece.piece_code }} - {{ piece.owner_name }} ({{ piece.glaze_type }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shelf-select">选择层板</label>
+                            <select id="shelf-select">
+                                <option value="">-- 请选择层板 --</option>
+                                {% for shelf in shelves %}
+                                    <option value="{{ shelf.shelf_number }}">
+                                        层板 {{ shelf.shelf_number }} ({{ shelf.temperature_zone }}, 最大{{ shelf.max_height }}cm)
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="placePiece()">
+                            安排到层板
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- 未安排作品列表 -->
+                <div class="card sidebar-section">
+                    <h2>待安排作品 ({{ unplaced_pieces | length }})</h2>
+                    {% if unplaced_pieces %}
+                        <div class="unplaced-list">
+                            {% for piece in unplaced_pieces %}
+                                <div class="unplaced-item" 
+                                     data-piece-code="{{ piece.piece_code }}"
+                                     onclick="quickPlace('{{ piece.piece_code }}')">
+                                    <div class="code">{{ piece.piece_code }} - {{ piece.owner_name }}</div>
+                                    <div class="info">
+                                        {{ piece.height }}×{{ piece.width }}×{{ piece.depth }}cm | 
+                                        {{ piece.glaze_type }} | 
+                                        {{ piece.temperature_zone }} |
+                                        <span class="{% if piece.payment_status == '未付款' %}text-danger{% endif %}">
+                                            {{ piece.payment_status }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p style="color: #718096; font-style: italic;">所有作品已安排</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 作品详情模态框 -->
+    <div class="modal-overlay" id="piece-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">作品详情</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modal-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 导出结果模态框 -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>导出结果</h3>
+                <button class="modal-close" onclick="closeExportModal()">×</button>
+            </div>
+            <div id="export-content">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const batchId = {{ batch.id }};
+        
+        function refreshValidation() {
+            location.reload();
+        }
+        
+        async function placePiece() {
+            const pieceCode = document.getElementById('piece-select').value;
+            const shelfNumber = document.getElementById('shelf-select').value;
+            
+            if (!pieceCode || !shelfNumber) {
+                alert('请选择作品和层板');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/batch/${batchId}/place`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        piece_code: pieceCode,
+                        shelf_number: parseInt(shelfNumber)
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('安排失败: ' + result.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+        
+        function quickPlace(pieceCode) {
+            document.getElementById('piece-select').value = pieceCode;
+            document.getElementById('shelf-select').focus();
+        }
+        
+        async function removePlacement(placementId) {
+            if (!confirm('确定要移除这个作品的安排吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/placement/${placementId}/remove`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('移除失败: ' + result.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+        
+        async function showPieceDetail(pieceId, placementId) {
+            // 获取校验信息
+            const validations = {{ validation.validations | tojson }};
+            const pieceValidation = validations.find(v => v.placement_id === placementId);
+            
+            const placements = {{ placements | tojson }};
+            const placement = placements.find(p => p.id === placementId);
+            
+            let content = '<div>';
+            
+            if (placement) {
+                content += `
+                    <p><strong>作品编号:</strong> ${placement.piece_code}</p>
+                    <p><strong>作者:</strong> ${placement.owner_name}</p>
+                    <p><strong>尺寸:</strong> ${placement.height}×${placement.width}×${placement.depth}cm</p>
+                    <p><strong>泥料:</strong> ${placement.clay_type}</p>
+                    <p><strong>釉药:</strong> ${placement.glaze_type}</p>
+                    <p><strong>温区:</strong> ${placement.temperature_zone}</p>
+                    <p><strong>付款状态:</strong> ${placement.payment_status}</p>
+                `;
+            }
+            
+            content += '<h3 style="margin-top: 20px;">校验结果</h3>';
+            
+            if (pieceValidation) {
+                for (const check of pieceValidation.validations) {
+                    let statusClass = check.valid ? 'valid' : 'invalid';
+                    if (check.overridden) {
+                        statusClass = 'overridden';
+                    }
+                    
+                    content += `
+                        <div class="validation-item ${statusClass}">
+                            <div class="validation-title">
+                                ${check.valid ? '✅' : '❌'} ${check.check_type}
+                                ${check.overridden ? '(已改判)' : ''}
+                            </div>
+                            <div class="validation-message">${check.message}</div>
+                        </div>
+                    `;
+                    
+                    // 显示改判选项
+                    if (!check.overridden && !check.valid) {
+                        content += `
+                            <div class="override-section" id="override-${check.check_type}">
+                                <h4>人工改判</h4>
+                                <textarea id="reason-${check.check_type}" placeholder="请输入改判原因..."></textarea>
+                                <div class="override-buttons">
+                                    <button class="btn btn-success" onclick="submitOverride('${check.check_type}', 'PASS', ${pieceId}, ${check.valid})">
+                                        ✓ 改判为通过
+                                    </button>
+                                    <button class="btn btn-danger" onclick="submitOverride('${check.check_type}', 'FAIL', ${pieceId}, ${check.valid})">
+                                        ✗ 确认不通过
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } else {
+                content += '<p>暂无校验数据</p>';
+            }
+            
+            content += '</div>';
+            
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('piece-modal').classList.add('active');
+        }
+        
+        async function submitOverride(checkType, result, pieceId, originalResult) {
+            const reason = document.getElementById(`reason-${checkType}`)?.value || '';
+            
+            try {
+                const response = await fetch(`/api/batch/${batchId}/review`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        piece_id: pieceId,
+                        check_type: checkType,
+                        original_result: originalResult ? 'PASS' : 'FAIL',
+                        overridden_result: result,
+                        override_reason: reason,
+                        reviewed_by: '管理员'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('改判记录已保存');
+                    location.reload();
+                } else {
+                    alert('保存失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('piece-modal').classList.remove('active');
+        }
+        
+        async function exportFormat(format) {
+            try {
+                const response = await fetch(`/batch/${batchId}/export/${format}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    let content = '<h4>导出成功！</h4>';
+                    if (result.path) {
+                        content += `<p>文件路径: ${result.path}</p>`;
+                    }
+                    if (result.files) {
+                        content += '<ul>';
+                        for (const [key, path] of Object.entries(result.files)) {
+                            if (path) {
+                                content += `<li>${key}: ${path}</li>`;
+                            }
+                        }
+                        content += '</ul>';
+                    }
+                    
+                    document.getElementById('export-content').innerHTML = content;
+                    document.getElementById('export-modal').classList.add('active');
+                } else {
+                    alert('导出失败: ' + result.error);
+                }
+            } catch (error) {
+                alert('网络错误: ' + error.message);
+            }
+        }
+        
+        function exportAll() {
+            exportFormat('all');
+        }
+        
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.remove('active');
+        }
+        
+        // 点击模态框外部关闭
+        document.getElementById('piece-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        document.getElementById('export-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeExportModal();
+            }
+        });
+    </script>
+</body>
+</html>
