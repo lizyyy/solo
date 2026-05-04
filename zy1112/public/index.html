@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>印务店管理系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-left">
+        <h1>🖨️ 印务店管理系统</h1>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary" onclick="showNewOrderModal()">+ 新建订单</button>
+      </div>
+    </header>
+
+    <nav class="nav">
+      <button class="nav-btn active" data-tab="dashboard">📊 仪表盘</button>
+      <button class="nav-btn" data-tab="orders">📋 订单管理</button>
+      <button class="nav-btn" data-tab="precheck">⚠️ 预检问题</button>
+      <button class="nav-btn" data-tab="schedule">📅 排产管理</button>
+      <button class="nav-btn" data-tab="stock">📦 纸张库存</button>
+      <button class="nav-btn" data-tab="customers">👥 客户管理</button>
+      <button class="nav-btn" data-tab="export">📄 数据导出</button>
+    </nav>
+
+    <main class="main">
+      <!-- 仪表盘 -->
+      <div id="dashboard" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total-orders">-</div>
+              <div class="stat-label">总订单数</div>
+            </div>
+          </div>
+          <div class="stat-card stat-pending">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pending-orders">-</div>
+              <div class="stat-label">待确认</div>
+            </div>
+          </div>
+          <div class="stat-card stat-warning">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pending-issues">-</div>
+              <div class="stat-label">待处理预检</div>
+            </div>
+          </div>
+          <div class="stat-card stat-danger">
+            <div class="stat-icon">📦</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-low-stock">-</div>
+              <div class="stat-label">库存不足</div>
+            </div>
+          </div>
+          <div class="stat-card stat-success">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-today-revenue">-</div>
+              <div class="stat-label">今日营收</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🚚</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-today-pickup">-</div>
+              <div class="stat-label">今日待取</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="dashboard-panel">
+            <h3>📋 订单看板</h3>
+            <div id="kanban-board" class="kanban-board"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="dashboard-panel half">
+            <h3>⚠️ 待处理预检问题</h3>
+            <div id="precheck-list-short" class="list-container"></div>
+          </div>
+          <div class="dashboard-panel half">
+            <h3>📦 库存预警</h3>
+            <div id="stock-alert-list" class="list-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单管理 -->
+      <div id="orders" class="tab-content">
+        <div class="page-header">
+          <h2>📋 订单管理</h2>
+          <div class="filters">
+            <select id="order-status-filter">
+              <option value="">全部状态</option>
+            </select>
+            <input type="date" id="order-date-from">
+            <input type="date" id="order-date-to">
+            <button class="btn" onclick="loadOrders()">筛选</button>
+          </div>
+        </div>
+        <div id="orders-table" class="table-container"></div>
+      </div>
+
+      <!-- 预检问题 -->
+      <div id="precheck" class="tab-content">
+        <div class="page-header">
+          <h2>⚠️ 预检问题队列</h2>
+          <div class="filters">
+            <select id="precheck-status-filter">
+              <option value="">全部</option>
+              <option value="pending">待处理</option>
+              <option value="resolved">已处理</option>
+            </select>
+            <button class="btn" onclick="loadPrecheckIssues()">筛选</button>
+          </div>
+        </div>
+        <div id="precheck-table" class="table-container"></div>
+      </div>
+
+      <!-- 排产管理 -->
+      <div id="schedule" class="tab-content">
+        <div class="page-header">
+          <h2>📅 设备排程</h2>
+          <div class="filters">
+            <input type="date" id="schedule-date" value="">
+            <button class="btn" onclick="loadSchedule()">查看</button>
+          </div>
+        </div>
+        <div id="schedule-view" class="schedule-container"></div>
+      </div>
+
+      <!-- 纸张库存 -->
+      <div id="stock" class="tab-content">
+        <div class="page-header">
+          <h2>📦 纸张库存</h2>
+          <button class="btn btn-primary" onclick="showStockAdjustModal()">+ 调整库存</button>
+        </div>
+        <div id="stock-table" class="table-container"></div>
+      </div>
+
+      <!-- 客户管理 -->
+      <div id="customers" class="tab-content">
+        <div class="page-header">
+          <h2>👥 客户管理</h2>
+          <button class="btn btn-primary" onclick="showCustomerModal()">+ 新增客户</button>
+        </div>
+        <div id="customers-table" class="table-container"></div>
+      </div>
+
+      <!-- 数据导出 -->
+      <div id="export" class="tab-content">
+        <div class="page-header">
+          <h2>📄 数据导出</h2>
+        </div>
+        <div class="export-grid">
+          <div class="export-card">
+            <h3>📋 今日生产单</h3>
+            <p>导出当天需要生产的订单列表</p>
+            <div class="export-buttons">
+              <button class="btn" onclick="downloadExport('today-production', 'markdown')">Markdown</button>
+              <button class="btn" onclick="downloadExport('today-production', 'html')">HTML</button>
+              <button class="btn" onclick="downloadExport('today-production', 'csv')">CSV</button>
+            </div>
+          </div>
+          <div class="export-card">
+            <h3>🚚 客户取件清单</h3>
+            <p>导出未来3天待取件订单</p>
+            <div class="export-buttons">
+              <button class="btn" onclick="downloadExport('pickup-list', 'markdown')">Markdown</button>
+              <button class="btn" onclick="downloadExport('pickup-list', 'csv')">CSV</button>
+            </div>
+          </div>
+          <div class="export-card">
+            <h3>📦 补纸清单</h3>
+            <p>导出纸张库存及补货预警</p>
+            <div class="export-buttons">
+              <button class="btn" onclick="downloadExport('restock-list', 'markdown')">Markdown</button>
+              <button class="btn" onclick="downloadExport('restock-list', 'csv')">CSV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 新建订单弹窗 -->
+  <div id="new-order-modal" class="modal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h3>新建订单</h3>
+        <button class="modal-close" onclick="closeModal('new-order-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="new-order-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>客户</label>
+              <select id="order-customer" name="customer_id">
+                <option value="">散客</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>取件时间</label>
+              <input type="datetime-local" id="order-pickup" name="pickup_time" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>成品类型</label>
+              <select id="order-product-type" name="product_type">
+                <option value="名片">名片</option>
+                <option value="宣传单">宣传单</option>
+                <option value="海报">海报</option>
+                <option value="画册">画册</option>
+                <option value="不干胶">不干胶</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>规格模板</label>
+              <select id="order-spec-template">
+                <option value="">自定义</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>宽度 (mm)</label>
+              <input type="number" id="order-width" name="width" value="90" required>
+            </div>
+            <div class="form-group">
+              <label>高度 (mm)</label>
+              <input type="number" id="order-height" name="height" value="54" required>
+            </div>
+            <div class="form-group">
+              <label>数量</label>
+              <input type="number" id="order-quantity" name="quantity" value="200" min="1" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>纸张</label>
+              <select id="order-paper" name="paper_id">
+                <option value="">请选择</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>工序</label>
+              <select id="order-processes" name="process_ids" multiple>
+              </select>
+              <small class="form-hint">按住 Ctrl/Cmd 多选</small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="order-notes" name="notes" rows="2"></textarea>
+          </div>
+          <div id="order-preview" class="preview-box" style="display:none;">
+            <h4>报价预览</h4>
+            <div class="preview-row">
+              <span>预估用纸:</span>
+              <span id="preview-paper">- 张</span>
+            </div>
+            <div class="preview-row">
+              <span>成本估算:</span>
+              <span id="preview-cost">-</span>
+            </div>
+            <div class="preview-row">
+              <span>报价:</span>
+              <span id="preview-price" class="price">-</span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('new-order-modal')">取消</button>
+        <button class="btn btn-primary" onclick="submitNewOrder()">创建订单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 订单详情弹窗 -->
+  <div id="order-detail-modal" class="modal">
+    <div class="modal-content xlarge">
+      <div class="modal-header">
+        <h3 id="detail-order-title">订单详情</h3>
+        <button class="modal-close" onclick="closeModal('order-detail-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="order-detail-content">
+      </div>
+    </div>
+  </div>
+
+  <!-- 库存调整弹窗 -->
+  <div id="stock-adjust-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>调整库存</h3>
+        <button class="modal-close" onclick="closeModal('stock-adjust-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="stock-adjust-form">
+          <div class="form-group">
+            <label>纸张</label>
+            <select id="adjust-paper" required>
+              <option value="">请选择</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>调整数量 (正数增加，负数减少)</label>
+            <input type="number" id="adjust-quantity" value="100" required>
+          </div>
+          <div class="form-group">
+            <label>原因</label>
+            <input type="text" id="adjust-reason" placeholder="如：进货、盘点调整等">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('stock-adjust-modal')">取消</button>
+        <button class="btn btn-primary" onclick="submitStockAdjust()">确认调整</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 客户管理弹窗 -->
+  <div id="customer-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="customer-modal-title">新增客户</h3>
+        <button class="modal-close" onclick="closeModal('customer-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="customer-form">
+          <input type="hidden" id="customer-id">
+          <div class="form-group">
+            <label>姓名 *</label>
+            <input type="text" id="customer-name" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>电话</label>
+              <input type="tel" id="customer-phone">
+            </div>
+            <div class="form-group">
+              <label>微信</label>
+              <input type="text" id="customer-wechat">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>地址</label>
+            <input type="text" id="customer-address">
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="customer-notes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('customer-modal')">取消</button>
+        <button class="btn btn-primary" onclick="submitCustomer()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
