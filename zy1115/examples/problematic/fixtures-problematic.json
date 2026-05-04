@@ -1,0 +1,134 @@
+[
+  {
+    "name": "get_users_list",
+    "method": "GET",
+    "path": "/api/users",
+    "description": "获取用户列表",
+    "params": {
+      "page": 1,
+      "limit": 20
+    },
+    "response": {
+      "page": 1,
+      "limit": 20,
+      "total": 100,
+      "items": [
+        {
+          "id": 1,
+          "name": "测试用户1",
+          "email": "user1@test.com",
+          "createdAt": "2024-01-15",
+          "updatedAt": "2024-01-16T14:20:00Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "get_user_by_id",
+    "method": "GET",
+    "path": "/api/users/1",
+    "description": "获取单个用户",
+    "response": {
+      "id": "1",
+      "name": "测试用户1",
+      "email": "user1@test.com",
+      "phone": null,
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-16T14:20:00Z"
+    }
+  },
+  {
+    "name": "get_orders_list",
+    "method": "GET",
+    "path": "/api/orders",
+    "description": "获取订单列表",
+    "params": {
+      "page": 1,
+      "pageSize": 20,
+      "status": "paid"
+    },
+    "response": {
+      "page": 1,
+      "pageSize": 20,
+      "total": 25,
+      "data": [
+        {
+          "id": 2001,
+          "orderNo": "TEST20240115001",
+          "userId": "1",
+          "status": "refunded",
+          "amount": 99.00,
+          "currency": "CNY",
+          "createdAt": "2024-01-15T10:30:00Z",
+          "paidAt": "2024-01-15T10:35:00Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "create_order",
+    "method": "POST",
+    "path": "/api/orders",
+    "description": "创建订单",
+    "request": {
+      "userId": 1,
+      "items": [
+        {
+          "productId": 101,
+          "quantity": 2,
+          "price": 99.00
+        }
+      ],
+      "shippingAddress": {
+        "name": "测试用户",
+        "phone": "13800138000",
+        "address": "测试地址",
+        "city": "北京",
+        "postalCode": "100000"
+      }
+    },
+    "response": {
+      "id": 2002,
+      "orderNo": "TEST20240115002",
+      "status": "pending",
+      "amount": 198.00,
+      "createdAt": "2024-01-15T14:00:00Z"
+    },
+    "status": 201
+  },
+  {
+    "name": "get_order_by_id",
+    "method": "GET",
+    "path": "/api/orders/2001",
+    "description": "获取订单详情",
+    "response": {
+      "id": 2001,
+      "orderNo": "TEST20240115001",
+      "userId": 1,
+      "status": "paid",
+      "amount": 99.00,
+      "currency": "CNY",
+      "items": [
+        {
+          "productId": 101,
+          "productName": "测试商品",
+          "quantity": 1,
+          "price": 99.00,
+          "subtotal": 99.00
+        }
+      ],
+      "shippingAddress": {
+        "name": "测试用户",
+        "phone": "13800138000",
+        "address": "测试地址",
+        "city": "北京",
+        "postalCode": "100000"
+      },
+      "createdAt": "2024-01-15T10:30:00Z",
+      "paidAt": "2024-01-15T10:35:00Z",
+      "shippedAt": "2024-01-16T09:00:00Z",
+      "deliveredAt": null,
+      "trackingNumber": "SF1234567890"
+    }
+  }
+]

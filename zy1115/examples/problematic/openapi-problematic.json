@@ -1,0 +1,288 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "订单管理 API (有问题的版本)",
+    "version": "1.0.0",
+    "description": "用于演示各种 Schema 漂移问题的示例 API 文档"
+  },
+  "paths": {
+    "/api/users": {
+      "get": {
+        "summary": "获取用户列表",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回用户列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page": { "type": "integer" },
+                    "limit": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "name": { "type": "string" },
+                          "email": { "type": "string", "format": "email" },
+                          "createdAt": { "type": "string", "format": "date" },
+                          "updatedAt": { "type": "string" }
+                        },
+                        "required": ["id", "name", "email", "createdAt"]
+                      }
+                    }
+                  },
+                  "required": ["page", "limit", "total", "items"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "获取单个用户",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回用户信息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "phone": { "type": "string" },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                  },
+                  "required": ["id", "name", "email", "phone"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "summary": "获取订单列表",
+        "operationId": "getOrders",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回订单列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "page": { "type": "integer" },
+                    "pageSize": { "type": "integer" },
+                    "total": { "type": "integer" },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer" },
+                          "orderNo": { "type": "string" },
+                          "userId": { "type": "string" },
+                          "status": {
+                            "type": "string",
+                            "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+                          },
+                          "amount": { "type": "number", "description": "订单金额，单位：元" },
+                          "currency": { "type": "string", "default": "CNY" },
+                          "createdAt": { "type": "string" },
+                          "paidAt": { "type": "string" }
+                        },
+                        "required": ["id", "orderNo", "userId", "status", "amount"]
+                      }
+                    }
+                  },
+                  "required": ["page", "pageSize", "total", "data"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "创建订单",
+        "operationId": "createOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "integer" },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "productId": { "type": "integer" },
+                        "quantity": { "type": "integer", "minimum": 1 },
+                        "price": { "type": "number" }
+                      },
+                      "required": ["productId", "quantity", "price"]
+                    }
+                  },
+                  "shippingAddress": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string" },
+                      "phone": { "type": "string" },
+                      "address": { "type": "string" },
+                      "city": { "type": "string" },
+                      "postalCode": { "type": "string" }
+                    },
+                    "required": ["name", "phone", "address", "city", "postalCode"]
+                  }
+                },
+                "required": ["userId", "items", "shippingAddress"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "订单创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "orderNo": { "type": "string" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+                    },
+                    "amount": { "type": "number" },
+                    "createdAt": { "type": "string", "format": "date-time" }
+                  },
+                  "required": ["id", "orderNo", "status", "amount", "createdAt"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "summary": "获取单个订单",
+        "operationId": "getOrderById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功返回订单详情",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "orderNo": { "type": "string" },
+                    "userId": { "type": "integer" },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "paid", "shipped", "delivered", "cancelled"]
+                    },
+                    "amount": { "type": "number" },
+                    "currency": { "type": "string" },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "productId": { "type": "integer" },
+                          "productName": { "type": "string" },
+                          "quantity": { "type": "integer" },
+                          "price": { "type": "number" },
+                          "subtotal": { "type": "number" }
+                        }
+                      }
+                    },
+                    "shippingAddress": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "phone": { "type": "string" },
+                        "address": { "type": "string" },
+                        "city": { "type": "string" },
+                        "postalCode": { "type": "string" }
+                      }
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "paidAt": { "type": "string", "format": "date-time" },
+                    "shippedAt": { "type": "string", "format": "date-time" },
+                    "deliveredAt": { "type": "string", "format": "date-time" }
+                  },
+                  "required": ["id", "orderNo", "userId", "status", "amount"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

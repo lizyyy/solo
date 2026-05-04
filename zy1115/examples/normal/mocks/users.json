@@ -1,0 +1,39 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/users",
+    "response": {
+      "page": 1,
+      "pageSize": 20,
+      "total": 100,
+      "data": [
+        {
+          "id": 1,
+          "name": "张三",
+          "email": "zhangsan@example.com",
+          "createdAt": "2024-01-15T10:30:00Z",
+          "updatedAt": "2024-01-16T14:20:00Z"
+        },
+        {
+          "id": 2,
+          "name": "李四",
+          "email": "lisi@example.com",
+          "createdAt": "2024-01-14T09:15:00Z",
+          "updatedAt": "2024-01-14T09:15:00Z"
+        }
+      ]
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/api/users/1",
+    "response": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "phone": "13800138000",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-16T14:20:00Z"
+    }
+  }
+]
