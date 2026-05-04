@@ -1,0 +1,23 @@
+{
+  "name": "observation-review-frontend",
+  "version": "1.0.0",
+  "description": "校园天文社观测夜复盘工具 - 前端",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["astronomy", "observation", "review", "vue3"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.3.4",
+    "axios": "^1.5.0",
+    "dayjs": "^1.11.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "vite": "^4.4.9"
+  }
+}
