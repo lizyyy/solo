@@ -1,0 +1,24 @@
+{
+  "guests": [
+    {
+      "name": "李四",
+      "permission_type": "full_release",
+      "sign_date": "2024-03-10",
+      "terms": "允许在所有平台播出，包括音频和视频"
+    },
+    {
+      "name": "王五",
+      "permission_type": "audio_only",
+      "sign_date": "2024-03-12",
+      "restrictions": "仅音频，不可用于视频剪辑或短视频平台"
+    },
+    {
+      "name": "赵六",
+      "permission_type": "limited",
+      "sign_date": "2024-03-15",
+      "valid_from": "2024-03-15",
+      "valid_until": "2024-06-15",
+      "notes": "有效期3个月，到期需重新授权"
+    }
+  ]
+}

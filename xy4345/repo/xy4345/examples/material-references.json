@@ -1,0 +1,43 @@
+{
+  "materials": [
+    {
+      "name": "采访片段 - AI 发展趋势",
+      "type": "clip",
+      "source": "嘉宾张三",
+      "duration": 300,
+      "authorization": {
+        "holder_name": "张三",
+        "permission_type": "full_release",
+        "sign_date": "2024-03-15",
+        "terms": "允许在所有平台播出，包括剪辑和二次创作"
+      }
+    },
+    {
+      "name": "新闻片段 - 科技发布会",
+      "type": "clip",
+      "source": "TechNews 官网",
+      "duration": 120,
+      "authorization": {
+        "holder_name": "TechNews",
+        "permission_type": "fair_use",
+        "notes": "已获得引用许可"
+      }
+    },
+    {
+      "name": "专家观点 - 经济学分析",
+      "type": "clip",
+      "source": "李四教授",
+      "duration": 240
+    },
+    {
+      "name": "历史资料片段",
+      "type": "clip",
+      "source": "公共档案",
+      "duration": 60,
+      "authorization": {
+        "holder_name": "公共档案馆",
+        "permission_type": "public_domain"
+      }
+    }
+  ]
+}

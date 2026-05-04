@@ -1,0 +1,30 @@
+{
+  "ads": [
+    {
+      "name": "品牌A产品介绍",
+      "sponsor": "品牌A公司",
+      "duration": 15,
+      "timestamp": "00:05:30",
+      "notes": "开场后第一个广告"
+    },
+    {
+      "name": "品牌B开场广告",
+      "sponsor": "品牌B",
+      "duration": 30,
+      "timestamp": "00:00:30"
+    },
+    {
+      "name": "品牌C中段广告",
+      "sponsor": "品牌C科技",
+      "duration": 45,
+      "timestamp": "00:15:00",
+      "notes": "注意：此广告时长超过标准"
+    },
+    {
+      "name": "品牌D片尾赞助",
+      "sponsor": "品牌D教育",
+      "duration": 20,
+      "timestamp": "00:28:00"
+    }
+  ]
+}
