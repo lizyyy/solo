@@ -1,0 +1,21 @@
+{
+  "name": "webhook-debugger",
+  "version": "1.0.0",
+  "description": "本地 Webhook 调试服务 - 帮助小团队调试第三方回调接入",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node scripts/seed.js",
+    "test": "node test/smoke.test.js"
+  },
+  "keywords": ["webhook", "debug", "api", "signature", "retry"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
