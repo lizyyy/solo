@@ -1,0 +1,48 @@
+queues:
+  - name: "default"
+    worker_concurrency: 10
+    batch_size: 1
+    poll_interval: "1s"
+    default_timeout: "30s"
+    max_retries: 3
+    priority_quota:
+      high: 0.4
+      medium: 0.4
+      low: 0.2
+
+  - name: "priority"
+    worker_concurrency: 4
+    batch_size: 1
+    poll_interval: "500ms"
+    default_timeout: "30s"
+    max_retries: 1
+
+worker_pools:
+  - name: "default-pool"
+    worker_count: 10
+    queue_names: ["default"]
+    concurrency_per_worker: 1
+    batch_size: 1
+    poll_interval: "1s"
+
+  - name: "priority-pool"
+    worker_count: 4
+    queue_names: ["priority"]
+    concurrency_per_worker: 2
+    batch_size: 1
+    poll_interval: "500ms"
+
+retry_policy:
+  strategy: "fixed"
+  initial_delay: "1s"
+  max_delay: "5m"
+  multiplier: 2.0
+  jitter: 0.1
+
+analysis:
+  wait_time_percentiles: [50, 95, 99]
+  execution_time_percentiles: [50, 95, 99]
+  retry_storm_window: "10s"
+  retry_storm_threshold: 5
+  priority_inversion_threshold: 3
+  starvation_threshold: "5m"

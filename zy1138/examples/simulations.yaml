@@ -1,0 +1,92 @@
+simulations:
+  - name: "current-config"
+    description: "当前生产配置"
+    worker_pools:
+      - name: "default-pool"
+        worker_count: 3
+        queue_names: ["default"]
+        concurrency_per_worker: 1
+        batch_size: 1
+        poll_interval: "1s"
+    default_retry_policy:
+      strategy: "fixed"
+      initial_delay: "1s"
+      max_delay: "30s"
+      multiplier: 2.0
+      jitter: 0.1
+    queues:
+      - name: "default"
+        worker_concurrency: 3
+        batch_size: 1
+        poll_interval: "1s"
+        default_timeout: "30s"
+        max_retries: 3
+
+  - name: "more-workers"
+    description: "增加 Worker 数量到 10"
+    worker_pools:
+      - name: "default-pool"
+        worker_count: 10
+        queue_names: ["default"]
+        concurrency_per_worker: 1
+        batch_size: 1
+        poll_interval: "1s"
+    default_retry_policy:
+      strategy: "fixed"
+      initial_delay: "1s"
+      max_delay: "30s"
+      multiplier: 2.0
+      jitter: 0.1
+    queues:
+      - name: "default"
+        worker_concurrency: 10
+        batch_size: 1
+        poll_interval: "1s"
+        default_timeout: "30s"
+        max_retries: 3
+
+  - name: "exponential-backoff"
+    description: "使用指数退避重试策略"
+    worker_pools:
+      - name: "default-pool"
+        worker_count: 3
+        queue_names: ["default"]
+        concurrency_per_worker: 1
+        batch_size: 1
+        poll_interval: "1s"
+    default_retry_policy:
+      strategy: "exponential"
+      initial_delay: "1s"
+      max_delay: "5m"
+      multiplier: 2.0
+      jitter: 0.3
+    queues:
+      - name: "default"
+        worker_concurrency: 3
+        batch_size: 1
+        poll_interval: "1s"
+        default_timeout: "30s"
+        max_retries: 5
+
+  - name: "batch-optimized"
+    description: "启用批处理，调整轮询间隔"
+    worker_pools:
+      - name: "default-pool"
+        worker_count: 5
+        queue_names: ["default"]
+        concurrency_per_worker: 2
+        batch_size: 5
+        poll_interval: "500ms"
+    default_retry_policy:
+      strategy: "exponential"
+      initial_delay: "2s"
+      max_delay: "5m"
+      multiplier: 2.5
+      jitter: 0.3
+    queues:
+      - name: "default"
+        worker_concurrency: 10
+        batch_size: 5
+        poll_interval: "500ms"
+        default_timeout: "60s"
+        max_retries: 5

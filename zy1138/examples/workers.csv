@@ -1,0 +1,12 @@
+id,name,queue_types,concurrency,batch_size,poll_interval_ms,status
+worker-001,email-worker-01,email_send,1,1,1000,active
+worker-002,email-worker-02,email_send,1,1,1000,active
+worker-003,email-worker-03,email_send,1,1,1000,active
+worker-004,image-worker-01,image_process,1,1,2000,active
+worker-005,image-worker-02,image_process,1,1,2000,active
+worker-006,notification-worker-01,notification_push,2,5,500,active
+worker-007,database-worker-01,database_sync,1,1,5000,active
+worker-008,payment-worker-01,payment_process,2,1,500,active
+worker-009,payment-worker-02,payment_process,2,1,500,active
+worker-010,report-worker-01,report_generate,1,1,3000,active
+worker-011,archive-worker-01,log_archive,1,1,10000,idle
