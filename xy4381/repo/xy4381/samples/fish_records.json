@@ -1,0 +1,40 @@
+{
+  "records": [
+    {
+      "tank_code": "A01",
+      "fish_species": "小丑鱼",
+      "fish_name": "尼莫夫妇",
+      "quantity": 2,
+      "introduction_date": "2026-04-01",
+      "is_quarantined": false,
+      "notes": "已适应环境"
+    },
+    {
+      "tank_code": "A01",
+      "fish_species": "蓝倒吊",
+      "fish_name": "多莉",
+      "quantity": 1,
+      "introduction_date": "2026-04-15",
+      "is_quarantined": false,
+      "notes": ""
+    },
+    {
+      "tank_code": "A02",
+      "fish_species": "黄金吊",
+      "fish_name": "",
+      "quantity": 3,
+      "introduction_date": "2026-04-20",
+      "is_quarantined": false,
+      "notes": ""
+    },
+    {
+      "tank_code": "A03",
+      "fish_species": "海马",
+      "fish_name": "小海",
+      "quantity": 5,
+      "introduction_date": "2026-05-02",
+      "is_quarantined": true,
+      "notes": "新入缸，观察中"
+    }
+  ]
+}

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水族馆巡检系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        header h1 { 
+            font-size: 24px; 
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        header .date { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .stat-info h3 { font-size: 13px; color: #666; font-weight: 500; }
+        .stat-info .number { font-size: 28px; font-weight: 700; color: #333; }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .nav-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover { color: #2d5a87; }
+        .nav-tab.active { 
+            color: #2d5a87; 
+            border-bottom-color: #2d5a87;
+            font-weight: 600;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .import-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .import-box {
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .import-box:hover { 
+            border-color: #2d5a87; 
+            background: #f8fafc;
+        }
+        .import-box.dragover {
+            border-color: #2d5a87;
+            background: #ebf4ff;
+        }
+        .import-box .icon { font-size: 36px; margin-bottom: 10px; }
+        .import-box h3 { font-size: 16px; margin-bottom: 8px; color: #1e3a5f; }
+        .import-box p { font-size: 13px; color: #666; margin-bottom: 15px; }
+        .import-box input[type="file"] { display: none; }
+        .import-box label {
+            display: inline-block;
+            background: #2d5a87;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .import-box label:hover { background: #1e3a5f; }
+        
+        .risk-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        .risk-item:hover { border-color: #cbd5e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .risk-item.critical { border-left: 4px solid #ef4444; }
+        .risk-item.warning { border-left: 4px solid #f59e0b; }
+        .risk-item.info { border-left: 4px solid #3b82f6; }
+        
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .risk-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .risk-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .risk-badge.critical { background: #fef2f2; color: #dc2626; }
+        .risk-badge.warning { background: #fffbeb; color: #d97706; }
+        .risk-badge.info { background: #eff6ff; color: #2563eb; }
+        
+        .risk-tank { font-weight: 600; color: #1e3a5f; }
+        .risk-type { font-size: 13px; color: #666; }
+        .risk-desc { font-size: 14px; color: #333; margin: 8px 0; }
+        .risk-meta { font-size: 12px; color: #999; }
+        
+        .review-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: none;
+        }
+        .review-section.expanded { display: block; }
+        
+        .review-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .review-form select, .review-form textarea, .review-form input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .review-form textarea {
+            flex: 1;
+            min-width: 200px;
+            min-height: 36px;
+            resize: vertical;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #2d5a87; color: white; }
+        .btn-primary:hover { background: #1e3a5f; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        .btn-sm { padding: 6px 12px; font-size: 13px; }
+        .btn-link {
+            background: none;
+            color: #2d5a87;
+            padding: 0;
+            text-decoration: underline;
+        }
+        
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .export-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .export-box h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .export-box p { font-size: 13px; color: #666; margin-bottom: 15px; }
+        .export-box .form-group { margin-bottom: 12px; }
+        .export-box label { display: block; font-size: 13px; margin-bottom: 5px; color: #555; }
+        .export-box input, .export-box select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff30;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+        
+        .review-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .review-status.pending { background: #fef3c7; color: #92400e; }
+        .review-status.confirmed { background: #fee2e2; color: #991b1b; }
+        .review-status.dismissed { background: #e5e7eb; color: #4b5563; }
+        .review-status.resolved { background: #d1fae5; color: #065f46; }
+        
+        .btn-detect {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            margin-bottom: 20px;
+        }
+        .btn-detect:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>
+                <span>🐠</span>
+                水族馆巡检系统
+            </h1>
+            <div class="date">今日日期: {{ today.strftime('%Y年%m月%d日') }}</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #dbeafe;">🐟</div>
+                <div class="stat-info">
+                    <h3>展缸总数</h3>
+                    <div class="number">{{ stats.total_tanks }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fee2e2;">🔴</div>
+                <div class="stat-info">
+                    <h3>严重风险</h3>
+                    <div class="number" style="color: #dc2626;">{{ stats.critical_count }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7;">🟡</div>
+                <div class="stat-info">
+                    <h3>警告风险</h3>
+                    <div class="number" style="color: #d97706;">{{ stats.warning_count }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7;">🍽️</div>
+                <div class="stat-info">
+                    <h3>未投喂展缸</h3>
+                    <div class="number" style="color: {{ '#d97706' if stats.unfed_count > 0 else '#10b981' }};">{{ stats.unfed_count }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="risks">风险列表</button>
+            <button class="nav-tab" data-tab="import">数据导入</button>
+            <button class="nav-tab" data-tab="export">数据导出</button>
+        </div>
+        
+        <div id="risks-tab" class="tab-content active">
+            <div class="card">
+                <h2>
+                    <span>⚠️</span>
+                    今日风险检测
+                </h2>
+                
+                <button class="btn btn-detect" onclick="detectRisks()">
+                    🔄 重新检测所有风险
+                </button>
+                
+                <div id="risks-list">
+                    {% if today_risks %}
+                        {% for risk in today_risks %}
+                        <div class="risk-item {{ risk.risk_level }}" data-risk-id="{{ risk.id }}">
+                            <div class="risk-header">
+                                <div class="risk-title">
+                                    <span class="risk-badge {{ risk.risk_level }}">
+                                        {% if risk.risk_level == 'critical' %}严重
+                                        {% elif risk.risk_level == 'warning' %}警告
+                                        {% else %}提示{% endif %}
+                                    </span>
+                                    <span class="risk-tank">{{ risk.tank.tank_code }} ({{ risk.tank.tank_name or '未命名' }})</span>
+                                    <span class="risk-type">{{ RISK_TYPES.get(risk.risk_type, risk.risk_type) }}</span>
+                                </div>
+                                <div>
+                                    {% if risk.review_status != 'pending' %}
+                                    <span class="review-status {{ risk.review_status }}">
+                                        {{ REVIEW_STATUSES.get(risk.review_status, risk.review_status) }}
+                                        {% if risk.reviewed_by %} - {{ risk.reviewed_by }}{% endif %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="risk-desc">{{ risk.description }}</div>
+                            <div class="risk-meta">
+                                检测时间: {{ risk.detected_date }}
+                                {% if risk.review_comment %}
+                                | 复核备注: {{ risk.review_comment }}
+                                {% endif %}
+                            </div>
+                            
+                            {% if risk.review_status == 'pending' %}
+                            <div style="margin-top: 12px;">
+                                <button class="btn btn-sm btn-link" onclick="toggleReview({{ risk.id }})">
+                                    展开复核
+                                </button>
+                            </div>
+                            <div class="review-section" id="review-{{ risk.id }}">
+                                <div class="review-form">
+                                    <select id="review-status-{{ risk.id }}">
+                                        <option value="pending">待复核</option>
+                                        <option value="confirmed">确认风险</option>
+                                        <option value="dismissed">误报驳回</option>
+                                        <option value="resolved">已处理</option>
+                                    </select>
+                                    <input type="text" id="reviewer-{{ risk.id }}" placeholder="复核人姓名" style="width: 120px;">
+                                    <textarea id="review-comment-{{ risk.id }}" placeholder="复核备注..."></textarea>
+                                    <button class="btn btn-primary btn-sm" onclick="submitReview({{ risk.id }})">提交</button>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="icon">✅</div>
+                            <p>今日暂无风险记录</p>
+                            <p style="font-size: 13px; margin-top: 8px;">点击"重新检测所有风险"开始检测</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div id="import-tab" class="tab-content">
+            <div class="card">
+                <h2>
+                    <span>📥</span>
+                    数据导入
+                </h2>
+                
+                <div class="import-section">
+                    <div class="import-box" data-import-type="water_quality">
+                        <div class="icon">🌡️</div>
+                        <h3>水质数据</h3>
+                        <p>导入 CSV 格式的水温、盐度、pH、氨氮数据</p>
+                        <label>
+                            <input type="file" accept=".csv" onchange="handleImport(this, 'water_quality')">
+                            选择 CSV 文件
+                        </label>
+                    </div>
+                    
+                    <div class="import-box" data-import-type="feeding">
+                        <div class="icon">🐟</div>
+                        <h3>投喂记录</h3>
+                        <p>导入 JSON 格式的投喂记录</p>
+                        <label>
+                            <input type="file" accept=".json" onchange="handleImport(this, 'feeding')">
+                            选择 JSON 文件
+                        </label>
+                    </div>
+                    
+                    <div class="import-box" data-import-type="water_change">
+                        <div class="icon">💧</div>
+                        <h3>换水计划</h3>
+                        <p>导入 CSV 或 JSON 格式的换水记录</p>
+                        <label>
+                            <input type="file" accept=".csv,.json" onchange="handleImport(this, 'water_change')">
+                            选择文件
+                        </label>
+                    </div>
+                    
+                    <div class="import-box" data-import-type="observations">
+                        <div class="icon">📝</div>
+                        <h3>异常观察</h3>
+                        <p>导入 CSV 或 JSON 格式的观察记录</p>
+                        <label>
+                            <input type="file" accept=".csv,.json" onchange="handleImport(this, 'observations')">
+                            选择文件
+                        </label>
+                    </div>
+                    
+                    <div class="import-box" data-import-type="fish">
+                        <div class="icon">🐠</div>
+                        <h3>鱼类记录</h3>
+                        <p>导入 JSON 格式的鱼类/隔离记录</p>
+                        <label>
+                            <input type="file" accept=".json" onchange="handleImport(this, 'fish')">
+                            选择 JSON 文件
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>
+                    <span>📋</span>
+                    导入格式说明
+                </h2>
+                <div style="font-size: 14px; line-height: 1.8;">
+                    <p><strong>水质数据 (CSV):</strong> 列名支持: tank_code/展缸编号/缸号, date/日期, temp/水温, salinity/盐度, ph/PH/pH, ammonia/氨氮</p>
+                    <p><strong>投喂记录 (JSON):</strong> 格式: {"records": [{"tank_code": "A01", "date": "2024-01-01", "feed_type": "颗粒饲料", "feed_amount_g": 50, "feeder_name": "张三"}]}</p>
+                    <p><strong>换水计划:</strong> 包含 change_date/换水日期, next_scheduled_date/下次换水日期 等字段</p>
+                    <p><strong>鱼类记录 (JSON):</strong> 包含 fish_species/鱼种, introduction_date/入缸日期, is_quarantined/是否隔离 等字段</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="export-tab" class="tab-content">
+            <div class="card">
+                <h2>
+                    <span>📤</span>
+                    数据导出
+                </h2>
+                
+                <div class="export-grid">
+                    <div class="export-box">
+                        <h3><span>📄</span> Markdown 值班交接单</h3>
+                        <p>生成包含风险概览、展缸状态的值班交接单</p>
+                        <div class="form-group">
+                            <label>日期</label>
+                            <input type="date" id="export-handover-date" value="{{ today.strftime('%Y-%m-%d') }}">
+                        </div>
+                        <div class="form-group">
+                            <label>值班人员</label>
+                            <input type="text" id="export-handover-reviewer" placeholder="可选">
+                        </div>
+                        <button class="btn btn-primary" onclick="exportHandover()">导出 Markdown</button>
+                    </div>
+                    
+                    <div class="export-box">
+                        <h3><span>📊</span> CSV 风险清单</h3>
+                        <p>导出指定日期范围内的风险记录</p>
+                        <div class="form-group">
+                            <label>包含天数</label>
+                            <select id="export-risks-days">
+                                <option value="1">今天</option>
+                                <option value="3">近3天</option>
+                                <option value="7" selected>近7天</option>
+                                <option value="14">近14天</option>
+                                <option value="30">近30天</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="export-risks-resolved">
+                                包含已处理风险
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportRisksCsv()">导出 CSV</button>
+                    </div>
+                    
+                    <div class="export-box">
+                        <h3><span>📦</span> JSON 审计包</h3>
+                        <p>导出完整的当日数据，用于审计和备份</p>
+                        <div class="form-group">
+                            <label>日期</label>
+                            <input type="date" id="export-audit-date" value="{{ today.strftime('%Y-%m-%d') }}">
+                        </div>
+                        <p style="font-size: 12px; color: #888; margin-top: -8px;">包含: 展缸、水质、投喂、换水、鱼类、观察、风险、复核记录</p>
+                        <button class="btn btn-primary" onclick="exportAudit()">导出 JSON</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+            });
+        });
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function toggleReview(riskId) {
+            const section = document.getElementById('review-' + riskId);
+            section.classList.toggle('expanded');
+        }
+        
+        async function submitReview(riskId) {
+            const status = document.getElementById('review-status-' + riskId).value;
+            const reviewer = document.getElementById('reviewer-' + riskId).value;
+            const comment = document.getElementById('review-comment-' + riskId).value;
+            
+            try {
+                const response = await fetch(`/api/risks/${riskId}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        review_status: status,
+                        reviewed_by: reviewer,
+                        review_comment: comment
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showToast('复核已提交', 'success');
+                    location.reload();
+                } else {
+                    showToast(result.error || '提交失败', 'error');
+                }
+            } catch (e) {
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        async function detectRisks() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> 检测中...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/detect-risks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showToast(`检测完成，发现 ${result.total_risks} 个风险`, 'success');
+                    location.reload();
+                } else {
+                    showToast('检测失败', 'error');
+                }
+            } catch (e) {
+                showToast('网络错误', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+        
+        async function handleImport(input, importType) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const box = input.closest('.import-box');
+            const originalHTML = box.innerHTML;
+            box.innerHTML = '<div class="icon"><span class="loading" style="border-color: #2d5a8730; border-top-color: #2d5a87;"></span></div><p style="margin-top: 10px;">导入中...</p>';
+            
+            try {
+                const response = await fetch(`/api/import/${importType}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const r = result.result;
+                    showToast(`导入成功: ${r.imported_records} 条记录, ${r.tanks_created} 个新展缸`, 'success');
+                    if (r.warnings && r.warnings.length > 0) {
+                        console.log('Warnings:', r.warnings);
+                    }
+                } else {
+                    showToast(result.error || '导入失败', 'error');
+                }
+            } catch (e) {
+                showToast('网络错误', 'error');
+            } finally {
+                box.innerHTML = originalHTML;
+                const newInput = box.querySelector('input[type="file"]');
+                if (newInput) {
+                    newInput.onchange = (e) => handleImport(e.target, importType);
+                }
+            }
+        }
+        
+        function exportHandover() {
+            const date = document.getElementById('export-handover-date').value;
+            const reviewer = document.getElementById('export-handover-reviewer').value;
+            let url = '/api/export/handover?';
+            if (date) url += `export_date=${encodeURIComponent(date)}&`;
+            if (reviewer) url += `reviewer_name=${encodeURIComponent(reviewer)}`;
+            window.location.href = url;
+        }
+        
+        function exportRisksCsv() {
+            const days = document.getElementById('export-risks-days').value;
+            const includeResolved = document.getElementById('export-risks-resolved').checked;
+            window.location.href = `/api/export/risks_csv?days=${days}&include_resolved=${includeResolved}`;
+        }
+        
+        function exportAudit() {
+            const date = document.getElementById('export-audit-date').value;
+            window.location.href = `/api/export/audit?export_date=${encodeURIComponent(date)}`;
+        }
+        
+        document.querySelectorAll('.import-box').forEach(box => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('dragover');
+            });
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('dragover');
+            });
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('dragover');
+                const importType = box.dataset.importType;
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const input = box.querySelector('input[type="file"]');
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    input.files = dt.files;
+                    handleImport(input, importType);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

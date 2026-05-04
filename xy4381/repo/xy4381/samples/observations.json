@@ -1,0 +1,31 @@
+{
+  "records": [
+    {
+      "tank_code": "A01",
+      "observation_date": "2026-05-04",
+      "time": "10:00",
+      "observer_name": "张饲养员",
+      "observation_type": "正常",
+      "description": "所有鱼类活动正常，水质参数稳定",
+      "severity": "normal"
+    },
+    {
+      "tank_code": "A02",
+      "observation_date": "2026-05-04",
+      "time": "10:30",
+      "observer_name": "李饲养员",
+      "observation_type": "异常",
+      "description": "发现一条黄金吊有轻微白点症状，建议隔离观察",
+      "severity": "warning"
+    },
+    {
+      "tank_code": "A03",
+      "observation_date": "2026-05-04",
+      "time": "11:00",
+      "observer_name": "李饲养员",
+      "observation_type": "异常",
+      "description": "新入缸海马进食量偏少，继续观察",
+      "severity": "info"
+    }
+  ]
+}

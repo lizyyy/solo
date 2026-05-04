@@ -1,0 +1,31 @@
+{
+  "records": [
+    {
+      "tank_code": "A01",
+      "date": "2026-05-04",
+      "time": "09:00",
+      "feed_type": "颗粒饲料",
+      "feed_amount_g": 45,
+      "feeder_name": "张饲养员",
+      "notes": "正常投喂"
+    },
+    {
+      "tank_code": "A02",
+      "date": "2026-05-04",
+      "time": "09:15",
+      "feed_type": "颗粒饲料",
+      "feed_amount_g": 60,
+      "feeder_name": "张饲养员",
+      "notes": ""
+    },
+    {
+      "tank_code": "A03",
+      "date": "2026-05-04",
+      "time": "09:30",
+      "feed_type": "薄片饲料",
+      "feed_amount_g": 30,
+      "feeder_name": "李饲养员",
+      "notes": "新鱼入缸第3天，少量投喂"
+    }
+  ]
+}
