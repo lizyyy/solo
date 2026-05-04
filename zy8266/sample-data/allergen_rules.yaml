@@ -1,0 +1,53 @@
+version: "1.0"
+lastUpdated: "2026-04-30"
+rules:
+  - allergen: "花生/坚果类"
+    code: "NUT"
+    highRiskIngredients:
+      - "花生"
+      - "核桃"
+      - "杏仁"
+      - "腰果"
+      - "坚果"
+    severity: "high"
+    crossContaminationRisk: true
+    notes: "含花生的菜品必须单独留样，标签标注过敏原信息"
+  
+  - allergen: "海鲜类"
+    code: "SEA"
+    highRiskIngredients:
+      - "虾"
+      - "蟹"
+      - "鱿鱼"
+      - "海鲜"
+      - "鱼"
+    severity: "high"
+    crossContaminationRisk: true
+    notes: "海鲜类菜品需确保不与其他菜品交叉污染"
+  
+  - allergen: "蛋类"
+    code: "EGG"
+    highRiskIngredients:
+      - "鸡蛋"
+      - "蛋"
+    severity: "medium"
+    crossContaminationRisk: false
+    notes: "蛋类过敏原相对常见，但风险较低"
+  
+  - allergen: "豆制品"
+    code: "SOY"
+    highRiskIngredients:
+      - "豆腐"
+      - "黄豆"
+      - "大豆"
+    severity: "medium"
+    crossContaminationRisk: false
+    notes: "豆制品过敏原，注意成分标注"
+
+reportingRequirements:
+  - requirement: "所有高风险菜品必须在留样标签上标注过敏原类型"
+    frequency: "每次留样"
+  - requirement: "每月汇总过敏原风险情况，提交食品安全报告"
+    frequency: "每月"
+  - requirement: "发生过敏反应事件后24小时内提交追溯报告"
+    frequency: "事件触发"

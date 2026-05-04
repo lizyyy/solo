@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食堂留样与过敏原追溯复盘看板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .import-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .import-card {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .import-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .import-card.has-data {
+            border-style: solid;
+            border-color: #4ade80;
+            background: #f0fdf4;
+        }
+
+        .import-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .import-card .file-name {
+            font-size: 12px;
+            color: #999;
+            word-break: break-all;
+        }
+
+        .import-card .status {
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status.ready {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .stat-card.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .stat-card.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e2e8f0;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+
+        .timeline-item.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .timeline-item.warning::before {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px #f59e0b;
+        }
+
+        .timeline-item.danger {
+            border-left-color: #ef4444;
+        }
+
+        .timeline-item.danger::before {
+            background: #ef4444;
+            box-shadow: 0 0 0 2px #ef4444;
+        }
+
+        .timeline-item .time {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .timeline-item .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .timeline-item .details {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .timeline-item .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .issues-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .issues-table th,
+        .issues-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .issues-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .issues-table td {
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .issues-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .severity-high {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .severity-medium {
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        .severity-low {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .allergen-risk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .allergen-card {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .allergen-card.medium {
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .allergen-card.low {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .allergen-card .allergen-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #991b1b;
+            margin-bottom: 8px;
+        }
+
+        .allergen-card.medium .allergen-name {
+            color: #92400e;
+        }
+
+        .allergen-card.low .allergen-name {
+            color: #166534;
+        }
+
+        .allergen-card .risk-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 12px;
+        }
+
+        .allergen-card.medium .risk-count {
+            color: #d97706;
+        }
+
+        .allergen-card.low .risk-count {
+            color: #059669;
+        }
+
+        .allergen-card .ingredients {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .batch-chain {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .batch-chain-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .batch-chain-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .batch-chain-meta {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .batch-steps {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .batch-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
+        }
+
+        .batch-step .step-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .batch-step .step-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .batch-arrow {
+            font-size: 18px;
+            color: #cbd5e1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state .message {
+            font-size: 14px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .demo-guide {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid #fcd34d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .demo-guide h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+
+        .demo-guide ol {
+            margin-left: 20px;
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.8;
+        }
+
+        .demo-guide li {
+            margin-bottom: 8px;
+        }
+
+        .demo-highlight {
+            background: #fef9c3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>校园食堂留样与过敏原追溯复盘看板</h1>
+            <p>后勤食品安全负责人专用 - 数据导入、风险分析、问题追溯、报告导出</p>
+        </header>
+
+        <div class="demo-guide" id="demoGuide">
+            <h3>🎯 核心演示流程（点击执行）</h3>
+            <ol>
+                <li><button class="btn btn-secondary" onclick="loadSampleData()">1. 一键加载示例数据</button> - 自动导入所有示例文件</li>
+                <li><button class="btn btn-secondary" onclick="runAnalysis()">2. 执行风险分析</button> - 检测留样重量不足、温度异常等问题</li>
+                <li><button class="btn btn-secondary" onclick="showFilters()">3. 使用筛选器</button> - 按日期/窗口/冰箱筛选数据</li>
+                <li><button class="btn btn-secondary" onclick="showIssues()">4. 查看问题详情</button> - 定位高风险问题</li>
+                <li><button class="btn btn-secondary" onclick="exportReports()">5. 导出报告</button> - 生成 issues.csv 和 canteen_review.md</li>
+            </ol>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📁 数据导入</h2>
+            
+            <div class="import-section">
+                <div class="import-card" id="import-dishes" onclick="document.getElementById('file-dishes').click()">
+                    <h3>dishes.csv</h3>
+                    <p style="font-size: 12px; color: #666;">菜品信息（含配料）</p>
+                    <p class="file-name" id="file-dishes-name">未选择文件</p>
+                    <span class="status pending" id="status-dishes">待导入</span>
+                </div>
+                <input type="file" id="file-dishes" accept=".csv" style="display: none;" onchange="handleFileSelect(this, 'dishes')">
+
+                <div class="import-card" id="import-samples" onclick="document.getElementById('file-samples').click()">
+                    <h3>sample_fridges.jsonl</h3>
+                    <p style="font-size: 12px; color: #666;">留样冰箱记录（温度日志）</p>
+                    <p class="file-name" id="file-samples-name">未选择文件</p>
+                    <span class="status pending" id="status-samples">待导入</span>
+                </div>
+                <input type="file" id="file-samples" accept=".jsonl,.json" style="display: none;" onchange="handleFileSelect(this, 'samples')">
+
+                <div class="import-card" id="import-allergens" onclick="document.getElementById('file-allergens').click()">
+                    <h3>allergen_rules.yaml</h3>
+                    <p style="font-size: 12px; color: #666;">过敏原规则配置</p>
+                    <p class="file-name" id="file-allergens-name">未选择文件</p>
+                    <span class="status pending" id="status-allergens">待导入</span>
+                </div>
+                <input type="file" id="file-allergens" accept=".yaml,.yml" style="display: none;" onchange="handleFileSelect(this, 'allergens')">
+
+                <div class="import-card" id="import-batches" onclick="document.getElementById('file-batches').click()">
+                    <h3>supplier_batches.csv</h3>
+                    <p style="font-size: 12px; color: #666;">供应商批次信息</p>
+                    <p class="file-name" id="file-batches-name">未选择文件</p>
+                    <span class="status pending" id="status-batches">待导入</span>
+                </div>
+                <input type="file" id="file-batches" accept=".csv" style="display: none;" onchange="handleFileSelect(this, 'batches')">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="btn-analyze" onclick="analyzeData()" disabled>
+                    🔍 分析数据
+                </button>
+                <button class="btn btn-secondary" onclick="clearAllData()">
+                    🗑️ 清空数据
+                </button>
+            </div>
+        </div>
+
+        <div class="section" id="results-section" style="display: none;">
+            <h2 class="section-title">📊 分析概览</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value" id="stat-dishes">0</div>
+                    <div class="label">菜品总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="stat-samples">0</div>
+                    <div class="label">留样记录</div>
+                </div>
+                <div class="stat-card warning" id="stat-issues-card">
+                    <div class="value" id="stat-issues">0</div>
+                    <div class="label">问题数量</div>
+                </div>
+                <div class="stat-card danger" id="stat-high-issues-card">
+                    <div class="value" id="stat-high-issues">0</div>
+                    <div class="label">高风险问题</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="filters-section" style="display: none;">
+            <h2 class="section-title">🔎 数据筛选</h2>
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label>日期范围</label>
+                    <select id="filter-date">
+                        <option value="all">全部日期</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>窗口</label>
+                    <select id="filter-window">
+                        <option value="all">全部窗口</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>冰箱</label>
+                    <select id="filter-fridge">
+                        <option value="all">全部冰箱</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>问题类型</label>
+                    <select id="filter-issue-type">
+                        <option value="all">全部类型</option>
+                        <option value="weight_insufficient">重量不足</option>
+                        <option value="temperature_gap">温度断档</option>
+                        <option value="temperature_abnormal">温度异常</option>
+                        <option value="batch_mismatch">批次错配</option>
+                        <option value="allergen_risk">过敏原风险</option>
+                        <option value="midnight_misclassification">夜宵归属错误</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="applyFilters()">应用筛选</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">重置筛选</button>
+            </div>
+        </div>
+
+        <div class="section" id="detail-section" style="display: none;">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('timeline')">⏰ 留样时间线</div>
+                <div class="tab" onclick="switchTab('issues')">⚠️ 问题列表</div>
+                <div class="tab" onclick="switchTab('allergens')">🌰 过敏原风险</div>
+                <div class="tab" onclick="switchTab('batches')">🔗 批次链路</div>
+            </div>
+
+            <div class="tab-content active" id="tab-timeline">
+                <h3 style="margin-bottom: 16px; font-size: 15px;">留样事件时间线</h3>
+                <div class="timeline" id="timeline-container">
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <div class="message">暂无留样数据</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-issues">
+                <h3 style="margin-bottom: 16px; font-size: 15px;">检测到的问题</h3>
+                <div id="issues-container">
+                    <div class="empty-state">
+                        <div class="icon">✅</div>
+                        <div class="message">暂无问题检测</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-allergens">
+                <h3 style="margin-bottom: 16px; font-size: 15px;">过敏原风险分析</h3>
+                <div class="allergen-risk-grid" id="allergens-container">
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">🌰</div>
+                        <div class="message">暂无过敏原风险数据</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="tab-batches">
+                <h3 style="margin-bottom: 16px; font-size: 15px;">供应商批次链路</h3>
+                <div id="batches-container">
+                    <div class="empty-state">
+                        <div class="icon">🔗</div>
+                        <div class="message">暂无批次链路数据</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="export-section" style="display: none;">
+            <h2 class="section-title">📥 报告导出</h2>
+            
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="exportIssuesCSV()">
+                    📄 导出 issues.csv
+                </button>
+                <button class="btn btn-warning" onclick="exportReviewMD()">
+                    📝 导出 canteen_review.md
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            files: {
+                dishes: null,
+                samples: null,
+                allergens: null,
+                batches: null
+            },
+            data: null,
+            issues: [],
+            summary: null,
+            filters: {
+                date: 'all',
+                window: 'all',
+                fridge: 'all',
+                issueType: 'all'
+            }
+        };
+
+        function handleFileSelect(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                appState.files[type] = {
+                    name: file.name,
+                    content: e.target.result
+                };
+                
+                document.getElementById(`file-${type}-name`).textContent = file.name;
+                document.getElementById(`status-${type}`).textContent = '已就绪';
+                document.getElementById(`status-${type}`).className = 'status ready';
+                document.getElementById(`import-${type}`).classList.add('has-data');
+                
+                checkAllReady();
+            };
+            reader.readAsText(file);
+        }
+
+        function checkAllReady() {
+            const allReady = Object.values(appState.files).every(f => f !== null);
+            document.getElementById('btn-analyze').disabled = !allReady;
+        }
+
+        async function loadSampleData() {
+            try {
+                const types = ['dishes', 'samples', 'allergens', 'batches'];
+                const endpoints = {
+                    'dishes': 'dishes',
+                    'samples': 'sample-fridges',
+                    'allergens': 'allergen-rules',
+                    'batches': 'supplier-batches'
+                };
+
+                for (const type of types) {
+                    const response = await fetch(`/api/sample-data/${endpoints[type]}`);
+                    const content = await response.text();
+                    
+                    appState.files[type] = {
+                        name: `sample_${type}`,
+                        content: content
+                    };
+
+                    document.getElementById(`file-${type}-name`).textContent = `示例数据 (已加载)`;
+                    document.getElementById(`status-${type}`).textContent = '已就绪';
+                    document.getElementById(`status-${type}`).className = 'status ready';
+                    document.getElementById(`import-${type}`).classList.add('has-data');
+                }
+
+                checkAllReady();
+                showAlert('success', '✅ 示例数据已全部加载完成！点击"分析数据"开始分析。');
+            } catch (error) {
+                console.error('Error loading sample data:', error);
+                showAlert('danger', '❌ 加载示例数据失败，请确保服务器已启动。');
+            }
+        }
+
+        async function analyzeData() {
+            if (!appState.files.dishes || !appState.files.samples || 
+                !appState.files.allergens || !appState.files.batches) {
+                showAlert('warning', '请先导入所有必要的数据文件');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        dishes: appState.files.dishes.content,
+                        sampleFridges: appState.files.samples.content,
+                        allergenRules: appState.files.allergens.content,
+                        supplierBatches: appState.files.batches.content
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    appState.data = result.data;
+                    appState.issues = result.issues;
+                    appState.summary = result.summary;
+
+                    updateDashboard();
+                    showAlert('success', '✅ 数据分析完成！发现 ' + result.issues.length + ' 个问题。');
+                } else {
+                    showAlert('danger', '❌ 分析失败: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showAlert('danger', '❌ 分析过程出错，请检查数据格式。');
+            }
+        }
+
+        function updateDashboard() {
+            document.getElementById('results-section').style.display = 'block';
+            document.getElementById('filters-section').style.display = 'block';
+            document.getElementById('detail-section').style.display = 'block';
+            document.getElementById('export-section').style.display = 'block';
+
+            if (appState.summary) {
+                document.getElementById('stat-dishes').textContent = appState.summary.totalDishes;
+                document.getElementById('stat-samples').textContent = appState.summary.totalSamples;
+                document.getElementById('stat-issues').textContent = appState.summary.totalIssues;
+                document.getElementById('stat-high-issues').textContent = appState.summary.issuesBySeverity.high;
+
+                if (appState.summary.issuesBySeverity.high > 0) {
+                    document.getElementById('stat-issues-card').classList.add('danger');
+                    document.getElementById('stat-issues-card').classList.remove('warning');
+                }
+            }
+
+            populateFilters();
+            renderTimeline();
+            renderIssues();
+            renderAllergens();
+            renderBatches();
+        }
+
+        function populateFilters() {
+            const dates = new Set();
+            const windows = new Set();
+            const fridges = new Set();
+
+            if (appState.data) {
+                if (appState.data.dishes) {
+                    appState.data.dishes.forEach(d => {
+                        if (d.date) dates.add(d.date);
+                        if (d.window) windows.add(d.window);
+                    });
+                }
+                if (appState.data.sampleFridges) {
+                    appState.data.sampleFridges.forEach(s => {
+                        if (s.date) dates.add(s.date);
+                        if (s.window) windows.add(s.window);
+                        if (s.fridgeId) fridges.add(s.fridgeId);
+                    });
+                }
+            }
+
+            const dateSelect = document.getElementById('filter-date');
+            dateSelect.innerHTML = '<option value="all">全部日期</option>';
+            Array.from(dates).sort().forEach(d => {
+                const option = document.createElement('option');
+                option.value = d;
+                option.textContent = d;
+                dateSelect.appendChild(option);
+            });
+
+            const windowSelect = document.getElementById('filter-window');
+            windowSelect.innerHTML = '<option value="all">全部窗口</option>';
+            Array.from(windows).forEach(w => {
+                const option = document.createElement('option');
+                option.value = w;
+                option.textContent = w;
+                windowSelect.appendChild(option);
+            });
+
+            const fridgeSelect = document.getElementById('filter-fridge');
+            fridgeSelect.innerHTML = '<option value="all">全部冰箱</option>';
+            Array.from(fridges).forEach(f => {
+                const option = document.createElement('option');
+                option.value = f;
+                option.textContent = f;
+                fridgeSelect.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            appState.filters.date = document.getElementById('filter-date').value;
+            appState.filters.window = document.getElementById('filter-window').value;
+            appState.filters.fridge = document.getElementById('filter-fridge').value;
+            appState.filters.issueType = document.getElementById('filter-issue-type').value;
+
+            renderTimeline();
+            renderIssues();
+            renderAllergens();
+            renderBatches();
+
+            showAlert('info', '筛选条件已应用');
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-date').value = 'all';
+            document.getElementById('filter-window').value = 'all';
+            document.getElementById('filter-fridge').value = 'all';
+            document.getElementById('filter-issue-type').value = 'all';
+
+            appState.filters = {
+                date: 'all',
+                window: 'all',
+                fridge: 'all',
+                issueType: 'all'
+            };
+
+            renderTimeline();
+            renderIssues();
+            renderAllergens();
+            renderBatches();
+
+            showAlert('info', '筛选条件已重置');
+        }
+
+        function matchFilters(item) {
+            if (appState.filters.date !== 'all' && item.date !== appState.filters.date) {
+                return false;
+            }
+            if (appState.filters.window !== 'all' && item.window !== appState.filters.window) {
+                return false;
+            }
+            if (appState.filters.fridge !== 'all' && item.fridgeId !== appState.filters.fridge) {
+                return false;
+            }
+            return true;
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            
+            if (!appState.data || !appState.data.sampleFridges) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <div class="message">暂无留样数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const samples = appState.data.sampleFridges
+                .filter(s => matchFilters(s))
+                .sort((a, b) => new Date(a.sampleTime) - new Date(b.sampleTime));
+
+            if (samples.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <div class="message">暂无符合筛选条件的留样数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            samples.forEach(sample => {
+                const issuesForSample = appState.issues.filter(i => 
+                    i.dishId === sample.dishId && i.date === sample.date
+                );
+
+                const hasIssues = issuesForSample.length > 0;
+                const hasHighIssues = issuesForSample.some(i => i.severity === 'high');
+                
+                let itemClass = '';
+                let badges = [];
+
+                if (hasHighIssues) {
+                    itemClass = 'danger';
+                } else if (hasIssues) {
+                    itemClass = 'warning';
+                }
+
+                issuesForSample.forEach(issue => {
+                    const badgeClass = issue.severity === 'high' ? 'danger' : 
+                                      issue.severity === 'medium' ? 'warning' : 'info';
+                    badges.push(`<span class="badge badge-${badgeClass}">${issue.description}</span>`);
+                });
+
+                const sampleTime = sample.sampleTime ? new Date(sample.sampleTime).toLocaleString('zh-CN') : '未知时间';
+                
+                html += `
+                    <div class="timeline-item ${itemClass}">
+                        <div class="time">${sample.date} | ${sampleTime}</div>
+                        <div class="title">${sample.dishName || sample.dishId} - ${sample.window}</div>
+                        <div class="details">
+                            冰箱: ${sample.fridgeId} | 重量: ${sample.weight || '未知'}g | 操作人: ${sample.operator || '未知'}
+                        </div>
+                        ${badges.length > 0 ? '<div>' + badges.join(' ') + '</div>' : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderIssues() {
+            const container = document.getElementById('issues-container');
+            
+            if (!appState.issues || appState.issues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">✅</div>
+                        <div class="message">暂无问题检测，数据状态良好！</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let filteredIssues = appState.issues;
+
+            if (appState.filters.issueType !== 'all') {
+                filteredIssues = filteredIssues.filter(i => i.type === appState.filters.issueType);
+            }
+
+            filteredIssues = filteredIssues.filter(i => {
+                if (appState.filters.date !== 'all' && i.date !== appState.filters.date) return false;
+                if (appState.filters.window !== 'all' && i.window !== appState.filters.window) return false;
+                return true;
+            });
+
+            if (filteredIssues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <div class="message">暂无符合筛选条件的问题</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const typeLabels = {
+                'weight_insufficient': '重量不足',
+                'temperature_gap': '温度断档',
+                'temperature_abnormal': '温度异常',
+                'batch_mismatch': '批次错配',
+                'allergen_risk': '过敏原风险',
+                'midnight_misclassification': '夜宵归属错误'
+            };
+
+            let html = `
+                <table class="issues-table">
+                    <thead>
+                        <tr>
+                            <th>严重程度</th>
+                            <th>问题类型</th>
+                            <th>日期</th>
+                            <th>窗口</th>
+                            <th>相关菜品/原料</th>
+                            <th>详情</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            filteredIssues.forEach(issue => {
+                const severityClass = `severity-${issue.severity}`;
+                const severityLabel = issue.severity === 'high' ? '高' : 
+                                      issue.severity === 'medium' ? '中' : '低';
+                const typeLabel = typeLabels[issue.type] || issue.type;
+                const itemName = issue.dishName || issue.ingredientName || '未知';
+
+                html += `
+                    <tr>
+                        <td><span class="${severityClass}">${severityLabel}</span></td>
+                        <td>${typeLabel}</td>
+                        <td>${issue.date || '-'}</td>
+                        <td>${issue.window || '-'}</td>
+                        <td>${itemName}</td>
+                        <td>${issue.description}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function renderAllergens() {
+            const container = document.getElementById('allergens-container');
+            
+            if (!appState.issues) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">🌰</div>
+                        <div class="message">暂无过敏原风险数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const allergenIssues = appState.issues.filter(i => i.type === 'allergen_risk');
+            
+            if (allergenIssues.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="icon">✅</div>
+                        <div class="message">未检测到过敏原风险</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const allergenGroups = {};
+            allergenIssues.forEach(issue => {
+                const allergen = issue.allergen || '未知过敏原';
+                if (!allergenGroups[allergen]) {
+                    allergenGroups[allergen] = {
+                        count: 0,
+                        dishes: [],
+                        ingredients: new Set()
+                    };
+                }
+                allergenGroups[allergen].count++;
+                allergenGroups[allergen].dishes.push(issue.dishName);
+                if (issue.ingredient) {
+                    allergenGroups[allergen].ingredients.add(issue.ingredient);
+                }
+            });
+
+            let html = '';
+            Object.entries(allergenGroups).forEach(([allergen, data]) => {
+                const cardClass = data.count > 3 ? '' : 'medium';
+                html += `
+                    <div class="allergen-card ${cardClass}">
+                        <div class="allergen-name">${allergen}</div>
+                        <div class="risk-count">${data.count} 个风险菜品</div>
+                        <div class="ingredients">
+                            <strong>涉及原料:</strong> ${Array.from(data.ingredients).join(', ') || '未知'}<br>
+                            <strong>相关菜品:</strong> ${data.dishes.slice(0, 3).join(', ')}${data.dishes.length > 3 ? '...' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderBatches() {
+            const container = document.getElementById('batches-container');
+            
+            if (!appState.data || !appState.data.supplierBatches) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔗</div>
+                        <div class="message">暂无批次链路数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const batches = appState.data.supplierBatches.filter(b => matchFilters(b));
+
+            if (batches.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <div class="message">暂无符合筛选条件的批次数据</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const batchMismatchIssues = appState.issues.filter(i => i.type === 'batch_mismatch');
+            const mismatchKeys = new Set(batchMismatchIssues.map(i => 
+                `${i.ingredientId}-${i.window}-${i.date}`
+            ));
+
+            let html = '';
+            batches.forEach(batch => {
+                const key = `${batch.ingredientId}-${batch.window}-${batch.date}`;
+                const hasMismatch = mismatchKeys.has(key);
+                const mismatchClass = hasMismatch ? 'alert-danger' : 'alert-info';
+
+                html += `
+                    <div class="batch-chain ${mismatchClass}">
+                        <div class="batch-chain-header">
+                            <div class="batch-chain-title">
+                                ${batch.ingredientName || batch.ingredientId} - ${batch.window}
+                                ${hasMismatch ? '<span class="badge badge-danger">批次错配!</span>' : ''}
+                            </div>
+                            <div class="batch-chain-meta">日期: ${batch.date}</div>
+                        </div>
+                        <div class="batch-steps">
+                            <div class="batch-step">
+                                <div class="step-label">供应商</div>
+                                <div class="step-value">${batch.supplierName || '未知'}</div>
+                            </div>
+                            <span class="batch-arrow">→</span>
+                            <div class="batch-step">
+                                <div class="step-label">批次号</div>
+                                <div class="step-value">${batch.batchNumber || '未知'}</div>
+                            </div>
+                            <span class="batch-arrow">→</span>
+                            <div class="batch-step">
+                                <div class="step-label">到货时间</div>
+                                <div class="step-value">${batch.arrivalTime ? new Date(batch.arrivalTime).toLocaleDateString('zh-CN') : '未知'}</div>
+                            </div>
+                            <span class="batch-arrow">→</span>
+                            <div class="batch-step">
+                                <div class="step-label">有效期</div>
+                                <div class="step-value">${batch.expiryDate || '未知'}</div>
+                            </div>
+                            <span class="batch-arrow">→</span>
+                            <div class="batch-step">
+                                <div class="step-label">数量</div>
+                                <div class="step-value">${batch.quantity || '未知'} ${batch.unit || ''}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function exportIssuesCSV() {
+            if (!appState.issues || appState.issues.length === 0) {
+                showAlert('warning', '暂无问题数据可导出');
+                return;
+            }
+
+            const typeLabels = {
+                'weight_insufficient': '重量不足',
+                'temperature_gap': '温度断档',
+                'temperature_abnormal': '温度异常',
+                'batch_mismatch': '批次错配',
+                'allergen_risk': '过敏原风险',
+                'midnight_misclassification': '夜宵归属错误'
+            };
+
+            const headers = ['严重程度', '问题类型', '日期', '窗口', '相关项目', '详情'];
+            let csv = headers.join(',') + '\n';
+
+            appState.issues.forEach(issue => {
+                const severityLabel = issue.severity === 'high' ? '高' : 
+                                      issue.severity === 'medium' ? '中' : '低';
+                const typeLabel = typeLabels[issue.type] || issue.type;
+                const itemName = (issue.dishName || issue.ingredientName || '未知').replace(/,/g, ';');
+                const description = issue.description.replace(/,/g, ';');
+
+                csv += [
+                    severityLabel,
+                    typeLabel,
+                    issue.date || '',
+                    issue.window || '',
+                    itemName,
+                    description
+                ].join(',') + '\n';
+            });
+
+            downloadFile(csv, 'issues.csv', 'text/csv');
+            showAlert('success', '✅ issues.csv 已导出');
+        }
+
+        function exportReviewMD() {
+            if (!appState.summary) {
+                showAlert('warning', '暂无分析数据可导出');
+                return;
+            }
+
+            const typeLabels = {
+                'weight_insufficient': '重量不足',
+                'temperature_gap': '温度断档',
+                'temperature_abnormal': '温度异常',
+                'batch_mismatch': '批次错配',
+                'allergen_risk': '过敏原风险',
+                'midnight_misclassification': '夜宵归属错误'
+            };
+
+            let md = `# 校园食堂食品安全复盘报告
+
+## 一、概览
+
+| 指标 | 数值 |
+|------|------|
+| 菜品总数 | ${appState.summary.totalDishes} |
+| 留样记录 | ${appState.summary.totalSamples} |
+| 供应商批次 | ${appState.summary.totalBatches} |
+| **问题总数** | **${appState.summary.totalIssues}** |
+| **高风险问题** | **${appState.summary.issuesBySeverity.high}** |
+
+## 二、问题分布
+
+### 按严重程度
+- 高风险: ${appState.summary.issuesBySeverity.high} 个
+- 中风险: ${appState.summary.issuesBySeverity.medium} 个
+- 低风险: ${appState.summary.issuesBySeverity.low} 个
+
+### 按问题类型
+`;
+
+            Object.entries(appState.summary.issuesByType).forEach(([type, count]) => {
+                const label = typeLabels[type] || type;
+                md += `- ${label}: ${count} 个\n`;
+            });
+
+            md += `
+## 三、详细问题列表
+
+`;
+
+            if (appState.issues.length > 0) {
+                appState.issues.forEach((issue, index) => {
+                    const severityLabel = issue.severity === 'high' ? '🔴 高' : 
+                                          issue.severity === 'medium' ? '🟡 中' : '🟢 低';
+                    const typeLabel = typeLabels[issue.type] || issue.type;
+
+                    md += `### ${index + 1}. ${typeLabel}
+
+- **严重程度**: ${severityLabel}
+- **日期**: ${issue.date || '未知'}
+- **窗口**: ${issue.window || '未知'}
+- **相关项目**: ${issue.dishName || issue.ingredientName || '未知'}
+- **详情**: ${issue.description}
+
+`;
+                });
+            } else {
+                md += `未检测到任何问题，数据状态良好！\n`;
+            }
+
+            md += `
+## 四、改进建议
+
+1. **留样重量不足问题**: 建议加强留样操作培训，确保每样菜品留样重量达到标准（≥125g）
+2. **温度监控问题**: 定期检查冰箱温度记录设备，确保数据连续且在安全范围内（0-4°C）
+3. **批次管理问题**: 建立严格的批次追踪制度，同一原料同一窗口应使用同一批次
+4. **过敏原管理**: 对含过敏原的菜品进行明确标识，避免交叉污染
+5. **夜宵记录**: 优化跨午夜夜宵的日期归属逻辑，确保数据准确性
+
+---
+
+**报告生成时间**: ${new Date().toLocaleString('zh-CN')}
+**分析系统**: 校园食堂留样与过敏原追溯复盘看板
+`;
+
+            downloadFile(md, 'canteen_review.md', 'text/markdown');
+            showAlert('success', '✅ canteen_review.md 已导出');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAllData() {
+            appState = {
+                files: {
+                    dishes: null,
+                    samples: null,
+                    allergens: null,
+                    batches: null
+                },
+                data: null,
+                issues: [],
+                summary: null,
+                filters: {
+                    date: 'all',
+                    window: 'all',
+                    fridge: 'all',
+                    issueType: 'all'
+                }
+            };
+
+            ['dishes', 'samples', 'allergens', 'batches'].forEach(type => {
+                document.getElementById(`file-${type}-name`).textContent = '未选择文件';
+                document.getElementById(`status-${type}`).textContent = '待导入';
+                document.getElementById(`status-${type}`).className = 'status pending';
+                document.getElementById(`import-${type}`).classList.remove('has-data');
+            });
+
+            document.getElementById('btn-analyze').disabled = true;
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('filters-section').style.display = 'none';
+            document.getElementById('detail-section').style.display = 'none';
+            document.getElementById('export-section').style.display = 'none';
+
+            showAlert('info', '数据已清空');
+        }
+
+        function showAlert(type, message) {
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '20px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '1000';
+            alert.style.maxWidth = '400px';
+
+            document.body.appendChild(alert);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function runAnalysis() {
+            if (!document.getElementById('btn-analyze').disabled) {
+                analyzeData();
+            } else {
+                showAlert('warning', '请先导入数据！点击"一键加载示例数据"按钮。');
+            }
+        }
+
+        function showFilters() {
+            if (document.getElementById('filters-section').style.display !== 'none') {
+                document.getElementById('filters-section').scrollIntoView({ behavior: 'smooth' });
+                showAlert('info', '筛选器区域已定位，请调整筛选条件后点击"应用筛选"');
+            } else {
+                showAlert('warning', '请先分析数据！');
+            }
+        }
+
+        function showIssues() {
+            if (document.getElementById('detail-section').style.display !== 'none') {
+                document.querySelectorAll('.tab')[1].click();
+                document.getElementById('detail-section').scrollIntoView({ behavior: 'smooth' });
+                showAlert('info', '问题列表已显示，点击表格查看详细问题');
+            } else {
+                showAlert('warning', '请先分析数据！');
+            }
+        }
+
+        function exportReports() {
+            if (document.getElementById('export-section').style.display !== 'none') {
+                document.getElementById('export-section').scrollIntoView({ behavior: 'smooth' });
+                showAlert('info', '导出区域已定位，点击按钮导出报告');
+            } else {
+                showAlert('warning', '请先分析数据！');
+            }
+        }
+    </script>
+</body>
+</html>

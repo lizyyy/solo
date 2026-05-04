@@ -1,0 +1,23 @@
+{
+  "name": "canteen-safety-dashboard",
+  "version": "1.0.0",
+  "description": "校园食堂留样与过敏原追溯复盘看板",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "canteen",
+    "food-safety",
+    "allergen",
+    "traceability"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "csv-parser": "^3.0.0",
+    "js-yaml": "^4.1.0"
+  }
+}
