@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="路况勘察分析工具 - 示例数据">
+  <metadata>
+    <name>周末骑行路线 - 示例数据</name>
+    <desc>这是一条从奥林匹克公园到颐和园的示例骑行路线，包含模拟的路况数据。</desc>
+    <time>2024-05-01T08:00:00Z</time>
+  </metadata>
+  <trk>
+    <name>奥林匹克公园 -> 颐和园</name>
+    <desc>周末休闲骑行路线，全长约15公里</desc>
+    <trkseg>
+      <!-- 奥林匹克公园起点 -->
+      <trkpt lat="40.0030" lon="116.3870">
+        <ele>45.0</ele>
+        <time>2024-05-01T08:00:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0035" lon="116.3875">
+        <ele>45.2</ele>
+        <time>2024-05-01T08:00:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0040" lon="116.3880">
+        <ele>45.1</ele>
+        <time>2024-05-01T08:01:00Z</time>
+      </trkpt>
+      
+      <!-- 路段1: 北四环中路 - 坑洼路段 -->
+      <trkpt lat="40.0045" lon="116.3885">
+        <ele>44.8</ele>
+        <time>2024-05-01T08:01:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0050" lon="116.3890">
+        <ele>44.5</ele>
+        <time>2024-05-01T08:02:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0055" lon="116.3895">
+        <ele>44.3</ele>
+        <time>2024-05-01T08:02:30Z</time>
+      </trkpt>
+      
+      <!-- 路段2: 中关村 - 逆行风险 -->
+      <trkpt lat="40.0060" lon="116.3900">
+        <ele>45.0</ele>
+        <time>2024-05-01T08:03:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0065" lon="116.3905">
+        <ele>45.2</ele>
+        <time>2024-05-01T08:03:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0070" lon="116.3910">
+        <ele>45.5</ele>
+        <time>2024-05-01T08:04:00Z</time>
+      </trkpt>
+      
+      <!-- 路段3: 清华西门 - 照明差 -->
+      <trkpt lat="40.0075" lon="116.3915">
+        <ele>45.3</ele>
+        <time>2024-05-01T08:04:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0080" lon="116.3920">
+        <ele>45.1</ele>
+        <time>2024-05-01T08:05:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0085" lon="116.3925">
+        <ele>44.9</ele>
+        <time>2024-05-01T08:05:30Z</time>
+      </trkpt>
+      
+      <!-- 路段4: 圆明园东路 - 施工路段 -->
+      <trkpt lat="40.0090" lon="116.3930">
+        <ele>44.7</ele>
+        <time>2024-05-01T08:06:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0095" lon="116.3935">
+        <ele>44.5</ele>
+        <time>2024-05-01T08:06:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0100" lon="116.3940">
+        <ele>44.3</ele>
+        <time>2024-05-01T08:07:00Z</time>
+      </trkpt>
+      
+      <!-- 路段5: 西苑桥 - 积水风险 -->
+      <trkpt lat="40.0105" lon="116.3945">
+        <ele>44.0</ele>
+        <time>2024-05-01T08:07:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0110" lon="116.3950">
+        <ele>43.8</ele>
+        <time>2024-05-01T08:08:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0115" lon="116.3955">
+        <ele>43.5</ele>
+        <time>2024-05-01T08:08:30Z</time>
+      </trkpt>
+      
+      <!-- 继续向颐和园 -->
+      <trkpt lat="40.0120" lon="116.3960">
+        <ele>43.3</ele>
+        <time>2024-05-01T08:09:00Z</time>
+      </trkpt>
+      <trkpt lat="40.0125" lon="116.3965">
+        <ele>43.1</ele>
+        <time>2024-05-01T08:09:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0130" lon="116.3970">
+        <ele>42.9</ele>
+        <time>2024-05-01T08:10:00Z</time>
+      </trkpt>
+      
+      <!-- 路段6: 颐和园附近 - 障碍物 -->
+      <trkpt lat="40.0135" lon="116.3975">
+        <ele>42.7</ele>
+        <time>2024-05-01T08:10:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0140" lon="116.3980">
+        <ele>42.5</ele>
+        <time>2024-05-01T08:11:00Z</time>
+      </trkpt>
+      
+      <!-- 路段7: 更多坑洼 -->
+      <trkpt lat="40.0145" lon="116.3985">
+        <ele>42.3</ele>
+        <time>2024-05-01T08:11:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0150" lon="116.3990">
+        <ele>42.1</ele>
+        <time>2024-05-01T08:12:00Z</time>
+      </trkpt>
+      
+      <!-- 路段8: 逆行风险重复 -->
+      <trkpt lat="40.0155" lon="116.3995">
+        <ele>41.9</ele>
+        <time>2024-05-01T08:12:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0160" lon="116.4000">
+        <ele>41.7</ele>
+        <time>2024-05-01T08:13:00Z</time>
+      </trkpt>
+      
+      <!-- 颐和园终点 -->
+      <trkpt lat="40.0165" lon="116.4005">
+        <ele>41.5</ele>
+        <time>2024-05-01T08:13:30Z</time>
+      </trkpt>
+      <trkpt lat="40.0170" lon="116.4010">
+        <ele>41.3</ele>
+        <time>2024-05-01T08:14:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
