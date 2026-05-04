@@ -1,0 +1,18 @@
+{"scan_id": "SCAN001", "bag_id": "PAPER-2026-01-15-R001-01", "teacher_id": "T001", "action": "领取", "timestamp": "2026-01-15T08:30:00", "location": "考务中心-东校区", "notes": "考前领取备用卷袋"}
+{"scan_id": "SCAN002", "bag_id": "ANSWER-2026-01-15-R001-01", "teacher_id": "T002", "action": "发放", "timestamp": "2026-01-15T08:35:00", "location": "考务中心-东校区", "notes": "考前领取答题卡袋"}
+{"scan_id": "SCAN003", "bag_id": "PAPER-2026-01-15-R001-01", "teacher_id": "T001", "action": "领取", "timestamp": "2026-01-15T08:40:00", "location": "考务中心-东校区", "notes": "重复领取 - 问题1：重复签收"}
+{"scan_id": "SCAN004", "bag_id": "PAPER-2026-01-15-R003-01", "teacher_id": "T001", "action": "领取", "timestamp": "2026-01-15T08:45:00", "location": "考务中心-西校区", "notes": "问题2：越权领取 - T001是东校区老师，领取西校区R003的试卷"}
+{"scan_id": "SCAN005", "bag_id": "PAPER-2026-01-15-R002-01", "teacher_id": "T003", "action": "领取", "timestamp": "2026-01-15T13:30:00", "location": "考务中心-西校区", "notes": "问题3：跨校区 - T003是西校区老师领取东校区R002的试卷"}
+{"scan_id": "SCAN006", "bag_id": "ANSWER-2026-01-15-R001-01", "teacher_id": "T001", "action": "收齐", "timestamp": "2026-01-15T11:05:00", "location": "R001考场", "notes": "考试结束后收齐答题卡"}
+{"scan_id": "SCAN007", "bag_id": "ANSWER-2026-01-15-R001-01", "teacher_id": "T007", "action": "核验", "timestamp": "2026-01-15T11:30:00", "location": "考务中心-东校区", "notes": "考务核验答题卡数量"}
+{"scan_id": "SCAN008", "bag_id": "ANSWER-2026-01-15-R001-01", "teacher_id": "T007", "action": "归档", "timestamp": "2026-01-15T19:00:00", "location": "考务中心-东校区", "notes": "正常归档"}
+{"scan_id": "SCAN009", "bag_id": "PAPER-2026-01-16-R005-01", "teacher_id": "T005", "action": "领取", "timestamp": "2026-01-16T22:30:00", "location": "考务中心-东校区", "notes": "跨午夜补考领取试卷"}
+{"scan_id": "SCAN010", "bag_id": "ANSWER-2026-01-16-R005-01", "teacher_id": "T005", "action": "发放", "timestamp": "2026-01-16T22:35:00", "location": "考务中心-东校区", "notes": "跨午夜补考领取答题卡"}
+{"scan_id": "SCAN011", "bag_id": "PAPER-2026-01-16-R005-01", "teacher_id": "T005", "action": "启封", "timestamp": "2026-01-16T22:55:00", "location": "R005考场", "notes": "启封试卷"}
+{"scan_id": "SCAN012", "bag_id": "ANSWER-2026-01-16-R005-01", "teacher_id": "T006", "action": "收齐", "timestamp": "2026-01-17T01:05:00", "location": "R005考场", "notes": "跨午夜考试结束收齐答题卡"}
+{"scan_id": "SCAN013", "bag_id": "ANSWER-2026-01-16-R005-01", "teacher_id": "T007", "action": "归档", "timestamp": "2026-01-16T19:00:00", "location": "考务中心-东校区", "notes": "问题4：跨午夜归档错位 - 归档日期应该是2026-01-17，但记录为2026-01-16"}
+{"scan_id": "SCAN014", "bag_id": "PAPER-2026-01-15-R001-01", "teacher_id": "T001", "action": "启封", "timestamp": "2026-01-15T08:50:00", "location": "R001考场", "notes": "启封备用卷"}
+{"scan_id": "SCAN015", "bag_id": "PAPER-2026-01-15-R001-01", "teacher_id": "T001", "action": "回收", "timestamp": "2026-01-15T11:05:00", "location": "R001考场", "notes": "回收未使用的备用卷"}
+{"scan_id": "SCAN016", "bag_id": "PAPER-2026-01-15-R001-01", "teacher_id": "T007", "action": "归档", "timestamp": "2026-01-15T19:30:00", "location": "考务中心-东校区", "notes": "归档备用卷袋"}
+{"scan_id": "SCAN017", "bag_id": "PAPER-2026-01-16-R006-01", "teacher_id": "T005", "action": "领取", "timestamp": "2026-01-16T23:00:00", "location": "考务中心-东校区", "notes": "另一跨午夜补考领取试卷"}
+{"scan_id": "SCAN018", "bag_id": "ANSWER-2026-01-16-R006-01", "teacher_id": "T005", "action": "发放", "timestamp": "2026-01-16T23:05:00", "location": "考务中心-东校区", "notes": "领取答题卡"}

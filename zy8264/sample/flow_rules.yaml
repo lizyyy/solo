@@ -1,0 +1,97 @@
+flow_rules:
+  paper_bag_flow:
+    name: 备用卷袋流转流程
+    states:
+      - SEALED: 已封存
+      - RECEIVED: 已领取
+      - IN_USE: 考试中
+      - RETURNED: 已归还
+      - ARCHIVED: 已归档
+    transitions:
+      - from: SEALED
+        to: RECEIVED
+        action: 领取
+        required_roles: [主监考, 副监考]
+        time_window: 考前30分钟 - 考前10分钟
+      
+      - from: RECEIVED
+        to: IN_USE
+        action: 启封
+        required_roles: [主监考]
+        time_window: 考前10分钟 - 考试开始后5分钟
+      
+      - from: IN_USE
+        to: RETURNED
+        action: 回收
+        required_roles: [主监考, 副监考]
+        time_window: 考试结束后10分钟内
+      
+      - from: RETURNED
+        to: ARCHIVED
+        action: 归档
+        required_roles: [考务]
+        time_window: 考试当天20:00前
+
+  answer_bag_flow:
+    name: 答题卡袋流转流程
+    states:
+      - SEALED: 已封存
+      - DISTRIBUTED: 已发放
+      - COLLECTED: 已收齐
+      - VERIFIED: 已核验
+      - ARCHIVED: 已归档
+    transitions:
+      - from: SEALED
+        to: DISTRIBUTED
+        action: 发放
+        required_roles: [主监考, 副监考]
+        time_window: 考前30分钟 - 考前10分钟
+      
+      - from: DISTRIBUTED
+        to: COLLECTED
+        action: 收齐
+        required_roles: [主监考, 副监考]
+        time_window: 考试结束后10分钟内
+      
+      - from: COLLECTED
+        to: VERIFIED
+        action: 核验
+        required_roles: [考务]
+        time_window: 考试结束后30分钟内
+      
+      - from: VERIFIED
+        to: ARCHIVED
+        action: 归档
+        required_roles: [考务]
+        time_window: 考试当天20:00前
+
+validation_rules:
+  duplicate_signature:
+    name: 重复签收检测
+    description: 同一袋不允许在相同状态下被多次签收
+    severity: HIGH
+
+  unauthorized_access:
+    name: 越权领取检测
+    description: 监考老师只能领取其授权考场的试卷袋
+    severity: CRITICAL
+
+  cross_campus:
+    name: 跨校区归属检测
+    description: 试卷袋流转操作人必须与袋所属校区一致
+    severity: HIGH
+
+  midnight_exam_archive:
+    name: 跨午夜补考归档错位检测
+    description: 跨午夜考试的归档日期应使用考试结束日期
+    severity: MEDIUM
+
+  missing_transition:
+    name: 缺失流转节点检测
+    description: 检测流转过程中缺失的必要状态转换
+    severity: HIGH
+
+  time_violation:
+    name: 时间窗口违规检测
+    description: 检测操作是否在规定的时间窗口内进行
+    severity: MEDIUM

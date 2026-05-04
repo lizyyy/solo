@@ -1,0 +1,110 @@
+manifests:
+  - bag_id: PAPER-2026-01-15-R001-01
+    bag_type: 备用卷袋
+    exam_date: 2026-01-15
+    exam_time: 09:00-11:00
+    room_id: R001
+    campus: 东校区
+    subject: 计算机基础
+    paper_count: 40
+    sealed_time: 2026-01-14T16:00:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: ANSWER-2026-01-15-R001-01
+    bag_type: 答题卡袋
+    exam_date: 2026-01-15
+    exam_time: 09:00-11:00
+    room_id: R001
+    campus: 东校区
+    subject: 计算机基础
+    answer_count: 40
+    sealed_time: 2026-01-14T16:00:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: PAPER-2026-01-15-R002-01
+    bag_type: 备用卷袋
+    exam_date: 2026-01-15
+    exam_time: 14:00-16:00
+    room_id: R002
+    campus: 东校区
+    subject: 数据结构
+    paper_count: 35
+    sealed_time: 2026-01-14T16:30:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: ANSWER-2026-01-15-R002-01
+    bag_type: 答题卡袋
+    exam_date: 2026-01-15
+    exam_time: 14:00-16:00
+    room_id: R002
+    campus: 东校区
+    subject: 数据结构
+    answer_count: 35
+    sealed_time: 2026-01-14T16:30:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: PAPER-2026-01-15-R003-01
+    bag_type: 备用卷袋
+    exam_date: 2026-01-15
+    exam_time: 09:00-11:00
+    room_id: R003
+    campus: 西校区
+    subject: 高等数学
+    paper_count: 45
+    sealed_time: 2026-01-14T16:00:00
+    initial_location: 考务中心-西校区
+
+  - bag_id: ANSWER-2026-01-15-R003-01
+    bag_type: 答题卡袋
+    exam_date: 2026-01-15
+    exam_time: 09:00-11:00
+    room_id: R003
+    campus: 西校区
+    subject: 高等数学
+    answer_count: 45
+    sealed_time: 2026-01-14T16:00:00
+    initial_location: 考务中心-西校区
+
+  - bag_id: PAPER-2026-01-16-R005-01
+    bag_type: 备用卷袋
+    exam_date: 2026-01-16
+    exam_time: 23:00-01:00
+    room_id: R005
+    campus: 东校区
+    subject: 物理实验补考
+    paper_count: 30
+    sealed_time: 2026-01-15T18:00:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: ANSWER-2026-01-16-R005-01
+    bag_type: 答题卡袋
+    exam_date: 2026-01-16
+    exam_time: 23:00-01:00
+    room_id: R005
+    campus: 东校区
+    subject: 物理实验补考
+    answer_count: 30
+    sealed_time: 2026-01-15T18:00:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: PAPER-2026-01-16-R006-01
+    bag_type: 备用卷袋
+    exam_date: 2026-01-16
+    exam_time: 23:30-01:30
+    room_id: R006
+    campus: 东校区
+    subject: 化学实验补考
+    paper_count: 30
+    sealed_time: 2026-01-15T18:30:00
+    initial_location: 考务中心-东校区
+
+  - bag_id: ANSWER-2026-01-16-R006-01
+    bag_type: 答题卡袋
+    exam_date: 2026-01-16
+    exam_time: 23:30-01:30
+    room_id: R006
+    campus: 东校区
+    subject: 化学实验补考
+    answer_count: 30
+    sealed_time: 2026-01-15T18:30:00
+    initial_location: 考务中心-东校区
