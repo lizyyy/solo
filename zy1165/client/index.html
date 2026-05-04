@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>限流实验台 - 令牌桶 vs 漏桶</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>限流实验台</h1>
+      <p class="subtitle">比较令牌桶(Token Bucket)与漏桶(Leaky Bucket)限流算法</p>
+    </header>
+
+    <main class="main-content">
+      <section class="config-section">
+        <div class="section-header">
+          <h2>实验配置</h2>
+          <div class="preset-buttons">
+            <button id="loadPresetGood" class="btn btn-secondary">加载推荐配置</button>
+            <button id="loadPresetBad" class="btn btn-warning">加载坏配置示例</button>
+          </div>
+        </div>
+
+        <form id="experimentForm" class="config-form">
+          <div class="config-group">
+            <h3>流量配置</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="totalRequests">总请求数</label>
+                <input type="number" id="totalRequests" value="1000" min="1">
+              </div>
+              <div class="form-group">
+                <label for="burstDuration">突刺持续时间(秒)</label>
+                <input type="number" id="burstDuration" value="5" min="0" step="0.1">
+              </div>
+              <div class="form-group">
+                <label for="burstRate">突刺请求速率(RPS)</label>
+                <input type="number" id="burstRate" value="100" min="1">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="steadyDuration">平稳期持续时间(秒)</label>
+                <input type="number" id="steadyDuration" value="10" min="0" step="0.1">
+              </div>
+              <div class="form-group">
+                <label for="steadyRate">平稳期请求速率(RPS)</label>
+                <input type="number" id="steadyRate" value="10" min="1">
+              </div>
+              <div class="form-group">
+                <label for="seed">随机种子(可选)</label>
+                <input type="number" id="seed" placeholder="留空使用随机">
+              </div>
+            </div>
+          </div>
+
+          <div class="config-group">
+            <h3>令牌桶配置</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tokenRate">令牌生成速率(个/秒)</label>
+                <input type="number" id="tokenRate" value="50" min="1" step="0.1">
+              </div>
+              <div class="form-group">
+                <label for="tokenCapacity">桶容量</label>
+                <input type="number" id="tokenCapacity" value="100" min="1">
+              </div>
+            </div>
+          </div>
+
+          <div class="config-group">
+            <h3>漏桶配置</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="leakRate">漏出速率(个/秒)</label>
+                <input type="number" id="leakRate" value="50" min="1" step="0.1">
+              </div>
+              <div class="form-group">
+                <label for="leakCapacity">桶容量</label>
+                <input type="number" id="leakCapacity" value="100" min="1">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="queueLength">队列长度</label>
+                <input type="number" id="queueLength" value="50" min="0">
+              </div>
+              <div class="form-group">
+                <label for="timeout">超时时间(毫秒)</label>
+                <input type="number" id="timeout" value="5000" min="0">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-large">运行实验</button>
+            <button type="button" id="resetForm" class="btn btn-secondary">重置配置</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="resultsSection" class="results-section hidden">
+        <div class="section-header">
+          <h2>实验结果</h2>
+          <div class="export-buttons">
+            <button id="exportMarkdown" class="btn btn-secondary">导出 Markdown</button>
+            <button id="exportJson" class="btn btn-secondary">导出 JSON</button>
+          </div>
+        </div>
+
+        <div class="results-summary">
+          <div class="comparison-card">
+            <h3>放行率对比</h3>
+            <div class="comparison-chart-container">
+              <canvas id="allowRateChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="stats-grid">
+            <div class="stat-card token-bucket">
+              <h4>令牌桶</h4>
+              <div class="stat-value" id="tbAllowed">-</div>
+              <div class="stat-label">放行</div>
+            </div>
+            <div class="stat-card token-bucket">
+              <h4>令牌桶</h4>
+              <div class="stat-value" id="tbRejected">-</div>
+              <div class="stat-label">拒绝</div>
+            </div>
+            <div class="stat-card leaky-bucket">
+              <h4>漏桶</h4>
+              <div class="stat-value" id="lbAllowed">-</div>
+              <div class="stat-label">放行</div>
+            </div>
+            <div class="stat-card leaky-bucket">
+              <h4>漏桶</h4>
+              <div class="stat-value" id="lbQueued">-</div>
+              <div class="stat-label">排队</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h3>时间轴视图</h3>
+          <div class="chart-container">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h3>桶水位/令牌数变化</h3>
+          <div class="chart-container">
+            <canvas id="levelChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <h3>延迟分布</h3>
+          <div class="chart-row">
+            <div class="chart-container">
+              <h4>令牌桶</h4>
+              <canvas id="tbLatencyChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h4>漏桶</h4>
+              <canvas id="lbLatencyChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-table-section">
+          <h3>详细统计</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>指标</th>
+                <th>令牌桶</th>
+                <th>漏桶</th>
+              </tr>
+            </thead>
+            <tbody id="statsTableBody">
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="history-section">
+        <div class="section-header">
+          <h2>历史实验</h2>
+          <button id="refreshHistory" class="btn btn-secondary">刷新</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <p class="empty-message">暂无历史实验</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/charts.js"></script>
+</body>
+</html>
