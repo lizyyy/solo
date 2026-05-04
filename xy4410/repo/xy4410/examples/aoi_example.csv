@@ -1,0 +1,9 @@
+reference,defect_type,location_x,location_y,confidence,component_side,rework_needed,false_alarm,notes
+R1,Missing,10.5,25.3,95.2,Top,True,False,电阻缺失
+C2,Offset,28.6,30.2,78.5,Top,True,False,X轴偏移0.1mm
+U1,Bridging,30.0,40.0,88.3,Top,True,False,引脚23-24桥接
+D1,Missing,15.0,35.0,92.1,Top,True,False,LED缺失
+R5,Insufficient_Solder,21.8,28.5,65.4,Top,False,True,锡量不足，实际为误报
+J2,Inspection_Error,60.0,20.0,99.0,Top,True,False,USB插座检测异常
+C6,Shift,45.0,25.0,72.3,Top,True,False,Y轴偏移0.08mm
+L1,No_Solder,50.0,30.0,85.6,Top,True,False,电感无焊锡

@@ -1,0 +1,15 @@
+reference,part_number,description,quantity,package,value,part_type
+R1,RES-0402-1K,电阻 1KΩ 1/16W 5%,2,0402,1KΩ,resistor
+R2,RES-0402-10K,电阻 10KΩ 1/16W 5%,1,0402,10KΩ,resistor
+R3,RES-0603-100R,电阻 100Ω 1/10W 1%,3,0603,100Ω,resistor
+C1,CAP-0402-100nF,电容 100nF 16V X7R,4,0402,100nF,capacitor
+C2,CAP-0805-10uF,电容 10uF 10V X5R,2,0805,10uF,capacitor
+U1,STM32F103C8T6,微控制器 STM32F103C8T6,1,LQFP-48,STM32F103C8T6,ic
+U2,ESP32-WROOM-32,WiFi/蓝牙模块,1,ESP32-WROOM,ESP32-WROOM-32,module
+D1,LED-0603-RED,LED 红色 0603,2,0603,RED,diode
+Q1,MMBT3904,NPN晶体管 SOT-23,1,SOT-23,MMBT3904,transistor
+J1,HDR-2x5P,排针 2x5P 2.54mm,1,2x5P,HDR-2x5P,connector
+J2,USB-C-16P,USB Type-C 插座,1,USB-C,USB-C-16P,connector
+SW1,SW-TACT-6x6,轻触开关 6x6mm,1,6x6,SW-TACT,switch
+L1,IND-0603-10uH,电感 10uH 0603,1,0603,10uH,inductor
+FB1,FERRITE-0805,磁珠 0805 100Ω@100MHz,1,0805,100Ω@100MHz,ferrite

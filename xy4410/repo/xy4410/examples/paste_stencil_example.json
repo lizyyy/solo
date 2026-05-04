@@ -1,0 +1,58 @@
+{
+  "solder_pastes": [
+    {
+      "lot_number": "SP2025-0042",
+      "solder_paste_type": "SAC305",
+      "manufacturer": "Alpha",
+      "alloy_type": "SAC305 (Sn96.5Ag3.0Cu0.5)",
+      "particle_size": "Type 4",
+      "flux_type": "RMA",
+      "manufacture_date": "2025-03-15",
+      "expiry_date": "2026-03-14",
+      "thaw_complete_time": "2025-06-30T08:00:00",
+      "max_thaw_hours": 24,
+      "status": "active",
+      "notes": "用于常规生产"
+    },
+    {
+      "lot_number": "SP2024-1128",
+      "solder_paste_type": "SAC305",
+      "manufacturer": "Kester",
+      "alloy_type": "SAC305",
+      "particle_size": "Type 3",
+      "flux_type": "ROL0",
+      "manufacture_date": "2024-11-28",
+      "expiry_date": "2025-05-27",
+      "status": "expired",
+      "notes": "已过期，请勿使用"
+    }
+  ],
+  "stencils": [
+    {
+      "stencil_id": "STN-001",
+      "board_number": "DEV-2025-001",
+      "board_revision": "A",
+      "thickness_mm": 0.12,
+      "material": "Steel",
+      "finish": "Electropolished",
+      "manufacture_date": "2025-01-15",
+      "use_count": 125,
+      "max_uses": 10000,
+      "status": "active",
+      "notes": "主力钢网，状态良好"
+    },
+    {
+      "stencil_id": "STN-002",
+      "board_number": "DEV-2025-002",
+      "board_revision": "B",
+      "thickness_mm": 0.15,
+      "material": "Steel",
+      "finish": "Nano-Coated",
+      "manufacture_date": "2025-02-20",
+      "use_count": 0,
+      "max_uses": 10000,
+      "status": "active",
+      "notes": "新钢网，未使用"
+    }
+  ]
+}
