@@ -1,0 +1,9 @@
+path,method,name,avg_response_time_ms,p95_response_time_ms,p99_response_time_ms,request_count,error_count,cache_hit_rate,related_cache_keys
+/api/users/profile,GET,user_profile,15.5,25.3,45.2,150,2,0.85,"user:profile:*"
+/api/products,GET,product_list,35.2,80.5,150.0,80,5,0.60,"product:list:*"
+/api/products/{id},GET,product_detail,45.8,120.0,250.0,60,3,0.55,"product:detail:*"
+/api/orders,GET,order_list,120.5,300.0,600.0,25,1,0.30,"order:list:*"
+/api/auth/check,GET,auth_check,25.0,50.0,80.0,200,0,0.90,"session:*"
+/api/config,GET,site_config,10.0,15.0,20.0,100,0,0.95,"config:*"
+/api/hot,GET,hot_content,5.0,8.0,12.0,500,0,0.99,"hot_key:*"
+/api/concurrent,GET,concurrent_test,8.0,15.0,25.0,10,0,0.00,"concurrent_miss:*"

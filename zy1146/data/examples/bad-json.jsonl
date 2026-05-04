@@ -1,0 +1,4 @@
+{"id": "evt_001", "key": "test:key:1", "type": "HIT", "backend": "redis", "timestamp": 1735689600.0
+{"id": "evt_002", "key": "test:key:2", "type": "MISS", "backend": "redis", "timestamp": 1735689601.0, "latency_ms": 10.5}
+this is not json at all
+{"id": "evt_003", "key": "test:key:3", "type": "SET", "backend": "redis", "timestamp": 1735689602.0, "ttl": 3600}

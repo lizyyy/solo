@@ -1,0 +1,5 @@
+{"id": "evt_001", "key": "duplicate:key", "type": "HIT", "backend": "redis", "timestamp": 1735689600.0, "latency_ms": 2.5}
+{"id": "evt_001", "key": "another:key", "type": "MISS", "backend": "redis", "timestamp": 1735689601.0, "latency_ms": 3.2}
+{"id": "evt_002", "key": "normal:key:1", "type": "SET", "backend": "redis", "timestamp": 1735689602.0, "ttl": 3600}
+{"id": "evt_002", "key": "normal:key:2", "type": "HIT", "backend": "redis", "timestamp": 1735689603.0, "latency_ms": 1.8}
+{"id": "evt_003", "key": "unique:key", "type": "HIT", "backend": "redis", "timestamp": 1735689604.0, "latency_ms": 2.1}

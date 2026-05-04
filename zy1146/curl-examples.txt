@@ -1,0 +1,333 @@
+# Cache Analyzer cURL 示例
+# 启动服务: php -S localhost:8080 -t public
+
+# =============================================================================
+# 1. 数据导入
+# =============================================================================
+
+# 1.1 查看导入状态
+curl http://localhost:8080/api/import/status
+
+# 1.2 导入缓存事件 (JSONL 格式)
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "{\"id\": \"evt_001\", \"key\": \"test:key:1\", \"type\": \"HIT\", \"backend\": \"redis\", \"timestamp\": 1735689600.0, \"latency_ms\": 2.5}\n{\"id\": \"evt_002\", \"key\": \"test:key:2\", \"type\": \"MISS\", \"backend\": \"redis\", \"timestamp\": 1735689601.0, \"latency_ms\": 5.0}",
+    "filename": "cache-events.jsonl"
+  }'
+
+# 1.3 导入路由数据 (CSV 格式)
+curl -X POST http://localhost:8080/api/import/routes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "path,method,name,avg_response_time_ms,p95_response_time_ms,p99_response_time_ms,request_count,error_count,cache_hit_rate,related_cache_keys\n/api/users/profile,GET,user_profile,15.5,25.3,45.2,150,2,0.85,\"user:profile:*\"",
+    "filename": "routes.csv"
+  }'
+
+# 1.4 导入缓存配置 (YAML 格式)
+curl -X POST http://localhost:8080/api/import/cache-config \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "cache_backends:\n  - name: redis\n    type: redis\n    max_memory_mb: 512\n    eviction_policy: allkeys-lru\nopcache:\n  enabled: true\n  config:\n    opcache.enable: 1",
+    "filename": "cache-config.yaml"
+  }'
+
+# 1.5 导入慢查询 (CSV 格式)
+curl -X POST http://localhost:8080/api/import/slow-queries \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "query,query_type,execution_time_ms,lock_time_ms,rows_examined,rows_sent,database,table_name,timestamp,explain_plan,is_cacheable,recommendation\n\"SELECT * FROM users WHERE id = 1\",SELECT,150.5,0.5,1,1,mydb,users,1735689600.0,\"Using index\",1,\"Cache with TTL 3600s\"",
+    "filename": "slow-queries.csv"
+  }'
+
+# 1.6 清除所有数据
+curl -X POST http://localhost:8080/api/import/clear
+
+# =============================================================================
+# 2. 分析接口
+# =============================================================================
+
+# 2.1 命中率分析
+curl http://localhost:8080/api/analysis/hit-rate
+
+# 2.2 命中率分析 (带过滤参数)
+curl "http://localhost:8080/api/analysis/hit-rate?backend=redis"
+curl "http://localhost:8080/api/analysis/hit-rate?route=/api/users/profile"
+curl "http://localhost:8080/api/analysis/hit-rate?start_time=1735689600&end_time=1735690000"
+
+# 2.3 性能分析
+curl http://localhost:8080/api/analysis/performance
+
+# 2.4 热Key分析
+curl http://localhost:8080/api/analysis/hot-keys
+
+# 2.5 热Key分析 (带参数)
+curl "http://localhost:8080/api/analysis/hot-keys?top_n=20&threshold=0.01"
+
+# 2.6 TTL 分布分析
+curl http://localhost:8080/api/analysis/ttl-distribution
+
+# 2.7 风险分析
+curl http://localhost:8080/api/analysis/risks
+
+# 2.8 运行完整分析
+curl -X POST http://localhost:8080/api/analysis/full
+
+# 完整分析带过滤
+curl -X POST "http://localhost:8080/api/analysis/full?backend=redis&limit=1000"
+
+# =============================================================================
+# 3. 模拟优化接口
+# =============================================================================
+
+# 3.1 获取可用策略列表
+curl http://localhost:8080/api/simulation/strategies
+
+# 3.2 模拟 TTL 调整
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "ttl_adjustment",
+    "parameters": {
+      "ttl_multiplier": 2.0,
+      "max_ttl": 86400
+    }
+  }'
+
+# 3.3 模拟缓存预热
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "prewarming",
+    "parameters": {
+      "prewarm_ratio": 0.2,
+      "prewarm_keys": ["hot:key:1", "hot:key:2"]
+    }
+  }'
+
+# 3.4 模拟互斥锁 (防击穿)
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "mutex_lock",
+    "parameters": {
+      "lock_timeout_ms": 1000,
+      "concurrent_window_seconds": 1.0
+    }
+  }'
+
+# 3.5 模拟布隆过滤器 (防穿透)
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "bloom_filter",
+    "parameters": {
+      "false_positive_rate": 0.01
+    }
+  }'
+
+# 3.6 模拟 Stale-While-Revalidate
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "stale_while_revalidate",
+    "parameters": {
+      "stale_window_seconds": 30,
+      "revalidate_in_background": true
+    }
+  }'
+
+# 3.7 模拟 Key 分层
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "key_tiering",
+    "parameters": {
+      "hot_key_threshold": 0.01,
+      "tier_count": 3
+    }
+  }'
+
+# 3.8 模拟标签失效
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "tag_invalidation",
+    "parameters": {
+      "tag_group_size": 100,
+      "invalidation_pattern": "tag_based"
+    }
+  }'
+
+# 3.9 模拟 TTL 抖动 (防雪崩)
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "ttl_jitter",
+    "parameters": {
+      "jitter_percent": 15,
+      "jitter_type": "additive"
+    }
+  }'
+
+# 3.10 模拟负向缓存 (防穿透)
+curl -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategy": "negative_caching",
+    "parameters": {
+      "negative_ttl_seconds": 60,
+      "penetration_threshold_ms": 1000
+    }
+  }'
+
+# 3.11 对比多种策略
+curl -X POST http://localhost:8080/api/simulation/compare \
+  -H "Content-Type: application/json" \
+  -d '{
+    "strategies": [
+      {
+        "strategy": "ttl_adjustment",
+        "parameters": {
+          "ttl_multiplier": 2.0,
+          "max_ttl": 86400
+        }
+      },
+      {
+        "strategy": "ttl_jitter",
+        "parameters": {
+          "jitter_percent": 15,
+          "jitter_type": "additive"
+        }
+      },
+      {
+        "strategy": "prewarming",
+        "parameters": {
+          "prewarm_ratio": 0.2
+        }
+      },
+      {
+        "strategy": "mutex_lock",
+        "parameters": {
+          "lock_timeout_ms": 1000,
+          "concurrent_window_seconds": 1.0
+        }
+      },
+      {
+        "strategy": "stale_while_revalidate",
+        "parameters": {
+          "stale_window_seconds": 30
+        }
+      }
+    ]
+  }'
+
+# 3.12 运行推荐优化组合
+curl -X POST http://localhost:8080/api/simulation/recommended
+
+# =============================================================================
+# 4. 导出报告接口
+# =============================================================================
+
+# 4.1 导出 Markdown 报告
+curl http://localhost:8080/api/export/report/markdown -o cache-analysis.md
+
+# 4.2 导出 JSON 报告
+curl http://localhost:8080/api/export/report/json -o cache-analysis.json
+
+# 4.3 导出 CSV 数据
+curl http://localhost:8080/api/export/report/csv -o cache-events.csv
+
+# =============================================================================
+# 5. 错误处理测试
+# =============================================================================
+
+# 5.1 测试坏 JSON
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "{invalid json}"
+  }'
+
+# 5.2 测试缺失字段
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "{\"id\": \"evt_001\", \"key\": \"test\", \"type\": \"HIT\"}"
+  }'
+
+# 5.3 测试无效 TTL
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "{\"id\": \"evt_001\", \"key\": \"test\", \"type\": \"SET\", \"backend\": \"redis\", \"timestamp\": 1735689600.0, \"ttl\": -3600}"
+  }'
+
+# 5.4 测试重复 ID
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "{\"id\": \"dup_001\", \"key\": \"k1\", \"type\": \"HIT\", \"backend\": \"redis\", \"timestamp\": 1735689600.0}\n{\"id\": \"dup_001\", \"key\": \"k2\", \"type\": \"MISS\", \"backend\": \"redis\", \"timestamp\": 1735689601.0}"
+  }'
+
+# 5.5 测试空内容
+curl -X POST http://localhost:8080/api/import/cache-events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": ""
+  }'
+
+# =============================================================================
+# 6. 完整工作流示例
+# =============================================================================
+
+# 步骤 1: 先导入样例数据 (使用 data/ 目录下的文件)
+# 注意: 需要将文件内容读取并转义
+
+# 步骤 2: 查看状态
+curl http://localhost:8080/api/import/status
+
+# 步骤 3: 运行完整分析
+curl -X POST http://localhost:8080/api/analysis/full
+
+# 步骤 4: 查看各维度分析
+curl http://localhost:8080/api/analysis/hit-rate
+curl http://localhost:8080/api/analysis/performance
+curl http://localhost:8080/api/analysis/hot-keys
+curl http://localhost:8080/api/analysis/risks
+
+# 步骤 5: 运行推荐优化模拟
+curl -X POST http://localhost:8080/api/simulation/recommended
+
+# 步骤 6: 对比特定策略
+curl -X POST http://localhost:8080/api/simulation/compare \
+  -H "Content-Type: application/json" \
+  -d '{"strategies": [{"strategy": "ttl_adjustment", "parameters": {"ttl_multiplier": 2.0}}, {"strategy": "ttl_jitter", "parameters": {"jitter_percent": 15}}]}'
+
+# 步骤 7: 导出报告
+curl http://localhost:8080/api/export/report/markdown -o report.md
+curl http://localhost:8080/api/export/report/json -o report.json
+
+# 步骤 8: 清除数据 (可选)
+# curl -X POST http://localhost:8080/api/import/clear
+
+# =============================================================================
+# 7. 使用 jq 美化输出
+# =============================================================================
+
+# 需要安装 jq: brew install jq 或 apt install jq
+
+# 查看命中率
+curl -s http://localhost:8080/api/analysis/hit-rate | jq
+
+# 查看热Key前5名
+curl -s http://localhost:8080/api/analysis/hot-keys | jq '.result.top_keys[:5]'
+
+# 查看风险等级
+curl -s http://localhost:8080/api/analysis/risks | jq '.result.overall_risk_level'
+
+# 查看模拟优化后的命中率提升
+curl -s -X POST http://localhost:8080/api/simulation/optimization \
+  -H "Content-Type: application/json" \
+  -d '{"strategy": "ttl_adjustment", "parameters": {"ttl_multiplier": 2.0}}' \
+  | jq '{baseline_hit_rate: .baseline.summary.hit_rate_percent, simulated_hit_rate: .simulation.summary.hit_rate_percent}'

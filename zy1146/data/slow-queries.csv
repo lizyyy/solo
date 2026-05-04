@@ -1,0 +1,10 @@
+query,query_type,execution_time_ms,lock_time_ms,rows_examined,rows_sent,database,table_name,timestamp,explain_plan,is_cacheable,recommendation
+"SELECT * FROM users WHERE id = 1001",SELECT,150.5,0.5,1,1,mydb,users,1735689600.0,"Using index",1,"Cache with TTL 3600s, low cardinality"
+"SELECT * FROM products WHERE category_id = 5 ORDER BY created_at DESC LIMIT 20",SELECT,850.3,1.2,10000,20,mydb,products,1735689601.0,"Using filesort, Using where",1,"Add index on (category_id, created_at), cache results"
+"SELECT COUNT(*) FROM orders WHERE user_id = 1001 AND status = 'pending'",SELECT,1200.8,2.5,50000,1,mydb,orders,1735689602.0,"Using where, Using temporary",1,"Cache aggregate, consider summary table"
+"SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = 5001",JOIN,250.0,0.8,2,1,mydb,products,1735689603.0,"Using index",1,"Cache product detail with TTL 7200s"
+"UPDATE users SET last_login = NOW() WHERE id = 1001",UPDATE,50.2,5.0,1,0,mydb,users,1735689604.0,,0,"Write operation, invalidate user cache"
+"SELECT * FROM non_existent_table WHERE id = 9999",SELECT,2500.0,0.1,0,0,mydb,non_existent_table,1735689605.0,"Error: Table doesn't exist",0,"Check table existence, consider negative caching"
+"SELECT * FROM products WHERE price > 100 AND stock > 0 ORDER BY RAND() LIMIT 10",SELECT,3500.5,0.3,5000,10,mydb,products,1735689606.0,"Using where, Using temporary, Using filesort",0,"Avoid ORDER BY RAND(), optimize query first"
+"SELECT u.*, (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) as order_count FROM users u",SUBQUERY,1800.0,1.0,1000,1000,mydb,users,1735689607.0,"Dependent subquery",1,"Rewrite with JOIN, cache user stats"
+"INSERT INTO logs (message, created_at) VALUES ('test', NOW())",INSERT,10.0,0.1,0,0,mydb,logs,1735689608.0,,0,"Write-only table, no caching needed"

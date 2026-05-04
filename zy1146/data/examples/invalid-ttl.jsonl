@@ -1,0 +1,4 @@
+{"id": "evt_001", "key": "test:key:1", "type": "SET", "backend": "redis", "timestamp": 1735689600.0, "ttl": -3600, "latency_ms": 5.2}
+{"id": "evt_002", "key": "test:key:2", "type": "SET", "backend": "redis", "timestamp": 1735689601.0, "ttl": "invalid_string", "latency_ms": 5.3}
+{"id": "evt_003", "key": "test:key:3", "type": "SET", "backend": "redis", "timestamp": 1735689602.0, "ttl": 3600, "latency_ms": 5.1}
+{"id": "evt_004", "key": "test:key:4", "type": "SET", "backend": "redis", "timestamp": 1735689603.0, "ttl": -100, "latency_ms": 5.4}
