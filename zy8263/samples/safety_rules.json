@@ -1,0 +1,42 @@
+{
+  "rules": {
+    "speed_limits": [
+      {
+        "limit": 30,
+        "area": "general",
+        "description": "通用区域限速 30 km/h"
+      },
+      {
+        "limit": 15,
+        "area": "stand_area",
+        "description": "机位区域限速 15 km/h"
+      }
+    ],
+    "no_entry_zones": [
+      {
+        "name": "跑道禁区",
+        "polygon": [
+          { "lat": 31.1450, "lon": 121.8040 },
+          { "lat": 31.1450, "lon": 121.8100 },
+          { "lat": 31.1440, "lon": 121.8100 },
+          { "lat": 31.1440, "lon": 121.8040 }
+        ],
+        "allowed_vehicle_types": [],
+        "description": "未经授权车辆禁止进入跑道区域"
+      }
+    ],
+    "proximity_rules": {
+      "min_distance": 10,
+      "description": "车辆之间最小安全距离 10 米"
+    },
+    "fueling_rules": {
+      "no_bridge_during_fueling": true,
+      "min_distance_from_bridge": 20,
+      "description": "加油作业期间登机桥不得作业，保持至少 20 米距离"
+    },
+    "bridge_rules": {
+      "max_extension_time": 1800,
+      "description": "登机桥最长伸展时间 30 分钟"
+    }
+  }
+}

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D 机坪作业复盘工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      overflow: hidden;
+    }
+    
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #1a1a2e;
+    }
+    
+    .header {
+      height: 50px;
+      background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid #333;
+    }
+    
+    .header h1 {
+      color: #00d4ff;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
+    .header-controls {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #00d4ff;
+      color: #1a1a2e;
+    }
+    
+    .btn-primary:hover {
+      background: #00b3e6;
+    }
+    
+    .btn-secondary {
+      background: #333;
+      color: #fff;
+    }
+    
+    .btn-secondary:hover {
+      background: #444;
+    }
+    
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: 320px;
+      background: #16213e;
+      border-right: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .sidebar-section {
+      padding: 15px;
+      border-bottom: 1px solid #333;
+    }
+    
+    .sidebar-section:last-child {
+      border-bottom: none;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .section-title {
+      color: #00d4ff;
+      font-size: 14px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .file-upload-area {
+      border: 2px dashed #333;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .file-upload-area.dragover {
+      border-color: #00d4ff;
+      background: rgba(0, 212, 255, 0.1);
+    }
+    
+    .file-upload-area p {
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    
+    .file-list {
+      margin-top: 10px;
+    }
+    
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #ccc;
+    }
+    
+    .file-item.success {
+      border-left: 3px solid #4caf50;
+    }
+    
+    .file-item.error {
+      border-left: 3px solid #f44336;
+    }
+    
+    .filter-group {
+      margin-bottom: 15px;
+    }
+    
+    .filter-label {
+      color: #aaa;
+      font-size: 12px;
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    .filter-select {
+      width: 100%;
+      padding: 8px 10px;
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 13px;
+    }
+    
+    .risk-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .risk-item {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .risk-item:hover {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .risk-item.high {
+      border-left-color: #f44336;
+    }
+    
+    .risk-item.medium {
+      border-left-color: #ff9800;
+    }
+    
+    .risk-item.low {
+      border-left-color: #ffeb3b;
+    }
+    
+    .risk-item .risk-type {
+      font-size: 12px;
+      color: #fff;
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+    
+    .risk-item .risk-time {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 3px;
+    }
+    
+    .risk-item .risk-desc {
+      font-size: 11px;
+      color: #aaa;
+    }
+    
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #three-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .canvas-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .info-panel {
+      background: rgba(22, 33, 62, 0.9);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      min-width: 200px;
+    }
+    
+    .info-panel h3 {
+      color: #00d4ff;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .info-panel p {
+      color: #ccc;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    
+    .timeline-container {
+      height: 140px;
+      background: #16213e;
+      border-top: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 20px;
+    }
+    
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .timeline-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: #00d4ff;
+      color: #1a1a2e;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .play-btn:hover {
+      background: #00b3e6;
+    }
+    
+    .play-btn.playing::before {
+      content: '⏸';
+    }
+    
+    .play-btn::before {
+      content: '▶';
+    }
+    
+    .time-display {
+      color: #fff;
+      font-size: 14px;
+      font-family: monospace;
+      min-width: 120px;
+      text-align: center;
+    }
+    
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .speed-control label {
+      color: #888;
+      font-size: 12px;
+    }
+    
+    .speed-select {
+      padding: 5px 8px;
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 12px;
+    }
+    
+    .timeline-visual {
+      flex: 1;
+      position: relative;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .timeline-axis {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 25px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    
+    .timeline-axis span {
+      color: #666;
+      font-size: 10px;
+      font-family: monospace;
+    }
+    
+    .timeline-tracks {
+      position: absolute;
+      top: 25px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+    
+    .timeline-track {
+      height: 24px;
+      position: relative;
+      border-bottom: 1px solid rgba(51, 51, 51, 0.5);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    
+    .timeline-track-label {
+      width: 80px;
+      flex-shrink: 0;
+      color: #888;
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .timeline-track-content {
+      flex: 1;
+      position: relative;
+      height: 100%;
+    }
+    
+    .timeline-event {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .timeline-event.flight {
+      background: #2196f3;
+    }
+    
+    .timeline-event.vehicle {
+      background: #4caf50;
+    }
+    
+    .timeline-event.risk {
+      background: #f44336;
+      z-index: 10;
+    }
+    
+    .timeline-cursor {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #00d4ff;
+      z-index: 20;
+      pointer-events: none;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(26, 26, 46, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .loading-overlay.hidden {
+      display: none;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #333;
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      margin-top: 20px;
+      color: #00d4ff;
+      font-size: 16px;
+    }
+    
+    .stats-panel {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(22, 33, 62, 0.9);
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      color: #ccc;
+      font-size: 12px;
+    }
+    
+    .stats-panel h3 {
+      color: #00d4ff;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    
+    .stats-label {
+      color: #888;
+    }
+    
+    .stats-value {
+      color: #fff;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div class="loading-text">加载中...</div>
+    </div>
+    
+    <div class="header">
+      <h1>✈️ 3D 机坪作业复盘工具</h1>
+      <div class="header-controls">
+        <button class="btn btn-secondary" id="loadSampleBtn">加载示例数据</button>
+        <button class="btn btn-primary" id="exportBtn">导出报告</button>
+      </div>
+    </div>
+    
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="sidebar-section">
+          <h2 class="section-title">📁 数据导入</h2>
+          <div class="file-upload-area" id="fileUploadArea">
+            <p>拖拽文件到此处或点击选择</p>
+            <p style="font-size: 11px;">支持: stands.json, vehicle_tracks.csv, turnarounds.yaml, safety_rules.json</p>
+            <input type="file" id="fileInput" multiple accept=".json,.csv,.yaml,.yml" style="display: none;">
+            <button class="btn btn-primary" id="selectFilesBtn">选择文件</button>
+          </div>
+          <div class="file-list" id="fileList"></div>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="section-title">🔍 筛选条件</h2>
+          <div class="filter-group">
+            <label class="filter-label">航班筛选</label>
+            <select class="filter-select" id="flightFilter">
+              <option value="all">全部航班</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">车辆类型筛选</label>
+            <select class="filter-select" id="vehicleTypeFilter">
+              <option value="all">全部类型</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">风险级别筛选</label>
+            <select class="filter-select" id="riskLevelFilter">
+              <option value="all">全部级别</option>
+              <option value="high">高危</option>
+              <option value="medium">中危</option>
+              <option value="low">低危</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="sidebar-section">
+          <h2 class="section-title">⚠️ 风险事件 (<span id="riskCount">0</span>)</h2>
+          <div class="risk-list" id="riskList">
+            <p style="color: #888; font-size: 12px;">暂无风险事件</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="canvas-container">
+        <canvas id="three-canvas"></canvas>
+        <div class="stats-panel" id="statsPanel">
+          <h3>📊 实时状态</h3>
+          <div class="stats-row">
+            <span class="stats-label">当前时间:</span>
+            <span class="stats-value" id="currentTime">-</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">活动车辆:</span>
+            <span class="stats-value" id="activeVehicles">0</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">当前航班:</span>
+            <span class="stats-value" id="currentFlights">0</span>
+          </div>
+          <div class="stats-row">
+            <span class="stats-label">播放速度:</span>
+            <span class="stats-value" id="playbackSpeed">1x</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="timeline-container">
+      <div class="timeline-header">
+        <div class="timeline-controls">
+          <button class="play-btn" id="playBtn"></button>
+          <div class="time-display" id="timeDisplay">00:00:00 - 00:00:00</div>
+          <div class="speed-control">
+            <label>速度:</label>
+            <select class="speed-select" id="speedSelect">
+              <option value="0.5">0.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="2">2x</option>
+              <option value="5">5x</option>
+              <option value="10">10x</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-visual" id="timelineVisual">
+        <div class="timeline-axis" id="timelineAxis">
+          <span>时间轴</span>
+        </div>
+        <div class="timeline-tracks" id="timelineTracks"></div>
+        <div class="timeline-cursor" id="timelineCursor" style="left: 0px;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

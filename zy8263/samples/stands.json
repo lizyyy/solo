@@ -1,0 +1,49 @@
+{
+  "stands": [
+    {
+      "id": "101",
+      "name": "101",
+      "latitude": 31.1434,
+      "longitude": 121.8060,
+      "type": "passenger",
+      "gate": "A1",
+      "restricted": false
+    },
+    {
+      "id": "102",
+      "name": "102",
+      "latitude": 31.1436,
+      "longitude": 121.8065,
+      "type": "passenger",
+      "gate": "A2",
+      "restricted": false
+    },
+    {
+      "id": "103",
+      "name": "103",
+      "latitude": 31.1438,
+      "longitude": 121.8070,
+      "type": "passenger",
+      "gate": "A3",
+      "restricted": false
+    },
+    {
+      "id": "201",
+      "name": "201",
+      "latitude": 31.1424,
+      "longitude": 121.8080,
+      "type": "cargo",
+      "gate": "C1",
+      "restricted": false
+    },
+    {
+      "id": "202",
+      "name": "202",
+      "latitude": 31.1426,
+      "longitude": 121.8085,
+      "type": "cargo",
+      "gate": "C2",
+      "restricted": true
+    }
+  ]
+}
