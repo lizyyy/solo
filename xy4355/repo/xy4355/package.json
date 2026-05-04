@@ -1,0 +1,19 @@
+{
+  "name": "hydroponic-calibrator",
+  "version": "1.0.0",
+  "description": "小型水培农场营养液校准器",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["hydroponic", "nutrient", "calibrator", "ec", "ph"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "archiver": "^6.0.1"
+  }
+}
