@@ -1,0 +1,11 @@
+jvmOptions:
+  - "-XX:+UseG1GC"
+  - "-Xms8g"
+  - "-Xmx8g"
+  - "-XX:MaxGCPauseMillis=200"
+  - "-XX:G1HeapRegionSize=8m"
+  - "-XX:MetaspaceSize=128m"
+  - "-XX:MaxMetaspaceSize=256m"
+  - "-XX:+ParallelRefProcEnabled"
+  - "-XX:ParallelGCThreads=8"
+  - "-XX:ConcGCThreads=2"

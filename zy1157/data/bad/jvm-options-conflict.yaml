@@ -1,0 +1,13 @@
+jvmOptions:
+  - "-XX:+UseG1GC"
+  - "-Xms2g"
+  - "-Xmx4g"
+  - "-XX:MaxGCPauseMillis=100"
+  - "-XX:G1HeapRegionSize=3m"
+  - "-XX:NewRatio=2"
+  - "-XX:SurvivorRatio=8"
+  - "-XX:+DisableExplicitGC"
+  - "-XX:+ExplicitGCInvokesConcurrent"
+  - "-XX:MetaspaceSize=64m"
+  - "-XX:ParallelGCThreads=32"
+  - "-XX:ConcGCThreads=16"

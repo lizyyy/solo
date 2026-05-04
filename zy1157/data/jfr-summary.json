@@ -1,0 +1,188 @@
+{
+  "version": "1.0",
+  "recordingInfo": {
+    "startTime": "2026-05-04T08:00:00Z",
+    "endTime": "2026-05-04T09:15:00Z",
+    "durationMs": 4500000,
+    "jvmVersion": "11.0.11",
+    "jvmVendor": "Oracle Corporation",
+    "osName": "Linux",
+    "osVersion": "5.4.0-80-generic",
+    "cpuCount": 8,
+    "totalMemory": 17179869184
+  },
+  "gc": {
+    "totalCollections": 22,
+    "totalPauseTime": 3856,
+    "maxPauseTime": 854,
+    "gcOverheadPercent": 8.57,
+    "youngGarbageCollections": [
+      {
+        "startTime": "2026-05-04T08:00:30.500Z",
+        "durationMs": 85,
+        "gcCause": "G1 Evacuation Pause",
+        "heapBeforeBytes": 1258291200,
+        "heapAfterBytes": 188743680,
+        "heapMaxBytes": 4294967296,
+        "gcName": "G1 Young GC"
+      },
+      {
+        "startTime": "2026-05-04T08:01:30.200Z",
+        "durationMs": 72,
+        "gcCause": "G1 Evacuation Pause",
+        "heapBeforeBytes": 1279262720,
+        "heapAfterBytes": 209715200,
+        "heapMaxBytes": 4294967296,
+        "gcName": "G1 Young GC"
+      },
+      {
+        "startTime": "2026-05-04T08:02:30.100Z",
+        "durationMs": 99,
+        "gcCause": "G1 Evacuation Pause",
+        "heapBeforeBytes": 1310720000,
+        "heapAfterBytes": 241172480,
+        "heapMaxBytes": 4294967296,
+        "gcName": "G1 Young GC"
+      },
+      {
+        "startTime": "2026-05-04T08:04:00.500Z",
+        "durationMs": 157,
+        "gcCause": "G1 Evacuation Pause",
+        "heapBeforeBytes": 2936012800,
+        "heapAfterBytes": 1572864000,
+        "heapMaxBytes": 4294967296,
+        "gcName": "G1 Mixed GC"
+      },
+      {
+        "startTime": "2026-05-04T08:05:30.200Z",
+        "durationMs": 89,
+        "gcCause": "G1 Evacuation Pause",
+        "heapBeforeBytes": 2673868800,
+        "heapAfterBytes": 1625292800,
+        "heapMaxBytes": 4294967296,
+        "gcName": "G1 Young GC"
+      }
+    ],
+    "oldGarbageCollections": [
+      {
+        "startTime": "2026-05-04T08:18:30.500Z",
+        "durationMs": 854,
+        "gcCause": "Allocation Failure",
+        "heapBeforeBytes": 3984588800,
+        "heapAfterBytes": 1887436800,
+        "heapMaxBytes": 4294967296,
+        "gcName": "Full GC"
+      },
+      {
+        "startTime": "2026-05-04T08:28:30.500Z",
+        "durationMs": 723,
+        "gcCause": "Metadata GC Threshold",
+        "heapBeforeBytes": 4089446400,
+        "heapAfterBytes": 1992294400,
+        "heapMaxBytes": 4294967296,
+        "gcName": "Full GC"
+      }
+    ],
+    "concurrentPhases": [
+      {
+        "startTime": "2026-05-04T08:03:30.000Z",
+        "phase": "Concurrent Mark",
+        "durationMs": 2500,
+        "gcName": "G1 Concurrent Mark"
+      },
+      {
+        "startTime": "2026-05-04T08:07:00.000Z",
+        "phase": "Concurrent Mark",
+        "durationMs": 3200,
+        "gcName": "G1 Concurrent Mark"
+      }
+    ],
+    "events": [
+      {
+        "timestamp": "2026-05-04T08:12:30.000Z",
+        "name": "G1 Humongous Allocation",
+        "duration": 5,
+        "heapBeforeBytes": 3355443200,
+        "heapAfterBytes": 3358257152,
+        "heapMaxBytes": 4294967296,
+        "cause": "Humongous Object Allocation"
+      },
+      {
+        "timestamp": "2026-05-04T08:24:30.000Z",
+        "name": "G1 Humongous Allocation",
+        "duration": 7,
+        "heapBeforeBytes": 3774873600,
+        "heapAfterBytes": 3779067904,
+        "heapMaxBytes": 4294967296,
+        "cause": "Humongous Object Allocation"
+      }
+    ]
+  },
+  "gcPause": {
+    "count": 22,
+    "totalDurationMs": 3856,
+    "maxDurationMs": 854,
+    "avgDurationMs": 175,
+    "p50DurationMs": 89,
+    "p95DurationMs": 257,
+    "p99DurationMs": 789,
+    "pauses": [
+      {"type": "Young GC", "durationMs": 85, "timestamp": "2026-05-04T08:00:30.500Z"},
+      {"type": "Young GC", "durationMs": 72, "timestamp": "2026-05-04T08:01:30.200Z"},
+      {"type": "Young GC", "durationMs": 99, "timestamp": "2026-05-04T08:02:30.100Z"},
+      {"type": "Mixed GC", "durationMs": 157, "timestamp": "2026-05-04T08:04:00.500Z"},
+      {"type": "Young GC", "durationMs": 89, "timestamp": "2026-05-04T08:05:30.200Z"},
+      {"type": "Full GC", "durationMs": 854, "timestamp": "2026-05-04T08:18:30.500Z"},
+      {"type": "Full GC", "durationMs": 723, "timestamp": "2026-05-04T08:28:30.500Z"}
+    ]
+  },
+  "heap": {
+    "maxSizeBytes": 4294967296,
+    "committedSizeBytes": 4294967296,
+    "peakUsedBytes": 4089446400,
+    "avgUsedBytes": 2852126720,
+    "eden": {
+      "maxSizeBytes": 1073741824,
+      "peakUsedBytes": 1073741824,
+      "avgUsedBytes": 900000000
+    },
+    "survivor": {
+      "maxSizeBytes": 67108864,
+      "peakUsedBytes": 67108864,
+      "avgUsedBytes": 50000000
+    },
+    "old": {
+      "maxSizeBytes": 3154116608,
+      "peakUsedBytes": 3019898880,
+      "avgUsedBytes": 1900000000
+    }
+  },
+  "allocation": {
+    "totalAllocationBytes": 85899345920,
+    "allocationRatePerSec": 19088743,
+    "tlabSizeBytes": 2097152,
+    "humongousAllocations": {
+      "count": 2,
+      "totalSizeBytes": 6291456,
+      "maxSizeBytes": 3145728
+    }
+  },
+  "cpu": {
+    "jvmUserPercent": 25.5,
+    "jvmSystemPercent": 3.2,
+    "gcUserPercent": 8.7,
+    "gcSystemPercent": 1.1,
+    "applicationUserPercent": 14.5
+  },
+  "metaspace": {
+    "usedBytes": 184549350,
+    "committedBytes": 201326592,
+    "maxBytes": 268435456,
+    "peakUsedBytes": 188743680
+  },
+  "threads": {
+    "peakCount": 256,
+    "daemonCount": 180,
+    "totalStarted": 1024
+  }
+}

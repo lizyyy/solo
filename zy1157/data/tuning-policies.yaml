@@ -1,0 +1,86 @@
+name: default
+version: "1.0"
+
+riskThresholds:
+  full_gc_count:
+    critical: 10
+    high: 5
+    medium: 2
+    low: 0
+  pause_time_ms:
+    critical: 500
+    high: 300
+    medium: 200
+    low: 100
+  memory_usage_percent:
+    critical: 95
+    high: 90
+    medium: 80
+    low: 70
+  gc_overhead_percent:
+    critical: 20
+    high: 15
+    medium: 10
+    low: 5
+  humongous_count:
+    critical: 50
+    high: 20
+    medium: 10
+    low: 5
+  promotion_failure_count:
+    critical: 10
+    high: 5
+    medium: 2
+    low: 1
+
+sloConfig:
+  max_pause_ms: 200
+  max_gc_overhead_percent: 10
+  max_full_gc_per_hour: 1
+  memory_headroom_min_percent: 15
+
+policies:
+  containerReserve:
+    recommended_reserve_percent: 20
+    min_reserve_percent: 15
+    max_heap_ratio: 0.75
+  
+  youngGen:
+    min_percent: 20
+    max_percent: 60
+    recommended_percent: 30
+  
+  g1Specific:
+    min_region_size_mb: 1
+    max_region_size_mb: 32
+    recommended_ihop_percent: 45
+    recommended_reserve_percent: 15
+  
+  zgcSpecific:
+    recommended_pause_ms: 200
+    large_page_enabled: true
+  
+  generalRecommendations:
+    - condition: full_gc_frequent
+      action: increase_heap_or_change_collector
+      priority: critical
+    
+    - condition: pause_slo_violation
+      action: adjust_max_pause_or_zgc
+      priority: high
+    
+    - condition: humongous_allocations
+      action: increase_region_size
+      priority: high
+    
+    - condition: promotion_failures
+      action: increase_heap_or_young_gen
+      priority: critical
+    
+    - condition: high_gc_overhead
+      action: increase_heap_size
+      priority: high
+    
+    - condition: low_container_headroom
+      action: reduce_heap_or_increase_container
+      priority: high
