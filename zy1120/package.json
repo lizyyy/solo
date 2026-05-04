@@ -1,0 +1,21 @@
+{
+  "name": "kiln-firing-simulator",
+  "version": "1.0.0",
+  "description": "陶艺小窑烧成曲线预演工具",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "init-db": "node server/init-db.js",
+    "test": "node server/test.js"
+  },
+  "keywords": ["kiln", "ceramic", "firing", "simulator"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.9.0",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  }
+}

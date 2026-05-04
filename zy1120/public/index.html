@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>陶艺小窑烧成曲线预演工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>陶艺小窑烧成曲线预演工具</h1>
+      <p class="subtitle">为工作室老师设计的烧成方案管理与风险检查系统</p>
+    </header>
+
+    <nav class="app-nav">
+      <button class="nav-btn active" data-tab="dashboard">仪表盘</button>
+      <button class="nav-btn" data-tab="kilns">窑炉参数</button>
+      <button class="nav-btn" data-tab="materials">坯体/釉料</button>
+      <button class="nav-btn" data-tab="pieces">作品库</button>
+      <button class="nav-btn" data-tab="plans">烧成方案</button>
+      <button class="nav-btn" data-tab="records">烧成记录</button>
+    </nav>
+
+    <main class="app-main">
+      <section id="tab-dashboard" class="tab-content active">
+        <div class="dashboard-grid">
+          <div class="card stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-kilns">0</div>
+              <div class="stat-label">窑炉数量</div>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon">🏺</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pieces">0</div>
+              <div class="stat-label">作品数量</div>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-plans">0</div>
+              <div class="stat-label">烧成方案</div>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-records">0</div>
+              <div class="stat-label">烧成记录</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>快速操作</h3>
+          <div class="quick-actions">
+            <button class="btn btn-primary" onclick="app.openPlanModal()">新建烧成方案</button>
+            <button class="btn btn-secondary" onclick="app.loadPlans()">查看所有方案</button>
+            <button class="btn btn-secondary" onclick="app.switchTab('pieces')">添加新作品</button>
+          </div>
+        </div>
+
+        <div class="card" id="recent-plans-card">
+          <h3>最近的烧成方案</h3>
+          <div id="recent-plans-list">
+            <p class="empty-state">暂无烧成方案</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-kilns" class="tab-content">
+        <div class="section-header">
+          <h2>窑炉参数管理</h2>
+          <button class="btn btn-primary" onclick="app.openKilnModal()">添加窑炉</button>
+        </div>
+        <div id="kilns-list" class="list-container">
+          <p class="empty-state">加载中...</p>
+        </div>
+      </section>
+
+      <section id="tab-materials" class="tab-content">
+        <div class="materials-tabs">
+          <button class="material-tab active" data-material="bodies">坯体资料</button>
+          <button class="material-tab" data-material="glazes">釉料资料</button>
+        </div>
+        
+        <div id="bodies-section" class="material-section">
+          <div class="section-header">
+            <h3>坯体资料库</h3>
+            <button class="btn btn-primary" onclick="app.openBodyModal()">添加坯体</button>
+          </div>
+          <div id="bodies-list" class="list-container">
+            <p class="empty-state">加载中...</p>
+          </div>
+        </div>
+
+        <div id="glazes-section" class="material-section hidden">
+          <div class="section-header">
+            <h3>釉料资料库</h3>
+            <button class="btn btn-primary" onclick="app.openGlazeModal()">添加釉料</button>
+          </div>
+          <div id="glazes-list" class="list-container">
+            <p class="empty-state">加载中...</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-pieces" class="tab-content">
+        <div class="section-header">
+          <h2>作品库</h2>
+          <button class="btn btn-primary" onclick="app.openPieceModal()">添加作品</button>
+        </div>
+        <div id="pieces-list" class="list-container">
+          <p class="empty-state">加载中...</p>
+        </div>
+      </section>
+
+      <section id="tab-plans" class="tab-content">
+        <div class="section-header">
+          <h2>烧成方案管理</h2>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" onclick="app.openCompareModal()">方案对比</button>
+            <button class="btn btn-primary" onclick="app.openPlanModal()">新建方案</button>
+          </div>
+        </div>
+        <div id="plans-list" class="list-container">
+          <p class="empty-state">加载中...</p>
+        </div>
+      </section>
+
+      <section id="tab-records" class="tab-content">
+        <div class="section-header">
+          <h2>烧成记录与复盘</h2>
+          <button class="btn btn-primary" onclick="app.openRecordModal()">添加记录</button>
+        </div>
+        <div id="records-list" class="list-container">
+          <p class="empty-state">加载中...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" id="generic-modal">
+      <div class="modal-header">
+        <h3 id="modal-title">标题</h3>
+        <button class="modal-close" onclick="app.closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
