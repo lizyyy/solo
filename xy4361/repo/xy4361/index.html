@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音准复盘工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>音准复盘工具</h1>
+            <p>社区合唱团排练分析助手</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 导入区域 -->
+            <section id="import-section" class="section">
+                <h2>数据导入</h2>
+                <div class="import-container">
+                    <div class="import-card">
+                        <h3>排练片段 CSV</h3>
+                        <p>格式：时间、声部、基频、响度、歌词小节</p>
+                        <input type="file" id="rehearsal-file" accept=".csv">
+                        <div class="file-status" id="rehearsal-status">未选择文件</div>
+                    </div>
+                    
+                    <div class="import-card">
+                        <h3>目标音高表</h3>
+                        <p>格式：声部、小节、目标音高、时长</p>
+                        <input type="file" id="target-file" accept=".csv">
+                        <div class="file-status" id="target-status">未选择文件</div>
+                    </div>
+                    
+                    <button id="analyze-btn" class="btn btn-primary">开始分析</button>
+                </div>
+            </section>
+
+            <!-- 分析结果区域 -->
+            <section id="results-section" class="section hidden">
+                <h2>分析结果</h2>
+                
+                <!-- 统计概览 -->
+                <div class="stats-container" id="stats-container">
+                    <div class="stat-card">
+                        <h3>总问题数</h3>
+                        <div class="stat-number" id="total-issues">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>跑调问题</h3>
+                        <div class="stat-number" id="pitch-issues">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>节奏问题</h3>
+                        <div class="stat-number" id="rhythm-issues">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>声部不均衡</h3>
+                        <div class="stat-number" id="balance-issues">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>反复出错</h3>
+                        <div class="stat-number" id="repeat-issues">0</div>
+                    </div>
+                </div>
+
+                <!-- 问题列表 -->
+                <div class="issues-container">
+                    <div class="issues-header">
+                        <h3>问题清单</h3>
+                        <div class="filter-controls">
+                            <select id="filter-type">
+                                <option value="all">全部类型</option>
+                                <option value="pitch">跑调</option>
+                                <option value="rhythm">节奏</option>
+                                <option value="balance">声部不均衡</option>
+                                <option value="repeat">反复出错</option>
+                            </select>
+                            <select id="filter-voice">
+                                <option value="all">全部声部</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="issues-list" id="issues-list">
+                        <p class="empty-message">暂无问题数据</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 复核区域 -->
+            <section id="review-section" class="section hidden">
+                <div class="review-header">
+                    <button id="back-to-list" class="btn btn-secondary">返回列表</button>
+                    <h2 id="review-title">问题复核</h2>
+                </div>
+                
+                <div class="review-content">
+                    <div class="review-detail" id="review-detail">
+                        <!-- 问题详情将在这里显示 -->
+                    </div>
+                    
+                    <div class="review-actions">
+                        <div class="review-status">
+                            <label>复核状态：</label>
+                            <select id="review-status">
+                                <option value="pending">待复核</option>
+                                <option value="confirmed">确认问题</option>
+                                <option value="dismissed">忽略</option>
+                            </select>
+                        </div>
+                        
+                        <div class="review-comments">
+                            <label>老师批注：</label>
+                            <textarea id="review-comments" placeholder="输入对这个问题的批注..."></textarea>
+                        </div>
+                        
+                        <div class="review-buttons">
+                            <button id="save-review" class="btn btn-primary">保存批注</button>
+                            <button id="prev-issue" class="btn btn-secondary">上一个</button>
+                            <button id="next-issue" class="btn btn-secondary">下一个</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 导出区域 -->
+        <section id="export-section" class="section hidden">
+            <h2>导出功能</h2>
+            <div class="export-container">
+                <button id="export-markdown" class="btn btn-primary">
+                    导出 Markdown 练习建议
+                </button>
+                <button id="export-csv" class="btn btn-primary">
+                    导出 CSV 问题清单
+                </button>
+                <button id="export-json" class="btn btn-primary">
+                    导出 JSON 审计包
+                </button>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 社区合唱团音准复盘工具</p>
+        </footer>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/import.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
