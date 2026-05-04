@@ -1,0 +1,27 @@
+{
+  "name": "performance-pack-inspector",
+  "version": "1.0.0",
+  "description": "社区合唱团演出资料包巡检器",
+  "main": "src/cli/index.js",
+  "bin": {
+    "inspect-pack": "src/cli/index.js",
+    "inspect-server": "src/server/index.js"
+  },
+  "scripts": {
+    "start": "node src/cli/index.js",
+    "server": "node src/server/index.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["choir", "inspector", "performance", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "commander": "^12.1.0",
+    "csv-parser": "^3.2.0",
+    "express": "^4.21.0",
+    "morgan": "^1.10.0",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {}
+}
