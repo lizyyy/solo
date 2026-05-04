@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本向量检索实验台</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📊 文本向量检索实验台</h1>
+            <p class="subtitle">支持 TF-IDF / Embedding 向量化 + 余弦相似度检索</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="corpus">📁 语料库</button>
+            <button class="tab-btn" data-tab="vectorize">⚙️ 向量化</button>
+            <button class="tab-btn" data-tab="search">🔍 检索</button>
+            <button class="tab-btn" data-tab="analysis">📈 分析</button>
+            <button class="tab-btn" data-tab="evaluate">📋 评估</button>
+            <button class="tab-btn" data-tab="history">📜 历史</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="corpus-tab" class="tab-content active">
+                <div class="card">
+                    <h2>📁 语料库管理</h2>
+                    
+                    <div class="upload-section">
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="fileInput" accept=".csv,.jsonl,.txt" hidden>
+                            <div class="upload-icon">📤</div>
+                            <p>拖拽文件到此处或点击选择</p>
+                            <p class="upload-hint">支持格式: .csv, .jsonl, .txt</p>
+                        </div>
+                        <button class="btn btn-primary" id="uploadBtn">上传文件</button>
+                    </div>
+
+                    <div class="add-document-section">
+                        <h3>添加单条文档</h3>
+                        <div class="form-group">
+                            <label>文档ID (可选)</label>
+                            <input type="text" id="newDocId" placeholder="留空自动生成">
+                        </div>
+                        <div class="form-group">
+                            <label>文档内容</label>
+                            <textarea id="newDocContent" rows="4" placeholder="输入文档内容..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" id="addDocBtn">添加文档</button>
+                    </div>
+
+                    <div class="corpus-stats" id="corpusStats">
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalDocs">0</span>
+                            <span class="stat-label">文档总数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalTokens">0</span>
+                            <span class="stat-label">总词数</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="avgLength">0</span>
+                            <span class="stat-label">平均长度</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="vocabSize">0</span>
+                            <span class="stat-label">词汇表</span>
+                        </div>
+                    </div>
+
+                    <div class="document-list">
+                        <h3>文档列表</h3>
+                        <div class="table-container">
+                            <table id="corpusTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>内容</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="corpusTableBody">
+                                    <tr>
+                                        <td colspan="3" class="empty-state">暂无文档，请上传或添加文档</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination" id="corpusPagination"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vectorize-tab" class="tab-content">
+                <div class="card">
+                    <h2>⚙️ 向量化配置</h2>
+                    
+                    <div class="config-grid">
+                        <div class="form-group">
+                            <label>分词器</label>
+                            <select id="tokenizerSelect">
+                                <option value="jieba">结巴分词 (中文)</option>
+                                <option value="space">空格分词 (英文)</option>
+                                <option value="char">字符级分词</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>停用词语言</label>
+                            <select id="stopwordLangSelect">
+                                <option value="chinese">中文</option>
+                                <option value="english">英文</option>
+                                <option value="both">中英文混合</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>向量化方法</label>
+                            <select id="vectorizationSelect">
+                                <option value="tfidf">TF-IDF</option>
+                                <option value="embedding">简化 Embedding</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="embeddingDimGroup" style="display:none;">
+                            <label>Embedding 维度</label>
+                            <input type="number" id="embeddingDim" value="100" min="50" max="1000" step="50">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>向量归一化</label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="normalizeCheck" checked>
+                                <span>启用 L2 归一化</span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>版本名称</label>
+                            <input type="text" id="versionName" placeholder="如: v1_tfidf_jieba">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>自定义停用词 (每行一个)</label>
+                        <textarea id="customStopwords" rows="3" placeholder="停用词1&#10;停用词2&#10;停用词3"></textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-large" id="vectorizeBtn">🚀 开始向量化</button>
+
+                    <div class="vectorization-result" id="vectorizationResult" style="display:none;">
+                        <h3>向量化结果</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <span class="result-label">向量维度</span>
+                                <span class="result-value" id="vectorDimensions">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">词汇表大小</span>
+                                <span class="result-value" id="vocabularySize">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">版本名称</span>
+                                <span class="result-value" id="versionResult">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="version-history">
+                        <h3>历史版本</h3>
+                        <div id="versionList" class="version-list">
+                            <p class="empty-state">暂无历史版本</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="search-tab" class="tab-content">
+                <div class="card">
+                    <h2>🔍 向量检索</h2>
+                    
+                    <div class="search-section">
+                        <div class="form-group">
+                            <label>查询文本</label>
+                            <textarea id="searchQuery" rows="3" placeholder="输入查询文本..."></textarea>
+                        </div>
+                        
+                        <div class="search-config">
+                            <div class="form-group">
+                                <label>Top-K</label>
+                                <input type="number" id="topK" value="5" min="1" max="50">
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-large" id="searchBtn">🔍 检索</button>
+                    </div>
+
+                    <div class="search-results" id="searchResults" style="display:none;">
+                        <h3>检索结果</h3>
+                        <div class="query-info" id="queryInfo"></div>
+                        <div id="resultList" class="result-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="analysis-tab" class="tab-content">
+                <div class="card">
+                    <h2>📈 向量分析</h2>
+                    
+                    <div class="analysis-tabs">
+                        <button class="analysis-tab-btn active" data-analysis="similarity">相似度矩阵</button>
+                        <button class="analysis-tab-btn" data-analysis="dimension">维度贡献</button>
+                    </div>
+
+                    <div id="similarity-analysis" class="analysis-content active">
+                        <div class="form-group">
+                            <label>显示文档数量 (最多50)</label>
+                            <input type="number" id="matrixLimit" value="20" min="5" max="50">
+                        </div>
+                        <button class="btn btn-primary" id="loadMatrixBtn">加载相似度矩阵</button>
+                        
+                        <div class="matrix-container" id="matrixContainer">
+                            <canvas id="similarityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="dimension-analysis" class="analysis-content">
+                        <div class="form-group">
+                            <label>查询文本 (分析维度贡献)</label>
+                            <textarea id="dimensionQuery" rows="2" placeholder="输入查询文本分析维度贡献..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>显示 Top-N 特征</label>
+                            <input type="number" id="topFeatures" value="15" min="5" max="50">
+                        </div>
+                        <button class="btn btn-primary" id="analyzeDimensionBtn">分析维度贡献</button>
+                        
+                        <div id="dimensionResults" class="dimension-results"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="evaluate-tab" class="tab-content">
+                <div class="card">
+                    <h2>📋 检索评估</h2>
+                    
+                    <div class="eval-config">
+                        <div class="form-group">
+                            <label>Top-K</label>
+                            <input type="number" id="evalTopK" value="5" min="1" max="20">
+                        </div>
+                        <button class="btn btn-primary" id="evaluateBtn">计算评估指标</button>
+                        <button class="btn btn-secondary" id="exportReportBtn">导出报告</button>
+                    </div>
+
+                    <div class="eval-results" id="evalResults" style="display:none;">
+                        <h3>评估结果</h3>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricPrecision">0</div>
+                                <div class="metric-label">平均 Precision@K</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricRecall">0</div>
+                                <div class="metric-label">平均 Recall@K</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricF1">0</div>
+                                <div class="metric-label">平均 F1</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricMAP">0</div>
+                                <div class="metric-label">MAP</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricMRR">0</div>
+                                <div class="metric-label">MRR</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="metricNDCG">0</div>
+                                <div class="metric-label">NDCG</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="annotation-guide">
+                        <h3>相关性标注说明</h3>
+                        <div class="annotation-legend">
+                            <span class="anno-3">3 - 高度相关</span>
+                            <span class="anno-2">2 - 相关</span>
+                            <span class="anno-1">1 - 部分相关</span>
+                            <span class="anno-0">0 - 不相关</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history-tab" class="tab-content">
+                <div class="card">
+                    <h2>📜 查询历史</h2>
+                    
+                    <div class="history-list" id="historyList">
+                        <p class="empty-state">暂无查询历史</p>
+                    </div>
+                    
+                    <div class="pagination" id="historyPagination"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
