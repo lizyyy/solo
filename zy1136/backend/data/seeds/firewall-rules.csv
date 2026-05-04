@@ -1,0 +1,11 @@
+rule_number,name,action,source,destination,protocol,ports,description,is_enabled
+1,允许办公网访问互联网,allow,192.168.10.0/24,any,tcp,80;443,办公网HTTP/HTTPS访问,true
+2,允许办公网访问DNS,allow,192.168.10.0/24,8.8.8.8;8.8.4.4,udp,53,DNS查询,true
+3,允许服务器段访问数据库,allow,192.168.20.0/24,192.168.20.10,tcp,3306;5432,数据库访问,true
+4,允许远程办公VPN访问,allow,10.0.0.0/24,192.168.10.0/24,tcp,22;3389,VPN远程访问,true
+5,允许访客网访问互联网,allow,192.168.30.0/24,any,tcp,80;443,访客网HTTP/HTTPS访问,true
+6,危险规则-允许任何访问,allow,any,any,any,any,测试用过于宽松的规则,true
+7,访客网访问内网服务,allow,192.168.30.0/24,192.168.20.10,tcp,3306,访客网可访问数据库(危险),true
+8,拒绝外部访问SSH,deny,any,192.168.10.0/24,tcp,22,禁止外部SSH访问,true
+9,拒绝外部访问RDP,deny,any,192.168.10.0/24,tcp,3389,禁止外部远程桌面访问,true
+10,允许ICMP,any,192.168.10.0/24,192.168.20.0/24,icmp,any,Ping测试,true

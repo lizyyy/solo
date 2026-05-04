@@ -1,0 +1,5 @@
+name,type,mac_address,serial_number,department,owner,location,purchase_date,status,notes
+无效设备1,computer,invalid-mac,SN-TEST-001,测试部,测试员,测试区,2024-01-01,active,MAC地址格式无效
+重复设备,,00:1A:2B:3C:4D:5E,SN-DUPLICATE-001,重复部门,重复用户,重复位置,2024-01-01,active,MAC地址与办公电脑-001重复
+,computer,00:1A:2B:3C:4D:FD,,缺失名称,,缺失位置,2024-01-01,active,缺失设备名称字段
+无效类型电脑,invalid_type,00:1A:2B:3C:4D:FE,SN-TEST-002,测试部,测试员,测试区,2024-01-01,active,设备类型无效

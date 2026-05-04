@@ -1,0 +1,6 @@
+vlan_id,name,type,is_guest,description
+10,办公VLAN,data,false,公司内部办公网络VLAN
+20,服务器VLAN,data,false,服务器专用网段VLAN
+30,访客VLAN,guest,true,访客网络专用VLAN
+40,管理VLAN,management,false,网络设备管理VLAN
+50,语音VLAN,voice,false,IP电话专用VLAN

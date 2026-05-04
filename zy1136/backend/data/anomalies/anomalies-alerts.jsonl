@@ -1,0 +1,10 @@
+{"title":"严重测试告警","type":"test_alert","severity":"critical","ip_address":"10.0.0.1","description":"这是一个用于测试的严重级别告警","raw_data":{"test":true,"level":"critical"}}
+{"title":"高风险测试告警","type":"test_alert","severity":"high","ip_address":"10.0.0.2","description":"这是一个用于测试的高风险级别告警","raw_data":{"test":true,"level":"high"}}
+{"title":"中风险测试告警","type":"test_alert","severity":"medium","ip_address":"10.0.0.3","description":"这是一个用于测试的中风险级别告警","raw_data":{"test":true,"level":"medium"}}
+{"title":"低风险测试告警","type":"test_alert","severity":"low","ip_address":"10.0.0.4","description":"这是一个用于测试的低风险级别告警","raw_data":{"test":true,"level":"low"}}
+{"title":"信息测试告警","type":"test_alert","severity":"info","ip_address":"10.0.0.5","description":"这是一个用于测试的信息级别告警","raw_data":{"test":true,"level":"info"}}
+{"title":"同一设备重复告警-1","type":"test_duplicate","severity":"high","ip_address":"192.168.1.200","description":"测试同一设备重复告警归并功能","raw_data":{"device":"test-device-001"}}
+{"title":"同一设备重复告警-2","type":"test_duplicate","severity":"high","ip_address":"192.168.1.200","description":"测试同一设备重复告警归并功能","raw_data":{"device":"test-device-001"}}
+{"title":"同一设备重复告警-3","type":"test_duplicate","severity":"high","ip_address":"192.168.1.200","description":"测试同一设备重复告警归并功能","raw_data":{"device":"test-device-001"}}
+{"title":"同一设备重复告警-4","type":"test_duplicate","severity":"high","ip_address":"192.168.1.200","description":"测试同一设备重复告警归并功能","raw_data":{"device":"test-device-001"}}
+{"title":"同一设备重复告警-5","type":"test_duplicate","severity":"high","ip_address":"192.168.1.200","description":"测试同一设备重复告警归并功能","raw_data":{"device":"test-device-001"}}

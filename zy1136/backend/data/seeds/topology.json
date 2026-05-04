@@ -1,0 +1,251 @@
+{
+  "nodes": [
+    {
+      "id": "core-sw",
+      "name": "核心交换机",
+      "type": "switch",
+      "mac_address": "00:1A:2B:3C:4D:90",
+      "location": "机房-核心机柜"
+    },
+    {
+      "id": "sw-1f",
+      "name": "汇聚交换机-1F",
+      "type": "switch",
+      "mac_address": "00:1A:2B:3C:4D:91",
+      "location": "1楼配线间"
+    },
+    {
+      "id": "sw-2f",
+      "name": "汇聚交换机-2F",
+      "type": "switch",
+      "mac_address": "00:1A:2B:3C:4D:92",
+      "location": "2楼配线间"
+    },
+    {
+      "id": "fw-01",
+      "name": "防火墙-01",
+      "type": "firewall",
+      "mac_address": "00:1A:2B:3C:4D:C0",
+      "location": "机房-核心机柜"
+    },
+    {
+      "id": "srv-01",
+      "name": "服务器-001",
+      "type": "server",
+      "mac_address": "00:1A:2B:3C:4D:70",
+      "location": "机房-1号机柜"
+    },
+    {
+      "id": "srv-02",
+      "name": "服务器-002",
+      "type": "server",
+      "mac_address": "00:1A:2B:3C:4D:71",
+      "location": "机房-1号机柜"
+    },
+    {
+      "id": "srv-03",
+      "name": "服务器-003",
+      "type": "server",
+      "mac_address": "00:1A:2B:3C:4D:72",
+      "location": "机房-2号机柜"
+    },
+    {
+      "id": "ap-1f-01",
+      "name": "无线AP-1F-01",
+      "type": "ap",
+      "mac_address": "00:1A:2B:3C:4D:A0",
+      "location": "1楼办公区"
+    },
+    {
+      "id": "ap-1f-02",
+      "name": "无线AP-1F-02",
+      "type": "ap",
+      "mac_address": "00:1A:2B:3C:4D:A1",
+      "location": "1楼大厅"
+    },
+    {
+      "id": "ap-2f-01",
+      "name": "无线AP-2F-01",
+      "type": "ap",
+      "mac_address": "00:1A:2B:3C:4D:A2",
+      "location": "2楼办公区"
+    },
+    {
+      "id": "pc-001",
+      "name": "办公电脑-001",
+      "type": "computer",
+      "mac_address": "00:1A:2B:3C:4D:5E",
+      "location": "1楼办公区"
+    },
+    {
+      "id": "pc-002",
+      "name": "办公电脑-002",
+      "type": "computer",
+      "mac_address": "00:1A:2B:3C:4D:5F",
+      "location": "1楼办公区"
+    },
+    {
+      "id": "pc-003",
+      "name": "办公电脑-003",
+      "type": "computer",
+      "mac_address": "00:1A:2B:3C:4D:60",
+      "location": "2楼办公区"
+    },
+    {
+      "id": "pc-004",
+      "name": "办公电脑-004",
+      "type": "computer",
+      "mac_address": "00:1A:2B:3C:4D:61",
+      "location": "2楼办公区"
+    },
+    {
+      "id": "prt-001",
+      "name": "打印机-001",
+      "type": "printer",
+      "mac_address": "00:1A:2B:3C:4D:80",
+      "location": "1楼大厅"
+    },
+    {
+      "id": "prt-002",
+      "name": "打印机-002",
+      "type": "printer",
+      "mac_address": "00:1A:2B:3C:4D:81",
+      "location": "2楼财务室"
+    },
+    {
+      "id": "cam-001",
+      "name": "摄像头-1F-01",
+      "type": "camera",
+      "mac_address": "00:1A:2B:3C:4D:B0",
+      "location": "1楼大门"
+    },
+    {
+      "id": "cam-002",
+      "name": "摄像头-1F-02",
+      "type": "camera",
+      "mac_address": "00:1A:2B:3C:4D:B1",
+      "location": "1楼机房入口"
+    }
+  ],
+  "edges": [
+    {
+      "source": "fw-01",
+      "target": "core-sw",
+      "type": "uplink",
+      "relationship_type": "connected",
+      "connection_details": "防火墙上联核心交换机，端口G0/0"
+    },
+    {
+      "source": "core-sw",
+      "target": "sw-1f",
+      "type": "trunk",
+      "relationship_type": "uplink",
+      "connection_details": "核心交换机上联1楼汇聚，端口G1/0/1，Trunk VLAN 10,20,30"
+    },
+    {
+      "source": "core-sw",
+      "target": "sw-2f",
+      "type": "trunk",
+      "relationship_type": "uplink",
+      "connection_details": "核心交换机上联2楼汇聚，端口G1/0/2，Trunk VLAN 10,20,30"
+    },
+    {
+      "source": "core-sw",
+      "target": "srv-01",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "Web服务器连接核心交换机G1/0/10，VLAN 20"
+    },
+    {
+      "source": "core-sw",
+      "target": "srv-02",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "数据库服务器连接核心交换机G1/0/11，VLAN 20"
+    },
+    {
+      "source": "core-sw",
+      "target": "srv-03",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "文件服务器连接核心交换机G1/0/12，VLAN 20"
+    },
+    {
+      "source": "sw-1f",
+      "target": "ap-1f-01",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "无线AP连接1楼交换机G0/1，VLAN 10"
+    },
+    {
+      "source": "sw-1f",
+      "target": "ap-1f-02",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "无线AP连接1楼交换机G0/2，VLAN 30（访客VLAN）"
+    },
+    {
+      "source": "sw-1f",
+      "target": "pc-001",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "办公电脑连接1楼交换机G0/3，VLAN 10"
+    },
+    {
+      "source": "sw-1f",
+      "target": "pc-002",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "办公电脑连接1楼交换机G0/4，VLAN 10"
+    },
+    {
+      "source": "sw-1f",
+      "target": "prt-001",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "打印机连接1楼交换机G0/5，VLAN 10"
+    },
+    {
+      "source": "sw-1f",
+      "target": "cam-001",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "摄像头连接1楼交换机G0/6，VLAN 10"
+    },
+    {
+      "source": "sw-1f",
+      "target": "cam-002",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "摄像头连接1楼交换机G0/7，VLAN 10"
+    },
+    {
+      "source": "sw-2f",
+      "target": "ap-2f-01",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "无线AP连接2楼交换机G0/1，VLAN 10"
+    },
+    {
+      "source": "sw-2f",
+      "target": "pc-003",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "办公电脑连接2楼交换机G0/2，VLAN 10"
+    },
+    {
+      "source": "sw-2f",
+      "target": "pc-004",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "办公电脑连接2楼交换机G0/3，VLAN 10"
+    },
+    {
+      "source": "sw-2f",
+      "target": "prt-002",
+      "type": "access",
+      "relationship_type": "connected",
+      "connection_details": "打印机连接2楼交换机G0/4，VLAN 10"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "network-management-console",
+  "version": "1.0.0",
+  "description": "公司网络管理台 - 本地可运行的网络资产管理系统",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test": "cd backend && npm test"
+  },
+  "keywords": [
+    "network",
+    "management",
+    "assets",
+    "vlan",
+    "firewall"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

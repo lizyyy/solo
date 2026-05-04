@@ -1,0 +1,15 @@
+{"title":"IP地址冲突: 192.168.10.100","type":"ip_conflict","severity":"critical","ip_address":"192.168.10.100","description":"检测到IP地址冲突，多个设备使用同一个IP","raw_data":{"conflict_count":2,"devices":["00:1A:2B:3C:4D:5E","00:1A:2B:3C:4D:FF"]}}
+{"title":"网段利用率过高: 服务器网段","type":"high_utilization","severity":"high","description":"服务器网段利用率已达95%","raw_data":{"segment":"192.168.20.0/24","utilization":0.95,"total_ips":254,"used_ips":241}}
+{"title":"网段利用率过高: 测试网段","type":"high_utilization","severity":"critical","description":"测试网段利用率已达100%","raw_data":{"segment":"192.168.99.0/29","utilization":1.0,"total_ips":6,"used_ips":6}}
+{"title":"未知设备接入: AA:BB:CC:DD:EE:FF","type":"unknown_device","severity":"high","ip_address":"192.168.30.150","description":"未在资产库中登记的设备接入网络","raw_data":{"mac_address":"AA:BB:CC:DD:EE:FF","hostname":"UNKNOWN-DEVICE","ip":"192.168.30.150"}}
+{"title":"防火墙规则过于宽松: 危险规则-允许任何访问","type":"overly_permissive","severity":"high","description":"防火墙规则6允许任何源到任何目的的任何流量","raw_data":{"rule_number":6,"name":"危险规则-允许任何访问","action":"allow","source":"any","destination":"any"}}
+{"title":"访客网误通内网: 访客网可访问数据库","type":"guest_to_internal","severity":"critical","description":"防火墙规则7允许访客网直接访问数据库服务器","raw_data":{"rule_number":7,"source":"192.168.30.0/24","destination":"192.168.20.10","port":"3306"}}
+{"title":"DHCP租约长期未更新: 192.168.30.151","type":"stale_dhcp","severity":"low","ip_address":"192.168.30.151","description":"设备租约已超过15天未更新","raw_data":{"mac_address":"11:22:33:44:55:66","hostname":"GUEST-PC","lease_start":"2024-04-20T09:00:00"}}
+{"title":"DHCP租约长期未更新: 192.168.30.152","type":"stale_dhcp","severity":"low","ip_address":"192.168.30.152","description":"设备租约已超过20天未更新","raw_data":{"mac_address":"22:33:44:55:66:77","hostname":"OLD-DEVICE","lease_start":"2024-04-15T08:00:00"}}
+{"title":"端口未登记: 核心交换机-G1/0/15","type":"unregistered_port","severity":"medium","description":"交换机端口状态为Up但未登记连接设备","raw_data":{"switch_name":"核心交换机","port_number":"G1/0/15","status":"up"}}
+{"title":"服务端口暴露: 服务器-001-22","type":"exposed_service","severity":"high","description":"SSH端口对外暴露","raw_data":{"asset_name":"服务器-001","port":22,"protocol":"tcp","service_name":"SSH"}}
+{"title":"服务端口暴露: 服务器-002-3389","type":"exposed_service","severity":"high","description":"远程桌面端口对外暴露","raw_data":{"asset_name":"服务器-002","port":3389,"protocol":"tcp","service_name":"RDP"}}
+{"title":"服务端口暴露: 服务器-003-8080","type":"exposed_service","severity":"medium","description":"Web服务端口对外暴露","raw_data":{"asset_name":"服务器-003","port":8080,"protocol":"tcp","service_name":"HTTP-Alt"}}
+{"title":"IP地址冲突: 192.168.10.100","type":"ip_conflict","severity":"critical","ip_address":"192.168.10.100","description":"检测到IP地址冲突（重复告警）","raw_data":{"conflict_count":2}}
+{"title":"IP地址冲突: 192.168.10.100","type":"ip_conflict","severity":"critical","ip_address":"192.168.10.100","description":"检测到IP地址冲突（重复告警）","raw_data":{"conflict_count":2}}
+{"title":"未知设备接入: AA:BB:CC:DD:EE:FF","type":"unknown_device","severity":"high","ip_address":"192.168.30.150","description":"未登记设备重复告警","raw_data":{"mac_address":"AA:BB:CC:DD:EE:FF"}}

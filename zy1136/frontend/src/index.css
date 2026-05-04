@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-card {
+  border-radius: 8px;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+}
+
+.ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+}
+
+.ant-btn-primary:hover {
+  background: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-dark > .ant-menu .ant-menu-item-selected {
+  background: #1890ff;
+}
+
+.ant-badge-status-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.ant-tag {
+  border-radius: 4px;
+}
+
+.ant-descriptions-item-label {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ant-timeline-item-content {
+  padding-bottom: 12px;
+}
+
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
+  background: #1890ff;
+}
+
+.ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #1890ff;
+}
+
+.ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title::after {
+  background-color: #1890ff;
+}
+
+.ant-upload-drag {
+  border-radius: 8px;
+}
+
+.ant-upload-drag-hover {
+  border-color: #1890ff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
