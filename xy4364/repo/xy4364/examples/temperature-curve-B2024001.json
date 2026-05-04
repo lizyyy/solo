@@ -1,0 +1,29 @@
+{
+  "batchNumber": "B2024001",
+  "targetCurve": [
+    { "time": 0, "temperature": 25 },
+    { "time": 10, "temperature": 40 },
+    { "time": 20, "temperature": 60 },
+    { "time": 30, "temperature": 80 },
+    { "time": 40, "temperature": 100 },
+    { "time": 50, "temperature": 120 },
+    { "time": 80, "temperature": 120 },
+    { "time": 90, "temperature": 100 },
+    { "time": 100, "temperature": 80 },
+    { "time": 110, "temperature": 60 },
+    { "time": 120, "temperature": 40 }
+  ],
+  "actualCurve": [
+    { "time": 0, "temperature": 25 },
+    { "time": 10, "temperature": 38 },
+    { "time": 20, "temperature": 57 },
+    { "time": 30, "temperature": 76 },
+    { "time": 40, "temperature": 95 },
+    { "time": 50, "temperature": 115 },
+    { "time": 80, "temperature": 118 },
+    { "time": 90, "temperature": 98 },
+    { "time": 100, "temperature": 78 },
+    { "time": 110, "temperature": 58 },
+    { "time": 120, "temperature": 38 }
+  ]
+}

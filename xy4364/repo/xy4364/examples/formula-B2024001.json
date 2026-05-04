@@ -1,0 +1,21 @@
+{
+  "batchNumber": "B2024001",
+  "targetFormula": [
+    { "chemicalName": "活性红 X-3B", "dosage": 2.5, "unit": "g/L" },
+    { "chemicalName": "活性黄 X-6G", "dosage": 1.2, "unit": "g/L" },
+    { "chemicalName": "活性蓝 X-BR", "dosage": 0.8, "unit": "g/L" },
+    { "chemicalName": "元明粉", "dosage": 50, "unit": "g/L" },
+    { "chemicalName": "纯碱", "dosage": 20, "unit": "g/L" },
+    { "chemicalName": "渗透剂 JFC", "dosage": 1, "unit": "g/L" },
+    { "chemicalName": "固色剂 Y", "dosage": 2, "unit": "g/L" }
+  ],
+  "actualFormula": [
+    { "chemicalName": "活性红 X-3B", "dosage": 2.5, "unit": "g/L", "added": true },
+    { "chemicalName": "活性黄 X-6G", "dosage": 1.2, "unit": "g/L", "added": true },
+    { "chemicalName": "活性蓝 X-BR", "dosage": 0.8, "unit": "g/L", "added": true },
+    { "chemicalName": "元明粉", "dosage": 50, "unit": "g/L", "added": true },
+    { "chemicalName": "纯碱", "dosage": 20, "unit": "g/L", "added": false },
+    { "chemicalName": "渗透剂 JFC", "dosage": 1, "unit": "g/L", "added": true },
+    { "chemicalName": "固色剂 Y", "dosage": 2, "unit": "g/L", "added": true }
+  ]
+}
