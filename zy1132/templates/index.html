@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城市更新评估系统</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .app-header h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .btn-secondary {
+            background: #7f8c8d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #6c7a7b;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+        }
+        
+        .sidebar {
+            width: 380px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .sidebar-tab.active {
+            color: #2d5a87;
+            border-bottom-color: #2d5a87;
+            background: white;
+            font-weight: 600;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .panel-section {
+            margin-bottom: 20px;
+        }
+        
+        .panel-section h3 {
+            font-size: 1rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-card.blue {
+            background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+        }
+        
+        .stat-card.red {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .info-item {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .info-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-bottom: 2px;
+        }
+        
+        .info-item value {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .gap-item {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        
+        .gap-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .gap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .gap-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .gap-severity {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .severity-critical {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .severity-high {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .severity-medium {
+            background: #fff8e1;
+            color: #f9a825;
+        }
+        
+        .severity-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .gap-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .gap-details span {
+            margin-right: 12px;
+        }
+        
+        .conflict-item {
+            background: #fff5f5;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .conflict-item.medium {
+            background: #fffbeb;
+            border-color: #fde047;
+        }
+        
+        .conflict-item.low {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+        
+        .conflict-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #991b1b;
+        }
+        
+        .conflict-item.medium .conflict-title {
+            color: #854d0e;
+        }
+        
+        .conflict-item.low .conflict-title {
+            color: #166534;
+        }
+        
+        .conflict-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .conflict-recommendation {
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.7);
+            padding: 8px;
+            border-radius: 4px;
+            color: #555;
+        }
+        
+        .scheme-item {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .scheme-item:hover {
+            border-color: #3498db;
+            background: #f0f7ff;
+        }
+        
+        .scheme-item.active {
+            border-color: #3498db;
+            background: #e3f2fd;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+        }
+        
+        .scheme-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .scheme-meta {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        .scheme-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .scheme-actions .btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+        
+        .map-control-group {
+            margin-bottom: 8px;
+        }
+        
+        .map-control-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0,0,0,0.2);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #eee;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-top: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.success {
+            background: #27ae60;
+        }
+        
+        .toast.error {
+            background: #e74c3c;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .export-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .export-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .export-menu.show {
+            display: block;
+        }
+        
+        .export-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #555;
+            transition: background 0.2s;
+        }
+        
+        .export-item:hover {
+            background: #f5f7fa;
+            color: #2d5a87;
+        }
+        
+        .parcel-popup {
+            min-width: 200px;
+        }
+        
+        .parcel-popup h4 {
+            margin-bottom: 8px;
+            color: #2d5a87;
+        }
+        
+        .parcel-popup p {
+            margin: 4px 0;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <h1>🏙️ 城市更新评估系统</h1>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="createNewScheme()">
+                📋 新建方案
+            </button>
+            <button class="btn btn-success" onclick="runAssessment()">
+                🔍 重新评估
+            </button>
+            <div class="export-dropdown">
+                <button class="btn btn-warning" onclick="toggleExportMenu()">
+                    📥 导出报告 ▾
+                </button>
+                <div class="export-menu" id="exportMenu">
+                    <div class="export-item" onclick="exportReport('markdown')">Markdown 报告</div>
+                    <div class="export-item" onclick="exportReport('html')">HTML 报告</div>
+                    <div class="export-item" onclick="exportReport('csv')">CSV 数据</div>
+                    <div class="export-item" onclick="exportReport('geojson')">GeoJSON</div>
+                    <div class="export-item" onclick="exportReport('all')">全部导出</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-tabs">
+                <div class="sidebar-tab active" data-tab="parcel" onclick="switchTab('parcel')">
+                    地块详情
+                </div>
+                <div class="sidebar-tab" data-tab="gap" onclick="switchTab('gap')">
+                    服务缺口
+                </div>
+                <div class="sidebar-tab" data-tab="conflict" onclick="switchTab('conflict')">
+                    冲突检查
+                </div>
+                <div class="sidebar-tab" data-tab="scheme" onclick="switchTab('scheme')">
+                    方案管理
+                </div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div id="tab-parcel" class="tab-content active">
+                    <div class="panel-section">
+                        <h3>📊 整体统计</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>总地块数</label>
+                                <value id="stat-total-parcels">-</value>
+                            </div>
+                            <div class="info-item">
+                                <label>居住地块</label>
+                                <value id="stat-residential">-</value>
+                            </div>
+                            <div class="info-item">
+                                <label>总用地面积</label>
+                                <value id="stat-total-area">-</value>
+                            </div>
+                            <div class="info-item">
+                                <label>现状人口</label>
+                                <value id="stat-total-pop">-</value>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section" id="selected-parcel-panel">
+                        <h3>📍 选中地块</h3>
+                        <div class="empty-state" id="no-parcel-selected">
+                            <div class="empty-state-icon">🗺️</div>
+                            <p>点击地图上的地块查看详情</p>
+                        </div>
+                        <div id="parcel-detail" style="display: none;">
+                            <div class="stat-card blue">
+                                <div class="stat-value" id="detail-name">-</div>
+                                <div class="stat-label">地块名称</div>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>用地性质</label>
+                                    <value id="detail-land-use">-</value>
+                                </div>
+                                <div class="info-item">
+                                    <label>用地面积</label>
+                                    <value id="detail-area">-</value>
+                                </div>
+                                <div class="info-item">
+                                    <label>现状容积率</label>
+                                    <value id="detail-current-far">-</value>
+                                </div>
+                                <div class="info-item">
+                                    <label>规划容积率</label>
+                                    <value id="detail-plan-far">-</value>
+                                </div>
+                                <div class="info-item">
+                                    <label>控规上限</label>
+                                    <value id="detail-max-far">-</value>
+                                </div>
+                                <div class="info-item">
+                                    <label>估算人口</label>
+                                    <value id="detail-population">-</value>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px;">
+                                <button class="btn btn-primary" style="width: 100%;" onclick="openEditParcelModal()">
+                                    ✏️ 编辑地块参数
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <h3>📈 综合评分</h3>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-gap" class="tab-content">
+                    <div class="panel-section">
+                        <h3>⚠️ 服务缺口清单</h3>
+                        <div id="gap-list">
+                            <div class="empty-state">
+                                <div class="loading"></div>
+                                <p>加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-conflict" class="tab-content">
+                    <div class="panel-section">
+                        <h3>🚨 冲突检查结果</h3>
+                        <div id="conflict-list">
+                            <div class="empty-state">
+                                <div class="loading"></div>
+                                <p>加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-scheme" class="tab-content">
+                    <div class="panel-section">
+                        <h3>💾 方案列表</h3>
+                        <div style="margin-bottom: 12px;">
+                            <button class="btn btn-primary" style="width: 100%;" onclick="createNewScheme()">
+                                ➕ 新建方案
+                            </button>
+                        </div>
+                        <div id="scheme-list">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p>暂无保存的方案</p>
+                                <p style="font-size: 0.8rem; margin-top: 8px;">当前使用默认数据</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 24px;">
+                            <h3 style="margin-bottom: 12px;">🔄 方案对比</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>方案 A</label>
+                                    <select id="compare-scheme-1">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>方案 B</label>
+                                    <select id="compare-scheme-2">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;" onclick="compareSchemes()">
+                                🔍 开始对比
+                            </button>
+                            <div id="compare-result" style="margin-top: 16px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="map-container">
+            <div id="map"></div>
+            
+            <div class="map-controls">
+                <div class="map-control-group">
+                    <label>显示图层</label>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="layer-parcels" checked onchange="toggleLayer('parcels')">
+                            <span style="font-size: 0.85rem;">地块边界</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="layer-facilities" checked onchange="toggleLayer('facilities')">
+                            <span style="font-size: 0.85rem;">配套设施</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="layer-radius" onchange="toggleLayer('radius')">
+                            <span style="font-size: 0.85rem;">服务半径</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="map-control-group">
+                    <label>设施类型</label>
+                    <select id="facility-filter" onchange="filterFacilities()">
+                        <option value="">全部</option>
+                        <option value="school_primary">小学</option>
+                        <option value="school_secondary">中学</option>
+                        <option value="kindergarten">幼儿园</option>
+                        <option value="elderly">养老设施</option>
+                        <option value="park">公园</option>
+                        <option value="market">菜市场</option>
+                        <option value="bus_stop">公交站</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="legend" id="legend">
+                <div class="legend-title">用地性质图例</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e8f5e9;"></div>
+                    <span>居住用地</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #fff3e0;"></div>
+                    <span>商业用地</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e3f2fd;"></div>
+                    <span>公共服务</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #c8e6c9;"></div>
+                    <span>绿地</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f5f5f5;"></div>
+                    <span>道路用地</span>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="createSchemeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 新建方案</h2>
+                <button class="modal-close" onclick="closeModal('createSchemeModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>方案名称</label>
+                <input type="text" id="new-scheme-name" placeholder="请输入方案名称">
+            </div>
+            <div class="form-group">
+                <label>方案描述</label>
+                <textarea id="new-scheme-desc" rows="3" placeholder="描述此方案的调整内容..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>基于方案（可选）</label>
+                <select id="new-scheme-base">
+                    <option value="">默认数据</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createSchemeModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitNewScheme()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="editParcelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ 编辑地块参数</h2>
+                <button class="modal-close" onclick="closeModal('editParcelModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>地块名称</label>
+                <input type="text" id="edit-parcel-name" readonly>
+            </div>
+            <div class="form-group">
+                <label>用地性质</label>
+                <select id="edit-parcel-land-use">
+                    <option value="R2">二类居住用地</option>
+                    <option value="R3">三类居住用地</option>
+                    <option value="B1">商业用地</option>
+                    <option value="A3">教育科研用地</option>
+                    <option value="A6">社会福利用地</option>
+                    <option value="G1">公园绿地</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>规划容积率</label>
+                    <input type="number" id="edit-parcel-plan-far" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>控规上限</label>
+                    <input type="number" id="edit-parcel-max-far" step="0.1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>现状容积率</label>
+                    <input type="number" id="edit-parcel-current-far" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>高度限制（米）</label>
+                    <input type="number" id="edit-parcel-height">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editParcelModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveParcelChanges()">保存更改</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let map;
+        let parcelLayer;
+        let facilityLayer;
+        let radiusLayers = [];
+        let selectedParcelId = null;
+        let currentSchemeId = null;
+        let assessmentData = null;
+        let radarChart = null;
+        
+        const landUseColors = {
+            'R': '#e8f5e9',
+            'R2': '#c8e6c9',
+            'R3': '#a5d6a7',
+            'B': '#fff3e0',
+            'B1': '#ffe0b2',
+            'B2': '#ffcc80',
+            'A': '#e3f2fd',
+            'A3': '#bbdefb',
+            'A5': '#90caf9',
+            'A6': '#64b5f6',
+            'G': '#c8e6c9',
+            'G1': '#81c784',
+            'S': '#f5f5f5',
+            'S4': '#eeeeee',
+            'M': '#f3e5f5'
+        };
+        
+        const facilityIcons = {
+            'school_primary': '🏫',
+            'school_secondary': '🏫',
+            'kindergarten': '🎒',
+            'elderly': '🏥',
+            'park': '🌳',
+            'market': '🏪',
+            'bus_stop': '🚌',
+            'community_center': '🏛️'
+        };
+        
+        const serviceRadiusColors = {
+            'school_primary': '#ff9800',
+            'school_secondary': '#ff5722',
+            'kindergarten': '#e91e63',
+            'elderly': '#9c27b0',
+            'park': '#4caf50',
+            'market': '#ffeb3b',
+            'bus_stop': '#2196f3',
+            'community_center': '#00bcd4'
+        };
+        
+        function initMap() {
+            map = L.map('map').setView([39.916, 116.387], 14);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            
+            loadParcels();
+            loadFacilities();
+            loadAssessment();
+            loadSchemes();
+            loadStats();
+        }
+        
+        async function loadParcels() {
+            try {
+                const url = currentSchemeId 
+                    ? `/api/parcels?scheme_id=${currentSchemeId}` 
+                    : '/api/parcels';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (parcelLayer) {
+                    map.removeLayer(parcelLayer);
+                }
+                
+                parcelLayer = L.geoJSON(data, {
+                    style: function(feature) {
+                        const landUse = feature.properties.land_use;
+                        return {
+                            fillColor: landUseColors[landUse] || '#9e9e9e',
+                            weight: 2,
+                            opacity: 1,
+                            color: '#666',
+                            fillOpacity: 0.7
+                        };
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const props = feature.properties;
+                        const popupContent = `
+                            <div class="parcel-popup">
+                                <h4>${props.name || '未命名地块'}</h4>
+                                <p><strong>用地性质:</strong> ${props.land_use}</p>
+                                <p><strong>面积:</strong> ${props.area_sqm?.toLocaleString()} ㎡</p>
+                                <p><strong>规划容积率:</strong> ${props.plan_far}</p>
+                                <p><strong>估算人口:</strong> ${props.estimated_population?.toLocaleString() || '-'}</p>
+                            </div>
+                        `;
+                        layer.bindPopup(popupContent);
+                        
+                        layer.on('click', function() {
+                            selectParcel(feature);
+                        });
+                    }
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error loading parcels:', error);
+                showToast('加载地块数据失败', 'error');
+            }
+        }
+        
+        async function loadFacilities() {
+            try {
+                const url = currentSchemeId 
+                    ? `/api/facilities?scheme_id=${currentSchemeId}` 
+                    : '/api/facilities';
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (facilityLayer) {
+                    map.removeLayer(facilityLayer);
+                }
+                
+                facilityLayer = L.geoJSON(data, {
+                    pointToLayer: function(feature, latlng) {
+                        const props = feature.properties;
+                        const icon = facilityIcons[props.type] || '📍';
+                        return L.marker(latlng, {
+                            icon: L.divIcon({
+                                className: 'custom-icon',
+                                html: `<div style="font-size: 24px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${icon}</div>`,
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 12]
+                            })
+                        });
+                    },
+                    onEachFeature: function(feature, layer) {
+                        const props = feature.properties;
+                        layer.bindPopup(`
+                            <div>
+                                <h4>${props.name}</h4>
+                                <p><strong>类型:</strong> ${props.type}</p>
+                                <p><strong>容量:</strong> ${props.capacity}</p>
+                                <p>${props.description || ''}</p>
+                            </div>
+                        `);
+                    }
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error loading facilities:', error);
+            }
+        }
+        
+        async function loadAssessment() {
+            try {
+                const url = currentSchemeId 
+                    ? `/api/assessment?scheme_id=${currentSchemeId}` 
+                    : '/api/assessment';
+                const response = await fetch(url);
+                assessmentData = await response.json();
+                
+                renderGaps(assessmentData.service_gaps);
+                renderConflicts(assessmentData.conflicts);
+                renderRadarChart(assessmentData.service_scores);
+            } catch (error) {
+                console.error('Error loading assessment:', error);
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                document.getElementById('stat-total-parcels').textContent = data.parcels.total;
+                document.getElementById('stat-residential').textContent = data.parcels.residential;
+                document.getElementById('stat-total-area').textContent = (data.parcels.total_area_sqm / 10000).toFixed(2) + ' 公顷';
+                document.getElementById('stat-total-pop').textContent = data.parcels.total_population.toLocaleString() + ' 人';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        async function loadSchemes() {
+            try {
+                const response = await fetch('/api/schemes');
+                const schemes = await response.json();
+                
+                const listEl = document.getElementById('scheme-list');
+                const baseSelect = document.getElementById('new-scheme-base');
+                const compare1 = document.getElementById('compare-scheme-1');
+                const compare2 = document.getElementById('compare-scheme-2');
+                
+                baseSelect.innerHTML = '<option value="">默认数据</option>';
+                compare1.innerHTML = '<option value="">请选择</option>';
+                compare2.innerHTML = '<option value="">请选择</option>';
+                
+                if (schemes.length === 0) {
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>暂无保存的方案</p>
+                            <p style="font-size: 0.8rem; margin-top: 8px;">当前使用默认数据</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                schemes.forEach(s => {
+                    const isActive = s.id === currentSchemeId;
+                    html += `
+                        <div class="scheme-item ${isActive ? 'active' : ''}" onclick="selectScheme('${s.id}')">
+                            <div class="scheme-name">${s.name}</div>
+                            <div class="scheme-meta">
+                                ${s.parcel_count} 个地块 · ${s.facility_count} 个设施 · 
+                                ${new Date(s.updated_at).toLocaleDateString('zh-CN')}
+                            </div>
+                            <div class="scheme-actions">
+                                <button class="btn btn-secondary" onclick="event.stopPropagation(); saveCurrentToScheme('${s.id}')">更新</button>
+                                <button class="btn btn-danger" onclick="event.stopPropagation(); deleteScheme('${s.id}')">删除</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    baseSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+                    compare1.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+                    compare2.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+                });
+                
+                listEl.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading schemes:', error);
+            }
+        }
+        
+        function renderGaps(gaps) {
+            const el = document.getElementById('gap-list');
+            
+            if (!gaps || gaps.length === 0) {
+                el.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>暂无服务缺口数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            gaps.forEach(gap => {
+                const severityClass = `severity-${gap.severity}`;
+                const severityText = {
+                    'critical': '严重',
+                    'high': '较高',
+                    'medium': '中等',
+                    'low': '较低'
+                }[gap.severity] || gap.severity;
+                
+                html += `
+                    <div class="gap-item">
+                        <div class="gap-header">
+                            <span class="gap-name">${gap.facility_name}</span>
+                            <span class="gap-severity ${severityClass}">${severityText}</span>
+                        </div>
+                        <div class="gap-details">
+                            <span>服务半径: ${gap.radius_meters}m</span>
+                            <span>需求: ${gap.demand}</span>
+                            <span>供应: ${gap.supply}</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.85rem;">
+                            <strong style="color: ${gap.gap > 0 ? '#e74c3c' : '#27ae60'};">
+                                缺口: ${gap.gap} (${gap.gap_percentage}%)
+                            </strong>
+                            ${gap.affected_population > 0 ? `<span style="margin-left: 12px; color: #888;">影响 ${gap.affected_population} 人</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            el.innerHTML = html;
+        }
+        
+        function renderConflicts(conflicts) {
+            const el = document.getElementById('conflict-list');
+            
+            if (!conflicts || conflicts.length === 0) {
+                el.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>未发现明显冲突</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            conflicts.forEach((conflict, index) => {
+                const severityClass = conflict.severity === 'high' ? '' : 
+                                     conflict.severity === 'medium' ? 'medium' : 'low';
+                html += `
+                    <div class="conflict-item ${severityClass}">
+                        <div class="conflict-title">${index + 1}. ${conflict.description}</div>
+                        <div class="conflict-desc">
+                            <strong>位置:</strong> ${conflict.location}<br>
+                            <strong>当前值:</strong> ${conflict.current_value} → 
+                            <strong>限值:</strong> ${conflict.limit_value}
+                        </div>
+                        <div class="conflict-recommendation">
+                            💡 ${conflict.recommendation}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            el.innerHTML = html;
+        }
+        
+        function renderRadarChart(scores) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const categoryLabels = {
+                'education': '教育设施',
+                'healthcare_elderly': '医疗养老',
+                'green_space': '绿地空间',
+                'commerce_market': '商业市场',
+                'transportation': '交通出行',
+                'community_services': '社区服务'
+            };
+            
+            const data = scores?.category_scores || {};
+            const labels = Object.keys(data).map(k => categoryLabels[k] || k);
+            const values = Object.values(data);
+            
+            if (radarChart) {
+                radarChart.destroy();
+            }
+            
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '评分',
+                        data: values,
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(52, 152, 219, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function selectParcel(feature) {
+            selectedParcelId = feature.properties.id;
+            const props = feature.properties;
+            
+            document.getElementById('no-parcel-selected').style.display = 'none';
+            document.getElementById('parcel-detail').style.display = 'block';
+            
+            document.getElementById('detail-name').textContent = props.name;
+            document.getElementById('detail-land-use').textContent = props.land_use;
+            document.getElementById('detail-area').textContent = (props.area_sqm / 10000).toFixed(2) + ' 公顷';
+            document.getElementById('detail-current-far').textContent = props.current_far;
+            document.getElementById('detail-plan-far').textContent = props.plan_far;
+            document.getElementById('detail-max-far').textContent = props.max_far;
+            document.getElementById('detail-population').textContent = (props.estimated_population || props.existing_population || 0).toLocaleString() + ' 人';
+            
+            document.getElementById('edit-parcel-name').value = props.name;
+            document.getElementById('edit-parcel-land-use').value = props.land_use;
+            document.getElementById('edit-parcel-plan-far').value = props.plan_far;
+            document.getElementById('edit-parcel-max-far').value = props.max_far;
+            document.getElementById('edit-parcel-current-far').value = props.current_far;
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        function openEditParcelModal() {
+            if (!selectedParcelId) {
+                showToast('请先选择一个地块', 'error');
+                return;
+            }
+            document.getElementById('editParcelModal').classList.add('show');
+        }
+        
+        async function saveParcelChanges() {
+            const updates = {
+                land_use: document.getElementById('edit-parcel-land-use').value,
+                plan_far: parseFloat(document.getElementById('edit-parcel-plan-far').value),
+                max_far: parseFloat(document.getElementById('edit-parcel-max-far').value),
+                current_far: parseFloat(document.getElementById('edit-parcel-current-far').value)
+            };
+            
+            try {
+                const url = currentSchemeId 
+                    ? `/api/parcels/${selectedParcelId}?scheme_id=${currentSchemeId}`
+                    : `/api/parcels/${selectedParcelId}`;
+                
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (response.ok) {
+                    closeModal('editParcelModal');
+                    showToast('地块参数已更新', 'success');
+                    loadParcels();
+                    loadAssessment();
+                    loadStats();
+                } else {
+                    showToast('更新失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving parcel:', error);
+                showToast('保存失败', 'error');
+            }
+        }
+        
+        function createNewScheme() {
+            document.getElementById('new-scheme-name').value = '';
+            document.getElementById('new-scheme-desc').value = '';
+            document.getElementById('createSchemeModal').classList.add('show');
+        }
+        
+        async function submitNewScheme() {
+            const name = document.getElementById('new-scheme-name').value.trim();
+            if (!name) {
+                showToast('请输入方案名称', 'error');
+                return;
+            }
+            
+            const data = {
+                name: name,
+                description: document.getElementById('new-scheme-desc').value,
+                base_scheme_id: document.getElementById('new-scheme-base').value || null
+            };
+            
+            try {
+                const response = await fetch('/api/schemes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const scheme = await response.json();
+                    closeModal('createSchemeModal');
+                    currentSchemeId = scheme.id;
+                    showToast(`方案 "${name}" 已创建`, 'success');
+                    loadSchemes();
+                    loadParcels();
+                    loadFacilities();
+                    loadAssessment();
+                } else {
+                    showToast('创建失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating scheme:', error);
+                showToast('创建失败', 'error');
+            }
+        }
+        
+        async function selectScheme(schemeId) {
+            currentSchemeId = schemeId;
+            loadSchemes();
+            loadParcels();
+            loadFacilities();
+            loadAssessment();
+            showToast('已切换方案', 'success');
+        }
+        
+        async function deleteScheme(schemeId) {
+            if (!confirm('确定要删除此方案吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/schemes/${schemeId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    if (currentSchemeId === schemeId) {
+                        currentSchemeId = null;
+                    }
+                    showToast('方案已删除', 'success');
+                    loadSchemes();
+                    if (!currentSchemeId) {
+                        loadParcels();
+                        loadFacilities();
+                        loadAssessment();
+                    }
+                } else {
+                    showToast('删除失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting scheme:', error);
+                showToast('删除失败', 'error');
+            }
+        }
+        
+        async function saveCurrentToScheme(schemeId) {
+            alert('请先编辑地块参数，然后保存到方案');
+        }
+        
+        async function compareSchemes() {
+            const s1 = document.getElementById('compare-scheme-1').value;
+            const s2 = document.getElementById('compare-scheme-2').value;
+            
+            if (!s1 || !s2) {
+                showToast('请选择两个方案进行对比', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/schemes/compare?scheme1=${s1}&scheme2=${s2}`);
+                const comparison = await response.json();
+                
+                let html = '<div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 0.85rem;">';
+                html += `<p><strong>方案 A:</strong> ${comparison.scheme1.name}</p>`;
+                html += `<p><strong>方案 B:</strong> ${comparison.scheme2.name}</p>`;
+                
+                if (comparison.parcel_changes && comparison.parcel_changes.length > 0) {
+                    html += '<p style="margin-top: 8px;"><strong>地块变更:</strong></p><ul>';
+                    comparison.parcel_changes.forEach(c => {
+                        const typeText = {
+                            'added': '新增',
+                            'removed': '删除',
+                            'modified': '修改'
+                        }[c.type];
+                        html += `<li>${typeText}: ${c.name}`;
+                        if (c.changes) {
+                            html += ' (';
+                            const changeTexts = [];
+                            if (c.changes.plan_far) changeTexts.push(`容积率: ${c.changes.plan_far.from} → ${c.changes.plan_far.to}`);
+                            if (c.changes.land_use) changeTexts.push(`用途: ${c.changes.land_use.from} → ${c.changes.land_use.to}`);
+                            html += changeTexts.join(', ') + ')';
+                        }
+                        html += '</li>';
+                    });
+                    html += '</ul>';
+                }
+                
+                if (comparison.assessment_differences && Object.keys(comparison.assessment_differences).length > 0) {
+                    html += '<p style="margin-top: 8px;"><strong>评分差异:</strong></p><ul>';
+                    const labels = {
+                        'education': '教育',
+                        'healthcare_elderly': '养老',
+                        'green_space': '绿地',
+                        'commerce_market': '商业',
+                        'transportation': '交通',
+                        'community_services': '社区服务',
+                        'total_score': '综合评分'
+                    };
+                    Object.entries(comparison.assessment_differences).forEach(([key, val]) => {
+                        const label = labels[key] || key;
+                        const deltaColor = val.delta > 0 ? '#27ae60' : val.delta < 0 ? '#e74c3c' : '#888';
+                        const deltaSign = val.delta > 0 ? '+' : '';
+                        html += `<li>${label}: ${val.from} → ${val.to} <span style="color: ${deltaColor};">(${deltaSign}${val.delta})</span></li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                html += '</div>';
+                document.getElementById('compare-result').innerHTML = html;
+            } catch (error) {
+                console.error('Error comparing schemes:', error);
+                showToast('对比失败', 'error');
+            }
+        }
+        
+        function runAssessment() {
+            loadAssessment();
+            showToast('评估已重新计算', 'success');
+        }
+        
+        function toggleExportMenu() {
+            document.getElementById('exportMenu').classList.toggle('show');
+        }
+        
+        function exportReport(format) {
+            document.getElementById('exportMenu').classList.remove('show');
+            
+            const url = currentSchemeId 
+                ? `/api/export/${format}?scheme_id=${currentSchemeId}`
+                : `/api/export/${format}`;
+            
+            window.location.href = url;
+            showToast(`正在导出 ${format.toUpperCase()} 格式...`, 'success');
+        }
+        
+        function toggleLayer(layerType) {
+            if (layerType === 'parcels') {
+                const checked = document.getElementById('layer-parcels').checked;
+                if (checked) {
+                    if (parcelLayer) map.addLayer(parcelLayer);
+                } else {
+                    if (parcelLayer) map.removeLayer(parcelLayer);
+                }
+            } else if (layerType === 'facilities') {
+                const checked = document.getElementById('layer-facilities').checked;
+                if (checked) {
+                    if (facilityLayer) map.addLayer(facilityLayer);
+                } else {
+                    if (facilityLayer) map.removeLayer(facilityLayer);
+                }
+            } else if (layerType === 'radius') {
+                const checked = document.getElementById('layer-radius').checked;
+                if (checked) {
+                    showServiceRadius();
+                } else {
+                    hideServiceRadius();
+                }
+            }
+        }
+        
+        function showServiceRadius() {
+            hideServiceRadius();
+            
+            const selectedType = document.getElementById('facility-filter').value;
+            if (!facilityLayer) return;
+            
+            facilityLayer.eachLayer(function(layer) {
+                const props = layer.feature?.properties;
+                if (!props) return;
+                
+                if (selectedType && props.type !== selectedType) return;
+                
+                const radius = {
+                    'school_primary': 500,
+                    'school_secondary': 1000,
+                    'kindergarten': 300,
+                    'elderly': 800,
+                    'park': 500,
+                    'market': 500,
+                    'bus_stop': 300,
+                    'community_center': 800
+                }[props.type] || 500;
+                
+                const color = serviceRadiusColors[props.type] || '#2196f3';
+                
+                const circle = L.circle(layer.getLatLng(), {
+                    radius: radius,
+                    color: color,
+                    weight: 2,
+                    fillColor: color,
+                    fillOpacity: 0.15,
+                    opacity: 0.5
+                }).addTo(map);
+                
+                radiusLayers.push(circle);
+            });
+        }
+        
+        function hideServiceRadius() {
+            radiusLayers.forEach(l => map.removeLayer(l));
+            radiusLayers = [];
+        }
+        
+        function filterFacilities() {
+            const selectedType = document.getElementById('facility-filter').value;
+            
+            if (facilityLayer) {
+                facilityLayer.setStyle(function(feature) {
+                    if (!selectedType) return {};
+                    return { opacity: feature.properties.type === selectedType ? 1 : 0.2 };
+                });
+            }
+            
+            if (document.getElementById('layer-radius').checked) {
+                showServiceRadius();
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        document.addEventListener('click', function(e) {
+            const exportMenu = document.getElementById('exportMenu');
+            if (!e.target.closest('.export-dropdown')) {
+                exportMenu.classList.remove('show');
+            }
+        });
+        
+        initMap();
+    </script>
+</body>
+</html>

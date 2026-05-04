@@ -1,0 +1,170 @@
+{
+  "version": "1.0",
+  "name": "老城街区更新规划规则",
+  "description": "适用于老城核心区更新改造项目的控规与服务半径规则",
+  "land_use_rules": {
+    "R2": {
+      "name": "二类居住用地",
+      "max_far": 3.5,
+      "max_height": 80,
+      "max_density": 35,
+      "population_per_ha": 800
+    },
+    "R3": {
+      "name": "三类居住用地",
+      "max_far": 3.0,
+      "max_height": 60,
+      "max_density": 30,
+      "population_per_ha": 1200
+    },
+    "B1": {
+      "name": "商业用地",
+      "max_far": 5.0,
+      "max_height": 100,
+      "max_density": 45
+    },
+    "A3": {
+      "name": "教育科研用地",
+      "max_far": 2.0,
+      "max_height": 45,
+      "max_density": 25
+    },
+    "A6": {
+      "name": "社会福利用地",
+      "max_far": 2.5,
+      "max_height": 36,
+      "max_density": 28
+    },
+    "G1": {
+      "name": "公园绿地",
+      "max_far": 0.15,
+      "max_height": 15,
+      "max_density": 10
+    }
+  },
+  "service_radius": {
+    "school_primary": {
+      "name": "小学",
+      "radius_meters": 500,
+      "capacity_per_1000": 40,
+      "unit": "学位"
+    },
+    "school_secondary": {
+      "name": "中学",
+      "radius_meters": 1000,
+      "capacity_per_1000": 30,
+      "unit": "学位"
+    },
+    "kindergarten": {
+      "name": "幼儿园",
+      "radius_meters": 300,
+      "capacity_per_1000": 30,
+      "unit": "学位"
+    },
+    "elderly": {
+      "name": "养老设施",
+      "radius_meters": 800,
+      "capacity_per_1000": 50,
+      "unit": "床位"
+    },
+    "park": {
+      "name": "公园绿地",
+      "radius_meters": 500,
+      "capacity_per_1000": 2.0,
+      "unit": "平方米/人"
+    },
+    "market": {
+      "name": "菜市场",
+      "radius_meters": 500,
+      "capacity_per_1000": 1.0,
+      "unit": "平方米/千人"
+    },
+    "bus_stop": {
+      "name": "公交站",
+      "radius_meters": 300,
+      "capacity_per_1000": 0,
+      "unit": "站点"
+    },
+    "community_center": {
+      "name": "社区中心",
+      "radius_meters": 800,
+      "capacity_per_1000": 0,
+      "unit": "处"
+    }
+  },
+  "service_standards": {
+    "education": {
+      "primary_school": {
+        "class_size": 45,
+        "classes_per_school": 24,
+        "students_per_1000_people": 40
+      },
+      "secondary_school": {
+        "class_size": 50,
+        "classes_per_school": 36,
+        "students_per_1000_people": 30
+      },
+      "kindergarten": {
+        "class_size": 30,
+        "classes_per_school": 9,
+        "students_per_1000_people": 30
+      }
+    },
+    "healthcare": {
+      "elderly_care": {
+        "beds_per_1000_elderly": 40,
+        "daycare_slots_per_1000_elderly": 20
+      }
+    },
+    "green_space": {
+      "per_capita_park_area": 8.0,
+      "community_park_radius": 500,
+      "neighborhood_park_radius": 300
+    },
+    "transportation": {
+      "walking_distance_to_bus": 300,
+      "walking_distance_to_subway": 800,
+      "bike_lane_coverage": 0.8
+    }
+  },
+  "conflict_checks": {
+    "far_exceed_max": {
+      "enabled": true,
+      "severity": "high",
+      "description": "容积率超过控规上限"
+    },
+    "height_exceed_limit": {
+      "enabled": true,
+      "severity": "high",
+      "description": "建筑高度超过限高"
+    },
+    "density_exceed_limit": {
+      "enabled": true,
+      "severity": "medium",
+      "description": "建筑密度超过上限"
+    },
+    "population_gap_worsened": {
+      "enabled": true,
+      "severity": "high",
+      "description": "居住人口增加但配套学位缺口扩大"
+    },
+    "park_coverage_insufficient": {
+      "enabled": true,
+      "severity": "medium",
+      "description": "公园绿地服务半径覆盖不足"
+    },
+    "road_barrier_effect": {
+      "enabled": true,
+      "severity": "medium",
+      "description": "道路割裂导致慢行到达不可用"
+    }
+  },
+  "assessment_weights": {
+    "education": 0.25,
+    "healthcare_elderly": 0.20,
+    "green_space": 0.15,
+    "commerce_market": 0.15,
+    "transportation": 0.15,
+    "community_services": 0.10
+  }
+}

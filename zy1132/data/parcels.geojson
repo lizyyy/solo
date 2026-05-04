@@ -1,0 +1,239 @@
+{
+  "type": "FeatureCollection",
+  "name": "parcels",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P001",
+        "name": "老城核心区地块1",
+        "land_use": "R2",
+        "area_sqm": 12500,
+        "current_far": 2.5,
+        "plan_far": 3.0,
+        "max_far": 3.5,
+        "building_area": 31250,
+        "residential_units": 350,
+        "existing_population": 890,
+        "age_distribution": "0-17: 15%, 18-64: 65%, 65+: 20%",
+        "building_age": "1980-1995",
+        "height_limit": 80,
+        "density_limit": 35
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.385, 39.915],
+          [116.388, 39.915],
+          [116.388, 39.918],
+          [116.385, 39.918],
+          [116.385, 39.915]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P002",
+        "name": "老城核心区地块2",
+        "land_use": "R2",
+        "area_sqm": 9800,
+        "current_far": 2.0,
+        "plan_far": 2.8,
+        "max_far": 3.2,
+        "building_area": 19600,
+        "residential_units": 220,
+        "existing_population": 560,
+        "age_distribution": "0-17: 12%, 18-64: 60%, 65+: 28%",
+        "building_age": "1975-1990",
+        "height_limit": 60,
+        "density_limit": 30
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.388, 39.915],
+          [116.391, 39.915],
+          [116.391, 39.917],
+          [116.388, 39.917],
+          [116.388, 39.915]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P003",
+        "name": "商务区地块",
+        "land_use": "B1",
+        "area_sqm": 8500,
+        "current_far": 3.0,
+        "plan_far": 4.0,
+        "max_far": 5.0,
+        "building_area": 25500,
+        "residential_units": 0,
+        "existing_population": 0,
+        "age_distribution": "",
+        "building_age": "2000-2010",
+        "height_limit": 100,
+        "density_limit": 40
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.385, 39.918],
+          [116.388, 39.918],
+          [116.388, 39.920],
+          [116.385, 39.920],
+          [116.385, 39.918]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P004",
+        "name": "教育用地",
+        "land_use": "A3",
+        "area_sqm": 15000,
+        "current_far": 1.2,
+        "plan_far": 1.5,
+        "max_far": 1.8,
+        "building_area": 18000,
+        "residential_units": 0,
+        "existing_population": 0,
+        "age_distribution": "",
+        "building_age": "1995-2005",
+        "height_limit": 45,
+        "density_limit": 20
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.391, 39.917],
+          [116.394, 39.917],
+          [116.394, 39.920],
+          [116.391, 39.920],
+          [116.391, 39.917]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P005",
+        "name": "公园绿地",
+        "land_use": "G1",
+        "area_sqm": 22000,
+        "current_far": 0.1,
+        "plan_far": 0.1,
+        "max_far": 0.15,
+        "building_area": 2200,
+        "residential_units": 0,
+        "existing_population": 0,
+        "age_distribution": "",
+        "building_age": "2010-2020",
+        "height_limit": 15,
+        "density_limit": 5
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.382, 39.912],
+          [116.385, 39.912],
+          [116.385, 39.915],
+          [116.382, 39.915],
+          [116.382, 39.912]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P006",
+        "name": "老旧小区改造地块",
+        "land_use": "R3",
+        "area_sqm": 7200,
+        "current_far": 1.8,
+        "plan_far": 2.5,
+        "max_far": 3.0,
+        "building_area": 12960,
+        "residential_units": 180,
+        "existing_population": 450,
+        "age_distribution": "0-17: 10%, 18-64: 50%, 65+: 40%",
+        "building_age": "1970-1985",
+        "height_limit": 54,
+        "density_limit": 28
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.379, 39.915],
+          [116.382, 39.915],
+          [116.382, 39.918],
+          [116.379, 39.918],
+          [116.379, 39.915]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P007",
+        "name": "养老设施用地",
+        "land_use": "A6",
+        "area_sqm": 6000,
+        "current_far": 1.5,
+        "plan_far": 2.0,
+        "max_far": 2.5,
+        "building_area": 9000,
+        "residential_units": 0,
+        "existing_population": 0,
+        "age_distribution": "",
+        "building_age": "2005-2015",
+        "height_limit": 36,
+        "density_limit": 25
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.379, 39.912],
+          [116.382, 39.912],
+          [116.382, 39.915],
+          [116.379, 39.915],
+          [116.379, 39.912]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "P008",
+        "name": "道路用地",
+        "land_use": "S",
+        "area_sqm": 4500,
+        "current_far": 0,
+        "plan_far": 0,
+        "max_far": 0,
+        "building_area": 0,
+        "residential_units": 0,
+        "existing_population": 0,
+        "age_distribution": "",
+        "building_age": "",
+        "height_limit": 0,
+        "density_limit": 0
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [116.384, 39.9145],
+          [116.386, 39.9145],
+          [116.386, 39.9185],
+          [116.384, 39.9185],
+          [116.384, 39.9145]
+        ]]
+      }
+    }
+  ]
+}
