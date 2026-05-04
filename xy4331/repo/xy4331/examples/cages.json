@@ -1,0 +1,57 @@
+{
+  "cages": [
+    {
+      "cage_id": "C-RA01-001",
+      "rack_id": "RA-01",
+      "position": "A1",
+      "max_capacity": 5,
+      "status": "available"
+    },
+    {
+      "cage_id": "C-RA01-002",
+      "rack_id": "RA-01",
+      "position": "A2",
+      "max_capacity": 5,
+      "status": "available"
+    },
+    {
+      "cage_id": "C-RA01-003",
+      "rack_id": "RA-01",
+      "position": "A3",
+      "max_capacity": 5,
+      "status": "available"
+    },
+    {
+      "cage_id": "C-RA01-004",
+      "rack_id": "RA-01",
+      "position": "B1",
+      "max_capacity": 3,
+      "status": "available",
+      "notes": "独立通风笼具(IVC)"
+    },
+    {
+      "cage_id": "C-RA01-005",
+      "rack_id": "RA-01",
+      "position": "B2",
+      "max_capacity": 3,
+      "status": "available",
+      "notes": "独立通风笼具(IVC)"
+    },
+    {
+      "cage_id": "C-RB01-001",
+      "rack_id": "RB-01",
+      "position": "A1",
+      "max_capacity": 4,
+      "status": "available",
+      "notes": "观察区笼具"
+    },
+    {
+      "cage_id": "C-RB01-002",
+      "rack_id": "RB-01",
+      "position": "A2",
+      "max_capacity": 4,
+      "status": "available",
+      "notes": "观察区笼具"
+    }
+  ]
+}

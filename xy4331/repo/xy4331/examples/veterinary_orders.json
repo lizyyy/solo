@@ -1,0 +1,64 @@
+{
+  "orders": [
+    {
+      "order_id": "VO-2024-001",
+      "animal_id": "M-2024-001",
+      "examination_date": "2024-12-15",
+      "symptoms": "毛发粗糙、食欲下降",
+      "diagnosis": "疑似皮肤感染",
+      "treatment_plan": "外用抗菌药膏，每日2次，连续7天",
+      "medications": "盐酸特比萘芬乳膏",
+      "observation_period_days": 7,
+      "start_observation_date": "2024-12-15",
+      "veterinarian_signature": "李兽医",
+      "signature_date": "2024-12-15",
+      "status": "observing",
+      "notes": "观察期正常进行中"
+    },
+    {
+      "order_id": "VO-2024-002",
+      "animal_id": "M-2024-002",
+      "examination_date": "2024-12-10",
+      "symptoms": "轻微腹泻",
+      "diagnosis": "消化不良",
+      "treatment_plan": "调整饲料，添加益生菌",
+      "medications": "益生菌制剂",
+      "observation_period_days": 7,
+      "start_observation_date": "2024-12-10",
+      "veterinarian_signature": null,
+      "signature_date": null,
+      "status": "draft",
+      "notes": "处置单未签署 - 缺签检测用例"
+    },
+    {
+      "order_id": "VO-2024-003",
+      "animal_id": "R-2024-001",
+      "examination_date": "2024-12-01",
+      "symptoms": "体重下降、活动减少",
+      "diagnosis": "需要进一步检查",
+      "treatment_plan": "血常规检查，补充营养",
+      "medications": "复合维生素",
+      "observation_period_days": 14,
+      "start_observation_date": "2024-12-01",
+      "veterinarian_signature": "王兽医",
+      "signature_date": "2024-12-01",
+      "status": "observing",
+      "notes": "观察期超时检测用例 - 应该已结束但未完成"
+    },
+    {
+      "order_id": "VO-2024-004",
+      "animal_id": "M-2024-003",
+      "examination_date": "2024-12-17",
+      "symptoms": "眼部分泌物增多",
+      "diagnosis": "结膜炎",
+      "treatment_plan": "抗生素滴眼液，每日3次",
+      "medications": "氧氟沙星滴眼液",
+      "observation_period_days": 5,
+      "start_observation_date": null,
+      "veterinarian_signature": null,
+      "signature_date": null,
+      "status": "draft",
+      "notes": "新处置单，等待签署"
+    }
+  ]
+}

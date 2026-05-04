@@ -1,0 +1,58 @@
+{
+  "alerts": [
+    {
+      "alert_id": "ALERT-2024-001",
+      "cage_id": "C-RA01-001",
+      "sensor_type": "温度",
+      "threshold_value": 26.0,
+      "measured_value": 28.5,
+      "alert_time": "2024-12-18T08:30:00",
+      "severity": "high",
+      "status": "open"
+    },
+    {
+      "alert_id": "ALERT-2024-002",
+      "cage_id": "C-RA01-001",
+      "sensor_type": "湿度",
+      "threshold_value": 70.0,
+      "measured_value": 78.2,
+      "alert_time": "2024-12-18T08:35:00",
+      "severity": "warning",
+      "status": "open"
+    },
+    {
+      "alert_id": "ALERT-2024-003",
+      "cage_id": "C-RA01-002",
+      "sensor_type": "温度",
+      "threshold_value": 26.0,
+      "measured_value": 25.8,
+      "alert_time": "2024-12-18T09:00:00",
+      "severity": "info",
+      "status": "resolved",
+      "resolution_notes": "空调系统自动调整",
+      "resolved_at": "2024-12-18T09:15:00"
+    },
+    {
+      "alert_id": "ALERT-2024-004",
+      "cage_id": "C-RA01-004",
+      "sensor_type": "氨气",
+      "threshold_value": 25.0,
+      "measured_value": 32.0,
+      "alert_time": "2024-12-18T10:00:00",
+      "severity": "high",
+      "status": "acknowledged",
+      "acknowledged_by": "张饲养员",
+      "acknowledged_at": "2024-12-18T10:30:00"
+    },
+    {
+      "alert_id": "ALERT-2024-005",
+      "cage_id": "C-RA01-005",
+      "sensor_type": "温度",
+      "threshold_value": 26.0,
+      "measured_value": 27.2,
+      "alert_time": "2024-12-17T22:15:00",
+      "severity": "warning",
+      "status": "open"
+    }
+  ]
+}

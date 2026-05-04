@@ -1,0 +1,71 @@
+{
+  "inspections": [
+    {
+      "inspection_id": "INSP-2024-001",
+      "cage_id": "C-RA01-001",
+      "inspection_date": "2024-12-18T08:00:00",
+      "inspector": "张饲养员",
+      "general_condition": "良好",
+      "food_level": "充足",
+      "water_level": "正常",
+      "bedding_condition": "干燥",
+      "abnormal_signs": "",
+      "actions_taken": "",
+      "status": "completed"
+    },
+    {
+      "inspection_id": "INSP-2024-002",
+      "cage_id": "C-RA01-002",
+      "inspection_date": "2024-12-18T08:15:00",
+      "inspector": "张饲养员",
+      "general_condition": "良好",
+      "food_level": "充足",
+      "water_level": "正常",
+      "bedding_condition": "稍湿",
+      "abnormal_signs": "垫料轻微潮湿",
+      "actions_taken": "记录观察，准备更换垫料",
+      "status": "completed",
+      "notes": "建议下午更换垫料"
+    },
+    {
+      "inspection_id": "INSP-2024-003",
+      "cage_id": "C-RA01-004",
+      "inspection_date": "2024-12-18T08:30:00",
+      "inspector": "李饲养员",
+      "general_condition": "需关注",
+      "food_level": "充足",
+      "water_level": "正常",
+      "bedding_condition": "正常",
+      "abnormal_signs": "大鼠活动减少，精神萎靡",
+      "actions_taken": "已通知兽医复查",
+      "status": "completed",
+      "notes": "VO-2024-003观察期动物"
+    },
+    {
+      "inspection_id": "INSP-2024-004",
+      "cage_id": "C-RA01-005",
+      "inspection_date": "2024-12-18T08:45:00",
+      "inspector": "李饲养员",
+      "general_condition": "良好",
+      "food_level": "充足",
+      "water_level": "正常",
+      "bedding_condition": "干燥",
+      "abnormal_signs": "",
+      "actions_taken": "",
+      "status": "completed"
+    },
+    {
+      "inspection_id": "INSP-2024-005",
+      "cage_id": "C-RA01-003",
+      "inspection_date": "2024-12-17T16:00:00",
+      "inspector": "王饲养员",
+      "general_condition": "良好",
+      "food_level": "充足",
+      "water_level": "正常",
+      "bedding_condition": "干燥",
+      "abnormal_signs": "",
+      "actions_taken": "",
+      "status": "completed"
+    }
+  ]
+}
