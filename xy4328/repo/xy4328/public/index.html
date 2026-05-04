@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>器械包放行追踪台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>器械包放行追踪台</h1>
+            <p class="subtitle">医院消毒供应室器械包追踪管理系统</p>
+        </header>
+
+        <div class="stats-panel" id="statsPanel">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPackages">0</div>
+                <div class="stat-label">器械包总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCycles">0</div>
+                <div class="stat-label">总锅次数</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-value" id="qualifiedCycles">0</div>
+                <div class="stat-label">合格锅次</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value" id="releasedPackages">0</div>
+                <div class="stat-label">已放行</div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-value" id="distributedPackages">0</div>
+                <div class="stat-label">已领用</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value" id="abnormalCount">0</div>
+                <div class="stat-label">异常数量</div>
+            </div>
+        </div>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="packages">器械包管理</button>
+            <button class="tab-btn" data-tab="cycles">灭菌锅次</button>
+            <button class="tab-btn" data-tab="distributions">领用记录</button>
+            <button class="tab-btn" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="recall">召回查询</button>
+        </nav>
+
+        <div class="tab-content active" id="packages-tab">
+            <div class="search-panel">
+                <h3>查询条件</h3>
+                <div class="search-row">
+                    <div class="form-group">
+                        <label>条码/包名</label>
+                        <input type="text" id="searchBarcode" placeholder="输入条码或包名">
+                    </div>
+                    <div class="form-group">
+                        <label>领用科室</label>
+                        <input type="text" id="searchDepartment" placeholder="输入科室名称">
+                    </div>
+                    <div class="form-group">
+                        <label>状态筛选</label>
+                        <select id="searchStatus">
+                            <option value="">全部</option>
+                            <option value="待放行">待放行</option>
+                            <option value="已放行">已放行</option>
+                            <option value="已领用">已领用</option>
+                            <option value="异常">异常</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="searchPackages()">查询</button>
+                        <button class="btn" onclick="clearSearch()">清空</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn btn-success" onclick="showAddPackageModal()">+ 新增器械包</button>
+                <button class="btn btn-primary" onclick="refreshPackages()">刷新列表</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>条码</th>
+                            <th>包名称</th>
+                            <th>锅次号</th>
+                            <th>有效期</th>
+                            <th>状态</th>
+                            <th>放行时间</th>
+                            <th>领用科室</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packagesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="cycles-tab">
+            <div class="action-bar">
+                <button class="btn btn-success" onclick="showAddCycleModal()">+ 新增锅次</button>
+                <button class="btn btn-primary" onclick="refreshCycles()">刷新列表</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>锅次号</th>
+                            <th>灭菌日期</th>
+                            <th>物理监测</th>
+                            <th>化学监测</th>
+                            <th>生物监测</th>
+                            <th>是否合格</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cyclesTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="distributions-tab">
+            <div class="action-bar">
+                <button class="btn btn-success" onclick="showAddDistributionModal()">+ 新增领用</button>
+                <button class="btn btn-primary" onclick="refreshDistributions()">刷新列表</button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>条码</th>
+                            <th>包名称</th>
+                            <th>锅次号</th>
+                            <th>科室</th>
+                            <th>领用人</th>
+                            <th>领用时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="distributionsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="import-tab">
+            <div class="import-section">
+                <h3>导入灭菌锅次</h3>
+                <div class="import-box">
+                    <input type="file" id="cyclesFile" accept=".csv">
+                    <button class="btn btn-primary" onclick="importCycles()">导入锅次</button>
+                </div>
+                <p class="help-text">CSV格式：锅次号,灭菌日期,物理监测,化学监测,生物监测</p>
+            </div>
+
+            <div class="import-section">
+                <h3>导入器械包</h3>
+                <div class="import-box">
+                    <input type="file" id="packagesFile" accept=".csv">
+                    <button class="btn btn-primary" onclick="importPackages()">导入器械包</button>
+                </div>
+                <p class="help-text">CSV格式：条码,包名称,锅次号,有效期</p>
+            </div>
+
+            <div class="import-section">
+                <h3>导入领用记录</h3>
+                <div class="import-box">
+                    <input type="file" id="distributionsFile" accept=".csv">
+                    <button class="btn btn-primary" onclick="importDistributions()">导入领用</button>
+                </div>
+                <p class="help-text">CSV格式：条码,科室,领用人,领用时间</p>
+            </div>
+
+            <div id="importResult" class="import-result hidden">
+                <h4>导入结果</h4>
+                <div id="importResultContent"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="recall-tab">
+            <div class="search-panel">
+                <h3>召回查询条件</h3>
+                <div class="search-row">
+                    <div class="form-group">
+                        <label>锅次号</label>
+                        <input type="text" id="recallCycleNumber" placeholder="输入锅次号">
+                    </div>
+                    <div class="form-group">
+                        <label>科室</label>
+                        <input type="text" id="recallDepartment" placeholder="输入科室">
+                    </div>
+                    <div class="form-group">
+                        <label>领用日期开始</label>
+                        <input type="date" id="recallStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label>领用日期结束</label>
+                        <input type="date" id="recallEndDate">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="searchRecall()">查询</button>
+                        <button class="btn btn-danger" onclick="exportRecallCSV()">导出召回CSV</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAllRecall" onchange="toggleSelectAllRecall()"></th>
+                            <th>条码</th>
+                            <th>包名称</th>
+                            <th>锅次号</th>
+                            <th>状态</th>
+                            <th>异常原因</th>
+                            <th>科室</th>
+                            <th>领用人</th>
+                            <th>领用时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recallTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="packageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="packageModalTitle">新增器械包</h3>
+                <span class="close" onclick="closePackageModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="packageForm">
+                    <input type="hidden" id="packageId">
+                    <div class="form-group">
+                        <label>条码 *</label>
+                        <input type="text" id="packageBarcode" required>
+                    </div>
+                    <div class="form-group">
+                        <label>包名称 *</label>
+                        <input type="text" id="packageName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>锅次号 *</label>
+                        <input type="text" id="packageCycleNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label>有效期 *</label>
+                        <input type="date" id="packageValidUntil" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closePackageModal()">取消</button>
+                <button class="btn btn-primary" onclick="savePackage()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="cycleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cycleModalTitle">新增锅次</h3>
+                <span class="close" onclick="closeCycleModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="cycleForm">
+                    <input type="hidden" id="cycleId">
+                    <div class="form-group">
+                        <label>锅次号 *</label>
+                        <input type="text" id="cycleNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label>灭菌日期 *</label>
+                        <input type="date" id="cycleDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>物理监测</label>
+                        <select id="cyclePhysical">
+                            <option value="">未检测</option>
+                            <option value="合格">合格</option>
+                            <option value="不合格">不合格</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>化学监测</label>
+                        <select id="cycleChemical">
+                            <option value="">未检测</option>
+                            <option value="合格">合格</option>
+                            <option value="不合格">不合格</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>生物监测</label>
+                        <select id="cycleBiological">
+                            <option value="">未检测</option>
+                            <option value="合格">合格</option>
+                            <option value="不合格">不合格</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeCycleModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveCycle()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="distributionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增领用记录</h3>
+                <span class="close" onclick="closeDistributionModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="distributionForm">
+                    <div class="form-group">
+                        <label>条码 *</label>
+                        <input type="text" id="distributionBarcode" required placeholder="扫描或输入条码">
+                    </div>
+                    <div class="form-group">
+                        <label>科室 *</label>
+                        <input type="text" id="distributionDepartment" required>
+                    </div>
+                    <div class="form-group">
+                        <label>领用人</label>
+                        <input type="text" id="distributionReceiver">
+                    </div>
+                    <div class="form-group">
+                        <label>领用时间</label>
+                        <input type="datetime-local" id="distributionTime">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeDistributionModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveDistribution()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
