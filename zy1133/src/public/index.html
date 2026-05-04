@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Band Rehearsal Review - 乐队排练复盘工具</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1 class="logo">🎸 Band Rehearsal Review</h1>
+        <nav class="nav" id="mainNav">
+          <button class="nav-btn active" data-page="projects">项目列表</button>
+          <button class="nav-btn" data-page="import">导入数据</button>
+          <button class="nav-btn" data-page="dashboard">复盘看板</button>
+          <button class="nav-btn" data-page="compare">排练对比</button>
+          <button class="nav-btn" data-page="practice">练习清单</button>
+          <button class="nav-btn" data-page="export">导出报告</button>
+        </nav>
+        <div class="project-selector" id="projectSelector" style="display: none;">
+          <label>当前项目:</label>
+          <select id="currentProjectSelect">
+            <option value="">选择项目</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="page-projects" class="page active">
+        <div class="page-header">
+          <h2>📁 项目列表</h2>
+          <p>选择或创建排练复盘项目</p>
+        </div>
+        <div class="projects-grid" id="projectsGrid">
+          <div class="project-card loading">
+            <div class="loading-spinner"></div>
+            <p>加载中...</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-import" class="page">
+        <div class="page-header">
+          <h2>📤 导入数据</h2>
+          <p>上传排练数据文件进行校验和导入</p>
+        </div>
+        
+        <div class="import-container">
+          <div class="upload-section">
+            <h3>数据文件格式说明</h3>
+            <div class="format-info" id="formatInfo">
+              <p>需要上传以下文件（支持 CSV 或 JSON 格式）：</p>
+              <ul>
+                <li><strong>sessions</strong> - 排练场次信息</li>
+                <li><strong>setlist</strong> - 歌曲列表</li>
+                <li><strong>takes</strong> - Take 记录</li>
+                <li><strong>pitch-beat</strong> - 音高节拍偏差数据</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="upload-section">
+            <h3>文件上传</h3>
+            <form id="uploadForm" class="upload-form">
+              <div class="upload-group">
+                <label for="sessionsFile">sessions.csv / sessions.json</label>
+                <input type="file" id="sessionsFile" name="sessions" accept=".csv,.json">
+                <span class="file-status" id="sessionsStatus">未选择</span>
+              </div>
+              
+              <div class="upload-group">
+                <label for="setlistFile">setlist.csv / setlist.json</label>
+                <input type="file" id="setlistFile" name="setlist" accept=".csv,.json">
+                <span class="file-status" id="setlistStatus">未选择</span>
+              </div>
+              
+              <div class="upload-group">
+                <label for="takesFile">takes.csv / takes.json</label>
+                <input type="file" id="takesFile" name="takes" accept=".csv,.json">
+                <span class="file-status" id="takesStatus">未选择</span>
+              </div>
+              
+              <div class="upload-group">
+                <label for="pitchBeatFile">pitch-beat.csv / pitch-beat.json</label>
+                <input type="file" id="pitchBeatFile" name="pitchBeat" accept=".csv,.json">
+                <span class="file-status" id="pitchBeatStatus">未选择</span>
+              </div>
+
+              <div class="upload-actions">
+                <button type="button" id="validateBtn" class="btn btn-secondary">先校验</button>
+                <button type="button" id="importBtn" class="btn btn-primary" disabled>创建项目</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="validation-results" id="validationResults" style="display: none;">
+            <h3>校验结果</h3>
+            <div id="validationContent"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-dashboard" class="page">
+        <div class="page-header">
+          <h2>📊 复盘看板</h2>
+          <p>分析排练数据，发现问题</p>
+        </div>
+
+        <div class="filters-panel" id="filtersPanel">
+          <h3>筛选条件</h3>
+          <div class="filters-grid" id="filtersGrid">
+            <div class="filter-group">
+              <label>排练场次</label>
+              <select id="filterSessions" multiple>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>歌曲</label>
+              <select id="filterSongs" multiple>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>段落</label>
+              <select id="filterSections" multiple>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>成员</label>
+              <select id="filterMusicians" multiple>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>乐器</label>
+              <select id="filterInstruments" multiple>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>错误类型</label>
+              <select id="filterErrorTypes" multiple>
+              </select>
+            </div>
+          </div>
+          <div class="filter-actions">
+            <button id="applyFilters" class="btn btn-primary">应用筛选</button>
+            <button id="resetFilters" class="btn btn-secondary">重置</button>
+          </div>
+        </div>
+
+        <div class="dashboard-content">
+          <div class="summary-cards" id="summaryCards">
+            <div class="summary-card">
+              <div class="card-value" id="totalErrors">-</div>
+              <div class="card-label">总错误数</div>
+            </div>
+            <div class="summary-card pitch">
+              <div class="card-value" id="pitchErrors">-</div>
+              <div class="card-label">音准问题</div>
+            </div>
+            <div class="summary-card beat">
+              <div class="card-value" id="beatErrors">-</div>
+              <div class="card-label">节奏问题</div>
+            </div>
+            <div class="summary-card severe">
+              <div class="card-value" id="severeErrors">-</div>
+              <div class="card-label">严重问题</div>
+            </div>
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-container">
+              <h3>段落问题热力图</h3>
+              <div class="heatmap-container" id="sectionHeatmap"></div>
+            </div>
+            
+            <div class="chart-container">
+              <h3>成员问题排行</h3>
+              <div class="ranking-container" id="musicianRanking"></div>
+            </div>
+
+            <div class="chart-container">
+              <h3>音准/节奏趋势</h3>
+              <canvas id="trendChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+              <h3>错误类型分布</h3>
+              <canvas id="errorTypeChart"></canvas>
+            </div>
+          </div>
+
+          <div class="data-table-container">
+            <h3>详细数据（可标记）</h3>
+            <div class="table-controls">
+              <input type="text" id="dataSearch" placeholder="搜索...">
+              <div class="pagination" id="dataPagination"></div>
+            </div>
+            <table class="data-table" id="dataTable">
+              <thead>
+                <tr>
+                  <th>场次</th>
+                  <th>歌曲</th>
+                  <th>段落</th>
+                  <th>成员</th>
+                  <th>乐器</th>
+                  <th>时间点</th>
+                  <th>音高偏差</th>
+                  <th>节拍偏移</th>
+                  <th>错误类型</th>
+                  <th>标记</th>
+                  <th>备注</th>
+                </tr>
+              </thead>
+              <tbody id="dataTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-compare" class="page">
+        <div class="page-header">
+          <h2>🔄 排练对比</h2>
+          <p>对比两次排练或两个 Take 的变化</p>
+        </div>
+
+        <div class="compare-selector">
+          <div class="compare-group">
+            <label>基准场次</label>
+            <select id="compareSession1">
+              <option value="">选择场次</option>
+            </select>
+          </div>
+          <div class="compare-group">
+            <label>对比场次</label>
+            <select id="compareSession2">
+              <option value="">选择场次</option>
+            </select>
+          </div>
+          <button id="compareBtn" class="btn btn-primary">开始对比</button>
+        </div>
+
+        <div class="compare-results" id="compareResults" style="display: none;">
+          <div class="compare-summary">
+            <h3>对比摘要</h3>
+            <div class="compare-cards" id="compareCards"></div>
+          </div>
+
+          <div class="compare-detail">
+            <div class="compare-section">
+              <h3>段落变化</h3>
+              <div id="sectionComparison"></div>
+            </div>
+            
+            <div class="compare-section">
+              <h3>成员变化</h3>
+              <div id="musicianComparison"></div>
+            </div>
+
+            <div class="compare-section">
+              <h3>反复出现的问题</h3>
+              <div id="recurringIssues"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-practice" class="page">
+        <div class="page-header">
+          <h2>📋 下次排练练习清单</h2>
+          <p>按优先级列出需要重点练习的内容</p>
+        </div>
+
+        <div class="practice-list-container" id="practiceListContainer">
+          <div class="loading">加载中...</div>
+        </div>
+      </section>
+
+      <section id="page-export" class="page">
+        <div class="page-header">
+          <h2>📥 导出报告</h2>
+          <p>生成复盘报告并导出</p>
+        </div>
+
+        <div class="export-container">
+          <div class="export-formats">
+            <h3>选择导出格式</h3>
+            <div class="format-grid">
+              <button class="format-btn" data-format="json">
+                <span class="format-icon">📄</span>
+                <span class="format-name">JSON</span>
+                <span class="format-desc">完整数据结构</span>
+              </button>
+              <button class="format-btn" data-format="csv">
+                <span class="format-icon">📊</span>
+                <span class="format-name">CSV</span>
+                <span class="format-desc">表格数据</span>
+              </button>
+              <button class="format-btn" data-format="md">
+                <span class="format-icon">📝</span>
+                <span class="format-name">Markdown</span>
+                <span class="format-desc">文档格式</span>
+              </button>
+              <button class="format-btn" data-format="html">
+                <span class="format-icon">🌐</span>
+                <span class="format-name">HTML</span>
+                <span class="format-desc">网页报告</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="export-options">
+            <h3>导出选项</h3>
+            <div class="options-group">
+              <label>
+                <input type="checkbox" id="exportAnnotations" checked>
+                包含标记和备注
+              </label>
+              <label>
+                <input type="checkbox" id="exportPracticeList" checked>
+                包含练习清单
+              </label>
+              <label>
+                <input type="checkbox" id="exportCharts" checked>
+                包含图表数据
+              </label>
+            </div>
+          </div>
+
+          <div class="export-preview" id="exportPreview">
+            <h3>预览</h3>
+            <div class="preview-content" id="previewContent">
+              <p class="text-muted">选择格式后预览报告内容</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal" id="annotationModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>标记和备注</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>标记类型</label>
+            <div class="mark-options" id="markOptions">
+              <button class="mark-option" data-type="none">无标记</button>
+              <button class="mark-option" data-type="false_positive">误检</button>
+              <button class="mark-option" data-type="need_practice">需要重点练</button>
+              <button class="mark-option" data-type="fixed">已修正</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="noteText" rows="4" placeholder="添加备注..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary modal-close">取消</button>
+          <button class="btn btn-primary" id="saveAnnotation">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

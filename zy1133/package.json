@@ -1,0 +1,24 @@
+{
+  "name": "band-rehearsal-review",
+  "version": "1.0.0",
+  "description": "乐队排练复盘工具 - 帮助业余乐队分析排练数据，发现问题，提升效率",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "jest tests/"
+  },
+  "keywords": ["band", "rehearsal", "review", "music", "analysis"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "papaparse": "^5.4.1",
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
