@@ -1,0 +1,7 @@
+Designator,Mid X,Mid Y,Rotation,Layer,Part Number,Description,Value
+C1,20.00,20.00,0,Top,CAP-001,100nF Ceramic Capacitor,100nF
+R1,35.00,20.00,90,Top,RES-001,10k Ohm Resistor,10k
+U1,50.00,40.00,0,Top,MCU-STM32F103,STM32F103 Microcontroller,STM32F103C8T6
+D1,65.00,20.00,0,Top,LED-RED-0603,Red LED 0603,RED
+J1,95.00,40.00,180,Top,CONN-USB-MICRO,Micro USB Connector,Micro-USB
+IC1,20.00,50.00,0,Top,REG-LDO-3V3,3.3V LDO Regulator,LM1117-3.3

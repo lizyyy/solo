@@ -1,0 +1,7 @@
+Reference,PartNumber,Description,Footprint,Quantity,Manufacturer,Value,Available
+C1,CAP-001,100nF Ceramic Capacitor,0603,1,Yageo,100nF,True
+R1,RES-001,10k Ohm Resistor,0603,1,Yageo,10k,True
+U1,MCU-STM32F103,STM32F103 Microcontroller,LQFP48,1,STMicroelectronics,STM32F103C8T6,True
+D1,LED-RED-0603,Red LED 0603,0603-LED,1,Osram,RED,True
+J1,CONN-USB-MICRO,Micro USB Connector,USB-MICRO-B,1,Molex,Micro-USB,True
+IC1,REG-LDO-3V3,3.3V LDO Regulator,SOT-223,1,Texas Instruments,LM1117-3.3,True

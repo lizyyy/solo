@@ -1,0 +1,401 @@
+{
+  "name": "Error Test Board",
+  "version": "1.0",
+  "units": "mm",
+  "board_outline": {
+    "width": 100.0,
+    "height": 80.0,
+    "origin_x": 0.0,
+    "origin_y": 0.0,
+    "keepout_zones": [
+      {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 5.0,
+        "height": 80.0,
+        "description": "左侧禁布区"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "C1",
+      "reference": "C1",
+      "part_number": "CAP-001",
+      "footprint": "0603",
+      "description": "100nF Ceramic Capacitor",
+      "component_type": "capacitor",
+      "x": 2.0,
+      "y": 20.0,
+      "rotation": 0.0,
+      "layer": "top",
+      "is_polar": false,
+      "power_dissipation": 0.1,
+      "height": 1.0,
+      "pads": [
+        {
+          "id": "C1-P1",
+          "shape": "rectangle",
+          "x": 0.5,
+          "y": 20.0,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "GND",
+          "is_smd": true
+        },
+        {
+          "id": "C1-P2",
+          "shape": "rectangle",
+          "x": 3.5,
+          "y": 20.0,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "VCC_3V3",
+          "is_smd": true
+        }
+      ]
+    },
+    {
+      "id": "R1",
+      "reference": "R1",
+      "part_number": "RES-001",
+      "footprint": "0603",
+      "description": "10k Ohm Resistor",
+      "component_type": "resistor",
+      "x": 35.0,
+      "y": 20.0,
+      "rotation": 45.0,
+      "layer": "top",
+      "is_polar": false,
+      "power_dissipation": 0.125,
+      "height": 0.8,
+      "pads": [
+        {
+          "id": "R1-P1",
+          "shape": "rectangle",
+          "x": 35.0,
+          "y": 18.5,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "VCC_3V3",
+          "is_smd": true
+        },
+        {
+          "id": "R1-P2",
+          "shape": "rectangle",
+          "x": 35.0,
+          "y": 21.5,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "SIGNAL_1",
+          "is_smd": true
+        }
+      ]
+    },
+    {
+      "id": "D1",
+      "reference": "D1",
+      "part_number": "LED-RED-0603",
+      "footprint": "0603-LED",
+      "description": "Red LED 0603",
+      "component_type": "led",
+      "x": 65.0,
+      "y": 20.0,
+      "rotation": 180.0,
+      "layer": "top",
+      "is_polar": true,
+      "polarity_direction": "left",
+      "power_dissipation": 0.05,
+      "height": 1.2,
+      "pads": [
+        {
+          "id": "D1-P1",
+          "shape": "rectangle",
+          "x": 63.5,
+          "y": 20.0,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "SIGNAL_1",
+          "is_smd": true
+        },
+        {
+          "id": "D1-P2",
+          "shape": "rectangle",
+          "x": 66.5,
+          "y": 20.0,
+          "width": 1.5,
+          "height": 1.2,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "GND",
+          "is_smd": true
+        }
+      ]
+    },
+    {
+      "id": "J1",
+      "reference": "J1",
+      "part_number": "CONN-USB-MICRO",
+      "footprint": "USB-MICRO-B",
+      "description": "Micro USB Connector",
+      "component_type": "connector",
+      "x": 97.0,
+      "y": 40.0,
+      "rotation": 0.0,
+      "layer": "top",
+      "is_polar": false,
+      "power_dissipation": 0.0,
+      "height": 3.0,
+      "pads": [
+        {
+          "id": "J1-P1",
+          "shape": "rectangle",
+          "x": 95.0,
+          "y": 36.0,
+          "width": 1.2,
+          "height": 2.0,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "VCC_5V",
+          "is_smd": true
+        },
+        {
+          "id": "J1-P2",
+          "shape": "rectangle",
+          "x": 95.0,
+          "y": 38.5,
+          "width": 1.2,
+          "height": 2.0,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "USB_DM",
+          "is_smd": true
+        },
+        {
+          "id": "J1-P3",
+          "shape": "rectangle",
+          "x": 95.0,
+          "y": 41.0,
+          "width": 1.2,
+          "height": 2.0,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "USB_DP",
+          "is_smd": true
+        },
+        {
+          "id": "J1-P4",
+          "shape": "rectangle",
+          "x": 95.0,
+          "y": 43.5,
+          "width": 1.2,
+          "height": 2.0,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "ID",
+          "is_smd": true
+        },
+        {
+          "id": "J1-P5",
+          "shape": "rectangle",
+          "x": 95.0,
+          "y": 46.0,
+          "width": 1.2,
+          "height": 2.0,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "GND",
+          "is_smd": true
+        }
+      ]
+    },
+    {
+      "id": "IC1",
+      "reference": "IC1",
+      "part_number": "REG-LDO-3V3",
+      "footprint": "SOT-223",
+      "description": "3.3V LDO Regulator",
+      "component_type": "ic",
+      "x": 20.0,
+      "y": 50.0,
+      "rotation": 0.0,
+      "layer": "top",
+      "is_polar": false,
+      "power_dissipation": 1.2,
+      "height": 1.8,
+      "pads": [
+        {
+          "id": "IC1-P1",
+          "shape": "rectangle",
+          "x": 17.0,
+          "y": 48.5,
+          "width": 2.0,
+          "height": 1.5,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "VIN",
+          "is_smd": true
+        },
+        {
+          "id": "IC1-P2",
+          "shape": "rectangle",
+          "x": 20.0,
+          "y": 52.0,
+          "width": 3.0,
+          "height": 2.5,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "GND",
+          "is_smd": true
+        },
+        {
+          "id": "IC1-P3",
+          "shape": "rectangle",
+          "x": 23.0,
+          "y": 48.5,
+          "width": 2.0,
+          "height": 1.5,
+          "rotation": 0.0,
+          "layer": "top",
+          "net_name": "VCC_3V3",
+          "is_smd": true
+        }
+      ]
+    }
+  ],
+  "pads": [
+    {
+      "id": "GND-PAD1",
+      "shape": "rectangle",
+      "x": 10.0,
+      "y": 10.0,
+      "width": 2.0,
+      "height": 2.0,
+      "rotation": 0.0,
+      "layer": "top",
+      "net_name": "GND",
+      "is_smd": true
+    },
+    {
+      "id": "GND-PAD2",
+      "shape": "rectangle",
+      "x": 12.0,
+      "y": 10.0,
+      "width": 2.0,
+      "height": 2.0,
+      "rotation": 0.0,
+      "layer": "top",
+      "net_name": "VCC_3V3",
+      "is_smd": true
+    }
+  ],
+  "vias": [
+    {
+      "id": "VIA1",
+      "x": 40.0,
+      "y": 35.0,
+      "drill_diameter": 0.2,
+      "pad_diameter": 0.8,
+      "start_layer": "top",
+      "end_layer": "bottom",
+      "net_name": "GND",
+      "is_plated": true
+    },
+    {
+      "id": "VIA2",
+      "x": 60.0,
+      "y": 35.0,
+      "drill_diameter": 0.4,
+      "pad_diameter": 0.5,
+      "start_layer": "top",
+      "end_layer": "bottom",
+      "net_name": "VCC_3V3",
+      "is_plated": true
+    }
+  ],
+  "tracks": [
+    {
+      "id": "TRK1",
+      "start_x": 3.5,
+      "start_y": 20.0,
+      "end_x": 35.0,
+      "end_y": 18.5,
+      "width": 0.1,
+      "layer": "top",
+      "net_name": "VCC_3V3",
+      "is_trace": true
+    },
+    {
+      "id": "TRK2",
+      "start_x": 35.0,
+      "start_y": 21.5,
+      "end_x": 63.5,
+      "end_y": 20.0,
+      "width": 0.12,
+      "layer": "top",
+      "net_name": "SIGNAL_1",
+      "is_trace": true
+    },
+    {
+      "id": "TRK3",
+      "start_x": 0.5,
+      "start_y": 20.0,
+      "end_x": 10.0,
+      "end_y": 10.0,
+      "width": 0.1,
+      "layer": "top",
+      "net_name": "GND",
+      "is_trace": true
+    },
+    {
+      "id": "TRK4",
+      "start_x": 40.1,
+      "start_y": 35.0,
+      "end_x": 60.0,
+      "end_y": 35.0,
+      "width": 0.1,
+      "layer": "top",
+      "net_name": "GND",
+      "is_trace": true
+    }
+  ],
+  "silk_screen": [
+    {
+      "id": "SS-C1",
+      "type": "text",
+      "x": 0.5,
+      "y": 20.0,
+      "text": "C1",
+      "layer": "top",
+      "rotation": 0.0,
+      "width": 2.0,
+      "height": 1.0
+    }
+  ],
+  "net_list": [
+    "VCC_3V3",
+    "VCC_5V",
+    "GND",
+    "SIGNAL_1",
+    "USB_DM",
+    "USB_DP",
+    "VIN",
+    "ID"
+  ],
+  "critical_nets": [
+    "VCC_3V3",
+    "USB_DM",
+    "USB_DP"
+  ],
+  "keepout_zones": []
+}

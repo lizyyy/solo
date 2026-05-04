@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCB打样预审工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 左侧面板 */
+        .left-panel {
+            width: 320px;
+            background-color: #252526;
+            border-right: 1px solid #3c3c3c;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px;
+            background-color: #2d2d30;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        .panel-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cccccc;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        /* 问题列表 */
+        .issue-item {
+            background-color: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-item:hover {
+            border-color: #007acc;
+            background-color: #3c3c3c;
+        }
+
+        .issue-item.selected {
+            border-color: #007acc;
+            background-color: #094771;
+        }
+
+        .issue-header {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .severity-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .severity-critical { background-color: #f48771; }
+        .severity-warning { background-color: #dcdcaa; }
+        .severity-info { background-color: #4fc1ff; }
+
+        .issue-title {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .issue-id {
+            font-size: 11px;
+            color: #858585;
+            font-family: monospace;
+        }
+
+        .issue-details {
+            padding: 0 12px 12px;
+            display: none;
+            font-size: 12px;
+            color: #d4d4d4;
+        }
+
+        .issue-item.expanded .issue-details {
+            display: block;
+        }
+
+        .issue-detail-row {
+            margin-top: 8px;
+        }
+
+        .issue-detail-label {
+            color: #858585;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-open { background-color: #f4877120; color: #f48771; }
+        .status-confirmed { background-color: #dcdcaa20; color: #dcdcaa; }
+        .status-false_positive { background-color: #85858520; color: #858585; }
+        .status-resolved { background-color: #4ec9b020; color: #4ec9b0; }
+
+        .status-select {
+            background-color: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .status-select:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            width: 320px;
+            background-color: #252526;
+            border-left: 1px solid #3c3c3c;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 中间画布区域 */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            background-color: #2d2d30;
+            border-bottom: 1px solid #3c3c3c;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background-color: #3c3c3c;
+        }
+
+        .btn {
+            background-color: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: #094771;
+            border-color: #007acc;
+        }
+
+        .btn-primary {
+            background-color: #0e639c;
+            border-color: #0e639c;
+        }
+
+        .btn-primary:hover {
+            background-color: #1177bb;
+            border-color: #1177bb;
+        }
+
+        .btn-success {
+            background-color: #4ec9b020;
+            border-color: #4ec9b0;
+            color: #4ec9b0;
+        }
+
+        .btn-success:hover {
+            background-color: #4ec9b030;
+        }
+
+        .btn-warning {
+            background-color: #dcdcaa20;
+            border-color: #dcdcaa;
+            color: #dcdcaa;
+        }
+
+        .btn-danger {
+            background-color: #f4877120;
+            border-color: #f48771;
+            color: #f48771;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            background-color: transparent;
+            border: none;
+            color: #d4d4d4;
+            border-radius: 3px;
+        }
+
+        .toggle-btn:hover {
+            background-color: #3c3c3c;
+        }
+
+        .toggle-btn.active {
+            color: #007acc;
+        }
+
+        .toggle-checkbox {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background-color: #1e1e1e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pcbCanvas {
+            position: absolute;
+            cursor: crosshair;
+        }
+
+        .canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .coordinates-display {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background-color: #2d2d30cc;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: monospace;
+            color: #858585;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .zoom-btn {
+            width: 28px;
+            height: 28px;
+            background-color: #2d2d30;
+            border: 1px solid #3c3c3c;
+            color: #d4d4d4;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+        }
+
+        .zoom-btn:hover {
+            background-color: #3c3c3c;
+        }
+
+        /* 规则面板 */
+        .rule-item {
+            background-color: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .rule-header {
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .rule-header:hover {
+            background-color: #3c3c3c;
+        }
+
+        .rule-enabled {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .rule-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .rule-category {
+            font-size: 11px;
+            color: #858585;
+            padding: 2px 6px;
+            background-color: #3c3c3c;
+            border-radius: 3px;
+        }
+
+        .rule-severity {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .rule-details {
+            padding: 0 12px 12px;
+            display: none;
+            font-size: 12px;
+            border-top: 1px solid #3c3c3c;
+        }
+
+        .rule-item.expanded .rule-details {
+            display: block;
+        }
+
+        .rule-description {
+            color: #858585;
+            margin: 8px 0;
+        }
+
+        .rule-param {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .rule-param-label {
+            color: #858585;
+            font-size: 11px;
+        }
+
+        .rule-param-input {
+            background-color: #3c3c3c;
+            color: #d4d4d4;
+            border: 1px solid #3c3c3c;
+            border-radius: 3px;
+            padding: 4px 8px;
+            width: 80px;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .rule-param-input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        /* 统计面板 */
+        .stats-panel {
+            background-color: #2d2d30;
+            padding: 12px;
+            margin: 8px;
+            border-radius: 4px;
+            border: 1px solid #3c3c3c;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .stats-label {
+            color: #858585;
+        }
+
+        .stats-value {
+            font-weight: 600;
+        }
+
+        .stats-value.critical { color: #f48771; }
+        .stats-value.warning { color: #dcdcaa; }
+        .stats-value.info { color: #4fc1ff; }
+
+        /* 版本面板 */
+        .version-item {
+            background-color: #2d2d30;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .version-item:hover {
+            border-color: #007acc;
+        }
+
+        .version-item.selected {
+            border-color: #007acc;
+            background-color: #094771;
+        }
+
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .version-id {
+            font-size: 13px;
+            font-weight: 600;
+            color: #007acc;
+        }
+
+        .version-time {
+            font-size: 11px;
+            color: #858585;
+        }
+
+        .version-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+        }
+
+        .version-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #00000080;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 6px;
+            min-width: 400px;
+            max-width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #858585;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #d4d4d4;
+        }
+
+        .modal-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #3c3c3c;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .file-input-wrapper {
+            border: 2px dashed #3c3c3c;
+            border-radius: 6px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: #007acc;
+            background-color: #2d2d30;
+        }
+
+        .file-input-wrapper.dragover {
+            border-color: #007acc;
+            background-color: #09477130;
+        }
+
+        .file-input-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .file-input-text {
+            font-size: 13px;
+            color: #858585;
+        }
+
+        .file-input-text strong {
+            color: #007acc;
+        }
+
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background-color: #2d2d30;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .file-name {
+            font-size: 13px;
+        }
+
+        .file-status {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .file-status.success {
+            background-color: #4ec9b020;
+            color: #4ec9b0;
+        }
+
+        .file-status.error {
+            background-color: #f4877120;
+            color: #f48771;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #3c3c3c;
+            margin-bottom: 12px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #858585;
+        }
+
+        .tab:hover {
+            color: #d4d4d4;
+        }
+
+        .tab.active {
+            color: #007acc;
+            border-bottom-color: #007acc;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f4f4f;
+        }
+
+        /* 隐藏文件输入 */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3c3c3c;
+            border-top-color: #007acc;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #858585;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* 比较视图 */
+        .compare-view {
+            display: none;
+        }
+
+        .compare-view.active {
+            display: block;
+        }
+
+        .compare-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background-color: #2d2d30;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        .compare-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compare-select label {
+            font-size: 12px;
+            color: #858585;
+        }
+
+        .diff-added {
+            background-color: #4ec9b020;
+            border-left: 3px solid #4ec9b0;
+        }
+
+        .diff-removed {
+            background-color: #f4877120;
+            border-left: 3px solid #f48771;
+        }
+
+        .diff-changed {
+            background-color: #dcdcaa20;
+            border-left: 3px solid #dcdcaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧面板：问题列表 -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <h2>问题列表</h2>
+            </div>
+            
+            <div class="stats-panel">
+                <div class="stats-row">
+                    <span class="stats-label">总计</span>
+                    <span class="stats-value" id="statTotal">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">严重</span>
+                    <span class="stats-value critical" id="statCritical">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">警告</span>
+                    <span class="stats-value warning" id="statWarning">0</span>
+                </div>
+                <div class="stats-row">
+                    <span class="stats-label">提示</span>
+                    <span class="stats-value info" id="statInfo">0</span>
+                </div>
+            </div>
+
+            <div class="panel-content" id="issueList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div>暂无问题</div>
+                    <div style="margin-top: 4px; font-size: 11px;">导入数据并运行检查</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间画布区域 -->
+        <div class="center-panel">
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button class="btn" id="btnImport">📁 导入数据</button>
+                    <button class="btn btn-primary" id="btnCheck">🔍 运行检查</button>
+                </div>
+                
+                <div class="toolbar-divider"></div>
+                
+                <div class="toolbar-group">
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleTopLayer" checked>
+                        顶层
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleBottomLayer">
+                        底层
+                    </label>
+                </div>
+                
+                <div class="toolbar-divider"></div>
+                
+                <div class="toolbar-group">
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleComponents" checked>
+                        器件
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="togglePads" checked>
+                        焊盘
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleVias" checked>
+                        过孔
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleTracks" checked>
+                        走线
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="checkbox" class="toggle-checkbox" id="toggleSilkScreen" checked>
+                        丝印
+                    </label>
+                </div>
+                
+                <div class="toolbar-divider"></div>
+                
+                <div class="toolbar-group">
+                    <button class="btn" id="btnExport">📤 导出报告</button>
+                    <button class="btn" id="btnCompare">⚖️ 版本对比</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="pcbCanvas"></canvas>
+                <div class="coordinates-display" id="coordinatesDisplay">X: 0.00, Y: 0.00 mm</div>
+                <div class="zoom-controls">
+                    <button class="zoom-btn" id="zoomIn">+</button>
+                    <button class="zoom-btn" id="zoomOut">−</button>
+                    <button class="zoom-btn" id="zoomFit">⧉</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧面板：规则和版本 -->
+        <div class="right-panel">
+            <div class="tabs">
+                <div class="tab active" data-tab="rules">规则配置</div>
+                <div class="tab" data-tab="versions">版本历史</div>
+            </div>
+            
+            <div class="panel-content" id="rulesTab">
+                <div class="empty-state" id="rulesEmpty">
+                    <div class="empty-state-icon">⚙️</div>
+                    <div>暂无规则</div>
+                    <div style="margin-top: 4px; font-size: 11px;">导入规则文件</div>
+                </div>
+                <div id="rulesList" style="display: none;"></div>
+            </div>
+            
+            <div class="panel-content" id="versionsTab" style="display: none;">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📜</div>
+                    <div>暂无版本</div>
+                    <div style="margin-top: 4px; font-size: 11px;">运行检查以创建版本</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入数据模态框 -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">导入数据</div>
+                <button class="modal-close" id="closeImportModal">×</button>
+            </div>
+            <div class="modal-content">
+                <div class="file-input-wrapper" id="boardDropZone">
+                    <div class="file-input-icon">🔲</div>
+                    <div class="file-input-text">
+                        点击或拖拽 <strong>board.json</strong> 到此处
+                    </div>
+                    <input type="file" id="boardFileInput" accept=".json">
+                </div>
+                
+                <div class="file-input-wrapper" id="bomDropZone">
+                    <div class="file-input-icon">📋</div>
+                    <div class="file-input-text">
+                        点击或拖拽 <strong>bom.csv</strong> 到此处
+                    </div>
+                    <input type="file" id="bomFileInput" accept=".csv">
+                </div>
+                
+                <div class="file-input-wrapper" id="rulesDropZone">
+                    <div class="file-input-icon">⚙️</div>
+                    <div class="file-input-text">
+                        点击或拖拽 <strong>rules.json</strong> 到此处
+                    </div>
+                    <input type="file" id="rulesFileInput" accept=".json">
+                </div>
+                
+                <div class="file-input-wrapper" id="pickPlaceDropZone">
+                    <div class="file-input-icon">📍</div>
+                    <div class="file-input-text">
+                        点击或拖拽 <strong>pick-place.csv</strong> 到此处（可选）
+                    </div>
+                    <input type="file" id="pickPlaceFileInput" accept=".csv">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelImport">取消</button>
+                <button class="btn btn-primary" id="confirmImport">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出报告模态框 -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">导出报告</div>
+                <button class="modal-close" id="closeExportModal">×</button>
+            </div>
+            <div class="modal-content">
+                <div style="margin-bottom: 16px;">
+                    <div style="margin-bottom: 8px; font-size: 13px; color: #858585;">选择版本</div>
+                    <select id="exportVersionSelect" class="rule-param-input" style="width: 100%; margin-bottom: 16px;">
+                        <option value="">请选择版本</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="margin-bottom: 8px; font-size: 13px; color: #858585;">导出格式</div>
+                    <div style="display: flex; gap: 12px;">
+                        <label class="toggle-btn" style="flex: 1; padding: 12px; border: 1px solid #3c3c3c; border-radius: 4px; text-align: center;">
+                            <input type="radio" name="exportFormat" value="json" checked>
+                            JSON
+                        </label>
+                        <label class="toggle-btn" style="flex: 1; padding: 12px; border: 1px solid #3c3c3c; border-radius: 4px; text-align: center;">
+                            <input type="radio" name="exportFormat" value="markdown">
+                            Markdown
+                        </label>
+                        <label class="toggle-btn" style="flex: 1; padding: 12px; border: 1px solid #3c3c3c; border-radius: 4px; text-align: center;">
+                            <input type="radio" name="exportFormat" value="html">
+                            HTML
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelExport">取消</button>
+                <button class="btn btn-primary" id="confirmExport">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 版本对比模态框 -->
+    <div class="modal-overlay" id="compareModal">
+        <div class="modal" style="min-width: 700px;">
+            <div class="modal-header">
+                <div class="modal-title">版本对比</div>
+                <button class="modal-close" id="closeCompareModal">×</button>
+            </div>
+            <div class="modal-content">
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 8px; font-size: 13px; color: #858585;">版本 1</div>
+                        <select id="compareVersion1" class="rule-param-input" style="width: 100%;">
+                            <option value="">选择版本</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="margin-bottom: 8px; font-size: 13px; color: #858585;">版本 2</div>
+                        <select id="compareVersion2" class="rule-param-input" style="width: 100%;">
+                            <option value="">选择版本</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="runCompare" style="width: 100%; margin-bottom: 16px;">运行对比</button>
+                <div id="compareResults" style="max-height: 300px; overflow-y: auto;">
+                    <div class="empty-state" style="height: 150px;">
+                        <div>选择两个版本进行对比</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancelCompare">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        let state = {
+            pcbData: null,
+            bomData: null,
+            rulesData: null,
+            versions: [],
+            currentVersionId: null,
+            selectedIssueId: null,
+            issues: [],
+            zoom: 1,
+            panX: 0,
+            panY: 0,
+            isPanning: false,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            boardMinX: 0,
+            boardMinY: 0,
+            boardMaxX: 100,
+            boardMaxY: 100,
+            layers: {
+                top: true,
+                bottom: false
+            },
+            visibility: {
+                components: true,
+                pads: true,
+                vias: true,
+                tracks: true,
+                silkScreen: true
+            }
+        };
+
+        const canvas = document.getElementById('pcbCanvas');
+        const ctx = canvas.getContext('2d');
+        const coordinatesDisplay = document.getElementById('coordinatesDisplay');
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            renderBoard();
+        }
+
+        function coordToCanvas(x, y) {
+            const scale = state.zoom * Math.min(canvas.width / (state.boardMaxX - state.boardMinX + 20), 
+                                              canvas.height / (state.boardMaxY - state.boardMinY + 20));
+            return {
+                x: (x - state.boardMinX) * scale + state.panX + 20,
+                y: canvas.height - (y - state.boardMinY) * scale + state.panY - 20
+            };
+        }
+
+        function canvasToCoord(canvasX, canvasY) {
+            const scale = state.zoom * Math.min(canvas.width / (state.boardMaxX - state.boardMinX + 20), 
+                                              canvas.height / (state.boardMaxY - state.boardMinY + 20));
+            return {
+                x: (canvasX - state.panX - 20) / scale + state.boardMinX,
+                y: state.boardMaxY - (canvasY - state.panY - 20) / scale + state.boardMinY
+            };
+        }
+
+        function getScale() {
+            return state.zoom * Math.min(canvas.width / (state.boardMaxX - state.boardMinX + 20), 
+                                        canvas.height / (state.boardMaxY - state.boardMinY + 20));
+        }
+
+        function renderBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (!state.pcbData) {
+                ctx.fillStyle = '#2d2d30';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#858585';
+                ctx.fillText('导入板数据以查看PCB', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            const board = state.pcbData.board_outline;
+            state.boardMinX = board.origin_x;
+            state.boardMinY = board.origin_y;
+            state.boardMaxX = board.origin_x + board.width;
+            state.boardMaxY = board.origin_y + board.height;
+
+            ctx.fillStyle = '#1e3a1e';
+            const topLeft = coordToCanvas(state.boardMinX, state.boardMaxY);
+            const bottomRight = coordToCanvas(state.boardMaxX, state.boardMinY);
+            ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+
+            ctx.strokeStyle = '#4ec9b0';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+
+            if (state.visibility.tracks) {
+                drawTracks();
+            }
+
+            if (state.visibility.pads) {
+                drawPads();
+            }
+
+            if (state.visibility.vias) {
+                drawVias();
+            }
+
+            if (state.visibility.components) {
+                drawComponents();
+            }
+
+            if (state.visibility.silkScreen) {
+                drawSilkScreen();
+            }
+
+            drawHighlightedIssue();
+            drawKeepoutZones();
+        }
+
+        function drawTracks() {
+            const tracks = state.pcbData.tracks || [];
+            
+            tracks.forEach(track => {
+                if (track.layer === 'top' && !state.layers.top) return;
+                if (track.layer === 'bottom' && !state.layers.bottom) return;
+
+                const start = coordToCanvas(track.start_x, track.start_y);
+                const end = coordToCanvas(track.end_x, track.end_y);
+                const scale = getScale();
+                const width = track.width * scale;
+
+                ctx.beginPath();
+                ctx.moveTo(start.x, start.y);
+                ctx.lineTo(end.x, end.y);
+                
+                ctx.lineWidth = Math.max(width, 1);
+                ctx.strokeStyle = track.layer === 'top' ? '#cc8800' : '#cc6666';
+                ctx.stroke();
+
+                if (state.pcbData.critical_nets && state.pcbData.critical_nets.includes(track.net_name)) {
+                    ctx.strokeStyle = '#ff0000';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([4, 4]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            });
+        }
+
+        function drawPads() {
+            const pads = state.pcbData.pads || [];
+            
+            pads.forEach(pad => {
+                if (pad.layer === 'top' && !state.layers.top) return;
+                if (pad.layer === 'bottom' && !state.layers.bottom) return;
+
+                const pos = coordToCanvas(pad.x, pad.y);
+                const scale = getScale();
+                const w = pad.width * scale;
+                const h = pad.height * scale;
+
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.rotate(-pad.rotation * Math.PI / 180);
+
+                ctx.fillStyle = pad.layer === 'top' ? '#ffcc00' : '#ff8888';
+                
+                if (pad.shape === 'circle' || pad.radius) {
+                    const r = (pad.radius || Math.min(pad.width, pad.height) / 2) * scale;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(-w/2, -h/2, w, h);
+                }
+
+                ctx.restore();
+            });
+        }
+
+        function drawVias() {
+            const vias = state.pcbData.vias || [];
+            
+            vias.forEach(via => {
+                const pos = coordToCanvas(via.x, via.y);
+                const scale = getScale();
+                
+                const padR = via.pad_diameter / 2 * scale;
+                const drillR = via.drill_diameter / 2 * scale;
+
+                ctx.fillStyle = '#888888';
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, padR, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#1e3a1e';
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, drillR, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#666666';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, drillR, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+
+        function drawComponents() {
+            const components = state.pcbData.components || [];
+            
+            components.forEach(comp => {
+                if (comp.layer === 'top' && !state.layers.top) return;
+                if (comp.layer === 'bottom' && !state.layers.bottom) return;
+
+                const pos = coordToCanvas(comp.x, comp.y);
+                const scale = getScale();
+
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.rotate(-comp.rotation * Math.PI / 180);
+
+                const compWidth = (comp.pads && comp.pads.length > 0) ? 
+                    Math.max(...comp.pads.map(p => p.x + p.width/2)) - Math.min(...comp.pads.map(p => p.x - p.width/2)) + 2 : 4;
+                const compHeight = (comp.pads && comp.pads.length > 0) ? 
+                    Math.max(...comp.pads.map(p => p.y + p.height/2)) - Math.min(...comp.pads.map(p => p.y - p.height/2)) + 2 : 2;
+
+                ctx.fillStyle = comp.layer === 'top' ? 'rgba(100, 100, 150, 0.5)' : 'rgba(150, 100, 100, 0.5)';
+                ctx.fillRect(-compWidth/2 * scale, -compHeight/2 * scale, compWidth * scale, compHeight * scale);
+
+                ctx.strokeStyle = comp.layer === 'top' ? '#6688cc' : '#cc6666';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(-compWidth/2 * scale, -compHeight/2 * scale, compWidth * scale, compHeight * scale);
+
+                if (comp.is_polar) {
+                    ctx.fillStyle = '#ff4444';
+                    ctx.beginPath();
+                    ctx.arc(-compWidth/2 * scale + 5, 0, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `${Math.max(10, scale * 0.8)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText(comp.reference, 0, 4);
+
+                ctx.restore();
+            });
+        }
+
+        function drawSilkScreen() {
+            const silkItems = state.pcbData.silk_screen || [];
+            
+            silkItems.forEach(item => {
+                if (item.layer === 'top' && !state.layers.top) return;
+                if (item.layer === 'bottom' && !state.layers.bottom) return;
+
+                const pos = coordToCanvas(item.x, item.y);
+                const scale = getScale();
+
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.rotate(-item.rotation * Math.PI / 180);
+
+                ctx.fillStyle = '#f0e68c';
+                ctx.font = `${Math.max(8, scale * 0.6)}px sans-serif`;
+                ctx.textAlign = 'center';
+                
+                if (item.text) {
+                    ctx.fillText(item.text, 0, 3);
+                } else if (item.width && item.height) {
+                    ctx.strokeStyle = '#f0e68c';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(-item.width/2 * scale, -item.height/2 * scale, item.width * scale, item.height * scale);
+                }
+
+                ctx.restore();
+            });
+        }
+
+        function drawKeepoutZones() {
+            const keepouts = (state.pcbData.keepout_zones || []).concat(
+                state.pcbData.board_outline.keepout_zones || []
+            );
+            
+            keepouts.forEach(zone => {
+                if (!zone.x || !zone.y || !zone.width || !zone.height) return;
+
+                const topLeft = coordToCanvas(zone.x, zone.y + zone.height);
+                const scale = getScale();
+                const w = zone.width * scale;
+                const h = zone.height * scale;
+
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                ctx.fillRect(topLeft.x, topLeft.y, w, h);
+
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(topLeft.x, topLeft.y, w, h);
+                ctx.setLineDash([]);
+            });
+        }
+
+        function drawHighlightedIssue() {
+            if (!state.selectedIssueId) return;
+
+            const issue = state.issues.find(i => i.id === state.selectedIssueId);
+            if (!issue || !issue.location) return;
+
+            const loc = issue.location;
+            if (loc.x !== undefined && loc.y !== undefined) {
+                const pos = coordToCanvas(loc.x, loc.y);
+                const scale = getScale();
+
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 20 * scale, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(pos.x - 10 * scale, pos.y);
+                ctx.lineTo(pos.x + 10 * scale, pos.y);
+                ctx.moveTo(pos.x, pos.y - 10 * scale);
+                ctx.lineTo(pos.x, pos.y + 10 * scale);
+                ctx.stroke();
+            }
+        }
+
+        async function loadDefaultRules() {
+            try {
+                const response = await fetch(`${API_BASE}/data/rules`);
+                if (response.ok) {
+                    state.rulesData = await response.json();
+                    renderRulesList();
+                }
+            } catch (e) {
+                console.log('使用默认规则');
+            }
+        }
+
+        function renderRulesList() {
+            if (!state.rulesData || !state.rulesData.rules) {
+                document.getElementById('rulesEmpty').style.display = 'flex';
+                document.getElementById('rulesList').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('rulesEmpty').style.display = 'none';
+            document.getElementById('rulesList').style.display = 'block';
+
+            const rulesList = document.getElementById('rulesList');
+            rulesList.innerHTML = '';
+
+            state.rulesData.rules.forEach(rule => {
+                const severityClass = `severity-${rule.severity}`;
+                const isEnabled = rule.enabled;
+                
+                const ruleEl = document.createElement('div');
+                ruleEl.className = 'rule-item';
+                ruleEl.innerHTML = `
+                    <div class="rule-header">
+                        <input type="checkbox" class="rule-enabled" data-rule-id="${rule.id}" ${isEnabled ? 'checked' : ''}>
+                        <div class="rule-severity ${severityClass}"></div>
+                        <div class="rule-name">${rule.name}</div>
+                        <div class="rule-category">${rule.category}</div>
+                    </div>
+                    <div class="rule-details">
+                        <div class="rule-description">${rule.description}</div>
+                        <div class="rule-param">
+                            <span class="rule-param-label">严重程度</span>
+                            <span style="text-transform: uppercase; font-weight: 600;" class="${severityClass}">${rule.severity}</span>
+                        </div>
+                        ${Object.entries(rule.parameters || {}).map(([key, value]) => `
+                            <div class="rule-param">
+                                <span class="rule-param-label">${key}</span>
+                                <input type="number" class="rule-param-input" data-rule-id="${rule.id}" data-param="${key}" value="${value}" step="0.01">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                const header = ruleEl.querySelector('.rule-header');
+                header.addEventListener('click', (e) => {
+                    if (e.target.type === 'checkbox' || e.target.tagName === 'INPUT') return;
+                    ruleEl.classList.toggle('expanded');
+                });
+
+                const enabledCheckbox = ruleEl.querySelector('.rule-enabled');
+                enabledCheckbox.addEventListener('change', (e) => {
+                    updateRule(rule.id, { enabled: e.target.checked });
+                });
+
+                const paramInputs = ruleEl.querySelectorAll('.rule-param-input');
+                paramInputs.forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const param = e.target.dataset.param;
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value)) {
+                            updateRuleParameter(rule.id, param, value);
+                        }
+                    });
+                });
+
+                rulesList.appendChild(ruleEl);
+            });
+        }
+
+        async function updateRule(ruleId, updates) {
+            if (!state.rulesData) return;
+            
+            const rule = state.rulesData.rules.find(r => r.id === ruleId);
+            if (rule) {
+                Object.assign(rule, updates);
+            }
+
+            try {
+                await fetch(`${API_BASE}/data/rules/${ruleId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(rule)
+                });
+            } catch (e) {
+                console.error('更新规则失败:', e);
+            }
+        }
+
+        async function updateRuleParameter(ruleId, param, value) {
+            if (!state.rulesData) return;
+            
+            const rule = state.rulesData.rules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.parameters[param] = value;
+            }
+
+            try {
+                await fetch(`${API_BASE}/data/rules/${ruleId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(rule)
+                });
+            } catch (e) {
+                console.error('更新规则参数失败:', e);
+            }
+        }
+
+        function renderIssueList() {
+            const issueList = document.getElementById('issueList');
+            
+            if (state.issues.length === 0) {
+                issueList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>暂无问题</div>
+                        <div style="margin-top: 4px; font-size: 11px;">运行检查以查看问题</div>
+                    </div>
+                `;
+                return;
+            }
+
+            issueList.innerHTML = '';
+            
+            const sortedIssues = [...state.issues].sort((a, b) => {
+                const severityOrder = { critical: 0, warning: 1, info: 2 };
+                return severityOrder[a.severity] - severityOrder[b.severity];
+            });
+
+            sortedIssues.forEach(issue => {
+                const severityClass = `severity-${issue.severity}`;
+                const statusClass = `status-${issue.status}`;
+                
+                const issueEl = document.createElement('div');
+                issueEl.className = `issue-item ${state.selectedIssueId === issue.id ? 'selected' : ''}`;
+                issueEl.dataset.issueId = issue.id;
+                
+                issueEl.innerHTML = `
+                    <div class="issue-header">
+                        <div class="severity-badge ${severityClass}"></div>
+                        <div class="issue-title">${issue.title}</div>
+                        <div class="issue-id">${issue.id}</div>
+                    </div>
+                    <div class="issue-details">
+                        <div class="issue-detail-row">
+                            <div class="issue-detail-label">描述</div>
+                            <div>${issue.description}</div>
+                        </div>
+                        <div class="issue-detail-row">
+                            <div class="issue-detail-label">建议</div>
+                            <div>${issue.suggestion}</div>
+                        </div>
+                        <div class="issue-detail-row">
+                            <div class="issue-detail-label">位置</div>
+                            <div>
+                                ${issue.location.x !== undefined ? `X: ${issue.location.x.toFixed(2)}mm, Y: ${issue.location.y.toFixed(2)}mm` : ''}
+                                ${issue.location.layer ? ` | 层: ${issue.location.layer}` : ''}
+                                ${issue.location.reference ? ` | 器件: ${issue.location.reference}` : ''}
+                            </div>
+                        </div>
+                        <div class="issue-detail-row">
+                            <div class="issue-detail-label">状态</div>
+                            <div>
+                                <select class="status-select" data-issue-id="${issue.id}">
+                                    <option value="open" ${issue.status === 'open' ? 'selected' : ''}>未处理</option>
+                                    <option value="confirmed" ${issue.status === 'confirmed' ? 'selected' : ''}>已确认</option>
+                                    <option value="false_positive" ${issue.status === 'false_positive' ? 'selected' : ''}>误报</option>
+                                    <option value="resolved" ${issue.status === 'resolved' ? 'selected' : ''}>已解决</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                issueEl.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'SELECT') return;
+                    
+                    document.querySelectorAll('.issue-item').forEach(el => el.classList.remove('selected'));
+                    issueEl.classList.add('selected');
+                    issueEl.classList.toggle('expanded');
+                    
+                    state.selectedIssueId = issue.id;
+                    renderBoard();
+                });
+
+                const statusSelect = issueEl.querySelector('.status-select');
+                statusSelect.addEventListener('change', (e) => {
+                    updateIssueStatus(issue.id, e.target.value);
+                });
+
+                issueList.appendChild(issueEl);
+            });
+
+            updateStats();
+        }
+
+        async function updateIssueStatus(issueId, status) {
+            if (!state.currentVersionId) return;
+
+            const issue = state.issues.find(i => i.id === issueId);
+            if (issue) {
+                issue.status = status;
+            }
+
+            try {
+                await fetch(`${API_BASE}/check/results/${state.currentVersionId}/issues/${issueId}?status=${status}`, {
+                    method: 'PUT'
+                });
+            } catch (e) {
+                console.error('更新问题状态失败:', e);
+            }
+
+            updateStats();
+        }
+
+        function updateStats() {
+            const stats = {
+                total: state.issues.length,
+                critical: state.issues.filter(i => i.severity === 'critical').length,
+                warning: state.issues.filter(i => i.severity === 'warning').length,
+                info: state.issues.filter(i => i.severity === 'info').length
+            };
+
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statCritical').textContent = stats.critical;
+            document.getElementById('statWarning').textContent = stats.warning;
+            document.getElementById('statInfo').textContent = stats.info;
+        }
+
+        async function uploadFile(file, type) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const endpoints = {
+                board: '/import/board',
+                bom: '/import/bom',
+                rules: '/import/rules',
+                pick_place: '/import/pick-place'
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoints[type]}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || '上传失败');
+                }
+            } catch (e) {
+                throw e;
+            }
+        }
+
+        async function runCheck() {
+            if (!state.pcbData) {
+                alert('请先导入板数据');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/check/run`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    state.currentVersionId = result.version_id;
+                    state.issues = result.data.issues;
+                    renderIssueList();
+                    await loadVersions();
+                    return result;
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || '检查失败');
+                }
+            } catch (e) {
+                alert('检查失败: ' + e.message);
+            }
+        }
+
+        async function loadVersions() {
+            try {
+                const response = await fetch(`${API_BASE}/check/results`);
+                if (response.ok) {
+                    const data = await response.json();
+                    state.versions = data.versions || [];
+                    renderVersionsList();
+                    updateExportSelects();
+                }
+            } catch (e) {
+                console.error('加载版本失败:', e);
+            }
+        }
+
+        function renderVersionsList() {
+            const versionsTab = document.getElementById('versionsTab');
+            
+            if (state.versions.length === 0) {
+                versionsTab.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📜</div>
+                        <div>暂无版本</div>
+                        <div style="margin-top: 4px; font-size: 11px;">运行检查以创建版本</div>
+                    </div>
+                `;
+                return;
+            }
+
+            versionsTab.innerHTML = '';
+            
+            const sortedVersions = [...state.versions].sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+
+            sortedVersions.forEach(version => {
+                const versionEl = document.createElement('div');
+                versionEl.className = `version-item ${state.currentVersionId === version.version_id ? 'selected' : ''}`;
+                
+                const time = new Date(version.timestamp);
+                const timeStr = time.toLocaleString('zh-CN');
+
+                versionEl.innerHTML = `
+                    <div class="version-header">
+                        <div class="version-id">${version.version_id}</div>
+                        <div class="version-time">${timeStr}</div>
+                    </div>
+                    <div class="version-stats">
+                        <div class="version-stat">
+                            <span class="severity-badge severity-critical"></span>
+                            ${version.critical_count}
+                        </div>
+                        <div class="version-stat">
+                            <span class="severity-badge severity-warning"></span>
+                            ${version.warning_count}
+                        </div>
+                        <div class="version-stat">
+                            <span class="severity-badge severity-info"></span>
+                            ${version.info_count}
+                        </div>
+                        <div class="version-stat">
+                            总计: ${version.issue_count}
+                        </div>
+                    </div>
+                `;
+
+                versionEl.addEventListener('click', async () => {
+                    await loadVersion(version.version_id);
+                });
+
+                versionsTab.appendChild(versionEl);
+            });
+        }
+
+        async function loadVersion(versionId) {
+            try {
+                const response = await fetch(`${API_BASE}/check/results/${versionId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    state.currentVersionId = versionId;
+                    state.issues = result.issues || [];
+                    renderIssueList();
+                    renderVersionsList();
+                }
+            } catch (e) {
+                console.error('加载版本失败:', e);
+            }
+        }
+
+        function updateExportSelects() {
+            const exportSelect = document.getElementById('exportVersionSelect');
+            const compareSelect1 = document.getElementById('compareVersion1');
+            const compareSelect2 = document.getElementById('compareVersion2');
+
+            [exportSelect, compareSelect1, compareSelect2].forEach(select => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">选择版本</option>';
+                
+                state.versions.forEach(v => {
+                    const option = document.createElement('option');
+                    option.value = v.version_id;
+                    option.textContent = `${v.version_id} (${new Date(v.timestamp).toLocaleString('zh-CN')}) - ${v.issue_count} 个问题`;
+                    select.appendChild(option);
+                });
+
+                if (currentValue) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        async function exportReport(versionId, format) {
+            try {
+                const response = await fetch(`${API_BASE}/export/${versionId}/${format}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    if (format === 'json') {
+                        const data = await response.json();
+                        downloadFile(JSON.stringify(data, null, 2), `report_${versionId}.json`, 'application/json');
+                    } else {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `report_${versionId}.${format === 'markdown' ? 'md' : 'html'}`;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    }
+                }
+            } catch (e) {
+                alert('导出失败: ' + e.message);
+            }
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        async function compareVersions(v1, v2) {
+            try {
+                const response = await fetch(`${API_BASE}/compare/${v1}/${v2}`);
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (e) {
+                console.error('对比失败:', e);
+            }
+            return null;
+        }
+
+        function initEventListeners() {
+            window.addEventListener('resize', resizeCanvas);
+
+            document.getElementById('toggleTopLayer').addEventListener('change', (e) => {
+                state.layers.top = e.target.checked;
+                renderBoard();
+            });
+
+            document.getElementById('toggleBottomLayer').addEventListener('change', (e) => {
+                state.layers.bottom = e.target.checked;
+                renderBoard();
+            });
+
+            ['toggleComponents', 'togglePads', 'toggleVias', 'toggleTracks', 'toggleSilkScreen'].forEach(id => {
+                document.getElementById(id).addEventListener('change', (e) => {
+                    const key = id.replace('toggle', '').charAt(0).toLowerCase() + id.replace('toggle', '').slice(1);
+                    state.visibility[key] = e.target.checked;
+                    renderBoard();
+                });
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const coord = canvasToCoord(x, y);
+                coordinatesDisplay.textContent = `X: ${coord.x.toFixed(2)}, Y: ${coord.y.toFixed(2)} mm`;
+
+                if (state.isPanning) {
+                    state.panX += x - state.lastMouseX;
+                    state.panY += y - state.lastMouseY;
+                    state.lastMouseX = x;
+                    state.lastMouseY = y;
+                    renderBoard();
+                }
+            });
+
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 1 || e.button === 2) {
+                    state.isPanning = true;
+                    state.lastMouseX = e.clientX - canvas.getBoundingClientRect().left;
+                    state.lastMouseY = e.clientY - canvas.getBoundingClientRect().top;
+                    e.preventDefault();
+                }
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                state.isPanning = false;
+            });
+
+            canvas.addEventListener('mouseleave', () => {
+                state.isPanning = false;
+            });
+
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                state.zoom *= delta;
+                state.zoom = Math.max(0.1, Math.min(10, state.zoom));
+                renderBoard();
+            });
+
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                state.zoom *= 1.2;
+                state.zoom = Math.min(10, state.zoom);
+                renderBoard();
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                state.zoom *= 0.8;
+                state.zoom = Math.max(0.1, state.zoom);
+                renderBoard();
+            });
+
+            document.getElementById('zoomFit').addEventListener('click', () => {
+                state.zoom = 1;
+                state.panX = 0;
+                state.panY = 0;
+                renderBoard();
+            });
+
+            document.getElementById('btnImport').addEventListener('click', () => {
+                document.getElementById('importModal').classList.add('active');
+            });
+
+            document.getElementById('closeImportModal').addEventListener('click', () => {
+                document.getElementById('importModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelImport').addEventListener('click', () => {
+                document.getElementById('importModal').classList.remove('active');
+            });
+
+            document.getElementById('btnCheck').addEventListener('click', async () => {
+                await runCheck();
+            });
+
+            document.getElementById('confirmImport').addEventListener('click', async () => {
+                document.getElementById('importModal').classList.remove('active');
+            });
+
+            document.getElementById('boardDropZone').addEventListener('click', () => {
+                document.getElementById('boardFileInput').click();
+            });
+
+            document.getElementById('bomDropZone').addEventListener('click', () => {
+                document.getElementById('bomFileInput').click();
+            });
+
+            document.getElementById('rulesDropZone').addEventListener('click', () => {
+                document.getElementById('rulesFileInput').click();
+            });
+
+            document.getElementById('pickPlaceDropZone').addEventListener('click', () => {
+                document.getElementById('pickPlaceFileInput').click();
+            });
+
+            document.getElementById('boardFileInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const result = await uploadFile(file, 'board');
+                        state.pcbData = result.data;
+                        renderBoard();
+                        alert('板数据导入成功');
+                    } catch (err) {
+                        alert('导入失败: ' + err.message);
+                    }
+                }
+            });
+
+            document.getElementById('bomFileInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        await uploadFile(file, 'bom');
+                        alert('BOM导入成功');
+                    } catch (err) {
+                        alert('导入失败: ' + err.message);
+                    }
+                }
+            });
+
+            document.getElementById('rulesFileInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const result = await uploadFile(file, 'rules');
+                        state.rulesData = result.data;
+                        renderRulesList();
+                        alert('规则导入成功');
+                    } catch (err) {
+                        alert('导入失败: ' + err.message);
+                    }
+                }
+            });
+
+            document.getElementById('pickPlaceFileInput').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        await uploadFile(file, 'pick_place');
+                        alert('贴片数据导入成功');
+                    } catch (err) {
+                        alert('导入失败: ' + err.message);
+                    }
+                }
+            });
+
+            document.getElementById('btnExport').addEventListener('click', () => {
+                if (state.versions.length === 0) {
+                    alert('请先运行检查创建版本');
+                    return;
+                }
+                document.getElementById('exportModal').classList.add('active');
+            });
+
+            document.getElementById('closeExportModal').addEventListener('click', () => {
+                document.getElementById('exportModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelExport').addEventListener('click', () => {
+                document.getElementById('exportModal').classList.remove('active');
+            });
+
+            document.getElementById('confirmExport').addEventListener('click', async () => {
+                const versionId = document.getElementById('exportVersionSelect').value;
+                if (!versionId) {
+                    alert('请选择版本');
+                    return;
+                }
+                const formatRadio = document.querySelector('input[name="exportFormat"]:checked');
+                const format = formatRadio ? formatRadio.value : 'json';
+                
+                await exportReport(versionId, format);
+                document.getElementById('exportModal').classList.remove('active');
+            });
+
+            document.getElementById('btnCompare').addEventListener('click', () => {
+                if (state.versions.length < 2) {
+                    alert('需要至少两个版本才能对比');
+                    return;
+                }
+                document.getElementById('compareModal').classList.add('active');
+            });
+
+            document.getElementById('closeCompareModal').addEventListener('click', () => {
+                document.getElementById('compareModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelCompare').addEventListener('click', () => {
+                document.getElementById('compareModal').classList.remove('active');
+            });
+
+            document.getElementById('runCompare').addEventListener('click', async () => {
+                const v1 = document.getElementById('compareVersion1').value;
+                const v2 = document.getElementById('compareVersion2').value;
+                
+                if (!v1 || !v2) {
+                    alert('请选择两个版本');
+                    return;
+                }
+                
+                if (v1 === v2) {
+                    alert('请选择不同的版本');
+                    return;
+                }
+
+                const result = await compareVersions(v1, v2);
+                if (result) {
+                    const compareResults = document.getElementById('compareResults');
+                    compareResults.innerHTML = `
+                        <div style="margin-bottom: 16px;">
+                            <h4 style="margin-bottom: 8px; color: #007acc;">对比结果</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div style="background: #2d2d30; padding: 12px; border-radius: 4px;">
+                                    <div style="font-size: 12px; color: #858585; margin-bottom: 4px;">版本 ${v1}</div>
+                                    <div>问题数: ${result.version1_stats.total}</div>
+                                    <div>严重: ${result.version1_stats.critical}</div>
+                                    <div>警告: ${result.version1_stats.warning}</div>
+                                </div>
+                                <div style="background: #2d2d30; padding: 12px; border-radius: 4px;">
+                                    <div style="font-size: 12px; color: #858585; margin-bottom: 4px;">版本 ${v2}</div>
+                                    <div>问题数: ${result.version2_stats.total}</div>
+                                    <div>严重: ${result.version2_stats.critical}</div>
+                                    <div>警告: ${result.version2_stats.warning}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <h4 style="margin-bottom: 8px;">变化</h4>
+                            <div ${result.differences.total_change > 0 ? 'class="diff-added"' : 'class="diff-removed"'} style="padding: 8px; margin-bottom: 4px; border-radius: 3px;">
+                                总问题数: ${result.differences.total_change > 0 ? '+' : ''}${result.differences.total_change}
+                            </div>
+                            <div ${result.differences.critical_change > 0 ? 'class="diff-added"' : 'class="diff-removed"'} style="padding: 8px; margin-bottom: 4px; border-radius: 3px;">
+                                严重问题: ${result.differences.critical_change > 0 ? '+' : ''}${result.differences.critical_change}
+                            </div>
+                            <div ${result.differences.warning_change > 0 ? 'class="diff-added"' : 'class="diff-removed"'} style="padding: 8px; margin-bottom: 4px; border-radius: 3px;">
+                                警告问题: ${result.differences.warning_change > 0 ? '+' : ''}${result.differences.warning_change}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const tabName = tab.dataset.tab;
+                    document.getElementById('rulesTab').style.display = tabName === 'rules' ? 'block' : 'none';
+                    document.getElementById('versionsTab').style.display = tabName === 'versions' ? 'block' : 'none';
+                });
+            });
+
+            ['boardDropZone', 'bomDropZone', 'rulesDropZone', 'pickPlaceDropZone'].forEach(id => {
+                const zone = document.getElementById(id);
+                
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('dragover');
+                });
+                
+                zone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                });
+                
+                zone.addEventListener('drop', async (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                    
+                    const file = e.dataTransfer.files[0];
+                    if (!file) return;
+                    
+                    const typeMap = {
+                        'boardDropZone': 'board',
+                        'bomDropZone': 'bom',
+                        'rulesDropZone': 'rules',
+                        'pickPlaceDropZone': 'pick_place'
+                    };
+                    
+                    try {
+                        const result = await uploadFile(file, typeMap[id]);
+                        
+                        if (typeMap[id] === 'board') {
+                            state.pcbData = result.data;
+                            renderBoard();
+                        } else if (typeMap[id] === 'rules') {
+                            state.rulesData = result.data;
+                            renderRulesList();
+                        }
+                        
+                        alert('导入成功');
+                    } catch (err) {
+                        alert('导入失败: ' + err.message);
+                    }
+                });
+            });
+        }
+
+        function init() {
+            resizeCanvas();
+            initEventListeners();
+            loadVersions();
+            
+            state.rulesData = {
+                name: "Default PCB Rules",
+                version: "1.0",
+                description: "默认PCB设计规则集",
+                rules: [
+                    {
+                        id: "trace_width",
+                        name: "走线宽度检查",
+                        category: "electrical",
+                        description: "检查走线宽度是否符合最小要求",
+                        severity: "critical",
+                        enabled: true,
+                        parameters: { min_width: 0.15, critical_nets: {} }
+                    },
+                    {
+                        id: "clearance",
+                        name: "间距检查",
+                        category: "electrical",
+                        description: "检查走线、焊盘、过孔之间的间距",
+                        severity: "critical",
+                        enabled: true,
+                        parameters: { min_clearance: 0.15, pad_to_pad: 0.2, pad_to_trace: 0.15, trace_to_trace: 0.15, via_to_any: 0.15 }
+                    },
+                    {
+                        id: "via_size",
+                        name: "过孔尺寸检查",
+                        category: "manufacturing",
+                        description: "检查过孔钻孔直径和环形焊盘宽度",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { min_drill: 0.3, max_drill: 6.0, min_annular_ring: 0.15 }
+                    },
+                    {
+                        id: "component_to_edge",
+                        name: "器件到板边距离检查",
+                        category: "assembly",
+                        description: "检查器件与板边的最小距离",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { min_distance: 2.0, connectors_extra: 3.0 }
+                    },
+                    {
+                        id: "silkscreen_over_pad",
+                        name: "丝印压焊盘检查",
+                        category: "manufacturing",
+                        description: "检查丝印是否覆盖焊盘",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { min_clearance: 0.1 }
+                    },
+                    {
+                        id: "bom_availability",
+                        name: "BOM缺料检查",
+                        category: "bom",
+                        description: "检查BOM中的器件是否可用",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { require_alternate: false, critical_components: [] }
+                    },
+                    {
+                        id: "footprint_match",
+                        name: "封装匹配检查",
+                        category: "bom",
+                        description: "检查PCB封装与BOM封装是否一致",
+                        severity: "critical",
+                        enabled: true,
+                        parameters: {}
+                    },
+                    {
+                        id: "polarity_direction",
+                        name: "极性器件方向检查",
+                        category: "assembly",
+                        description: "检查极性器件的旋转角度是否规范",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { allowed_rotations: [0, 90, 180, 270], check_diode_alignment: true }
+                    },
+                    {
+                        id: "connector_orientation",
+                        name: "连接器朝向检查",
+                        category: "assembly",
+                        description: "检查边缘连接器是否朝向外",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { edge_connectors_outward: true, pin1_location: "left" }
+                    },
+                    {
+                        id: "thermal_margin",
+                        name: "高功耗器件散热检查",
+                        category: "thermal",
+                        description: "检查高功耗器件的散热余量",
+                        severity: "warning",
+                        enabled: true,
+                        parameters: { high_power_threshold: 0.5, min_clearance: 1.0, thermal_vias_required: true, via_count_min: 4 }
+                    }
+                ]
+            };
+            renderRulesList();
+        }
+
+        init();
+    </script>
+</body>
+</html>
