@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装修材料核算工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-left">
+                <h1>装修材料核算工具</h1>
+                <span class="version">v1.0</span>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="import-btn">导入数据</button>
+                <button class="btn btn-secondary" id="export-btn">导出数据</button>
+                <button class="btn btn-primary" id="report-btn">生成报告</button>
+            </div>
+        </header>
+        
+        <nav class="nav-tabs">
+            <button class="tab active" data-tab="rooms">房间视角</button>
+            <button class="tab" data-tab="materials">材料视角</button>
+            <button class="tab" data-tab="risks">风险检测</button>
+        </nav>
+        
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <h3>筛选条件</h3>
+                    
+                    <div class="filter-item">
+                        <label>房间</label>
+                        <select id="room-filter" multiple>
+                            <option value="">全部房间</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label>材料类型</label>
+                        <select id="material-type-filter" multiple>
+                            <option value="">全部类型</option>
+                            <option value="瓷砖">瓷砖</option>
+                            <option value="地板">地板</option>
+                            <option value="乳胶漆">乳胶漆</option>
+                            <option value="踢脚线">踢脚线</option>
+                            <option value="胶水">胶水</option>
+                            <option value="辅料">辅料</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-item">
+                        <label>风险等级</label>
+                        <select id="risk-filter">
+                            <option value="">全部等级</option>
+                            <option value="high">高风险</option>
+                            <option value="medium">中风险</option>
+                            <option value="low">低风险</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="reset-filter-btn">重置筛选</button>
+                </div>
+                
+                <div class="data-section">
+                    <h3>数据管理</h3>
+                    <div class="data-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">房间数</span>
+                            <span class="stat-value" id="room-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">材料数</span>
+                            <span class="stat-value" id="material-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">采购记录</span>
+                            <span class="stat-value" id="purchase-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">变更记录</span>
+                            <span class="stat-value" id="change-count">0</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" id="load-sample-btn">加载示例数据</button>
+                    <button class="btn btn-danger" id="clear-data-btn">清空数据</button>
+                </div>
+            </aside>
+            
+            <main class="content">
+                <div class="tab-content active" id="rooms-content">
+                    <div class="content-header">
+                        <h2>房间视角</h2>
+                        <p>按房间查看材料用量和采购情况</p>
+                    </div>
+                    <div class="rooms-list" id="rooms-list">
+                        <div class="empty-state">
+                            <p>暂无数据，请先导入或加载示例数据</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="materials-content">
+                    <div class="content-header">
+                        <h2>材料视角</h2>
+                        <p>按材料查看用量、采购和库存情况</p>
+                    </div>
+                    <div class="materials-list" id="materials-list">
+                        <div class="empty-state">
+                            <p>暂无数据，请先导入或加载示例数据</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="risks-content">
+                    <div class="content-header">
+                        <h2>风险检测</h2>
+                        <p>自动检测材料采购和使用中的风险</p>
+                    </div>
+                    <div class="risks-stats" id="risks-stats">
+                        <div class="risk-stat high">
+                            <span class="risk-stat-label">高风险</span>
+                            <span class="risk-stat-value" id="high-risk-count">0</span>
+                        </div>
+                        <div class="risk-stat medium">
+                            <span class="risk-stat-label">中风险</span>
+                            <span class="risk-stat-value" id="medium-risk-count">0</span>
+                        </div>
+                        <div class="risk-stat low">
+                            <span class="risk-stat-label">低风险</span>
+                            <span class="risk-stat-value" id="low-risk-count">0</span>
+                        </div>
+                    </div>
+                    <div class="risks-list" id="risks-list">
+                        <div class="empty-state">
+                            <p>暂无数据，请先导入或加载示例数据</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">详情</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 动态内容 -->
+            </div>
+            <div class="modal-footer" id="modal-footer">
+                <button class="btn btn-secondary" id="modal-cancel">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toast-container"></div>
+    
+    <input type="file" id="file-input" accept=".csv,.json" style="display: none;">
+    <input type="file" id="multi-file-input" multiple accept=".csv,.json" style="display: none;">
+    
+    <script src="app.js"></script>
+</body>
+</html>

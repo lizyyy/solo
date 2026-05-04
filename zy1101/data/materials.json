@@ -1,0 +1,86 @@
+[
+    {
+        "id": "mat_1",
+        "name": "客厅地砖 800x800",
+        "type": "瓷砖",
+        "specification": "800mm×800mm",
+        "unitPrice": 128,
+        "unit": "㎡",
+        "lossRate": 8,
+        "coveragePerUnit": 0.64
+    },
+    {
+        "id": "mat_2",
+        "name": "卧室木地板",
+        "type": "地板",
+        "specification": "1218mm×198mm",
+        "unitPrice": 189,
+        "unit": "㎡",
+        "lossRate": 5,
+        "coveragePerUnit": 1
+    },
+    {
+        "id": "mat_3",
+        "name": "厨房墙砖 300x600",
+        "type": "瓷砖",
+        "specification": "300mm×600mm",
+        "unitPrice": 68,
+        "unit": "㎡",
+        "lossRate": 10,
+        "coveragePerUnit": 0.18
+    },
+    {
+        "id": "mat_4",
+        "name": "卫生间地砖 300x300",
+        "type": "瓷砖",
+        "specification": "300mm×300mm",
+        "unitPrice": 45,
+        "unit": "㎡",
+        "lossRate": 10,
+        "coveragePerUnit": 0.09
+    },
+    {
+        "id": "mat_5",
+        "name": "乳胶漆 白色",
+        "type": "乳胶漆",
+        "specification": "5L/桶",
+        "unitPrice": 399,
+        "unit": "桶",
+        "lossRate": 5,
+        "coverageArea": 35,
+        "hasExpiry": true,
+        "expiryDays": 730
+    },
+    {
+        "id": "mat_6",
+        "name": "实木踢脚线",
+        "type": "踢脚线",
+        "specification": "8cm高",
+        "unitPrice": 35,
+        "unit": "米",
+        "lossRate": 5,
+        "coveragePerUnit": 1
+    },
+    {
+        "id": "mat_7",
+        "name": "瓷砖背胶",
+        "type": "胶水",
+        "specification": "5kg/桶",
+        "unitPrice": 89,
+        "unit": "桶",
+        "hasExpiry": true,
+        "expiryDays": 180,
+        "isAdhesive": true
+    },
+    {
+        "id": "mat_8",
+        "name": "填缝剂",
+        "type": "辅料",
+        "specification": "2kg/袋",
+        "unitPrice": 28,
+        "unit": "袋",
+        "hasExpiry": true,
+        "expiryDays": 365,
+        "isAccessory": true
+    }
+]
