@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理赔顾问助手</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>理赔顾问助手</h1>
+            <nav>
+                <button id="btn-claims-list" class="nav-btn active">案件列表</button>
+                <button id="btn-risk-review" class="nav-btn">风险复核</button>
+                <button id="btn-missing-items" class="nav-btn">补件处理</button>
+            </nav>
+        </header>
+        
+        <main>
+            <!-- 案件列表页面 -->
+            <section id="claims-list" class="page active">
+                <div class="page-header">
+                    <h2>理赔案件列表</h2>
+                    <button id="btn-new-claim" class="btn-primary">新建案件</button>
+                </div>
+                
+                <div id="claims-container" class="claims-container">
+                    <!-- 案件列表将通过 JavaScript 动态生成 -->
+                </div>
+            </section>
+            
+            <!-- 风险复核页面 -->
+            <section id="risk-review" class="page">
+                <div class="page-header">
+                    <h2>风险复核</h2>
+                    <select id="risk-claim-select" class="form-control">
+                        <option value="">选择案件</option>
+                    </select>
+                </div>
+                
+                <div id="risk-checks-container" class="risk-checks-container">
+                    <p class="empty-message">请先选择一个案件查看风险检查结果</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="btn-run-risk-check" class="btn-primary" disabled>执行风险检查</button>
+                </div>
+            </section>
+            
+            <!-- 补件处理页面 -->
+            <section id="missing-items" class="page">
+                <div class="page-header">
+                    <h2>补件处理</h2>
+                    <select id="missing-claim-select" class="form-control">
+                        <option value="">选择案件</option>
+                    </select>
+                </div>
+                
+                <div id="missing-items-container" class="missing-items-container">
+                    <p class="empty-message">请先选择一个案件查看缺件清单</p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="btn-add-missing-item" class="btn-primary" disabled>添加缺件</button>
+                    <button id="btn-export-markdown" class="btn-secondary" disabled>导出补件清单</button>
+                    <button id="btn-export-json" class="btn-secondary" disabled>导出审计包</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- 新建案件模态框 -->
+    <div id="modal-new-claim" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建理赔案件</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-new-claim">
+                    <div class="form-group">
+                        <label for="new-case-number">案件编号 *</label>
+                        <input type="text" id="new-case-number" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-customer-name">客户姓名 *</label>
+                        <input type="text" id="new-customer-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-policy-number">保单号</label>
+                        <input type="text" id="new-policy-number" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">创建案件</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 案件详情模态框 -->
+    <div id="modal-claim-detail" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>案件详情</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-tabs">
+                    <button class="tab-btn active" data-tab="info">基本信息</button>
+                    <button class="tab-btn" data-tab="bills">票据列表</button>
+                    <button class="tab-btn" data-tab="import">导入数据</button>
+                    <button class="tab-btn" data-tab="notes">备注</button>
+                </div>
+                
+                <!-- 基本信息标签页 -->
+                <div id="tab-info" class="tab-content active">
+                    <form id="form-edit-claim">
+                        <div class="form-group">
+                            <label for="edit-case-number">案件编号</label>
+                            <input type="text" id="edit-case-number" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-customer-name">客户姓名</label>
+                            <input type="text" id="edit-customer-name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-policy-number">保单号</label>
+                            <input type="text" id="edit-policy-number" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-status">状态</label>
+                            <select id="edit-status" class="form-control">
+                                <option value="processing">处理中</option>
+                                <option value="pending">待补件</option>
+                                <option value="reviewing">审核中</option>
+                                <option value="completed">已完成</option>
+                                <option value="rejected">已拒赔</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn-primary">保存修改</button>
+                            <button type="button" id="btn-delete-claim" class="btn-danger">删除案件</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- 票据列表标签页 -->
+                <div id="tab-bills" class="tab-content">
+                    <div id="bills-container" class="bills-container">
+                        <p class="empty-message">暂无票据数据</p>
+                    </div>
+                </div>
+                
+                <!-- 导入数据标签页 -->
+                <div id="tab-import" class="tab-content">
+                    <div class="import-section">
+                        <h4>导入医院费用 CSV</h4>
+                        <p class="help-text">支持包含日期、金额、医院、科室、类型、发票号等字段的 CSV 文件</p>
+                        <form id="form-import-csv">
+                            <div class="form-group">
+                                <input type="file" id="import-csv-file" accept=".csv" class="form-control">
+                            </div>
+                            <button type="submit" class="btn-primary">导入 CSV</button>
+                        </form>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h4>导入保单条款 JSON</h4>
+                        <p class="help-text">支持包含保单名称、免赔额、等待期、生效日期等字段的 JSON 文件</p>
+                        <form id="form-import-policy">
+                            <div class="form-group">
+                                <input type="file" id="import-policy-file" accept=".json" class="form-control">
+                            </div>
+                            <button type="submit" class="btn-primary">导入保单</button>
+                        </form>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h4>导入材料照片</h4>
+                        <p class="help-text">支持上传诊断证明、发票等材料的照片</p>
+                        <form id="form-import-photos">
+                            <div class="form-group">
+                                <input type="file" id="import-photo-files" accept="image/*" multiple class="form-control">
+                            </div>
+                            <button type="submit" class="btn-primary">上传照片</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- 备注标签页 -->
+                <div id="tab-notes" class="tab-content">
+                    <form id="form-add-note">
+                        <div class="form-group">
+                            <label for="new-note-content">添加备注</label>
+                            <textarea id="new-note-content" class="form-control" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">添加备注</button>
+                    </form>
+                    
+                    <div id="notes-container" class="notes-container">
+                        <p class="empty-message">暂无备注</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加缺件模态框 -->
+    <div id="modal-add-missing-item" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加缺件</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-add-missing-item">
+                    <div class="form-group">
+                        <label for="new-item-type">缺件类型 *</label>
+                        <select id="new-item-type" class="form-control" required>
+                            <option value="诊断证明">诊断证明</option>
+                            <option value="发票">发票</option>
+                            <option value="费用清单">费用清单</option>
+                            <option value="病历">病历</option>
+                            <option value="检查报告">检查报告</option>
+                            <option value="身份证明">身份证明</option>
+                            <option value="银行账户">银行账户</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-item-description">描述 *</label>
+                        <input type="text" id="new-item-description" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-item-priority">优先级</label>
+                        <select id="new-item-priority" class="form-control">
+                            <option value="high">高</option>
+                            <option value="medium" selected>中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">添加缺件</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑缺件模态框 -->
+    <div id="modal-edit-missing-item" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑缺件</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-missing-item">
+                    <input type="hidden" id="edit-item-id">
+                    <div class="form-group">
+                        <label for="edit-item-type">缺件类型</label>
+                        <select id="edit-item-type" class="form-control">
+                            <option value="诊断证明">诊断证明</option>
+                            <option value="发票">发票</option>
+                            <option value="费用清单">费用清单</option>
+                            <option value="病历">病历</option>
+                            <option value="检查报告">检查报告</option>
+                            <option value="身份证明">身份证明</option>
+                            <option value="银行账户">银行账户</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-item-description">描述</label>
+                        <input type="text" id="edit-item-description" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-item-status">状态</label>
+                        <select id="edit-item-status" class="form-control">
+                            <option value="pending">待补充</option>
+                            <option value="resolved">已补充</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-item-priority">优先级</label>
+                        <select id="edit-item-priority" class="form-control">
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-item-notes">备注</label>
+                        <textarea id="edit-item-notes" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">保存修改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知消息 -->
+    <div id="notification" class="notification"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
