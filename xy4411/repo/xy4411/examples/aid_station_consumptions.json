@@ -1,0 +1,80 @@
+[
+  {
+    "consumption_id": "CONS-001",
+    "station_id": "AS1",
+    "recorded_at": "2024-10-20T09:00:00",
+    "consumed_items": {
+      "water_liters": 85,
+      "sports_drink_liters": 55,
+      "energy_bars": 120,
+      "fruit_kg": 25,
+      "soup_bowls": 60
+    },
+    "notes": "早高峰过后清点"
+  },
+  {
+    "consumption_id": "CONS-002",
+    "station_id": "AS1",
+    "recorded_at": "2024-10-20T12:00:00",
+    "consumed_items": {
+      "water_liters": 180,
+      "sports_drink_liters": 120,
+      "energy_bars": 250,
+      "fruit_kg": 55,
+      "soup_bowls": 130
+    },
+    "notes": "午间清点"
+  },
+  {
+    "consumption_id": "CONS-003",
+    "station_id": "AS2",
+    "recorded_at": "2024-10-20T11:30:00",
+    "consumed_items": {
+      "water_liters": 150,
+      "sports_drink_liters": 100,
+      "energy_bars": 200,
+      "fruit_kg": 45,
+      "soup_bowls": 100
+    },
+    "notes": "中午清点"
+  },
+  {
+    "consumption_id": "CONS-004",
+    "station_id": "AS2",
+    "recorded_at": "2024-10-20T14:00:00",
+    "consumed_items": {
+      "water_liters": 320,
+      "sports_drink_liters": 240,
+      "energy_bars": 420,
+      "fruit_kg": 95,
+      "soup_bowls": 220
+    },
+    "notes": "收尾清点 - 消耗显著高于预期"
+  },
+  {
+    "consumption_id": "CONS-005",
+    "station_id": "AS3",
+    "recorded_at": "2024-10-20T14:00:00",
+    "consumed_items": {
+      "water_liters": 100,
+      "sports_drink_liters": 70,
+      "energy_bars": 150,
+      "fruit_kg": 30,
+      "soup_bowls": 80
+    },
+    "notes": "下午清点"
+  },
+  {
+    "consumption_id": "CONS-006",
+    "station_id": "AS3",
+    "recorded_at": "2024-10-20T16:00:00",
+    "consumed_items": {
+      "water_liters": 20,
+      "sports_drink_liters": 15,
+      "energy_bars": 30,
+      "fruit_kg": 5,
+      "soup_bowls": 10
+    },
+    "notes": "负数记录 - 可能是登记错误"
+  }
+]

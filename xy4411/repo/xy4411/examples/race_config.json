@@ -1,0 +1,85 @@
+{
+  "race_name": "2024 山野越野挑战赛",
+  "race_date": "2024-10-20",
+  "distance_km": 25.0,
+  "checkpoints": [
+    {
+      "cp_id": "CP0",
+      "name": "起点",
+      "distance_km": 0.0,
+      "cutoff_time": "2024-10-20T06:15:00",
+      "is_start": true,
+      "is_end": false
+    },
+    {
+      "cp_id": "CP1",
+      "name": "CP1-云顶",
+      "distance_km": 5.5,
+      "cutoff_time": "2024-10-20T08:00:00",
+      "is_start": false,
+      "is_end": false
+    },
+    {
+      "cp_id": "CP2",
+      "name": "CP2-河谷",
+      "distance_km": 12.0,
+      "cutoff_time": "2024-10-20T10:30:00",
+      "is_start": false,
+      "is_end": false
+    },
+    {
+      "cp_id": "CP3",
+      "name": "CP3-垭口",
+      "distance_km": 18.5,
+      "cutoff_time": "2024-10-20T13:00:00",
+      "is_start": false,
+      "is_end": false
+    },
+    {
+      "cp_id": "CP4",
+      "name": "终点",
+      "distance_km": 25.0,
+      "cutoff_time": "2024-10-20T15:30:00",
+      "is_start": false,
+      "is_end": true
+    }
+  ],
+  "aid_stations": [
+    {
+      "station_id": "AS1",
+      "name": "CP1-云顶补给站",
+      "checkpoint_id": "CP1",
+      "expected_items": {
+        "water_liters": 300,
+        "sports_drink_liters": 200,
+        "energy_bars": 400,
+        "fruit_kg": 100,
+        "soup_bowls": 200
+      }
+    },
+    {
+      "station_id": "AS2",
+      "name": "CP2-河谷补给站",
+      "checkpoint_id": "CP2",
+      "expected_items": {
+        "water_liters": 400,
+        "sports_drink_liters": 300,
+        "energy_bars": 500,
+        "fruit_kg": 120,
+        "soup_bowls": 300
+      }
+    },
+    {
+      "station_id": "AS3",
+      "name": "CP3-垭口补给站",
+      "checkpoint_id": "CP3",
+      "expected_items": {
+        "water_liters": 350,
+        "sports_drink_liters": 250,
+        "energy_bars": 450,
+        "fruit_kg": 90,
+        "soup_bowls": 250
+      }
+    }
+  ]
+}

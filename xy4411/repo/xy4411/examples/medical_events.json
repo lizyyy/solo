@@ -1,0 +1,72 @@
+[
+  {
+    "event_id": "MED-001",
+    "timestamp": "2024-10-20T08:30:00",
+    "bib": "1003",
+    "checkpoint_id": "CP1",
+    "location": "CP1-云顶补给站",
+    "symptoms": ["肌肉痉挛", "脱水"],
+    "severity": "moderate",
+    "treatment": ["电解质补充", "休息30分钟"],
+    "treated_by": "李医生",
+    "status": "继续比赛",
+    "needs_follow_up": true,
+    "notes": "选手主诉右侧小腿肌肉痉挛，无法继续前进。经补液和拉伸后缓解，继续比赛。"
+  },
+  {
+    "event_id": "MED-002",
+    "timestamp": "2024-10-20T11:00:00",
+    "bib": "1005",
+    "checkpoint_id": "CP2",
+    "location": "CP2-河谷医疗点",
+    "symptoms": ["轻微擦伤", "皮肤红肿"],
+    "severity": "mild",
+    "treatment": ["伤口消毒", "创可贴包扎"],
+    "treated_by": "王护士",
+    "status": "继续比赛",
+    "needs_follow_up": false,
+    "notes": "选手在下山路段摔倒，左肘轻微擦伤，消毒处理后继续比赛。"
+  },
+  {
+    "event_id": "MED-003",
+    "timestamp": "2024-10-20T12:45:00",
+    "bib": "1004",
+    "checkpoint_id": "CP2",
+    "location": "CP2-河谷附近赛道",
+    "symptoms": ["晕厥", "意识不清", "高温"],
+    "severity": "severe",
+    "treatment": ["紧急降温", "静脉补液", "呼叫救护车"],
+    "treated_by": "张医生",
+    "status": "退赛送医",
+    "needs_follow_up": true,
+    "notes": "选手在CP2后约2公里处被发现倒地，意识不清，体温40.2℃。紧急降温处理后由救护车送往医院，诊断为热射病。"
+  },
+  {
+    "event_id": "MED-004",
+    "timestamp": "2024-10-20T14:00:00",
+    "bib": "1007",
+    "checkpoint_id": "CP2",
+    "location": "CP2-河谷补给站",
+    "symptoms": ["脚踝扭伤", "肿胀", "无法承重"],
+    "severity": "moderate",
+    "treatment": ["冰敷", "加压包扎", "轮椅护送退赛"],
+    "treated_by": "刘护士",
+    "status": "退赛",
+    "needs_follow_up": true,
+    "notes": "选手在下山时扭伤左脚踝，肿胀明显，无法继续比赛。已联系家属接回，建议赛后拍片检查。"
+  },
+  {
+    "event_id": "MED-005",
+    "timestamp": "2024-10-20T14:30:00",
+    "bib": "1001",
+    "checkpoint_id": "CP3",
+    "location": "CP3-垭口医疗点",
+    "symptoms": ["头痛", "恶心"],
+    "severity": "mild",
+    "treatment": ["休息", "补水"],
+    "treated_by": "陈医生",
+    "status": "继续比赛",
+    "needs_follow_up": false,
+    "notes": "选手主诉轻微头痛和恶心，休息15分钟后缓解，继续比赛。"
+  }
+]
