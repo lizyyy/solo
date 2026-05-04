@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吊点安全预演工具 - 演出场馆安全系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部工具栏 -->
+        <header id="toolbar">
+            <h1>吊点安全预演工具</h1>
+            <div class="toolbar-actions">
+                <button id="btnNewRehearsal" class="btn btn-primary">新建预演</button>
+                <button id="btnSaveRehearsal" class="btn btn-success">保存预演</button>
+                <button id="btnLoadRehearsal" class="btn btn-info">加载预演</button>
+                <div class="rehearsal-selector">
+                    <select id="rehearsalList"></select>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main id="main-container">
+            <!-- 左侧数据面板 -->
+            <aside id="data-panel">
+                <div class="panel-section" id="import-section">
+                    <h3>数据导入</h3>
+                    <div class="import-group">
+                        <label>桁架吊点表</label>
+                        <input type="file" id="fileTruss" accept=".xlsx,.xls,.csv,.json">
+                        <button id="btnClearTruss" class="btn btn-danger btn-small">清除</button>
+                    </div>
+                    <div class="import-group">
+                        <label>设备重量清单</label>
+                        <input type="file" id="fileEquipment" accept=".xlsx,.xls,.csv,.json">
+                        <button id="btnClearEquipment" class="btn btn-danger btn-small">清除</button>
+                    </div>
+                    <div class="import-group">
+                        <label>葫芦额定载荷</label>
+                        <input type="file" id="fileHoists" accept=".xlsx,.xls,.csv,.json">
+                        <button id="btnClearHoists" class="btn btn-danger btn-small">清除</button>
+                    </div>
+                    <div class="import-group">
+                        <label>拉力计读数</label>
+                        <input type="file" id="fileLoadCells" accept=".xlsx,.xls,.csv,.json">
+                        <button id="btnClearLoadCells" class="btn btn-danger btn-small">清除</button>
+                    </div>
+                </div>
+
+                <div class="panel-section" id="data-summary">
+                    <h3>数据概览</h3>
+                    <div class="summary-item">
+                        <span>吊点数量:</span>
+                        <span id="countTruss">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>设备数量:</span>
+                        <span id="countEquipment">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>葫芦数量:</span>
+                        <span id="countHoists">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>拉力计数量:</span>
+                        <span id="countLoadCells">0</span>
+                    </div>
+                </div>
+
+                <div class="panel-section" id="equipment-list">
+                    <h3>设备列表 (可拖拽)</h3>
+                    <div id="equipment-items"></div>
+                </div>
+
+                <div class="panel-section" id="hoist-config">
+                    <h3>葫芦配置</h3>
+                    <div id="hoist-items"></div>
+                </div>
+            </aside>
+
+            <!-- 中间3D场景 -->
+            <section id="scene-container">
+                <div id="canvas-container">
+                    <canvas id="three-canvas"></canvas>
+                </div>
+                <div class="scene-controls">
+                    <button id="btnTopView" class="btn">俯视图</button>
+                    <button id="btnFrontView" class="btn">正视图</button>
+                    <button id="btnSideView" class="btn">侧视图</button>
+                    <button id="btnResetView" class="btn">重置视角</button>
+                    <button id="btnToggleGrid" class="btn">切换网格</button>
+                </div>
+                <div class="scene-info">
+                    <span id="scene-info-text">提示: 从左侧拖拽设备到桁架上，或选中设备后使用键盘调整位置</span>
+                </div>
+            </section>
+
+            <!-- 右侧风险面板 -->
+            <aside id="risk-panel">
+                <div class="panel-section" id="risk-summary">
+                    <h3>风险总览</h3>
+                    <div class="risk-stats">
+                        <div class="risk-stat critical">
+                            <span class="count" id="criticalCount">0</span>
+                            <span class="label">严重风险</span>
+                        </div>
+                        <div class="risk-stat warning">
+                            <span class="count" id="warningCount">0</span>
+                            <span class="label">警告</span>
+                        </div>
+                        <div class="risk-stat info">
+                            <span class="count" id="infoCount">0</span>
+                            <span class="label">提示</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section" id="risk-details">
+                    <h3>风险详情</h3>
+                    <div class="risk-filters">
+                        <button class="filter-btn active" data-filter="all">全部</button>
+                        <button class="filter-btn" data-filter="overload">超载</button>
+                        <button class="filter-btn" data-filter="unbalance">偏载</button>
+                        <button class="filter-btn" data-filter="safety-ropes">安全绳</button>
+                        <button class="filter-btn" data-filter="conflicts">冲突</button>
+                    </div>
+                    <div id="risk-list"></div>
+                </div>
+
+                <div class="panel-section" id="review-notes">
+                    <h3>人工复核备注</h3>
+                    <textarea id="reviewTextarea" placeholder="输入复核备注..."></textarea>
+                    <div class="review-status">
+                        <label>复核状态:</label>
+                        <select id="reviewStatus">
+                            <option value="pending">待复核</option>
+                            <option value="reviewed">已复核</option>
+                            <option value="approved">已批准</option>
+                            <option value="needs-change">需修改</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel-section" id="export-section">
+                    <h3>导出报告</h3>
+                    <button id="btnExportMarkdown" class="btn btn-secondary">导出 Markdown 风险单</button>
+                    <button id="btnExportJSON" class="btn btn-secondary">导出 JSON 审计包</button>
+                    <button id="btnExportAll" class="btn btn-primary">导出完整报告</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal-overlay" class="hidden">
+        <div id="modal">
+            <div id="modal-header">
+                <h3 id="modal-title">提示</h3>
+                <button id="modal-close">&times;</button>
+            </div>
+            <div id="modal-content"></div>
+            <div id="modal-footer">
+                <button id="modal-cancel" class="btn">取消</button>
+                <button id="modal-confirm" class="btn btn-primary">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/dataImporter.js"></script>
+    <script src="js/riskEngine.js"></script>
+    <script src="js/scene3D.js"></script>
+    <script src="js/exporter.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
