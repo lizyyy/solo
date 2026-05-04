@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>陶瓷釉料小试复盘工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>陶瓷釉料小试复盘工具</h1>
+      <nav>
+        <button onclick="showView('kilns')">窑次列表</button>
+        <button onclick="showView('materials')">原料管理</button>
+        <button onclick="showView('bodies')">坯体管理</button>
+        <button onclick="showView('import')">导入数据</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- 窑次列表视图 -->
+      <div id="view-kilns" class="view active">
+        <div class="toolbar">
+          <button class="primary" onclick="showCreateKilnModal()">+ 新建窑次</button>
+        </div>
+        <div id="kilns-list" class="list-container"></div>
+      </div>
+
+      <!-- 窑次详情视图 -->
+      <div id="view-kiln-detail" class="view">
+        <div class="toolbar">
+          <button onclick="showView('kilns')">← 返回列表</button>
+          <h2 id="kiln-detail-title">窑次详情</h2>
+          <div class="actions">
+            <button onclick="showAddSampleModal()">+ 添加试片</button>
+            <button onclick="analyzePositions()">分析窑位温差</button>
+            <button onclick="exportMarkdown()">导出 Markdown</button>
+            <button onclick="exportIssues()">导出问题清单</button>
+            <button class="danger" onclick="deleteKiln()">删除窑次</button>
+          </div>
+        </div>
+        <div id="kiln-detail-content"></div>
+      </div>
+
+      <!-- 原料管理视图 -->
+      <div id="view-materials" class="view">
+        <div class="toolbar">
+          <button class="primary" onclick="showCreateMaterialModal()">+ 新建原料</button>
+        </div>
+        <div id="materials-list" class="list-container"></div>
+      </div>
+
+      <!-- 坯体管理视图 -->
+      <div id="view-bodies" class="view">
+        <div class="toolbar">
+          <button class="primary" onclick="showCreateBodyModal()">+ 新建坯体</button>
+        </div>
+        <div id="bodies-list" class="list-container"></div>
+      </div>
+
+      <!-- 导入数据视图 -->
+      <div id="view-import" class="view">
+        <div class="import-container">
+          <div class="import-section">
+            <h3>导入 CSV</h3>
+            <input type="file" id="csv-file" accept=".csv" onchange="importCSV()">
+            <div id="csv-preview"></div>
+          </div>
+          <div class="import-section">
+            <h3>导入 JSON</h3>
+            <input type="file" id="json-file" accept=".json" onchange="importJSON()">
+            <div id="json-preview"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 新建窑次弹窗 -->
+  <div id="modal-create-kiln" class="modal">
+    <div class="modal-content">
+      <h3>新建窑次</h3>
+      <form onsubmit="createKiln(event)">
+        <div class="form-group">
+          <label>窑次名称</label>
+          <input type="text" id="kiln-name" required>
+        </div>
+        <div class="form-group">
+          <label>日期</label>
+          <input type="date" id="kiln-date" required>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="kiln-notes" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal('modal-create-kiln')">取消</button>
+          <button type="submit" class="primary">创建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 添加试片弹窗 -->
+  <div id="modal-add-sample" class="modal">
+    <div class="modal-content wide">
+      <h3>添加试片</h3>
+      <form onsubmit="addSample(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>试片编号</label>
+            <input type="text" id="sample-code">
+          </div>
+          <div class="form-group">
+            <label>坯体</label>
+            <select id="sample-body">
+              <option value="">-- 选择坯体 --</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>窑位</label>
+            <input type="text" id="sample-position" placeholder="如：上层、下层、前门">
+          </div>
+          <div class="form-group">
+            <label>窑位温度 (°C)</label>
+            <input type="number" id="sample-position-temp" step="0.1" placeholder="实际测量温度">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>配方</label>
+          <div id="recipe-items" class="recipe-container">
+            <div class="recipe-item">
+              <select class="recipe-material">
+                <option value="">-- 选择原料 --</option>
+              </select>
+              <input type="number" class="recipe-weight" step="0.01" placeholder="用量">
+              <button type="button" onclick="removeRecipeItem(this)">×</button>
+            </div>
+          </div>
+          <button type="button" class="small" onclick="addRecipeItem()">+ 添加原料</button>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="sample-notes" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal('modal-add-sample')">取消</button>
+          <button type="submit" class="primary">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 新建原料弹窗 -->
+  <div id="modal-create-material" class="modal">
+    <div class="modal-content wide">
+      <h3>新建原料</h3>
+      <form onsubmit="createMaterial(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>原料名称</label>
+            <input type="text" id="material-name" required>
+          </div>
+          <div class="form-group">
+            <label>化学式</label>
+            <input type="text" id="material-formula">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>氧化物含量 (%)</label>
+          <div id="oxide-items" class="oxide-container">
+            <div class="oxide-item">
+              <select class="oxide-type">
+                <option value="">-- 选择氧化物 --</option>
+                <option value="SiO2">SiO2</option>
+                <option value="Al2O3">Al2O3</option>
+                <option value="K2O">K2O</option>
+                <option value="Na2O">Na2O</option>
+                <option value="CaO">CaO</option>
+                <option value="MgO">MgO</option>
+                <option value="B2O3">B2O3</option>
+                <option value="ZnO">ZnO</option>
+                <option value="TiO2">TiO2</option>
+                <option value="ZrO2">ZrO2</option>
+                <option value="Fe2O3">Fe2O3</option>
+                <option value="P2O5">P2O5</option>
+                <option value="Li2O">Li2O</option>
+                <option value="SrO">SrO</option>
+                <option value="BaO">BaO</option>
+                <option value="PbO">PbO</option>
+              </select>
+              <input type="number" class="oxide-percentage" step="0.01" placeholder="百分比">
+              <button type="button" onclick="removeOxideItem(this)">×</button>
+            </div>
+          </div>
+          <button type="button" class="small" onclick="addOxideItem()">+ 添加氧化物</button>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="material-notes" rows="2"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal('modal-create-material')">取消</button>
+          <button type="submit" class="primary">创建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 新建坯体弹窗 -->
+  <div id="modal-create-body" class="modal">
+    <div class="modal-content">
+      <h3>新建坯体</h3>
+      <form onsubmit="createBody(event)">
+        <div class="form-group">
+          <label>坯体编号</label>
+          <input type="text" id="body-code" required>
+        </div>
+        <div class="form-group">
+          <label>名称</label>
+          <input type="text" id="body-name">
+        </div>
+        <div class="form-group">
+          <label>描述</label>
+          <textarea id="body-description" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="closeModal('modal-create-body')">取消</button>
+          <button type="submit" class="primary">创建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 风险改判弹窗 -->
+  <div id="modal-risk-override" class="modal">
+    <div class="modal-content">
+      <h3>风险改判</h3>
+      <div id="override-risk-list"></div>
+      <div class="form-actions">
+        <button type="button" onclick="closeModal('modal-risk-override')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
