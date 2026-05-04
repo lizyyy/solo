@@ -1,0 +1,1 @@
+from app.tasks.processing_tasks import process_interview_anonymization

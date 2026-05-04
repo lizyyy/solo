@@ -1,0 +1,35 @@
+{
+  "authorization_id": "AUTH-2026-002",
+  "interview_id": "INT-2026-002",
+  "respondent": {
+    "name": "王小红",
+    "id_card": "310101199505055678",
+    "phone": "13987654321",
+    "email": "wangxiaohong@marketing-sh.com"
+  },
+  "authorization_details": {
+    "date": "2026-04-18",
+    "location": "上海市浦东新区陆家嘴金融中心会议室",
+    "interview_purpose": "移动应用用户满意度调查",
+    "data_usage": "访谈内容将用于产品改进和用户体验分析，所有个人信息将被脱敏处理",
+    "data_retention": "原始数据将在研究完成后保存3年，脱敏数据可长期保存用于研究",
+    "withdrawal_rights": "受访者有权在任何时候撤回授权，要求删除其个人数据"
+  },
+  "consent": {
+    "audio_recording": true,
+    "video_recording": false,
+    "data_usage": true,
+    "third_party_sharing": false
+  },
+  "signatures": {
+    "respondent_signature": "王小红",
+    "researcher_signature": "李研究员",
+    "signature_date": "2026-04-18"
+  },
+  "witness": {
+    "name": "陈见证",
+    "title": "研究协调员",
+    "signature": "陈见证",
+    "signature_date": "2026-04-18"
+  }
+}

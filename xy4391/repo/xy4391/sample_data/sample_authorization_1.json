@@ -1,0 +1,35 @@
+{
+  "authorization_id": "AUTH-2026-001",
+  "interview_id": "INT-2026-001",
+  "respondent": {
+    "name": "李明",
+    "id_card": "110101199001011234",
+    "phone": "13812345678",
+    "email": "liming@techcompany.com"
+  },
+  "authorization_details": {
+    "date": "2026-04-15",
+    "location": "北京市海淀区中关村会议室A",
+    "interview_purpose": "用户体验研究，产品改进",
+    "data_usage": "访谈内容将用于产品改进和用户体验分析，所有个人信息将被脱敏处理",
+    "data_retention": "原始数据将在研究完成后保存3年，脱敏数据可长期保存用于研究",
+    "withdrawal_rights": "受访者有权在任何时候撤回授权，要求删除其个人数据"
+  },
+  "consent": {
+    "audio_recording": true,
+    "video_recording": false,
+    "data_usage": true,
+    "third_party_sharing": false
+  },
+  "signatures": {
+    "respondent_signature": "李明",
+    "researcher_signature": "张研究员",
+    "signature_date": "2026-04-15"
+  },
+  "witness": {
+    "name": "王见证",
+    "title": "研究助理",
+    "signature": "王见证",
+    "signature_date": "2026-04-15"
+  }
+}
