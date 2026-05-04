@@ -1,0 +1,12 @@
+business_domain,cache_key,ttl_seconds,expire_at,is_hot,access_count,data_type
+product,product:detail:1001,3600,2026-05-04T11:00:00Z,true,15000,json
+product,product:detail:1002,3600,2026-05-04T11:00:00Z,true,12000,json
+product,product:detail:1003,3600,2026-05-04T11:00:00Z,false,500,json
+inventory,inventory:stock:1001,1800,2026-05-04T10:30:00Z,true,8000,string
+inventory,inventory:stock:1002,1800,2026-05-04T10:30:00Z,false,300,string
+member,member:level:10001,7200,2026-05-04T12:00:00Z,false,100,json
+member,member:level:10002,7200,2026-05-04T12:00:00Z,false,80,json
+config,config:promo:2026_may,86400,2026-05-05T10:00:00Z,true,20000,json
+config,config:banner:main,86400,2026-05-05T10:00:00Z,true,18000,string
+product,product:detail:1004,3600,2026-05-04T11:00:00Z,false,200,json
+product,product:detail:1005,3600,2026-05-04T11:00:00Z,false,150,json

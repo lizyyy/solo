@@ -1,0 +1,6 @@
+business_domain,cache_key,ttl_seconds,expire_at,is_hot
+product,product:detail:1001,-100,2026-05-04T11:00:00Z,true
+,product:detail:1002,3600,2026-05-04T11:00:00Z,true
+product,,3600,2026-05-04T11:00:00Z,true
+product,product:detail:1003,abc,2026-05-04T11:00:00Z,true
+product,product:detail:1004,3600,invalid_date,true

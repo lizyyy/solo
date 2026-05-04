@@ -1,0 +1,15 @@
+- strategy_name: "无效策略"
+  strategy_type: "invalid_strategy_type"
+  business_domain: "product"
+  is_enabled: true
+  priority: 1
+  config_json: '{}'
+  description: "这是一个无效的策略类型"
+
+- strategy_name: "缺少名称的策略"
+  strategy_type: "negative_cache"
+  business_domain: "product"
+  is_enabled: true
+  priority: 2
+  config_json: '{"ttl_seconds": "not_a_number"}'
+  description: "配置参数类型错误"

@@ -1,0 +1,47 @@
+- strategy_name: "负缓存策略"
+  strategy_type: "negative_cache"
+  business_domain: "product"
+  is_enabled: true
+  priority: 1
+  config_json: '{"ttl_seconds": 60, "max_size": 10000}'
+  description: "对不存在的key设置60秒负缓存"
+
+- strategy_name: "TTL抖动策略"
+  strategy_type: "ttl_jitter"
+  business_domain: "product"
+  is_enabled: true
+  priority: 2
+  config_json: '{"jitter_percent": 20}'
+  description: "为所有key的TTL增加±20%的随机抖动"
+
+- strategy_name: "热点key预热策略"
+  strategy_type: "hot_key_prewarm"
+  business_domain: "product"
+  is_enabled: true
+  priority: 3
+  config_json: '{"prewarm_threshold": 1000, "prewarm_count": 100}'
+  description: "预热访问量超过1000的TOP热点key"
+
+- strategy_name: "互斥锁策略"
+  strategy_type: "mutex_lock"
+  business_domain: "product"
+  is_enabled: true
+  priority: 4
+  config_json: '{"timeout_ms": 5000, "max_wait_ms": 3000}'
+  description: "使用single-flight模式防止并发回源"
+
+- strategy_name: "布隆过滤器策略"
+  strategy_type: "bloom_filter"
+  business_domain: "product"
+  is_enabled: false
+  priority: 5
+  config_json: '{"false_positive_rate": 0.01, "expected_inserts": 1000000}'
+  description: "使用布隆过滤器拦截无效key"
+
+- strategy_name: "异步刷新策略"
+  strategy_type: "stale_while_revalidate"
+  business_domain: "product"
+  is_enabled: true
+  priority: 6
+  config_json: '{"stale_ratio": 0.1, "max_stale_seconds": 60}'
+  description: "允许返回过期数据同时异步刷新"

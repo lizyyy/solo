@@ -1,0 +1,12 @@
+{
+  "plan_name": "2026_may_promotion",
+  "business_domain": "product",
+  "start_time": "2026-05-01T00:00:00Z",
+  "end_time": "2026-05-10T23:59:59Z",
+  "expected_qps": 5000,
+  "peak_qps": 15000,
+  "hot_key_ratio": 0.4,
+  "cold_start_ratio": 0.1,
+  "invalid_key_ratio": 0.15,
+  "description": "五一促销活动流量规划，预计峰值QPS 15000"
+}
