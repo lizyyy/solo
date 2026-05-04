@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "tree_id": "TREE-001",
+        "species": "香樟树",
+        "address": "中山路123号",
+        "district": "东城区",
+        "status": "healthy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.4074, 39.9042]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tree_id": "TREE-002",
+        "species": "法桐",
+        "address": "中山路125号",
+        "district": "东城区",
+        "status": "healthy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.4074, 39.9042]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tree_id": "TREE-003",
+        "species": "国槐",
+        "address": "长安街456号",
+        "district": "西城区",
+        "status": "needs_attention"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.4174, 39.9142]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tree_id": "TREE-004",
+        "species": "白蜡",
+        "address": "建国路789号",
+        "district": "朝阳区",
+        "status": "healthy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.4274, 39.9242]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "tree_id": "TREE-005",
+        "species": "银杏",
+        "address": "三里屯路10号",
+        "district": "朝阳区",
+        "status": "healthy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [116.4374, 39.9342]
+      }
+    }
+  ]
+}

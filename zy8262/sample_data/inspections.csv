@@ -1,0 +1,7 @@
+inspection_id,tree_id,inspector,inspection_date,photo_paths,pest_damage,disease_present,health_status,notes
+INSP-001,TREE-001,张三,2026-05-03T09:30:00,["/photos/tree001_01.jpg","/photos/tree001_02.jpg"],false,false,normal,树木生长良好
+INSP-002,TREE-002,李四,2026-05-03T10:15:00,[],true,true,needs_attention,发现天牛幼虫危害
+INSP-003,TREE-003,王五,2026-05-03T02:45:00,["/photos/tree003_01.jpg"],true,false,poor,凌晨巡检记录 - 归属日期存疑
+INSP-004,TREE-004,赵六,2026-05-02T14:20:00,["/photos/tree004_01.jpg","/photos/tree004_02.jpg","/photos/tree004_03.jpg"],false,false,normal,正常巡检
+INSP-005,TREE-005,张三,2026-05-02T16:00:00,[],false,false,normal,忘记拍照
+INSP-006,TREE-003,李四,2026-05-01T03:30:00,["/photos/tree003_02.jpg"],true,true,critical,跨午夜巡检 - 病虫害严重

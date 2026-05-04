@@ -1,0 +1,40 @@
+rules:
+  - type: banned_chemical
+    name: 禁用高毒农药
+    value:
+      - 甲胺磷
+      - 敌敌畏
+      - 氧化乐果
+      - 对硫磷
+      - 久效磷
+      - 磷胺
+    description: 国家禁用的高毒农药清单
+    active: true
+
+  - type: banned_chemical
+    name: 禁用有机磷农药
+    value:
+      - 甲基对硫磷
+      - 内吸磷
+      - 涕灭威
+      - 克百威
+      - 灭线磷
+    description: 补充禁用农药清单
+    active: true
+
+  - type: rain_record
+    name: 降雨记录
+    value:
+      - "2026-05-02T06:00:00"
+      - "2026-05-01T20:00:00"
+      - "2026-04-30T15:00:00"
+    description: 系统记录的降雨时间，用于判断雨后喷药有效性
+    active: true
+
+  - type: inspection_hours
+    name: 巡检工作时间
+    value:
+      start: "08:00"
+      end: "18:00"
+    description: 正常巡检工作时间，凌晨0-6点为异常时段
+    active: true
