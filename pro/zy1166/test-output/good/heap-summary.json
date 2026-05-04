@@ -1,0 +1,149 @@
+{
+  "generatedAt": "2026-05-04T17:18:15.144Z",
+  "version": "1.0",
+  "summary": {
+    "totalHeapSize": 536870912,
+    "usedHeapSize": 188743680,
+    "heapSizeLimit": 536870912,
+    "totalJSHeapSize": 268435456,
+    "usedJSHeapSize": 157286400,
+    "jsHeapSizeLimit": 536870912
+  },
+  "spaces": [
+    {
+      "name": "old_space",
+      "size": 419430400,
+      "used_size": 125829120,
+      "usagePercent": 30
+    },
+    {
+      "name": "new_space",
+      "size": 134217728,
+      "used_size": 41943040,
+      "usagePercent": 31
+    },
+    {
+      "name": "code_space",
+      "size": 67108864,
+      "used_size": 15728640,
+      "usagePercent": 23
+    },
+    {
+      "name": "map_space",
+      "size": 33554432,
+      "used_size": 5242880,
+      "usagePercent": 15
+    }
+  ],
+  "nodes": [
+    {
+      "type": "string",
+      "name": "string",
+      "self_size": 31457280,
+      "size": 31457280,
+      "count": 15000
+    },
+    {
+      "type": "object",
+      "name": "object",
+      "self_size": 41943040,
+      "size": 41943040,
+      "count": 5000
+    },
+    {
+      "type": "array",
+      "name": "array",
+      "self_size": 26214400,
+      "size": 26214400,
+      "count": 3000
+    },
+    {
+      "type": "function",
+      "name": "function",
+      "self_size": 15728640,
+      "size": 15728640,
+      "count": 8000
+    },
+    {
+      "type": "Buffer",
+      "name": "Buffer",
+      "self_size": 5242880,
+      "size": 5242880,
+      "count": 100
+    }
+  ],
+  "typeDistribution": [
+    {
+      "type": "object",
+      "count": 5000,
+      "totalSize": 41943040,
+      "avgSize": 8192
+    },
+    {
+      "type": "string",
+      "count": 15000,
+      "totalSize": 31457280,
+      "avgSize": 2048
+    },
+    {
+      "type": "array",
+      "count": 3000,
+      "totalSize": 26214400,
+      "avgSize": 8533
+    },
+    {
+      "type": "function",
+      "count": 8000,
+      "totalSize": 15728640,
+      "avgSize": 1920
+    },
+    {
+      "type": "Buffer",
+      "count": 100,
+      "totalSize": 5242880,
+      "avgSize": 51200
+    }
+  ],
+  "topTypes": [
+    {
+      "type": "object",
+      "count": 5000,
+      "totalSize": 41943040,
+      "avgSize": 8192
+    },
+    {
+      "type": "string",
+      "count": 15000,
+      "totalSize": 31457280,
+      "avgSize": 2048
+    }
+  ],
+  "largeObjects": [],
+  "bufferAnalysis": {
+    "totalBuffers": 100,
+    "totalBufferSize": 5242880,
+    "avgBufferSize": 51200,
+    "largestBuffer": 512000,
+    "bufferTypes": []
+  },
+  "natives": [],
+  "nativeMemory": {
+    "totalExternal": 10485760,
+    "categories": []
+  },
+  "potentialLeakIndicators": [],
+  "stats": {
+    "heapUsagePercent": 35,
+    "jsHeapUsagePercent": 30,
+    "spaceWithHighestUsage": {
+      "name": "new_space",
+      "usagePercent": 31
+    },
+    "largestType": {
+      "type": "object",
+      "totalSize": 41943040
+    },
+    "totalLargeObjects": 0,
+    "potentialLeakCount": 0
+  }
+}

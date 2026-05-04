@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-05-04T17:18:15.146Z",
+  "totalPaths": 100,
+  "paths": [],
+  "groupedPaths": {
+    "byRootType": {},
+    "byObjectType": {},
+    "byPathLength": {}
+  },
+  "suspiciousPaths": [],
+  "keyRoots": [
+    {
+      "type": "(Global properties)",
+      "count": 30,
+      "isCommon": true
+    },
+    {
+      "type": "(array)",
+      "count": 20,
+      "isCommon": true
+    },
+    {
+      "type": "(object)",
+      "count": 25,
+      "isCommon": true
+    },
+    {
+      "type": "(closure)",
+      "count": 15,
+      "isCommon": true
+    }
+  ],
+  "commonRetainers": [],
+  "statistics": {
+    "totalPaths": 100,
+    "suspiciousPaths": 0,
+    "criticalPaths": 0,
+    "warningPaths": 0,
+    "byRootType": {},
+    "byObjectType": {},
+    "avgPathLength": 3.5
+  }
+}

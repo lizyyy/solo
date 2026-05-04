@@ -1,0 +1,287 @@
+{
+  "v8Flags": {
+    "raw": "--max-old-space-size=256",
+    "parsed": {
+      "max-old-space-size": "256",
+      "maxOldSpaceSize": 256
+    },
+    "issues": []
+  },
+  "caches": [
+    {
+      "id": "cache_0",
+      "name": "unboundedCache",
+      "type": "generic",
+      "maxSize": null,
+      "ttl": null,
+      "evictionPolicy": "none",
+      "currentSize": 50000,
+      "hitRate": 0.3,
+      "missRate": 0.7,
+      "issues": [
+        {
+          "type": "unbounded_cache",
+          "severity": "critical",
+          "message": "缓存没有设置最大容量和 TTL，可能导致内存无限增长"
+        },
+        {
+          "type": "no_max_size",
+          "severity": "warning",
+          "message": "缓存没有设置最大容量"
+        },
+        {
+          "type": "no_ttl",
+          "severity": "warning",
+          "message": "缓存没有设置 TTL，对象可能永远不会过期"
+        }
+      ]
+    },
+    {
+      "id": "cache_1",
+      "name": "hugeCache",
+      "type": "LRU",
+      "maxSize": 200000,
+      "ttl": 3600,
+      "evictionPolicy": "LRU",
+      "currentSize": 180000,
+      "hitRate": 0.4,
+      "missRate": 0.6,
+      "issues": [
+        {
+          "type": "large_max_size",
+          "severity": "warning",
+          "message": "缓存最大容量可能过大"
+        },
+        {
+          "type": "near_capacity",
+          "severity": "warning",
+          "message": "缓存使用率超过 90%"
+        }
+      ]
+    }
+  ],
+  "objectPools": [
+    {
+      "id": "pool_0",
+      "name": "unboundedPool",
+      "type": "generic",
+      "objectType": "object",
+      "maxSize": null,
+      "minSize": 100,
+      "idleTimeout": null,
+      "maxIdleTime": null,
+      "currentSize": 5000,
+      "idleCount": 4500,
+      "activeCount": 500,
+      "issues": [
+        {
+          "type": "unbounded_pool",
+          "severity": "critical",
+          "message": "对象池没有设置最大容量限制"
+        },
+        {
+          "type": "no_idle_timeout",
+          "severity": "warning",
+          "message": "对象池没有设置空闲超时"
+        },
+        {
+          "type": "too_many_idle",
+          "severity": "warning",
+          "message": "空闲对象过多"
+        }
+      ]
+    },
+    {
+      "id": "pool_1",
+      "name": "hugePool",
+      "type": "buffer",
+      "objectType": "LargeBuffer",
+      "maxSize": 10000,
+      "minSize": 5000,
+      "idleTimeout": null,
+      "maxIdleTime": null,
+      "currentSize": 8000,
+      "idleCount": 6000,
+      "activeCount": 2000,
+      "issues": [
+        {
+          "type": "pool_too_large",
+          "severity": "warning",
+          "message": "对象池容量过大"
+        },
+        {
+          "type": "no_idle_timeout",
+          "severity": "warning",
+          "message": "对象池没有设置空闲超时"
+        }
+      ]
+    }
+  ],
+  "batchProcessing": [
+    {
+      "id": "batch_0",
+      "name": "unboundedBatch",
+      "batchSize": 2000,
+      "maxBatchSize": 5000,
+      "flushInterval": null,
+      "maxPending": null,
+      "currentPending": 50000,
+      "issues": [
+        {
+          "type": "unbounded_pending",
+          "severity": "critical",
+          "message": "批处理队列没有设置最大待处理数量和刷新间隔"
+        },
+        {
+          "type": "no_max_pending",
+          "severity": "warning",
+          "message": "批处理队列没有设置最大待处理数量"
+        },
+        {
+          "type": "no_flush_interval",
+          "severity": "warning",
+          "message": "批处理没有设置刷新间隔"
+        },
+        {
+          "type": "batch_too_large",
+          "severity": "warning",
+          "message": "批处理大小可能过大"
+        }
+      ]
+    }
+  ],
+  "weakRefUsage": [
+    {
+      "id": "weakref_0",
+      "name": "badWeakRef",
+      "usage": "缓存持有",
+      "hasDeref": false,
+      "hasHeldValue": true,
+      "issues": [
+        {
+          "type": "weakref_with_held_value",
+          "severity": "warning",
+          "message": "WeakRef 持有强引用"
+        },
+        {
+          "type": "weakref_no_deref_check",
+          "severity": "warning",
+          "message": "WeakRef 未检查 deref 结果"
+        }
+      ]
+    }
+  ],
+  "finalizationRegistryUsage": [
+    {
+      "id": "finalization_0",
+      "name": "badFinalization",
+      "usage": "对象清理",
+      "hasCleanupCallback": true,
+      "hasUnregister": false,
+      "issues": [
+        {
+          "type": "finalization_without_unregister",
+          "severity": "critical",
+          "message": "FinalizationRegistry 回调可能泄漏"
+        },
+        {
+          "type": "finalization_no_unregister",
+          "severity": "warning",
+          "message": "FinalizationRegistry 未使用 unregister"
+        }
+      ]
+    }
+  ],
+  "potentialIssues": [
+    {
+      "category": "cache",
+      "cacheName": "unboundedCache",
+      "type": "unbounded_cache_no_ttl",
+      "severity": "critical",
+      "message": "缓存没有设置最大容量和 TTL"
+    },
+    {
+      "category": "object_pool",
+      "poolName": "unboundedPool",
+      "type": "unbounded_pool",
+      "severity": "critical",
+      "message": "对象池没有设置最大容量限制"
+    },
+    {
+      "category": "batch_processing",
+      "batchName": "unboundedBatch",
+      "type": "unbounded_pending",
+      "severity": "critical",
+      "message": "批处理队列没有设置限制"
+    },
+    {
+      "category": "finalization_registry",
+      "registryName": "badFinalization",
+      "type": "finalization_without_unregister",
+      "severity": "critical",
+      "message": "FinalizationRegistry 回调可能泄漏"
+    }
+  ],
+  "recommendations": [],
+  "summary": {
+    "overview": {
+      "cacheCount": 2,
+      "objectPoolCount": 2,
+      "batchProcessingCount": 1,
+      "weakRefCount": 1,
+      "finalizationRegistryCount": 1,
+      "totalIssues": 15,
+      "criticalIssues": 4,
+      "warningIssues": 11
+    },
+    "v8Config": {
+      "maxOldSpaceSize": "256 MB",
+      "semiSpaceSize": "N/A",
+      "traceGC": false,
+      "exposeGC": false
+    },
+    "cacheSummary": [
+      {
+        "name": "unboundedCache",
+        "maxSize": "Unbounded",
+        "ttl": "None",
+        "currentSize": 50000,
+        "issues": 3
+      },
+      {
+        "name": "hugeCache",
+        "maxSize": 200000,
+        "ttl": 3600,
+        "currentSize": 180000,
+        "issues": 2
+      }
+    ],
+    "poolSummary": [
+      {
+        "name": "unboundedPool",
+        "objectType": "object",
+        "maxSize": "Unbounded",
+        "currentSize": 5000,
+        "idleCount": 4500,
+        "issues": 3
+      },
+      {
+        "name": "hugePool",
+        "objectType": "LargeBuffer",
+        "maxSize": 10000,
+        "currentSize": 8000,
+        "idleCount": 6000,
+        "issues": 2
+      }
+    ],
+    "batchSummary": [
+      {
+        "name": "unboundedBatch",
+        "batchSize": 2000,
+        "maxPending": "Unbounded",
+        "flushInterval": "None",
+        "issues": 4
+      }
+    ]
+  }
+}

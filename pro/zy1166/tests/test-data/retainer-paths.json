@@ -1,0 +1,849 @@
+{
+  "generatedAt": "2026-05-04T17:23:24.083Z",
+  "totalPaths": 200,
+  "paths": [],
+  "groupedPaths": {
+    "byRootType": {},
+    "byObjectType": {},
+    "byPathLength": {}
+  },
+  "suspiciousPaths": [
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_0\"] -> Element@1000",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_1\"] -> Element@1001",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_2\"] -> Element@1002",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_3\"] -> Element@1003",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_4\"] -> Element@1004",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_5\"] -> Element@1005",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_6\"] -> Element@1006",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_7\"] -> Element@1007",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_8\"] -> Element@1008",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_9\"] -> Element@1009",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_10\"] -> Element@1010",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_11\"] -> Element@1011",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_12\"] -> Element@1012",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_13\"] -> Element@1013",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_14\"] -> Element@1014",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_15\"] -> Element@1015",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_16\"] -> Element@1016",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_17\"] -> Element@1017",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_18\"] -> Element@1018",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_19\"] -> Element@1019",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_20\"] -> Element@1020",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_21\"] -> Element@1021",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_22\"] -> Element@1022",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_23\"] -> Element@1023",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "global -> eventListeners[\"click_24\"] -> Element@1024",
+      "matchedPatterns": [
+        {
+          "name": "事件监听器",
+          "description": "事件监听器未正确移除可能导致内存泄漏",
+          "severity": "critical"
+        },
+        {
+          "name": "全局对象引用",
+          "description": "全局对象上的引用不会被释放",
+          "severity": "critical"
+        }
+      ],
+      "highestSeverity": "critical"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2000 -> callback@3000 -> context@4000 -> largeData@5000",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2001 -> callback@3001 -> context@4001 -> largeData@5001",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2002 -> callback@3002 -> context@4002 -> largeData@5002",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2003 -> callback@3003 -> context@4003 -> largeData@5003",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2004 -> callback@3004 -> context@4004 -> largeData@5004",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2005 -> callback@3005 -> context@4005 -> largeData@5005",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2006 -> callback@3006 -> context@4006 -> largeData@5006",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2007 -> callback@3007 -> context@4007 -> largeData@5007",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2008 -> callback@3008 -> context@4008 -> largeData@5008",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2009 -> callback@3009 -> context@4009 -> largeData@5009",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2010 -> callback@3010 -> context@4010 -> largeData@5010",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2011 -> callback@3011 -> context@4011 -> largeData@5011",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2012 -> callback@3012 -> context@4012 -> largeData@5012",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2013 -> callback@3013 -> context@4013 -> largeData@5013",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "setTimeout@2014 -> callback@3014 -> context@4014 -> largeData@5014",
+      "matchedPatterns": [
+        {
+          "name": "定时器引用",
+          "description": "定时器未清理可能导致持续引用",
+          "severity": "warning"
+        },
+        {
+          "name": "Closure 引用",
+          "description": "闭包可能持有对外部变量的引用",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6000 -> target@7000 -> strongRef@8000",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6001 -> target@7001 -> strongRef@8001",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6002 -> target@7002 -> strongRef@8002",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6003 -> target@7003 -> strongRef@8003",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6004 -> target@7004 -> strongRef@8004",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6005 -> target@7005 -> strongRef@8005",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6006 -> target@7006 -> strongRef@8006",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6007 -> target@7007 -> strongRef@8007",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6008 -> target@7008 -> strongRef@8008",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    },
+    {
+      "path": {},
+      "pathString": "WeakRef@6009 -> target@7009 -> strongRef@8009",
+      "matchedPatterns": [
+        {
+          "name": "WeakRef/FinalizationRegistry 引用",
+          "description": "WeakRef 和 FinalizationRegistry 的使用需要特别关注",
+          "severity": "warning"
+        }
+      ],
+      "highestSeverity": "warning"
+    }
+  ],
+  "keyRoots": [
+    {
+      "type": "(Global properties)",
+      "count": 80,
+      "isCommon": true
+    },
+    {
+      "type": "(event listener)",
+      "count": 40,
+      "isCommon": true
+    },
+    {
+      "type": "(timer)",
+      "count": 25,
+      "isCommon": true
+    },
+    {
+      "type": "(closure)",
+      "count": 35,
+      "isCommon": true
+    },
+    {
+      "type": "(WeakRef)",
+      "count": 15,
+      "isCommon": true
+    }
+  ],
+  "commonRetainers": [],
+  "statistics": {
+    "totalPaths": 200,
+    "suspiciousPaths": 50,
+    "criticalPaths": 25,
+    "warningPaths": 25,
+    "byRootType": {},
+    "byObjectType": {},
+    "avgPathLength": 5.2
+  }
+}

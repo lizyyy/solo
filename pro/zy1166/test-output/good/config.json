@@ -1,0 +1,147 @@
+{
+  "v8Flags": {
+    "raw": "--max-old-space-size=512 --semi-space-size=32 --trace-gc",
+    "parsed": {
+      "max-old-space-size": "512",
+      "semi-space-size": "32",
+      "trace-gc": true,
+      "maxOldSpaceSize": 512,
+      "semiSpaceSize": 32,
+      "traceGC": true
+    },
+    "issues": []
+  },
+  "caches": [
+    {
+      "id": "cache_0",
+      "name": "userCache",
+      "type": "LRU",
+      "maxSize": 10000,
+      "ttl": 300,
+      "evictionPolicy": "LRU",
+      "currentSize": 4500,
+      "hitRate": 0.85,
+      "missRate": 0.15,
+      "issues": []
+    },
+    {
+      "id": "cache_1",
+      "name": "productCache",
+      "type": "TTL",
+      "maxSize": 5000,
+      "ttl": 600,
+      "evictionPolicy": "TTL",
+      "currentSize": 2000,
+      "hitRate": 0.75,
+      "missRate": 0.25,
+      "issues": []
+    }
+  ],
+  "objectPools": [
+    {
+      "id": "pool_0",
+      "name": "connectionPool",
+      "type": "database",
+      "objectType": "DBConnection",
+      "maxSize": 50,
+      "minSize": 10,
+      "idleTimeout": 60000,
+      "maxIdleTime": 300000,
+      "currentSize": 25,
+      "idleCount": 10,
+      "activeCount": 15,
+      "issues": []
+    },
+    {
+      "id": "pool_1",
+      "name": "bufferPool",
+      "type": "buffer",
+      "objectType": "Buffer",
+      "maxSize": 200,
+      "minSize": 50,
+      "idleTimeout": 30000,
+      "maxIdleTime": 120000,
+      "currentSize": 120,
+      "idleCount": 40,
+      "activeCount": 80,
+      "issues": []
+    }
+  ],
+  "batchProcessing": [
+    {
+      "id": "batch_0",
+      "name": "logBatch",
+      "batchSize": 100,
+      "maxBatchSize": 500,
+      "flushInterval": 5000,
+      "maxPending": 10000,
+      "currentPending": 150,
+      "issues": []
+    }
+  ],
+  "weakRefUsage": [],
+  "finalizationRegistryUsage": [],
+  "potentialIssues": [],
+  "recommendations": [],
+  "summary": {
+    "overview": {
+      "cacheCount": 2,
+      "objectPoolCount": 2,
+      "batchProcessingCount": 1,
+      "weakRefCount": 0,
+      "finalizationRegistryCount": 0,
+      "totalIssues": 0,
+      "criticalIssues": 0,
+      "warningIssues": 0
+    },
+    "v8Config": {
+      "maxOldSpaceSize": "512 MB",
+      "semiSpaceSize": "32 MB",
+      "traceGC": true,
+      "exposeGC": false
+    },
+    "cacheSummary": [
+      {
+        "name": "userCache",
+        "maxSize": 10000,
+        "ttl": 300,
+        "currentSize": 4500,
+        "issues": 0
+      },
+      {
+        "name": "productCache",
+        "maxSize": 5000,
+        "ttl": 600,
+        "currentSize": 2000,
+        "issues": 0
+      }
+    ],
+    "poolSummary": [
+      {
+        "name": "connectionPool",
+        "objectType": "DBConnection",
+        "maxSize": 50,
+        "currentSize": 25,
+        "idleCount": 10,
+        "issues": 0
+      },
+      {
+        "name": "bufferPool",
+        "objectType": "Buffer",
+        "maxSize": 200,
+        "currentSize": 120,
+        "idleCount": 40,
+        "issues": 0
+      }
+    ],
+    "batchSummary": [
+      {
+        "name": "logBatch",
+        "batchSize": 100,
+        "maxPending": 10000,
+        "flushInterval": 5000,
+        "issues": 0
+      }
+    ]
+  }
+}
