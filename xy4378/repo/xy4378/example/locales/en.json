@@ -1,0 +1,28 @@
+{
+  "common": {
+    "welcome": "Welcome to",
+    "greeting": "Hello, {username}",
+    "loading": "Loading...",
+    "error": "An error occurred"
+  },
+  "user": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "cart": {
+    "items_one": "There is {count} item in the cart",
+    "items_other": "There are {count} items in the cart",
+    "total": "Total: {price}",
+    "checkout": "Checkout"
+  },
+  "notification": {
+    "new_message_one": "You have {count} new message",
+    "new_message_other": "You have {count} new messages",
+    "count_zero": "No new messages"
+  },
+  "page": {
+    "home": "Home",
+    "about": "About Us"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "common": {
+    "welcome": "欢迎使用",
+    "greeting": "你好，{name}",
+    "loading": "加载中...",
+    "error": "发生错误"
+  },
+  "user": {
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "退出登录",
+    "messages": "消息"
+  },
+  "cart": {
+    "items": "购物车中有 {count} 件商品",
+    "total": "总计：{price}",
+    "checkout": "结算",
+    "empty": "购物车为空"
+  },
+  "notification": {
+    "new_message": "您有 {count} 条新消息",
+    "count_zero": "没有新消息"
+  },
+  "page": {
+    "home": "首页",
+    "about": "关于我们",
+    "contact": "联系我们"
+  }
+}
