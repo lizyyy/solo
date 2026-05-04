@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天文夜观测规划工具</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0c1445 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: #64b5f6;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.3);
+        }
+        
+        .header p {
+            color: #90a4ae;
+            font-size: 1.1rem;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #81d4fa;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(129, 212, 250, 0.3);
+        }
+        
+        .import-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .import-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .import-card:hover {
+            border-color: rgba(100, 181, 246, 0.5);
+            background: rgba(100, 181, 246, 0.1);
+        }
+        
+        .import-card.success {
+            border-style: solid;
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .import-card h3 {
+            color: #b3e5fc;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .file-button:hover {
+            background: linear-gradient(135deg, #64b5f6, #42a5f5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
+        }
+        
+        .file-info {
+            font-size: 0.9rem;
+            color: #90a4ae;
+            margin-top: 10px;
+        }
+        
+        .file-info.success {
+            color: #81c784;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #64b5f6, #42a5f5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 187, 106, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa726, #fb8c00);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #ffb74d, #ffa726);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 167, 38, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .timeline-section {
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+        
+        .timeline {
+            display: flex;
+            min-width: max-content;
+            padding: 20px 0;
+        }
+        
+        .timeline-hour {
+            width: 120px;
+            padding: 10px;
+            text-align: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-hour:first-child {
+            border-left: none;
+        }
+        
+        .timeline-hour-header {
+            font-weight: 600;
+            color: #81d4fa;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .timeline-indicators {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .indicator {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .indicator:hover {
+            transform: scale(1.05);
+        }
+        
+        .indicator-cloud {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid #ff9800;
+            color: #ffb74d;
+        }
+        
+        .indicator-cloud-critical {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #ef9a9a;
+        }
+        
+        .indicator-target {
+            background: rgba(100, 181, 246, 0.2);
+            border: 1px solid #64b5f6;
+            color: #90caf9;
+        }
+        
+        .indicator-conflict {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #ef9a9a;
+        }
+        
+        .indicator-override {
+            background: rgba(156, 39, 176, 0.2);
+            border: 1px solid #9c27b0;
+            color: #ce93d8;
+        }
+        
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .target-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .target-card:hover {
+            border-color: rgba(100, 181, 246, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .target-card.status-safe {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+        
+        .target-card.status-warning {
+            border-color: #ff9800;
+            background: rgba(255, 152, 0, 0.05);
+        }
+        
+        .target-card.status-danger {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.05);
+        }
+        
+        .target-card.status-override-safe {
+            border-color: #9c27b0;
+            background: rgba(156, 39, 176, 0.05);
+        }
+        
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .target-name {
+            font-size: 1.3rem;
+            color: #b3e5fc;
+            font-weight: 600;
+        }
+        
+        .target-time {
+            font-size: 0.9rem;
+            color: #90a4ae;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        
+        .target-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: #78909c;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        .risks-section {
+            margin-bottom: 15px;
+        }
+        
+        .risks-title {
+            font-size: 0.9rem;
+            color: #90a4ae;
+            margin-bottom: 8px;
+        }
+        
+        .risk-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .risk-tag {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .risk-tag.cloud {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid #ff9800;
+        }
+        
+        .risk-tag.moon {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ffb74d;
+            border: 1px solid #ff9800;
+        }
+        
+        .risk-tag.equipment {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ef9a9a;
+            border: 1px solid #f44336;
+        }
+        
+        .risk-tag.experience {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ef9a9a;
+            border: 1px solid #f44336;
+        }
+        
+        .risk-tag.none {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border: 1px solid #4caf50;
+        }
+        
+        .override-section {
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .override-label {
+            font-size: 0.85rem;
+            color: #90a4ae;
+            margin-bottom: 8px;
+        }
+        
+        .override-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .override-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .override-btn.allow {
+            background: rgba(76, 175, 80, 0.2);
+            color: #81c784;
+            border: 1px solid #4caf50;
+        }
+        
+        .override-btn.allow:hover,
+        .override-btn.allow.active {
+            background: rgba(76, 175, 80, 0.4);
+        }
+        
+        .override-btn.deny {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ef9a9a;
+            border: 1px solid #f44336;
+        }
+        
+        .override-btn.deny:hover,
+        .override-btn.deny.active {
+            background: rgba(244, 67, 54, 0.4);
+        }
+        
+        .override-btn.reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #90a4ae;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .override-btn.reset:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .override-reason {
+            margin-top: 10px;
+        }
+        
+        .override-reason input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        .override-reason input:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+        
+        .override-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(156, 39, 176, 0.1);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #ce93d8;
+        }
+        
+        .export-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .export-info {
+            color: #90a4ae;
+            font-size: 0.9rem;
+        }
+        
+        .sample-data {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .sample-data-title {
+            font-size: 0.95rem;
+            color: #b3e5fc;
+            margin-bottom: 10px;
+        }
+        
+        .sample-data-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #90a4ae;
+            white-space: pre-wrap;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value.safe {
+            color: #81c784;
+        }
+        
+        .stat-value.warning {
+            color: #ffb74d;
+        }
+        
+        .stat-value.danger {
+            color: #ef9a9a;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #90a4ae;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #90a4ae;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #90a4ae;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            color: #81d4fa;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #90a4ae;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+        
+        .modal-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            font-size: 0.9rem;
+            color: #90a4ae;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #64b5f6;
+        }
+        
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            border-radius: 8px;
+            font-weight: 500;
+            z-index: 999;
+            animation: fadeInOut 2s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .equipment-usage {
+            margin-top: 20px;
+        }
+        
+        .equipment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .equipment-table th,
+        .equipment-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .equipment-table th {
+            background: rgba(0, 0, 0, 0.3);
+            color: #81d4fa;
+            font-weight: 600;
+        }
+        
+        .equipment-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .usage-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .usage-indicator.free {
+            background: #4caf50;
+        }
+        
+        .usage-indicator.used {
+            background: #ff9800;
+        }
+        
+        .usage-indicator.conflict {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <header class="header">
+                <h1>🔭 天文夜观测规划工具</h1>
+                <p>导入观测数据，自动分析风险，智能规划观测计划</p>
+            </header>
+            
+            <section v-if="showSaveIndicator" class="save-indicator">
+                已保存到本地
+            </section>
+            
+            <section class="section">
+                <h2 class="section-title">📁 数据导入</h2>
+                <div class="import-grid">
+                    <div class="import-card" :class="{ success: starCatalogLoaded }">
+                        <h3>🌟 目标星表 (CSV)</h3>
+                        <div class="file-input-wrapper">
+                            <span class="file-button">选择文件</span>
+                            <input type="file" accept=".csv" @change="handleStarCatalogUpload($event)">
+                        </div>
+                        <div class="file-info" :class="{ success: starCatalogLoaded }">
+                            {{ starCatalogLoaded ? `已加载 ${starTargets.length} 个目标` : '请选择 CSV 文件' }}
+                        </div>
+                    </div>
+                    
+                    <div class="import-card" :class="{ success: equipmentLoaded }">
+                        <h3>📷 设备表 (CSV)</h3>
+                        <div class="file-input-wrapper">
+                            <span class="file-button">选择文件</span>
+                            <input type="file" accept=".csv" @change="handleEquipmentUpload($event)">
+                        </div>
+                        <div class="file-info" :class="{ success: equipmentLoaded }">
+                            {{ equipmentLoaded ? `已加载 ${equipment.length} 台设备` : '请选择 CSV 文件' }}
+                        </div>
+                    </div>
+                    
+                    <div class="import-card" :class="{ success: weatherLoaded }">
+                        <h3>🌤️ 天气记录 (CSV)</h3>
+                        <div class="file-input-wrapper">
+                            <span class="file-button">选择文件</span>
+                            <input type="file" accept=".csv" @change="handleWeatherUpload($event)">
+                        </div>
+                        <div class="file-info" :class="{ success: weatherLoaded }">
+                            {{ weatherLoaded ? `已加载 ${weatherRecords.length} 条记录` : '请选择 CSV 文件' }}
+                        </div>
+                    </div>
+                    
+                    <div class="import-card" :class="{ success: membersLoaded }">
+                        <h3>👥 成员报名 (JSON)</h3>
+                        <div class="file-input-wrapper">
+                            <span class="file-button">选择文件</span>
+                            <input type="file" accept=".json" @change="handleMembersUpload($event)">
+                        </div>
+                        <div class="file-info" :class="{ success: membersLoaded }">
+                            {{ membersLoaded ? `已加载 ${members.length} 位成员` : '请选择 JSON 文件' }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" @click="loadSampleData">
+                        📋 加载示例数据
+                    </button>
+                    <button class="btn btn-secondary" @click="clearAllData">
+                        🗑️ 清空所有数据
+                    </button>
+                </div>
+                
+                <div v-if="showSampleInfo" class="sample-data">
+                    <h3 class="sample-data-title">示例数据格式说明</h3>
+                    <div class="sample-data-content">
+目标星表 CSV 格式：
+name,type,ra,dec,mag,startHour,endHour,requiredEquipment,requiredExperience,moonDistanceLimit
+M42,星云,05:35:17,-05:23:28,4.0,19,23,望远镜,初级,30
+
+设备表 CSV 格式：
+id,name,type,available
+T01,星特朗8SE,望远镜,true
+C01,佳能600D,相机,true
+
+天气记录 CSV 格式：
+hour,cloudCover,moonPhase,moonAltitude
+19,10,0.3,15
+20,15,0.3,25
+
+成员报名 JSON 格式：
+{
+  "members": [
+    {"id": "M01", "name": "张三", "experience": "高级", "availableHours": [19,20,21,22]}
+  ]
+}
+                    </div>
+                </div>
+            </section>
+            
+            <section v-if="allDataLoaded" class="section">
+                <h2 class="section-title">📊 分析结果</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value safe">{{ stats.safe }}</div>
+                        <div class="stat-label">✅ 适合观测</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value warning">{{ stats.warning }}</div>
+                        <div class="stat-label">⚠️ 有风险</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value danger">{{ stats.danger }}</div>
+                        <div class="stat-label">❌ 不适合</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #ce93d8;">{{ stats.overridden }}</div>
+                        <div class="stat-label">✏️ 已改判</div>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <span class="filter-label">筛选状态：</span>
+                        <select class="filter-select" v-model="filterStatus">
+                            <option value="all">全部</option>
+                            <option value="safe">适合观测</option>
+                            <option value="warning">有风险</option>
+                            <option value="danger">不适合</option>
+                            <option value="overridden">已改判</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <span class="filter-label">筛选时段：</span>
+                        <select class="filter-select" v-model="filterHour">
+                            <option value="all">全部时段</option>
+                            <option v-for="hour in timeSlots" :key="hour" :value="hour">
+                                {{ hour }}:00 - {{ hour + 1 }}:00
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            
+            <section v-if="allDataLoaded" class="section">
+                <h2 class="section-title">⏱️ 观测时间轴</h2>
+                <div class="timeline-section">
+                    <div class="timeline">
+                        <div v-for="hour in timeSlots" :key="hour" class="timeline-hour">
+                            <div class="timeline-hour-header">{{ hour }}:00</div>
+                            <div class="timeline-indicators">
+                                <div v-if="getCloudCoverForHour(hour) !== null" 
+                                     :class="['indicator', getCloudIndicatorClass(hour)]"
+                                     @click="scrollToTargets(hour)">
+                                    云量: {{ getCloudCoverForHour(hour) }}%
+                                </div>
+                                <div v-for="target in getTargetsForHour(hour)" :key="target.id"
+                                     :class="['indicator', getTargetIndicatorClass(target)]"
+                                     @click="scrollToTarget(target.id)">
+                                    {{ target.name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section v-if="allDataLoaded" class="section">
+                <h2 class="section-title">🎯 观测目标卡片</h2>
+                
+                <div v-if="filteredTargets.length === 0" class="no-data">
+                    没有符合筛选条件的目标
+                </div>
+                
+                <div v-else class="targets-grid">
+                    <div v-for="target in filteredTargets" :key="target.id" 
+                         class="target-card" :class="getTargetCardClass(target)"
+                         :id="'target-' + target.id">
+                        <div class="target-header">
+                            <div>
+                                <div class="target-name">{{ target.name }}</div>
+                                <div style="font-size: 0.85rem; color: #90a4ae; margin-top: 4px;">
+                                    {{ target.type }} | 星等 {{ target.mag }}
+                                </div>
+                            </div>
+                            <div class="target-time">
+                                {{ target.startHour }}:00 - {{ target.endHour }}:00
+                            </div>
+                        </div>
+                        
+                        <div class="target-info">
+                            <div class="info-item">
+                                <div class="info-label">赤经/赤纬</div>
+                                <div class="info-value">{{ target.ra }} / {{ target.dec }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">所需设备</div>
+                                <div class="info-value">{{ target.requiredEquipment }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">经验要求</div>
+                                <div class="info-value">{{ target.requiredExperience }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">月距限制</div>
+                                <div class="info-value">{{ target.moonDistanceLimit }}°</div>
+                            </div>
+                        </div>
+                        
+                        <div class="risks-section">
+                            <div class="risks-title">风险评估：</div>
+                            <div class="risk-tags">
+                                <span v-if="target.risks.length === 0" class="risk-tag none">
+                                    ✅ 无风险
+                                </span>
+                                <span v-else v-for="risk in target.risks" :key="risk.type"
+                                      :class="['risk-tag', risk.type]">
+                                    {{ getRiskIcon(risk.type) }} {{ risk.message }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="override-section">
+                            <div class="override-label">人工改判：</div>
+                            <div class="override-buttons">
+                                <button class="override-btn allow" 
+                                        :class="{ active: target.override === 'allow' }"
+                                        @click="setOverride(target.id, 'allow')">
+                                    ✅ 改为适合
+                                </button>
+                                <button class="override-btn deny"
+                                        :class="{ active: target.override === 'deny' }"
+                                        @click="setOverride(target.id, 'deny')">
+                                    ❌ 改为不适合
+                                </button>
+                                <button class="override-btn reset"
+                                        @click="setOverride(target.id, null)">
+                                    🔄 重置
+                                </button>
+                            </div>
+                            
+                            <div v-if="target.override" class="override-reason">
+                                <input type="text" 
+                                       placeholder="输入改判原因（可选）"
+                                       v-model="target.overrideReason"
+                                       @input="saveOverrides">
+                            </div>
+                            
+                            <div v-if="target.override" class="override-info">
+                                {{ target.override === 'allow' ? '✅ 已改判为适合观测' : '❌ 已改判为不适合观测' }}
+                                <span v-if="target.overrideReason">：{{ target.overrideReason }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section v-if="allDataLoaded" class="section">
+                <h2 class="section-title">📷 设备使用情况</h2>
+                <div class="equipment-usage">
+                    <table class="equipment-table">
+                        <thead>
+                            <tr>
+                                <th>设备ID</th>
+                                <th>设备名称</th>
+                                <th>类型</th>
+                                <th>使用时段</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="equip in equipmentUsage" :key="equip.id">
+                                <td>{{ equip.id }}</td>
+                                <td>{{ equip.name }}</td>
+                                <td>{{ equip.type }}</td>
+                                <td>
+                                    <span v-if="equip.usage.length > 0">
+                                        {{ equip.usage.map(u => `${u.hour}:00 (${u.targetName})`).join(', ') }}
+                                    </span>
+                                    <span v-else style="color: #90a4ae;">未使用</span>
+                                </td>
+                                <td>
+                                    <span :class="['usage-indicator', equip.status]"></span>
+                                    {{ getEquipmentStatusText(equip.status) }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section v-if="allDataLoaded" class="section">
+                <h2 class="section-title">📤 导出</h2>
+                <div class="export-section">
+                    <button class="btn btn-success" @click="exportMarkdown">
+                        📄 导出 Markdown 观测单
+                    </button>
+                    <button class="btn btn-warning" @click="exportJSON">
+                        📋 导出 JSON 审计记录
+                    </button>
+                    <button class="btn btn-secondary" @click="previewMarkdown">
+                        👁️ 预览 Markdown
+                    </button>
+                    <button class="btn btn-secondary" @click="previewJSON">
+                        👁️ 预览 JSON
+                    </button>
+                    <div class="export-info">
+                        最后更新：{{ lastUpdateTime }}
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div v-if="showPreviewModal" class="modal-overlay" @click.self="closePreviewModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">{{ previewTitle }}</h3>
+                    <button class="modal-close" @click="closePreviewModal">×</button>
+                </div>
+                <div class="modal-content">{{ previewContent }}</div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @click="copyPreviewContent">
+                        📋 复制到剪贴板
+                    </button>
+                    <button class="btn btn-secondary" @click="closePreviewModal">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref, computed, watch, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                const starTargets = ref([]);
+                const equipment = ref([]);
+                const weatherRecords = ref([]);
+                const members = ref([]);
+                const overrides = ref({});
+                
+                const starCatalogLoaded = ref(false);
+                const equipmentLoaded = ref(false);
+                const weatherLoaded = ref(false);
+                const membersLoaded = ref(false);
+                
+                const showSampleInfo = ref(false);
+                const showSaveIndicator = ref(false);
+                const showPreviewModal = ref(false);
+                const previewTitle = ref('');
+                const previewContent = ref('');
+                
+                const filterStatus = ref('all');
+                const filterHour = ref('all');
+                
+                const lastUpdateTime = ref('');
+                
+                const allDataLoaded = computed(() => {
+                    return starCatalogLoaded.value && equipmentLoaded.value && 
+                           weatherLoaded.value && membersLoaded.value;
+                });
+                
+                const timeSlots = computed(() => {
+                    if (weatherRecords.value.length === 0) return [];
+                    const hours = weatherRecords.value.map(r => r.hour).sort((a, b) => a - b);
+                    return [...new Set(hours)];
+                });
+                
+                const analyzedTargets = computed(() => {
+                    return starTargets.value.map(target => {
+                        const risks = [];
+                        const targetHours = [];
+                        for (let h = target.startHour; h < target.endHour; h++) {
+                            targetHours.push(h);
+                        }
+                        
+                        for (const hour of targetHours) {
+                            const weather = weatherRecords.value.find(w => w.hour === hour);
+                            if (weather) {
+                                if (weather.cloudCover > 30) {
+                                    if (!risks.find(r => r.type === 'cloud')) {
+                                        risks.push({
+                                            type: 'cloud',
+                                            message: `云量 ${weather.cloudCover}% 超限`,
+                                            hour
+                                        });
+                                    }
+                                }
+                                
+                                if (weather.moonAltitude > 0) {
+                                    const moonRisk = risks.find(r => r.type === 'moon');
+                                    if (!moonRisk) {
+                                        risks.push({
+                                            type: 'moon',
+                                            message: `月亮在地平线上，月相 ${Math.round(weather.moonPhase * 100)}%`,
+                                            hour
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        
+                        const requiredEquip = target.requiredEquipment.split(/[,，]/).map(s => s.trim());
+                        const matchingEquip = equipment.value.filter(e => 
+                            requiredEquip.includes(e.type) && e.available
+                        );
+                        
+                        if (matchingEquip.length === 0) {
+                            risks.push({
+                                type: 'equipment',
+                                message: `无可用设备: ${target.requiredEquipment}`,
+                                hour: null
+                            });
+                        }
+                        
+                        const expLevel = { '初级': 1, '中级': 2, '高级': 3 };
+                        const requiredExp = expLevel[target.requiredExperience] || 1;
+                        
+                        const qualifiedMembers = members.value.filter(m => {
+                            const memberExp = expLevel[m.experience] || 1;
+                            const hasTime = targetHours.some(h => m.availableHours.includes(h));
+                            return memberExp >= requiredExp && hasTime;
+                        });
+                        
+                        if (qualifiedMembers.length === 0) {
+                            risks.push({
+                                type: 'experience',
+                                message: `无符合经验要求的成员 (需要 ${target.requiredExperience})`,
+                                hour: null
+                            });
+                        }
+                        
+                        const override = overrides.value[target.id];
+                        let effectiveStatus;
+                        
+                        if (override) {
+                            effectiveStatus = override.decision === 'allow' ? 'safe' : 'danger';
+                        } else {
+                            const hasDangerRisk = risks.some(r => 
+                                r.type === 'equipment' || r.type === 'experience' || 
+                                (r.type === 'cloud' && weatherRecords.value.find(w => w.hour === r.hour)?.cloudCover > 60)
+                            );
+                            
+                            if (hasDangerRisk) {
+                                effectiveStatus = 'danger';
+                            } else if (risks.length > 0) {
+                                effectiveStatus = 'warning';
+                            } else {
+                                effectiveStatus = 'safe';
+                            }
+                        }
+                        
+                        return {
+                            ...target,
+                            risks,
+                            override: override?.decision || null,
+                            overrideReason: override?.reason || '',
+                            effectiveStatus,
+                            targetHours
+                        };
+                    });
+                });
+                
+                const filteredTargets = computed(() => {
+                    let targets = [...analyzedTargets.value];
+                    
+                    if (filterStatus.value !== 'all') {
+                        if (filterStatus.value === 'overridden') {
+                            targets = targets.filter(t => t.override);
+                        } else {
+                            targets = targets.filter(t => t.effectiveStatus === filterStatus.value);
+                        }
+                    }
+                    
+                    if (filterHour.value !== 'all') {
+                        const hour = parseInt(filterHour.value);
+                        targets = targets.filter(t => t.targetHours.includes(hour));
+                    }
+                    
+                    return targets;
+                });
+                
+                const stats = computed(() => {
+                    const result = { safe: 0, warning: 0, danger: 0, overridden: 0 };
+                    analyzedTargets.value.forEach(t => {
+                        result[t.effectiveStatus]++;
+                        if (t.override) result.overridden++;
+                    });
+                    return result;
+                });
+                
+                const equipmentUsage = computed(() => {
+                    return equipment.value.map(equip => {
+                        const usage = [];
+                        let hasConflict = false;
+                        
+                        analyzedTargets.value.forEach(target => {
+                            const requiredEquip = target.requiredEquipment.split(/[,，]/).map(s => s.trim());
+                            if (requiredEquip.includes(equip.type) && equip.available) {
+                                target.targetHours.forEach(hour => {
+                                    const existing = usage.find(u => u.hour === hour);
+                                    if (existing) {
+                                        hasConflict = true;
+                                        existing.targetNames = existing.targetNames || [existing.targetName];
+                                        existing.targetNames.push(target.name);
+                                        existing.targetName = existing.targetNames.join(', ');
+                                    } else {
+                                        usage.push({ hour, targetName: target.name });
+                                    }
+                                });
+                            }
+                        });
+                        
+                        let status = 'free';
+                        if (hasConflict) {
+                            status = 'conflict';
+                        } else if (usage.length > 0) {
+                            status = 'used';
+                        }
+                        
+                        return {
+                            ...equip,
+                            usage,
+                            status
+                        };
+                    });
+                });
+                
+                const parseCSV = (text) => {
+                    const lines = text.trim().split('\n');
+                    if (lines.length < 2) return [];
+                    
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const data = [];
+                    
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(',').map(v => v.trim());
+                        const row = {};
+                        headers.forEach((header, idx) => {
+                            row[header] = values[idx] || '';
+                        });
+                        data.push(row);
+                    }
+                    
+                    return data;
+                };
+                
+                const handleFileUpload = (event, parser, handler) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = parser(e.target.result);
+                            handler(data);
+                        } catch (err) {
+                            alert('文件解析错误: ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                
+                const handleStarCatalogUpload = (event) => {
+                    handleFileUpload(event, parseCSV, (data) => {
+                        starTargets.value = data.map((row, idx) => ({
+                            id: `T${String(idx + 1).padStart(3, '0')}`,
+                            name: row.name || row['名称'] || '',
+                            type: row.type || row['类型'] || '',
+                            ra: row.ra || row['赤经'] || '',
+                            dec: row.dec || row['赤纬'] || '',
+                            mag: parseFloat(row.mag || row['星等'] || 0),
+                            startHour: parseInt(row.startHour || row['开始时间'] || 19),
+                            endHour: parseInt(row.endHour || row['结束时间'] || 23),
+                            requiredEquipment: row.requiredEquipment || row['所需设备'] || '',
+                            requiredExperience: row.requiredExperience || row['经验要求'] || '初级',
+                            moonDistanceLimit: parseFloat(row.moonDistanceLimit || row['月距限制'] || 30)
+                        })).filter(t => t.name);
+                        starCatalogLoaded.value = true;
+                        updateLastTime();
+                    });
+                };
+                
+                const handleEquipmentUpload = (event) => {
+                    handleFileUpload(event, parseCSV, (data) => {
+                        equipment.value = data.map((row, idx) => ({
+                            id: row.id || `E${String(idx + 1).padStart(3, '0')}`,
+                            name: row.name || row['名称'] || '',
+                            type: row.type || row['类型'] || '',
+                            available: (row.available || row['可用'] || 'true').toLowerCase() !== 'false'
+                        })).filter(e => e.name);
+                        equipmentLoaded.value = true;
+                        updateLastTime();
+                    });
+                };
+                
+                const handleWeatherUpload = (event) => {
+                    handleFileUpload(event, parseCSV, (data) => {
+                        weatherRecords.value = data.map(row => ({
+                            hour: parseInt(row.hour || row['小时'] || 0),
+                            cloudCover: parseFloat(row.cloudCover || row['云量'] || 0),
+                            moonPhase: parseFloat(row.moonPhase || row['月相'] || 0),
+                            moonAltitude: parseFloat(row.moonAltitude || row['月亮高度'] || 0)
+                        })).filter(w => !isNaN(w.hour));
+                        weatherLoaded.value = true;
+                        updateLastTime();
+                    });
+                };
+                
+                const handleMembersUpload = (event) => {
+                    handleFileUpload(event, JSON.parse, (data) => {
+                        members.value = (data.members || data).map((row, idx) => ({
+                            id: row.id || `M${String(idx + 1).padStart(3, '0')}`,
+                            name: row.name || '',
+                            experience: row.experience || '初级',
+                            availableHours: row.availableHours || row.hours || []
+                        })).filter(m => m.name);
+                        membersLoaded.value = true;
+                        updateLastTime();
+                    });
+                };
+                
+                const loadSampleData = () => {
+                    starTargets.value = [
+                        {
+                            id: 'T001',
+                            name: 'M42 猎户座大星云',
+                            type: '发射星云',
+                            ra: '05:35:17',
+                            dec: '-05:23:28',
+                            mag: 4.0,
+                            startHour: 19,
+                            endHour: 23,
+                            requiredEquipment: '望远镜',
+                            requiredExperience: '初级',
+                            moonDistanceLimit: 30
+                        },
+                        {
+                            id: 'T002',
+                            name: 'M45 昴星团',
+                            type: '疏散星团',
+                            ra: '03:47:24',
+                            dec: '+24:07:00',
+                            mag: 1.6,
+                            startHour: 18,
+                            endHour: 22,
+                            requiredEquipment: '双筒望远镜',
+                            requiredExperience: '初级',
+                            moonDistanceLimit: 20
+                        },
+                        {
+                            id: 'T003',
+                            name: 'M31 仙女座星系',
+                            type: '星系',
+                            ra: '00:42:44',
+                            dec: '+41:16:09',
+                            mag: 3.4,
+                            startHour: 20,
+                            endHour: 24,
+                            requiredEquipment: '望远镜,相机',
+                            requiredExperience: '中级',
+                            moonDistanceLimit: 40
+                        },
+                        {
+                            id: 'T004',
+                            name: 'M81 波德星系',
+                            type: '星系',
+                            ra: '09:55:33',
+                            dec: '+69:03:55',
+                            mag: 6.9,
+                            startHour: 21,
+                            endHour: 24,
+                            requiredEquipment: '望远镜,相机',
+                            requiredExperience: '高级',
+                            moonDistanceLimit: 50
+                        }
+                    ];
+                    
+                    equipment.value = [
+                        { id: 'E001', name: '星特朗 8SE', type: '望远镜', available: true },
+                        { id: 'E002', name: '信达小黑', type: '望远镜', available: true },
+                        { id: 'E003', name: '博冠 10x50', type: '双筒望远镜', available: true },
+                        { id: 'E004', name: '佳能 600D', type: '相机', available: true },
+                        { id: 'E005', name: 'ZWO ASI120MC', type: '相机', available: false }
+                    ];
+                    
+                    weatherRecords.value = [
+                        { hour: 18, cloudCover: 10, moonPhase: 0.3, moonAltitude: 10 },
+                        { hour: 19, cloudCover: 15, moonPhase: 0.3, moonAltitude: 20 },
+                        { hour: 20, cloudCover: 25, moonPhase: 0.3, moonAltitude: 30 },
+                        { hour: 21, cloudCover: 45, moonPhase: 0.3, moonAltitude: 35 },
+                        { hour: 22, cloudCover: 70, moonPhase: 0.3, moonAltitude: 25 },
+                        { hour: 23, cloudCover: 50, moonPhase: 0.3, moonAltitude: 10 }
+                    ];
+                    
+                    members.value = [
+                        { id: 'M001', name: '张三', experience: '高级', availableHours: [18, 19, 20, 21, 22, 23] },
+                        { id: 'M002', name: '李四', experience: '中级', availableHours: [19, 20, 21, 22] },
+                        { id: 'M003', name: '王五', experience: '初级', availableHours: [18, 19, 20] },
+                        { id: 'M004', name: '赵六', experience: '中级', availableHours: [20, 21, 22, 23] }
+                    ];
+                    
+                    starCatalogLoaded.value = true;
+                    equipmentLoaded.value = true;
+                    weatherLoaded.value = true;
+                    membersLoaded.value = true;
+                    
+                    showSampleInfo.value = true;
+                    updateLastTime();
+                };
+                
+                const clearAllData = () => {
+                    if (confirm('确定要清空所有数据吗？')) {
+                        starTargets.value = [];
+                        equipment.value = [];
+                        weatherRecords.value = [];
+                        members.value = [];
+                        overrides.value = {};
+                        
+                        starCatalogLoaded.value = false;
+                        equipmentLoaded.value = false;
+                        weatherLoaded.value = false;
+                        membersLoaded.value = false;
+                        
+                        showSampleInfo.value = false;
+                        localStorage.removeItem('astroObserver_overrides');
+                        localStorage.removeItem('astroObserver_data');
+                    }
+                };
+                
+                const getCloudCoverForHour = (hour) => {
+                    const record = weatherRecords.value.find(w => w.hour === hour);
+                    return record ? record.cloudCover : null;
+                };
+                
+                const getCloudIndicatorClass = (hour) => {
+                    const cover = getCloudCoverForHour(hour);
+                    if (cover > 60) return 'indicator-cloud-critical';
+                    if (cover > 30) return 'indicator-cloud';
+                    return 'indicator-target';
+                };
+                
+                const getTargetsForHour = (hour) => {
+                    return analyzedTargets.value.filter(t => t.targetHours.includes(hour));
+                };
+                
+                const getTargetIndicatorClass = (target) => {
+                    if (target.override) return 'indicator-override';
+                    if (target.effectiveStatus === 'danger') return 'indicator-conflict';
+                    if (target.effectiveStatus === 'warning') return 'indicator-cloud';
+                    return 'indicator-target';
+                };
+                
+                const getTargetCardClass = (target) => {
+                    if (target.override) {
+                        return 'status-override-safe';
+                    }
+                    return `status-${target.effectiveStatus}`;
+                };
+                
+                const getRiskIcon = (type) => {
+                    const icons = {
+                        cloud: '☁️',
+                        moon: '🌙',
+                        equipment: '📷',
+                        experience: '👤'
+                    };
+                    return icons[type] || '⚠️';
+                };
+                
+                const getEquipmentStatusText = (status) => {
+                    const texts = {
+                        free: '空闲',
+                        used: '已分配',
+                        conflict: '冲突'
+                    };
+                    return texts[status] || status;
+                };
+                
+                const setOverride = (targetId, decision) => {
+                    if (decision === null) {
+                        delete overrides.value[targetId];
+                    } else {
+                        overrides.value[targetId] = {
+                            decision,
+                            reason: overrides.value[targetId]?.reason || '',
+                            timestamp: new Date().toISOString()
+                        };
+                    }
+                    saveOverrides();
+                };
+                
+                const saveOverrides = () => {
+                    analyzedTargets.value.forEach(target => {
+                        if (target.override) {
+                            overrides.value[target.id] = {
+                                decision: target.override,
+                                reason: target.overrideReason || '',
+                                timestamp: overrides.value[target.id]?.timestamp || new Date().toISOString()
+                            };
+                        }
+                    });
+                    
+                    localStorage.setItem('astroObserver_overrides', JSON.stringify(overrides.value));
+                    showSaveIndicator.value = true;
+                    setTimeout(() => {
+                        showSaveIndicator.value = false;
+                    }, 2000);
+                    updateLastTime();
+                };
+                
+                const updateLastTime = () => {
+                    lastUpdateTime.value = new Date().toLocaleString('zh-CN');
+                };
+                
+                const scrollToTargets = (hour) => {
+                    filterHour.value = String(hour);
+                };
+                
+                const scrollToTarget = (targetId) => {
+                    setTimeout(() => {
+                        const element = document.getElementById('target-' + targetId);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 100);
+                };
+                
+                const generateMarkdown = () => {
+                    let md = `# 天文夜观测计划\n\n`;
+                    md += `> 生成时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+                    
+                    md += `## 统计概览\n\n`;
+                    md += `- ✅ 适合观测：${stats.value.safe} 个\n`;
+                    md += `- ⚠️ 有风险：${stats.value.warning} 个\n`;
+                    md += `- ❌ 不适合：${stats.value.danger} 个\n`;
+                    md += `- ✏️ 已改判：${stats.value.overridden} 个\n\n`;
+                    
+                    md += `## 观测时间轴\n\n`;
+                    md += `| 时段 | 云量 | 目标 |\n`;
+                    md += `|------|------|------|\n`;
+                    
+                    timeSlots.value.forEach(hour => {
+                        const cover = getCloudCoverForHour(hour);
+                        const targets = getTargetsForHour(hour);
+                        const targetNames = targets.map(t => t.name).join(', ') || '无';
+                        md += `| ${hour}:00 | ${cover}% | ${targetNames} |\n`;
+                    });
+                    md += `\n`;
+                    
+                    md += `## 观测目标详情\n\n`;
+                    
+                    analyzedTargets.value.forEach(target => {
+                        const statusEmoji = target.override 
+                            ? (target.effectiveStatus === 'safe' ? '✅' : '❌')
+                            : (target.effectiveStatus === 'safe' ? '✅' : target.effectiveStatus === 'warning' ? '⚠️' : '❌');
+                        
+                        md += `### ${statusEmoji} ${target.name}\n\n`;
+                        md += `- **类型**：${target.type}\n`;
+                        md += `- **星等**：${target.mag}\n`;
+                        md += `- **赤经**：${target.ra}\n`;
+                        md += `- **赤纬**：${target.dec}\n`;
+                        md += `- **观测时段**：${target.startHour}:00 - ${target.endHour}:00\n`;
+                        md += `- **所需设备**：${target.requiredEquipment}\n`;
+                        md += `- **经验要求**：${target.requiredExperience}\n`;
+                        md += `- **月距限制**：${target.moonDistanceLimit}°\n\n`;
+                        
+                        if (target.risks.length > 0) {
+                            md += `**风险评估**：\n\n`;
+                            target.risks.forEach(risk => {
+                                md += `- ${getRiskIcon(risk.type)} ${risk.message}\n`;
+                            });
+                            md += `\n`;
+                        }
+                        
+                        if (target.override) {
+                            md += `**人工改判**：${target.override === 'allow' ? '改为适合观测' : '改为不适合观测'}\n`;
+                            if (target.overrideReason) {
+                                md += `**改判原因**：${target.overrideReason}\n`;
+                            }
+                            md += `\n`;
+                        }
+                        
+                        md += `---\n\n`;
+                    });
+                    
+                    md += `## 设备使用情况\n\n`;
+                    md += `| 设备 | 类型 | 使用时段 | 状态 |\n`;
+                    md += `|------|------|----------|------|\n`;
+                    
+                    equipmentUsage.value.forEach(equip => {
+                        const usageText = equip.usage.length > 0 
+                            ? equip.usage.map(u => `${u.hour}:00 (${u.targetName})`).join('; ')
+                            : '未使用';
+                        const statusText = getEquipmentStatusText(equip.status);
+                        md += `| ${equip.name} | ${equip.type} | ${usageText} | ${statusText} |\n`;
+                    });
+                    md += `\n`;
+                    
+                    return md;
+                };
+                
+                const generateJSON = () => {
+                    const audit = {
+                        generatedAt: new Date().toISOString(),
+                        statistics: stats.value,
+                        targets: analyzedTargets.value.map(t => ({
+                            id: t.id,
+                            name: t.name,
+                            type: t.type,
+                            effectiveStatus: t.effectiveStatus,
+                            risks: t.risks,
+                            override: t.override ? {
+                                decision: t.override,
+                                reason: t.overrideReason,
+                                timestamp: overrides.value[t.id]?.timestamp
+                            } : null
+                        })),
+                        equipment: equipmentUsage.value,
+                        weather: weatherRecords.value,
+                        members: members.value
+                    };
+                    
+                    return JSON.stringify(audit, null, 2);
+                };
+                
+                const exportMarkdown = () => {
+                    const md = generateMarkdown();
+                    downloadFile(md, `观测计划_${new Date().toISOString().split('T')[0]}.md`, 'text/markdown');
+                };
+                
+                const exportJSON = () => {
+                    const json = generateJSON();
+                    downloadFile(json, `审计记录_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+                };
+                
+                const downloadFile = (content, filename, type) => {
+                    const blob = new Blob([content], { type });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                };
+                
+                const previewMarkdown = () => {
+                    previewTitle.value = 'Markdown 观测单预览';
+                    previewContent.value = generateMarkdown();
+                    showPreviewModal.value = true;
+                };
+                
+                const previewJSON = () => {
+                    previewTitle.value = 'JSON 审计记录预览';
+                    previewContent.value = generateJSON();
+                    showPreviewModal.value = true;
+                };
+                
+                const closePreviewModal = () => {
+                    showPreviewModal.value = false;
+                };
+                
+                const copyPreviewContent = () => {
+                    navigator.clipboard.writeText(previewContent.value).then(() => {
+                        alert('已复制到剪贴板');
+                    }).catch(err => {
+                        alert('复制失败: ' + err.message);
+                    });
+                };
+                
+                onMounted(() => {
+                    try {
+                        const savedOverrides = localStorage.getItem('astroObserver_overrides');
+                        if (savedOverrides) {
+                            overrides.value = JSON.parse(savedOverrides);
+                        }
+                    } catch (e) {
+                        console.log('无法加载本地存储的改判数据');
+                    }
+                    
+                    updateLastTime();
+                });
+                
+                return {
+                    starTargets,
+                    equipment,
+                    weatherRecords,
+                    members,
+                    overrides,
+                    starCatalogLoaded,
+                    equipmentLoaded,
+                    weatherLoaded,
+                    membersLoaded,
+                    showSampleInfo,
+                    showSaveIndicator,
+                    showPreviewModal,
+                    previewTitle,
+                    previewContent,
+                    filterStatus,
+                    filterHour,
+                    lastUpdateTime,
+                    allDataLoaded,
+                    timeSlots,
+                    analyzedTargets,
+                    filteredTargets,
+                    stats,
+                    equipmentUsage,
+                    handleStarCatalogUpload,
+                    handleEquipmentUpload,
+                    handleWeatherUpload,
+                    handleMembersUpload,
+                    loadSampleData,
+                    clearAllData,
+                    getCloudCoverForHour,
+                    getCloudIndicatorClass,
+                    getTargetsForHour,
+                    getTargetIndicatorClass,
+                    getTargetCardClass,
+                    getRiskIcon,
+                    getEquipmentStatusText,
+                    setOverride,
+                    saveOverrides,
+                    scrollToTargets,
+                    scrollToTarget,
+                    exportMarkdown,
+                    exportJSON,
+                    previewMarkdown,
+                    previewJSON,
+                    closePreviewModal,
+                    copyPreviewContent
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
