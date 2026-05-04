@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>干船坞涂装放行工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>干船坞涂装放行工具</h1>
+            <div class="header-actions">
+                <button id="resetAllBtn" class="btn btn-danger">重置所有数据</button>
+                <button id="exportMarkdownBtn" class="btn btn-primary">导出放行单(Markdown)</button>
+                <button id="exportJsonBtn" class="btn btn-secondary">导出审计包(JSON)</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- 左侧：数据导入区 -->
+            <aside class="import-section">
+                <h2>数据导入</h2>
+                
+                <div class="import-group">
+                    <h3>船体分区 (CSV)</h3>
+                    <input type="file" id="zonesFile" accept=".csv" class="file-input">
+                    <button class="btn btn-sm btn-info" onclick="showCsvTemplate('zones')">查看模板格式</button>
+                    <div id="zonesSummary" class="import-summary"></div>
+                </div>
+
+                <div class="import-group">
+                    <h3>涂料批号 (CSV)</h3>
+                    <input type="file" id="paintsFile" accept=".csv" class="file-input">
+                    <button class="btn btn-sm btn-info" onclick="showCsvTemplate('paints')">查看模板格式</button>
+                    <div id="paintsSummary" class="import-summary"></div>
+                </div>
+
+                <div class="import-group">
+                    <h3>湿膜厚度抽检 (CSV)</h3>
+                    <input type="file" id="wftFile" accept=".csv" class="file-input">
+                    <button class="btn btn-sm btn-info" onclick="showCsvTemplate('wft')">查看模板格式</button>
+                    <div id="wftSummary" class="import-summary"></div>
+                </div>
+
+                <div class="import-group">
+                    <h3>温湿度/露点 (JSON)</h3>
+                    <input type="file" id="envFile" accept=".json" class="file-input">
+                    <button class="btn btn-sm btn-info" onclick="showJsonTemplate()">查看模板格式</button>
+                    <div id="envSummary" class="import-summary"></div>
+                </div>
+
+                <div class="import-group">
+                    <h3>施工人员排班 (CSV)</h3>
+                    <input type="file" id="scheduleFile" accept=".csv" class="file-input">
+                    <button class="btn btn-sm btn-info" onclick="showCsvTemplate('schedule')">查看模板格式</button>
+                    <div id="scheduleSummary" class="import-summary"></div>
+                </div>
+            </aside>
+
+            <!-- 中间：问题告警区 -->
+            <section class="alerts-section">
+                <h2>问题告警</h2>
+                <div id="alertsContainer" class="alerts-container">
+                    <div class="alert-placeholder">请先导入数据以查看问题告警</div>
+                </div>
+            </section>
+
+            <!-- 右侧：分区复核区 -->
+            <section class="review-section">
+                <h2>分区复核</h2>
+                <div class="review-filters">
+                    <select id="statusFilter">
+                        <option value="all">全部状态</option>
+                        <option value="unreviewed">待复核</option>
+                        <option value="approved">已放行</option>
+                        <option value="rejected">需整改</option>
+                    </select>
+                    <button id="refreshBtn" class="btn btn-sm">刷新状态</button>
+                </div>
+                <div id="zonesContainer" class="zones-container">
+                    <div class="zones-placeholder">请先导入船体分区数据</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 分区详情模态框 -->
+        <div id="zoneModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalZoneTitle">分区详情</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="zoneInfo" class="zone-info"></div>
+                    <div id="zoneIssues" class="zone-issues"></div>
+                    <div class="review-form">
+                        <label>复核状态：</label>
+                        <select id="reviewStatus">
+                            <option value="unreviewed">待复核</option>
+                            <option value="approved">放行</option>
+                            <option value="rejected">需整改</option>
+                        </select>
+                        <label>复核备注：</label>
+                        <textarea id="reviewNotes" rows="4" placeholder="请输入复核备注..."></textarea>
+                        <label>复核人：</label>
+                        <input type="text" id="reviewerName" placeholder="请输入复核人姓名">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveReviewBtn" class="btn btn-primary">保存复核</button>
+                    <button id="closeModalBtn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模板格式模态框 -->
+        <div id="templateModal" class="modal hidden">
+            <div class="modal-content modal-wide">
+                <div class="modal-header">
+                    <h3 id="templateTitle">数据格式模板</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <pre id="templateContent" class="template-content"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button id="copyTemplateBtn" class="btn btn-primary">复制模板</button>
+                    <button id="closeTemplateBtn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
