@@ -1,0 +1,71 @@
+[
+  {
+    "id": "sample-level-001",
+    "name": "示例关卡：第一场 开幕",
+    "description": "这是一个示例关卡，用于演示换景排练系统的功能。包含开场换景、换幕和灯光切换三个事件。",
+    "sceneData": {
+      "name": "社区剧场 - 第一场",
+      "background": "街道场景",
+      "settings": {
+        "stageWidth": 800,
+        "stageHeight": 400
+      }
+    },
+    "propsList": [
+      { "id": "prop-table", "name": "桌子", "icon": "🪑", "width": 80, "height": 50 },
+      { "id": "prop-chair", "name": "椅子", "icon": "💺", "width": 50, "height": 60 },
+      { "id": "prop-lamp", "name": "台灯", "icon": "💡", "width": 40, "height": 40 },
+      { "id": "prop-book", "name": "书本", "icon": "📚", "width": 40, "height": 30 }
+    ],
+    "timeline": [
+      {
+        "time": 0,
+        "duration": 15,
+        "name": "开场换景",
+        "description": "将桌子移动到舞台左侧目标区域",
+        "requiredItems": [
+          { 
+            "type": "props", 
+            "id": "prop-table", 
+            "targetZone": { "name": "舞台左侧", "x": 50, "y": 100, "width": 100, "height": 100 }
+          }
+        ]
+      },
+      {
+        "time": 20,
+        "duration": 10,
+        "name": "放置道具",
+        "description": "将椅子放在桌子旁边",
+        "requiredItems": [
+          { 
+            "type": "props", 
+            "id": "prop-chair", 
+            "targetZone": { "name": "舞台中央", "x": 350, "y": 150, "width": 100, "height": 100 }
+          }
+        ]
+      },
+      {
+        "time": 35,
+        "duration": 12,
+        "name": "灯光准备",
+        "description": "将聚光灯放到舞台上",
+        "requiredItems": []
+      }
+    ],
+    "stageConfig": {
+      "width": 800,
+      "height": 400,
+      "dangerZones": [
+        { "name": "后台通道", "x": 0, "y": 0, "width": 50, "height": 400 },
+        { "name": "观众席", "x": 750, "y": 0, "width": 50, "height": 400 }
+      ],
+      "targetZones": [
+        { "name": "舞台左侧", "x": 50, "y": 100, "width": 100, "height": 100 },
+        { "name": "舞台中央", "x": 350, "y": 150, "width": 100, "height": 100 },
+        { "name": "舞台右侧", "x": 650, "y": 100, "width": 100, "height": 100 }
+      ]
+    },
+    "createdAt": "2026-05-04T00:00:00.000Z",
+    "updatedAt": "2026-05-04T00:00:00.000Z"
+  }
+]
