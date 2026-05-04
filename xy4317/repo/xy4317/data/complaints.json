@@ -1,0 +1,29 @@
+{
+  "building_code": "XQ-001",
+  "complaints": [
+    {
+      "unit_number": "101",
+      "complaint_date": "2026-04-20",
+      "complaint_type": "噪音污染",
+      "description": "担心施工期间噪音过大，影响老人休息",
+      "status": "pending",
+      "resolution": ""
+    },
+    {
+      "unit_number": "201",
+      "complaint_date": "2026-04-21",
+      "complaint_type": "采光影响",
+      "description": "电梯井可能会影响我家的采光",
+      "status": "pending",
+      "resolution": ""
+    },
+    {
+      "unit_number": "102",
+      "complaint_date": "2026-04-22",
+      "complaint_type": "安全顾虑",
+      "description": "担心电梯加装后的结构安全问题",
+      "status": "resolved",
+      "resolution": "已安排专业机构进行结构检测和评估，结果将公示"
+    }
+  ]
+}

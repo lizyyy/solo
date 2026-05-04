@@ -1,0 +1,29 @@
+{
+  "building_code": "XQ-001",
+  "batches": [
+    {
+      "batch_name": "一期施工-地基工程",
+      "start_date": "2026-05-10",
+      "end_date": "2026-06-15",
+      "work_hours_start": "08:00",
+      "work_hours_end": "18:00",
+      "status": "pending"
+    },
+    {
+      "batch_name": "二期施工-主体结构",
+      "start_date": "2026-06-20",
+      "end_date": "2026-08-30",
+      "work_hours_start": "07:30",
+      "work_hours_end": "19:00",
+      "status": "pending"
+    },
+    {
+      "batch_name": "三期施工-安装调试",
+      "start_date": "2026-09-01",
+      "end_date": "2026-09-30",
+      "work_hours_start": "09:00",
+      "work_hours_end": "17:00",
+      "status": "pending"
+    }
+  ]
+}
