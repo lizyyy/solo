@@ -1,0 +1,29 @@
+{"trace_id": "trace-001", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-123"}
+{"trace_id": "trace-001", "middleware_name": "tenant-resolver", "event_type": "context_set", "key": "user_id", "value": "user-456", "old_value": "user-123"}
+{"trace_id": "trace-001", "middleware_name": "rate-limiter", "event_type": "context_set", "key": "rate_limit_remaining", "value": "99"}
+{"trace_id": "trace-002", "middleware_name": "panic-recover", "event_type": "context_set", "key": "request_start", "value": "2024-01-15T10:00:00Z"}
+{"trace_id": "trace-002", "middleware_name": "cors-handler", "event_type": "context_set", "key": "cors_allowed", "value": "true"}
+{"trace_id": "trace-002", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-789"}
+{"trace_id": "trace-002", "middleware_name": "tenant-resolver", "event_type": "context_set", "key": "tenant_id", "value": "tenant-x"}
+{"trace_id": "trace-002", "middleware_name": "timeout-handler", "event_type": "context_set", "key": "timeout_deadline", "value": "2024-01-15T10:00:30Z"}
+{"trace_id": "trace-002", "middleware_name": "trace-middleware", "event_type": "context_missing", "key": "timeout_deadline"}
+{"trace_id": "trace-003", "middleware_name": "auth-jwt", "event_type": "next_not_called", "key": "preflight_blocked"}
+{"trace_id": "trace-004", "middleware_name": "panic-recover", "event_type": "context_set", "key": "request_id", "value": "req-004"}
+{"trace_id": "trace-004", "middleware_name": "cors-handler", "event_type": "context_set", "key": "cors_origin", "value": "https://example.com"}
+{"trace_id": "trace-004", "middleware_name": "tenant-resolver", "event_type": "context_set", "key": "tenant_id", "value": "tenant-b"}
+{"trace_id": "trace-004", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-aaa"}
+{"trace_id": "trace-004", "middleware_name": "idempotency-check", "event_type": "idempotency_set", "key": "idem_key", "value": "idem-key-001"}
+{"trace_id": "trace-005", "middleware_name": "panic-recover", "event_type": "context_set", "key": "request_id", "value": "req-005"}
+{"trace_id": "trace-005", "middleware_name": "cors-handler", "event_type": "context_set", "key": "cors_origin", "value": "https://example.com"}
+{"trace_id": "trace-005", "middleware_name": "tenant-resolver", "event_type": "context_set", "key": "tenant_id", "value": "tenant-c"}
+{"trace_id": "trace-005", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-bbb"}
+{"trace_id": "trace-005", "middleware_name": "idempotency-check", "event_type": "idempotency_set", "key": "idem_key", "value": "idem-key-001"}
+{"trace_id": "trace-006", "middleware_name": "panic-recover", "event_type": "context_set", "key": "request_id", "value": "req-006"}
+{"trace_id": "trace-006", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-ccc"}
+{"trace_id": "trace-006", "middleware_name": "cors-handler", "event_type": "context_set", "key": "cors_allowed", "value": "true"}
+{"trace_id": "trace-006", "middleware_name": "tenant-resolver", "event_type": "context_set", "key": "tenant_id", "value": "tenant-d"}
+{"trace_id": "trace-007", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "auth_failed", "value": "missing_token"}
+{"trace_id": "trace-008", "middleware_name": "panic-recover", "event_type": "context_set", "key": "request_id", "value": "req-008"}
+{"trace_id": "trace-008", "middleware_name": "cors-handler", "event_type": "context_set", "key": "cors_allowed", "value": "true"}
+{"trace_id": "trace-008", "middleware_name": "auth-jwt", "event_type": "context_set", "key": "user_id", "value": "user-ddd"}
+{"trace_id": "trace-008", "middleware_name": "trace-middleware", "event_type": "header_lost", "key": "x-trace-id"}

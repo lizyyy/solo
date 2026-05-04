@@ -1,0 +1,65 @@
+routes:
+  - service_name: "api-gateway"
+    method: "POST"
+    path: "/api/v1/users"
+    description: "Create user endpoint"
+    middlewares:
+      - "auth-jwt"
+      - "tenant-resolver"
+      - "rate-limiter"
+      - "request-logger"
+
+  - service_name: "api-gateway"
+    method: "GET"
+    path: "/api/v1/users/:id"
+    description: "Get user by ID"
+    middlewares:
+      - "panic-recover"
+      - "cors-handler"
+      - "auth-jwt"
+      - "tenant-resolver"
+      - "timeout-handler"
+      - "trace-middleware"
+
+  - service_name: "api-gateway"
+    method: "PUT"
+    path: "/api/v1/users/:id"
+    description: "Update user"
+    middlewares:
+      - "panic-recover"
+      - "auth-jwt"
+      - "cors-handler"
+      - "tenant-resolver"
+      - "idempotency-check"
+      - "rate-limiter"
+
+  - service_name: "api-gateway"
+    method: "OPTIONS"
+    path: "/api/v1/users"
+    description: "CORS preflight for users"
+    middlewares:
+      - "auth-jwt"
+      - "cors-handler"
+
+  - service_name: "payment-service"
+    method: "POST"
+    path: "/api/v1/payments"
+    description: "Create payment"
+    middlewares:
+      - "panic-recover"
+      - "cors-handler"
+      - "tenant-resolver"
+      - "auth-jwt"
+      - "idempotency-check"
+      - "rate-limiter-ip"
+      - "timeout-handler"
+
+  - service_name: "payment-service"
+    method: "GET"
+    path: "/api/v1/payments/:id"
+    description: "Get payment by ID"
+    middlewares:
+      - "panic-recover"
+      - "cors-handler"
+      - "auth-jwt"
+      - "trace-middleware"

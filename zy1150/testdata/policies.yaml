@@ -1,0 +1,37 @@
+policies:
+  - name: "middleware-order-policy"
+    type: "ordering"
+    description: "Enforce correct middleware ordering"
+    is_active: true
+    rules:
+      recover_must_be_first: true
+      cors_before_auth: true
+      tenant_before_auth: true
+      timeout_before_handler: true
+
+  - name: "context-safety-policy"
+    type: "context"
+    description: "Context usage safety rules"
+    is_active: true
+    rules:
+      no_key_overwrite: true
+      propagate_timeout: true
+      unique_key_names: true
+
+  - name: "request-safety-policy"
+    type: "request"
+    description: "Request handling safety rules"
+    is_active: true
+    rules:
+      body_read_once: true
+      always_call_next: true
+      trace_header_propagation: true
+
+  - name: "idempotency-policy"
+    type: "idempotency"
+    description: "Idempotency handling rules"
+    is_active: true
+    rules:
+      unique_keys_per_tenant: true
+      key_ttl_enforced: true
+      required_for_write_methods: true

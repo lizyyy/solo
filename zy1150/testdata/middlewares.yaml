@@ -1,0 +1,94 @@
+middlewares:
+  - name: "panic-recover"
+    type: "recover"
+    description: "Recover from panics and return 500"
+    config:
+      log_panic: true
+      return_stack: false
+
+  - name: "cors-handler"
+    type: "cors"
+    description: "Handle CORS preflight requests"
+    config:
+      allowed_origins:
+        - "https://example.com"
+        - "http://localhost:3000"
+      allowed_methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowed_headers:
+        - "Content-Type"
+        - "Authorization"
+        - "X-Tenant-ID"
+        - "X-Idempotency-Key"
+
+  - name: "auth-jwt"
+    type: "auth"
+    description: "JWT authentication middleware"
+    config:
+      header_name: "Authorization"
+      token_prefix: "Bearer"
+      claims_required:
+        - "user_id"
+        - "exp"
+
+  - name: "tenant-resolver"
+    type: "tenant"
+    description: "Resolve tenant from request"
+    config:
+      source: "header"
+      header_name: "X-Tenant-ID"
+      fallback_to_default: false
+
+  - name: "rate-limiter"
+    type: "rate_limit"
+    description: "Rate limiting by user ID"
+    config:
+      key_source: "user_id"
+      requests_per_second: 100
+      burst: 50
+
+  - name: "rate-limiter-ip"
+    type: "rate_limit"
+    description: "Rate limiting by IP address"
+    config:
+      key_source: "ip"
+      requests_per_second: 50
+      burst: 20
+
+  - name: "timeout-handler"
+    type: "timeout"
+    description: "Request timeout handler"
+    config:
+      timeout_seconds: 30
+      timeout_message: "Request timed out"
+
+  - name: "trace-middleware"
+    type: "trace"
+    description: "Distributed tracing middleware"
+    config:
+      trace_header: "X-Trace-ID"
+      span_header: "X-Span-ID"
+      propagate_headers: true
+
+  - name: "idempotency-check"
+    type: "idempotency"
+    description: "Idempotency key validation"
+    config:
+      header_name: "X-Idempotency-Key"
+      ttl_seconds: 86400
+      required_for_methods:
+        - "POST"
+        - "PUT"
+        - "DELETE"
+
+  - name: "request-logger"
+    type: "logging"
+    description: "Request logging middleware"
+    config:
+      log_headers: true
+      log_body: false
+      log_duration: true
