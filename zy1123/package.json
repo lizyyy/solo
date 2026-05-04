@@ -1,0 +1,43 @@
+{
+  "name": "doc-sync-guard",
+  "version": "1.0.0",
+  "description": "文档并发写安全助手 - 协调多人并发编辑，防止覆盖，智能合并冲突",
+  "main": "src/cli.js",
+  "bin": {
+    "doc-guard": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "server": "node src/server.js",
+    "test": "jest --coverage"
+  },
+  "keywords": [
+    "document",
+    "concurrency",
+    "merge",
+    "conflict",
+    "lease",
+    "markdown",
+    "json",
+    "version-control"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "chalk": "^4.1.2",
+    "diff": "^5.1.0",
+    "lodash": "^4.17.21",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "tempy": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
