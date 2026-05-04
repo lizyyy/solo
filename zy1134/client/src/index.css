@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 音符样式 */
+.note-sharp {
+  color: #ef4444;
+}
+
+.note-flat {
+  color: #3b82f6;
+}
+
+.note-natural {
+  color: #64748b;
+}
+
+/* 和弦可视化 */
+.chord-keyboard {
+  display: flex;
+  gap: 2px;
+}
+
+.piano-key {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.white-key {
+  width: 40px;
+  height: 120px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0 0 4px 4px;
+  z-index: 1;
+}
+
+.white-key.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.black-key {
+  position: absolute;
+  width: 24px;
+  height: 70px;
+  background: #1e293b;
+  border-radius: 0 0 3px 3px;
+  z-index: 2;
+  left: 28px;
+  top: 0;
+}
+
+.black-key.active {
+  background: #475569;
+}

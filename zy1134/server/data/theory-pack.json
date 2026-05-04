@@ -1,0 +1,527 @@
+{
+  "version": "1.0.0",
+  "description": "乐理和声练习题库样例数据",
+  "knowledgePoints": [
+    {
+      "id": 1,
+      "name": "大调音阶音级",
+      "category": "音阶",
+      "description": "识别大调音阶中的各级音"
+    },
+    {
+      "id": 2,
+      "name": "小调音阶音级",
+      "category": "音阶",
+      "description": "识别小调音阶中的各级音"
+    },
+    {
+      "id": 3,
+      "name": "三和弦构成",
+      "category": "和弦",
+      "description": "大三和弦、小三和弦、减三和弦、增三和弦的构成"
+    },
+    {
+      "id": 4,
+      "name": "七和弦构成",
+      "category": "和弦",
+      "description": "大七和弦、小七和弦、属七和弦、减七和弦的构成"
+    },
+    {
+      "id": 5,
+      "name": "三和弦转位",
+      "category": "转位",
+      "description": "三和弦的第一转位（六和弦）、第二转位（四六和弦）"
+    },
+    {
+      "id": 6,
+      "name": "七和弦转位",
+      "category": "转位",
+      "description": "七和弦的第一、第二、第三转位"
+    },
+    {
+      "id": 7,
+      "name": "大调罗马数字",
+      "category": "罗马数字",
+      "description": "大调和弦功能的罗马数字标记"
+    },
+    {
+      "id": 8,
+      "name": "小调罗马数字",
+      "category": "罗马数字",
+      "description": "小调和弦功能的罗马数字标记"
+    },
+    {
+      "id": 9,
+      "name": "正格终止",
+      "category": "终止式",
+      "description": "V -> I 的进行"
+    },
+    {
+      "id": 10,
+      "name": "变格终止",
+      "category": "终止式",
+      "description": "IV -> I 的进行"
+    },
+    {
+      "id": 11,
+      "name": "半终止",
+      "category": "终止式",
+      "description": "结束在 V 级的进行"
+    },
+    {
+      "id": 12,
+      "name": "欺骗终止",
+      "category": "终止式",
+      "description": "V -> vi 的进行"
+    }
+  ],
+  "questions": [
+    {
+      "knowledge_point_id": 1,
+      "type": "scale_identification",
+      "difficulty": 1,
+      "content": {
+        "question": "在 C 大调中，第 III 级音是什么？",
+        "key": "C",
+        "scaleType": "major",
+        "degree": 3
+      },
+      "options": ["A", "B", "C", "D"],
+      "correct_answer": {
+        "note": "E",
+        "degree": 3,
+        "key": "C"
+      },
+      "explanation": "C 大调音阶为 C-D-E-F-G-A-B，第 III 级音是 E。",
+      "tags": ["C大调", "音级识别", "基础"]
+    },
+    {
+      "knowledge_point_id": 1,
+      "type": "scale_identification",
+      "difficulty": 2,
+      "content": {
+        "question": "在 G 大调中，第 V 级音是什么？",
+        "key": "G",
+        "scaleType": "major",
+        "degree": 5
+      },
+      "options": ["C", "D", "E", "F#"],
+      "correct_answer": {
+        "note": "D",
+        "degree": 5,
+        "key": "G"
+      },
+      "explanation": "G 大调音阶为 G-A-B-C-D-E-F#，第 V 级音是 D。注意 G 大调有一个升号（F#）。",
+      "tags": ["G大调", "音级识别", "调号"]
+    },
+    {
+      "knowledge_point_id": 1,
+      "type": "scale_identification",
+      "difficulty": 2,
+      "content": {
+        "question": "在 F 大调中，第 IV 级音是什么？",
+        "key": "F",
+        "scaleType": "major",
+        "degree": 4
+      },
+      "options": ["Bb", "B", "C", "D"],
+      "correct_answer": {
+        "note": "Bb",
+        "degree": 4,
+        "key": "F"
+      },
+      "explanation": "F 大调音阶为 F-G-A-Bb-C-D-E，第 IV 级音是 Bb。注意 F 大调有一个降号（Bb）。",
+      "tags": ["F大调", "音级识别", "降号调"]
+    },
+    {
+      "knowledge_point_id": 2,
+      "type": "scale_identification",
+      "difficulty": 2,
+      "content": {
+        "question": "在 a 和声小调中，第 VII 级音是什么？",
+        "key": "A",
+        "scaleType": "harmonic_minor",
+        "degree": 7
+      },
+      "options": ["G", "G#", "A", "B"],
+      "correct_answer": {
+        "note": "G#",
+        "degree": 7,
+        "key": "A"
+      },
+      "explanation": "a 和声小调音阶为 A-B-C-D-E-F-G#。和声小调需要升高第 VII 级音（导音），所以是 G# 而不是 G。",
+      "tags": ["a小调", "和声小调", "导音"]
+    },
+    {
+      "knowledge_point_id": 3,
+      "type": "chord_construction",
+      "difficulty": 1,
+      "content": {
+        "question": "以 C 为根音的大三和弦由哪些音构成？",
+        "root": "C",
+        "chordType": "major"
+      },
+      "options": [
+        ["C", "E", "G"],
+        ["C", "Eb", "G"],
+        ["C", "E", "G#"],
+        ["C", "D", "G"]
+      ],
+      "correct_answer": {
+        "notes": ["C", "E", "G"],
+        "chordType": "major",
+        "root": "C"
+      },
+      "explanation": "大三和弦的结构是：根音 + 大三度（4个半音） + 纯五度（7个半音）。C 到 E 是大三度，E 到 G 是小三度（合起来是纯五度）。",
+      "tags": ["大三和弦", "C", "和弦构成"]
+    },
+    {
+      "knowledge_point_id": 3,
+      "type": "chord_construction",
+      "difficulty": 1,
+      "content": {
+        "question": "以 A 为根音的小三和弦由哪些音构成？",
+        "root": "A",
+        "chordType": "minor"
+      },
+      "options": [
+        ["A", "C#", "E"],
+        ["A", "C", "E"],
+        ["A", "C", "Eb"],
+        ["A", "B", "E"]
+      ],
+      "correct_answer": {
+        "notes": ["A", "C", "E"],
+        "chordType": "minor",
+        "root": "A"
+      },
+      "explanation": "小三和弦的结构是：根音 + 小三度（3个半音） + 纯五度（7个半音）。A 到 C 是小三度，C 到 E 是大三度（合起来是纯五度）。",
+      "tags": ["小三和弦", "A", "和弦构成"]
+    },
+    {
+      "knowledge_point_id": 3,
+      "type": "chord_construction",
+      "difficulty": 2,
+      "content": {
+        "question": "以 B 为根音的减三和弦由哪些音构成？",
+        "root": "B",
+        "chordType": "diminished"
+      },
+      "options": [
+        ["B", "D", "F"],
+        ["B", "D#", "F#"],
+        ["B", "D", "F#"],
+        ["B", "Eb", "G"]
+      ],
+      "correct_answer": {
+        "notes": ["B", "D", "F"],
+        "chordType": "diminished",
+        "root": "B"
+      },
+      "explanation": "减三和弦的结构是：根音 + 小三度 + 减五度（6个半音）。B 到 D 是小三度，D 到 F 也是小三度（合起来是减五度）。",
+      "tags": ["减三和弦", "B", "和弦构成"]
+    },
+    {
+      "knowledge_point_id": 4,
+      "type": "chord_construction",
+      "difficulty": 2,
+      "content": {
+        "question": "以 G 为根音的属七和弦（大小七和弦）由哪些音构成？",
+        "root": "G",
+        "chordType": "dominant_seventh",
+        "isSeventh": true
+      },
+      "options": [
+        ["G", "B", "D", "F#"],
+        ["G", "B", "D", "F"],
+        ["G", "Bb", "D", "F"],
+        ["G", "B", "Db", "F"]
+      ],
+      "correct_answer": {
+        "notes": ["G", "B", "D", "F"],
+        "chordType": "dominant_seventh",
+        "root": "G"
+      },
+      "explanation": "属七和弦（大小七和弦）的结构是：大三和弦 + 小七度。G 大三和弦是 G-B-D，加上小七度 F（G 到 F 是小七度，10个半音）。",
+      "tags": ["属七和弦", "G", "七和弦", "大小七"]
+    },
+    {
+      "knowledge_point_id": 5,
+      "type": "inversion",
+      "difficulty": 2,
+      "content": {
+        "question": "C 大三和弦的第一转位（六和弦）的低音是什么？",
+        "root": "C",
+        "chordType": "major",
+        "inversion": 1
+      },
+      "options": ["C", "E", "G", "A"],
+      "correct_answer": {
+        "bassNote": "E",
+        "inversion": 1,
+        "chordNotes": ["E", "G", "C"]
+      },
+      "explanation": "三和弦的第一转位（六和弦）是将三音作为低音。C 大三和弦 C-E-G 的第一转位低音是 E，和弦音排列为 E-G-C。",
+      "tags": ["三和弦", "第一转位", "六和弦", "C"]
+    },
+    {
+      "knowledge_point_id": 5,
+      "type": "inversion",
+      "difficulty": 2,
+      "content": {
+        "question": "F 大三和弦的第二转位（四六和弦）的低音是什么？",
+        "root": "F",
+        "chordType": "major",
+        "inversion": 2
+      },
+      "options": ["F", "A", "C", "D"],
+      "correct_answer": {
+        "bassNote": "C",
+        "inversion": 2,
+        "chordNotes": ["C", "F", "A"]
+      },
+      "explanation": "三和弦的第二转位（四六和弦）是将五音作为低音。F 大三和弦 F-A-C 的第二转位低音是 C，和弦音排列为 C-F-A。",
+      "tags": ["三和弦", "第二转位", "四六和弦", "F"]
+    },
+    {
+      "knowledge_point_id": 6,
+      "type": "inversion",
+      "difficulty": 3,
+      "content": {
+        "question": "G 属七和弦的第三转位（二和弦）的低音是什么？",
+        "root": "G",
+        "chordType": "dominant_seventh",
+        "inversion": 3
+      },
+      "options": ["G", "B", "D", "F"],
+      "correct_answer": {
+        "bassNote": "F",
+        "inversion": 3,
+        "chordNotes": ["F", "G", "B", "D"]
+      },
+      "explanation": "七和弦的第三转位（二和弦）是将七音作为低音。G 属七和弦 G-B-D-F 的第三转位低音是 F，和弦音排列为 F-G-B-D。",
+      "tags": ["七和弦", "第三转位", "二和弦", "属七"]
+    },
+    {
+      "knowledge_point_id": 7,
+      "type": "roman_numeral",
+      "difficulty": 1,
+      "content": {
+        "question": "在 C 大调中，G-B-D 这个和弦的罗马数字标记是什么？",
+        "key": "C",
+        "scaleType": "major",
+        "chordNotes": ["G", "B", "D"]
+      },
+      "options": ["I", "IV", "V", "vi"],
+      "correct_answer": {
+        "romanNumeral": "V",
+        "function": "属功能",
+        "chordType": "major",
+        "root": "G"
+      },
+      "explanation": "C 大调的各级和弦：I(C-E-G)、ii(D-F-A)、iii(E-G-B)、IV(F-A-C)、V(G-B-D)、vi(A-C-E)、vii°(B-D-F)。G-B-D 是 V 级大三和弦。",
+      "tags": ["C大调", "罗马数字", "V级", "属功能"]
+    },
+    {
+      "knowledge_point_id": 7,
+      "type": "roman_numeral",
+      "difficulty": 1,
+      "content": {
+        "question": "在 C 大调中，A-C-E 这个和弦的罗马数字标记是什么？",
+        "key": "C",
+        "scaleType": "major",
+        "chordNotes": ["A", "C", "E"]
+      },
+      "options": ["I", "iii", "V", "vi"],
+      "correct_answer": {
+        "romanNumeral": "vi",
+        "function": "下属功能/主功能",
+        "chordType": "minor",
+        "root": "A"
+      },
+      "explanation": "C 大调的各级和弦：I(C-E-G)、ii(D-F-A)、iii(E-G-B)、IV(F-A-C)、V(G-B-D)、vi(A-C-E)、vii°(B-D-F)。A-C-E 是 vi 级小三和弦。",
+      "tags": ["C大调", "罗马数字", "vi级", "小三和弦"]
+    },
+    {
+      "knowledge_point_id": 7,
+      "type": "roman_numeral",
+      "difficulty": 2,
+      "content": {
+        "question": "在 G 大调中，D-F#-A 这个和弦的罗马数字标记是什么？",
+        "key": "G",
+        "scaleType": "major",
+        "chordNotes": ["D", "F#", "A"]
+      },
+      "options": ["I", "IV", "V", "vi"],
+      "correct_answer": {
+        "romanNumeral": "V",
+        "function": "属功能",
+        "chordType": "major",
+        "root": "D"
+      },
+      "explanation": "G 大调音阶是 G-A-B-C-D-E-F#，各级和弦：I(G-B-D)、ii(A-C-E)、iii(B-D-F#)、IV(C-E-G)、V(D-F#-A)、vi(E-G-B)、vii°(F#-A-C)。D-F#-A 是 V 级大三和弦。",
+      "tags": ["G大调", "罗马数字", "V级", "调号"]
+    },
+    {
+      "knowledge_point_id": 8,
+      "type": "roman_numeral",
+      "difficulty": 2,
+      "content": {
+        "question": "在 a 和声小调中，E-G#-B 这个和弦的罗马数字标记是什么？",
+        "key": "A",
+        "scaleType": "harmonic_minor",
+        "chordNotes": ["E", "G#", "B"]
+      },
+      "options": ["i", "III", "V", "vii°"],
+      "correct_answer": {
+        "romanNumeral": "V",
+        "function": "属功能",
+        "chordType": "major",
+        "root": "E"
+      },
+      "explanation": "a 和声小调音阶是 A-B-C-D-E-F-G#。由于升高了第 VII 级（G#），V 级和弦 E-G#-B 变成了大三和弦，这是和声小调的特点。",
+      "tags": ["a小调", "和声小调", "罗马数字", "V级"]
+    },
+    {
+      "knowledge_point_id": 9,
+      "type": "cadence",
+      "difficulty": 1,
+      "content": {
+        "question": "在 C 大调中，以下哪个和弦进行是正格终止？",
+        "key": "C",
+        "scaleType": "major"
+      },
+      "options": [
+        "IV -> I",
+        "V -> I",
+        "I -> V",
+        "V -> vi"
+      ],
+      "correct_answer": {
+        "cadenceType": "authentic",
+        "progression": ["V", "I"],
+        "description": "正格终止是 V 到 I 的进行"
+      },
+      "explanation": "正格终止（Authentic Cadence）是从属功能和弦（V 或 V7）到主功能和弦（I）的进行，具有强烈的结束感。V -> I 是典型的正格终止。",
+      "tags": ["终止式", "正格终止", "V-I"]
+    },
+    {
+      "knowledge_point_id": 10,
+      "type": "cadence",
+      "difficulty": 1,
+      "content": {
+        "question": "在 C 大调中，以下哪个和弦进行是变格终止？",
+        "key": "C",
+        "scaleType": "major"
+      },
+      "options": [
+        "IV -> I",
+        "V -> I",
+        "I -> IV",
+        "V -> vi"
+      ],
+      "correct_answer": {
+        "cadenceType": "plagal",
+        "progression": ["IV", "I"],
+        "description": "变格终止是 IV 到 I 的进行"
+      },
+      "explanation": "变格终止（Plagal Cadence）是从下属功能和弦（IV）到主功能和弦（I）的进行，也称为\"阿门终止\"，常用于赞美诗的结束。",
+      "tags": ["终止式", "变格终止", "IV-I", "阿门终止"]
+    },
+    {
+      "knowledge_point_id": 11,
+      "type": "cadence",
+      "difficulty": 2,
+      "content": {
+        "question": "在 C 大调中，如果一个乐句结束在 G 大三和弦上，这是什么类型的终止？",
+        "key": "C",
+        "scaleType": "major",
+        "endingChord": "G"
+      },
+      "options": [
+        "正格终止",
+        "变格终止",
+        "半终止",
+        "欺骗终止"
+      ],
+      "correct_answer": {
+        "cadenceType": "half",
+        "progression": ["?", "V"],
+        "description": "半终止结束在 V 级和弦上"
+      },
+      "explanation": "半终止（Half Cadence）结束在属功能和弦（V）上，给人一种\"未完成\"、\"期待继续\"的感觉，常用于乐句的中间结束。G 是 C 大调的 V 级音。",
+      "tags": ["终止式", "半终止", "V级"]
+    },
+    {
+      "knowledge_point_id": 12,
+      "type": "cadence",
+      "difficulty": 2,
+      "content": {
+        "question": "在 C 大调中，以下哪个和弦进行是欺骗终止？",
+        "key": "C",
+        "scaleType": "major"
+      },
+      "options": [
+        "V -> I",
+        "V -> vi",
+        "IV -> I",
+        "I -> V"
+      ],
+      "correct_answer": {
+        "cadenceType": "deceptive",
+        "progression": ["V", "vi"],
+        "description": "欺骗终止是 V 到 vi 的进行"
+      },
+      "explanation": "欺骗终止（Deceptive Cadence）是从属功能和弦（V）预期应该到主功能（I），但却到了其他和弦（最常见的是 vi）。V -> vi 是典型的欺骗终止，给人一种\"意外\"的感觉。",
+      "tags": ["终止式", "欺骗终止", "V-vi"]
+    },
+    {
+      "knowledge_point_id": 4,
+      "type": "chord_construction",
+      "difficulty": 3,
+      "content": {
+        "question": "以 B 为根音的减七和弦由哪些音构成？",
+        "root": "B",
+        "chordType": "diminished_seventh",
+        "isSeventh": true
+      },
+      "options": [
+        ["B", "D", "F", "Ab"],
+        ["B", "D#", "F#", "A"],
+        ["B", "D", "F#", "A"],
+        ["B", "Eb", "G", "Bb"]
+      ],
+      "correct_answer": {
+        "notes": ["B", "D", "F", "Ab"],
+        "chordType": "diminished_seventh",
+        "root": "B"
+      },
+      "explanation": "减七和弦的结构是：减三和弦 + 减七度。每个相邻音之间都是小三度（3个半音）。B 减七和弦是 B-D-F-Ab（注意 Ab 也可以写成 G#，但在减七和弦中通常用降号表示）。",
+      "tags": ["减七和弦", "B", "七和弦", "减和弦"]
+    },
+    {
+      "knowledge_point_id": 9,
+      "type": "cadence",
+      "difficulty": 3,
+      "content": {
+        "question": "在 C 大调中，G7 -> C 这个进行属于什么类型的终止？",
+        "key": "C",
+        "scaleType": "major",
+        "progression": ["G7", "C"]
+      },
+      "options": [
+        "正格终止",
+        "变格终止",
+        "半终止",
+        "欺骗终止"
+      ],
+      "correct_answer": {
+        "cadenceType": "authentic",
+        "progression": ["V7", "I"],
+        "description": "属七和弦到主和弦也是正格终止"
+      },
+      "explanation": "G7 是 C 大调的 V7 级属七和弦。V7 -> I 是最强烈的正格终止，因为属七和弦的七音（F）有强烈的倾向要解决到主和弦的三音（E）。",
+      "tags": ["终止式", "正格终止", "属七解决", "V7-I"]
+    }
+  ]
+}

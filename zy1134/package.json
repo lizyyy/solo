@@ -1,0 +1,24 @@
+{
+  "name": "music-theory-practice",
+  "version": "1.0.0",
+  "description": "乐理和声练习台 - 全栈Web应用",
+  "main": "server/src/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd server && npm run build && cd ../client && npm run build",
+    "start": "cd server && npm start",
+    "import": "cd server && npm run import",
+    "test": "cd server && npm test"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ]
+}
