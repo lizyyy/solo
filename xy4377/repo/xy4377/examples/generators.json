@@ -1,0 +1,17 @@
+[
+    {
+        "name": "主发电机 #1",
+        "capacity_kw": 200.0,
+        "redundancy_threshold": 0.3
+    },
+    {
+        "name": "主发电机 #2",
+        "capacity_kw": 150.0,
+        "redundancy_threshold": 0.3
+    },
+    {
+        "name": "备用发电机",
+        "capacity_kw": 100.0,
+        "redundancy_threshold": 0.2
+    }
+]

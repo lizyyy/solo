@@ -1,0 +1,86 @@
+[
+    {
+        "name": "C-01-主舞台灯光",
+        "panel_name": "主配电箱-A",
+        "phase": "L1",
+        "max_capacity_kw": 30.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-02-主舞台音响",
+        "panel_name": "主配电箱-A",
+        "phase": "L2",
+        "max_capacity_kw": 25.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-03-主舞台视频",
+        "panel_name": "主配电箱-A",
+        "phase": "L3",
+        "max_capacity_kw": 20.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-04-副舞台灯光",
+        "panel_name": "主配电箱-B",
+        "phase": "L1",
+        "max_capacity_kw": 20.0,
+        "generator_id": 2
+    },
+    {
+        "name": "C-05-副舞台音响",
+        "panel_name": "主配电箱-B",
+        "phase": "L2",
+        "max_capacity_kw": 18.0,
+        "generator_id": 2
+    },
+    {
+        "name": "C-06-美食区-A",
+        "panel_name": "摊位配电箱-1",
+        "phase": "L1",
+        "max_capacity_kw": 15.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-07-美食区-B",
+        "panel_name": "摊位配电箱-1",
+        "phase": "L2",
+        "max_capacity_kw": 15.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-08-美食区-C",
+        "panel_name": "摊位配电箱-1",
+        "phase": "L3",
+        "max_capacity_kw": 8.0,
+        "generator_id": 1
+    },
+    {
+        "name": "C-09-文创区-A",
+        "panel_name": "摊位配电箱-2",
+        "phase": "L1",
+        "max_capacity_kw": 10.0,
+        "generator_id": 2
+    },
+    {
+        "name": "C-10-文创区-B",
+        "panel_name": "摊位配电箱-2",
+        "phase": "L2",
+        "max_capacity_kw": 10.0,
+        "generator_id": 2
+    },
+    {
+        "name": "C-11-雨棚区-A",
+        "panel_name": "雨棚配电箱",
+        "phase": "L1",
+        "max_capacity_kw": 12.0,
+        "generator_id": 3
+    },
+    {
+        "name": "C-12-雨棚区-B",
+        "panel_name": "雨棚配电箱",
+        "phase": "L2",
+        "max_capacity_kw": 12.0,
+        "generator_id": 3
+    }
+]

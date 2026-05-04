@@ -1,0 +1,155 @@
+[
+    {
+        "name": "主舞台-灯光系统",
+        "location": "主舞台区",
+        "power_required_kw": 28.0,
+        "circuit_id": 1,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": true
+    },
+    {
+        "name": "主舞台-音响系统",
+        "location": "主舞台区",
+        "power_required_kw": 22.0,
+        "circuit_id": 2,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": true
+    },
+    {
+        "name": "主舞台-LED大屏",
+        "location": "主舞台区",
+        "power_required_kw": 18.0,
+        "circuit_id": 3,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": true
+    },
+    {
+        "name": "副舞台-灯光",
+        "location": "副舞台区",
+        "power_required_kw": 15.0,
+        "circuit_id": 4,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "副舞台-音响",
+        "location": "副舞台区",
+        "power_required_kw": 14.0,
+        "circuit_id": 5,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "美食摊位-A1-烧烤王",
+        "location": "美食区-前排",
+        "power_required_kw": 8.0,
+        "circuit_id": 6,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "美食摊位-A2-奶茶铺",
+        "location": "美食区-前排",
+        "power_required_kw": 5.0,
+        "circuit_id": 6,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "美食摊位-B1-小吃摊",
+        "location": "美食区-中排",
+        "power_required_kw": 6.0,
+        "circuit_id": 7,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "美食摊位-B2-汉堡店",
+        "location": "美食区-中排",
+        "power_required_kw": 7.0,
+        "circuit_id": 7,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "美食摊位-C1-冰淇淋",
+        "location": "美食区-后排",
+        "power_required_kw": 3.0,
+        "circuit_id": 8,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "文创摊位-01-手绘",
+        "location": "文创区-左",
+        "power_required_kw": 2.0,
+        "circuit_id": 9,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "文创摊位-02-摄影",
+        "location": "文创区-左",
+        "power_required_kw": 1.5,
+        "circuit_id": 9,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "文创摊位-03-手作",
+        "location": "文创区-右",
+        "power_required_kw": 1.0,
+        "circuit_id": 10,
+        "is_rain_protected": false,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "雨棚摊位-01-饮品",
+        "location": "雨棚区-A",
+        "power_required_kw": 4.0,
+        "circuit_id": 11,
+        "is_rain_protected": true,
+        "has_rcd_protection": false,
+        "is_critical": false
+    },
+    {
+        "name": "雨棚摊位-02-简餐",
+        "location": "雨棚区-A",
+        "power_required_kw": 5.0,
+        "circuit_id": 11,
+        "is_rain_protected": true,
+        "has_rcd_protection": true,
+        "is_critical": false
+    },
+    {
+        "name": "雨棚摊位-03-休息区照明",
+        "location": "雨棚区-B",
+        "power_required_kw": 3.0,
+        "circuit_id": 12,
+        "is_rain_protected": true,
+        "has_rcd_protection": false,
+        "is_critical": false
+    },
+    {
+        "name": "雨棚摊位-04-充电区",
+        "location": "雨棚区-B",
+        "power_required_kw": 2.0,
+        "circuit_id": 12,
+        "is_rain_protected": true,
+        "has_rcd_protection": true,
+        "is_critical": false
+    }
+]
