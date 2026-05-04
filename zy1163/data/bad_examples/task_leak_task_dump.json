@@ -1,0 +1,65 @@
+{
+  "tasks": [
+    {
+      "task_id": "leak-001",
+      "name": "forgotten_background_task",
+      "state": "pending",
+      "coro_name": "periodic_cleanup",
+      "created_at": "2026-05-05T08:00:00Z",
+      "last_updated_at": "2026-05-05T08:00:01Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "interval": 60,
+        "description": "Created with create_task() but never awaited or cancelled"
+      }
+    },
+    {
+      "task_id": "leak-002",
+      "name": "orphan_http_request",
+      "state": "pending",
+      "coro_name": "fire_and_forget_request",
+      "created_at": "2026-05-05T09:30:00Z",
+      "last_updated_at": "2026-05-05T09:30:02Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "url": "https://analytics.example.com/event",
+        "description": "Fire-and-forget pattern but task never completes"
+      }
+    },
+    {
+      "task_id": "leak-003",
+      "name": "never_awaited_subtask",
+      "state": "running",
+      "coro_name": "process_data_batch",
+      "created_at": "2026-05-05T09:45:00Z",
+      "last_updated_at": "2026-05-05T09:45:30Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "batch_size": 1000,
+        "description": "Task reference was lost, nobody is waiting for it"
+      }
+    },
+    {
+      "task_id": "normal-001",
+      "name": "properly_awaited_task",
+      "state": "done",
+      "coro_name": "fetch_user_profile",
+      "created_at": "2026-05-05T10:00:00Z",
+      "last_updated_at": "2026-05-05T10:00:05Z",
+      "waiting_on": null,
+      "awaited_by": ["main-task"],
+      "cancel_requested": false,
+      "metadata": {
+        "user_id": 12345
+      }
+    }
+  ],
+  "generated_at": "2026-05-05T10:00:00Z",
+  "description": "Bad example: Tasks created but never awaited (potential memory leaks)"
+}

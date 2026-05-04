@@ -1,0 +1,76 @@
+{
+  "tasks": [
+    {
+      "task_id": "task-001",
+      "name": "main_loop",
+      "state": "running",
+      "coro_name": "asyncio_main",
+      "created_at": "2026-05-05T10:00:00Z",
+      "last_updated_at": "2026-05-05T10:00:30Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "priority": "high"
+      }
+    },
+    {
+      "task_id": "task-002",
+      "name": "api_request",
+      "state": "pending",
+      "coro_name": "fetch_user_data",
+      "created_at": "2026-05-05T10:00:05Z",
+      "last_updated_at": "2026-05-05T10:00:15Z",
+      "waiting_on": "task-005",
+      "awaited_by": ["task-001"],
+      "cancel_requested": false,
+      "metadata": {
+        "endpoint": "/api/users"
+      }
+    },
+    {
+      "task_id": "task-003",
+      "name": "db_query",
+      "state": "pending",
+      "coro_name": "query_database",
+      "created_at": "2026-05-05T10:00:10Z",
+      "last_updated_at": "2026-05-05T10:00:20Z",
+      "waiting_on": "task-005",
+      "awaited_by": ["task-001"],
+      "cancel_requested": false,
+      "metadata": {
+        "table": "users"
+      }
+    },
+    {
+      "task_id": "task-004",
+      "name": "file_writer",
+      "state": "done",
+      "coro_name": "write_log_file",
+      "created_at": "2026-05-05T10:00:00Z",
+      "last_updated_at": "2026-05-05T10:00:10Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "file": "app.log"
+      }
+    },
+    {
+      "task_id": "task-005",
+      "name": "redis_cache",
+      "state": "running",
+      "coro_name": "get_from_cache",
+      "created_at": "2026-05-05T10:00:05Z",
+      "last_updated_at": "2026-05-05T10:00:15Z",
+      "waiting_on": null,
+      "awaited_by": ["task-002", "task-003"],
+      "cancel_requested": false,
+      "metadata": {
+        "key": "user_cache"
+      }
+    }
+  ],
+  "generated_at": "2026-05-05T10:00:30Z",
+  "version": "1.0"
+}

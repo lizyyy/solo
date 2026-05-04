@@ -1,0 +1,11 @@
+{"timestamp": "2026-05-05T10:00:00.000Z", "event_type": "task_created", "task_id": "bad-cancel-001", "coro_name": "badly_written_coroutine", "details": {"name": "ignores_cancellation"}}
+{"timestamp": "2026-05-05T10:00:00.100Z", "event_type": "task_running", "task_id": "bad-cancel-001", "details": {"phase": "starting"}}
+{"timestamp": "2026-05-05T10:00:05.000Z", "event_type": "task_pending", "task_id": "bad-cancel-001", "waiting_on": "io-operation", "details": {"reason": "waiting for network"}}
+{"timestamp": "2026-05-05T10:00:10.000Z", "event_type": "task_cancel_requested", "task_id": "bad-cancel-001", "details": {"source": "timeout_handler"}}
+{"timestamp": "2026-05-05T10:00:10.000Z", "event_type": "task_pending", "task_id": "bad-cancel-001", "waiting_on": "io-operation", "details": {"note": "Task still pending after cancel request - ignores CancelledError"}}
+{"timestamp": "2026-05-05T10:00:15.000Z", "event_type": "task_running", "task_id": "bad-cancel-001", "details": {"phase": "resumed_ignoring_cancel", "note": "Task resumed running even though cancelled"}}
+{"timestamp": "2026-05-05T10:00:20.000Z", "event_type": "task_pending", "task_id": "bad-cancel-001", "waiting_on": "another-io", "details": {"note": "Task continues to wait despite cancellation"}}
+{"timestamp": "2026-05-05T10:00:30.000Z", "event_type": "task_created", "task_id": "good-cancel-001", "coro_name": "well_written_coroutine", "details": {"name": "respects_cancellation"}}
+{"timestamp": "2026-05-05T10:00:30.100Z", "event_type": "task_running", "task_id": "good-cancel-001", "details": {}}
+{"timestamp": "2026-05-05T10:00:35.000Z", "event_type": "task_cancel_requested", "task_id": "good-cancel-001", "details": {"source": "user_request"}}
+{"timestamp": "2026-05-05T10:00:35.100Z", "event_type": "task_cancelled", "task_id": "good-cancel-001", "details": {"reason": "CancelledError properly handled"}}

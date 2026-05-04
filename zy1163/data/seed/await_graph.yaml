@@ -1,0 +1,25 @@
+edges:
+  - from: task-001
+    to: task-002
+    await_time: "2026-05-05T10:00:05.000Z"
+    description: "main_loop awaiting api_request"
+
+  - from: task-001
+    to: task-003
+    await_time: "2026-05-05T10:00:10.000Z"
+    description: "main_loop awaiting db_query"
+
+  - from: task-002
+    to: task-005
+    await_time: "2026-05-05T10:00:15.000Z"
+    description: "api_request awaiting redis_cache"
+
+  - from: task-003
+    to: task-005
+    await_time: "2026-05-05T10:00:20.000Z"
+    description: "db_query awaiting redis_cache"
+
+metadata:
+  generated_at: "2026-05-05T10:00:30Z"
+  version: "1.0"
+  task_count: 5

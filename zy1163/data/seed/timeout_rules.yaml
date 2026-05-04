@@ -1,0 +1,21 @@
+rules:
+  - pattern: "fetch_.*"
+    timeout_seconds: 10.0
+    description: "API 请求任务的默认超时时间"
+
+  - pattern: "query_.*"
+    timeout_seconds: 30.0
+    description: "数据库查询任务的超时时间"
+
+  - pattern: "get_from_cache|redis_cache"
+    timeout_seconds: 5.0
+    description: "Redis 缓存操作的超时时间"
+
+  - pattern: "write_.*|file_writer"
+    timeout_seconds: 60.0
+    description: "文件写入操作的超时时间"
+
+metadata:
+  generated_at: "2026-05-05T10:00:00Z"
+  version: "1.0"
+  total_rules: 4

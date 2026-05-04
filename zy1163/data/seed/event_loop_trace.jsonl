@@ -1,0 +1,17 @@
+{"timestamp": "2026-05-05T10:00:00.000Z", "event_type": "task_created", "task_id": "task-001", "coro_name": "asyncio_main", "details": {"name": "main_loop"}}
+{"timestamp": "2026-05-05T10:00:00.100Z", "event_type": "task_running", "task_id": "task-001", "details": {}}
+{"timestamp": "2026-05-05T10:00:00.200Z", "event_type": "task_created", "task_id": "task-004", "coro_name": "write_log_file", "details": {"name": "file_writer"}}
+{"timestamp": "2026-05-05T10:00:00.300Z", "event_type": "task_running", "task_id": "task-004", "details": {}}
+{"timestamp": "2026-05-05T10:00:05.000Z", "event_type": "task_created", "task_id": "task-002", "coro_name": "fetch_user_data", "details": {"name": "api_request"}}
+{"timestamp": "2026-05-05T10:00:05.100Z", "event_type": "task_running", "task_id": "task-002", "details": {}}
+{"timestamp": "2026-05-05T10:00:05.200Z", "event_type": "task_created", "task_id": "task-005", "coro_name": "get_from_cache", "details": {"name": "redis_cache"}}
+{"timestamp": "2026-05-05T10:00:05.300Z", "event_type": "task_running", "task_id": "task-005", "details": {}}
+{"timestamp": "2026-05-05T10:00:10.000Z", "event_type": "task_created", "task_id": "task-003", "coro_name": "query_database", "details": {"name": "db_query"}}
+{"timestamp": "2026-05-05T10:00:10.100Z", "event_type": "task_running", "task_id": "task-003", "details": {}}
+{"timestamp": "2026-05-05T10:00:10.000Z", "event_type": "task_done", "task_id": "task-004", "details": {"result": "success"}}
+{"timestamp": "2026-05-05T10:00:15.000Z", "event_type": "task_waiting", "task_id": "task-002", "target": "task-005", "details": {"reason": "awaiting_cache"}}
+{"timestamp": "2026-05-05T10:00:15.000Z", "event_type": "task_pending", "task_id": "task-002", "waiting_on": "task-005", "details": {}}
+{"timestamp": "2026-05-05T10:00:20.000Z", "event_type": "task_waiting", "task_id": "task-003", "target": "task-005", "details": {"reason": "awaiting_cache"}}
+{"timestamp": "2026-05-05T10:00:20.000Z", "event_type": "task_pending", "task_id": "task-003", "waiting_on": "task-005", "details": {}}
+{"timestamp": "2026-05-05T10:00:25.000Z", "event_type": "task_running", "task_id": "task-001", "details": {"progress": "50%"}}
+{"timestamp": "2026-05-05T10:00:30.000Z", "event_type": "task_running", "task_id": "task-005", "details": {"progress": "75%"}}

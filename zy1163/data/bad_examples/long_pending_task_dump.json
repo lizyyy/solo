@@ -1,0 +1,66 @@
+{
+  "tasks": [
+    {
+      "task_id": "task-101",
+      "name": "stuck_api_call",
+      "state": "pending",
+      "coro_name": "fetch_external_api",
+      "created_at": "2026-05-05T09:00:00Z",
+      "last_updated_at": "2026-05-05T09:00:05Z",
+      "waiting_on": "task-102",
+      "awaited_by": ["task-100"],
+      "cancel_requested": false,
+      "metadata": {
+        "endpoint": "https://slow-api.example.com/data",
+        "timeout_expected": 30
+      }
+    },
+    {
+      "task_id": "task-102",
+      "name": "slow_network_io",
+      "state": "pending",
+      "coro_name": "network_stream_read",
+      "created_at": "2026-05-05T09:00:00Z",
+      "last_updated_at": "2026-05-05T09:00:10Z",
+      "waiting_on": null,
+      "awaited_by": ["task-101"],
+      "cancel_requested": false,
+      "metadata": {
+        "socket_timeout": 60,
+        "bytes_read": 0
+      }
+    },
+    {
+      "task_id": "task-100",
+      "name": "main_request_handler",
+      "state": "pending",
+      "coro_name": "handle_http_request",
+      "created_at": "2026-05-05T09:00:00Z",
+      "last_updated_at": "2026-05-05T09:00:02Z",
+      "waiting_on": "task-101",
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "request_id": "req-abc123",
+        "user_agent": "Mozilla/5.0"
+      }
+    },
+    {
+      "task_id": "task-103",
+      "name": "another_stuck_task",
+      "state": "running",
+      "coro_name": "infinite_while_loop",
+      "created_at": "2026-05-05T08:00:00Z",
+      "last_updated_at": "2026-05-05T08:00:01Z",
+      "waiting_on": null,
+      "awaited_by": [],
+      "cancel_requested": false,
+      "metadata": {
+        "loop_count": "infinite",
+        "description": "This task runs forever without await"
+      }
+    }
+  ],
+  "generated_at": "2026-05-05T10:00:00Z",
+  "description": "Bad example: Tasks stuck for over 1 hour"
+}

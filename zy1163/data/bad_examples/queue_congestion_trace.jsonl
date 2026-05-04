@@ -1,0 +1,22 @@
+{"timestamp": "2026-05-05T10:00:00.000Z", "event_type": "queue_created", "queue_name": "request_queue", "maxsize": 100, "details": {}}
+{"timestamp": "2026-05-05T10:00:00.100Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-001"}}
+{"timestamp": "2026-05-05T10:00:00.200Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-002"}}
+{"timestamp": "2026-05-05T10:00:00.300Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-003"}}
+{"timestamp": "2026-05-05T10:00:00.400Z", "event_type": "queue_get", "queue_name": "request_queue", "task_id": "consumer-001", "details": {"item_id": "req-001"}}
+{"timestamp": "2026-05-05T10:00:00.500Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-002", "details": {"item_id": "req-004"}}
+{"timestamp": "2026-05-05T10:00:00.600Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-002", "details": {"item_id": "req-005"}}
+{"timestamp": "2026-05-05T10:00:00.700Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-006"}}
+{"timestamp": "2026-05-05T10:00:00.800Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-002", "details": {"item_id": "req-007"}}
+{"timestamp": "2026-05-05T10:00:00.900Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-008"}}
+{"timestamp": "2026-05-05T10:00:01.000Z", "event_type": "task_waiting", "task_id": "consumer-001", "target": "slow_io_operation", "details": {"reason": "consumer is stuck on slow IO, queue growing"}}
+{"timestamp": "2026-05-05T10:00:01.100Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-002", "details": {"item_id": "req-009"}}
+{"timestamp": "2026-05-05T10:00:01.200Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-010"}}
+{"timestamp": "2026-05-05T10:00:01.300Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-002", "details": {"item_id": "req-011"}}
+{"timestamp": "2026-05-05T10:00:01.400Z", "event_type": "queue_put", "queue_name": "request_queue", "task_id": "producer-001", "details": {"item_id": "req-012"}}
+{"timestamp": "2026-05-05T10:00:01.500Z", "event_type": "task_created", "task_id": "waiting-task-001", "coro_name": "wait_for_queue", "details": {}}
+{"timestamp": "2026-05-05T10:00:01.600Z", "event_type": "task_waiting", "task_id": "waiting-task-001", "target": "queue:request_queue", "details": {"reason": "waiting to put item in full queue"}}
+{"timestamp": "2026-05-05T10:00:01.700Z", "event_type": "task_created", "task_id": "waiting-task-002", "coro_name": "wait_for_queue", "details": {}}
+{"timestamp": "2026-05-05T10:00:01.800Z", "event_type": "task_waiting", "task_id": "waiting-task-002", "target": "queue:request_queue", "details": {"reason": "waiting to put item in full queue"}}
+{"timestamp": "2026-05-05T10:00:01.900Z", "event_type": "task_created", "task_id": "waiting-task-003", "coro_name": "wait_for_queue", "details": {}}
+{"timestamp": "2026-05-05T10:00:02.000Z", "event_type": "task_waiting", "task_id": "waiting-task-003", "target": "queue:request_queue", "details": {"reason": "waiting to put item in full queue"}}
+{"timestamp": "2026-05-05T10:00:02.100Z", "event_type": "task_pending", "task_id": "consumer-001", "waiting_on": "slow_io_operation", "details": {"note": "Consumer is still stuck, queue is congested"}}
