@@ -1,0 +1,5 @@
+order_id,customer_id,product_name,category,purchase_date,status
+O999,NOT_EXIST,测试产品,测试分类,2024-01-01,active
+O998,C001,海尔冰箱,大家电,无效日期格式,active
+O997,C002,格力空调,大家电,2024/02/30,active
+,O001测试,测试产品,测试分类,2024-01-01,active

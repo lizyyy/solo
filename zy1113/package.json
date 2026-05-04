@@ -1,0 +1,23 @@
+{
+  "name": "service-call-attribution",
+  "version": "1.0.0",
+  "description": "售后语音纪要归因和跟进建议台",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "seed": "node server/scripts/seed.js",
+    "test": "node --test server/tests/*.test.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dayjs": "^1.11.10",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "natural": "^6.10.4"
+  },
+  "devDependencies": {}
+}
