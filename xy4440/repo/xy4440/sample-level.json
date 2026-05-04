@@ -1,0 +1,96 @@
+{
+  "id": "sample_training_level_001",
+  "name": "初级救援训练场景",
+  "description": "适合皮划艇夏令营教练进行基础救援训练的场景。包含3名落水学员、2艘救援艇、河流水流和浅滩障碍。",
+  "difficulty": "easy",
+  "timeLimit": 180,
+  "maxTurns": 20,
+  
+  "rivers": [
+    {
+      "x": 100,
+      "y": 100,
+      "width": 1000,
+      "height": 500,
+      "flowDirection": 90,
+      "flowSpeed": 1.5
+    }
+  ],
+  
+  "shallows": [
+    {
+      "x": 400,
+      "y": 200,
+      "width": 150,
+      "height": 100
+    },
+    {
+      "x": 700,
+      "y": 400,
+      "width": 200,
+      "height": 120
+    }
+  ],
+  
+  "students": [
+    {
+      "x": 300,
+      "y": 250,
+      "name": "学员A",
+      "health": 85
+    },
+    {
+      "x": 600,
+      "y": 350,
+      "name": "学员B",
+      "health": 70
+    },
+    {
+      "x": 800,
+      "y": 200,
+      "name": "学员C",
+      "health": 90
+    }
+  ],
+  
+  "boats": [
+    {
+      "x": 150,
+      "y": 150,
+      "name": "救援艇1号",
+      "energy": 100,
+      "maxPassengers": 2
+    },
+    {
+      "x": 150,
+      "y": 450,
+      "name": "救援艇2号",
+      "energy": 100,
+      "maxPassengers": 2
+    }
+  ],
+  
+  "ropes": [
+    {
+      "startX": 500,
+      "startY": 100,
+      "endX": 500,
+      "endY": 600
+    }
+  ],
+  
+  "safeZones": [
+    {
+      "x": 1050,
+      "y": 350,
+      "radius": 60
+    }
+  ],
+  
+  "metadata": {
+    "createdAt": "2026-05-05T10:00:00.000Z",
+    "author": "系统管理员",
+    "tags": ["初级", "训练", "多人救援", "夏令营"],
+    "notes": "这是一个用于皮划艇夏令营教练训练的标准场景。学员需要在水流中被救援，救援艇需要避开浅滩区域。建议先救援健康值较低的学员B。"
+  }
+}
