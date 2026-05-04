@@ -1,0 +1,60 @@
+{
+  "windows": [
+    {
+      "targetId": "target_001",
+      "startTime": "2026-05-15T20:00:00",
+      "endTime": "2026-05-15T21:30:00",
+      "duration": 90,
+      "deviceIds": ["device_001", "device_002", "device_004"],
+      "notes": "M42 深空拍摄 - LRGB通道各30分钟"
+    },
+    {
+      "targetId": "target_002",
+      "startTime": "2026-05-15T21:30:00",
+      "endTime": "2026-05-15T23:00:00",
+      "duration": 90,
+      "deviceIds": ["device_001", "device_002", "device_004"],
+      "notes": "M31 仙女座星系拍摄"
+    },
+    {
+      "targetId": "target_003",
+      "startTime": "2026-05-15T20:30:00",
+      "endTime": "2026-05-15T21:00:00",
+      "duration": 30,
+      "deviceIds": ["device_001", "device_002", "device_004"],
+      "notes": "M45 昴星团广角拍摄 - 注意：与M42窗口冲突"
+    },
+    {
+      "targetId": "target_001",
+      "startTime": "2026-05-16T01:00:00",
+      "endTime": "2026-05-16T02:30:00",
+      "duration": 90,
+      "deviceIds": ["device_001", "device_008", "device_005"],
+      "notes": "M42 第二轮拍摄 - 使用备用赤道仪和窄带滤镜"
+    },
+    {
+      "targetId": "target_006",
+      "startTime": "2026-05-15T23:00:00",
+      "endTime": "2026-05-16T00:00:00",
+      "duration": 60,
+      "deviceIds": ["device_001", "device_003", "device_004"],
+      "notes": "木星高分辨率拍摄 - 使用行星相机"
+    },
+    {
+      "targetId": "target_007",
+      "startTime": "2026-05-16T00:00:00",
+      "endTime": "2026-05-16T00:45:00",
+      "duration": 45,
+      "deviceIds": ["device_001", "device_003", "device_004"],
+      "notes": "土星高分辨率拍摄 - 设备冲突检测"
+    },
+    {
+      "targetId": "target_008",
+      "startTime": "2026-05-15T21:00:00",
+      "endTime": "2026-05-15T22:00:00",
+      "duration": 60,
+      "deviceIds": ["device_008", "device_002", "device_005"],
+      "notes": "M51 涡状星系 - 使用导星镜和备用赤道仪"
+    }
+  ]
+}

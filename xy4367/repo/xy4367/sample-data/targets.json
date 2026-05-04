@@ -1,0 +1,60 @@
+{
+  "targets": [
+    {
+      "name": "M42 猎户座大星云",
+      "type": "发射星云",
+      "rightAscension": "05h35m17.3s",
+      "declination": "-05°23'28\"",
+      "priority": 3
+    },
+    {
+      "name": "M31 仙女座星系",
+      "type": "螺旋星系",
+      "rightAscension": "00h42m44.3s",
+      "declination": "+41°16'09\"",
+      "priority": 2
+    },
+    {
+      "name": "M45 昴星团",
+      "type": "疏散星团",
+      "rightAscension": "03h47m24.0s",
+      "declination": "+24°07'00\"",
+      "priority": 2
+    },
+    {
+      "name": "M8 礁湖星云",
+      "type": "发射星云",
+      "rightAscension": "18h03m37.0s",
+      "declination": "-24°23'12\"",
+      "priority": 1
+    },
+    {
+      "name": "M20 三裂星云",
+      "type": "发射星云",
+      "rightAscension": "18h02m23.0s",
+      "declination": "-23°02'00\"",
+      "priority": 1
+    },
+    {
+      "name": "木星",
+      "type": "行星",
+      "rightAscension": "02h20m00.0s",
+      "declination": "+12°00'00\"",
+      "priority": 3
+    },
+    {
+      "name": "土星",
+      "type": "行星",
+      "rightAscension": "22h30m00.0s",
+      "declination": "-10°00'00\"",
+      "priority": 3
+    },
+    {
+      "name": "M51 涡状星系",
+      "type": "螺旋星系",
+      "rightAscension": "13h29m52.7s",
+      "declination": "+47°11'43\"",
+      "priority": 2
+    }
+  ]
+}
