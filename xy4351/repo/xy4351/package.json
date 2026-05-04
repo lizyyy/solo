@@ -1,0 +1,32 @@
+{
+  "name": "native-plant-seed-bank-service",
+  "version": "1.0.0",
+  "description": "社区乡土植物种子库本地后端服务",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "init-db": "node scripts/init-db.js",
+    "seed-data": "node scripts/seed-data.js"
+  },
+  "keywords": [
+    "乡土植物",
+    "种子库",
+    "REST API",
+    "SQLite",
+    "植物保育"
+  ],
+  "author": "Community Native Plant Seed Bank",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
