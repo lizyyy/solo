@@ -1,0 +1,71 @@
+{
+  "floor_plan": {
+    "width": 600,
+    "height": 400,
+    "start": {
+      "x": 50,
+      "y": 350
+    },
+    "walls": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 600,
+        "height": 20
+      },
+      {
+        "x": 0,
+        "y": 380,
+        "width": 600,
+        "height": 20
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "width": 20,
+        "height": 400
+      },
+      {
+        "x": 580,
+        "y": 0,
+        "width": 20,
+        "height": 400
+      },
+      {
+        "x": 200,
+        "y": 100,
+        "width": 20,
+        "height": 150
+      }
+    ]
+  },
+  "checkpoints": [
+    {
+      "id": "door_1",
+      "name": "前门",
+      "type": "door",
+      "position": {
+        "x": 300,
+        "y": 50
+      }
+    },
+    {
+      "id": "temp_1",
+      "name": "展厅温湿度",
+      "type": "temperature",
+      "position": {
+        "x": 150,
+        "y": 200
+      }
+    },
+    {
+      "id": "exhibit_1",
+      "name": "镇馆之宝展柜",
+      "type": "exhibit",
+      "position": {
+        "x": 450,
+        "y": 300
+      }
+    }
+  ]
+}

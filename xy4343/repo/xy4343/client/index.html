@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆夜间安保训练系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 主菜单 -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-container">
+                <h1>🏛️ 博物馆夜间安保训练</h1>
+                <p class="subtitle">新入职安保人员巡查技能训练系统</p>
+                
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" onclick="showScreen('level-select')">
+                        🎮 开始训练
+                    </button>
+                    <button class="btn btn-secondary" onclick="showScreen('import-level')">
+                        📂 导入关卡
+                    </button>
+                    <button class="btn btn-secondary" onclick="showScreen('history')">
+                        📊 历史记录
+                    </button>
+                </div>
+                
+                <div class="instructions">
+                    <h3>操作说明</h3>
+                    <ul>
+                        <li><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移动巡查员</li>
+                        <li>到达检查点附近自动检查</li>
+                        <li>在时间限制内完成所有检查点</li>
+                        <li>漏检或绕路太多会扣分</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关卡选择 -->
+        <div id="level-select" class="screen">
+            <div class="level-select-container">
+                <h2>选择关卡</h2>
+                <button class="btn btn-back" onclick="showScreen('main-menu')">← 返回</button>
+                
+                <div id="level-list" class="level-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导入关卡 -->
+        <div id="import-level" class="screen">
+            <div class="import-container">
+                <h2>导入关卡</h2>
+                <button class="btn btn-back" onclick="showScreen('main-menu')">← 返回</button>
+                
+                <div class="import-form">
+                    <div class="form-group">
+                        <label for="level-name">关卡名称</label>
+                        <input type="text" id="level-name" placeholder="输入关卡名称">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="level-description">关卡描述</label>
+                        <textarea id="level-description" rows="3" placeholder="输入关卡描述"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time-limit">时间限制（秒）</label>
+                        <input type="number" id="time-limit" value="120" min="30" max="600">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>展厅平面图 JSON</label>
+                        <div class="file-upload">
+                            <input type="file" id="floor-plan-file" accept=".json">
+                            <label for="floor-plan-file">选择文件</label>
+                            <span id="file-name">未选择文件</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>JSON 预览</label>
+                        <textarea id="json-preview" rows="10" readonly placeholder="选择文件后将显示JSON内容"></textarea>
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="importLevel()">导入关卡</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 历史记录 -->
+        <div id="history" class="screen">
+            <div class="history-container">
+                <h2>巡查历史记录</h2>
+                <button class="btn btn-back" onclick="showScreen('main-menu')">← 返回</button>
+                
+                <div id="history-list" class="history-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="screen">
+            <div class="game-container">
+                <!-- 顶部状态栏 -->
+                <div class="game-header">
+                    <div class="level-info">
+                        <span id="current-level">关卡：--</span>
+                    </div>
+                    <div class="time-display">
+                        <span>剩余时间：</span>
+                        <span id="time-remaining" class="time-value">00:00</span>
+                    </div>
+                    <div class="checkpoint-count">
+                        <span>检查点：</span>
+                        <span id="checkpoints-count">0/0</span>
+                    </div>
+                    <button class="btn btn-small" onclick="showScreen('main-menu')">退出</button>
+                </div>
+                
+                <!-- 游戏画布 -->
+                <div class="game-canvas-container">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+                
+                <!-- 底部信息栏 -->
+                <div class="game-footer">
+                    <div id="game-message" class="game-message">准备开始巡查...</div>
+                    <div class="checkpoint-list">
+                        <span>当前目标：</span>
+                        <span id="next-checkpoint">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果界面 -->
+        <div id="result-screen" class="screen">
+            <div class="result-container">
+                <h2>巡查结束</h2>
+                
+                <div class="score-display">
+                    <div class="score-circle">
+                        <span id="final-score">0</span>
+                        <span class="score-total">/100</span>
+                    </div>
+                    <div id="score-rating" class="score-rating">--</div>
+                </div>
+                
+                <div class="result-details">
+                    <div class="detail-section">
+                        <h3>检查点情况</h3>
+                        <div class="detail-item">
+                            <span>总检查点：</span>
+                            <span id="detail-total-checkpoints">0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>已检查：</span>
+                            <span id="detail-visited-checkpoints" class="success">0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>漏检：</span>
+                            <span id="detail-missed-checkpoints" class="error">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>时间情况</h3>
+                        <div class="detail-item">
+                            <span>用时：</span>
+                            <span id="detail-time-used">0秒</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>时间限制：</span>
+                            <span id="detail-time-limit">0秒</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>超时：</span>
+                            <span id="detail-overtime">0秒</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>路线情况</h3>
+                        <div class="detail-item">
+                            <span>实际距离：</span>
+                            <span id="detail-actual-distance">0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>最优距离：</span>
+                            <span id="detail-optimal-distance">0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>路线效率：</span>
+                            <span id="detail-efficiency">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>扣分详情</h3>
+                        <div class="detail-item">
+                            <span>漏检惩罚：</span>
+                            <span id="penalty-missed" class="error">-0分</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>绕路惩罚：</span>
+                            <span id="penalty-detour" class="error">-0分</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>超时惩罚：</span>
+                            <span id="penalty-overtime" class="error">-0分</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="btn btn-primary" onclick="restartGame()">重新挑战</button>
+                    <button class="btn btn-secondary" onclick="exportMarkdown()">导出复盘报告</button>
+                    <button class="btn btn-secondary" onclick="exportJson()">导出审计包</button>
+                    <button class="btn btn-secondary" onclick="showScreen('main-menu')">返回主菜单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
