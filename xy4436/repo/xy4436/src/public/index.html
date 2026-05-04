@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>灯光巡演预检工具 - Light Checker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --critical: #dc2626;
+      --info: #3b82f6;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 24px 0;
+      margin-bottom: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+    }
+    
+    .header-title h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .header-title p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: white;
+      color: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--gray-100);
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--gray-100);
+    }
+    
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid var(--primary);
+    }
+    
+    .stat-card.critical {
+      border-left-color: var(--critical);
+    }
+    
+    .stat-card.warning {
+      border-left-color: var(--warning);
+    }
+    
+    .stat-card.success {
+      border-left-color: var(--success);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-top: 4px;
+    }
+    
+    .project-list {
+      list-style: none;
+    }
+    
+    .project-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background-color: var(--gray-50);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    
+    .project-item:hover {
+      background-color: var(--gray-100);
+    }
+    
+    .project-item.active {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .project-info h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .project-info p {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+    
+    .project-stats {
+      display: flex;
+      gap: 16px;
+      font-size: 0.8rem;
+    }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .badge-critical {
+      background-color: #fef2f2;
+      color: var(--critical);
+    }
+    
+    .badge-warning {
+      background-color: #fffbeb;
+      color: var(--warning);
+    }
+    
+    .badge-success {
+      background-color: #ecfdf5;
+      color: var(--success);
+    }
+    
+    .badge-info {
+      background-color: #eff6ff;
+      color: var(--info);
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+    }
+    
+    @media (max-width: 1024px) {
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .tab {
+      padding: 12px 20px;
+      border: none;
+      background: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .tab:hover {
+      color: var(--gray-800);
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    th {
+      background-color: var(--gray-50);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+    
+    tr:hover {
+      background-color: var(--gray-50);
+    }
+    
+    .issue-item {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background-color: var(--gray-50);
+      border-left: 4px solid var(--gray-300);
+    }
+    
+    .issue-item.critical {
+      border-left-color: var(--critical);
+      background-color: #fef2f2;
+    }
+    
+    .issue-item.warning {
+      border-left-color: var(--warning);
+      background-color: #fffbeb;
+    }
+    
+    .issue-item.info {
+      border-left-color: var(--info);
+      background-color: #eff6ff;
+    }
+    
+    .issue-item.resolved {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+    
+    .issue-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    
+    .issue-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    
+    .issue-type {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      background-color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    
+    .issue-desc {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-bottom: 12px;
+    }
+    
+    .issue-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .resolution-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray-500);
+    }
+    
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-overlay.active {
+      display: flex;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-500);
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--gray-200);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray-500);
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    
+    .toast.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .toast.success {
+      background-color: var(--success);
+    }
+    
+    .toast.error {
+      background-color: var(--danger);
+    }
+    
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 6px;
+      background: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .action-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <div class="header-title">
+          <h1>🎭 Light Checker</h1>
+          <p>灯光巡演预检工具 - DMX地址校验 · 功率监控 · 素材检查</p>
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-primary" onclick="openCreateProjectModal()">
+            ➕ 新建项目
+          </button>
+        </div>
+      </div>
+    </header>
+    
+    <div class="two-column">
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">📁 项目列表</h2>
+          </div>
+          <ul class="project-list" id="projectList">
+            <li class="loading">
+              <span class="spinner"></span>
+              <p>加载中...</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div>
+        <div id="noProjectSelected" class="card">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              <polyline points="13 2 13 9 20 9"/>
+            </svg>
+            <p>请选择一个项目查看详情</p>
+            <p style="margin-top: 8px; font-size: 0.85rem;">或点击顶部"新建项目"按钮创建新项目</p>
+          </div>
+        </div>
+        
+        <div id="projectDetail" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title" id="detailProjectName">项目名称</h2>
+                <p style="font-size: 0.85rem; color: var(--gray-500); margin-top: 4px;" id="detailProjectVenue">场地</p>
+              </div>
+              <div class="action-bar">
+                <button class="btn btn-success btn-sm" onclick="runValidation()">
+                  🔍 重新校验
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="exportMarkdown()">
+                  📄 导出 MD
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="exportJson()">
+                  📦 导出 JSON
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProject()">
+                  🗑️ 删除
+                </button>
+              </div>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid">
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="tabs">
+              <button class="tab active" data-tab="issues">⚠️ 问题清单</button>
+              <button class="tab" data-tab="fixtures">🎯 灯具</button>
+              <button class="tab" data-tab="cues">🎬 Cue</button>
+              <button class="tab" data-tab="circuits">⚡ 回路</button>
+              <button class="tab" data-tab="media">📁 素材</button>
+              <button class="tab" data-tab="banned">🚫 禁用设备</button>
+            </div>
+            
+            <div id="tab-issues" class="tab-content active">
+            </div>
+            
+            <div id="tab-fixtures" class="tab-content">
+            </div>
+            
+            <div id="tab-cues" class="tab-content">
+            </div>
+            
+            <div id="tab-circuits" class="tab-content">
+            </div>
+            
+            <div id="tab-media" class="tab-content">
+            </div>
+            
+            <div id="tab-banned" class="tab-content">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="createProjectModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">新建项目</h3>
+        <button class="modal-close" onclick="closeCreateProjectModal()">&times;</button>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">项目名称 *</label>
+        <input type="text" class="form-input" id="newProjectName" placeholder="例如：2024巡演-上海站">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">场地</label>
+        <input type="text" class="form-input" id="newProjectVenue" placeholder="例如：上海大剧院">
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCreateProjectModal()">取消</button>
+        <button class="btn btn-success" onclick="createProject()">创建</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    let projects = [];
+    let selectedProjectId = null;
+    let currentProjectData = null;
+    let issueFilter = 'all';
+    
+    async function fetchProjects() {
+      try {
+        const response = await fetch('/api/projects');
+        const result = await response.json();
+        
+        if (result.success) {
+          projects = result.data;
+          renderProjectList();
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('加载项目失败', 'error');
+      }
+    }
+    
+    function renderProjectList() {
+      const listEl = document.getElementById('projectList');
+      
+      if (projects.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+              <polyline points="13 2 13 9 20 9"/>
+            </svg>
+            <p>暂无项目</p>
+          </div>
+        `;
+        return;
+      }
+      
+      listEl.innerHTML = projects.map(p => {
+        const isActive = p.id === selectedProjectId;
+        const unresolved = p.summary?.unresolvedIssueCount || 0;
+        const hasIssues = unresolved > 0;
+        
+        return `
+          <li class="project-item ${isActive ? 'active' : ''}" onclick="selectProject('${p.id}')">
+            <div class="project-info">
+              <h3>${p.name}</h3>
+              <p>${p.venue || '未指定场地'} · ${new Date(p.createdAt).toLocaleDateString('zh-CN')}</p>
+            </div>
+            <div class="project-stats">
+              ${hasIssues ? `<span class="badge badge-critical">${unresolved} 问题</span>` : `<span class="badge badge-success">✓ 正常</span>`}
+            </div>
+          </li>
+        `;
+      }).join('');
+    }
+    
+    async function selectProject(projectId) {
+      selectedProjectId = projectId;
+      renderProjectList();
+      
+      try {
+        const response = await fetch(`/api/projects/${projectId}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          currentProjectData = result.data;
+          renderProjectDetail();
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('加载项目详情失败', 'error');
+      }
+    }
+    
+    function renderProjectDetail() {
+      if (!currentProjectData) return;
+      
+      document.getElementById('noProjectSelected').style.display = 'none';
+      document.getElementById('projectDetail').style.display = 'block';
+      
+      const { project, fixtures, cues, circuits, mediaFiles, bannedDevices, issues } = currentProjectData;
+      
+      document.getElementById('detailProjectName').textContent = project.name;
+      document.getElementById('detailProjectVenue').textContent = project.venue || '未指定场地';
+      
+      const unresolvedIssues = issues.filter(i => !i.resolved);
+      const criticalIssues = unresolvedIssues.filter(i => i.severity === 'critical');
+      const warningIssues = unresolvedIssues.filter(i => i.severity === 'warning');
+      
+      const statsGrid = document.getElementById('statsGrid');
+      statsGrid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${fixtures.length}</div>
+          <div class="stat-label">灯具总数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${cues.length}</div>
+          <div class="stat-label">Cue 数量</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${circuits.length}</div>
+          <div class="stat-label">电源回路</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${mediaFiles.length}</div>
+          <div class="stat-label">素材文件</div>
+        </div>
+        <div class="stat-card ${criticalIssues.length > 0 ? 'critical' : 'success'}">
+          <div class="stat-value">${criticalIssues.length}</div>
+          <div class="stat-label">严重问题</div>
+        </div>
+        <div class="stat-card ${warningIssues.length > 0 ? 'warning' : 'success'}">
+          <div class="stat-value">${warningIssues.length}</div>
+          <div class="stat-label">警告</div>
+        </div>
+      `;
+      
+      renderIssuesTab();
+      renderFixturesTab();
+      renderCuesTab();
+      renderCircuitsTab();
+      renderMediaTab();
+      renderBannedTab();
+    }
+    
+    function renderIssuesTab() {
+      const { issues } = currentProjectData;
+      const container = document.getElementById('tab-issues');
+      
+      let filteredIssues = issues;
+      if (issueFilter === 'unresolved') {
+        filteredIssues = issues.filter(i => !i.resolved);
+      } else if (issueFilter === 'resolved') {
+        filteredIssues = issues.filter(i => i.resolved);
+      } else if (issueFilter === 'critical') {
+        filteredIssues = issues.filter(i => i.severity === 'critical');
+      } else if (issueFilter === 'warning') {
+        filteredIssues = issues.filter(i => i.severity === 'warning');
+      }
+      
+      if (filteredIssues.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <p>没有问题</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="filter-bar">
+          <button class="filter-btn ${issueFilter === 'all' ? 'active' : ''}" onclick="setIssueFilter('all')">全部 (${issues.length})</button>
+          <button class="filter-btn ${issueFilter === 'unresolved' ? 'active' : ''}" onclick="setIssueFilter('unresolved')">未解决 (${issues.filter(i => !i.resolved).length})</button>
+          <button class="filter-btn ${issueFilter === 'resolved' ? 'active' : ''}" onclick="setIssueFilter('resolved')">已解决 (${issues.filter(i => i.resolved).length})</button>
+          <button class="filter-btn ${issueFilter === 'critical' ? 'active' : ''}" onclick="setIssueFilter('critical')">严重 (${issues.filter(i => i.severity === 'critical').length})</button>
+          <button class="filter-btn ${issueFilter === 'warning' ? 'active' : ''}" onclick="setIssueFilter('warning')">警告 (${issues.filter(i => i.severity === 'warning').length})</button>
+        </div>
+        ${filteredIssues.map(issue => {
+          const typeLabel = {
+            'dmx_conflict': 'DMX冲突',
+            'power_overload': '功率超载',
+            'missing_media': '素材缺失',
+            'banned_device': '禁用设备',
+            'other': '其他'
+          }[issue.type] || issue.type;
+          
+          return `
+            <div class="issue-item ${issue.severity} ${issue.resolved ? 'resolved' : ''}">
+              <div class="issue-header">
+                <div>
+                  <span class="issue-title">${getSeverityIcon(issue.severity)} ${issue.title}</span>
+                  <span class="issue-type">${typeLabel}</span>
+                </div>
+                <span class="badge ${issue.resolved ? 'badge-success' : issue.severity === 'critical' ? 'badge-critical' : 'badge-warning'}">
+                  ${issue.resolved ? '已解决' : issue.severity === 'critical' ? '严重' : issue.severity === 'warning' ? '警告' : '提示'}
+                </span>
+              </div>
+              <div class="issue-desc">${issue.description}</div>
+              ${!issue.resolved ? `
+                <div class="issue-actions">
+                  <input type="text" class="resolution-input" id="resolution-${issue.id}" placeholder="输入处理意见...">
+                  <button class="btn btn-success btn-sm" onclick="resolveIssue('${issue.id}')">标记解决</button>
+                </div>
+              ` : issue.resolutionNote ? `
+                <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--gray-200);">
+                  <strong>处理意见:</strong> ${issue.resolutionNote}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
+      `;
+    }
+    
+    function getSeverityIcon(severity) {
+      switch (severity) {
+        case 'critical': return '🔴';
+        case 'warning': return '🟡';
+        case 'info': return '🔵';
+        default: return '⚪';
+      }
+    }
+    
+    function setIssueFilter(filter) {
+      issueFilter = filter;
+      renderIssuesTab();
+    }
+    
+    async function resolveIssue(issueId) {
+      const input = document.getElementById(`resolution-${issueId}`);
+      const resolutionNote = input?.value || '';
+      
+      try {
+        const response = await fetch(`/api/issues/${issueId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resolved: true,
+            resolutionNote
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('问题已标记为解决', 'success');
+          if (selectedProjectId) {
+            await selectProject(selectedProjectId);
+          }
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('操作失败', 'error');
+      }
+    }
+    
+    function renderFixturesTab() {
+      const { fixtures } = currentProjectData;
+      const container = document.getElementById('tab-fixtures');
+      
+      if (fixtures.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>暂无灯具数据</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>名称</th>
+              <th>类型</th>
+              <th>DMX地址</th>
+              <th>通道</th>
+              <th>Universe</th>
+              <th>功率</th>
+              <th>回路</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${fixtures.sort((a, b) => a.universe - b.universe || a.dmxStartAddress - b.dmxStartAddress).map((f, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td><strong>${f.name}</strong></td>
+                <td>${f.type || '-'}</td>
+                <td>${f.dmxStartAddress}</td>
+                <td>${f.dmxChannelCount}</td>
+                <td>${f.universe}</td>
+                <td>${f.power}W</td>
+                <td>${f.circuitId || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function renderCuesTab() {
+      const { cues } = currentProjectData;
+      const container = document.getElementById('tab-cues');
+      
+      if (cues.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>暂无 Cue 数据</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Cue号</th>
+              <th>名称</th>
+              <th>描述</th>
+              <th>引用素材</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cues.map(c => `
+              <tr>
+                <td><strong>${c.cueNumber}</strong></td>
+                <td>${c.name || '-'}</td>
+                <td>${c.description || '-'}</td>
+                <td>${c.mediaReferences.length > 0 ? c.mediaReferences.join(', ') : '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function renderCircuitsTab() {
+      const { circuits, fixtures } = currentProjectData;
+      const container = document.getElementById('tab-circuits');
+      
+      if (circuits.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>暂无回路数据</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const circuitPowerMap = {};
+      for (const fixture of fixtures) {
+        if (fixture.circuitId) {
+          circuitPowerMap[fixture.circuitId] = (circuitPowerMap[fixture.circuitId] || 0) + fixture.power;
+        }
+      }
+      
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>回路名称</th>
+              <th>最大容量</th>
+              <th>已使用</th>
+              <th>余量</th>
+              <th>状态</th>
+              <th>说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${circuits.map(c => {
+              const used = circuitPowerMap[c.name] || 0;
+              const margin = c.maxPower - used;
+              const isOverload = margin < 0;
+              
+              return `
+                <tr>
+                  <td><strong>${c.name}</strong></td>
+                  <td>${c.maxPower}W</td>
+                  <td>${used}W</td>
+                  <td class="${isOverload ? 'text-danger' : ''}">${margin}W</td>
+                  <td>
+                    <span class="badge ${isOverload ? 'badge-critical' : 'badge-success'}">
+                      ${isOverload ? '超载' : '正常'}
+                    </span>
+                  </td>
+                  <td>${c.description || '-'}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function renderMediaTab() {
+      const { mediaFiles } = currentProjectData;
+      const container = document.getElementById('tab-media');
+      
+      if (mediaFiles.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>暂无素材文件</p>
+          </div>
+        `;
+        return;
+      }
+      
+      function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      }
+      
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>文件名</th>
+              <th>类型</th>
+              <th>大小</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${mediaFiles.map(m => `
+              <tr>
+                <td>${m.name}</td>
+                <td>${m.fileType || '-'}</td>
+                <td>${formatSize(m.size)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function renderBannedTab() {
+      const { bannedDevices } = currentProjectData;
+      const container = document.getElementById('tab-banned');
+      
+      if (bannedDevices.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>无禁用设备</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>设备名称</th>
+              <th>禁用原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bannedDevices.map(b => `
+              <tr>
+                <td><strong>${b.name}</strong></td>
+                <td>${b.reason || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabName = tab.dataset.tab;
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+    
+    function openCreateProjectModal() {
+      document.getElementById('createProjectModal').classList.add('active');
+      document.getElementById('newProjectName').value = '';
+      document.getElementById('newProjectVenue').value = '';
+      document.getElementById('newProjectName').focus();
+    }
+    
+    function closeCreateProjectModal() {
+      document.getElementById('createProjectModal').classList.remove('active');
+    }
+    
+    async function createProject() {
+      const name = document.getElementById('newProjectName').value.trim();
+      const venue = document.getElementById('newProjectVenue').value.trim();
+      
+      if (!name) {
+        showToast('请输入项目名称', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, venue })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('项目创建成功', 'success');
+          closeCreateProjectModal();
+          await fetchProjects();
+          await selectProject(result.data.id);
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('创建项目失败', 'error');
+      }
+    }
+    
+    async function runValidation() {
+      if (!selectedProjectId) return;
+      
+      try {
+        const response = await fetch(`/api/projects/${selectedProjectId}/validate`, {
+          method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast(`校验完成，发现 ${result.data.summary.total} 个问题`, 'success');
+          await selectProject(selectedProjectId);
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('校验失败', 'error');
+      }
+    }
+    
+    function exportMarkdown() {
+      if (!selectedProjectId) return;
+      window.open(`/api/projects/${selectedProjectId}/export/markdown`, '_blank');
+    }
+    
+    function exportJson() {
+      if (!selectedProjectId) return;
+      window.open(`/api/projects/${selectedProjectId}/export/json`, '_blank');
+    }
+    
+    async function deleteProject() {
+      if (!selectedProjectId) return;
+      
+      if (!confirm('确定要删除此项目吗？此操作不可撤销。')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/projects/${selectedProjectId}`, {
+          method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('项目已删除', 'success');
+          selectedProjectId = null;
+          currentProjectData = null;
+          document.getElementById('noProjectSelected').style.display = 'block';
+          document.getElementById('projectDetail').style.display = 'none';
+          await fetchProjects();
+        } else {
+          showToast(result.error, 'error');
+        }
+      } catch (error) {
+        showToast('删除项目失败', 'error');
+      }
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} active`;
+      
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+    
+    fetchProjects();
+  </script>
+</body>
+</html>

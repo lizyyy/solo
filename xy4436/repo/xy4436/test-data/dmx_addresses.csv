@@ -1,0 +1,16 @@
+name,type,dmx_start,channels,universe,power,circuit
+LED Par 1-1,LED Par,1,8,1,500,回路A
+LED Par 1-2,LED Par,9,8,1,500,回路A
+LED Par 1-3,LED Par,17,8,1,500,回路A
+LED Par 1-4,LED Par,25,8,1,500,回路A
+LED Par 1-5,LED Par,33,8,1,500,回路B
+LED Par 1-6,LED Par,41,8,1,500,回路B
+LED Par 1-7,LED Par,49,8,1,500,回路B
+LED Par 1-8,LED Par,57,8,1,500,回路B
+Moving Head 1,Moving Head,65,16,1,800,回路C
+Moving Head 2,Moving Head,81,16,1,800,回路C
+Moving Head 3,Moving Head,97,16,1,800,回路D
+Moving Head 4,Moving Head,113,16,1,800,回路D
+Hazer 1,Hazer,130,3,1,1500,回路E
+Strobe 1,Strobe,133,4,1,1000,回路E
+Strobe 2,Strobe,137,4,1,1000,回路E
