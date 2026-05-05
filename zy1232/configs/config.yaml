@@ -1,0 +1,27 @@
+gateway:
+  port: 8080
+
+registry:
+  port: 8081
+
+services:
+  user:
+    default_port: 8091
+  order:
+    default_port: 8092
+
+ratelimit:
+  limit: 100
+  window: 60
+
+circuitbreaker:
+  threshold: 3
+  timeout: 30
+
+logging:
+  level: info
+  format: console
+
+persistence:
+  enabled: true
+  data_dir: ./data
