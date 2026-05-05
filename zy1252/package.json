@@ -1,0 +1,40 @@
+{
+  "name": "idempotency-api-demo",
+  "version": "1.0.0",
+  "description": "接口幂等性演示服务 - 处理超时重试、用户连点、支付回调重复投递",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/seeders/seed.js",
+    "test": "jest --runInBand",
+    "lint": "eslint src/",
+    "pressure": "node src/utils/pressureTest.js"
+  },
+  "keywords": [
+    "idempotency",
+    "幂等性",
+    "api",
+    "order",
+    "payment"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "supertest": "^6.3.4"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
