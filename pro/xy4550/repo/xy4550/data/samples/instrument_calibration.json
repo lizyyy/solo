@@ -1,0 +1,78 @@
+{
+  "instruments": [
+    {
+      "instrument_id": "INST-001",
+      "instrument_name": "三轴试验仪-1",
+      "model": "GDS-Advanced",
+      "calibration_date": "2025-06-15",
+      "calibration_validity": "2026-06-14",
+      "calibration_agency": "国家计量院",
+      "calibration_certificate_no": "CAL-2025-0615-001",
+      "status": "正常",
+      "next_calibration_due": "2026-06-14",
+      "components": [
+        {
+          "name": "力传感器",
+          "range": "0-100kN",
+          "accuracy": "±0.1%",
+          "last_calibration": "2025-06-15"
+        },
+        {
+          "name": "位移传感器",
+          "range": "0-100mm",
+          "accuracy": "±0.01mm",
+          "last_calibration": "2025-06-15"
+        },
+        {
+          "name": "压力传感器",
+          "range": "0-1MPa",
+          "accuracy": "±0.05%",
+          "last_calibration": "2025-06-15"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INST-002",
+      "instrument_name": "三轴试验仪-2",
+      "model": "GDS-Standard",
+      "calibration_date": "2025-03-20",
+      "calibration_validity": "2026-03-19",
+      "calibration_agency": "国家计量院",
+      "calibration_certificate_no": "CAL-2025-0320-002",
+      "status": "过期",
+      "next_calibration_due": "2026-03-19",
+      "components": [
+        {
+          "name": "力传感器",
+          "range": "0-50kN",
+          "accuracy": "±0.1%",
+          "last_calibration": "2025-03-20"
+        },
+        {
+          "name": "位移传感器",
+          "range": "0-50mm",
+          "accuracy": "±0.01mm",
+          "last_calibration": "2025-03-20"
+        }
+      ]
+    },
+    {
+      "instrument_id": "INST-003",
+      "instrument_name": "孔压计-1",
+      "model": "Pore-Pressure-Transducer",
+      "calibration_date": "2026-01-10",
+      "calibration_validity": "2027-01-09",
+      "calibration_agency": "国家计量院",
+      "calibration_certificate_no": "CAL-2026-0110-003",
+      "status": "正常",
+      "next_calibration_due": "2027-01-09"
+    }
+  ],
+  "test_instrument_mapping": {
+    "T001": "INST-001",
+    "T002": "INST-002",
+    "T003": "INST-001",
+    "T004": "INST-001",
+    "T005": "INST-003"
+  }
+}

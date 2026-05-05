@@ -1,0 +1,39 @@
+{
+  "test_id": "T001",
+  "sample_id": "S001",
+  "saturation_process": [
+    {
+      "step": 1,
+      "time": "2026-04-15 09:00:00",
+      "confining_pressure": 100.0,
+      "back_pressure": 50.0,
+      "pore_pressure": 45.2,
+      "b_value": 0.85,
+      "status": "未饱和"
+    },
+    {
+      "step": 2,
+      "time": "2026-04-15 09:30:00",
+      "confining_pressure": 150.0,
+      "back_pressure": 100.0,
+      "pore_pressure": 92.5,
+      "b_value": 0.90,
+      "status": "未饱和"
+    },
+    {
+      "step": 3,
+      "time": "2026-04-15 10:00:00",
+      "confining_pressure": 200.0,
+      "back_pressure": 150.0,
+      "pore_pressure": 145.8,
+      "b_value": 0.96,
+      "status": "已饱和"
+    }
+  ],
+  "saturation_check": {
+    "final_b_value": 0.96,
+    "saturation_time_min": 60,
+    "is_saturated": true,
+    "remarks": "B值达到0.95以上，饱和度合格"
+  }
+}
