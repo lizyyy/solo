@@ -1,0 +1,149 @@
+# 账单样例文件
+# 包含正常和异常的账单样例
+
+bills:
+  # 正常样例 1: 简单订单
+  - id: "bill-normal-001"
+    order_id: "order-2024-001"
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: "line-1"
+        name: "智能手机"
+        quantity: 1
+        unit_price: 3999.00
+        tax_rate: 13
+        is_tax_exempt: false
+        service_fee_rate: 1.5
+      - id: "line-2"
+        name: "手机壳"
+        quantity: 2
+        unit_price: 49.00
+        tax_rate: 13
+        is_tax_exempt: false
+    discounts: []
+    notes: "正常订单 - 购买手机和配件"
+
+  # 正常样例 2: 含折扣订单
+  - id: "bill-normal-002"
+    order_id: "order-2024-002"
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: "line-1"
+        name: "笔记本电脑"
+        quantity: 1
+        unit_price: 5999.00
+        tax_rate: 13
+        is_tax_exempt: false
+        discounts: ["disc-new-user"]
+    discounts: ["disc-new-user"]
+    notes: "含新用户折扣的订单"
+
+  # 正常样例 3: 免税商品
+  - id: "bill-normal-003"
+    order_id: "order-2024-003"
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: "line-1"
+        name: "出口商品A"
+        quantity: 10
+        unit_price: 100.00
+        tax_rate: 0
+        is_tax_exempt: true
+      - id: "line-2"
+        name: "国内商品B"
+        quantity: 5
+        unit_price: 200.00
+        tax_rate: 13
+        is_tax_exempt: false
+    discounts: []
+    notes: "包含免税商品的订单"
+
+  # 正常样例 4: 测试取整策略差异
+  - id: "bill-rounding-test-001"
+    order_id: "order-2024-004"
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: "line-1"
+        name: "测试商品1"
+        quantity: 3
+        unit_price: 10.333
+        tax_rate: 13
+        is_tax_exempt: false
+      - id: "line-2"
+        name: "测试商品2"
+        quantity: 1
+        unit_price: 1.235
+        tax_rate: 6
+        is_tax_exempt: false
+    discounts: []
+    notes: "用于测试取整策略的订单 - 标准取整"
+
+  # 正常样例 5: 使用不同取整配置
+  - id: "bill-rounding-test-002"
+    order_id: "order-2024-005"
+    currency: "CNY"
+    rounding_profile_id: "aggressive"
+    lines:
+      - id: "line-1"
+        name: "测试商品1"
+        quantity: 3
+        unit_price: 10.333
+        tax_rate: 13
+        is_tax_exempt: false
+      - id: "line-2"
+        name: "测试商品2"
+        quantity: 1
+        unit_price: 1.235
+        tax_rate: 6
+        is_tax_exempt: false
+    discounts: []
+    notes: "用于测试取整策略的订单 - 向上取整"
+
+  # 异常样例 1: 缺少必填字段
+  - id: "bill-error-001"
+    order_id: ""
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: ""
+        name: ""
+        quantity: 0
+        unit_price: -100.00
+        tax_rate: 13
+    discounts: []
+    notes: "异常订单 - 测试字段验证"
+
+  # 异常样例 2: 折扣超过小计
+  - id: "bill-error-002"
+    order_id: "order-2024-error-002"
+    currency: "CNY"
+    rounding_profile_id: "standard"
+    lines:
+      - id: "line-1"
+        name: "低价商品"
+        quantity: 1
+        unit_price: 50.00
+        tax_rate: 13
+        is_tax_exempt: false
+        discounts: ["disc-too-large"]
+    discounts: ["disc-too-large"]
+    notes: "异常订单 - 测试折扣超过小计"
+
+  # 异常样例 3: 无效取整配置
+  - id: "bill-error-003"
+    order_id: "order-2024-error-003"
+    currency: "CNY"
+    rounding_profile_id: "non-existent-profile"
+    lines:
+      - id: "line-1"
+        name: "普通商品"
+        quantity: 1
+        unit_price: 100.00
+        tax_rate: 13
+        is_tax_exempt: false
+    discounts: []
+    notes: "异常订单 - 测试无效取整配置"

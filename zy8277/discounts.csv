@@ -1,0 +1,6 @@
+id,name,type,value,application,priority,applicable_to_all,applicable_line_ids
+disc-new-user,新用户立减,FIXED_AMOUNT,100,PRE_TAX,1,true,
+disc-member,会员折扣,PERCENTAGE,10,POST_TAX,2,true,
+disc-seasonal,季节性折扣,PERCENTAGE,15,PRE_TAX,3,true,
+disc-too-large,超大折扣,FIXED_AMOUNT,200,PRE_TAX,1,true,
+disc-specific,特定商品折扣,PERCENTAGE,20,PRE_TAX,1,false,line-1

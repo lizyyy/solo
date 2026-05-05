@@ -1,0 +1,32 @@
+{
+    "tax_rules": [
+        {
+            "id": "tax-13",
+            "name": "一般纳税人税率",
+            "rate": 13,
+            "categories": ["电子产品", "服装", "日用品"],
+            "is_default": false
+        },
+        {
+            "id": "tax-6",
+            "name": "服务业税率",
+            "rate": 6,
+            "categories": ["服务", "咨询"],
+            "is_default": false
+        },
+        {
+            "id": "tax-0",
+            "name": "零税率",
+            "rate": 0,
+            "categories": ["出口商品", "免税商品"],
+            "is_default": false
+        },
+        {
+            "id": "tax-default",
+            "name": "默认税率",
+            "rate": 13,
+            "categories": [],
+            "is_default": true
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+{
+    "rounding_profiles": [
+        {
+            "id": "standard",
+            "name": "标准取整配置",
+            "line_level_mode": "ROUND_HALF_UP",
+            "line_level_precision": 2,
+            "order_level_mode": "ROUND_HALF_UP",
+            "order_level_precision": 2,
+            "tax_rounding_mode": "ROUND_HALF_UP",
+            "tax_rounding_precision": 2
+        },
+        {
+            "id": "aggressive",
+            "name": "进取型取整（向上取整）",
+            "line_level_mode": "CEIL",
+            "line_level_precision": 2,
+            "order_level_mode": "CEIL",
+            "order_level_precision": 2,
+            "tax_rounding_mode": "CEIL",
+            "tax_rounding_precision": 2
+        },
+        {
+            "id": "conservative",
+            "name": "保守型取整（向下取整）",
+            "line_level_mode": "FLOOR",
+            "line_level_precision": 2,
+            "order_level_mode": "FLOOR",
+            "order_level_precision": 2,
+            "tax_rounding_mode": "FLOOR",
+            "tax_rounding_precision": 2
+        },
+        {
+            "id": "high-precision",
+            "name": "高精度取整",
+            "line_level_mode": "ROUND_HALF_UP",
+            "line_level_precision": 4,
+            "order_level_mode": "ROUND_HALF_UP",
+            "order_level_precision": 4,
+            "tax_rounding_mode": "ROUND_HALF_UP",
+            "tax_rounding_precision": 4
+        }
+    ]
+}
