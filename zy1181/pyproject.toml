@@ -1,0 +1,38 @@
+[project]
+name = "config-diagnostic"
+version = "0.1.0"
+description = "本地配置仓库诊断 CLI 工具，用于检测多种配置格式混用问题"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "sqlitedict>=2.1.0",
+    "deepdiff>=6.0.0",
+    "rich>=13.0.0",
+    "jinja2>=3.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+config-diagnostic = "config_diagnostic.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["config_diagnostic"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

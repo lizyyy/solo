@@ -1,0 +1,16 @@
+# LOCAL OVERRIDE - This file demonstrates priority override
+# Settings in this file will override those in settings.json
+
+{
+  "server": {
+    "port": 9090,
+    "debug": true
+  },
+  "database": {
+    "host": "localhost",
+    "password": "local_dev_password"
+  },
+  "logging": {
+    "level": "DEBUG"
+  }
+}

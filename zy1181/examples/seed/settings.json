@@ -1,0 +1,39 @@
+{
+  "app": {
+    "name": "My Application",
+    "version": "1.0.0",
+    "environment": "production",
+    "debug": false
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "ssl": true,
+    "tls_mode": "require"
+  },
+  "database": {
+    "host": "${DB_HOST}",
+    "port": 5432,
+    "name": "myapp_db",
+    "user": "${DB_USER}",
+    "password": "${DB_PASSWORD}",
+    "ssl_mode": "verify-full",
+    "max_connections": 20,
+    "pool_size": 10
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "json",
+    "output": "stdout"
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 300,
+    "max_size": 1000
+  },
+  "api": {
+    "rate_limit": 100,
+    "timeout": 30,
+    "retry_attempts": 3
+  }
+}
