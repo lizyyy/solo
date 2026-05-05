@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>击剑比赛数据分析工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>击剑比赛数据分析工具</h1>
+            <p>周末积分赛复盘分析系统</p>
+        </header>
+        
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="analysis">数据分析</button>
+            <button class="tab-btn" data-tab="visualization">可视化</button>
+            <button class="tab-btn" data-tab="export">数据导出</button>
+        </nav>
+        
+        <main>
+            <!-- 数据导入标签页 -->
+            <section id="import-tab" class="tab-content active">
+                <div class="import-section">
+                    <h2>数据导入</h2>
+                    <div class="import-grid">
+                        <div class="import-card">
+                            <h3>电动裁判器得分日志</h3>
+                            <input type="file" id="score-log" accept=".csv,.txt,.json">
+                            <p class="file-info">支持 CSV, TXT, JSON 格式</p>
+                            <div class="file-status" id="score-log-status"></div>
+                        </div>
+                        
+                        <div class="import-card">
+                            <h3>场地轮次表</h3>
+                            <input type="file" id="round-schedule" accept=".csv,.txt,.json,.xlsx,.xls">
+                            <p class="file-info">支持 CSV, TXT, JSON, Excel 格式</p>
+                            <div class="file-status" id="round-schedule-status"></div>
+                        </div>
+                        
+                        <div class="import-card">
+                            <h3>视频时间码</h3>
+                            <input type="file" id="video-timestamps" accept=".csv,.txt,.json">
+                            <p class="file-info">支持 CSV, TXT, JSON 格式</p>
+                            <div class="file-status" id="video-timestamps-status"></div>
+                        </div>
+                        
+                        <div class="import-card">
+                            <h3>裁判备注</h3>
+                            <input type="file" id="referee-notes" accept=".csv,.txt,.json">
+                            <p class="file-info">支持 CSV, TXT, JSON 格式</p>
+                            <div class="file-status" id="referee-notes-status"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="load-sample-data">加载示例数据</button>
+                        <button id="clear-all-data" disabled>清空所有数据</button>
+                        <button id="analyze-data" disabled>开始分析</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 数据分析标签页 -->
+            <section id="analysis-tab" class="tab-content">
+                <div class="analysis-section">
+                    <h2>数据分析</h2>
+                    
+                    <div class="filter-section">
+                        <div class="filter-group">
+                            <label for="filter-fencer">选手筛选:</label>
+                            <select id="filter-fencer" disabled>
+                                <option value="">所有选手</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="filter-piste">场地筛选:</label>
+                            <select id="filter-piste" disabled>
+                                <option value="">所有场地</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="filter-anomaly">异常类型:</label>
+                            <select id="filter-anomaly" disabled>
+                                <option value="">所有异常</option>
+                                <option value="missed">疑似漏记</option>
+                                <option value="double-light">双灯争议</option>
+                                <option value="score-mismatch">暂停后比分错位</option>
+                                <option value="bye-anomaly">选手轮空异常</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-summary">
+                        <div class="summary-card">
+                            <h3>总剑数</h3>
+                            <p class="summary-value" id="total-bouts">-</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>异常数量</h3>
+                            <p class="summary-value" id="total-anomalies">-</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>选手数量</h3>
+                            <p class="summary-value" id="total-fencers">-</p>
+                        </div>
+                        <div class="summary-card">
+                            <h3>场地数量</h3>
+                            <p class="summary-value" id="total-pistes">-</p>
+                        </div>
+                    </div>
+                    
+                    <div class="anomaly-list">
+                        <h3>异常详情</h3>
+                        <div id="anomaly-table-container"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 可视化标签页 -->
+            <section id="visualization-tab" class="tab-content">
+                <div class="visualization-section">
+                    <h2>时间线可视化</h2>
+                    
+                    <div class="visualization-controls">
+                        <div class="control-group">
+                            <label for="viz-fencer">选手:</label>
+                            <select id="viz-fencer" disabled>
+                                <option value="">所有选手</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="viz-piste">场地:</label>
+                            <select id="viz-piste" disabled>
+                                <option value="">所有场地</option>
+                            </select>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>
+                                <input type="checkbox" id="show-anomalies" checked>
+                                显示异常标记
+                            </label>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label>
+                                <input type="checkbox" id="show-video-markers" checked>
+                                显示视频时间码
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-container">
+                        <div id="timeline-chart"></div>
+                    </div>
+                    
+                    <div class="bout-detail">
+                        <h3>剑次详情</h3>
+                        <div id="bout-detail-content">
+                            <p>请点击时间线上的剑次查看详情</p>
+                        </div>
+                    </div>
+                    
+                    <div class="edit-note-section">
+                        <h3>人工改判备注</h3>
+                        <div class="note-input">
+                            <label for="selected-bout">选中剑次:</label>
+                            <span id="selected-bout-info">未选择</span>
+                        </div>
+                        <div class="note-input">
+                            <label for="reversal-type">改判类型:</label>
+                            <select id="reversal-type" disabled>
+                                <option value="">无改判</option>
+                                <option value="overrule">推翻原判</option>
+                                <option value="confirm">确认原判</option>
+                                <option value="adjust-score">调整比分</option>
+                            </select>
+                        </div>
+                        <div class="note-input">
+                            <label for="reversal-reason">改判理由:</label>
+                            <textarea id="reversal-reason" rows="3" placeholder="输入改判理由..."></textarea>
+                        </div>
+                        <button id="save-note" disabled>保存备注</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 数据导出标签页 -->
+            <section id="export-tab" class="tab-content">
+                <div class="export-section">
+                    <h2>数据导出</h2>
+                    
+                    <div class="export-options">
+                        <div class="export-card">
+                            <h3>Markdown 复盘单</h3>
+                            <p>生成包含所有异常和改判备注的复盘报告</p>
+                            <button id="export-markdown" disabled>导出 Markdown</button>
+                        </div>
+                        
+                        <div class="export-card">
+                            <h3>JSON 明细数据</h3>
+                            <p>导出所有分析数据，便于后续处理</p>
+                            <button id="export-json" disabled>导出 JSON</button>
+                        </div>
+                        
+                        <div class="export-card">
+                            <h3>CSV 异常报告</h3>
+                            <p>导出异常列表为 CSV 格式</p>
+                            <button id="export-csv" disabled>导出 CSV</button>
+                        </div>
+                    </div>
+                    
+                    <div class="export-preview">
+                        <h3>预览</h3>
+                        <div id="export-preview-content">
+                            <p>选择导出类型后在此预览</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>击剑比赛数据分析工具 &copy; 2026</p>
+        </footer>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/dataParser.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/visualization.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
