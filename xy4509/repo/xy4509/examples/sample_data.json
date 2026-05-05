@@ -1,0 +1,87 @@
+{
+  "batches": [
+    {
+      "batch_id": "BATCH-2026-001",
+      "source": "江苏苏州",
+      "purchase_date": "2026-04-15 00:00:00",
+      "total_weight_kg": 1500.5,
+      "grade": "5A",
+      "supplier": "苏州蚕业合作社",
+      "notes": "春茧，质量较好"
+    },
+    {
+      "batch_id": "BATCH-2026-002",
+      "source": "浙江嘉兴",
+      "purchase_date": "2026-04-18 00:00:00",
+      "total_weight_kg": 1200.0,
+      "grade": "4A",
+      "supplier": "嘉兴茧站",
+      "notes": "中茧，需要注意含水率"
+    }
+  ],
+  "moisture_inspections": [
+    {
+      "inspection_id": "INSP-001",
+      "batch_id": "BATCH-2026-001",
+      "inspection_date": "2026-04-16 10:00:00",
+      "sample_weight_g": 100.0,
+      "dry_weight_g": 88.0,
+      "inspector": "张工",
+      "notes": "第一次抽检"
+    },
+    {
+      "inspection_id": "INSP-002",
+      "batch_id": "BATCH-2026-001",
+      "inspection_date": "2026-04-17 09:30:00",
+      "sample_weight_g": 100.0,
+      "dry_weight_g": 87.5,
+      "inspector": "张工",
+      "notes": "第二次抽检"
+    }
+  ],
+  "cooking_curves": [
+    {
+      "curve_id": "CURVE-001",
+      "batch_id": "BATCH-2026-001",
+      "cooking_date": "2026-04-18 08:00:00",
+      "curve_name": "标准煮茧曲线",
+      "temperature_points": [
+        {"time_min": 0, "temperature": 25},
+        {"time_min": 5, "temperature": 60},
+        {"time_min": 10, "temperature": 85},
+        {"time_min": 15, "temperature": 97},
+        {"time_min": 20, "temperature": 97},
+        {"time_min": 25, "temperature": 80}
+      ],
+      "operator": "王师傅",
+      "notes": "正常煮茧流程"
+    }
+  ],
+  "breakage_records": [
+    {
+      "record_id": "BREAK-001",
+      "batch_id": "BATCH-2026-001",
+      "record_date": "2026-04-19 08:00:00",
+      "machine_id": "缫丝机-01",
+      "spindle_count": 200,
+      "breakage_count": 15,
+      "operating_hours": 8.0,
+      "severity": "MEDIUM",
+      "operator": "李工",
+      "notes": "正常范围"
+    }
+  ],
+  "delivery_records": [
+    {
+      "delivery_id": "DELIV-001",
+      "batch_id": "BATCH-2026-001",
+      "delivery_date": "2026-04-25 10:00:00",
+      "silk_weight_kg": 585.0,
+      "grade": "一级",
+      "filature_rate": 39.0,
+      "customer": "上海丝绸厂",
+      "inspector": "张工",
+      "notes": "质量达标"
+    }
+  ]
+}
