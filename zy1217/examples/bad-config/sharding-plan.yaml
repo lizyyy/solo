@@ -1,0 +1,23 @@
+shards:
+  - id: 0
+    name: shard-0
+    host: 
+    port: 3306
+    database: 
+    weight: -1
+  - id: 0
+    name: shard-1
+    host: shard-1.example.com
+    port: 3306
+    database: ecommerce_shard1
+
+tables:
+  - table: 
+    shardKey: 
+    shardCount: -10
+    algorithm: unknown_algo
+
+routingRules:
+  - pattern: 
+    shardIds: [999, 1000]
+    priority: -5

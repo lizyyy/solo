@@ -1,0 +1,23 @@
+database:
+  type: unknown_db
+  host: 
+  port: -1
+  database: 
+
+connectionPool:
+  maxConnections: -5
+  minConnections: 100
+  maxWaitQueueSize: -10
+  connectionTimeoutMs: 500
+  idleTimeoutMs: 300000
+
+readWriteSeparation:
+  enabled: true
+  readReplicas: 
+  routingStrategy: unknown_strategy
+
+sharding:
+  enabled: true
+  shardCount: 0
+  shardKey: 
+  algorithm: bad_algo
