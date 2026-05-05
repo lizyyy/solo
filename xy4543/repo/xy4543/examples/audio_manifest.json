@@ -1,0 +1,87 @@
+{
+  "version": "1.0",
+  "description": "剧场音频清单示例",
+  "audio_items": [
+    {
+      "audio_id": "A001",
+      "name": "开场铃-标准",
+      "audio_type": "opening_bell",
+      "file_path": "/audio/bells/opening_standard.wav",
+      "duration_seconds": 15.5,
+      "loudness_dbfs": -20.0,
+      "target_loudness_min": -24.0,
+      "target_loudness_max": -16.0,
+      "description": "剧场标准开场提示铃，使用于每日19:00场",
+      "created_at": "2026-05-01 10:00:00"
+    },
+    {
+      "audio_id": "A002",
+      "name": "巡演提示音-欢迎",
+      "audio_type": "tour_prompt",
+      "file_path": "/audio/tour/welcome_prompt.mp3",
+      "duration_seconds": 30.0,
+      "loudness_dbfs": -18.5,
+      "target_loudness_min": -24.0,
+      "target_loudness_max": -16.0,
+      "description": "巡演团队进场欢迎提示",
+      "created_at": "2026-05-02 14:30:00"
+    },
+    {
+      "audio_id": "A003",
+      "name": "疏散广播-紧急",
+      "audio_type": "evacuation",
+      "file_path": "/audio/emergency/evacuation_cn.mp3",
+      "duration_seconds": 45.0,
+      "loudness_dbfs": -14.0,
+      "target_loudness_min": -20.0,
+      "target_loudness_max": -10.0,
+      "description": "紧急疏散广播，中文男声",
+      "created_at": "2026-04-15 09:00:00"
+    },
+    {
+      "audio_id": "A004",
+      "name": "背景音乐-开场前",
+      "audio_type": "background",
+      "file_path": "/audio/bg/pre_show_music.mp3",
+      "duration_seconds": 600.0,
+      "loudness_dbfs": -28.0,
+      "target_loudness_min": -24.0,
+      "target_loudness_max": -16.0,
+      "description": "开场前循环播放的背景音乐，响度偏低需要调整",
+      "created_at": "2026-05-03 11:00:00"
+    },
+    {
+      "audio_id": "A005",
+      "name": "常规广播-寻物启事",
+      "audio_type": "announcement",
+      "file_path": "/audio/announcements/missing_item_template.wav",
+      "duration_seconds": 20.0,
+      "loudness_dbfs": -35.0,
+      "target_loudness_min": -24.0,
+      "target_loudness_max": -16.0,
+      "description": "响度严重不达标，需要重新录制",
+      "created_at": "2026-05-04 09:00:00"
+    },
+    {
+      "audio_id": "A006",
+      "name": "开场铃-周末场",
+      "audio_type": "opening_bell",
+      "file_path": "/audio/bells/opening_standard.wav",
+      "duration_seconds": 15.5,
+      "loudness_dbfs": -20.0,
+      "target_loudness_min": -24.0,
+      "target_loudness_max": -16.0,
+      "description": "与A001使用相同文件路径，重复引用",
+      "created_at": "2026-05-01 10:05:00"
+    },
+    {
+      "audio_id": "A007",
+      "name": "缺失文件测试",
+      "audio_type": "other",
+      "file_path": "/audio/nonexistent_file.wav",
+      "duration_seconds": 10.0,
+      "loudness_dbfs": -20.0,
+      "description": "此文件不存在，用于测试文件缺失检测"
+    }
+  ]
+}

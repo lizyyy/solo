@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "description": "设备在线日志示例",
+  "check_time": "2026-05-05 23:00:00",
+  "device_logs": [
+    {
+      "device_id": "D001",
+      "zone_name": "大剧场",
+      "device_name": "主扬声器阵列-左",
+      "status": "online",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": 15,
+      "notes": "正常"
+    },
+    {
+      "device_id": "D002",
+      "zone_name": "大剧场",
+      "device_name": "主扬声器阵列-右",
+      "status": "online",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": 18,
+      "notes": "正常"
+    },
+    {
+      "device_id": "D003",
+      "zone_name": "大剧场",
+      "device_name": "中置扬声器",
+      "status": "offline",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": null,
+      "last_online_time": "2026-05-05 18:30:00",
+      "notes": "18:30后无响应，疑似网络故障"
+    },
+    {
+      "device_id": "D004",
+      "zone_name": "前厅",
+      "device_name": "背景音乐扬声器",
+      "status": "online",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": 22,
+      "notes": "正常"
+    },
+    {
+      "device_id": "D005",
+      "zone_name": "小剧场",
+      "device_name": "主扩声系统",
+      "status": "maintenance",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": null,
+      "notes": "计划内维护，预计5月7日恢复"
+    },
+    {
+      "device_id": "D006",
+      "zone_name": "走廊",
+      "device_name": "应急广播扬声器-1",
+      "status": "online",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": 12,
+      "notes": "正常"
+    },
+    {
+      "device_id": "D007",
+      "zone_name": "走廊",
+      "device_name": "应急广播扬声器-2",
+      "status": "offline",
+      "check_time": "2026-05-05 23:00:00",
+      "response_time_ms": null,
+      "last_online_time": "2026-05-04 10:00:00",
+      "notes": "已离线超过24小时，需紧急处理"
+    }
+  ]
+}

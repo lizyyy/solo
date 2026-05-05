@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "description": "分区播放计划示例",
+  "date": "2026-05-06",
+  "zone_schedules": [
+    {
+      "schedule_id": "S001",
+      "zone_name": "大剧场",
+      "audio_id": "A001",
+      "start_time": "18:45:00",
+      "end_time": "19:00:00",
+      "date": null,
+      "repeat_days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "is_override": false,
+      "notes": "每日晚场开场前播放"
+    },
+    {
+      "schedule_id": "S002",
+      "zone_name": "大剧场",
+      "audio_id": "A004",
+      "start_time": "18:30:00",
+      "end_time": "18:50:00",
+      "date": null,
+      "repeat_days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+      "is_override": false,
+      "notes": "与S001时段冲突（18:45-18:50重叠）"
+    },
+    {
+      "schedule_id": "S003",
+      "zone_name": "前厅",
+      "audio_id": "A002",
+      "start_time": "17:30:00",
+      "end_time": "18:00:00",
+      "date": "2026-05-06",
+      "is_override": false,
+      "notes": "5月6日巡演团队专属"
+    },
+    {
+      "schedule_id": "S004",
+      "zone_name": "大剧场",
+      "audio_id": "A003",
+      "start_time": "20:00:00",
+      "end_time": "20:15:00",
+      "date": "2026-05-06",
+      "is_override": true,
+      "notes": "应急广播被错误占用！这是严重问题"
+    },
+    {
+      "schedule_id": "S005",
+      "zone_name": "小剧场",
+      "audio_id": "INVALID_ID",
+      "start_time": "19:00:00",
+      "end_time": "19:05:00",
+      "date": "2026-05-06",
+      "is_override": false,
+      "notes": "引用不存在的音频ID"
+    }
+  ]
+}

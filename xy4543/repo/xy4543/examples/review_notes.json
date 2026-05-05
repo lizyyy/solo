@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "description": "人工复核备注示例",
+  "export_time": "2026-05-05 23:30:00",
+  "notes": [
+    {
+      "note_id": "N001",
+      "item_type": "audio",
+      "item_id": "A004",
+      "reviewer": "张工程师",
+      "review_time": "2026-05-05 22:15:00",
+      "status": "manual_review",
+      "comment": "背景音乐响度偏低是有意设置，因为开场前需要营造轻松氛围。但可能需要确认是否符合标准。",
+      "attachments": []
+    },
+    {
+      "note_id": "N002",
+      "item_type": "device",
+      "item_id": "D005",
+      "reviewer": "李主管",
+      "review_time": "2026-05-05 21:00:00",
+      "status": "pass",
+      "comment": "小剧场设备确实在计划维护中，工单编号：MAINT-2026-0507，无需处理。",
+      "attachments": ["/docs/maintenance_20260507.pdf"]
+    }
+  ]
+}
