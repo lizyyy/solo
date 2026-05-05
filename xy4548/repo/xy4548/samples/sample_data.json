@@ -1,0 +1,86 @@
+{
+  "batches": [
+    {
+      "batch_number": "FA-2026-001",
+      "batch_date": "2026-05-01",
+      "ash_source": "1号焚烧炉",
+      "total_weight": 12.5,
+      "bag_count": 10,
+      "chelating_agent_type": "高分子螯合剂",
+      "chelating_agent_dosage": 2.5,
+      "mixing_duration": 30,
+      "operator": "张三"
+    },
+    {
+      "batch_number": "FA-2026-002",
+      "batch_date": "2026-05-02",
+      "ash_source": "2号焚烧炉",
+      "total_weight": 15.0,
+      "bag_count": 12,
+      "chelating_agent_type": "硫代氨基甲酸盐",
+      "chelating_agent_dosage": 2.8,
+      "mixing_duration": 35,
+      "operator": "李四"
+    }
+  ],
+  "ton_bags": [
+    {
+      "bag_number": "TB-2026-001",
+      "batch_number": "FA-2026-001",
+      "weight": 1.25,
+      "rfid_tag": "RID-001",
+      "storage_location": "A区-01",
+      "production_time": "2026-05-01 08:30:00",
+      "inspection_status": "pending",
+      "risk_level": "unknown",
+      "is_qualified": false
+    },
+    {
+      "bag_number": "TB-2026-002",
+      "batch_number": "FA-2026-001",
+      "weight": 1.23,
+      "rfid_tag": "RID-002",
+      "storage_location": "A区-02",
+      "production_time": "2026-05-01 08:45:00",
+      "inspection_status": "pending",
+      "risk_level": "unknown",
+      "is_qualified": false
+    }
+  ],
+  "inspections": [
+    {
+      "inspection_number": "INSP-2026-001",
+      "batch_number": "FA-2026-001",
+      "bag_number": "TB-2026-001",
+      "inspection_type": "浸出毒性检测",
+      "inspection_date": "2026-05-02",
+      "inspector": "赵检测员",
+      "leaching_pb": 0.15,
+      "leaching_cd": 0.08,
+      "leaching_cr": 0.2,
+      "leaching_hg": 0.02,
+      "leaching_as": 0.15,
+      "leaching_zn": 80.0,
+      "leaching_cu": 25.0,
+      "leaching_ni": 0.3,
+      "inspection_report": "检测结果符合GB16889-2008标准限值"
+    }
+  ],
+  "reservations": [
+    {
+      "reservation_number": "RES-2026-001",
+      "batch_number": "FA-2026-001",
+      "reservation_date": "2026-05-03",
+      "planned_outbound_date": "2026-05-05",
+      "landfill_site": "XX市危险废物填埋场",
+      "transport_company": "XX运输有限公司",
+      "vehicle_number": "京A-12345",
+      "driver_name": "王司机",
+      "driver_phone": "13800138001",
+      "reserved_weight": 10.0,
+      "actual_weight": 0,
+      "status": "pending",
+      "is_completed": false
+    }
+  ]
+}

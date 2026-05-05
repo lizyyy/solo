@@ -1,0 +1,21 @@
+{
+  "name": "earthquake-review-dashboard",
+  "version": "1.0.0",
+  "description": "地震台网值班员波形触发复核台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["earthquake", "seismic", "monitoring", "dashboard"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "csv-parser": "^3.0.0",
+    "moment": "^2.29.4",
+    "lodash": "^4.17.21"
+  }
+}
