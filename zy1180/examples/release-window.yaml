@@ -1,0 +1,44 @@
+# 发布窗口配置
+environment: production
+
+# 允许发布的星期几
+allowed_days:
+  - Monday
+  - Tuesday
+  - Wednesday
+  - Thursday
+  - Friday
+
+# 允许发布的小时（24小时制）
+allowed_hours:
+  - 2
+  - 3
+  - 4
+  - 5
+
+# 单次发布最大允许时长（分钟）
+max_duration_minutes: 120
+
+# 高风险操作是否需要审批
+high_risk_requires_approval: true
+
+# 维护窗口时间
+maintenance_window_start: "02:00"
+maintenance_window_end: "06:00"
+
+# 审批配置
+approval:
+  required_for:
+    - critical_risk
+    - table_size_over_100mb
+    - irreversible_operations
+  approvers:
+    - dba_team
+    - engineering_lead
+
+# 通知配置
+notifications:
+  slack_channel: "#db-alerts"
+  email_recipients:
+    - dba@company.com
+    - devops@company.com
