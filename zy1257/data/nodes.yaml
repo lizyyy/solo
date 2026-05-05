@@ -1,0 +1,48 @@
+nodes:
+  - node_id: "a1b2c3d4e5f60001"
+    host: "192.168.1.10"
+    port: 7000
+    role: "master"
+    master_id: null
+    state: "connected"
+    is_alive: true
+
+  - node_id: "a1b2c3d4e5f60002"
+    host: "192.168.1.10"
+    port: 7001
+    role: "master"
+    master_id: null
+    state: "connected"
+    is_alive: true
+
+  - node_id: "a1b2c3d4e5f60003"
+    host: "192.168.1.10"
+    port: 7002
+    role: "master"
+    master_id: null
+    state: "connected"
+    is_alive: true
+
+  - node_id: "a1b2c3d4e5f60004"
+    host: "192.168.1.10"
+    port: 7003
+    role: "slave"
+    master_id: "a1b2c3d4e5f60001"
+    state: "connected"
+    is_alive: true
+
+  - node_id: "a1b2c3d4e5f60005"
+    host: "192.168.1.10"
+    port: 7004
+    role: "slave"
+    master_id: "a1b2c3d4e5f60002"
+    state: "connected"
+    is_alive: true
+
+  - node_id: "a1b2c3d4e5f60006"
+    host: "192.168.1.10"
+    port: 7005
+    role: "slave"
+    master_id: "a1b2c3d4e5f60003"
+    state: "connected"
+    is_alive: true

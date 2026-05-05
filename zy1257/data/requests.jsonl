@@ -1,0 +1,20 @@
+{"request_id": "req-001", "command": "GET", "key": "user:1000", "timestamp": "2026-05-03T10:01:00Z"}
+{"request_id": "req-002", "command": "SET", "key": "user:1000", "timestamp": "2026-05-03T10:01:01Z"}
+{"request_id": "req-003", "command": "GET", "key": "product:2000", "timestamp": "2026-05-03T10:01:02Z"}
+{"request_id": "req-004", "command": "SET", "key": "product:2000", "timestamp": "2026-05-03T10:01:03Z"}
+{"request_id": "req-005", "command": "GET", "key": "order:3000", "timestamp": "2026-05-03T10:01:04Z"}
+{"request_id": "req-006", "command": "HGET", "key": "user:1000:profile", "timestamp": "2026-05-03T10:01:05Z"}
+{"request_id": "req-007", "command": "HSET", "key": "user:1000:profile", "timestamp": "2026-05-03T10:01:06Z"}
+{"request_id": "req-008", "command": "ZRANGE", "key": "leaderboard:scores", "timestamp": "2026-05-03T10:01:07Z"}
+{"request_id": "req-009", "command": "ZADD", "key": "leaderboard:scores", "timestamp": "2026-05-03T10:01:08Z"}
+{"request_id": "req-010", "command": "MGET", "key": "user:1000", "timestamp": "2026-05-03T10:01:09Z"}
+{"request_id": "req-011", "command": "EVAL", "key": "counter:views", "timestamp": "2026-05-03T10:01:10Z", "keys": ["counter:views", "counter:unique"]}
+{"request_id": "req-012", "command": "GET", "key": "session:abc123", "timestamp": "2026-05-03T10:01:11Z"}
+{"request_id": "req-013", "command": "SET", "key": "session:abc123", "timestamp": "2026-05-03T10:01:12Z"}
+{"request_id": "req-014", "command": "DEL", "key": "old:data", "timestamp": "2026-05-03T10:01:13Z"}
+{"request_id": "req-015", "command": "INCR", "key": "page:views", "timestamp": "2026-05-03T10:01:14Z"}
+{"request_id": "req-016", "command": "EVALSHA", "key": "cache:invalidate", "timestamp": "2026-05-03T10:01:15Z", "keys": ["user:1000", "user:1001"]}
+{"request_id": "req-017", "command": "MULTI", "timestamp": "2026-05-03T10:01:16Z"}
+{"request_id": "req-018", "command": "EXEC", "timestamp": "2026-05-03T10:01:17Z"}
+{"request_id": "req-019", "command": "GET", "key": "config:feature", "timestamp": "2026-05-03T10:01:18Z"}
+{"request_id": "req-020", "command": "GET", "key": "stats:daily", "timestamp": "2026-05-03T10:01:19Z"}

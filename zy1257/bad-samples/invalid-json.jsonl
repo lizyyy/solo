@@ -1,0 +1,5 @@
+{"request_id": "req-001", "command": "GET", "key": "test1", "timestamp": "2026-05-03T10:00:00Z"}
+{"request_id": "req-002", "command": "SET", "key": "test2", "timestamp": invalid_timestamp}
+{"request_id": "req-003", "command": "GET", "key": "test3", "timestamp": "2026-05-03T10:00:02Z"
+missing closing brace
+{"request_id": "req-004", "command": "GET", "key": "test4", "timestamp": "2026-05-03T10:00:03Z"}

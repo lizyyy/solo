@@ -1,0 +1,9 @@
+nodes:
+  - node_id: "test1"
+    host: "192.168.1.10"
+    port: "not_a_number"
+    role: "master"
+
+  - node_id: "test2"
+    host: "192.168.1.10"
+    role: "invalid_role"

@@ -1,0 +1,15 @@
+{"type": "stable", "slot": 0, "from_node": null, "to_node": "a1b2c3d4e5f60001", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 1, "from_node": null, "to_node": "a1b2c3d4e5f60001", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 5460, "from_node": null, "to_node": "a1b2c3d4e5f60001", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 5461, "from_node": null, "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 5462, "from_node": null, "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 10922, "from_node": null, "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 10923, "from_node": null, "to_node": "a1b2c3d4e5f60003", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 10924, "from_node": null, "to_node": "a1b2c3d4e5f60003", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "stable", "slot": 16383, "from_node": null, "to_node": "a1b2c3d4e5f60003", "timestamp": "2026-05-01T00:00:00Z"}
+{"type": "migrating", "slot": 1000, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:00:00Z"}
+{"type": "importing", "slot": 1000, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:00:00Z"}
+{"type": "migrating", "slot": 1001, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:05:00Z"}
+{"type": "importing", "slot": 1001, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:05:00Z"}
+{"type": "migrating", "slot": 1002, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:10:00Z"}
+{"type": "importing", "slot": 1002, "from_node": "a1b2c3d4e5f60001", "to_node": "a1b2c3d4e5f60002", "timestamp": "2026-05-03T10:10:00Z"}
