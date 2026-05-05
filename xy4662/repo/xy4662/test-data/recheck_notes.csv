@@ -1,0 +1,3 @@
+bottle_code,recheck_reason,recheck_operator,recheck_time,original_value,recheck_value,conclusion
+B001,pH值接近临界值,质检员A,2024-05-02 14:00:00,7.2,7.25,结果正常，无需重采
+B002,浊度值偏高,质检员B,2024-05-02 15:00:00,15.3,14.8,复检通过，可能仪器漂移
