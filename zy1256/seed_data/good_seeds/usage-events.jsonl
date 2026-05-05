@@ -1,0 +1,17 @@
+{"timestamp": "2026-05-05T10:00:01", "key": "user:session:1001", "command": "HGET", "read_write": "read", "latency_ms": 0.5}
+{"timestamp": "2026-05-05T10:00:05", "key": "user:session:1001", "command": "HSET", "read_write": "write", "latency_ms": 0.8}
+{"timestamp": "2026-05-05T10:00:10", "key": "user:counter:clicks:1001", "command": "INCR", "read_write": "write", "latency_ms": 0.3}
+{"timestamp": "2026-05-05T10:00:15", "key": "leaderboard:daily", "command": "ZADD", "read_write": "write", "latency_ms": 1.2}
+{"timestamp": "2026-05-05T10:00:20", "key": "leaderboard:daily", "command": "ZREVRANGE", "read_write": "read", "latency_ms": 2.5}
+{"timestamp": "2026-05-05T10:00:25", "key": "queue:tasks:low", "command": "LPUSH", "read_write": "write", "latency_ms": 0.6}
+{"timestamp": "2026-05-05T10:00:30", "key": "queue:tasks:low", "command": "RPOP", "read_write": "write", "latency_ms": 0.5}
+{"timestamp": "2026-05-05T10:00:35", "key": "unique:emails:verified", "command": "SISMEMBER", "read_write": "read", "latency_ms": 0.4}
+{"timestamp": "2026-05-05T10:00:40", "key": "unique:emails:verified", "command": "SADD", "read_write": "write", "latency_ms": 0.7}
+{"timestamp": "2026-05-05T10:00:45", "key": "timeline:user:1001", "command": "ZADD", "read_write": "write", "latency_ms": 1.0}
+{"timestamp": "2026-05-05T10:00:50", "key": "timeline:user:1001", "command": "ZREVRANGEBYSCORE", "read_write": "read", "latency_ms": 3.2}
+{"timestamp": "2026-05-05T10:00:55", "key": "cache:product:12345", "command": "GET", "read_write": "read", "latency_ms": 0.4}
+{"timestamp": "2026-05-05T10:01:00", "key": "cache:product:12345", "command": "SETEX", "read_write": "write", "latency_ms": 0.6}
+{"timestamp": "2026-05-05T10:01:05", "key": "message:notifications", "command": "XADD", "read_write": "write", "latency_ms": 1.5}
+{"timestamp": "2026-05-05T10:01:10", "key": "message:notifications", "command": "XREADGROUP", "read_write": "read", "latency_ms": 2.1}
+{"timestamp": "2026-05-05T10:01:15", "key": "metrics:api:requests:total", "command": "INCR", "read_write": "write", "latency_ms": 0.3}
+{"timestamp": "2026-05-05T10:01:20", "key": "metrics:api:requests:total", "command": "GET", "read_write": "read", "latency_ms": 0.2}

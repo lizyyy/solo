@@ -1,0 +1,251 @@
+# ==============================================================================
+# Redis Structure Audit API - CURL Examples
+# ==============================================================================
+# Base URL: http://localhost:8000/api/v1
+# ==============================================================================
+
+# ==============================================================================
+# 1. Session Management
+# ==============================================================================
+
+# Create a new audit session
+curl -X POST "http://localhost:8000/api/v1/import/session" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_name": "Production Redis Audit - May 2026",
+    "description": "Monthly Redis structure health check"
+  }'
+
+# Get a specific session
+curl "http://localhost:8000/api/v1/import/session/1"
+
+# List all sessions
+curl "http://localhost:8000/api/v1/import/sessions?limit=50&offset=0"
+
+# Delete a session
+curl -X DELETE "http://localhost:8000/api/v1/import/session/1"
+
+# ==============================================================================
+# 2. Import Data
+# ==============================================================================
+
+# Import keys CSV file (session_id=1)
+curl -X POST "http://localhost:8000/api/v1/import/keys/1" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/good_seeds/keys.csv"
+
+# Import usage events JSONL file
+curl -X POST "http://localhost:8000/api/v1/import/events/1" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/good_seeds/usage-events.jsonl"
+
+# Import custom structure rules YAML
+curl -X POST "http://localhost:8000/api/v1/import/rules/1" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/good_seeds/structure-rules.yaml"
+
+# List imported keys for a session
+curl "http://localhost:8000/api/v1/import/keys/1?limit=100&offset=0"
+
+# List imported keys filtered by data type
+curl "http://localhost:8000/api/v1/import/keys/1?limit=100&data_type=string"
+
+# List usage events for a session
+curl "http://localhost:8000/api/v1/import/events/1?limit=100"
+
+# Search events by key name
+curl "http://localhost:8000/api/v1/import/events/1?key_name=counter"
+
+# ==============================================================================
+# 3. Run Analysis
+# ==============================================================================
+
+# Run full analysis for a session
+curl -X POST "http://localhost:8000/api/v1/analysis/1"
+
+# Get analysis results
+curl "http://localhost:8000/api/v1/analysis/1"
+
+# Get analysis summary
+curl "http://localhost:8000/api/v1/analysis/summary/1"
+
+# Get analysis for a specific key
+curl "http://localhost:8000/api/v1/analysis/key/1"
+
+# ==============================================================================
+# 4. Comparison (Alternative Structures)
+# ==============================================================================
+
+# Generate structure comparison for a session
+curl -X POST "http://localhost:8000/api/v1/comparison/1"
+
+# Generate comparison for a specific scenario
+curl -X POST "http://localhost:8000/api/v1/comparison/1?scenario=counter"
+
+# Get comparison results
+curl "http://localhost:8000/api/v1/comparison/1"
+
+# Get detailed comparison by ID
+curl "http://localhost:8000/api/v1/comparison/detail/1"
+
+# Get comparison matrix (scenario vs data type)
+curl "http://localhost:8000/api/v1/comparison/matrix/1"
+
+# ==============================================================================
+# 5. Generate Reports
+# ==============================================================================
+
+# Generate a full report in JSON format
+curl -X POST "http://localhost:8000/api/v1/report/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": 1,
+    "report_type": "full",
+    "format": "json"
+  }'
+
+# Generate a summary report in Markdown format
+curl -X POST "http://localhost:8000/api/v1/report/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": 1,
+    "report_type": "summary",
+    "format": "markdown"
+  }'
+
+# Generate a migration-focused report in HTML format
+curl -X POST "http://localhost:8000/api/v1/report/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": 1,
+    "report_type": "migration",
+    "format": "html"
+  }'
+
+# Get report metadata
+curl "http://localhost:8000/api/v1/report/1"
+
+# Download report file
+curl -O "http://localhost:8000/api/v1/report/download/1"
+
+# List all reports for a session
+curl "http://localhost:8000/api/v1/report/session/1"
+
+# Delete a report
+curl -X DELETE "http://localhost:8000/api/v1/report/1"
+
+# ==============================================================================
+# 6. Human Confirmation
+# ==============================================================================
+
+# Confirm a report (mark as reviewed by human)
+curl -X POST "http://localhost:8000/api/v1/confirmation/" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": 1,
+    "report_id": 1,
+    "confirmed_by": "john.doe@example.com",
+    "notes": "Reviewed all recommendations. Hot keys need immediate attention."
+  }'
+
+# Get confirmation status for a report
+curl "http://localhost:8000/api/v1/confirmation/report/1"
+
+# Get session confirmation status
+curl "http://localhost:8000/api/v1/confirmation/session/1/status"
+
+# Revoke confirmation
+curl -X POST "http://localhost:8000/api/v1/confirmation/revoke/1?revoked_by=admin@example.com&reason=Error%20in%20analysis"
+
+# Get confirmation history
+curl "http://localhost:8000/api/v1/confirmation/history/1"
+
+# ==============================================================================
+# 7. Bad Seeds Examples (For Testing Detection)
+# ==============================================================================
+
+# Create session for bad examples
+curl -X POST "http://localhost:8000/api/v1/import/session" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_name": "Bad Examples - Antipattern Detection",
+    "description": "Session with intentional bad Redis patterns for testing"
+  }'
+
+# Import bad keys (will be detected as issues)
+curl -X POST "http://localhost:8000/api/v1/import/keys/2" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/bad_seeds/keys.csv"
+
+# Import bad events
+curl -X POST "http://localhost:8000/api/v1/import/events/2" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/bad_seeds/usage-events.jsonl"
+
+# Import bad rules (intentional wrong rules)
+curl -X POST "http://localhost:8000/api/v1/import/rules/2" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/bad_seeds/structure-rules.yaml"
+
+# Run analysis - should find many issues
+curl -X POST "http://localhost:8000/api/v1/analysis/2"
+
+# ==============================================================================
+# 8. Health & Status
+# ==============================================================================
+
+# Root endpoint
+curl "http://localhost:8000/"
+
+# Health check
+curl "http://localhost:8000/health"
+
+# Service stats
+curl "http://localhost:8000/api/v1/stats"
+
+# OpenAPI docs (in browser)
+# http://localhost:8000/docs
+
+# ==============================================================================
+# 9. Full Workflow Example
+# ==============================================================================
+
+# Step 1: Create session
+SESSION_ID=$(curl -s -X POST "http://localhost:8000/api/v1/import/session" \
+  -H "Content-Type: application/json" \
+  -d '{"session_name": "Full Workflow Test"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+echo "Created session: $SESSION_ID"
+
+# Step 2: Import keys
+curl -X POST "http://localhost:8000/api/v1/import/keys/$SESSION_ID" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/good_seeds/keys.csv"
+
+# Step 3: Import events
+curl -X POST "http://localhost:8000/api/v1/import/events/$SESSION_ID" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./seed_data/good_seeds/usage-events.jsonl"
+
+# Step 4: Run analysis
+curl -X POST "http://localhost:8000/api/v1/analysis/$SESSION_ID"
+
+# Step 5: Generate comparison
+curl -X POST "http://localhost:8000/api/v1/comparison/$SESSION_ID"
+
+# Step 6: Generate report
+REPORT_ID=$(curl -s -X POST "http://localhost:8000/api/v1/report/generate" \
+  -H "Content-Type: application/json" \
+  -d "{\"session_id\": $SESSION_ID, \"report_type\": \"full\", \"format\": \"json\"}" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+echo "Created report: $REPORT_ID"
+
+# Step 7: Confirm report
+curl -X POST "http://localhost:8000/api/v1/confirmation/" \
+  -H "Content-Type: application/json" \
+  -d "{\"session_id\": $SESSION_ID, \"report_id\": $REPORT_ID, \"confirmed_by\": \"automated@test.com\"}"
+
+# Step 8: Download report
+curl -O "http://localhost:8000/api/v1/report/download/$REPORT_ID"
+
+echo "Workflow complete!"

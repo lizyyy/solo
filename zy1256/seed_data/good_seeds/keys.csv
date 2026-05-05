@@ -1,0 +1,10 @@
+key,type,ttl,memory,value_size,field_count,list_length,set_cardinality,zset_cardinality,tags,description
+user:session:1001,hash,86400,2048,,5,,,,session,User session data with proper TTL
+user:counter:clicks:1001,string,3600,128,8,,,,,counter,Counter using string type - correct choice
+leaderboard:daily,zset,-1,65536,,,,,1000,leaderboard,Daily leaderboard using ZSet - optimal
+queue:tasks:low,list,86400,131072,,,100,,,queue,Task queue using List - good choice
+unique:emails:verified,set,-1,32768,,,,500,,deduplication,Unique verified emails using Set - good
+timeline:user:1001,zset,604800,65536,,,,,500,timeline,User timeline using ZSet - optimal
+cache:product:12345,string,1800,2048,1500,,,,,cache,Product cache with proper TTL
+message:notifications,stream,86400,262144,,,,,,1000,messaging,Notification stream using Stream type
+metrics:api:requests:total,string,-1,128,16,,,,,counter,API request counter - good choice

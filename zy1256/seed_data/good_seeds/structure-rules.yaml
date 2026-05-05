@@ -1,0 +1,72 @@
+scenarios:
+  counter:
+    recommended_types:
+      - string
+    anti_patterns:
+      - hash
+      - set
+    memory_considerations: "String uses ~50 bytes overhead per key. Use INCR/DECR for atomic operations."
+    performance_notes: "O(1) complexity for counter operations. Best choice for simple counters."
+
+  leaderboard:
+    recommended_types:
+      - zset
+    anti_patterns:
+      - list
+      - set
+    memory_considerations: "ZSet uses skiplist, memory grows with elements. Consider using ZREMRANGEBYSCORE to limit size."
+    performance_notes: "O(log N) for inserts, O(log N + M) for range queries. Perfect for dynamic leaderboards."
+
+  queue:
+    recommended_types:
+      - list
+      - stream
+    anti_patterns:
+      - set
+      - zset
+    memory_considerations: "List uses linked list, memory grows with elements. Stream uses radix tree internally and supports consumer groups."
+    performance_notes: "List: O(1) for LPUSH/RPOP. Stream: O(log N) but with consumer groups, ACK, and persistence."
+
+  deduplication:
+    recommended_types:
+      - set
+      - hash
+      - zset
+    anti_patterns:
+      - list
+    memory_considerations: "Set uses hash table. Consider HyperLogLog for large datasets with acceptable error margin (~0.81%)."
+    performance_notes: "O(1) for SISMEMBER checks. HyperLogLog uses constant 12KB regardless of element count."
+
+  timeline:
+    recommended_types:
+      - zset
+      - list
+      - stream
+    anti_patterns:
+      - set
+    memory_considerations: "ZSet uses score for timestamps. Stream is ideal for append-only time series with consumer groups."
+    performance_notes: "ZSet: O(log N) insert, O(log N + M) range. Stream: O(log N) with efficient range queries and persistence."
+
+  cache:
+    recommended_types:
+      - string
+      - hash
+    anti_patterns: []
+    memory_considerations: "String for simple values, Hash for grouped data with field-level access. Always set TTL for cache data."
+    performance_notes: "Both O(1). Hash reduces keyspace overhead when grouping related fields. Consider maxmemory policies."
+
+  session:
+    recommended_types:
+      - hash
+      - string
+    anti_patterns: []
+    memory_considerations: "Hash allows partial field updates without full serialization. Set reasonable TTL for session expiration."
+    performance_notes: "O(1) for both. Hash better when you need to read/write individual fields frequently."
+
+  messaging:
+    recommended_types:
+      - stream
+      - list
+    anti_patterns: []
+    memory_considerations: "Stream offers persistence, consumer groups, and ACK. List is simpler but lacks group consumption."
+    performance_notes: "Stream: O(log N) but feature-rich. List: O(1) for push/pop but no ACK or groups."

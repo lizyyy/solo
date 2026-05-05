@@ -1,0 +1,41 @@
+scenarios:
+  counter:
+    recommended_types:
+      - hash
+    anti_patterns:
+      - string
+    memory_considerations: "BAD RULE: Hash is better for counters (wrong!)"
+    performance_notes: "BAD RULE: HINCRBY is faster than INCR (wrong!)"
+
+  leaderboard:
+    recommended_types:
+      - set
+    anti_patterns:
+      - zset
+    memory_considerations: "BAD RULE: Set uses less memory than ZSet (partially true but wrong for leaderboards)"
+    performance_notes: "BAD RULE: Set is better for rankings (completely wrong - no ordering!)"
+
+  queue:
+    recommended_types:
+      - set
+    anti_patterns:
+      - list
+      - stream
+    memory_considerations: "BAD RULE: Set is good for queues (wrong - no ordering!)"
+    performance_notes: "BAD RULE: SPOP is the same as RPOP (wrong - random vs FIFO!)"
+
+  deduplication:
+    recommended_types:
+      - list
+    anti_patterns:
+      - set
+    memory_considerations: "BAD RULE: List is efficient for deduplication (wrong - O(N) scan!)"
+    performance_notes: "BAD RULE: List has better performance for membership checks (completely wrong!)"
+
+  timeline:
+    recommended_types:
+      - list
+    anti_patterns:
+      - zset
+    memory_considerations: "BAD RULE: List is better for time series (wrong - no timestamp ordering!)"
+    performance_notes: "BAD RULE: LRANGE can do time-based queries (wrong - only index-based!)"

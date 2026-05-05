@@ -1,0 +1,11 @@
+key,type,ttl,memory,value_size,field_count,list_length,set_cardinality,zset_cardinality,stream_length,tags,description
+user:clicks:1001,hash,-1,4096,,150,,,,counter,BAD: Counter using Hash - should be String, no TTL
+leaderboard:weekly,set,-1,1048576,,,,5000,,leaderboard,BAD: Leaderboard using Set - should be ZSet, big key
+queue:priority:high,set,86400,524288,,,,1000,,queue,BAD: Queue using Set - should be List or Stream
+unique:ips:seen,list,-1,1048576,,,50000,,,deduplication,BAD: Deduplication using List - should be Set, huge size
+timeline:public:feed,list,-1,2097152,,,100000,,,timeline,BAD: Timeline using List - should be ZSet, no TTL
+cache:config:global,hash,-1,524288,,500,,,,cache,BAD: Cache without TTL - risk of memory exhaustion
+session:user:2001,string,2592000,1024,800,,,,,session,BAD: Session TTL too long (30 days) - security risk
+metrics:errors:count,set,-1,2048,,,,1000,,counter,BAD: Counter using Set - wrong structure
+product:reviews:12345,stream,-1,10485760,,,,,50000,cache,BAD: Using Stream as cache - wrong structure, big key
+notification:inbox:user:3001,string,-1,5242880,5000000,,,,,messaging,BAD: Message inbox using String - should be List/Stream, big key
