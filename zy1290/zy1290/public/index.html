@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仓库盘点管理系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.5rem; font-weight: 600; }
+    .header-actions { display: flex; gap: 0.75rem; }
+    
+    .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: white; color: #667eea; }
+    .btn-primary:hover { background: #f0f0ff; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .container { max-width: 1400px; margin: 1.5rem auto; padding: 0 1rem; }
+    
+    .status-bar { background: white; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; display: flex; gap: 2rem; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .status-item { display: flex; align-items: center; gap: 0.5rem; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .status-dot.online { background: #10b981; }
+    .status-dot.offline { background: #ef4444; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card { background: white; border-radius: 8px; padding: 1rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: #667eea; }
+    .stat-label { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+    
+    .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; overflow: hidden; }
+    .card-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f9fafb; }
+    .card-header h2 { font-size: 1rem; font-weight: 600; }
+    .card-body { padding: 1rem 1.5rem; }
+    
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; color: #374151; }
+    tr:hover { background: #f9fafb; }
+    
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; }
+    .badge-synced { background: #d1fae5; color: #065f46; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-syncing { background: #dbeafe; color: #1e40af; }
+    .badge-conflict { background: #fee2e2; color: #991b1b; }
+    
+    .action-btns { display: flex; gap: 0.25rem; }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow: auto; }
+    .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.125rem; font-weight: 600; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 0.75rem; }
+    
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.375rem; font-weight: 500; color: #374151; font-size: 0.875rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    
+    .conflict-section { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .conflict-section h4 { color: #991b1b; margin-bottom: 0.75rem; font-size: 0.9375rem; }
+    .diff-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.5rem; }
+    .diff-label { font-size: 0.75rem; color: #6b7280; }
+    .diff-value { font-weight: 600; }
+    .diff-value.local { color: #92400e; background: #fef3c7; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    .diff-value.server { color: #065f46; background: #d1fae5; padding: 0.25rem 0.5rem; border-radius: 4px; }
+    
+    .log-item { padding: 0.75rem; border-bottom: 1px solid #e5e7eb; font-size: 0.8125rem; }
+    .log-item:last-child { border-bottom: none; }
+    .log-time { color: #6b7280; font-size: 0.75rem; }
+    .log-action { font-weight: 600; margin: 0 0.5rem; }
+    .log-action.create { color: #059669; }
+    .log-action.update { color: #2563eb; }
+    .log-action.resolve { color: #7c3aed; }
+    .log-result.success { color: #059669; }
+    .log-result.conflict { color: #dc2626; }
+    .log-result.error { color: #dc2626; }
+    
+    .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 2000; }
+    .toast { background: white; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 0.75rem; animation: slideIn 0.3s ease; }
+    .toast.success { border-left: 4px solid #10b981; }
+    .toast.error { border-left: 4px solid #ef4444; }
+    .toast.warning { border-left: 4px solid #f59e0b; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    
+    .search-box { padding: 0.5rem 0; display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+    .search-box input { flex: 1; padding: 0.5rem 0.875rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; }
+    .search-box select { padding: 0.5rem 0.875rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; }
+    
+    .empty-state { text-align: center; padding: 2rem; color: #6b7280; }
+    .empty-state svg { width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5; }
+    
+    .tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 1rem; }
+    .tab { padding: 0.75rem 1.5rem; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: #6b7280; transition: all 0.2s; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; }
+    .tab:hover { color: #374151; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .syncing { opacity: 0.6; pointer-events: none; }
+    .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #ffffff33; border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .filter-draft { background: #fef3c7; }
+    .filter-syncing { background: #dbeafe; }
+    .filter-conflict { background: #fee2e2; }
+    
+    .operator-badge { background: #e5e7eb; color: #374151; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <div class="header">
+    <h1>📦 仓库盘点管理系统</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="app.exportReport()">📄 导出报告</button>
+      <button class="btn btn-warning" onclick="app.openAddModal()">➕ 新增盘点</button>
+      <button class="btn btn-success" id="syncBtn" onclick="app.syncAll()">🔄 同步全部</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-dot" id="networkStatus"></span>
+        <span id="networkText">检测网络中...</span>
+      </div>
+      <div class="status-item">
+        <span>📝 草稿队列: <strong id="draftCount">0</strong></span>
+      </div>
+      <div class="status-item">
+        <span>⚠️ 待解决冲突: <strong id="conflictCount">0</strong></span>
+      </div>
+      <div class="status-item">
+        <span>👤 操作人: </span>
+        <input type="text" id="operatorInput" value="盘点员A" style="width:100px;padding:0.25rem 0.5rem;border:1px solid #d1d5db;border-radius:4px;font-size:0.875rem;">
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">SKU 总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statSynced">0</div>
+        <div class="stat-label">已同步</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statPending">0</div>
+        <div class="stat-label">草稿待同步</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statConflict">0</div>
+        <div class="stat-label">冲突待解决</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="app.switchTab('inventory')">📋 库存列表</div>
+      <div class="tab" onclick="app.switchTab('queue')">📝 草稿队列</div>
+      <div class="tab" onclick="app.switchTab('conflicts')">⚠️ 冲突列表</div>
+      <div class="tab" onclick="app.switchTab('logs')">📜 同步日志</div>
+    </div>
+
+    <div id="tab-inventory" class="tab-content active">
+      <div class="card">
+        <div class="card-header">
+          <h2>库存盘点记录</h2>
+        </div>
+        <div class="card-body">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索 SKU、商品名称、库位..." oninput="app.filterInventory()">
+            <select id="statusFilter" onchange="app.filterInventory()">
+              <option value="">全部状态</option>
+              <option value="synced">已同步</option>
+              <option value="pending">草稿待同步</option>
+              <option value="syncing">同步中</option>
+              <option value="conflict">有冲突</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>状态</th>
+                  <th>SKU</th>
+                  <th>商品名称</th>
+                  <th>库位</th>
+                  <th>账面数量</th>
+                  <th>实际数量</th>
+                  <th>差异</th>
+                  <th>操作人</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="inventoryEmpty" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <p>暂无盘点记录</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-queue" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>草稿队列 (localStorage)</h2>
+          <div>
+            <button class="btn btn-sm btn-danger" onclick="app.clearDrafts()">清空草稿</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>状态</th>
+                  <th>SKU</th>
+                  <th>商品名称</th>
+                  <th>实际数量</th>
+                  <th>保存时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="queueTableBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="queueEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <p>暂无草稿数据，网络不稳定时数据会暂存于此</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-conflicts" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>冲突列表</h2>
+        </div>
+        <div class="card-body" id="conflictsBody">
+          <div class="empty-state" id="conflictsEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p>暂无冲突</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-logs" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>同步日志</h2>
+          <button class="btn btn-sm btn-secondary" onclick="app.refreshLogs()">刷新</button>
+        </div>
+        <div class="card-body" id="logsBody">
+          <div class="empty-state" id="logsEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <p>暂无同步日志</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="recordModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="recordModalTitle">新增盘点记录</h3>
+        <button class="btn btn-sm btn-secondary" onclick="app.closeModal('recordModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="recordForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>SKU *</label>
+              <input type="text" id="formSku" required placeholder="例如: SKU001">
+            </div>
+            <div class="form-group">
+              <label>商品名称 *</label>
+              <input type="text" id="formProductName" required placeholder="例如: 无线蓝牙耳机">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>库位</label>
+              <input type="text" id="formLocation" placeholder="例如: A-01-01">
+            </div>
+            <div class="form-group">
+              <label>单位</label>
+              <select id="formUnit">
+                <option value="个">个</option>
+                <option value="台">台</option>
+                <option value="件">件</option>
+                <option value="套">套</option>
+                <option value="箱">箱</option>
+                <option value="根">根</option>
+                <option value="张">张</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>账面数量</label>
+              <input type="number" id="formExpectedQty" value="0" min="0">
+            </div>
+            <div class="form-group">
+              <label>实际数量 *</label>
+              <input type="number" id="formActualQty" value="0" min="0" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="formRemark" rows="2" placeholder="盘点备注..."></textarea>
+          </div>
+          <input type="hidden" id="formClientVersion">
+          <input type="hidden" id="formIsEdit">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('recordModal')">取消</button>
+        <button class="btn btn-primary" onclick="app.saveRecord()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="conflictModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>⚠️ 解决数据冲突</h3>
+        <button class="btn btn-sm btn-secondary" onclick="app.closeModal('conflictModal')">✕</button>
+      </div>
+      <div class="modal-body" id="conflictModalBody">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('conflictModal')">取消</button>
+        <button class="btn btn-success" onclick="app.resolveConflict('keep_server')">保留服务器版本</button>
+        <button class="btn btn-warning" onclick="app.resolveConflict('overwrite')">用本地覆盖服务器</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000/api';
+    const STORAGE_KEY_DRAFTS = 'inventory_drafts';
+    const STORAGE_KEY_CONFLICTS = 'inventory_conflicts';
+    const STORAGE_KEY_SERVER_DATA = 'inventory_server_data';
+
+    const app = {
+      serverData: [],
+      drafts: [],
+      conflicts: [],
+      isOnline: true,
+      syncing: false,
+      currentConflict: null,
+      
+      init() {
+        this.loadFromStorage();
+        this.checkNetwork();
+        this.loadServerData();
+        this.refreshLogs();
+        this.setupNetworkListener();
+        this.render();
+      },
+
+      loadFromStorage() {
+        try {
+          const drafts = localStorage.getItem(STORAGE_KEY_DRAFTS);
+          const conflicts = localStorage.getItem(STORAGE_KEY_CONFLICTS);
+          const serverData = localStorage.getItem(STORAGE_KEY_SERVER_DATA);
+          
+          this.drafts = drafts ? JSON.parse(drafts) : [];
+          this.conflicts = conflicts ? JSON.parse(conflicts) : [];
+          this.serverData = serverData ? JSON.parse(serverData) : [];
+        } catch (e) {
+          console.error('加载本地存储失败:', e);
+        }
+      },
+
+      saveToStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY_DRAFTS, JSON.stringify(this.drafts));
+          localStorage.setItem(STORAGE_KEY_CONFLICTS, JSON.stringify(this.conflicts));
+          localStorage.setItem(STORAGE_KEY_SERVER_DATA, JSON.stringify(this.serverData));
+        } catch (e) {
+          console.error('保存到本地存储失败:', e);
+          this.showToast('本地存储失败: ' + e.message, 'error');
+        }
+      },
+
+      setupNetworkListener() {
+        window.addEventListener('online', () => {
+          this.isOnline = true;
+          this.updateNetworkStatus();
+          this.showToast('网络已恢复，正在自动同步...', 'success');
+          setTimeout(() => this.syncAll(), 1000);
+        });
+        
+        window.addEventListener('offline', () => {
+          this.isOnline = false;
+          this.updateNetworkStatus();
+          this.showToast('网络已断开，数据将保存到本地草稿', 'warning');
+        });
+      },
+
+      async checkNetwork() {
+        try {
+          const response = await fetch(API_BASE + '/inventory', { 
+            method: 'HEAD',
+            signal: AbortSignal.timeout(3000)
+          });
+          this.isOnline = response.ok;
+        } catch {
+          this.isOnline = false;
+        }
+        this.updateNetworkStatus();
+      },
+
+      updateNetworkStatus() {
+        const dot = document.getElementById('networkStatus');
+        const text = document.getElementById('networkText');
+        
+        if (this.isOnline) {
+          dot.className = 'status-dot online';
+          text.textContent = '网络在线';
+        } else {
+          dot.className = 'status-dot offline';
+          text.textContent = '网络离线 (草稿模式)';
+        }
+      },
+
+      async loadServerData() {
+        if (!this.isOnline) return;
+        
+        try {
+          const response = await fetch(API_BASE + '/inventory');
+          const data = await response.json();
+          
+          if (data.success) {
+            this.serverData = data.data;
+            this.saveToStorage();
+            this.render();
+          }
+        } catch (error) {
+          console.error('加载服务器数据失败:', error);
+          this.isOnline = false;
+          this.updateNetworkStatus();
+        }
+      },
+
+      async refreshLogs() {
+        if (!this.isOnline) return;
+        
+        try {
+          const response = await fetch(API_BASE + '/sync/logs?limit=50');
+          const data = await response.json();
+          
+          if (data.success) {
+            this.renderLogs(data.data);
+          }
+        } catch (error) {
+          console.error('加载日志失败:', error);
+        }
+      },
+
+      switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById('tab-' + tabName).classList.add('active');
+      },
+
+      getOperator() {
+        return document.getElementById('operatorInput').value.trim() || '未知操作员';
+      },
+
+      openAddModal() {
+        document.getElementById('recordModalTitle').textContent = '新增盘点记录';
+        document.getElementById('recordForm').reset();
+        document.getElementById('formIsEdit').value = 'false';
+        document.getElementById('recordModal').classList.add('active');
+      },
+
+      openEditModal(sku, isDraft = false) {
+        let record;
+        
+        if (isDraft) {
+          record = this.drafts.find(d => d.sku === sku);
+        } else {
+          const fromServer = this.serverData.find(s => s.sku === sku);
+          const fromDraft = this.drafts.find(d => d.sku === sku);
+          record = fromDraft || fromServer;
+        }
+        
+        if (!record) {
+          this.showToast('未找到该记录', 'error');
+          return;
+        }
+
+        document.getElementById('recordModalTitle').textContent = '编辑盘点记录';
+        document.getElementById('formSku').value = record.sku;
+        document.getElementById('formProductName').value = record.product_name;
+        document.getElementById('formLocation').value = record.location || '';
+        document.getElementById('formUnit').value = record.unit || '个';
+        document.getElementById('formExpectedQty').value = record.expected_qty || 0;
+        document.getElementById('formActualQty').value = record.actual_qty || 0;
+        document.getElementById('formRemark').value = record.remark || '';
+        document.getElementById('formClientVersion').value = record.version || record.clientVersion || 1;
+        document.getElementById('formIsEdit').value = 'true';
+        document.getElementById('recordModal').classList.add('active');
+      },
+
+      closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+      },
+
+      saveRecord() {
+        const sku = document.getElementById('formSku').value.trim();
+        const productName = document.getElementById('formProductName').value.trim();
+        const isEdit = document.getElementById('formIsEdit').value === 'true';
+        const clientVersion = parseInt(document.getElementById('formClientVersion').value) || 1;
+
+        if (!sku || !productName) {
+          this.showToast('SKU 和商品名称不能为空', 'error');
+          return;
+        }
+
+        const record = {
+          sku,
+          product_name: productName,
+          location: document.getElementById('formLocation').value.trim(),
+          unit: document.getElementById('formUnit').value,
+          expected_qty: parseInt(document.getElementById('formExpectedQty').value) || 0,
+          actual_qty: parseInt(document.getElementById('formActualQty').value) || 0,
+          remark: document.getElementById('formRemark').value.trim(),
+          clientVersion: clientVersion,
+          status: 'pending',
+          savedAt: new Date().toISOString(),
+          operator: this.getOperator()
+        };
+
+        this.closeModal('recordModal');
+
+        if (this.isOnline) {
+          this.trySyncRecord(record, isEdit);
+        } else {
+          this.saveToDraft(record);
+        }
+      },
+
+      saveToDraft(record) {
+        const existingIndex = this.drafts.findIndex(d => d.sku === record.sku);
+        if (existingIndex >= 0) {
+          this.drafts[existingIndex] = { ...this.drafts[existingIndex], ...record };
+        } else {
+          this.drafts.push(record);
+        }
+        
+        this.saveToStorage();
+        this.render();
+        this.showToast('已保存到草稿队列 (网络离线)', 'warning');
+      },
+
+      async trySyncRecord(record, isEdit) {
+        try {
+          record.status = 'syncing';
+          this.render();
+
+          const response = await fetch(API_BASE + '/sync/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              records: [record],
+              operator: this.getOperator()
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            if (data.conflicts && data.conflicts.length > 0) {
+              record.status = 'conflict';
+              this.handleConflict(data.conflicts[0], record);
+              this.showToast('数据冲突，需手动解决', 'warning');
+            } else {
+              this.drafts = this.drafts.filter(d => d.sku !== record.sku);
+              
+              if (data.results[0].action === 'created') {
+                this.serverData.push({
+                  ...record,
+                  version: (record.clientVersion || 1) + 1,
+                  status: 'synced'
+                });
+              } else {
+                const idx = this.serverData.findIndex(s => s.sku === record.sku);
+                if (idx >= 0) {
+                  this.serverData[idx] = {
+                    ...this.serverData[idx],
+                    ...record,
+                    version: (this.serverData[idx].version || 1) + 1
+                  };
+                }
+              }
+              
+              this.showToast('同步成功', 'success');
+              this.loadServerData();
+              this.refreshLogs();
+            }
+          } else {
+            throw new Error(data.error || '同步失败');
+          }
+        } catch (error) {
+          console.error('同步失败:', error);
+          this.isOnline = false;
+          this.updateNetworkStatus();
+          record.status = 'pending';
+          this.saveToDraft(record);
+        }
+
+        this.saveToStorage();
+        this.render();
+      },
+
+      handleConflict(conflictData, localRecord) {
+        const existingConflict = this.conflicts.find(c => c.sku === conflictData.sku);
+        const conflict = {
+          sku: conflictData.sku,
+          local: conflictData.local,
+          server: conflictData.server,
+          diff: conflictData.diff,
+          localRecord: localRecord,
+          createdAt: new Date().toISOString()
+        };
+
+        if (existingConflict) {
+          Object.assign(existingConflict, conflict);
+        } else {
+          this.conflicts.push(conflict);
+        }
+
+        this.saveToStorage();
+        this.render();
+      },
+
+      async syncAll() {
+        if (this.syncing) return;
+        if (this.drafts.length === 0) {
+          this.showToast('暂无待同步的草稿', 'warning');
+          return;
+        }
+        if (!this.isOnline) {
+          this.showToast('网络离线，无法同步', 'error');
+          return;
+        }
+
+        this.syncing = true;
+        document.getElementById('syncBtn').disabled = true;
+        document.getElementById('syncBtn').innerHTML = '<span class="spinner"></span> 同步中...';
+
+        const pendingRecords = this.drafts.filter(d => d.status !== 'syncing');
+        
+        try {
+          for (const record of pendingRecords) {
+            record.status = 'syncing';
+          }
+          this.render();
+
+          const response = await fetch(API_BASE + '/sync/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              records: pendingRecords,
+              operator: this.getOperator()
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            for (const result of data.results) {
+              if (result.status === 'success') {
+                this.drafts = this.drafts.filter(d => d.sku !== result.sku);
+              }
+            }
+
+            if (data.conflicts && data.conflicts.length > 0) {
+              for (let i = 0; i < data.conflicts.length; i++) {
+                const localRecord = pendingRecords.find(r => r.sku === data.conflicts[i].sku);
+                this.handleConflict(data.conflicts[i], localRecord);
+              }
+            }
+
+            this.showToast(`同步完成: ${data.stats.success} 成功, ${data.stats.conflict} 冲突`, 
+              data.stats.conflict > 0 ? 'warning' : 'success');
+            
+            this.loadServerData();
+            this.refreshLogs();
+          }
+        } catch (error) {
+          console.error('批量同步失败:', error);
+          for (const record of pendingRecords) {
+            record.status = 'pending';
+          }
+          this.showToast('同步失败: ' + error.message, 'error');
+        }
+
+        this.syncing = false;
+        document.getElementById('syncBtn').disabled = false;
+        document.getElementById('syncBtn').innerHTML = '🔄 同步全部';
+        
+        this.saveToStorage();
+        this.render();
+      },
+
+      openConflictModal(sku) {
+        const conflict = this.conflicts.find(c => c.sku === sku);
+        if (!conflict) return;
+
+        this.currentConflict = conflict;
+        
+        const body = document.getElementById('conflictModalBody');
+        body.innerHTML = `
+          <div class="conflict-section">
+            <h4>SKU: ${conflict.sku} - 数据冲突</h4>
+            <p style="margin-bottom: 1rem; color: #6b7280; font-size: 0.875rem;">
+              服务器版本(${conflict.server.version})与本地版本(${conflict.local.version})不一致，请选择处理方式
+            </p>
+            <div class="diff-row">
+              <div>
+                <div class="diff-label">本地修改 (实际数量)</div>
+                <div class="diff-value local">${conflict.local.actual_qty}</div>
+              </div>
+              <div>
+                <div class="diff-label">服务器当前 (实际数量)</div>
+                <div class="diff-value server">${conflict.server.actual_qty}</div>
+              </div>
+            </div>
+            ${conflict.local.expected_qty !== conflict.server.expected_qty ? `
+            <div class="diff-row">
+              <div>
+                <div class="diff-label">本地修改 (账面数量)</div>
+                <div class="diff-value local">${conflict.local.expected_qty}</div>
+              </div>
+              <div>
+                <div class="diff-label">服务器当前 (账面数量)</div>
+                <div class="diff-value server">${conflict.server.expected_qty}</div>
+              </div>
+            </div>
+            ` : ''}
+          </div>
+        `;
+        
+        document.getElementById('conflictModal').classList.add('active');
+      },
+
+      async resolveConflict(resolution) {
+        if (!this.currentConflict) return;
+        
+        try {
+          const response = await fetch(API_BASE + '/sync/resolve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sku: this.currentConflict.sku,
+              resolution,
+              localData: this.currentConflict.local,
+              operator: this.getOperator()
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            this.conflicts = this.conflicts.filter(c => c.sku !== this.currentConflict.sku);
+            this.drafts = this.drafts.filter(d => d.sku !== this.currentConflict.sku);
+            
+            if (resolution === 'keep_server' && data.data) {
+              const idx = this.serverData.findIndex(s => s.sku === data.data.sku);
+              if (idx >= 0) {
+                this.serverData[idx] = data.data;
+              }
+            }
+
+            this.closeModal('conflictModal');
+            this.showToast(resolution === 'overwrite' ? '已用本地数据覆盖服务器' : '已保留服务器版本', 'success');
+            
+            this.saveToStorage();
+            this.render();
+            this.loadServerData();
+            this.refreshLogs();
+          }
+        } catch (error) {
+          console.error('解决冲突失败:', error);
+          this.showToast('操作失败: ' + error.message, 'error');
+        }
+      },
+
+      deleteDraft(sku) {
+        if (confirm('确定要删除这条草稿吗？')) {
+          this.drafts = this.drafts.filter(d => d.sku !== sku);
+          this.saveToStorage();
+          this.render();
+          this.showToast('草稿已删除', 'success');
+        }
+      },
+
+      clearDrafts() {
+        if (this.drafts.length === 0) {
+          this.showToast('没有可清空的草稿', 'warning');
+          return;
+        }
+        
+        if (confirm(`确定要清空 ${this.drafts.length} 条草稿吗？此操作不可恢复！`)) {
+          this.drafts = [];
+          this.saveToStorage();
+          this.render();
+          this.showToast('草稿已清空', 'success');
+        }
+      },
+
+      async exportReport() {
+        if (!this.isOnline) {
+          this.showToast('网络离线，无法导出报告', 'error');
+          return;
+        }
+        
+        try {
+          const response = await fetch(API_BASE + '/report/markdown');
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `inventory-report-${Date.now()}.md`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          this.showToast('报告导出成功', 'success');
+        } catch (error) {
+          console.error('导出报告失败:', error);
+          this.showToast('导出失败: ' + error.message, 'error');
+        }
+      },
+
+      filterInventory() {
+        this.renderInventoryTable();
+      },
+
+      render() {
+        this.updateStats();
+        this.renderInventoryTable();
+        this.renderQueueTable();
+        this.renderConflictsList();
+      },
+
+      updateStats() {
+        const merged = this.getMergedData();
+        const syncedCount = merged.filter(r => r.status === 'synced').length;
+        const pendingCount = this.drafts.length;
+        const conflictCount = this.conflicts.length;
+
+        document.getElementById('statTotal').textContent = merged.length;
+        document.getElementById('statSynced').textContent = syncedCount;
+        document.getElementById('statPending').textContent = pendingCount;
+        document.getElementById('statConflict').textContent = conflictCount;
+        document.getElementById('draftCount').textContent = pendingCount;
+        document.getElementById('conflictCount').textContent = conflictCount;
+      },
+
+      getMergedData() {
+        const map = new Map();
+        
+        for (const item of this.serverData) {
+          map.set(item.sku, { ...item, status: 'synced' });
+        }
+        
+        for (const draft of this.drafts) {
+          map.set(draft.sku, { ...map.get(draft.sku), ...draft });
+        }
+        
+        for (const conflict of this.conflicts) {
+          const existing = map.get(conflict.sku);
+          if (existing) {
+            existing.status = 'conflict';
+          }
+        }
+        
+        return Array.from(map.values());
+      },
+
+      getStatusBadge(status) {
+        const badges = {
+          synced: '<span class="badge badge-synced">已同步</span>',
+          pending: '<span class="badge badge-pending">草稿</span>',
+          syncing: '<span class="badge badge-syncing">同步中</span>',
+          conflict: '<span class="badge badge-conflict">冲突</span>'
+        };
+        return badges[status] || badges.synced;
+      },
+
+      renderInventoryTable() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        let data = this.getMergedData();
+        
+        if (search) {
+          data = data.filter(item => 
+            item.sku.toLowerCase().includes(search) ||
+            item.product_name.toLowerCase().includes(search) ||
+            (item.location && item.location.toLowerCase().includes(search))
+          );
+        }
+        
+        if (statusFilter) {
+          data = data.filter(item => item.status === statusFilter);
+        }
+
+        const tbody = document.getElementById('inventoryTableBody');
+        const empty = document.getElementById('inventoryEmpty');
+
+        if (data.length === 0) {
+          tbody.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        
+        tbody.innerHTML = data.map(item => {
+          const diff = item.actual_qty - item.expected_qty;
+          const diffText = diff === 0 ? '<span style="color:#10b981">✓ 一致</span>' : 
+            (diff > 0 ? `<span style="color:#f59e0b">+${diff} 盘盈</span>` : `<span style="color:#ef4444">${diff} 盘亏</span>`);
+          
+          const rowClass = item.status === 'pending' ? 'filter-draft' : 
+                           item.status === 'syncing' ? 'filter-syncing' :
+                           item.status === 'conflict' ? 'filter-conflict' : '';
+
+          return `
+            <tr class="${rowClass}">
+              <td>${this.getStatusBadge(item.status)}</td>
+              <td><strong>${item.sku}</strong></td>
+              <td>${item.product_name}</td>
+              <td>${item.location || '-'}</td>
+              <td>${item.expected_qty}</td>
+              <td><strong>${item.actual_qty}</strong></td>
+              <td>${diffText}</td>
+              <td><span class="operator-badge">${item.operator || '-'}</span></td>
+              <td>${item.remark || '-'}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-sm btn-secondary" onclick="app.openEditModal('${item.sku}')">编辑</button>
+                  ${item.status === 'conflict' ? 
+                    `<button class="btn btn-sm btn-warning" onclick="app.openConflictModal('${item.sku}')">解决</button>` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      },
+
+      renderQueueTable() {
+        const tbody = document.getElementById('queueTableBody');
+        const empty = document.getElementById('queueEmpty');
+
+        if (this.drafts.length === 0) {
+          tbody.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        
+        tbody.innerHTML = this.drafts.map(item => `
+          <tr class="${item.status === 'syncing' ? 'syncing' : ''}">
+            <td>${this.getStatusBadge(item.status)}</td>
+            <td><strong>${item.sku}</strong></td>
+            <td>${item.product_name}</td>
+            <td>${item.actual_qty}</td>
+            <td>${new Date(item.savedAt).toLocaleString('zh-CN')}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-secondary" onclick="app.openEditModal('${item.sku}', true)">编辑</button>
+                <button class="btn btn-sm btn-danger" onclick="app.deleteDraft('${item.sku}')">删除</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      },
+
+      renderConflictsList() {
+        const body = document.getElementById('conflictsBody');
+        const empty = document.getElementById('conflictsEmpty');
+
+        if (this.conflicts.length === 0) {
+          body.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        
+        body.innerHTML = this.conflicts.map(conflict => `
+          <div class="conflict-section" style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+              <h4 style="margin:0;">⚠️ SKU: ${conflict.sku}</h4>
+              <button class="btn btn-sm btn-warning" onclick="app.openConflictModal('${conflict.sku}')">解决冲突</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div style="background:#fef3c7;padding:0.75rem;border-radius:6px;">
+                <div style="font-size:0.75rem;color:#92400e;margin-bottom:0.25rem;">本地修改</div>
+                <div><strong>实际数量:</strong> ${conflict.local.actual_qty}</div>
+                <div><strong>账面数量:</strong> ${conflict.local.expected_qty}</div>
+                <div><strong>版本:</strong> ${conflict.local.version}</div>
+              </div>
+              <div style="background:#d1fae5;padding:0.75rem;border-radius:6px;">
+                <div style="font-size:0.75rem;color:#065f46;margin-bottom:0.25rem;">服务器当前</div>
+                <div><strong>实际数量:</strong> ${conflict.server.actual_qty}</div>
+                <div><strong>账面数量:</strong> ${conflict.server.expected_qty}</div>
+                <div><strong>版本:</strong> ${conflict.server.version}</div>
+              </div>
+            </div>
+            <div style="margin-top:0.5rem;font-size:0.75rem;color:#6b7280;">
+              冲突时间: ${new Date(conflict.createdAt).toLocaleString('zh-CN')}
+            </div>
+          </div>
+        `).join('');
+      },
+
+      renderLogs(logs) {
+        const body = document.getElementById('logsBody');
+        const empty = document.getElementById('logsEmpty');
+
+        if (!logs || logs.length === 0) {
+          body.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        empty.style.display = 'none';
+        
+        body.innerHTML = logs.map(log => {
+          const resultClass = log.result.includes('success') ? 'success' : 
+                             log.result.includes('conflict') ? 'conflict' : 
+                             log.result.includes('error') ? 'error' : '';
+          
+          return `
+            <div class="log-item">
+              <span class="log-time">${new Date(log.created_at).toLocaleString('zh-CN')}</span>
+              <span class="log-action ${log.action}">[${log.action}]</span>
+              ${log.sku ? `<span>SKU: <strong>${log.sku}</strong></span>` : ''}
+              <span class="log-result ${resultClass}">${log.result}</span>
+              ${log.operator ? `<span style="color:#6b7280;">(${log.operator})</span>` : ''}
+            </div>
+          `;
+        }).join('');
+      },
+
+      showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠'}</span>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.animation = 'slideIn 0.3s ease reverse';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
