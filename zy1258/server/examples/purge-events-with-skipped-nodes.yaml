@@ -1,0 +1,46 @@
+- purgeId: purge-20240315-001
+  action: invalidate
+  urls:
+    - /index.html
+    - /assets/*
+  surrogateKeys:
+    - v1.1.0
+  status: completed
+  createdAt: 2024-03-15T10:30:00.000Z
+  completedAt: 2024-03-15T10:31:30.000Z
+  edgeNodes:
+    - id: node-hkg-001
+      location: Hong Kong
+      status: purged
+    - id: node-sgp-001
+      location: Singapore
+      status: purged
+    - id: node-tok-001
+      location: Tokyo
+      status: skipped
+    - id: node-nyc-001
+      location: New York
+      status: purged
+  skippedNodes:
+    - node-tok-001
+
+- purgeId: purge-20240315-002
+  action: delete
+  urls:
+    - /assets/style.oldhash1234.css
+  status: completed
+  createdAt: 2024-03-15T10:45:00.000Z
+  completedAt: 2024-03-15T10:45:15.000Z
+  edgeNodes:
+    - id: node-hkg-001
+      location: Hong Kong
+      status: purged
+    - id: node-sgp-001
+      location: Singapore
+      status: purged
+    - id: node-tok-001
+      location: Tokyo
+      status: purged
+    - id: node-nyc-001
+      location: New York
+      status: purged

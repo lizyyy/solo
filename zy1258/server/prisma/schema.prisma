@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model ReleaseBatch {
+  id           String    @id @default(uuid())
+  version      String
+  commitHash   String?
+  createdAt    DateTime  @default(now())
+  description  String?
+  status       String    @default("pending")
+  manifest     String?
+  resources    Resource[]
+  purgeEvents  PurgeEvent[]
+  hitChains    HitChain[]
+  anomalyUsers AnomalyUser[]
+  debugTasks   DebugTask[]
+}
+
+model Resource {
+  id              String   @id @default(uuid())
+  path            String
+  type            String
+  hash            String
+  contentLength   Int?
+  lastModified    DateTime?
+  etag            String?
+  releaseBatchId  String
+  releaseBatch    ReleaseBatch @relation(fields: [releaseBatchId], references: [id], onDelete: Cascade)
+  hitChains       HitChain[]
+}
+
+model HitChain {
+  id              String   @id @default(uuid())
+  requestId       String
+  url             String
+  method          String
+  statusCode      Int
+  edgeNodeId      String?
+  cacheStatus     String
+  cacheHitMiss    String
+  age             Int?
+  serverTiming    String?
+  xCache          String?
+  xEdgeLocation   String?
+  requestTime     DateTime?
+  responseTime    DateTime?
+  clientIp        String?
+  userAgent       String?
+  referer         String?
+  releaseBatchId  String?
+  resourceId      String?
+  releaseBatch    ReleaseBatch? @relation(fields: [releaseBatchId], references: [id], onDelete: SetNull)
+  resource        Resource?     @relation(fields: [resourceId], references: [id], onDelete: SetNull)
+  debugTaskId     String?
+  debugTask       DebugTask?    @relation(fields: [debugTaskId], references: [id], onDelete: SetNull)
+  risks           Risk[]
+}
+
+model AnomalyUser {
+  id              String   @id @default(uuid())
+  sessionId       String
+  userId          String?
+  clientIp        String?
+  userAgent       String?
+  firstSeen       DateTime @default(now())
+  lastSeen        DateTime @default(now())
+  errorType       String?
+  errorMessage    String?
+  errorStack      String?
+  affectedUrls    String?
+  releaseBatchId  String?
+  releaseBatch    ReleaseBatch? @relation(fields: [releaseBatchId], references: [id], onDelete: SetNull)
+  debugTaskId     String?
+  debugTask       DebugTask?    @relation(fields: [debugTaskId], references: [id], onDelete: SetNull)
+  risks           Risk[]
+}
+
+model PurgeEvent {
+  id              String   @id @default(uuid())
+  purgeId         String
+  action          String
+  urls            String
+  surrogateKeys   String?
+  status          String
+  createdAt       DateTime @default(now())
+  completedAt     DateTime?
+  edgeNodes       String?
+  skippedNodes    String?
+  releaseBatchId  String?
+  releaseBatch    ReleaseBatch? @relation(fields: [releaseBatchId], references: [id], onDelete: SetNull)
+  debugTaskId     String?
+  debugTask       DebugTask?    @relation(fields: [debugTaskId], references: [id], onDelete: SetNull)
+}
+
+model DebugTask {
+  id              String   @id @default(uuid())
+  name            String
+  type            String
+  status          String    @default("pending")
+  config          String?
+  snapshot        String?
+  conclusion      String?
+  createdAt       DateTime  @default(now())
+  startedAt       DateTime?
+  completedAt     DateTime?
+  releaseBatches  ReleaseBatch[]
+  hitChains       HitChain[]
+  anomalyUsers    AnomalyUser[]
+  purgeEvents     PurgeEvent[]
+  risks           Risk[]
+}
+
+model Risk {
+  id              String   @id @default(uuid())
+  type            String
+  severity        String
+  title           String
+  description     String
+  affectedUrls    String?
+  evidence        String?
+  suggestion      String?
+  hitChainId      String?
+  hitChain        HitChain?     @relation(fields: [hitChainId], references: [id], onDelete: Cascade)
+  anomalyUserId   String?
+  anomalyUser     AnomalyUser?  @relation(fields: [anomalyUserId], references: [id], onDelete: Cascade)
+  debugTaskId     String?
+  debugTask       DebugTask?    @relation(fields: [debugTaskId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+}

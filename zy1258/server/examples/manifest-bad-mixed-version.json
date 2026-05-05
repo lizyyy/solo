@@ -1,0 +1,39 @@
+{
+  "version": "1.1.0-bad",
+  "commitHash": "badbadbadbad",
+  "createdAt": "2024-03-15T10:30:00.000Z",
+  "entries": [
+    {
+      "path": "/index.html",
+      "type": "html",
+      "hash": "oldhash1234",
+      "contentLength": 2100,
+      "lastModified": "2024-03-10T10:25:00.000Z",
+      "etag": "W/\"oldhash1234\""
+    },
+    {
+      "path": "/assets/index.newhash5678.js",
+      "type": "javascript",
+      "hash": "newhash5678",
+      "contentLength": 520000,
+      "lastModified": "2024-03-15T10:25:00.000Z",
+      "etag": "W/\"newhash5678\""
+    },
+    {
+      "path": "/assets/vendor.newhash5678.js",
+      "type": "javascript",
+      "hash": "newhash5678",
+      "contentLength": 310000,
+      "lastModified": "2024-03-15T10:25:00.000Z",
+      "etag": "W/\"newhash5678\""
+    },
+    {
+      "path": "/assets/style.oldhash1234.css",
+      "type": "css",
+      "hash": "oldhash1234",
+      "contentLength": 105000,
+      "lastModified": "2024-03-10T10:25:00.000Z",
+      "etag": "W/\"oldhash1234\""
+    }
+  ]
+}
