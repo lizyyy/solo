@@ -1,0 +1,51 @@
+templates:
+  - name: plc_gateway_standard
+    description: "PLC网关标准日志格式"
+    pattern: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+\[(?P<device>PLC-\w+)\]\s+(?P<level>INFO|WARN|ERROR|DEBUG)\s+(?P<module>[\w\.]+):\s+(?P<message>.*)$'
+    fields:
+      timestamp:
+        format: "%Y-%m-%d %H:%M:%S.%f"
+      level:
+        enum: ["DEBUG", "INFO", "WARN", "ERROR"]
+    error_code_extraction:
+      pattern: 'Error\s+Code:\s*(?P<error_code>E\d{3,4})'
+      field: error_code
+    batch_extraction:
+      pattern: 'Batch\s+ID:\s*(?P<batch_id>B\d{6})'
+      field: batch_id
+
+  - name: edge_collector_jsonl
+    description: "边缘采集器JSONL格式"
+    pattern: '^(?P<json>.*)$'
+    is_json: true
+    json_fields:
+      timestamp: ["time", "timestamp", "@timestamp"]
+      device: ["device_id", "device", "plc_id"]
+      level: ["level", "log_level", "severity"]
+      message: ["message", "msg", "content"]
+      error_code: ["error_code", "code", "err_code"]
+      batch_id: ["batch_id", "batch", "lot_id"]
+    timestamp_format: "%Y-%m-%dT%H:%M:%S.%fZ"
+
+  - name: legacy_syslog_format
+    description: "遗留syslog格式日志"
+    pattern: '^(?P<timestamp>\w{3}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+(?P<device>PLC-\w+)\s+(?P<level>\w+):\s+(?P<message>.*)$'
+    fields:
+      timestamp:
+        format: "%b %d %H:%M:%S"
+        year_default: 2026
+    level_mapping:
+      "warning": "WARN"
+      "err": "ERROR"
+      "info": "INFO"
+      "debug": "DEBUG"
+    error_code_extraction:
+      pattern: '(?P<error_code>E\d{3,4})'
+      field: error_code
+
+  - name: partial_line_fallback
+    description: "半截行备用模板，尽可能提取信息"
+    pattern: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})'
+    fields:
+      timestamp:
+        format: "%Y-%m-%d %H:%M:%S"

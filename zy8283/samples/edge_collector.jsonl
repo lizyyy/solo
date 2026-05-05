@@ -1,0 +1,8 @@
+{"time": "2026-05-04T08:00:01.123Z", "device_id": "EDGE-001", "level": "INFO", "msg": "Edge collector initialized"}
+{"time": "2026-05-04T08:00:05.456Z", "device_id": "EDGE-001", "level": "INFO", "msg": "Connected to MQTT broker", "batch_id": "B2026001"}
+{"time": "2026-05-04T08:00:10.789Z", "device_id": "EDGE-002", "level": "ERROR", "msg": "Failed to publish data", "error_code": "E3001"}
+{"time": "2026-05-04T08:00:15.123Z", "device_id": "EDGE-001", "level": "INFO", "msg": "Data buffer flushed", "batch_id": "B2026001"}
+{"time": "2026-05-04T08:00:20.456Z", "device_id": "EDGE-003", "level": "WARN", "msg": "High memory usage detected"}
+{"time": "2026-05-04T08:00:25.789Z", "device_id": "EDGE-002", "level": "ERROR", "msg": "Database connection failed", "error_code": "E3002"}
+{"time": "2026-05-04T08:00:30.123Z", "device_id": "EDGE-001", "level": "INFO", "msg": "Batch completed", "batch_id": "B2026001"}
+{"time": "2026-05-04T08:00:35.456Z", "device_id": "EDGE-003", "level": "ERROR", "msg": "Configuration reload failed", "error_code": "E3003"}
