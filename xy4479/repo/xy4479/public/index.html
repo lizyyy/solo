@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民俗舞狮队装车训练游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="gameStatus" class="status-bar">
+            <div class="status-item">
+                <span class="status-label">时间</span>
+                <span id="timer" class="status-value">10:00</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">分数</span>
+                <span id="score" class="status-value score-positive">100</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">装载进度</span>
+                <div class="congestion-bar">
+                    <div id="congestionFill" class="congestion-fill" style="width: 0%"></div>
+                </div>
+                <span id="congestion" class="status-value congestion-value">0%</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">剩余物品</span>
+                <span id="remaining" class="status-value">29</span>
+            </div>
+        </div>
+
+        <div id="gameContainer" class="game-container">
+            <div class="waiting-area">
+                <div class="area-tabs">
+                    <button class="tab-btn active" data-tab="items">道具</button>
+                    <button class="tab-btn" data-tab="members">队员</button>
+                </div>
+                <h3 id="tabTitle">待装车道具</h3>
+                <div id="itemQueue" class="item-queue">
+                </div>
+            </div>
+
+            <div class="load-areas">
+                <div id="mainTruck" class="load-zone main-truck" data-zone="main-truck">
+                    <div class="zone-header">
+                        <span class="zone-icon">🚚</span>
+                        <span class="zone-title">主运输车</span>
+                        <span class="zone-desc">最大承重: 100kg</span>
+                        <span class="zone-weight">已装: <span id="mainTruckWeight">0</span>kg</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="zone-items" id="mainTruckItems"></div>
+                    </div>
+                </div>
+
+                <div id="backupTruck" class="load-zone backup-truck" data-zone="backup-truck">
+                    <div class="zone-header">
+                        <span class="zone-icon">🚐</span>
+                        <span class="zone-title">备用运输车</span>
+                        <span class="zone-desc">最大承重: 80kg</span>
+                        <span class="zone-weight">已装: <span id="backupTruckWeight">0</span>kg</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="zone-items" id="backupTruckItems"></div>
+                    </div>
+                </div>
+
+                <div id="waitingArea" class="load-zone waiting-area-zone" data-zone="waiting-area">
+                    <div class="zone-header">
+                        <span class="zone-icon">🏠</span>
+                        <span class="zone-title">候场区</span>
+                        <span class="zone-desc">最大承重: 30kg</span>
+                        <span class="zone-weight">已装: <span id="waitingAreaWeight">0</span>kg</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="zone-items" id="waitingAreaItems"></div>
+                    </div>
+                </div>
+
+                <div id="rainBackup" class="load-zone rain-backup" data-zone="rain-backup">
+                    <div class="zone-header">
+                        <span class="zone-icon">🌧️</span>
+                        <span class="zone-title">雨天备用区</span>
+                        <span class="zone-desc">最大承重: 20kg</span>
+                        <span class="zone-weight">已装: <span id="rainBackupWeight">0</span>kg</span>
+                    </div>
+                    <div class="zone-content">
+                        <div class="zone-items" id="rainBackupItems"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="startScreen" class="overlay">
+            <div class="overlay-content">
+                <h1>🦁 民俗舞狮队装车训练</h1>
+                <p class="subtitle">庙会演出前，将道具和队员正确安排到车辆和候场区</p>
+                
+                <div class="rules">
+                    <h3>装载区域</h3>
+                    <div class="rule-item main-truck-rule">
+                        <span class="rule-icon">🚚</span>
+                        <div>
+                            <strong>主运输车</strong> - 装载主要表演道具
+                            <div class="rule-examples">狮头、狮被、主鼓、锣镲、主音箱、队员服、醒狮鞋</div>
+                        </div>
+                    </div>
+                    <div class="rule-item backup-truck-rule">
+                        <span class="rule-icon">🚐</span>
+                        <div>
+                            <strong>备用运输车</strong> - 装载备用道具
+                            <div class="rule-examples">备用狮头、备用狮被、备用鼓、锂电池、备用服装</div>
+                        </div>
+                    </div>
+                    <div class="rule-item waiting-rule">
+                        <span class="rule-icon">🏠</span>
+                        <div>
+                            <strong>候场区</strong> - 队员集合和补给区
+                            <div class="rule-examples">队员、矿泉水、点心、充电宝、急救包</div>
+                        </div>
+                    </div>
+                    <div class="rule-item rain-rule">
+                        <span class="rule-icon">🌧️</span>
+                        <div>
+                            <strong>雨天备用区</strong> - 雨天应急物品
+                            <div class="rule-examples">防雨罩、雨衣套装</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-info">
+                    <h3>扣分规则</h3>
+                    <ul>
+                        <li>📦 道具放错区域: 扣15分</li>
+                        <li>🦁 主狮头未放主运输车: 额外扣20分</li>
+                        <li>⚖️ 重物(>10kg)放在候场区: 扣10分</li>
+                        <li>☔ 雨具未放雨天备用区: 扣10分</li>
+                        <li>🧑 队员不在候场区: 扣20分</li>
+                        <li>❌ 队员缺席提醒: 扣10分</li>
+                        <li>📊 区域超重: 扣10分</li>
+                        <li>🔢 同使用顺序道具分散存放: 扣5分</li>
+                    </ul>
+                </div>
+
+                <div class="start-buttons">
+                    <button id="newGameBtn" class="btn btn-primary btn-large">开始新训练</button>
+                    <button id="continueBtn" class="btn btn-secondary btn-large" style="display: none;">继续上一局</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="endScreen" class="overlay" style="display: none;">
+            <div class="overlay-content">
+                <h1>训练完成</h1>
+                <div class="final-score">
+                    <div class="score-circle">
+                        <span id="finalScoreValue">0</span>
+                        <span class="score-label">分</span>
+                    </div>
+                    <div class="score-detail">
+                        <div class="accuracy">
+                            <span class="accuracy-label">正确率</span>
+                            <span id="accuracyValue">0%</span>
+                        </div>
+                        <div class="patient-count">
+                            <span class="count-label">已装载</span>
+                            <span id="patientCountValue">0/29</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-stats" id="resultStats">
+                </div>
+
+                <div class="end-buttons">
+                    <button id="reviewBtn" class="btn btn-primary">查看复盘</button>
+                    <button id="newGameAgainBtn" class="btn btn-secondary">重新开始</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviewScreen" class="overlay" style="display: none;">
+            <div class="overlay-content review-content">
+                <div class="review-header">
+                    <h2>复盘记录</h2>
+                    <div class="review-controls">
+                        <button id="exportMarkdownBtn" class="btn btn-secondary">导出 Markdown</button>
+                        <button id="exportJsonBtn" class="btn btn-secondary">导出 JSON</button>
+                        <button id="closeReviewBtn" class="btn btn-secondary">关闭</button>
+                    </div>
+                </div>
+
+                <div class="review-notes">
+                    <h3>备注</h3>
+                    <textarea id="notesTextarea" placeholder="在这里添加您的备注..."></textarea>
+                    <button id="saveNotesBtn" class="btn btn-primary">保存备注</button>
+                </div>
+
+                <div class="review-decisions" id="reviewDecisions">
+                </div>
+
+                <div class="review-congestion" id="reviewCongestion" style="display: none;">
+                    <h3>警告事件</h3>
+                    <div id="congestionEvents"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="itemModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalItemName">物品详情</h3>
+                    <button id="closeModalBtn" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body" id="modalItemDetails">
+                </div>
+                <div class="modal-footer">
+                    <button id="modalCloseBtn" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification" style="display: none;">
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
