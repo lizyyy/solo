@@ -1,0 +1,72 @@
+# Go 代码质量扫描规则配置
+rules:
+  # 禁止跨层导入规则
+  cross_layer_import:
+    enabled: true
+    severity: high
+    description: "禁止跨层直接导入依赖"
+    layers:
+      - name: "handler"
+        path_pattern: "handler"
+        allowed_imports: ["service"]
+        forbidden_imports: ["repository"]
+      - name: "service"
+        path_pattern: "service"
+        allowed_imports: ["repository", "model"]
+        forbidden_imports: ["handler"]
+      - name: "repository"
+        path_pattern: "repository"
+        allowed_imports: ["model"]
+        forbidden_imports: ["handler", "service"]
+
+  # 裸返回错误规则
+  bare_return_error:
+    enabled: true
+    severity: medium
+    description: "禁止裸返回错误，应该使用 fmt.Errorf 包装或添加上下文"
+    patterns:
+      - "return err"
+      - "return nil, err"
+      - "return result, err"
+      - "return result, nil, err"
+
+  # 未处理错误规则
+  unhandled_error:
+    enabled: true
+    severity: high
+    description: "检测未处理的错误返回值"
+    patterns:
+      - "_ = [a-zA-Z0-9_.]+\\(.*\\)"  # 忽略错误返回值
+      - "[a-zA-Z0-9_]+\\(\\)\\s*$"   # 调用函数但未处理错误（需要更复杂的逻辑）
+
+  # 过期 TODO 规则
+  expired_todo:
+    enabled: true
+    severity: medium
+    description: "检测过期的 TODO 注释"
+    expire_days: 30  # 超过 30 天的 TODO 标记为过期
+    patterns:
+      - "TODO:"
+      - "TODO "
+      - "FIXME:"
+      - "FIXME "
+      - "HACK:"
+      - "HACK "
+
+  # 测试缺口规则
+  test_coverage:
+    enabled: true
+    severity: medium
+    description: "检测测试覆盖率不足的包"
+    min_coverage: 70  # 最小覆盖率百分比
+    exclude_packages:
+      - "cmd"
+      - "main"
+      - ".*_test"
+
+  # 函数复杂度规则（额外）
+  function_complexity:
+    enabled: true
+    severity: medium
+    description: "检测复杂度太高的函数"
+    max_complexity: 15
