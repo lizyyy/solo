@@ -1,0 +1,43 @@
+{
+  "name": "distributed-consistency-simulator",
+  "version": "1.0.0",
+  "description": "分布式一致性模拟 CLI 工具 - 模拟 CAP、BASE、Raft、Paxos、分布式锁和最终一致性的事故剧本",
+  "main": "dist/index.js",
+  "bin": {
+    "dcs": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli/index.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "dev": "ts-node src/cli/index.ts"
+  },
+  "keywords": [
+    "distributed-systems",
+    "consistency",
+    "raft",
+    "paxos",
+    "cap",
+    "base",
+    "simulator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@types/sqlite3": "^3.1.8",
+    "@types/uuid": "^9.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "sql.js": "^1.9.0",
+    "uuid": "^9.0.0",
+    "yaml": "^2.3.0"
+  }
+}

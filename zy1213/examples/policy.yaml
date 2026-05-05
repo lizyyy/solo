@@ -1,0 +1,16 @@
+name: "默认一致性策略"
+consistencyLevel: "strong"
+readRepair: true
+hintedHandoff: true
+readQuorum: 1
+writeQuorum: 2
+retryPolicy:
+  maxRetries: 3
+  baseDelay: 100
+  backoffMultiplier: 2
+lockLease:
+  duration: 10000
+  autoRenew: false
+failureDetection:
+  interval: 100
+  timeout: 1000
