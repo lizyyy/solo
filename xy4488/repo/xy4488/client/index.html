@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旧书交换站 - AI初筛系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-content">
+                <h1>📚 旧书交换站 - AI初筛系统</h1>
+                <div class="header-actions">
+                    <span id="currentBatchDisplay" class="batch-badge">未选择批次</span>
+                    <button onclick="showBatchModal()" class="btn btn-secondary">管理批次</button>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="import">数据导入</button>
+                <button class="nav-tab" data-tab="list">书籍列表</button>
+                <button class="nav-tab" data-tab="review">复核改判</button>
+                <button class="nav-tab" data-tab="export">导出数据</button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section id="import-section" class="tab-content active">
+                <div class="section-header">
+                    <h2>数据导入</h2>
+                    <p class="section-desc">请按顺序导入以下数据，所有数据将关联到当前批次</p>
+                </div>
+
+                <div class="import-grid">
+                    <div class="import-card">
+                        <div class="import-icon">📑</div>
+                        <h3>ISBN/书名 CSV</h3>
+                        <p>导入包含ISBN、书名、作者、出版社等信息的CSV文件</p>
+                        <div class="upload-area" id="csvUploadArea">
+                            <input type="file" id="csvFile" accept=".csv" class="file-input">
+                            <label for="csvFile" class="upload-label">
+                                <span class="upload-text">点击选择CSV文件</span>
+                            </label>
+                        </div>
+                        <div id="csvStatus" class="import-status"></div>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="import-icon">📸</div>
+                        <h3>捐书照片清单</h3>
+                        <p>上传书籍照片，系统会尝试从文件名提取ISBN和书名</p>
+                        <div class="upload-area" id="imagesUploadArea">
+                            <input type="file" id="imageFiles" accept="image/*" multiple class="file-input">
+                            <label for="imageFiles" class="upload-label">
+                                <span class="upload-text">点击选择多张图片</span>
+                            </label>
+                        </div>
+                        <div id="imagesStatus" class="import-status"></div>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="import-icon">⚠️</div>
+                        <h3>破损备注</h3>
+                        <p>导入包含ISBN和破损情况说明的CSV文件</p>
+                        <div class="upload-area" id="damageUploadArea">
+                            <input type="file" id="damageFile" accept=".csv" class="file-input">
+                            <label for="damageFile" class="upload-label">
+                                <span class="upload-text">点击选择破损备注CSV</span>
+                            </label>
+                        </div>
+                        <div id="damageStatus" class="import-status"></div>
+                    </div>
+
+                    <div class="import-card">
+                        <div class="import-icon">📋</div>
+                        <h3>预约领取表</h3>
+                        <p>导入已预约领书人的信息，系统会自动关联</p>
+                        <div class="upload-area" id="appointmentUploadArea">
+                            <input type="file" id="appointmentFile" accept=".csv" class="file-input">
+                            <label for="appointmentFile" class="upload-label">
+                                <span class="upload-text">点击选择预约表CSV</span>
+                            </label>
+                        </div>
+                        <div id="appointmentStatus" class="import-status"></div>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button onclick="runScreening()" class="btn btn-primary btn-large">
+                        🔍 运行AI初筛
+                    </button>
+                    <p class="action-hint">导入完成后点击运行AI初筛</p>
+                </div>
+            </section>
+
+            <section id="list-section" class="tab-content">
+                <div class="section-header">
+                    <h2>书籍列表</h2>
+                    <div class="filter-controls">
+                        <select id="categoryFilter" class="form-select">
+                            <option value="">全部分类</option>
+                            <option value="available">可上架</option>
+                            <option value="need_disinfect">需消毒</option>
+                            <option value="damaged">破损待处理</option>
+                            <option value="suspicious">疑似盗版/缺页</option>
+                        </select>
+                        <select id="reviewFilter" class="form-select">
+                            <option value="">全部状态</option>
+                            <option value="false">待复核</option>
+                            <option value="true">已复核</option>
+                        </select>
+                        <button onclick="loadBooks()" class="btn btn-secondary">刷新</button>
+                    </div>
+                </div>
+
+                <div id="booksList" class="books-grid">
+                    <div class="empty-state">
+                        <p>请先选择批次并导入数据</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="review-section" class="tab-content">
+                <div class="section-header">
+                    <h2>复核改判</h2>
+                    <p class="section-desc">查看AI分类详情，可人工改判并添加备注</p>
+                </div>
+
+                <div class="review-layout">
+                    <div class="review-sidebar">
+                        <h3>待复核书籍</h3>
+                        <div id="pendingList" class="pending-list">
+                            <p class="empty-text">暂无待复核书籍</p>
+                        </div>
+                    </div>
+
+                    <div class="review-detail" id="reviewDetail">
+                        <div class="empty-detail">
+                            <p>请从左侧选择一本书进行复核</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="export-section" class="tab-content">
+                <div class="section-header">
+                    <h2>导出数据</h2>
+                    <p class="section-desc">导出当前批次的处理结果</p>
+                </div>
+
+                <div class="export-cards">
+                    <div class="export-card">
+                        <div class="export-icon">📄</div>
+                        <h3>Markdown 上架清单</h3>
+                        <p>导出可上架书籍的完整清单，适合打印或分享</p>
+                        <button onclick="exportMarkdown()" class="btn btn-primary">
+                            导出 Markdown
+                        </button>
+                    </div>
+
+                    <div class="export-card">
+                        <div class="export-icon">📊</div>
+                        <h3>JSON 审计明细</h3>
+                        <p>导出完整的审计数据，包括所有分类、备注和操作日志</p>
+                        <button onclick="exportJSON()" class="btn btn-primary">
+                            导出 JSON
+                        </button>
+                    </div>
+                </div>
+
+                <div id="exportStats" class="stats-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="batchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批次管理</h3>
+                <button onclick="closeBatchModal()" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="create-batch-form">
+                    <h4>创建新批次</h4>
+                    <div class="form-row">
+                        <input type="text" id="newBatchNumber" placeholder="批次号（如：2026-05-01-01）" class="form-input">
+                        <input type="text" id="newBatchDesc" placeholder="描述（可选）" class="form-input">
+                        <button onclick="createBatch()" class="btn btn-primary">创建</button>
+                    </div>
+                </div>
+                <div class="batch-list-container">
+                    <h4>选择已有批次</h4>
+                    <div id="batchList" class="batch-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
