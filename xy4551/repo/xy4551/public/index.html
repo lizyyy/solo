@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物医院夜班护士工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>🐾 宠物医院夜班护士工具</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="clearAllData()">清空所有数据</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="risks">风险检测</button>
+            <button class="tab-btn" data-tab="surgery">手术排班</button>
+            <button class="tab-btn" data-tab="cages">术后笼位</button>
+            <button class="tab-btn" data-tab="oxygen">氧气流量</button>
+            <button class="tab-btn" data-tab="recovery">麻醉苏醒</button>
+            <button class="tab-btn" data-tab="owner">主人接送</button>
+            <button class="tab-btn" data-tab="export">导出交班</button>
+        </nav>
+
+        <main class="content">
+            <!-- 数据导入页面 -->
+            <section id="tab-import" class="tab-content active">
+                <div class="import-section">
+                    <h2>📥 导入数据</h2>
+                    <p class="subtitle">支持 CSV 和 JSON 格式文件，一次导入一种数据类型</p>
+                    
+                    <div class="import-grid">
+                        <div class="import-card">
+                            <div class="import-icon">📋</div>
+                            <h3>手术排班</h3>
+                            <p>导入当天/次日手术安排</p>
+                            <input type="file" id="file-surgery" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('file-surgery').click()">选择文件</button>
+                            <span class="file-name" id="filename-surgery"></span>
+                            <button class="btn btn-success" onclick="importData('surgery')" id="btn-import-surgery" disabled>导入</button>
+                        </div>
+
+                        <div class="import-card">
+                            <div class="import-icon">🏥</div>
+                            <h3>术后笼位</h3>
+                            <p>导入术后笼位安排</p>
+                            <input type="file" id="file-cage" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('file-cage').click()">选择文件</button>
+                            <span class="file-name" id="filename-cage"></span>
+                            <button class="btn btn-success" onclick="importData('cage')" id="btn-import-cage" disabled>导入</button>
+                        </div>
+
+                        <div class="import-card">
+                            <div class="import-icon">💨</div>
+                            <h3>氧气流量日志</h3>
+                            <p>导入氧气流量记录</p>
+                            <input type="file" id="file-oxygen" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('file-oxygen').click()">选择文件</button>
+                            <span class="file-name" id="filename-oxygen"></span>
+                            <button class="btn btn-success" onclick="importData('oxygen')" id="btn-import-oxygen" disabled>导入</button>
+                        </div>
+
+                        <div class="import-card">
+                            <div class="import-icon">💤</div>
+                            <h3>麻醉苏醒记录</h3>
+                            <p>导入苏醒监测记录</p>
+                            <input type="file" id="file-recovery" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('file-recovery').click()">选择文件</button>
+                            <span class="file-name" id="filename-recovery"></span>
+                            <button class="btn btn-success" onclick="importData('recovery')" id="btn-import-recovery" disabled>导入</button>
+                        </div>
+
+                        <div class="import-card">
+                            <div class="import-icon">👤</div>
+                            <h3>主人接送备注</h3>
+                            <p>导入主人交接信息</p>
+                            <input type="file" id="file-owner" accept=".csv,.json" hidden>
+                            <button class="btn btn-primary" onclick="document.getElementById('file-owner').click()">选择文件</button>
+                            <span class="file-name" id="filename-owner"></span>
+                            <button class="btn btn-success" onclick="importData('owner')" id="btn-import-owner" disabled>导入</button>
+                        </div>
+                    </div>
+
+                    <div class="import-status" id="import-status"></div>
+                </div>
+
+                <div class="sample-section">
+                    <h3>📄 示例数据格式</h3>
+                    <p>可参考以下格式准备导入文件，或使用项目中的示例数据</p>
+                    <div class="format-example">
+                        <pre><code>手术排班 CSV 示例:
+宠物名,手术类型,预约时间,主刀医生,备注
+豆豆,绝育手术,2026-05-05 09:00,张医生,术前禁食12小时
+毛毛,牙结石清除,2026-05-05 14:00,李医生,</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 风险检测页面 -->
+            <section id="tab-risks" class="tab-content">
+                <div class="risk-header">
+                    <h2>⚠️ 风险检测</h2>
+                    <button class="btn btn-primary" onclick="detectRisks()">重新检测风险</button>
+                </div>
+
+                <div class="risk-summary" id="risk-summary">
+                    <div class="summary-card critical">
+                        <span class="count" id="count-critical">0</span>
+                        <span class="label">严重风险</span>
+                    </div>
+                    <div class="summary-card warning">
+                        <span class="count" id="count-warning">0</span>
+                        <span class="label">警告风险</span>
+                    </div>
+                    <div class="summary-card info">
+                        <span class="count" id="count-info">0</span>
+                        <span class="label">提示信息</span>
+                    </div>
+                    <div class="summary-card dismissed">
+                        <span class="count" id="count-dismissed">0</span>
+                        <span class="label">已忽略</span>
+                    </div>
+                </div>
+
+                <div class="risk-list" id="risk-list">
+                    <div class="empty-state">
+                        <p>暂无风险检测结果</p>
+                        <button class="btn btn-primary" onclick="detectRisks()">开始检测</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 手术排班页面 -->
+            <section id="tab-surgery" class="tab-content">
+                <h2>📋 手术排班</h2>
+                <div class="table-container" id="surgery-table"></div>
+            </section>
+
+            <!-- 术后笼位页面 -->
+            <section id="tab-cages" class="tab-content">
+                <h2>🏥 术后笼位安排</h2>
+                <div class="table-container" id="cages-table"></div>
+            </section>
+
+            <!-- 氧气流量页面 -->
+            <section id="tab-oxygen" class="tab-content">
+                <h2>💨 氧气流量日志</h2>
+                <div class="table-container" id="oxygen-table"></div>
+            </section>
+
+            <!-- 麻醉苏醒页面 -->
+            <section id="tab-recovery" class="tab-content">
+                <h2>💤 麻醉苏醒记录</h2>
+                <div class="table-container" id="recovery-table"></div>
+            </section>
+
+            <!-- 主人接送页面 -->
+            <section id="tab-owner" class="tab-content">
+                <h2>👤 主人接送备注</h2>
+                <div class="table-container" id="owner-table"></div>
+            </section>
+
+            <!-- 导出页面 -->
+            <section id="tab-export" class="tab-content">
+                <h2>📤 导出交班单</h2>
+                <div class="export-options">
+                    <div class="export-card">
+                        <div class="export-icon">📝</div>
+                        <h3>Markdown 交班单</h3>
+                        <p>导出格式化的交班单，包含所有数据和备注</p>
+                        <button class="btn btn-primary" onclick="exportMarkdown()">导出 Markdown</button>
+                    </div>
+                    <div class="export-card">
+                        <div class="export-icon">📊</div>
+                        <h3>JSON 明细数据</h3>
+                        <p>导出完整的结构化数据，包含人工改判和补充备注</p>
+                        <button class="btn btn-primary" onclick="exportJSON()">导出 JSON</button>
+                    </div>
+                </div>
+
+                <div class="preview-section">
+                    <h3>📋 交班单预览</h3>
+                    <div class="markdown-preview" id="markdown-preview">
+                        <p class="preview-placeholder">导出前可在此预览内容...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框：人工改判 -->
+    <div class="modal" id="override-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>人工改判风险</h3>
+                <button class="modal-close" onclick="closeModal('override-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="risk-info" id="override-risk-info"></div>
+                <div class="form-group">
+                    <label>改判状态</label>
+                    <select id="override-status">
+                        <option value="dismissed">忽略此风险</option>
+                        <option value="confirmed">确认风险存在</option>
+                        <option value="resolved">标记为已解决</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>改判说明 (可选)</label>
+                    <textarea id="override-note" rows="3" placeholder="请输入改判原因说明..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('override-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveOverride()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：补充备注 -->
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>补充备注</h3>
+                <button class="modal-close" onclick="closeModal('note-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="record-info" id="note-record-info"></div>
+                <div class="form-group">
+                    <label>备注内容</label>
+                    <textarea id="note-content" rows="5" placeholder="请输入补充备注内容..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('note-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveNote()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
