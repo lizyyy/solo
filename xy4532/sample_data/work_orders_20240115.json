@@ -1,0 +1,172 @@
+{
+  "data_source": "CMMS-System-V3.1",
+  "export_time": "2024-01-15T16:00:00Z",
+  "work_orders": [
+    {
+      "work_order_id": "WO-20240115-001",
+      "turbine_id": "WT-015",
+      "issue_type": "叶片裂纹",
+      "description": "无人机巡检发现1号叶片前缘中段有长度约15cm的裂纹，建议立即处理",
+      "priority": "紧急",
+      "status": "待处理",
+      "created_at": "2024-01-15T14:45:00Z",
+      "scheduled_start": "2024-01-16T08:00:00Z",
+      "scheduled_end": "2024-01-16T18:00:00Z",
+      "assigned_to": "维修组A",
+      "blade_info": {
+        "blade_number": 1,
+        "segment": "LE",
+        "segment_name": "前缘",
+        "distance_from_root": 25.5,
+        "damage_length_cm": 15,
+        "damage_depth_mm": 3.5
+      },
+      "related_photos": [
+        "WT-015_LE_mid1.jpg",
+        "WT-015_LE_mid2.jpg"
+      ],
+      "related_alarm_id": "ALARM-20240115-001",
+      "materials_needed": [
+        "叶片修复环氧树脂",
+        "玻璃纤维布",
+        "打磨工具"
+      ],
+      "estimated_hours": 8
+    },
+    {
+      "work_order_id": "WO-20240115-002",
+      "turbine_id": "WT-023",
+      "issue_type": "雷击损伤",
+      "description": "2号叶片叶尖检测到雷击点，存在烧蚀痕迹，需检查是否影响结构完整性",
+      "priority": "高",
+      "status": "处理中",
+      "created_at": "2024-01-15T10:30:00Z",
+      "started_at": "2024-01-15T13:00:00Z",
+      "scheduled_end": "2024-01-16T12:00:00Z",
+      "assigned_to": "维修组B",
+      "blade_info": {
+        "blade_number": 2,
+        "segment": "tip",
+        "segment_name": "叶尖",
+        "distance_from_root": 45.0,
+        "damage_type": "雷击烧蚀",
+        "damage_diameter_cm": 5.2
+      },
+      "related_photos": [
+        "WT-023_LE_tip.jpg",
+        "WT-023_TE_tip.jpg"
+      ],
+      "related_alarm_id": "ALARM-20240115-003",
+      "inspection_notes": "叶尖表面可见黑色烧蚀痕迹，直径约5cm，需要使用内窥镜检查内部是否有损伤",
+      "materials_needed": [
+        "雷击点修复材料",
+        "表面密封胶",
+        "内窥镜检查设备"
+      ],
+      "progress_percent": 40
+    },
+    {
+      "work_order_id": "WO-20240115-003",
+      "turbine_id": "WT-008",
+      "issue_type": "前缘腐蚀",
+      "description": "3号叶片前缘有大面积雨蚀和腐蚀，影响气动性能",
+      "priority": "中",
+      "status": "待处理",
+      "created_at": "2024-01-15T09:00:00Z",
+      "scheduled_start": "2024-01-20T08:00:00Z",
+      "scheduled_end": "2024-01-22T18:00:00Z",
+      "assigned_to": "维修组A",
+      "blade_info": {
+        "blade_number": 3,
+        "segment": "LE",
+        "segment_name": "前缘",
+        "affected_length_m": 12.5,
+        "corrosion_severity": "中度"
+      },
+      "related_photos": [
+        "WT-008_LE_mid.jpg"
+      ],
+      "materials_needed": [
+        "前缘保护涂层",
+        "腻子修复材料",
+        "打磨工具"
+      ],
+      "estimated_hours": 16
+    },
+    {
+      "work_order_id": "WO-20240115-004",
+      "turbine_id": "WT-015",
+      "issue_type": "后缘分层",
+      "description": "1号叶片后缘检测到分层现象，长度约20cm",
+      "priority": "高",
+      "status": "待处理",
+      "created_at": "2024-01-15T15:00:00Z",
+      "scheduled_start": "2024-01-17T08:00:00Z",
+      "scheduled_end": "2024-01-17T18:00:00Z",
+      "assigned_to": "维修组C",
+      "blade_info": {
+        "blade_number": 1,
+        "segment": "TE",
+        "segment_name": "后缘",
+        "distance_from_root": 18.3,
+        "delamination_length_cm": 20,
+        "delamination_width_cm": 2.5
+      },
+      "related_photos": [
+        "WT-015_TE_mid.jpg"
+      ],
+      "related_alarm_id": "ALARM-20240115-001",
+      "materials_needed": [
+        "分层修复树脂",
+        "真空灌注设备",
+        "加热固化系统"
+      ],
+      "estimated_hours": 12
+    },
+    {
+      "work_order_id": "WO-20240114-005",
+      "turbine_id": "WT-045",
+      "issue_type": "表面磨损",
+      "description": "叶片表面有轻微磨损，需要预防性维护",
+      "priority": "低",
+      "status": "已完成",
+      "created_at": "2024-01-14T10:00:00Z",
+      "started_at": "2024-01-14T14:00:00Z",
+      "completed_at": "2024-01-14T16:30:00Z",
+      "assigned_to": "维修组B",
+      "blade_info": {
+        "blade_number": 2,
+        "segment": "PS",
+        "segment_name": "压力面",
+        "wear_area_m2": 0.5
+      },
+      "resolution_notes": "已完成表面清洁和涂层修复，检查无异常",
+      "materials_used": [
+        "清洁溶剂",
+        "表面涂层"
+      ],
+      "actual_hours": 2.5
+    }
+  ],
+  "summary": {
+    "total_work_orders": 5,
+    "by_priority": {
+      "紧急": 1,
+      "高": 2,
+      "中": 1,
+      "低": 1
+    },
+    "by_status": {
+      "待处理": 3,
+      "处理中": 1,
+      "已完成": 1
+    },
+    "by_issue_type": {
+      "叶片裂纹": 1,
+      "雷击损伤": 1,
+      "前缘腐蚀": 1,
+      "后缘分层": 1,
+      "表面磨损": 1
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "data_source": "SCADA-System-V2.5",
+  "export_time": "2024-01-15T15:00:00Z",
+  "alarms": [
+    {
+      "alarm_id": "ALARM-20240115-001",
+      "turbine_id": "WT-015",
+      "alarm_code": "BLADE_VIB_001",
+      "alarm_name": "叶片振动异常",
+      "severity": "严重",
+      "description": "1号叶片振动传感器检测到异常振动频率超过阈值",
+      "trigger_time": "2024-01-15T14:32:15Z",
+      "resolve_time": null,
+      "is_active": true,
+      "vibration_data": {
+        "frequency": 15.2,
+        "amplitude": 0.85,
+        "threshold": 0.5,
+        "duration_minutes": 45,
+        "blade_number": 1
+      },
+      "related_photos": [
+        "WT-015_LE_tip.jpg",
+        "WT-015_SS_tip.jpg"
+      ]
+    },
+    {
+      "alarm_id": "ALARM-20240115-002",
+      "turbine_id": "WT-015",
+      "alarm_code": "TEMP_HIGH_003",
+      "alarm_name": "齿轮箱温度超限",
+      "severity": "高",
+      "description": "齿轮箱油温达到85°C，超过正常运行阈值",
+      "trigger_time": "2024-01-15T13:20:00Z",
+      "resolve_time": null,
+      "is_active": true,
+      "temperature_data": {
+        "current_temp": 85.5,
+        "threshold": 80.0,
+        "ambient_temp": 15.2,
+        "component": "gearbox_oil"
+      }
+    },
+    {
+      "alarm_id": "ALARM-20240115-003",
+      "turbine_id": "WT-023",
+      "alarm_code": "LIGHTNING_001",
+      "alarm_name": "雷击检测",
+      "severity": "高",
+      "description": "雷击传感器检测到放电事件，建议检查叶片",
+      "trigger_time": "2024-01-15T10:15:30Z",
+      "resolve_time": "2024-01-15T11:30:00Z",
+      "is_active": false,
+      "lightning_data": {
+        "intensity_kA": 45.2,
+        "strike_location": "blade_2_tip",
+        "current_rms": 2.3
+      },
+      "related_photos": [
+        "WT-023_LE_tip.jpg"
+      ]
+    },
+    {
+      "alarm_id": "ALARM-20240115-004",
+      "turbine_id": "WT-008",
+      "alarm_code": "PITCH_ERR_002",
+      "alarm_name": "变桨角度偏差",
+      "severity": "中",
+      "description": "3号叶片变桨角度与其他叶片偏差超过3度",
+      "trigger_time": "2024-01-15T09:45:00Z",
+      "resolve_time": "2024-01-15T09:50:00Z",
+      "is_active": false,
+      "pitch_data": {
+        "blade_1_angle": 15.2,
+        "blade_2_angle": 15.5,
+        "blade_3_angle": 18.8,
+        "deviation": 3.6
+      }
+    },
+    {
+      "alarm_id": "ALARM-20240115-005",
+      "turbine_id": "WT-015",
+      "alarm_code": "COMM_ERR_001",
+      "alarm_name": "通信中断",
+      "severity": "中",
+      "description": "与叶片状态监测系统通信中断",
+      "trigger_time": "2024-01-15T08:30:00Z",
+      "resolve_time": "2024-01-15T08:35:00Z",
+      "is_active": false,
+      "communication_data": {
+        "system": "BCMS",
+        "duration_seconds": 300,
+        "retry_count": 5
+      }
+    },
+    {
+      "alarm_id": "ALARM-20240115-006",
+      "turbine_id": "WT-037",
+      "alarm_code": "OIL_LOW_001",
+      "alarm_name": "液压油位低",
+      "severity": "低",
+      "description": "变桨系统液压油位接近最低值",
+      "trigger_time": "2024-01-15T07:00:00Z",
+      "resolve_time": null,
+      "is_active": true,
+      "hydraulic_data": {
+        "current_level_percent": 15,
+        "warning_threshold": 20,
+        "critical_threshold": 10
+      }
+    }
+  ],
+  "summary": {
+    "total_alarms": 6,
+    "by_severity": {
+      "严重": 1,
+      "高": 2,
+      "中": 2,
+      "低": 1
+    },
+    "active_alarms": 3,
+    "resolved_alarms": 3
+  }
+}
