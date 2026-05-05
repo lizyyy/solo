@@ -1,0 +1,9 @@
+rule_name: "2024年度器乐比赛排名规则"
+drop_highest: 1
+drop_lowest: 1
+ranking_mode: "competition"
+promotion_threshold: 5
+promotion_score: 8.8
+categories:
+  - "少年组"
+  - "青年组"
