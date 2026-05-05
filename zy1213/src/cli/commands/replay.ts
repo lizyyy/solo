@@ -34,7 +34,7 @@ export const replayCommand = new Command('replay')
 
       // 初始化存储
       const storage = new SQLiteStorage(options.output);
-      storage.initialize();
+      await storage.initialize();
 
       // 创建模拟引擎
       const engine = new SimulationEngine(clusterConfig, policy, parseInt(options.seed), storage);

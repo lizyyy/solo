@@ -19,7 +19,7 @@ export const compareCommand = new Command('compare')
     try {
       // 初始化存储
       const storage = new SQLiteStorage(options.database);
-      storage.initialize();
+      await storage.initialize();
 
       let results: SimulationResult[] = [];
 
@@ -73,6 +73,13 @@ export const compareCommand = new Command('compare')
 
       // 生成报告
       const report = generateComparisonReport(results, comparison);
+      
+      // 确保输出目录存在
+      const outputDir = path.dirname(options.output);
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+      
       fs.writeFileSync(options.output, report);
       console.log(`\n比较报告已保存到: ${options.output}`);
 

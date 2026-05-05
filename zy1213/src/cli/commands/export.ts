@@ -20,7 +20,7 @@ export const exportCommand = new Command('export')
     try {
       // 初始化存储
       const storage = new SQLiteStorage(options.database);
-      storage.initialize();
+      await storage.initialize();
 
       // 获取运行结果
       let result: SimulationResult;

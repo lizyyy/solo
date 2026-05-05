@@ -192,7 +192,7 @@ export class SQLiteStorage {
 
     const nodes: Node[] = [];
     if (nodesResult.length > 0) {
-      nodesResult[0].values.forEach(row => {
+      nodesResult[0].values.forEach((row: any[]) => {
         nodes.push({
           id: row[2] as string,
           name: row[3] as string,
@@ -214,7 +214,7 @@ export class SQLiteStorage {
 
     const events: Event[] = [];
     if (eventsResult.length > 0) {
-      eventsResult[0].values.forEach(row => {
+      eventsResult[0].values.forEach((row: any[]) => {
         events.push({
           id: row[2] as string,
           timestamp: row[3] as number,
@@ -277,7 +277,7 @@ export class SQLiteStorage {
 
     const results: SimulationResult[] = [];
     if (runsResult.length > 0) {
-      runsResult[0].values.forEach(row => {
+      runsResult[0].values.forEach((row: any[]) => {
         const result = this.getSimulationResult(row[0] as string);
         if (result) {
           results.push(result);
