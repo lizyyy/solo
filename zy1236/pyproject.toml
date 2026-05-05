@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pitfall-analyzer"
+version = "0.1.0"
+description = "生成器和迭代器坑点分析 CLI 工具 - 帮助团队复盘 __iter__/__next__、yield、send/throw/close、StopIteration、惰性求值、一次性迭代器、tee 缓存膨胀等问题"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+  { name = "Team", email = "team@example.com" },
+]
+keywords = ["iterator", "generator", "python", "analysis", "debugging"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+  "pyyaml>=6.0",
+  "typing-extensions>=4.0; python_version<'3.10'",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+]
+
+[project.scripts]
+pitfall = "pitfall_analyzer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pitfall_analyzer"]

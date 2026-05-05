@@ -1,0 +1,42 @@
+version: '1.0'
+pipelines:
+- name: data_processing
+  description: 数据处理流水线
+  stages:
+  - name: reader
+    type: iterator
+    class: FileReader
+    description: 读取文件数据
+  - name: transformer
+    type: generator
+    function: transform_data
+    description: 数据转换
+  - name: filter
+    type: generator_expression
+    description: 过滤无效数据
+  - name: writer
+    type: iterator
+    class: DataWriter
+    description: 写入处理结果
+  risks:
+  - type: single_use_iterator
+    stage: reader
+    description: FileReader 是一次性迭代器，被多个 stage 消费
+  - type: lazy_evaluation
+    stage: filter
+    description: 生成器表达式延迟执行，错误可能在下游才暴露
+- name: event_stream
+  description: 事件流处理
+  stages:
+  - name: event_source
+    type: async_generator
+    function: event_stream
+    description: 异步事件源
+  - name: processor
+    type: generator
+    function: process_events
+    description: 处理事件
+  risks:
+  - type: stopiteration
+    stage: processor
+    description: 手动处理 StopIteration 可能在 Python 3.7+ 导致 RuntimeError

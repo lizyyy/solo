@@ -1,0 +1,6 @@
+{"timestamp": "2026-05-04T16:00:00", "type": "iterator_exhausted", "level": "error", "message": "Iterator has been exhausted", "context": {"iterator_type": "FileReader", "function": "process_batch", "line_number": 42}}
+{"timestamp": "2026-05-04T16:30:00", "type": "stopiteration_raised", "level": "warning", "message": "StopIteration raised inside generator", "context": {"generator_name": "transform_data", "line_number": 128}}
+{"timestamp": "2026-05-04T18:00:00", "type": "tee_memory_warning", "level": "warning", "message": "itertools.tee cache size exceeded threshold", "context": {"tee_id": "tee_0x7f8b1c2d3e4f", "cache_size": 1048576, "threshold": 524288}}
+{"timestamp": "2026-05-04T19:00:00", "type": "send_to_unstarted_generator", "level": "error", "message": "Can't send non-None value to a just-started generator", "context": {"generator_name": "event_stream", "line_number": 56}}
+{"timestamp": "2026-05-04T20:00:00", "type": "lazy_error_delayed", "level": "warning", "message": "Exception occurred during lazy evaluation", "context": {"expression_type": "generator_expression", "delayed_by": "2.3 seconds", "original_exception": "ValueError"}}
+{"timestamp": "2026-05-04T21:00:00", "type": "iterator_reused", "level": "warning", "message": "Iterator instance being reused after exhaustion", "context": {"iterator_type": "DataIterator", "reuse_count": 2}}
