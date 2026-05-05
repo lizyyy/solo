@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>砂型开浇守门员</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .stat-card.high .number { color: #e74c3c; }
+        .stat-card.medium .number { color: #f39c12; }
+        .action-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+        }
+        .filter-group select, .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .results-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .table-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .severity-high {
+            background: #fee;
+            color: #c0392b;
+        }
+        .severity-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .severity-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        .verdict-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .verdict-violation {
+            background: #fee;
+            color: #c0392b;
+        }
+        .verdict-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .verdict-waived {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-header h3 {
+            color: #2c3e50;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group select, .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .reviewed {
+            background: #e8f5e9 !important;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .message-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .upload-section {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .upload-section:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        .upload-section input[type="file"] {
+            display: none;
+        }
+        .upload-label {
+            cursor: pointer;
+            color: #3498db;
+            font-weight: 500;
+        }
+        .upload-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>砂型开浇守门员</h1>
+        <div class="subtitle">实时监控砂型质量，保障浇注安全</div>
+    </div>
+    
+    <div class="container">
+        <div id="messageContainer"></div>
+        
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="loadSampleData()">导入示例数据</button>
+            <button class="btn btn-success" onclick="runRules()">重新运行规则检测</button>
+            <div class="separator" style="flex: 1;"></div>
+            <button class="btn btn-warning" onclick="exportMarkdown()">导出交班单(MD)</button>
+            <button class="btn btn-warning" onclick="exportJson()">导出明细(JSON)</button>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>严重程度</label>
+                    <select id="severityFilter" onchange="loadResults()">
+                        <option value="">全部</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>规则类型</label>
+                    <select id="ruleTypeFilter" onchange="loadResults()">
+                        <option value="">全部</option>
+                        <option value="undried">未烘透</option>
+                        <option value="moisture_rebound">复潮</option>
+                        <option value="furnace_mismatch">炉次串号</option>
+                        <option value="time_conflict">开浇时间冲突</option>
+                        <option value="reinspection_needed">需复检</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>砂型编号</label>
+                    <input type="text" id="moldNoFilter" placeholder="输入砂型号..." onkeyup="if(event.key==='Enter')loadResults()">
+                </div>
+                <button class="btn btn-primary" onclick="loadResults()" style="margin-top: 20px;">查询</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="number" id="statMolds">-</div>
+                <div class="label">砂型总数</div>
+            </div>
+            <div class="stat-card high">
+                <div class="number" id="statViolations">-</div>
+                <div class="label">违规总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statReviews">-</div>
+                <div class="label">已复核</div>
+            </div>
+        </div>
+        
+        <div class="results-table">
+            <div class="table-header">
+                <h3>规则检测结果</h3>
+                <span id="resultCount">共 0 条</span>
+            </div>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>砂型编号</th>
+                        <th>规则名称</th>
+                        <th>严重程度</th>
+                        <th>问题描述</th>
+                        <th>检测时间</th>
+                        <th>改判状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr><td colspan="7" class="loading">加载中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>复核确认</h3>
+            </div>
+            <form id="reviewForm">
+                <input type="hidden" id="reviewResultId">
+                <input type="hidden" id="reviewMoldNo">
+                <div class="form-group">
+                    <label>砂型编号</label>
+                    <input type="text" id="reviewMoldNoDisplay" readonly>
+                </div>
+                <div class="form-group">
+                    <label>问题描述</label>
+                    <textarea id="reviewDescription" readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label>改判结果</label>
+                    <select id="reviewVerdict" required>
+                        <option value="">请选择</option>
+                        <option value="approved">确认合格（放行）</option>
+                        <option value="waived">豁免（有条件放行）</option>
+                        <option value="rejected">维持违规（禁止开浇）</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>复核备注</label>
+                    <textarea id="reviewNote" placeholder="请输入复核理由..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>复核人</label>
+                    <input type="text" id="reviewerName" placeholder="请输入姓名" value="班长">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeReviewModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">提交复核</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentResults = [];
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('statMolds').textContent = data.stats.total_molds;
+                    document.getElementById('statViolations').textContent = data.stats.total_violations;
+                    document.getElementById('statReviews').textContent = data.stats.total_reviews;
+                }
+            } catch (error) {
+                console.error('加载统计失败:', error);
+            }
+        }
+        
+        async function loadResults() {
+            const severity = document.getElementById('severityFilter').value;
+            const ruleType = document.getElementById('ruleTypeFilter').value;
+            const moldNo = document.getElementById('moldNoFilter').value.trim();
+            
+            let url = '/api/results?';
+            if (severity) url += `severity=${encodeURIComponent(severity)}&`;
+            if (ruleType) url += `rule_type=${encodeURIComponent(ruleType)}&`;
+            if (moldNo) url += `mold_no=${encodeURIComponent(moldNo)}&`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentResults = data.results;
+                    renderResults(data.results);
+                    document.getElementById('resultCount').textContent = `共 ${data.count} 条`;
+                }
+            } catch (error) {
+                showMessage('加载数据失败', 'error');
+                console.error(error);
+            }
+        }
+        
+        function renderResults(results) {
+            const tbody = document.getElementById('resultsBody');
+            
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = results.map(item => {
+                const severityClass = `severity-${item.severity}`;
+                const severityText = {high: '高', medium: '中', low: '低'}[item.severity] || item.severity;
+                
+                let verdictClass = '';
+                let verdictText = '未复核';
+                if (item.new_verdict) {
+                    verdictClass = `verdict-${item.new_verdict}`;
+                    verdictText = {approved: '已放行', waived: '已豁免', rejected: '维持违规'}[item.new_verdict] || item.new_verdict;
+                }
+                
+                const rowClass = item.new_verdict ? 'reviewed' : '';
+                
+                return `
+                    <tr class="${rowClass}">
+                        <td><strong>${item.mold_no}</strong></td>
+                        <td>${item.rule_name}</td>
+                        <td><span class="severity-badge ${severityClass}">${severityText}</span></td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${item.description}">${item.description}</td>
+                        <td>${item.check_time}</td>
+                        <td><span class="verdict-badge ${verdictClass}">${verdictText}</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openReviewModal(${item.id}, '${item.mold_no}', \`${escapeHtml(item.description)}\`)">复核</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function loadSampleData() {
+            if (!confirm('确定要导入示例数据吗？这将清空现有数据。')) return;
+            
+            try {
+                const response = await fetch('/api/import/sample', {method: 'POST'});
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('示例数据导入成功！', 'success');
+                    await loadStats();
+                    await loadResults();
+                } else {
+                    showMessage(data.error || '导入失败', 'error');
+                }
+            } catch (error) {
+                showMessage('导入失败: ' + error.message, 'error');
+            }
+        }
+        
+        async function runRules() {
+            try {
+                const response = await fetch('/api/rules/run', {method: 'POST'});
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`规则检测完成，共发现 ${data.total_violations} 项违规`, 'success');
+                    await loadStats();
+                    await loadResults();
+                }
+            } catch (error) {
+                showMessage('规则检测失败', 'error');
+            }
+        }
+        
+        function openReviewModal(resultId, moldNo, description) {
+            document.getElementById('reviewResultId').value = resultId;
+            document.getElementById('reviewMoldNo').value = moldNo;
+            document.getElementById('reviewMoldNoDisplay').value = moldNo;
+            document.getElementById('reviewDescription').value = description;
+            document.getElementById('reviewVerdict').value = '';
+            document.getElementById('reviewNote').value = '';
+            
+            document.getElementById('reviewModal').classList.add('show');
+        }
+        
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.remove('show');
+        }
+        
+        async function submitReview(event) {
+            event.preventDefault();
+            
+            const resultId = parseInt(document.getElementById('reviewResultId').value);
+            const moldNo = document.getElementById('reviewMoldNo').value;
+            const verdict = document.getElementById('reviewVerdict').value;
+            const note = document.getElementById('reviewNote').value;
+            const reviewer = document.getElementById('reviewerName').value;
+            
+            if (!verdict) {
+                alert('请选择改判结果');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/review', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        result_id: resultId,
+                        mold_no: moldNo,
+                        original_verdict: 'violation',
+                        new_verdict: verdict,
+                        review_note: note,
+                        reviewer: reviewer
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('复核记录已保存', 'success');
+                    closeReviewModal();
+                    await loadStats();
+                    await loadResults();
+                } else {
+                    showMessage(data.error || '保存失败', 'error');
+                }
+            } catch (error) {
+                showMessage('保存失败: ' + error.message, 'error');
+            }
+        }
+        
+        function exportMarkdown() {
+            window.location.href = '/api/export/markdown';
+        }
+        
+        function exportJson() {
+            window.location.href = '/api/export/json';
+        }
+        
+        function showMessage(text, type) {
+            const container = document.getElementById('messageContainer');
+            const className = type === 'success' ? 'message-success' : 'message-error';
+            container.innerHTML = `<div class="message ${className}">${text}</div>`;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+        
+        document.getElementById('reviewForm').addEventListener('submit', submitReview);
+        
+        document.getElementById('reviewModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReviewModal();
+            }
+        });
+        
+        loadStats();
+        loadResults();
+    </script>
+</body>
+</html>
