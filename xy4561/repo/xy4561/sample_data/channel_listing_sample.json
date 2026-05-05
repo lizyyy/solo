@@ -1,0 +1,92 @@
+{
+  "data": [
+    {
+      "isbn": "9787111213826",
+      "channel_name": "京东图书",
+      "channel_category": "计算机 > 编程语言 > Python",
+      "channel_price": 89.00,
+      "listing_status": "active",
+      "listing_date": "2016-07-01"
+    },
+    {
+      "isbn": "9787111213826",
+      "channel_name": "当当网",
+      "channel_category": "计算机与互联网 > 编程语言与工具 > Python",
+      "channel_price": 85.00,
+      "listing_status": "active",
+      "listing_date": "2016-07-15"
+    },
+    {
+      "isbn": "9787115428028",
+      "channel_name": "京东图书",
+      "channel_category": "计算机 > 编程语言 > Python",
+      "channel_price": 139.00,
+      "listing_status": "active",
+      "listing_date": "2017-01-01"
+    },
+    {
+      "isbn": "9787115428028",
+      "channel_name": "天猫图书",
+      "channel_category": "",
+      "channel_price": 135.00,
+      "listing_status": "active",
+      "listing_date": "2017-02-01"
+    },
+    {
+      "isbn": "9787115428028",
+      "channel_name": "亚马逊中国",
+      "channel_category": null,
+      "channel_price": 140.00,
+      "listing_status": "active",
+      "listing_date": "2017-03-01"
+    },
+    {
+      "isbn": "9787111592939",
+      "channel_name": "京东图书",
+      "channel_category": "计算机 > 编程语言 > Java",
+      "channel_price": 129.00,
+      "listing_status": "active",
+      "listing_date": "2018-08-01"
+    },
+    {
+      "isbn": "9787121361982",
+      "channel_name": "京东图书",
+      "channel_category": "计算机 > 编程语言 > Go",
+      "channel_price": 99.00,
+      "listing_status": "active",
+      "listing_date": "2019-01-01"
+    },
+    {
+      "isbn": "9787564129330",
+      "channel_name": "京东图书",
+      "channel_category": "计算机 > 人工智能 > 机器学习",
+      "channel_price": 88.00,
+      "listing_status": "active",
+      "listing_date": "2016-01-01"
+    },
+    {
+      "isbn": "9787302423287",
+      "channel_name": "",
+      "channel_category": "计算机 > 数据结构",
+      "channel_price": 79.00,
+      "listing_status": "active",
+      "listing_date": "2017-06-01"
+    },
+    {
+      "isbn": "",
+      "channel_name": "测试渠道",
+      "channel_category": "测试分类",
+      "channel_price": 50.00,
+      "listing_status": "active",
+      "listing_date": "2023-01-01"
+    },
+    {
+      "isbn": "1234567890",
+      "channel_name": "无效ISBN渠道",
+      "channel_category": "无效分类",
+      "channel_price": 100.00,
+      "listing_status": "active",
+      "listing_date": "2023-02-01"
+    }
+  ]
+}
