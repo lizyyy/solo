@@ -1,0 +1,43 @@
+name: "select-thundering-herd"
+description: "select 模式 - 惊群效应演示：多 worker 等待同一事件"
+selector_type: "select"
+trigger_mode: "lt"
+simulation_duration_ms: 50
+is_good_example: false
+tags:
+  - "select"
+  - "惊群效应"
+  - "坏示例"
+
+connections:
+  - id: "conn-1"
+    fd: 3
+    name: "共享连接"
+    read_buffer_size: 4096
+    read_events: [10, 20, 30]
+    read_data_size: 1024
+
+workers:
+  - id: 0
+    name: "worker-0"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false
+  
+  - id: 1
+    name: "worker-1"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false
+  
+  - id: 2
+    name: "worker-2"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false
+  
+  - id: 3
+    name: "worker-3"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false

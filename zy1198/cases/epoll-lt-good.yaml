@@ -1,0 +1,44 @@
+name: "epoll-lt-good"
+description: "epoll 水平触发模式 - 正常示例，多 worker 使用 EPOLLEXCLUSIVE 避免惊群"
+selector_type: "epoll"
+trigger_mode: "lt"
+simulation_duration_ms: 100
+is_good_example: true
+tags:
+  - "epoll"
+  - "水平触发"
+  - "正常示例"
+
+connections:
+  - id: "conn-1"
+    fd: 3
+    name: "客户端连接 A"
+    read_buffer_size: 4096
+    read_events: [10, 30, 50]
+    read_data_size: 1024
+  
+  - id: "conn-2"
+    fd: 4
+    name: "客户端连接 B"
+    read_buffer_size: 4096
+    read_events: [20, 40, 60]
+    read_data_size: 1024
+
+workers:
+  - id: 0
+    name: "worker-0"
+    read_chunk_size: 1024
+    read_delay_ms: 5
+    epollexclusive: true
+  
+  - id: 1
+    name: "worker-1"
+    read_chunk_size: 1024
+    read_delay_ms: 5
+    epollexclusive: true
+  
+  - id: 2
+    name: "worker-2"
+    read_chunk_size: 1024
+    read_delay_ms: 5
+    epollexclusive: true

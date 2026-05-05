@@ -1,0 +1,46 @@
+name: "poll-basic"
+description: "poll 模式 - 基础示例，与 select 类似但无 1024 限制"
+selector_type: "poll"
+trigger_mode: "lt"
+simulation_duration_ms: 100
+is_good_example: true
+tags:
+  - "poll"
+  - "水平触发"
+  - "基础示例"
+
+connections:
+  - id: "conn-1"
+    fd: 3
+    name: "连接 1"
+    read_buffer_size: 4096
+    read_events: [10, 50]
+    read_data_size: 1024
+  
+  - id: "conn-2"
+    fd: 4
+    name: "连接 2"
+    read_buffer_size: 4096
+    read_events: [20, 60]
+    read_data_size: 1024
+  
+  - id: "conn-3"
+    fd: 5
+    name: "连接 3"
+    read_buffer_size: 4096
+    read_events: [30, 70]
+    read_data_size: 1024
+  
+  - id: "conn-4"
+    fd: 6
+    name: "连接 4"
+    read_buffer_size: 4096
+    read_events: [40, 80]
+    read_data_size: 1024
+
+workers:
+  - id: 0
+    name: "worker-0"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false

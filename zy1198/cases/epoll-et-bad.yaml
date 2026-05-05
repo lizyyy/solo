@@ -1,0 +1,26 @@
+name: "epoll-et-bad"
+description: "epoll 边缘触发模式 - 坏示例，演示漏读风险：worker 只读取部分数据"
+selector_type: "epoll"
+trigger_mode: "et"
+simulation_duration_ms: 100
+is_good_example: false
+tags:
+  - "epoll"
+  - "边缘触发"
+  - "坏示例"
+  - "漏读"
+
+connections:
+  - id: "conn-1"
+    fd: 3
+    name: "大数据包连接"
+    read_buffer_size: 8192
+    read_events: [10]
+    read_data_size: 4096
+
+workers:
+  - id: 0
+    name: "worker-0"
+    read_chunk_size: 1024
+    read_delay_ms: 0
+    epollexclusive: false
