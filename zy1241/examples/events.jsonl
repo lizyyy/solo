@@ -1,0 +1,23 @@
+{"method": "__init__", "timestamp": "2026-05-05T10:00:00.001", "caller": "<module>", "target": "MyObj@0x1", "args": [], "kwargs": {}, "result": null}
+{"method": "__getattribute__", "timestamp": "2026-05-05T10:00:00.002", "caller": "<module>", "target": "MyObj@0x1", "args": ["name"], "kwargs": {}, "result": "Alice"}
+{"method": "__getattribute__", "timestamp": "2026-05-05T10:00:00.003", "caller": "<module>", "target": "MyObj@0x1", "args": ["missing_attr"], "kwargs": {}, "exception": "AttributeError: missing_attr"}
+{"method": "__getattr__", "timestamp": "2026-05-05T10:00:00.004", "caller": "<module>", "target": "MyObj@0x1", "args": ["missing_attr"], "kwargs": {}, "result": "default_value"}
+{"method": "__setattr__", "timestamp": "2026-05-05T10:00:00.005", "caller": "<module>", "target": "MyObj@0x1", "args": ["age", 30], "kwargs": {}, "result": null}
+{"method": "__enter__", "timestamp": "2026-05-05T10:00:00.010", "caller": "<module>", "target": "Resource@0x2", "args": [], "kwargs": {}, "result": "Resource@0x2"}
+{"method": "__exit__", "timestamp": "2026-05-05T10:00:00.015", "caller": "<module>", "target": "Resource@0x2", "args": [null, null, null], "kwargs": {}, "result": false}
+{"method": "__enter__", "timestamp": "2026-05-05T10:00:00.020", "caller": "<module>", "target": "BadResource@0x3", "args": [], "kwargs": {}, "result": "BadResource@0x3"}
+{"method": "__enter__", "timestamp": "2026-05-05T10:00:00.030", "caller": "<module>", "target": "SuppressError@0x4", "args": [], "kwargs": {}, "result": "SuppressError@0x4"}
+{"method": "__exit__", "timestamp": "2026-05-05T10:00:00.035", "caller": "<module>", "target": "SuppressError@0x4", "args": ["ValueError", "test error", "<traceback>"], "kwargs": {}, "result": true}
+{"method": "__bool__", "timestamp": "2026-05-05T10:00:00.040", "caller": "<module>", "target": "BoolObj@0x5", "args": [], "kwargs": {}, "result": true}
+{"method": "__len__", "timestamp": "2026-05-05T10:00:00.041", "caller": "<module>", "target": "LenObj@0x6", "args": [], "kwargs": {}, "result": 5}
+{"method": "__len__", "timestamp": "2026-05-05T10:00:00.042", "caller": "<module>", "target": "BadLenObj@0x7", "args": [], "kwargs": {}, "result": -1, "exception": "ValueError: __len__() should return >= 0"}
+{"method": "__eq__", "timestamp": "2026-05-05T10:00:00.050", "caller": "<module>", "target": "EqObj@0x8", "args": ["EqObj@0x9"], "kwargs": {}, "result": true}
+{"method": "__eq__", "timestamp": "2026-05-05T10:00:00.051", "caller": "<module>", "target": "EqObj@0x9", "args": ["EqObj@0x8"], "kwargs": {}, "result": true}
+{"method": "__hash__", "timestamp": "2026-05-05T10:00:00.052", "caller": "<module>", "target": "HashObj@0xa", "args": [], "kwargs": {}, "result": 12345}
+{"method": "__hash__", "timestamp": "2026-05-05T10:00:00.053", "caller": "<module>", "target": "NoneHashObj@0xb", "args": [], "kwargs": {}, "result": null, "exception": "TypeError: unhashable type"}
+{"method": "__call__", "timestamp": "2026-05-05T10:00:00.060", "caller": "<module>", "target": "CallableObj@0xc", "args": [1, 2], "kwargs": {"key": "value"}, "result": "called"}
+{"method": "__str__", "timestamp": "2026-05-05T10:00:00.070", "caller": "<module>", "target": "StrObj@0xd", "args": [], "kwargs": {}, "result": "String representation"}
+{"method": "__repr__", "timestamp": "2026-05-05T10:00:00.071", "caller": "<module>", "target": "ReprObj@0xe", "args": [], "kwargs": {}, "result": "ReprObj@0xe"}
+{"method": "__delattr__", "timestamp": "2026-05-05T10:00:00.080", "caller": "<module>", "target": "DelObj@0xf", "args": ["temp_attr"], "kwargs": {}, "result": null}
+{"method": "__new__", "timestamp": "2026-05-05T10:00:00.090", "caller": "<module>", "target": "NewObj", "args": [], "kwargs": {}, "result": "NewObj@0x10"}
+{"method": "__init__", "timestamp": "2026-05-05T10:00:00.091", "caller": "<module>", "target": "NewObj@0x10", "args": [], "kwargs": {}, "result": null}

@@ -1,0 +1,303 @@
+# 魔术方法测试用例示例
+# 这些用例展示了常见的魔术方法使用场景和潜在问题
+
+cases:
+  - id: case_001
+    name: 属性访问顺序测试
+    category: attribute_access
+    description: 测试 __getattribute__ 和 __getattr__ 的调用顺序
+    expected_behavior:
+      - 先调用 __getattribute__
+      - 如果 __getattribute__ 抛出 AttributeError，则调用 __getattr__
+    code_snippet: |
+      class MyClass:
+          def __getattribute__(self, name):
+              print(f"__getattribute__: {name}")
+              if name == "existing":
+                  return "value"
+              raise AttributeError(name)
+          
+          def __getattr__(self, name):
+              print(f"__getattr__: {name}")
+              return "default"
+      
+      obj = MyClass()
+      print(obj.existing)  # 调用 __getattribute__
+      print(obj.missing)   # 调用 __getattribute__ -> AttributeError -> __getattr__
+    metadata:
+      tags: ["__getattribute__", "__getattr__", "属性访问"]
+      difficulty: medium
+
+  - id: case_002
+    name: __setattr__ 无限递归风险
+    category: attribute_access
+    description: 展示 __setattr__ 的正确和错误实现方式
+    expected_behavior:
+      - 错误实现会导致无限递归
+      - 正确实现应该使用 object.__setattr__ 或 self.__dict__
+    code_snippet: |
+      # 错误实现 - 会导致无限递归
+      class BadSetAttr:
+          def __setattr__(self, name, value):
+              print(f"Setting {name} = {value}")
+              self.name = value  # 这里会再次调用 __setattr__，导致递归
+      
+      # 正确实现
+      class GoodSetAttr:
+          def __setattr__(self, name, value):
+              print(f"Setting {name} = {value}")
+              object.__setattr__(self, name, value)  # 方式1
+              # 或者: self.__dict__[name] = value      # 方式2
+    metadata:
+      tags: ["__setattr__", "递归", "常见陷阱"]
+      difficulty: hard
+      warning: "错误的 __setattr__ 实现会导致 StackOverflow"
+
+  - id: case_003
+    name: 上下文管理器资源清理
+    category: context_manager
+    description: 测试上下文管理器的 __enter__ 和 __exit__ 调用
+    expected_behavior:
+      - with 语句开始时调用 __enter__
+      - with 块结束时调用 __exit__
+      - __exit__ 接收异常参数（如果有）
+      - __exit__ 返回 True 会抑制异常
+    code_snippet: |
+      class Resource:
+          def __init__(self, name):
+              self.name = name
+          
+          def __enter__(self):
+              print(f"Opening resource: {self.name}")
+              return self
+          
+          def __exit__(self, exc_type, exc_val, exc_tb):
+              print(f"Closing resource: {self.name}")
+              if exc_type:
+                  print(f"  Exception: {exc_type} - {exc_val}")
+              # 返回 False（或 None）让异常继续传播
+              # 返回 True 会抑制异常
+              return False
+      
+      # 正常使用
+      with Resource("file.txt") as r:
+          print("Using resource...")
+      
+      # 异常情况
+      try:
+          with Resource("risky.txt") as r:
+              raise ValueError("Something went wrong")
+      except ValueError as e:
+          print(f"Caught: {e}")
+    metadata:
+      tags: ["__enter__", "__exit__", "上下文管理器", "资源管理"]
+      difficulty: medium
+
+  - id: case_004
+    name: 真值判断顺序 (__bool__ vs __len__)
+    category: truth_value
+    description: 测试布尔判断时 __bool__ 和 __len__ 的优先级
+    expected_behavior:
+      - 如果定义了 __bool__，优先调用
+      - 如果没有 __bool__，调用 __len__
+      - 如果都没有，对象默认为 True
+    code_snippet: |
+      class HasBool:
+          def __bool__(self):
+              print("__bool__ called")
+              return True
+          
+          def __len__(self):
+              print("__len__ called")
+              return 0
+      
+      class OnlyLen:
+          def __len__(self):
+              print("__len__ called")
+              return 5
+      
+      print("HasBool in if:")
+      if HasBool():
+          print("Truthy")
+      
+      print("\nOnlyLen in if:")
+      if OnlyLen():
+          print("Truthy")
+      
+      print("\nOnlyLen with len=0:")
+      class EmptyLen:
+          def __len__(self):
+              return 0
+      if EmptyLen():
+          print("Truthy")
+      else:
+          print("Falsy")
+    metadata:
+      tags: ["__bool__", "__len__", "真值判断", "布尔上下文"]
+      difficulty: easy
+
+  - id: case_005
+    name: __eq__ 和 __hash__ 的关系
+    category: equality_hashing
+    description: 展示定义 __eq__ 时必须考虑 __hash__ 的问题
+    expected_behavior:
+      - 定义了 __eq__ 但未定义 __hash__，__hash__ 会被设为 None
+      - __hash__ = None 的对象不可哈希，不能用于集合或字典键
+      - 相等的对象应该有相同的哈希值
+    code_snippet: |
+      # 问题实现 - 定义了 __eq__ 但没有 __hash__
+      class BadHash:
+          def __init__(self, value):
+              self.value = value
+          
+          def __eq__(self, other):
+              if not isinstance(other, BadHash):
+                  return False
+              return self.value == other.value
+      
+      # 正确实现 1 - 可哈希
+      class GoodHash:
+          def __init__(self, value):
+              self.value = value
+          
+          def __eq__(self, other):
+              if not isinstance(other, GoodHash):
+                  return False
+              return self.value == other.value
+          
+          def __hash__(self):
+              return hash(self.value)
+      
+      # 正确实现 2 - 不可哈希
+      class NotHashable:
+          def __init__(self, value):
+              self.value = value
+          
+          def __eq__(self, other):
+              return self.value == other.value
+          
+          __hash__ = None  # 明确表示不可哈希
+      
+      # 测试
+      a = GoodHash(1)
+      b = GoodHash(1)
+      print(f"a == b: {a == b}")
+      print(f"hash(a) == hash(b): {hash(a) == hash(b)}")
+      s = {a, b}
+      print(f"Set size: {len(s)}")  # 应该是 1
+    metadata:
+      tags: ["__eq__", "__hash__", "可哈希", "集合", "字典"]
+      difficulty: hard
+      warning: "定义 __eq__ 时必须考虑 __hash__，否则对象不可哈希"
+
+  - id: case_006
+    name: __call__ 方法使用
+    category: callable
+    description: 让对象像函数一样可调用
+    expected_behavior:
+      - 定义 __call__ 后，对象可以像函数一样被调用
+      - 可以有参数和返回值
+    code_snippet: |
+      class Counter:
+          def __init__(self):
+              self.count = 0
+          
+          def __call__(self, increment=1):
+              self.count += increment
+              return self.count
+      
+      counter = Counter()
+      print(counter())      # 1
+      print(counter())      # 2
+      print(counter(5))     # 7
+      print(counter.count)  # 7
+      
+      # 可以作为回调
+      def apply(func, values):
+          return [func(v) for v in values]
+      
+      class Multiplier:
+          def __init__(self, factor):
+              self.factor = factor
+          
+          def __call__(self, x):
+              return x * self.factor
+      
+      result = apply(Multiplier(2), [1, 2, 3])
+      print(result)  # [2, 4, 6]
+    metadata:
+      tags: ["__call__", "可调用对象", "闭包"]
+      difficulty: easy
+
+  - id: case_007
+    name: __len__ 返回负值陷阱
+    category: truth_value
+    description: __len__ 必须返回非负整数
+    expected_behavior:
+      - __len__ 返回负值会导致 ValueError
+      - __len__ 应该返回 >= 0 的整数
+    code_snippet: |
+      class BadLen:
+          def __len__(self):
+              return -1
+      
+      class GoodLen:
+          def __len__(self):
+              return 0
+      
+      try:
+          len(BadLen())
+      except ValueError as e:
+          print(f"Error: {e}")  # __len__() should return >= 0
+      
+      print(len(GoodLen()))  # 0
+    metadata:
+      tags: ["__len__", "常见陷阱", "异常"]
+      difficulty: easy
+      warning: "__len__ 必须返回非负整数"
+
+  - id: case_008
+    name: __exit__ 抑制异常风险
+    category: context_manager
+    description: __exit__ 返回 True 会抑制异常，需要谨慎使用
+    expected_behavior:
+      - __exit__ 返回 True 会抑制 with 块中的异常
+      - __exit__ 返回 False 或 None 会让异常继续传播
+      - 只有明确需要处理异常时才返回 True
+    code_snippet: |
+      class SuppressErrors:
+          def __enter__(self):
+              return self
+          
+          def __exit__(self, exc_type, exc_val, exc_tb):
+              if exc_type:
+                  print(f"Suppressing error: {exc_val}")
+                  return True  # 抑制异常
+              return False
+      
+      class PropagateErrors:
+          def __enter__(self):
+              return self
+          
+          def __exit__(self, exc_type, exc_val, exc_tb):
+              if exc_type:
+                  print(f"Error occurred: {exc_val}")
+              return False  # 让异常继续传播
+      
+      # 异常被抑制
+      print("Test 1: SuppressErrors")
+      with SuppressErrors():
+          raise ValueError("Oops!")
+      print("Continued...")
+      
+      # 异常传播
+      print("\nTest 2: PropagateErrors")
+      try:
+          with PropagateErrors():
+              raise ValueError("Oops again!")
+      except ValueError as e:
+          print(f"Caught: {e}")
+    metadata:
+      tags: ["__exit__", "异常处理", "上下文管理器", "常见陷阱"]
+      difficulty: medium
+      warning: "__exit__ 返回 True 会隐藏错误，可能导致难以调试的问题"
