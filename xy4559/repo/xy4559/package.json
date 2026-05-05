@@ -1,0 +1,36 @@
+{
+  "name": "puppet-checkout",
+  "version": "1.0.0",
+  "description": "巡演木偶剧团出箱交接核验CLI工具",
+  "main": "dist/index.js",
+  "bin": {
+    "puppet": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "puppet",
+    "theatre",
+    "inventory",
+    "checkout",
+    "handover"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "iconv-lite": "^0.6.3",
+    "jschardet": "^3.1.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.10",
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}
