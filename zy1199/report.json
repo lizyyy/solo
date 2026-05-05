@@ -1,0 +1,352 @@
+{
+  "generated_at": "2026-05-05T15:11:46.691055",
+  "total_results": 5,
+  "results": [
+    {
+      "id": 5,
+      "case_name": "comparison_mmap_write",
+      "file_size_mb": 100.0,
+      "method": "mmap_write",
+      "metrics": {
+        "user_space_copies": 1,
+        "kernel_space_copies": 2,
+        "total_copies": 3,
+        "context_switches": 1603,
+        "system_calls": 1603,
+        "estimated_cpu_usage_pct": 100.0,
+        "estimated_time_ms": 1394.1599999999999,
+        "estimated_throughput_mbps": 71.72777873414817
+      },
+      "bottleneck": {
+        "type": "io",
+        "reason": "磁盘 I/O 饱和 (100.0 Mbps)，读取 100.0 MB 需要约 1000 ms"
+      },
+      "copy_details": {
+        "method": "mmap + write",
+        "description": "内存映射方式：减少一次内核到用户的拷贝",
+        "steps": [
+          {
+            "step": "1",
+            "description": "mmap() 系统调用",
+            "from": "文件",
+            "to": "用户态虚拟地址空间",
+            "type": "地址映射（无拷贝）",
+            "optimization": "内存映射，建立页表映射"
+          },
+          {
+            "step": "2",
+            "description": "缺页异常触发读取",
+            "from": "磁盘",
+            "to": "内核页缓存",
+            "type": "DMA 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "3",
+            "description": "用户态直接访问",
+            "from": "页缓存（通过 mmap 映射）",
+            "to": "用户态处理",
+            "type": "直接访问（无拷贝）",
+            "optimization": "通过虚拟地址直接访问物理页"
+          },
+          {
+            "step": "4",
+            "description": "write() 系统调用",
+            "from": "用户态缓冲区",
+            "to": "内核 Socket 缓冲区",
+            "type": "用户态 -> 内核态 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "5",
+            "description": "协议栈发送",
+            "from": "Socket 缓冲区",
+            "to": "网卡",
+            "type": "内核态拷贝",
+            "optimization": null
+          }
+        ],
+        "key_points": [
+          "mmap 将文件映射到用户态虚拟地址空间",
+          "访问时通过缺页异常将数据读入页缓存",
+          "用户态可以直接访问页缓存（无需拷贝）",
+          "write 时仍需要一次用户态到内核态的拷贝",
+          "比 read+write 少一次拷贝，但需要管理 mmap 生命周期"
+        ]
+      },
+      "created_at": "2026-05-05T15:11:26.653439"
+    },
+    {
+      "id": 4,
+      "case_name": "good_sendfile_dma_sg",
+      "file_size_mb": 100.0,
+      "method": "sendfile",
+      "metrics": {
+        "user_space_copies": 0,
+        "kernel_space_copies": 1,
+        "total_copies": 1,
+        "context_switches": 2,
+        "system_calls": 3,
+        "estimated_cpu_usage_pct": 9.0,
+        "estimated_time_ms": 1000.7,
+        "estimated_throughput_mbps": 99.93004896572398
+      },
+      "bottleneck": {
+        "type": "network",
+        "reason": "网络带宽饱和 (100.0 Mbps)，传输 100.0 MB 需要约 1000 ms"
+      },
+      "copy_details": {
+        "method": "sendfile (零拷贝)",
+        "description": "真正的零拷贝：数据在内核态完成传输，无需用户态参与",
+        "steps": [
+          {
+            "step": "1",
+            "description": "sendfile() 系统调用",
+            "from": "文件描述符",
+            "to": "Socket 描述符",
+            "type": "内核态完成所有操作",
+            "optimization": "零拷贝系统调用"
+          },
+          {
+            "step": "2",
+            "description": "内核读取文件",
+            "from": "磁盘",
+            "to": "内核页缓存",
+            "type": "DMA 拷贝",
+            "optimization": "DMA Scatter-Gather"
+          },
+          {
+            "step": "3",
+            "description": "DMA SG 直接发送",
+            "from": "页缓存",
+            "to": "网卡",
+            "type": "无拷贝（仅描述符传递）",
+            "optimization": "DMA Scatter-Gather + TCP 分片卸载"
+          }
+        ],
+        "key_points": [
+          "sendfile 在内核态完成从文件到 Socket 的传输",
+          "完全避免用户态和内核态之间的数据拷贝",
+          "配合 DMA SG 可以实现真正的零拷贝（仅描述符传递）",
+          "上下文切换次数最少（仅 2 次系统调用）",
+          "适合大文件静态资源传输（如 CDN、文件下载）",
+          "限制：无法在用户态处理数据（如修改、加密）"
+        ]
+      },
+      "created_at": "2026-05-05T15:11:26.650218"
+    },
+    {
+      "id": 3,
+      "case_name": "good_sendfile_basic",
+      "file_size_mb": 100.0,
+      "method": "sendfile",
+      "metrics": {
+        "user_space_copies": 0,
+        "kernel_space_copies": 2,
+        "total_copies": 2,
+        "context_switches": 2,
+        "system_calls": 3,
+        "estimated_cpu_usage_pct": 14.0,
+        "estimated_time_ms": 1001.2,
+        "estimated_throughput_mbps": 99.8801438274071
+      },
+      "bottleneck": {
+        "type": "network",
+        "reason": "网络带宽饱和 (100.0 Mbps)，传输 100.0 MB 需要约 1000 ms"
+      },
+      "copy_details": {
+        "method": "sendfile (零拷贝)",
+        "description": "真正的零拷贝：数据在内核态完成传输，无需用户态参与",
+        "steps": [
+          {
+            "step": "1",
+            "description": "sendfile() 系统调用",
+            "from": "文件描述符",
+            "to": "Socket 描述符",
+            "type": "内核态完成所有操作",
+            "optimization": "零拷贝系统调用"
+          },
+          {
+            "step": "2",
+            "description": "内核读取文件",
+            "from": "磁盘",
+            "to": "内核页缓存",
+            "type": "DMA 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "3",
+            "description": "内核拷贝到 Socket 缓冲区",
+            "from": "页缓存",
+            "to": "Socket 缓冲区",
+            "type": "内核态拷贝",
+            "optimization": null
+          },
+          {
+            "step": "4",
+            "description": "协议栈发送",
+            "from": "Socket 缓冲区",
+            "to": "网卡",
+            "type": "DMA 拷贝",
+            "optimization": null
+          }
+        ],
+        "key_points": [
+          "sendfile 在内核态完成从文件到 Socket 的传输",
+          "完全避免用户态和内核态之间的数据拷贝",
+          "配合 DMA SG 可以实现真正的零拷贝（仅描述符传递）",
+          "上下文切换次数最少（仅 2 次系统调用）",
+          "适合大文件静态资源传输（如 CDN、文件下载）",
+          "限制：无法在用户态处理数据（如修改、加密）"
+        ]
+      },
+      "created_at": "2026-05-05T15:11:26.646655"
+    },
+    {
+      "id": 2,
+      "case_name": "bad_tls_compression_traditional",
+      "file_size_mb": 100.0,
+      "method": "read_write",
+      "metrics": {
+        "user_space_copies": 2,
+        "kernel_space_copies": 2,
+        "total_copies": 4,
+        "context_switches": 3202,
+        "system_calls": 3202,
+        "estimated_cpu_usage_pct": 100.0,
+        "estimated_time_ms": 1044.4,
+        "estimated_throughput_mbps": 95.74875526618155
+      },
+      "bottleneck": {
+        "type": "cpu",
+        "reason": "CPU 密集型操作: TLS 加密/解密, 数据压缩/解压, 用户态数据拷贝"
+      },
+      "copy_details": {
+        "method": "read + write",
+        "description": "传统方式：数据在内核态和用户态之间多次拷贝",
+        "steps": [
+          {
+            "step": "1",
+            "description": "read() 系统调用",
+            "from": "磁盘",
+            "to": "内核页缓存",
+            "type": "内核态拷贝",
+            "optimization": null
+          },
+          {
+            "step": "2",
+            "description": "内核 -> 用户态",
+            "from": "内核页缓存",
+            "to": "用户态缓冲区",
+            "type": "内核态 -> 用户态 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "2.5",
+            "description": "数据压缩",
+            "from": "原始数据",
+            "to": "压缩数据",
+            "type": "用户态 CPU 计算",
+            "optimization": "压缩比 2.0:1"
+          },
+          {
+            "step": "3",
+            "description": "write() 系统调用",
+            "from": "用户态缓冲区",
+            "to": "内核 Socket 缓冲区",
+            "type": "用户态 -> 内核态 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "3.5",
+            "description": "TLS 加密",
+            "from": "用户态明文",
+            "to": "用户态密文",
+            "type": "用户态 CPU 计算",
+            "optimization": null
+          },
+          {
+            "step": "4",
+            "description": "协议栈发送",
+            "from": "Socket 缓冲区",
+            "to": "网卡",
+            "type": "内核态拷贝",
+            "optimization": null
+          }
+        ],
+        "key_points": [
+          "需要 2 次用户态拷贝（read 时从内核到用户，write 时从用户到内核）",
+          "需要 2 次内核态拷贝（磁盘到页缓存，Socket 缓冲区到网卡）",
+          "上下文切换次数多（每次 read/write 都需要切换）",
+          "适合小文件或需要在用户态处理数据的场景"
+        ]
+      },
+      "created_at": "2026-05-05T15:11:26.643310"
+    },
+    {
+      "id": 1,
+      "case_name": "bad_traditional_read_write",
+      "file_size_mb": 100.0,
+      "method": "read_write",
+      "metrics": {
+        "user_space_copies": 2,
+        "kernel_space_copies": 2,
+        "total_copies": 4,
+        "context_switches": 3202,
+        "system_calls": 3202,
+        "estimated_cpu_usage_pct": 100.0,
+        "estimated_time_ms": 1586.64,
+        "estimated_throughput_mbps": 63.02626934906469
+      },
+      "bottleneck": {
+        "type": "cpu",
+        "reason": "CPU 密集型操作: 用户态数据拷贝"
+      },
+      "copy_details": {
+        "method": "read + write",
+        "description": "传统方式：数据在内核态和用户态之间多次拷贝",
+        "steps": [
+          {
+            "step": "1",
+            "description": "read() 系统调用",
+            "from": "磁盘",
+            "to": "内核页缓存",
+            "type": "内核态拷贝",
+            "optimization": null
+          },
+          {
+            "step": "2",
+            "description": "内核 -> 用户态",
+            "from": "内核页缓存",
+            "to": "用户态缓冲区",
+            "type": "内核态 -> 用户态 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "3",
+            "description": "write() 系统调用",
+            "from": "用户态缓冲区",
+            "to": "内核 Socket 缓冲区",
+            "type": "用户态 -> 内核态 拷贝",
+            "optimization": null
+          },
+          {
+            "step": "4",
+            "description": "协议栈发送",
+            "from": "Socket 缓冲区",
+            "to": "网卡",
+            "type": "内核态拷贝",
+            "optimization": null
+          }
+        ],
+        "key_points": [
+          "需要 2 次用户态拷贝（read 时从内核到用户，write 时从用户到内核）",
+          "需要 2 次内核态拷贝（磁盘到页缓存，Socket 缓冲区到网卡）",
+          "上下文切换次数多（每次 read/write 都需要切换）",
+          "适合小文件或需要在用户态处理数据的场景"
+        ]
+      },
+      "created_at": "2026-05-05T15:11:26.639444"
+    }
+  ]
+}

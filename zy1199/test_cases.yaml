@@ -1,0 +1,39 @@
+hardware:
+  disk_bandwidth_mbps: 100.0
+  network_bandwidth_mbps: 100.0
+  cpu_cores: 4
+  memory_gb: 16
+  page_cache_size_mb: 1024
+cases:
+- name: traditional_read_write
+  description: 传统 read + write 方式
+  category: comparison
+  tags:
+  - traditional
+  - baseline
+  config:
+    file_size_mb: 100.0
+    method: read_write
+    page_cache_hit: false
+    use_mmap: false
+    use_sendfile: false
+    use_dma_sg: false
+    use_tls: false
+    use_compression: false
+    chunk_size_kb: 64
+- name: sendfile_zero_copy
+  description: sendfile 零拷贝方式
+  category: comparison
+  tags:
+  - optimized
+  - zero-copy
+  config:
+    file_size_mb: 100.0
+    method: sendfile
+    page_cache_hit: false
+    use_mmap: false
+    use_sendfile: true
+    use_dma_sg: true
+    use_tls: false
+    use_compression: false
+    chunk_size_kb: 64
