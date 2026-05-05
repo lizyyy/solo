@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奶牛场早班检测工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .import-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .import-item {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .import-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .import-item h3 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .import-item p {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-item label {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .filter-item select, .filter-item input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .result-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .result-item:hover {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .result-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cow-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .severity-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .severity-critical {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .severity-warning {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .severity-info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .type-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .result-evidence {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .result-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        
+        .verdict-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .verdict-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .verdict-item label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .verdict-item select, .verdict-item textarea {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        
+        .verdict-item textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+        
+        .status-confirmed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .status-dismissed {
+            background: #e0e0e0;
+            color: #616161;
+        }
+        
+        .details-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: underline;
+        }
+        
+        .details-panel {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .details-panel.show {
+            display: block;
+        }
+        
+        .details-section {
+            margin-bottom: 15px;
+        }
+        
+        .details-section h4 {
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        
+        .details-table th, .details-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .details-table th {
+            background: #e9ecef;
+            color: #555;
+        }
+        
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 6px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .save-indicator.show {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tank-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .tank-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .tank-card h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .tank-cows {
+            list-style: none;
+        }
+        
+        .tank-cows li {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tank-cows li:last-child {
+            border-bottom: none;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .stat-card.warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card.info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐄 奶牛场早班检测工具</h1>
+            <p>早班挤奶后 - 异常检测与交班管理</p>
+        </div>
+        
+        <div class="card">
+            <h2>📁 数据导入</h2>
+            <div class="import-section">
+                <div class="import-item">
+                    <h3>🥛 挤奶机产奶量</h3>
+                    <p>CSV格式：牛号、日期、产奶量(kg)、奶罐号、挤奶时间、真空泵压力(kPa)</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn" onclick="document.getElementById('milkFile').click()">选择文件</button>
+                        <input type="file" id="milkFile" accept=".csv" onchange="importData('milk')">
+                    </div>
+                    <div id="milkStatus" style="margin-top: 10px; font-size: 0.85rem; color: #667eea;"></div>
+                </div>
+                
+                <div class="import-item">
+                    <h3>🔬 体细胞检测表</h3>
+                    <p>CSV格式：牛号、日期、体细胞计数、检测类型</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn" onclick="document.getElementById('somaticFile').click()">选择文件</button>
+                        <input type="file" id="somaticFile" accept=".csv" onchange="importData('somatic')">
+                    </div>
+                    <div id="somaticStatus" style="margin-top: 10px; font-size: 0.85rem; color: #667eea;"></div>
+                </div>
+                
+                <div class="import-item">
+                    <h3>📋 牛群分栏表</h3>
+                    <p>CSV格式：牛号、分栏、备注</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn" onclick="document.getElementById('cowsFile').click()">选择文件</button>
+                        <input type="file" id="cowsFile" accept=".csv" onchange="importData('cows')">
+                    </div>
+                    <div id="cowsStatus" style="margin-top: 10px; font-size: 0.85rem; color: #667eea;"></div>
+                </div>
+                
+                <div class="import-item">
+                    <h3>📝 兽医备注</h3>
+                    <p>CSV格式：牛号、日期、备注</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn" onclick="document.getElementById('vetNotesFile').click()">选择文件</button>
+                        <input type="file" id="vetNotesFile" accept=".csv" onchange="importData('vet-notes')">
+                    </div>
+                    <div id="vetNotesStatus" style="margin-top: 10px; font-size: 0.85rem; color: #667eea;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>⚙️ 操作</h2>
+            <div class="action-bar">
+                <button class="btn btn-warning" onclick="runDetection()">🔍 运行异常检测</button>
+                <button class="btn btn-success" onclick="exportMarkdown()">📄 导出交班单 (Markdown)</button>
+                <button class="btn btn-success" onclick="exportJson()">📋 导出明细 (JSON)</button>
+                <button class="btn btn-secondary" onclick="loadResults()">🔄 刷新数据</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>📊 检测结果</h2>
+            
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <div>处理中...</div>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">总异常数</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-number" id="criticalCount">0</div>
+                    <div class="stat-label">严重异常</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-number" id="pendingCount">0</div>
+                    <div class="stat-label">待处理</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-number" id="confirmedCount">0</div>
+                    <div class="stat-label">已确认</div>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('cow')">按牛号查看</button>
+                <button class="tab" onclick="switchTab('tank')">按奶罐查看</button>
+            </div>
+            
+            <div class="filters" id="filters">
+                <div class="filter-item">
+                    <label>检测类型：</label>
+                    <select id="typeFilter" onchange="filterResults()">
+                        <option value="">全部</option>
+                        <option value="mastitis">疑似乳房炎</option>
+                        <option value="pump_anomaly">真空泵异常</option>
+                        <option value="milk_mixing_risk">混奶风险</option>
+                        <option value="retest_needed">需要复检</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>严重程度：</label>
+                    <select id="severityFilter" onchange="filterResults()">
+                        <option value="">全部</option>
+                        <option value="critical">严重</option>
+                        <option value="warning">警告</option>
+                        <option value="info">提示</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>状态：</label>
+                    <select id="statusFilter" onchange="filterResults()">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="confirmed">已确认</option>
+                        <option value="dismissed">已驳回</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>搜索牛号：</label>
+                    <input type="text" id="searchCow" placeholder="输入牛号..." onkeyup="filterResults()">
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="cowTab">
+                <div class="results-list" id="resultsList">
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tankTab">
+                <div class="tank-view" id="tankView">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="save-indicator" id="saveIndicator">
+        ✓ 已保存
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let allResults = [];
+        let tankData = {};
+        
+        const typeNames = {
+            'mastitis': '疑似乳房炎',
+            'pump_anomaly': '真空泵异常',
+            'milk_mixing_risk': '混奶风险',
+            'retest_needed': '需要复检'
+        };
+        
+        async function importData(type) {
+            const fileInput = document.getElementById(type === 'milk' ? 'milkFile' : 
+                                                   type === 'somatic' ? 'somaticFile' : 
+                                                   type === 'cows' ? 'cowsFile' : 'vetNotesFile');
+            const statusEl = document.getElementById(type === 'milk' ? 'milkStatus' : 
+                                                      type === 'somatic' ? 'somaticStatus' : 
+                                                      type === 'cows' ? 'cowsStatus' : 'vetNotesStatus');
+            
+            if (fileInput.files.length === 0) return;
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                statusEl.textContent = '上传中...';
+                const response = await fetch(`${API_BASE}/import/${type}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    statusEl.textContent = data.message;
+                    statusEl.style.color = '#2e7d32';
+                } else {
+                    statusEl.textContent = '错误: ' + data.error;
+                    statusEl.style.color = '#c62828';
+                }
+            } catch (error) {
+                statusEl.textContent = '连接失败: ' + error.message;
+                statusEl.style.color = '#c62828';
+            }
+        }
+        
+        async function runDetection() {
+            const loading = document.getElementById('loadingIndicator');
+            loading.classList.add('show');
+            
+            try {
+                const response = await fetch(`${API_BASE}/detect`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    alert('检测完成: ' + data.message);
+                    await loadResults();
+                } else {
+                    alert('检测失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('连接失败: ' + error.message);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+        
+        async function loadResults() {
+            const loading = document.getElementById('loadingIndicator');
+            loading.classList.add('show');
+            
+            try {
+                const response = await fetch(`${API_BASE}/results`);
+                allResults = await response.json();
+                
+                updateStats();
+                filterResults();
+                loadTankData();
+            } catch (error) {
+                console.error('加载失败:', error);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+        
+        function updateStats() {
+            const statsGrid = document.getElementById('statsGrid');
+            if (allResults.length === 0) {
+                statsGrid.style.display = 'none';
+                return;
+            }
+            
+            statsGrid.style.display = 'grid';
+            document.getElementById('totalCount').textContent = allResults.length;
+            document.getElementById('criticalCount').textContent = allResults.filter(r => r.severity === 'critical').length;
+            document.getElementById('pendingCount').textContent = allResults.filter(r => r.status === 'pending').length;
+            document.getElementById('confirmedCount').textContent = allResults.filter(r => r.status === 'confirmed').length;
+        }
+        
+        function filterResults() {
+            const type = document.getElementById('typeFilter').value;
+            const severity = document.getElementById('severityFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchCow').value.toLowerCase();
+            
+            const filtered = allResults.filter(r => {
+                if (type && r.detection_type !== type) return false;
+                if (severity && r.severity !== severity) return false;
+                if (status && r.status !== status) return false;
+                if (search && !r.cow_number.toLowerCase().includes(search)) return false;
+                return true;
+            });
+            
+            renderResults(filtered);
+        }
+        
+        function renderResults(results) {
+            const container = document.getElementById('resultsList');
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <p>暂无检测结果</p>
+                        <p style="font-size: 0.85rem;">请先导入数据并运行检测</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            results.sort((a, b) => {
+                const severityOrder = { critical: 0, warning: 1, info: 2 };
+                if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+                    return severityOrder[a.severity] - severityOrder[b.severity];
+                }
+                return new Date(b.date) - new Date(a.date);
+            });
+            
+            container.innerHTML = results.map(r => `
+                <div class="result-item" data-id="${r.id}">
+                    <div class="result-header">
+                        <div class="result-title">
+                            <span class="cow-number">${r.cow_number === 'TANK_CHECK' ? '🥛 奶罐检查' : '🐄 ' + r.cow_number}</span>
+                            <span class="type-badge">${typeNames[r.detection_type] || r.detection_type}</span>
+                            <span class="severity-badge severity-${r.severity}">${r.severity === 'critical' ? '严重' : r.severity === 'warning' ? '警告' : '提示'}</span>
+                            <span class="status-badge status-${r.status}">${r.status === 'pending' ? '待处理' : r.status === 'confirmed' ? '已确认' : '已驳回'}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #888;">
+                            ${r.date}
+                        </div>
+                    </div>
+                    
+                    <div class="result-evidence">
+                        <strong>证据：</strong>${r.evidence}
+                    </div>
+                    
+                    ${r.cow_number !== 'TANK_CHECK' ? `
+                    <button class="details-btn" onclick="toggleDetails(${r.id}, '${r.cow_number}')">
+                        ▼ 查看牛只详情
+                    </button>
+                    <div class="details-panel" id="details-${r.id}"></div>
+                    ` : ''}
+                    
+                    <div class="verdict-section">
+                        <div class="verdict-item">
+                            <label>人工判定：</label>
+                            <select id="verdict-${r.id}" onchange="updateResult(${r.id})">
+                                <option value="" ${!r.human_verdict ? 'selected' : ''}>未判定</option>
+                                <option value="confirmed" ${r.human_verdict === 'confirmed' ? 'selected' : ''}>确认异常</option>
+                                <option value="dismissed" ${r.human_verdict === 'dismissed' ? 'selected' : ''}>驳回</option>
+                            </select>
+                        </div>
+                        <div class="verdict-item">
+                            <label>备注：</label>
+                            <textarea id="note-${r.id}" placeholder="输入备注..." onchange="updateResult(${r.id})">${r.human_note || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function toggleDetails(resultId, cowNumber) {
+            const panel = document.getElementById(`details-${resultId}`);
+            const btn = panel.previousElementSibling;
+            
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                btn.textContent = '▼ 查看牛只详情';
+                return;
+            }
+            
+            panel.classList.add('show');
+            btn.textContent = '▲ 收起详情';
+            
+            if (panel.innerHTML) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/cows/${cowNumber}/details`);
+                const data = await response.json();
+                
+                let html = `
+                    <div class="details-section">
+                        <h4>基本信息</h4>
+                        <p><strong>牛号：</strong>${data.cow.cow_number}</p>
+                        <p><strong>分栏：</strong>${data.cow.group || '未设置'}</p>
+                        <p><strong>备注：</strong>${data.cow.notes || '无'}</p>
+                    </div>
+                `;
+                
+                if (data.milk_records.length > 0) {
+                    html += `
+                        <div class="details-section">
+                            <h4>产奶记录</h4>
+                            <table class="details-table">
+                                <thead>
+                                    <tr><th>日期</th><th>产奶量(kg)</th><th>奶罐号</th><th>真空泵压力(kPa)</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${data.milk_records.slice(0, 10).map(m => `
+                                        <tr>
+                                            <td>${m.date}</td>
+                                            <td>${m.milk_yield || '-'}</td>
+                                            <td>${m.tank_number || '-'}</td>
+                                            <td>${m.pump_pressure || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                
+                if (data.somatic_records.length > 0) {
+                    html += `
+                        <div class="details-section">
+                            <h4>体细胞检测记录</h4>
+                            <table class="details-table">
+                                <thead>
+                                    <tr><th>日期</th><th>体细胞计数</th><th>检测类型</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${data.somatic_records.slice(0, 5).map(s => `
+                                        <tr>
+                                            <td>${s.date}</td>
+                                            <td>${s.somatic_count || '-'}</td>
+                                            <td>${s.test_type || '-'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                
+                if (data.vet_notes.length > 0) {
+                    html += `
+                        <div class="details-section">
+                            <h4>兽医备注</h4>
+                            <table class="details-table">
+                                <thead>
+                                    <tr><th>日期</th><th>备注</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${data.vet_notes.slice(0, 5).map(v => `
+                                        <tr>
+                                            <td>${v.date}</td>
+                                            <td>${v.note}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                
+                panel.innerHTML = html;
+            } catch (error) {
+                panel.innerHTML = '<p style="color: #c62828;">加载详情失败</p>';
+            }
+        }
+        
+        async function updateResult(resultId) {
+            const verdict = document.getElementById(`verdict-${resultId}`).value;
+            const note = document.getElementById(`note-${resultId}`).value;
+            
+            const updates = {};
+            if (verdict) {
+                updates.human_verdict = verdict;
+                updates.status = verdict === 'confirmed' ? 'confirmed' : 
+                                verdict === 'dismissed' ? 'dismissed' : 'pending';
+            }
+            if (note !== undefined) {
+                updates.human_note = note;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/results/${resultId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updates)
+                });
+                
+                const result = allResults.find(r => r.id === resultId);
+                if (result) {
+                    if (updates.human_verdict) result.human_verdict = updates.human_verdict;
+                    if (updates.status) result.status = updates.status;
+                    if (updates.human_note !== undefined) result.human_note = updates.human_note;
+                }
+                
+                updateStats();
+                showSaveIndicator();
+            } catch (error) {
+                console.error('保存失败:', error);
+            }
+        }
+        
+        async function loadTankData() {
+            try {
+                const response = await fetch(`${API_BASE}/cows`);
+                const cows = await response.json();
+                
+                tankData = {};
+                for (const cow of cows) {
+                    try {
+                        const detailsResponse = await fetch(`${API_BASE}/cows/${cow.cow_number}/details`);
+                        const details = await detailsResponse.json();
+                        
+                        for (const record of details.milk_records) {
+                            if (record.tank_number) {
+                                if (!tankData[record.tank_number]) {
+                                    tankData[record.tank_number] = [];
+                                }
+                                if (!tankData[record.tank_number].find(c => c.cow_number === cow.cow_number)) {
+                                    const hasIssue = allResults.some(r => 
+                                        r.cow_number === cow.cow_number && 
+                                        (r.status === 'pending' || r.status === 'confirmed')
+                                    );
+                                    tankData[record.tank_number].push({
+                                        cow_number: cow.cow_number,
+                                        group: cow.group,
+                                        has_issue: hasIssue
+                                    });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error(`加载奶牛 ${cow.cow_number} 详情失败:`, e);
+                    }
+                }
+                
+                renderTankView();
+            } catch (error) {
+                console.error('加载奶罐数据失败:', error);
+            }
+        }
+        
+        function renderTankView() {
+            const container = document.getElementById('tankView');
+            
+            if (Object.keys(tankData).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                        </svg>
+                        <p>暂无奶罐数据</p>
+                        <p style="font-size: 0.85rem;">请先导入产奶量数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = Object.entries(tankData).map(([tank, cows]) => `
+                <div class="tank-card">
+                    <h3>🥛 奶罐 ${tank}</h3>
+                    <div class="alert ${cows.some(c => c.has_issue) ? 'alert-info' : ''}">
+                        ${cows.some(c => c.has_issue) ? '⚠️ 此奶罐包含有异常的牛只' : '✅ 此奶罐无异常牛只'}
+                    </div>
+                    <ul class="tank-cows">
+                        ${cows.map(c => `
+                            <li>
+                                <span>🐄 ${c.cow_number} ${c.group ? `(${c.group})` : ''}</span>
+                                ${c.has_issue ? '<span class="severity-badge severity-warning">异常</span>' : ''}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab === 'cow' ? 'cowTab' : 'tankTab').classList.add('active');
+        }
+        
+        function exportMarkdown() {
+            window.open(`${API_BASE}/export/markdown`, '_blank');
+        }
+        
+        function exportJson() {
+            window.open(`${API_BASE}/export/json`, '_blank');
+        }
+        
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.remove('show');
+            void indicator.offsetWidth;
+            indicator.classList.add('show');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadResults();
+        });
+    </script>
+</body>
+</html>
