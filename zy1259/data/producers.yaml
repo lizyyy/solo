@@ -1,0 +1,40 @@
+producers:
+  - id: producer-001
+    name: order-service-producer
+    topic: order-events
+    enabled: true
+    createdAt: "2024-01-01T10:00:00Z"
+    metadata:
+      service: "order-service"
+      region: "cn-beijing"
+      version: "v2.1.0"
+
+  - id: producer-002
+    name: payment-service-producer
+    topic: payment-events
+    enabled: true
+    createdAt: "2024-01-01T10:05:00Z"
+    metadata:
+      service: "payment-service"
+      region: "cn-beijing"
+      version: "v1.8.3"
+
+  - id: producer-003
+    name: inventory-service-producer
+    topic: inventory-events
+    enabled: true
+    createdAt: "2024-01-01T10:10:00Z"
+    metadata:
+      service: "inventory-service"
+      region: "cn-shanghai"
+      version: "v3.0.1"
+
+  - id: producer-004
+    name: notification-service-producer
+    topic: notification-events
+    enabled: false
+    createdAt: "2024-01-01T10:15:00Z"
+    metadata:
+      service: "notification-service"
+      region: "cn-beijing"
+      version: "v1.2.0"

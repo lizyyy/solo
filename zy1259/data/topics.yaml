@@ -1,0 +1,60 @@
+topics:
+  - id: topic-001
+    name: order-events
+    partitions: 4
+    replicationFactor: 3
+    retentionMs: 604800000
+    orderKeyEnabled: true
+    createdAt: "2024-01-01T09:00:00Z"
+    metadata:
+      description: "Order lifecycle events"
+      maxMessageBytes: 1048576
+      cleanupPolicy: "delete"
+
+  - id: topic-002
+    name: payment-events
+    partitions: 4
+    replicationFactor: 3
+    retentionMs: 604800000
+    orderKeyEnabled: true
+    createdAt: "2024-01-01T09:05:00Z"
+    metadata:
+      description: "Payment processing events"
+      maxMessageBytes: 1048576
+      cleanupPolicy: "delete"
+
+  - id: topic-003
+    name: inventory-events
+    partitions: 8
+    replicationFactor: 3
+    retentionMs: 1209600000
+    orderKeyEnabled: true
+    createdAt: "2024-01-01T09:10:00Z"
+    metadata:
+      description: "Inventory update events"
+      maxMessageBytes: 1048576
+      cleanupPolicy: "compact,delete"
+
+  - id: topic-004
+    name: notification-events
+    partitions: 2
+    replicationFactor: 2
+    retentionMs: 86400000
+    orderKeyEnabled: false
+    createdAt: "2024-01-01T09:15:00Z"
+    metadata:
+      description: "Notification events (no ordering required)"
+      maxMessageBytes: 524288
+      cleanupPolicy: "delete"
+
+  - id: topic-005
+    name: dead-letter-queue
+    partitions: 1
+    replicationFactor: 3
+    retentionMs: 2592000000
+    orderKeyEnabled: false
+    createdAt: "2024-01-01T08:00:00Z"
+    metadata:
+      description: "Dead letter queue for failed messages"
+      maxMessageBytes: 2097152
+      cleanupPolicy: "delete"
