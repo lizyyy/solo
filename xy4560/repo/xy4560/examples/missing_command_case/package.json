@@ -1,0 +1,16 @@
+{
+  "name": "missing-command-example",
+  "version": "1.0.0",
+  "description": "命令缺失示例 - README 中的命令在 package.json 中不存在",
+  "scripts": {
+    "test": "node -e \"console.log('✅ 测试通过!'); process.exit(0)\"",
+    "build": "node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.writeFileSync('dist/bundle.js', '// bundle\\n'); console.log('✅ 构建完成!');\"",
+    "dev": "echo '🚀 开发服务器启动'"
+  },
+  "dependencies": {
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.0.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "normal-example",
+  "version": "1.0.0",
+  "description": "正常示例项目 - 配置与 README 完全匹配",
+  "scripts": {
+    "test": "node -e \"console.log('✅ 测试通过! 共 5 个测试用例, 全部通过.'); process.exit(0)\"",
+    "build": "node -e \"const fs = require('fs'); fs.mkdirSync('dist', { recursive: true }); fs.writeFileSync('dist/index.js', '// compiled code\\n'); fs.writeFileSync('dist/style.css', '/* compiled styles */\\n'); console.log('✅ 构建完成! 已生成 dist/index.js 和 dist/style.css');\"",
+    "dev": "echo '🚀 开发服务器将在端口 3000 启动 (模拟)'",
+    "start": "echo '🚀 生产服务器启动'"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "vite": "^5.0.0"
+  }
+}
