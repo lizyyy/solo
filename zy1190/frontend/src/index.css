@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ant-layout-header .logo {
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.ant-layout-content {
+  padding: 24px;
+  background: #f0f2f5;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-card-head {
+  font-weight: 600;
+}
+
+.metric-card {
+  text-align: center;
+}
+
+.metric-card .ant-statistic-title {
+  color: #666;
+  font-size: 13px;
+}
+
+.metric-card .ant-statistic-content {
+  font-size: 24px;
+}
+
+.chart-container {
+  height: 350px;
+  padding: 16px;
+}
+
+.config-section {
+  margin-bottom: 16px;
+}
+
+.config-section .ant-form-item {
+  margin-bottom: 12px;
+}
+
+.running-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.highlight-positive {
+  color: #52c41a;
+}
+
+.highlight-negative {
+  color: #ff4d4f;
+}
+
+.table-cell-better {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.table-cell-worse {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.optimization-card {
+  border-left: 4px solid #1890ff;
+  margin-bottom: 8px;
+}
+
+.warning-card {
+  border-left: 4px solid #faad14;
+  margin-bottom: 8px;
+}
+
+.success-card {
+  border-left: 4px solid #52c41a;
+  margin-bottom: 8px;
+}

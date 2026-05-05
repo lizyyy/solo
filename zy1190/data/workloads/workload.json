@@ -1,0 +1,124 @@
+{
+  "description": "Cache Lab 预设工作负载 - 用于演示各种缓存性能场景",
+  "created_at": "2026-05-05T00:00:00.000Z",
+  "presets": [
+    {
+      "name": "顺序访问基准测试",
+      "description": "最佳缓存利用场景 - 顺序访问 64MB 数组",
+      "config": {
+        "test_name": "sequential",
+        "array_size": 67108864,
+        "stride": 1,
+        "iterations": 10,
+        "cache_line_size": 64
+      },
+      "expected_behavior": {
+        "hit_rate": "~95%+",
+        "description": "顺序访问几乎不会有 Cache Miss，CPU 预取机制会提前加载相邻缓存行"
+      }
+    },
+    {
+      "name": "大跨步访问测试",
+      "description": "步长 = 16（64字节），每次访问不同缓存行",
+      "config": {
+        "test_name": "stride",
+        "array_size": 67108864,
+        "stride": 16,
+        "iterations": 10,
+        "cache_line_size": 64
+      },
+      "expected_behavior": {
+        "hit_rate": "~0%",
+        "description": "步长等于缓存行大小，每次访问都需要加载新缓存行"
+      }
+    },
+    {
+      "name": "随机访问测试",
+      "description": "最差缓存性能 - 完全随机访问",
+      "config": {
+        "test_name": "random",
+        "array_size": 67108864,
+        "iterations": 5,
+        "cache_line_size": 64,
+        "seed": 42
+      },
+      "expected_behavior": {
+        "hit_rate": "~0%",
+        "description": "随机访问没有空间局部性，每次访问几乎都是 Cache Miss"
+      }
+    },
+    {
+      "name": "伪共享 - 坏布局",
+      "description": "4 线程共享同一缓存行的不同变量",
+      "config": {
+        "test_name": "false_sharing",
+        "thread_count": 4,
+        "struct_layout": "bad",
+        "iterations": 5
+      },
+      "expected_behavior": {
+        "performance": "极差",
+        "description": "即使线程不共享数据，共享缓存行也会导致缓存一致性开销"
+      },
+      "optimization": "使用 alignas(64) 让每个变量独占缓存行"
+    },
+    {
+      "name": "伪共享 - 好布局",
+      "description": "4 线程，每个变量独占缓存行",
+      "config": {
+        "test_name": "false_sharing",
+        "thread_count": 4,
+        "struct_layout": "good",
+        "iterations": 5
+      },
+      "expected_behavior": {
+        "performance": "优秀",
+        "description": "每个变量独占缓存行，没有缓存一致性开销"
+      }
+    },
+    {
+      "name": "NUMA 本地 vs 远端内存对比",
+      "description": "对比访问本地和远端 NUMA 节点内存的延迟",
+      "config": {
+        "test_name": "numa",
+        "array_size": 67108864,
+        "numa_node": 0,
+        "iterations": 5
+      },
+      "expected_behavior": {
+        "remote_slowdown": "~1.5x - 3x",
+        "description": "访问远端 NUMA 节点内存会有显著延迟"
+      },
+      "system_requirement": "需要多 NUMA 节点系统"
+    }
+  ],
+  "learning_experiments": [
+    {
+      "title": "理解缓存行大小的影响",
+      "steps": [
+        "运行顺序访问测试，数组大小 64MB",
+        "尝试不同缓存行大小：32, 64, 128, 256 字节",
+        "观察吞吐量和命中率的变化"
+      ],
+      "insight": "更大的缓存行可以提高空间局部性，但会增加伪共享风险"
+    },
+    {
+      "title": "步长与缓存利用率的关系",
+      "steps": [
+        "运行跨步访问测试",
+        "尝试步长：1, 2, 4, 8, 16, 32",
+        "绘制步长 vs 延迟的曲线"
+      ],
+      "insight": "当步长 >= 缓存行元素数时，每次访问都是 Cache Miss"
+    },
+    {
+      "title": "伪共享的代价",
+      "steps": [
+        "分别运行坏布局和好布局的伪共享测试",
+        "对比两种布局的性能差异",
+        "计算性能提升倍数"
+      ],
+      "insight": "伪共享可能导致 10x+ 的性能损失，这是最常见的多线程性能陷阱之一"
+    }
+  ]
+}
