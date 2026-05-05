@@ -1,0 +1,42 @@
+[
+    {
+        "pickup_number": "EXP20240120001",
+        "express_company": "顺丰速运",
+        "pickup_time": "2024-01-20T16:00:00",
+        "total_packages": 3,
+        "driver_name": "王师傅",
+        "notes": "下午4点取件，包含3个病例",
+        "cases": [
+            {
+                "case_number": "DL20240001",
+                "tracking_number": "SF1234567890001"
+            },
+            {
+                "case_number": "DL20240002",
+                "tracking_number": "SF1234567890002"
+            },
+            {
+                "case_number": "DL20240005",
+                "tracking_number": "SF1234567890003"
+            }
+        ]
+    },
+    {
+        "pickup_number": "EXP20240121001",
+        "express_company": "圆通速递",
+        "pickup_time": "2024-01-21T15:00:00",
+        "total_packages": 2,
+        "driver_name": "李师傅",
+        "notes": "下午3点取件，包含2个病例",
+        "cases": [
+            {
+                "case_number": "DL20240003",
+                "tracking_number": "YT9876543210001"
+            },
+            {
+                "case_number": "DL20240004",
+                "tracking_number": "YT9876543210002"
+            }
+        ]
+    }
+]

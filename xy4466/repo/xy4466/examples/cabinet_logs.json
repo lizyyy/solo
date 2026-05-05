@@ -1,0 +1,42 @@
+[
+  {
+    "log_number": "LOG-2026-0001",
+    "stamp_code": "STAMP-001",
+    "operation_type": "take_out",
+    "operator_id": "E001",
+    "operator_name": "张三",
+    "operation_time": "2026-05-05T09:30:00",
+    "cabinet_id": "CAB-001",
+    "notes": "正常取章用于采购合同盖章"
+  },
+  {
+    "log_number": "LOG-2026-0002",
+    "stamp_code": "STAMP-001",
+    "operation_type": "put_back",
+    "operator_id": "E001",
+    "operator_name": "张三",
+    "operation_time": "2026-05-05T11:00:00",
+    "cabinet_id": "CAB-001",
+    "notes": "盖章完成，归还印章"
+  },
+  {
+    "log_number": "LOG-2026-0003",
+    "stamp_code": "STAMP-002",
+    "operation_type": "take_out",
+    "operator_id": "E002",
+    "operator_name": "李四",
+    "operation_time": "2026-05-05T14:00:00",
+    "cabinet_id": "CAB-001",
+    "notes": "取章用于合作协议签署"
+  },
+  {
+    "log_number": "LOG-2026-0004",
+    "stamp_code": "STAMP-003",
+    "operation_type": "take_out",
+    "operator_id": "E006",
+    "operator_name": "违规人员",
+    "operation_time": "2026-05-05T16:00:00",
+    "cabinet_id": "CAB-002",
+    "notes": "可疑操作，无授权记录"
+  }
+]

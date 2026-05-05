@@ -1,0 +1,71 @@
+[
+    {
+        "log_number": "SINTER20240116001",
+        "furnace_id": "FURNACE-01",
+        "start_time": "2024-01-16T08:00:00",
+        "end_time": "2024-01-16T12:00:00",
+        "max_temperature": 1050.0,
+        "min_temperature": 25.0,
+        "avg_temperature": 850.0,
+        "temperature_data": [
+            {"time": "2024-01-16T08:00:00", "temperature": 25.0},
+            {"time": "2024-01-16T08:30:00", "temperature": 200.0},
+            {"time": "2024-01-16T09:00:00", "temperature": 500.0},
+            {"time": "2024-01-16T09:30:00", "temperature": 800.0},
+            {"time": "2024-01-16T10:00:00", "temperature": 1050.0},
+            {"time": "2024-01-16T10:30:00", "temperature": 1050.0},
+            {"time": "2024-01-16T11:00:00", "temperature": 900.0},
+            {"time": "2024-01-16T11:30:00", "temperature": 600.0},
+            {"time": "2024-01-16T12:00:00", "temperature": 300.0}
+        ],
+        "status": "completed",
+        "notes": "正常烧结程序完成",
+        "case_numbers": ["DL20240001", "DL20240002"]
+    },
+    {
+        "log_number": "SINTER20240117001",
+        "furnace_id": "FURNACE-01",
+        "start_time": "2024-01-17T08:00:00",
+        "end_time": "2024-01-17T12:00:00",
+        "max_temperature": 950.0,
+        "min_temperature": 25.0,
+        "avg_temperature": 750.0,
+        "temperature_data": [
+            {"time": "2024-01-17T08:00:00", "temperature": 25.0},
+            {"time": "2024-01-17T08:30:00", "temperature": 180.0},
+            {"time": "2024-01-17T09:00:00", "temperature": 450.0},
+            {"time": "2024-01-17T09:30:00", "temperature": 700.0},
+            {"time": "2024-01-17T10:00:00", "temperature": 950.0},
+            {"time": "2024-01-17T10:30:00", "temperature": 950.0},
+            {"time": "2024-01-17T11:00:00", "temperature": 800.0},
+            {"time": "2024-01-17T11:30:00", "temperature": 500.0},
+            {"time": "2024-01-17T12:00:00", "temperature": 250.0}
+        ],
+        "status": "warning",
+        "notes": "最高温度未达到标准，可能影响产品质量",
+        "case_numbers": ["DL20240003", "DL20240004"]
+    },
+    {
+        "log_number": "SINTER20240118001",
+        "furnace_id": "FURNACE-02",
+        "start_time": "2024-01-18T09:00:00",
+        "end_time": "2024-01-18T13:00:00",
+        "max_temperature": 1080.0,
+        "min_temperature": 25.0,
+        "avg_temperature": 880.0,
+        "temperature_data": [
+            {"time": "2024-01-18T09:00:00", "temperature": 25.0},
+            {"time": "2024-01-18T09:30:00", "temperature": 220.0},
+            {"time": "2024-01-18T10:00:00", "temperature": 550.0},
+            {"time": "2024-01-18T10:30:00", "temperature": 850.0},
+            {"time": "2024-01-18T11:00:00", "temperature": 1080.0},
+            {"time": "2024-01-18T11:30:00", "temperature": 1080.0},
+            {"time": "2024-01-18T12:00:00", "temperature": 950.0},
+            {"time": "2024-01-18T12:30:00", "temperature": 650.0},
+            {"time": "2024-01-18T13:00:00", "temperature": 350.0}
+        ],
+        "status": "completed",
+        "notes": "二号炉正常烧结",
+        "case_numbers": ["DL20240005"]
+    }
+]

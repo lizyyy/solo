@@ -1,0 +1,32 @@
+[
+    {
+        "batch_number": "PRINT20240115001",
+        "printer_model": "Formlabs Form 3+",
+        "material_type": "Dental LT Clear Resin",
+        "print_date": "2024-01-15T10:00:00",
+        "total_items": 5,
+        "failed_items": 0,
+        "notes": "第一批打印，所有项目正常",
+        "case_numbers": ["DL20240001", "DL20240002"]
+    },
+    {
+        "batch_number": "PRINT20240116001",
+        "printer_model": "Formlabs Form 3+",
+        "material_type": "Dental LT Clear Resin",
+        "print_date": "2024-01-16T09:30:00",
+        "total_items": 4,
+        "failed_items": 1,
+        "notes": "第二批打印，有1个项目失败需要重打",
+        "case_numbers": ["DL20240003", "DL20240004"]
+    },
+    {
+        "batch_number": "PRINT20240117001",
+        "printer_model": "Formlabs Form 3B+",
+        "material_type": "Dental Model Resin",
+        "print_date": "2024-01-17T14:00:00",
+        "total_items": 3,
+        "failed_items": 0,
+        "notes": "模型打印，所有项目正常",
+        "case_numbers": ["DL20240005"]
+    }
+]

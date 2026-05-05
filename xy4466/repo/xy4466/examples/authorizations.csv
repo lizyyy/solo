@@ -1,0 +1,7 @@
+employee_id,employee_name,department,stamp_code,authorization_type,start_date,end_date,is_active
+E001,张三,财务部,STAMP-001,use,2026-01-01,2026-12-31,True
+E002,李四,市场部,STAMP-002,use,2026-01-01,2026-12-31,True
+E003,王五,人事部,STAMP-001,use,2026-01-01,2026-06-30,True
+E004,赵六,法务部,STAMP-003,use,2026-01-01,2026-12-31,True
+E005,钱七,销售部,STAMP-001,use,2026-03-01,2026-08-31,True
+E001,张三,财务部,STAMP-003,loan,2026-01-01,2026-12-31,True
