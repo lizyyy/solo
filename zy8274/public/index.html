@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>跨时区工单筛选工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>跨时区工单筛选工具</h1>
+      <p class="subtitle">精准筛选，避免跨天跨月计算错误</p>
+    </header>
+
+    <div class="filters-section">
+      <div class="filter-group">
+        <label class="filter-label">筛选模式</label>
+        <div class="radio-group" id="filterModeGroup">
+          <label class="radio-item">
+            <input type="radio" name="filterMode" value="store-local" class="radio-input">
+            <span class="radio-label">门店本地时间</span>
+            <span class="radio-desc">每个工单按所属门店时区计算</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="filterMode" value="hq-timezone" class="radio-input" checked>
+            <span class="radio-label">总部时区</span>
+            <span class="radio-desc">统一使用北京时间计算</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="filterMode" value="utc" class="radio-input">
+            <span class="radio-label">UTC时间</span>
+            <span class="radio-desc">统一使用UTC时间计算</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">时间范围</label>
+        <div class="range-buttons" id="rangeTypeGroup">
+          <button type="button" class="range-btn" data-range="today">今天</button>
+          <button type="button" class="range-btn" data-range="week">本周</button>
+          <button type="button" class="range-btn active" data-range="month">本月</button>
+          <button type="button" class="range-btn" data-range="custom">自定义</button>
+        </div>
+        <div class="custom-range" id="customRangeFields" style="display: none;">
+          <input type="date" id="customStart" class="date-input">
+          <span class="date-separator">至</span>
+          <input type="date" id="customEnd" class="date-input">
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn btn-primary" id="searchBtn">查询</button>
+        <button type="button" class="btn btn-secondary" id="exportBtn">导出报告</button>
+        <button type="button" class="btn btn-outline" id="resetDataBtn">重置数据</button>
+      </div>
+    </div>
+
+    <div class="summary-section" id="summarySection" style="display: none;">
+      <div class="summary-header">
+        <h2>筛选结果摘要</h2>
+        <div class="range-info" id="rangeInfo"></div>
+      </div>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="card-value" id="totalCount">0</div>
+          <div class="card-label">总工单数</div>
+        </div>
+        <div class="summary-card summary-card-success">
+          <div class="card-value" id="inRangeCount">0</div>
+          <div class="card-label">范围内工单</div>
+        </div>
+        <div class="summary-card summary-card-warning">
+          <div class="card-value" id="outRangeCount">0</div>
+          <div class="card-label">范围外工单</div>
+        </div>
+      </div>
+      <div class="summary-details" id="summaryDetails"></div>
+    </div>
+
+    <div class="tickets-section">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="in-range">范围内工单</button>
+        <button class="tab-btn" data-tab="out-range">范围外工单</button>
+        <button class="tab-btn" data-tab="all">全部工单</button>
+      </div>
+      <div class="ticket-list" id="ticketList">
+        <div class="loading">加载中...</div>
+      </div>
+    </div>
+
+    <div class="demo-hint">
+      <h3>演示提示</h3>
+      <p>样例数据包含 <strong>2024年2月底到3月初</strong> 的工单，覆盖北京时间与洛杉矶时区的跨月边界场景。</p>
+      <p>建议选择 <strong>"本月"</strong> 时间范围，分别切换不同的筛选模式，观察 <strong>TK-DEMO-001</strong> 到 <strong>TK-DEMO-004</strong> 这几个演示工单的包含/排除变化。</p>
+      <p>为了更好地看到跨月差异，请将自定义日期范围设置为 <strong>2024-03-01 至 2024-03-31</strong>，然后切换不同筛选模式对比结果。</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

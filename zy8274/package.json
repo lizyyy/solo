@@ -1,0 +1,15 @@
+{
+  "name": "ticket-timezone-filter",
+  "version": "1.0.0",
+  "description": "跨时区工单筛选工具",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "dayjs": "^1.11.10"
+  }
+}
