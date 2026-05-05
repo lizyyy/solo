@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>路灯运维AI小工具</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 头部导航 -->
+    <header class="app-header">
+      <div class="header-content">
+        <h1>
+          <span class="logo">💡</span>
+          路灯运维AI小工具
+        </h1>
+        <div class="header-actions">
+          <button id="exportMarkdown" class="btn btn-secondary">
+            📄 导出Markdown
+          </button>
+          <button id="exportJson" class="btn btn-secondary">
+            📊 导出JSON
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 左侧面板：数据导入和统计 -->
+      <aside class="left-panel">
+        <!-- 数据导入区域 -->
+        <section class="panel-section import-section">
+          <h2 class="section-title">📥 数据导入</h2>
+          
+          <div class="import-group">
+            <label class="import-label">
+              <span class="import-icon">🌙</span>
+              <span class="import-text">夜巡车照度CSV</span>
+              <input type="file" id="illuminationFile" accept=".csv" class="file-input">
+              <span class="file-status" id="illuminationStatus">未选择</span>
+            </label>
+          </div>
+          
+          <div class="import-group">
+            <label class="import-label">
+              <span class="import-icon">⚡</span>
+              <span class="import-text">灯杆电流日志</span>
+              <input type="file" id="currentFile" accept=".csv,.txt,.log" class="file-input">
+              <span class="file-status" id="currentStatus">未选择</span>
+            </label>
+          </div>
+          
+          <div class="import-group">
+            <label class="import-label">
+              <span class="import-icon">👥</span>
+              <span class="import-text">居民报修文本</span>
+              <input type="file" id="complaintsFile" accept=".txt,.csv" class="file-input">
+              <span class="file-status" id="complaintsStatus">未选择</span>
+            </label>
+          </div>
+          
+          <div class="import-group">
+            <label class="import-label">
+              <span class="import-icon">📋</span>
+              <span class="import-text">维修工单</span>
+              <input type="file" id="workOrdersFile" accept=".csv" class="file-input">
+              <span class="file-status" id="workOrdersStatus">未选择</span>
+            </label>
+          </div>
+          
+          <button id="importBtn" class="btn btn-primary btn-full">
+            开始分析
+          </button>
+          
+          <div id="importProgress" class="progress-container hidden">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-text" id="progressText">正在分析数据...</p>
+          </div>
+        </section>
+
+        <!-- 统计面板 -->
+        <section class="panel-section stats-section">
+          <h2 class="section-title">📈 风险统计</h2>
+          
+          <div class="stats-grid">
+            <div class="stat-card stat-danger">
+              <div class="stat-value" id="statHighPriority">0</div>
+              <div class="stat-label">高优先级</div>
+            </div>
+            <div class="stat-card stat-warning">
+              <div class="stat-value" id="statMediumPriority">0</div>
+              <div class="stat-label">中优先级</div>
+            </div>
+            <div class="stat-card stat-info">
+              <div class="stat-value" id="statLowPriority">0</div>
+              <div class="stat-label">低优先级</div>
+            </div>
+          </div>
+          
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-item-label">灯具衰减</span>
+              <span class="stat-item-value" id="statDimming">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item-label">线路故障</span>
+              <span class="stat-item-value" id="statFault">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-item-label">误报</span>
+              <span class="stat-item-value" id="statFalse">0</span>
+            </div>
+          </div>
+          
+          <div class="stats-footer">
+            <p>
+              总风险数: <strong id="statTotalRisks">0</strong>
+            </p>
+          </div>
+        </section>
+
+        <!-- 道路筛选 -->
+        <section class="panel-section filter-section">
+          <h2 class="section-title">🛣️ 道路筛选</h2>
+          
+          <div class="filter-controls">
+            <select id="roadFilter" class="select-input">
+              <option value="">全部道路</option>
+            </select>
+            
+            <select id="priorityFilter" class="select-input">
+              <option value="">全部优先级</option>
+              <option value="高">高优先级</option>
+              <option value="中">中优先级</option>
+              <option value="低">低优先级</option>
+            </select>
+            
+            <select id="statusFilter" class="select-input">
+              <option value="">全部状态</option>
+              <option value="待复核">待复核</option>
+              <option value="已确认">已确认</option>
+              <option value="已派工">已派工</option>
+              <option value="已完成">已完成</option>
+            </select>
+          </div>
+        </section>
+      </aside>
+
+      <!-- 右侧面板：风险列表 -->
+      <section class="right-panel">
+        <!-- 风险列表头部 -->
+        <div class="list-header">
+          <h2 class="list-title">风险列表</h2>
+          <div class="list-controls">
+            <button id="sortByPriority" class="btn btn-text">
+              按优先级排序
+            </button>
+            <button id="sortByRoad" class="btn btn-text">
+              按道路分组
+            </button>
+          </div>
+        </div>
+
+        <!-- 风险列表容器 -->
+        <div class="risk-list-container" id="riskListContainer">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📊</div>
+            <h3>暂无风险数据</h3>
+            <p>请导入数据开始分析</p>
+          </div>
+          
+          <div id="riskList" class="risk-list hidden">
+            <!-- 风险项将通过JS动态生成 -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 风险详情模态框 -->
+    <div id="riskModal" class="modal hidden">
+      <div class="modal-overlay" id="modalOverlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">风险详情</h3>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        
+        <div class="modal-body" id="modalBody">
+          <!-- 动态内容 -->
+        </div>
+        
+        <div class="modal-footer">
+          <div class="remarks-section">
+            <label class="remarks-label">复核备注</label>
+            <textarea id="remarksText" class="remarks-textarea" placeholder="输入复核备注..."></textarea>
+          </div>
+          
+          <div class="actions-section">
+            <select id="statusSelect" class="select-input">
+              <option value="待复核">待复核</option>
+              <option value="已确认">已确认</option>
+              <option value="已派工">已派工</option>
+              <option value="已完成">已完成</option>
+            </select>
+            
+            <button id="saveRemarks" class="btn btn-primary">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast hidden">
+      <span id="toastMessage"></span>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
