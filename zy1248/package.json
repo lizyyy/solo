@@ -1,0 +1,23 @@
+{
+  "name": "http-sandbox",
+  "version": "1.0.0",
+  "description": "HTTP 协议演练台 - 帮助团队复盘 HTTP 请求行为",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test": "jest"
+  },
+  "keywords": ["http", "cache", "protocol", "debug"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.7.0"
+  }
+}

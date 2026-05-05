@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTTP 协议演练台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tab:hover {
+      background: #f0f4ff;
+    }
+
+    .tab.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+      display: inline-block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f4ff;
+      color: #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e8ff;
+    }
+
+    .btn-danger {
+      background: #ff4757;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ff3742;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-2xx { background: #d4edda; color: #155724; }
+    .status-3xx { background: #fff3cd; color: #856404; }
+    .status-4xx { background: #f8d7da; color: #721c24; }
+    .status-5xx { background: #f8d7da; color: #721c24; }
+
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .code-block .method { color: #569cd6; }
+    .code-block .status { color: #4ec9b0; }
+    .code-block .header-key { color: #9cdcfe; }
+    .code-block .header-value { color: #ce9178; }
+    .code-block .body { color: #dcdcaa; }
+
+    .trace-item {
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #f8f9fa;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .trace-item.client { border-left-color: #667eea; }
+    .trace-item.cache { border-left-color: #f093fb; }
+    .trace-item.origin { border-left-color: #43e97b; }
+
+    .trace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .trace-component {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .trace-component.client { color: #667eea; }
+    .trace-component.cache { color: #f093fb; }
+    .trace-component.origin { color: #43e97b; }
+
+    .trace-action {
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .trace-timestamp {
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .scenario-card {
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .scenario-card:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .scenario-card h4 {
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .scenario-card p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .scenario-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e1e8ed;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-right: 4px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid #e1e8ed;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .history-item:hover {
+      background: #f8f9fa;
+    }
+
+    .history-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .history-actions .btn {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .section-divider {
+      margin: 30px 0;
+      border-top: 1px solid #e1e8ed;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .cache-status {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .cache-entry {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e1e8ed;
+    }
+
+    .cache-entry h4 {
+      margin-bottom: 12px;
+      color: #333;
+      word-break: break-all;
+    }
+
+    .cache-metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cache-metric:last-child {
+      border-bottom: none;
+    }
+
+    .cache-metric-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .cache-metric-value {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .cache-metric-value.fresh { color: #28a745; }
+    .cache-metric-value.stale { color: #dc3545; }
+
+    .headers-editor {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .header-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .header-row input {
+      flex: 1;
+    }
+
+    .header-row input:first-child {
+      flex: 0.4;
+    }
+
+    .add-header-btn {
+      width: 100%;
+      padding: 8px;
+      background: #f0f4ff;
+      border: 2px dashed #667eea;
+      border-radius: 8px;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .add-header-btn:hover {
+      background: #e0e8ff;
+    }
+
+    .resources-list {
+      margin-bottom: 16px;
+    }
+
+    .resource-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .resource-info {
+      flex: 1;
+    }
+
+    .resource-path {
+      font-weight: 500;
+      color: #333;
+      word-break: break-all;
+    }
+
+    .resource-meta {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .session-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #667eea22 0%, #764ba222 100%);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .session-id {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.9rem;
+      color: #667eea;
+    }
+
+    .finding-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .finding-item.error { background: #f8d7da; }
+    .finding-item.warning { background: #fff3cd; }
+    .finding-item.info { background: #d1ecf1; }
+
+    .finding-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .finding-desc {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .finding-suggestion {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #333;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .row {
+        flex-direction: column;
+      }
+      
+      .col {
+        min-width: 100%;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🌐 HTTP 协议演练台</h1>
+      <p>模拟浏览器、缓存代理和源站的完整请求响应链，帮助团队复盘 HTTP 缓存、重定向、CORS 等行为</p>
+    </header>
+
+    <div class="session-info" id="sessionInfo">
+      <div>
+        <strong>当前会话:</strong>
+        <span class="session-id" id="sessionId">未创建</span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="createSession()">新建会话</button>
+        <button class="btn btn-danger" onclick="clearCache()">清除缓存</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('config')">⚙️ 配置</button>
+      <button class="tab" onclick="switchTab('scenarios')">📋 预设场景</button>
+      <button class="tab" onclick="switchTab('execute')">🚀 执行请求</button>
+      <button class="tab" onclick="switchTab('results')">📊 结果分析</button>
+      <button class="tab" onclick="switchTab('history')">📜 历史记录</button>
+    </div>
+
+    <!-- 配置标签页 -->
+    <div id="tab-config" class="tab-content active">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <h2>📁 资源配置</h2>
+            <p style="margin-bottom: 16px; color: #666;">配置源站上的资源，包括内容、缓存头、重定向等</p>
+            
+            <div class="resources-list" id="resourcesList">
+              <p style="color: #999; text-align: center; padding: 20px;">暂无资源</p>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <h3 style="margin-bottom: 16px;">添加新资源</h3>
+            
+            <div class="form-group">
+              <label>资源路径 *</label>
+              <input type="text" id="resourcePath" placeholder="/static/style.css">
+            </div>
+
+            <div class="form-group">
+              <label>内容类型</label>
+              <select id="resourceContentType">
+                <option value="text/plain">text/plain</option>
+                <option value="text/html">text/html</option>
+                <option value="text/css">text/css</option>
+                <option value="application/javascript">application/javascript</option>
+                <option value="application/json">application/json</option>
+                <option value="image/png">image/png</option>
+                <option value="application/octet-stream">application/octet-stream</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>资源内容</label>
+              <textarea id="resourceBody" placeholder="Resource content..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>ETag (留空自动生成)</label>
+              <input type="text" id="resourceETag" placeholder='"abc123"'>
+            </div>
+
+            <div class="form-group">
+              <label>Last-Modified (留空使用当前时间)</label>
+              <input type="text" id="resourceLastModified" placeholder="Wed, 21 Oct 2020 07:28:00 GMT">
+            </div>
+
+            <div class="form-group">
+              <label>Cache-Control</label>
+              <select id="resourceCacheControl">
+                <option value="public, max-age=3600">public, max-age=3600 (1小时)</option>
+                <option value="public, max-age=86400">public, max-age=86400 (1天)</option>
+                <option value="public, max-age=31536000">public, max-age=31536000 (1年)</option>
+                <option value="no-cache">no-cache (每次重新验证)</option>
+                <option value="no-store">no-store (不缓存)</option>
+                <option value="public, max-age=3600, must-revalidate">public, max-age=3600, must-revalidate</option>
+                <option value="private, max-age=3600">private, max-age=3600</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Vary 头</label>
+              <input type="text" id="resourceVary" placeholder="Accept-Encoding, Accept">
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 16px;">
+              <strong>重定向配置:</strong> 如需配置重定向，请在下方设置
+            </div>
+
+            <div class="form-group">
+              <label>重定向状态码</label>
+              <select id="redirectStatusCode">
+                <option value="">不重定向</option>
+                <option value="301">301 Moved Permanently (永久)</option>
+                <option value="302">302 Found (临时)</option>
+                <option value="303">303 See Other</option>
+                <option value="307">307 Temporary Redirect</option>
+                <option value="308">308 Permanent Redirect</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="redirectLocationGroup" style="display: none;">
+              <label>重定向目标</label>
+              <input type="text" id="redirectLocation" placeholder="/new-path">
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="addResource()">添加资源</button>
+              <button class="btn btn-secondary" onclick="clearResourceForm()">清空表单</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2>💡 参数提示</h2>
+            
+            <div class="alert alert-warning">
+              <strong>常见错误:</strong>
+              <ul style="margin-top: 8px; margin-left: 20px;">
+                <li>ETag 应该用双引号包裹: <code>"abc123"</code> 而非 <code>abc123</code></li>
+                <li>Range 头格式: <code>bytes=0-99</code> 而非 <code>0-99</code></li>
+                <li>Cache-Control 指令用逗号分隔: <code>public, max-age=3600</code></li>
+              </ul>
+            </div>
+
+            <h3 style="margin-top: 20px; margin-bottom: 12px;">Cache-Control 速查</h3>
+            <div class="code-block">
+<span class="header-key">public</span>: <span class="header-value">任何缓存都可以存储</span>
+<span class="header-key">private</span>: <span class="header-value">仅浏览器缓存</span>
+<span class="header-key">no-cache</span>: <span class="header-value">使用前必须重新验证</span>
+<span class="header-key">no-store</span>: <span class="header-value">不存储任何内容</span>
+<span class="header-key">max-age=N</span>: <span class="header-value">缓存有效期 N 秒</span>
+<span class="header-key">must-revalidate</span>: <span class="header-value">过期后必须重新验证</span>
+<span class="header-key">immutable</span>: <span class="header-value">有效期内不会改变</span>
+            </div>
+
+            <h3 style="margin-top: 20px; margin-bottom: 12px;">状态码速查</h3>
+            <div class="code-block">
+<span class="status">200</span> <span class="body">OK - 请求成功</span>
+<span class="status">206</span> <span class="body">Partial Content - 部分内容</span>
+<span class="status">301</span> <span class="body">Moved Permanently - 永久重定向</span>
+<span class="status">302</span> <span class="body">Found - 临时重定向</span>
+<span class="status">304</span> <span class="body">Not Modified - 未修改</span>
+<span class="status">412</span> <span class="body">Precondition Failed - 前提条件失败</span>
+<span class="status">504</span> <span class="body">Gateway Timeout - 网关超时</span>
+            </div>
+
+            <h3 style="margin-top: 20px; margin-bottom: 12px;">条件请求头</h3>
+            <div class="code-block">
+<span class="header-key">If-Match</span>: <span class="header-value">ETag 匹配才执行</span>
+<span class="header-key">If-None-Match</span>: <span class="header-value">ETag 不匹配才执行</span>
+<span class="header-key">If-Modified-Since</span>: <span class="header-value">指定时间后修改才返回</span>
+<span class="header-key">If-Unmodified-Since</span>: <span class="header-value">指定时间后未修改才执行</span>
+<span class="header-key">If-Range</span>: <span class="header-value">范围请求的条件验证</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 预设场景标签页 -->
+    <div id="tab-scenarios" class="tab-content">
+      <div class="card">
+        <h2>📋 预设场景</h2>
+        <p style="margin-bottom: 20px; color: #666;">选择一个预设场景，快速开始演练</p>
+        
+        <div id="scenariosList">
+          <div class="loading active">
+            <div class="spinner"></div>
+            <p>加载场景中...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 执行请求标签页 -->
+    <div id="tab-execute" class="tab-content">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <h2>📤 请求配置</h2>
+            
+            <div class="form-group">
+              <label>请求方法</label>
+              <select id="requestMethod">
+                <option value="GET">GET</option>
+                <option value="HEAD">HEAD</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="OPTIONS">OPTIONS</option>
+                <option value="PATCH">PATCH</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>请求 URL *</label>
+              <input type="text" id="requestUrl" placeholder="/static/style.css">
+            </div>
+
+            <div class="form-group">
+              <label>请求头</label>
+              <div class="headers-editor" id="requestHeadersEditor">
+                <div class="header-row">
+                  <input type="text" class="header-key" placeholder="Header Name">
+                  <input type="text" class="header-value" placeholder="Header Value">
+                  <button class="btn btn-danger" onclick="removeHeaderRow(this)">×</button>
+                </div>
+              </div>
+              <button class="add-header-btn" onclick="addHeaderRow()">+ 添加请求头</button>
+            </div>
+
+            <div class="form-group">
+              <label>常用请求头预设</label>
+              <select id="headerPreset" onchange="applyHeaderPreset()">
+                <option value="">选择预设...</option>
+                <option value="no-cache">强制重新验证 (Cache-Control: no-cache)</option>
+                <option value="max-age-0">强制过期 (Cache-Control: max-age=0)</option>
+                <option value="range">范围请求 (Range: bytes=0-99)</option>
+                <option value="if-none-match">条件请求 (If-None-Match)</option>
+                <option value="if-modified-since">条件请求 (If-Modified-Since)</option>
+                <option value="only-if-cached">仅使用缓存 (Cache-Control: only-if-cached)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>请求体</label>
+              <textarea id="requestBody" placeholder="Request body (for POST/PUT/PATCH)..."></textarea>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <h3 style="margin-bottom: 16px;">CORS 配置</h3>
+            
+            <div class="form-group">
+              <label>启用 CORS 模拟</label>
+              <select id="corsEnabled">
+                <option value="true">是</option>
+                <option value="false">否</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="corsConfigGroup">
+              <label>Access-Control-Allow-Origin</label>
+              <input type="text" id="corsAllowOrigin" placeholder="* 或 https://example.com">
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="executeRequest()" style="font-size: 1.1rem; padding: 16px 32px;">
+                🚀 执行请求
+              </button>
+              <button class="btn btn-secondary" onclick="clearRequestForm()">清空表单</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2>📊 实时结果</h2>
+            
+            <div id="executeResults">
+              <p style="color: #999; text-align: center; padding: 40px;">执行请求后结果将显示在这里</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 结果分析标签页 -->
+    <div id="tab-results" class="tab-content">
+      <div id="resultsContent">
+        <p style="color: #999; text-align: center; padding: 40px;">请先执行请求或从历史记录中选择</p>
+      </div>
+    </div>
+
+    <!-- 历史记录标签页 -->
+    <div id="tab-history" class="tab-content">
+      <div class="card">
+        <h2>📜 历史记录</h2>
+        
+        <div id="historyList">
+          <p style="color: #999; text-align: center; padding: 40px;">暂无历史记录</p>
+        </div>
+
+        <div class="btn-group" style="margin-top: 20px;">
+          <button class="btn btn-danger" onclick="clearHistory()">清空历史</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSessionId = null;
+    let currentHistoryId = null;
+    let history = [];
+    let resources = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      createSession();
+      loadScenarios();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      document.getElementById('redirectStatusCode').addEventListener('change', function() {
+        const locationGroup = document.getElementById('redirectLocationGroup');
+        locationGroup.style.display = this.value ? 'block' : 'none';
+      });
+
+      document.getElementById('corsEnabled').addEventListener('change', function() {
+        const configGroup = document.getElementById('corsConfigGroup');
+        configGroup.style.display = this.value === 'true' ? 'block' : 'none';
+      });
+    }
+
+    async function createSession() {
+      try {
+        const response = await fetch('/api/sessions', {
+          method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+          currentSessionId = data.sessionId;
+          document.getElementById('sessionId').textContent = currentSessionId.substring(0, 12) + '...';
+          history = [];
+          resources = [];
+          updateResourcesList();
+          updateHistoryList();
+          showMessage('会话创建成功', 'success');
+        }
+      } catch (error) {
+        showMessage('创建会话失败: ' + error.message, 'error');
+      }
+    }
+
+    async function loadScenarios() {
+      try {
+        const response = await fetch('/api/scenarios');
+        const data = await response.json();
+        if (data.success) {
+          renderScenarios(data.scenarios);
+        }
+      } catch (error) {
+        document.getElementById('scenariosList').innerHTML = 
+          '<p style="color: #dc3545;">加载场景失败: ' + error.message + '</p>';
+      }
+    }
+
+    function renderScenarios(scenarios) {
+      const container = document.getElementById('scenariosList');
+      
+      if (!scenarios || scenarios.length === 0) {
+        container.innerHTML = '<p style="color: #999;">暂无场景</p>';
+        return;
+      }
+
+      let html = '';
+      for (const scenario of scenarios) {
+        html += `
+          <div class="scenario-card" onclick="loadScenario('${scenario.id}')">
+            <h4>${scenario.name}</h4>
+            <p>${scenario.description}</p>
+            <div>
+              <span class="scenario-tag">${scenario.category}</span>
+              <span class="scenario-tag">${scenario.resources.length} 个资源</span>
+              <span class="scenario-tag">${scenario.testRequests.length} 个测试请求</span>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    async function loadScenario(scenarioId) {
+      if (!currentSessionId) {
+        showMessage('请先创建会话', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/sessions/${currentSessionId}/scenarios/${scenarioId}`, {
+          method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          resources = data.scenario.resources;
+          updateResourcesList();
+          showMessage(`场景 "${data.scenario.name}" 加载成功`, 'success');
+          
+          if (data.scenario.testRequests.length > 0) {
+            const firstRequest = data.scenario.testRequests[0].request;
+            document.getElementById('requestMethod').value = firstRequest.method || 'GET';
+            document.getElementById('requestUrl').value = firstRequest.url || '/';
+          }
+          
+          switchTab('execute');
+        }
+      } catch (error) {
+        showMessage('加载场景失败: ' + error.message, 'error');
+      }
+    }
+
+    async function addResource() {
+      if (!currentSessionId) {
+        showMessage('请先创建会话', 'warning');
+        return;
+      }
+
+      const path = document.getElementById('resourcePath').value.trim();
+      if (!path) {
+        showMessage('请输入资源路径', 'warning');
+        return;
+      }
+
+      const resource = {
+        path: path,
+        body: document.getElementById('resourceBody').value,
+        contentType: document.getElementById('resourceContentType').value,
+        etag: document.getElementById('resourceETag').value || undefined,
+        lastModified: document.getElementById('resourceLastModified').value || undefined,
+        cacheControl: document.getElementById('resourceCacheControl').value,
+        vary: document.getElementById('resourceVary').value || undefined
+      };
+
+      const redirectStatusCode = document.getElementById('redirectStatusCode').value;
+      if (redirectStatusCode) {
+        resource.redirect = {
+          statusCode: parseInt(redirectStatusCode),
+          statusText: getRedirectStatusText(parseInt(redirectStatusCode)),
+          location: document.getElementById('redirectLocation').value
+        };
+      }
+
+      try {
+        const response = await fetch(`/api/sessions/${currentSessionId}/resources`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resources: [resource] })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          if (data.errors && data.errors.length > 0) {
+            showMessage('验证错误: ' + data.errors.map(e => e.errors.join('; ')).join('; '), 'error');
+            return;
+          }
+          
+          resources = [...resources, ...data.resources];
+          updateResourcesList();
+          clearResourceForm();
+          showMessage('资源添加成功', 'success');
+        }
+      } catch (error) {
+        showMessage('添加资源失败: ' + error.message, 'error');
+      }
+    }
+
+    function getRedirectStatusText(code) {
+      const texts = {
+        301: 'Moved Permanently',
+        302: 'Found',
+        303: 'See Other',
+        307: 'Temporary Redirect',
+        308: 'Permanent Redirect'
+      };
+      return texts[code] || 'Redirect';
+    }
+
+    function clearResourceForm() {
+      document.getElementById('resourcePath').value = '';
+      document.getElementById('resourceBody').value = '';
+      document.getElementById('resourceContentType').value = 'text/plain';
+      document.getElementById('resourceETag').value = '';
+      document.getElementById('resourceLastModified').value = '';
+      document.getElementById('resourceCacheControl').value = 'public, max-age=3600';
+      document.getElementById('resourceVary').value = '';
+      document.getElementById('redirectStatusCode').value = '';
+      document.getElementById('redirectLocation').value = '';
+      document.getElementById('redirectLocationGroup').style.display = 'none';
+    }
+
+    function updateResourcesList() {
+      const container = document.getElementById('resourcesList');
+      
+      if (resources.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">暂无资源</p>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < resources.length; i++) {
+        const resource = resources[i];
+        html += `
+          <div class="resource-item">
+            <div class="resource-info">
+              <div class="resource-path">${escapeHtml(resource.path)}</div>
+              <div class="resource-meta">
+                ${resource.contentType} | ${resource.cacheControl}
+                ${resource.redirect ? ' | 重定向到: ' + resource.redirect.location : ''}
+              </div>
+            </div>
+            <button class="btn btn-danger" onclick="removeResource(${i})" style="padding: 6px 12px; font-size: 0.85rem;">删除</button>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function removeResource(index) {
+      resources.splice(index, 1);
+      updateResourcesList();
+    }
+
+    function addHeaderRow() {
+      const editor = document.getElementById('requestHeadersEditor');
+      const row = document.createElement('div');
+      row.className = 'header-row';
+      row.innerHTML = `
+        <input type="text" class="header-key" placeholder="Header Name">
+        <input type="text" class="header-value" placeholder="Header Value">
+        <button class="btn btn-danger" onclick="removeHeaderRow(this)">×</button>
+      `;
+      editor.appendChild(row);
+    }
+
+    function removeHeaderRow(btn) {
+      const editor = document.getElementById('requestHeadersEditor');
+      if (editor.children.length > 1) {
+        btn.parentElement.remove();
+      }
+    }
+
+    function applyHeaderPreset() {
+      const preset = document.getElementById('headerPreset').value;
+      if (!preset) return;
+
+      const presets = {
+        'no-cache': [['Cache-Control', 'no-cache']],
+        'max-age-0': [['Cache-Control', 'max-age=0']],
+        'range': [['Range', 'bytes=0-99']],
+        'if-none-match': [['If-None-Match', '"abc123"']],
+        'if-modified-since': [['If-Modified-Since', 'Wed, 21 Oct 2020 07:28:00 GMT']],
+        'only-if-cached': [['Cache-Control', 'only-if-cached']]
+      };
+
+      const headers = presets[preset];
+      if (headers) {
+        const editor = document.getElementById('requestHeadersEditor');
+        editor.innerHTML = '';
+        
+        for (const [key, value] of headers) {
+          const row = document.createElement('div');
+          row.className = 'header-row';
+          row.innerHTML = `
+            <input type="text" class="header-key" value="${key}" placeholder="Header Name">
+            <input type="text" class="header-value" value="${value}" placeholder="Header Value">
+            <button class="btn btn-danger" onclick="removeHeaderRow(this)">×</button>
+          `;
+          editor.appendChild(row);
+        }
+      }
+
+      document.getElementById('headerPreset').value = '';
+    }
+
+    function getRequestHeaders() {
+      const headers = {};
+      const editor = document.getElementById('requestHeadersEditor');
+      const rows = editor.querySelectorAll('.header-row');
+      
+      for (const row of rows) {
+        const key = row.querySelector('.header-key').value.trim();
+        const value = row.querySelector('.header-value').value.trim();
+        if (key && value) {
+          headers[key] = value;
+        }
+      }
+      
+      return headers;
+    }
+
+    function clearRequestForm() {
+      document.getElementById('requestMethod').value = 'GET';
+      document.getElementById('requestUrl').value = '';
+      document.getElementById('requestBody').value = '';
+      document.getElementById('corsEnabled').value = 'true';
+      document.getElementById('corsAllowOrigin').value = '';
+      
+      const editor = document.getElementById('requestHeadersEditor');
+      editor.innerHTML = `
+        <div class="header-row">
+          <input type="text" class="header-key" placeholder="Header Name">
+          <input type="text" class="header-value" placeholder="Header Value">
+          <button class="btn btn-danger" onclick="removeHeaderRow(this)">×</button>
+        </div>
+      `;
+    }
+
+    async function executeRequest() {
+      if (!currentSessionId) {
+        showMessage('请先创建会话', 'warning');
+        return;
+      }
+
+      const url = document.getElementById('requestUrl').value.trim();
+      if (!url) {
+        showMessage('请输入请求 URL', 'warning');
+        return;
+      }
+
+      const request = {
+        method: document.getElementById('requestMethod').value,
+        url: url,
+        headers: getRequestHeaders(),
+        body: document.getElementById('requestBody').value
+      };
+
+      if (document.getElementById('corsEnabled').value === 'true') {
+        request.corsConfig = {
+          enabled: true,
+          allowOrigin: document.getElementById('corsAllowOrigin').value || '*'
+        };
+      } else {
+        request.corsConfig = { enabled: false };
+      }
+
+      try {
+        const response = await fetch(`/api/sessions/${currentSessionId}/execute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ request })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          const historyEntry = {
+            id: data.historyId,
+            request: request,
+            result: data.result,
+            timestamp: new Date().toISOString()
+          };
+          history.unshift(historyEntry);
+          currentHistoryId = data.historyId;
+          
+          renderExecuteResults(data.result);
+          renderDetailedResults(historyEntry);
+          updateHistoryList();
+          switchTab('results');
+        } else {
+          showMessage('执行失败: ' + (data.error || '未知错误'), 'error');
+          if (data.validationErrors) {
+            showMessage('验证错误: ' + data.validationErrors.join('; '), 'error');
+          }
+        }
+      } catch (error) {
+        showMessage('执行请求失败: ' + error.message, 'error');
+      }
+    }
+
+    function renderExecuteResults(result) {
+      const container = document.getElementById('executeResults');
+      const { response, trace, cacheStatus, duration } = result;
+
+      let statusClass = 'status-2xx';
+      if (response.statusCode >= 300 && response.statusCode < 400) statusClass = 'status-3xx';
+      else if (response.statusCode >= 400) statusClass = 'status-4xx';
+
+      let html = `
+        <div style="margin-bottom: 16px;">
+          <span class="status-badge ${statusClass}">${response.statusCode} ${response.statusText}</span>
+          <span style="margin-left: 12px; color: #666;">耗时: ${duration}ms</span>
+        </div>
+
+        <h4 style="margin-bottom: 12px;">响应头</h4>
+        <div class="code-block">
+<span class="status">HTTP/1.1 ${response.statusCode} ${response.statusText}</span>
+`;
+
+      for (const [key, value] of Object.entries(response.headers)) {
+        html += `<span class="header-key">${key}</span>: <span class="header-value">${value}</span>\n`;
+      }
+
+      html += `</div>`;
+
+      if (response.body) {
+        html += `
+          <h4 style="margin: 20px 0 12px;">响应体</h4>
+          <div class="code-block"><span class="body">${escapeHtml(response.body)}</span></div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function renderDetailedResults(historyEntry) {
+      const container = document.getElementById('resultsContent');
+      const { request, result, timestamp } = historyEntry;
+      const { response, trace, cacheStatus, duration } = result;
+
+      let statusClass = 'status-2xx';
+      if (response.statusCode >= 300 && response.statusCode < 400) statusClass = 'status-3xx';
+      else if (response.statusCode >= 400) statusClass = 'status-4xx';
+
+      let html = `
+        <div class="card">
+          <h2>📋 请求摘要</h2>
+          <div style="margin-bottom: 16px;">
+            <span class="status-badge ${statusClass}">${response.statusCode} ${response.statusText}</span>
+            <span style="margin-left: 12px; color: #666;">执行时间: ${timestamp}</span>
+            <span style="margin-left: 12px; color: #666;">耗时: ${duration}ms</span>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <h4 style="margin-bottom: 12px;">请求</h4>
+              <div class="code-block">
+<span class="method">${request.method}</span> <span class="header-value">${request.url}</span>
+`;
+
+      for (const [key, value] of Object.entries(request.headers || {})) {
+        html += `<span class="header-key">${key}</span>: <span class="header-value">${value}</span>\n`;
+      }
+
+      if (request.body) {
+        html += `\n<span class="body">${escapeHtml(request.body)}</span>`;
+      }
+
+      html += `</div>
+            </div>
+            <div class="col">
+              <h4 style="margin-bottom: 12px;">响应</h4>
+              <div class="code-block">
+<span class="status">HTTP/1.1 ${response.statusCode} ${response.statusText}</span>
+`;
+
+      for (const [key, value] of Object.entries(response.headers || {})) {
+        html += `<span class="header-key">${key}</span>: <span class="header-value">${value}</span>\n`;
+      }
+
+      if (response.body) {
+        html += `\n<span class="body">${escapeHtml(response.body)}</span>`;
+      }
+
+      html += `</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📊 状态码分析</h2>
+          ${getStatusCodeAnalysisHtml(response.statusCode)}
+        </div>
+`;
+
+      if (cacheStatus && cacheStatus.length > 0) {
+        html += `
+          <div class="card">
+            <h2>💾 缓存状态</h2>
+            <div class="cache-status">
+        `;
+
+        for (const entry of cacheStatus) {
+          html += `
+            <div class="cache-entry">
+              <h4>${escapeHtml(entry.key)}</h4>
+              <div class="cache-metric">
+                <span class="cache-metric-label">状态</span>
+                <span class="cache-metric-value ${entry.freshnessInfo.isFresh ? 'fresh' : 'stale'}">
+                  ${entry.freshnessInfo.isFresh ? '新鲜' : '已过期'}
+                </span>
+              </div>
+              <div class="cache-metric">
+                <span class="cache-metric-label">当前年龄</span>
+                <span class="cache-metric-value">${entry.freshnessInfo.currentAge.toFixed(2)} 秒</span>
+              </div>
+              <div class="cache-metric">
+                <span class="cache-metric-label">新鲜期</span>
+                <span class="cache-metric-value">${entry.freshnessInfo.freshLifetime.toFixed(2)} 秒</span>
+              </div>
+              ${!entry.freshnessInfo.isFresh ? `
+              <div class="cache-metric">
+                <span class="cache-metric-label">已过期</span>
+                <span class="cache-metric-value stale">${entry.freshnessInfo.staleSeconds.toFixed(2)} 秒</span>
+              </div>
+              ` : ''}
+              ${entry.freshnessInfo.isHeuristic ? `
+              <div class="cache-metric">
+                <span class="cache-metric-label">警告</span>
+                <span class="cache-metric-value stale">使用启发式过期</span>
+              </div>
+              ` : ''}
+            </div>
+          `;
+        }
+
+        html += `
+            </div>
+          </div>
+        `;
+      }
+
+      if (trace && trace.length > 0) {
+        html += `
+          <div class="card">
+            <h2>🔗 请求追踪链路</h2>
+        `;
+
+        for (const item of trace) {
+          html += `
+            <div class="trace-item ${item.component}">
+              <div class="trace-header">
+                <span class="trace-component ${item.component}">${getComponentName(item.component)}</span>
+                <span class="trace-timestamp">${item.timestamp}</span>
+              </div>
+              <div class="trace-action">${item.action}</div>
+              <div class="code-block" style="margin-top: 8px; font-size: 0.8rem;">
+${formatTraceDetails(item.details)}
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      }
+
+      html += `
+        <div class="card">
+          <h2>📥 导出报告</h2>
+          <p style="margin-bottom: 16px; color: #666;">导出完整的复盘报告，用于团队讨论和文档记录</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="exportReport('markdown')">📄 导出 Markdown</button>
+            <button class="btn btn-secondary" onclick="exportReport('json')">📋 导出 JSON</button>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function getComponentName(component) {
+      const names = {
+        client: '客户端 (Client)',
+        cache: '缓存代理 (Cache Proxy)',
+        origin: '源站 (Origin Server)'
+      };
+      return names[component] || component;
+    }
+
+    function formatTraceDetails(details) {
+      if (!details) return '(无详情)';
+      
+      let lines = [];
+      
+      if (details.request) {
+        lines.push(`请求: ${details.request.method || 'GET'} ${details.request.url || details.request.path || '-'}`);
+      }
+      
+      if (details.response) {
+        lines.push(`响应: ${details.response.statusCode} ${details.response.statusText || ''}`);
+      }
+      
+      if (details.reason) {
+        lines.push(`原因: ${details.reason}`);
+      }
+      
+      if (details.freshnessInfo) {
+        const fi = details.freshnessInfo;
+        lines.push(`新鲜度: ${fi.isFresh ? '新鲜' : '已过期'}`);
+        lines.push(`当前年龄: ${fi.currentAge.toFixed(2)} 秒`);
+        lines.push(`新鲜期: ${fi.freshLifetime.toFixed(2)} 秒`);
+      }
+      
+      if (details.method) {
+        lines.push(`方法: ${details.method}`);
+      }
+      
+      if (details.path) {
+        lines.push(`路径: ${details.path}`);
+      }
+      
+      if (details.statusCode) {
+        lines.push(`状态码: ${details.statusCode} ${details.statusText || ''}`);
+      }
+      
+      if (lines.length === 0) {
+        return JSON.stringify(details, null, 2);
+      }
+      
+      return lines.join('\n');
+    }
+
+    function getStatusCodeAnalysisHtml(code) {
+      const analyses = {
+        200: `
+          <div class="alert alert-success">
+            <strong>200 OK</strong> - 标准的成功响应
+          </div>
+          <h4 style="margin: 16px 0 8px;">缓存行为:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>如果响应包含缓存头，浏览器会缓存此响应</li>
+            <li>后续请求相同资源时，如果缓存未过期，可能直接使用缓存</li>
+            <li>缓存过期后会发送条件请求重新验证</li>
+          </ul>
+        `,
+        206: `
+          <div class="alert alert-info">
+            <strong>206 Partial Content</strong> - 部分内容响应
+          </div>
+          <h4 style="margin: 16px 0 8px;">触发条件:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>请求包含 Range 头</li>
+            <li>服务器支持范围请求</li>
+          </ul>
+          <h4 style="margin: 16px 0 8px;">常见场景:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>视频播放器分段加载</li>
+            <li>下载工具断点续传</li>
+            <li>大文件分块下载</li>
+          </ul>
+        `,
+        301: `
+          <div class="alert alert-warning">
+            <strong>301 Moved Permanently</strong> - 永久重定向
+          </div>
+          <h4 style="margin: 16px 0 8px;">关键特性:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>浏览器会缓存这个重定向</li>
+            <li>搜索引擎会更新索引</li>
+            <li>后续请求直接使用缓存的重定向</li>
+          </ul>
+        `,
+        302: `
+          <div class="alert alert-warning">
+            <strong>302 Found</strong> - 临时重定向
+          </div>
+          <h4 style="margin: 16px 0 8px;">与 301 的区别:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>浏览器不会缓存这个重定向</li>
+            <li>搜索引擎不会更新索引</li>
+            <li>后续请求仍会访问原 URL</li>
+          </ul>
+        `,
+        304: `
+          <div class="alert alert-info">
+            <strong>304 Not Modified</strong> - 资源未修改
+          </div>
+          <h4 style="margin: 16px 0 8px;">工作原理:</h4>
+          <ol style="margin-left: 20px; color: #555;">
+            <li>浏览器发送带条件头的请求 (If-None-Match 或 If-Modified-Since)</li>
+            <li>服务器比较 ETag 或 Last-Modified</li>
+            <li>如未修改，返回 304 (无响应体)</li>
+            <li>浏览器使用本地缓存的资源</li>
+          </ol>
+        `,
+        412: `
+          <div class="alert alert-error">
+            <strong>412 Precondition Failed</strong> - 前提条件失败
+          </div>
+          <h4 style="margin: 16px 0 8px;">常见原因:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>If-Match 中的 ETag 与服务器不匹配</li>
+            <li>If-Unmodified-Since 条件不满足</li>
+          </ul>
+          <h4 style="margin: 16px 0 8px;">使用场景:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>乐观锁并发控制</li>
+            <li>防止意外覆盖修改后的资源</li>
+          </ul>
+        `,
+        504: `
+          <div class="alert alert-error">
+            <strong>504 Gateway Timeout</strong> - 网关超时
+          </div>
+          <h4 style="margin: 16px 0 8px;">在演练台中的含义:</h4>
+          <ul style="margin-left: 20px; color: #555;">
+            <li>请求包含 Cache-Control: only-if-cached</li>
+            <li>缓存中没有该资源</li>
+            <li>无法满足"仅使用缓存"的要求</li>
+          </ul>
+        `
+      };
+
+      return analyses[code] || `
+        <div class="alert alert-info">
+          <strong>${code}</strong> - 状态码分析
+        </div>
+        <p style="color: #555;">未找到该状态码的详细分析。请参考 HTTP 规范文档。</p>
+      `;
+    }
+
+    function updateHistoryList() {
+      const container = document.getElementById('historyList');
+      
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px;">暂无历史记录</p>';
+        return;
+      }
+
+      let html = '';
+      for (const entry of history) {
+        const { request, result, timestamp } = entry;
+        const response = result.response;
+        
+        let statusClass = 'status-2xx';
+        if (response.statusCode >= 300 && response.statusCode < 400) statusClass = 'status-3xx';
+        else if (response.statusCode >= 400) statusClass = 'status-4xx';
+
+        html += `
+          <div class="history-item" onclick="viewHistory('${entry.id}')">
+            <div class="history-info">
+              <span class="status-badge ${statusClass}">${response.statusCode}</span>
+              <div>
+                <div style="font-weight: 500;">${request.method} ${request.url}</div>
+                <div style="font-size: 0.85rem; color: #666;">${timestamp}</div>
+              </div>
+            </div>
+            <div class="history-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-secondary" onclick="viewHistory('${entry.id}')">查看</button>
+              <button class="btn btn-primary" onclick="exportHistoryReport('${entry.id}', 'markdown')">MD</button>
+              <button class="btn btn-secondary" onclick="exportHistoryReport('${entry.id}', 'json')">JSON</button>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function viewHistory(id) {
+      const entry = history.find(h => h.id === id);
+      if (entry) {
+        currentHistoryId = id;
+        renderDetailedResults(entry);
+        renderExecuteResults(entry.result);
+        switchTab('results');
+      }
+    }
+
+    function clearHistory() {
+      history = [];
+      updateHistoryList();
+      showMessage('历史记录已清空', 'success');
+    }
+
+    async function clearCache() {
+      if (!currentSessionId) {
+        showMessage('请先创建会话', 'warning');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/sessions/${currentSessionId}/cache/clear`, {
+          method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+          showMessage('缓存已清除', 'success');
+        }
+      } catch (error) {
+        showMessage('清除缓存失败: ' + error.message, 'error');
+      }
+    }
+
+    async function exportReport(format) {
+      if (!currentHistoryId) {
+        showMessage('请先执行请求或选择历史记录', 'warning');
+        return;
+      }
+      await exportHistoryReport(currentHistoryId, format);
+    }
+
+    async function exportHistoryReport(historyId, format) {
+      if (!currentSessionId) {
+        showMessage('请先创建会话', 'warning');
+        return;
+      }
+
+      try {
+        const url = `/api/sessions/${currentSessionId}/history/${historyId}/export/${format}`;
+        window.open(url, '_blank');
+        showMessage(`导出 ${format.toUpperCase()} 报告成功`, 'success');
+      } catch (error) {
+        showMessage('导出报告失败: ' + error.message, 'error');
+      }
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabName).classList.add('active');
+    }
+
+    function showMessage(message, type = 'info') {
+      const alertClass = {
+        success: 'alert-success',
+        error: 'alert-error',
+        warning: 'alert-warning',
+        info: 'alert-info'
+      }[type] || 'alert-info';
+
+      const alert = document.createElement('div');
+      alert.className = `alert ${alertClass}`;
+      alert.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 400px;';
+      alert.innerHTML = `<strong>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</strong> ${message}`;
+      
+      document.body.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.style.transition = 'opacity 0.3s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 300);
+      }, 3000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
