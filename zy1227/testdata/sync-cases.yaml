@@ -1,0 +1,228 @@
+- name: "lock_order_inversion_case"
+  description: "案例1：锁顺序反转 - 两个 goroutine 以不同顺序获取锁"
+  primitives:
+    - type: "Mutex"
+      name: "muA"
+      location: "main.go:10"
+    - type: "Mutex"
+      name: "muB"
+      location: "main.go:11"
+  events:
+    - primitive_name: "muA"
+      primitive_type: "Mutex"
+      event_type: "Lock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:20"
+      details: "Goroutine 1 acquires muA first"
+    - primitive_name: "muB"
+      primitive_type: "Mutex"
+      event_type: "Lock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:01Z"
+      location: "main.go:21"
+      details: "Goroutine 1 acquires muB second"
+    - primitive_name: "muB"
+      primitive_type: "Mutex"
+      event_type: "Unlock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:02Z"
+      location: "main.go:25"
+    - primitive_name: "muA"
+      primitive_type: "Mutex"
+      event_type: "Unlock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:03Z"
+      location: "main.go:26"
+    - primitive_name: "muB"
+      primitive_type: "Mutex"
+      event_type: "Lock"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:04Z"
+      location: "main.go:35"
+      details: "Goroutine 2 acquires muB first (different order)"
+    - primitive_name: "muA"
+      primitive_type: "Mutex"
+      event_type: "Lock"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:05Z"
+      location: "main.go:36"
+      details: "Goroutine 2 acquires muA second"
+  expectations:
+    - issue_type: "lock_order_inversion"
+      should_exist: true
+      description: "应检测到锁顺序反转风险"
+
+- name: "waitgroup_count_error_case"
+  description: "案例2：WaitGroup 计数错误 - Done 调用次数超过 Add"
+  primitives:
+    - type: "WaitGroup"
+      name: "wg"
+      location: "main.go:15"
+  events:
+    - primitive_name: "wg"
+      primitive_type: "WaitGroup"
+      event_type: "Add"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:25"
+      details: "wg.Add(1)"
+    - primitive_name: "wg"
+      primitive_type: "WaitGroup"
+      event_type: "Done"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:01Z"
+      location: "main.go:35"
+      details: "First Done()"
+    - primitive_name: "wg"
+      primitive_type: "WaitGroup"
+      event_type: "Done"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:02Z"
+      location: "main.go:40"
+      details: "Second Done() - this is a bug!"
+  expectations:
+    - issue_type: "waitgroup_count_error"
+      should_exist: true
+      description: "应检测到 Done 调用次数超过 Add"
+
+- name: "rwmutex_starvation_case"
+  description: "案例3：读写锁饥饿 - 写锁等待时间过长"
+  primitives:
+    - type: "RWMutex"
+      name: "rwmu"
+      location: "main.go:12"
+  events:
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "Lock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:20"
+      details: "Writer attempts to acquire write lock"
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "RLock"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:01Z"
+      location: "main.go:30"
+      details: "Reader 1 acquires read lock"
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "RLock"
+      goroutine_id: 3
+      timestamp: "2024-01-01T10:00:02Z"
+      location: "main.go:30"
+      details: "Reader 2 acquires read lock"
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "RUnlock"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:10Z"
+      location: "main.go:40"
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "RUnlock"
+      goroutine_id: 3
+      timestamp: "2024-01-01T10:00:11Z"
+      location: "main.go:40"
+    - primitive_name: "rwmu"
+      primitive_type: "RWMutex"
+      event_type: "Unlock"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:12Z"
+      location: "main.go:25"
+      details: "Writer finally gets the lock after 12 seconds"
+  expectations:
+    - issue_type: "rwmutex_starvation"
+      should_exist: true
+      description: "应检测到写锁饥饿风险"
+
+- name: "cond_wakeup_miss_case"
+  description: "案例4：Cond 唤醒遗漏 - Wait 但没有 Signal/Broadcast"
+  primitives:
+    - type: "Cond"
+      name: "cond"
+      location: "main.go:18"
+    - type: "Mutex"
+      name: "mu"
+      location: "main.go:17"
+  events:
+    - primitive_name: "cond"
+      primitive_type: "Cond"
+      event_type: "Wait"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:30"
+      details: "Goroutine waits on condition"
+    - primitive_name: "cond"
+      primitive_type: "Cond"
+      event_type: "Wait"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:01Z"
+      location: "main.go:30"
+      details: "Another goroutine waits on condition"
+  expectations:
+    - issue_type: "cond_wakeup_miss"
+      should_exist: true
+      description: "应检测到 Wait 但没有唤醒"
+
+- name: "pool_misuse_case"
+  description: "案例5：Pool 误用 - 使用 Pool 存储重要数据"
+  primitives:
+    - type: "Pool"
+      name: "objPool"
+      location: "main.go:15"
+  events:
+    - primitive_name: "objPool"
+      primitive_type: "Pool"
+      event_type: "Get"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:25"
+      details: "Get object from pool"
+    - primitive_name: "objPool"
+      primitive_type: "Pool"
+      event_type: "Put"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:01Z"
+      location: "main.go:30"
+      details: "Put object back to pool without reset"
+  expectations:
+    - issue_type: "pool_misuse"
+      should_exist: true
+      description: "应检测到 Pool 误用风险"
+
+- name: "once_init_case"
+  description: "案例6：Once 初始化失败缓存 - 初始化函数可能失败"
+  primitives:
+    - type: "Once"
+      name: "once"
+      location: "main.go:12"
+  expectations:
+    - issue_type: "once_init_failed_cache"
+      should_exist: true
+      description: "应检测到 Once 初始化可能失败但无法重试的风险"
+
+- name: "race_condition_case"
+  description: "案例7：竞争条件 - 并发访问共享数据但没有同步"
+  primitives: []
+  events:
+    - primitive_name: "sharedData"
+      primitive_type: "Mutex"
+      event_type: "Read"
+      goroutine_id: 1
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:25"
+      details: "Read without lock"
+    - primitive_name: "sharedData"
+      primitive_type: "Mutex"
+      event_type: "Write"
+      goroutine_id: 2
+      timestamp: "2024-01-01T10:00:00Z"
+      location: "main.go:35"
+      details: "Write without lock (same time as read)"
+  expectations:
+    - issue_type: "race_condition"
+      should_exist: true
+      description: "应检测到竞争条件风险"
