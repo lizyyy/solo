@@ -1,0 +1,42 @@
+{
+  "washRecords": [
+    {
+      "barcode": "WD002",
+      "washDate": "2026-05-05",
+      "expectedReturnDate": "2026-05-11",
+      "status": "in_progress",
+      "notes": "需要干洗，污渍较多"
+    },
+    {
+      "barcode": "WD008",
+      "washDate": "2026-05-06",
+      "expectedReturnDate": "2026-05-15",
+      "status": "pending",
+      "notes": "披风有磨损需要修复"
+    }
+  ],
+  "alterationRecords": [
+    {
+      "barcode": "WD005",
+      "changeType": "尺码调整",
+      "currentSize": "M",
+      "targetSize": "S",
+      "requestDate": "2026-05-04",
+      "expectedCompletion": "2026-05-08",
+      "status": "in_progress",
+      "isConfirmed": false,
+      "notes": "李四瘦了，需要改小一码"
+    },
+    {
+      "barcode": "WD001",
+      "changeType": "袖口调整",
+      "currentSize": "M",
+      "targetSize": "M",
+      "requestDate": "2026-05-03",
+      "expectedCompletion": "2026-05-05",
+      "status": "completed",
+      "isConfirmed": true,
+      "notes": "袖口改短2厘米"
+    }
+  ]
+}
