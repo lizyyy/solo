@@ -1,0 +1,59 @@
+{
+  "targets": [
+    {
+      "name": "M42 猎户座大星云",
+      "ra": "5h35m24s",
+      "dec": "-5°23'28\"",
+      "priority": 1,
+      "min_moon_angle": 30.0,
+      "max_cloud_cover": 0.2,
+      "required_exposure": 300,
+      "required_binning": 1,
+      "required_gain": 0
+    },
+    {
+      "name": "M31 仙女座星系",
+      "ra": "0h42m44s",
+      "dec": "+41°16'9\"",
+      "priority": 2,
+      "min_moon_angle": 45.0,
+      "max_cloud_cover": 0.3,
+      "required_exposure": 600,
+      "required_binning": 2,
+      "required_gain": 100
+    },
+    {
+      "name": "M101 风车星系",
+      "ra": "14h03m13s",
+      "dec": "+54°20'57\"",
+      "priority": 1,
+      "min_moon_angle": 30.0,
+      "max_cloud_cover": 0.25,
+      "required_exposure": 300,
+      "required_binning": 1,
+      "required_gain": 0
+    },
+    {
+      "name": "M13 武仙座大星团",
+      "ra": "16h41m41s",
+      "dec": "+36°27'35\"",
+      "priority": 3,
+      "min_moon_angle": 20.0,
+      "max_cloud_cover": 0.4,
+      "required_exposure": 180,
+      "required_binning": 1,
+      "required_gain": 50
+    },
+    {
+      "name": "M57 环状星云",
+      "ra": "18h53m35s",
+      "dec": "+33°01'45\"",
+      "priority": 2,
+      "min_moon_angle": 35.0,
+      "max_cloud_cover": 0.2,
+      "required_exposure": 900,
+      "required_binning": 1,
+      "required_gain": 0
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+[project]
+name = "observatory-tool"
+version = "0.1.0"
+description = "小型天文台志愿者观测计划检查工具"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0",
+    "astropy>=5.0",
+    "sqlite-utils>=3.0",
+    "python-dateutil>=2.8",
+    "rich>=12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=22.0",
+]
+
+[project.scripts]
+obs-tool = "observatory_tool.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["observatory_tool"]

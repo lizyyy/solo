@@ -1,0 +1,16 @@
+{
+  "maintenance": [
+    {
+      "telescope_id": "main",
+      "start_time": "2026-05-06 20:00:00",
+      "end_time": "2026-05-06 22:00:00",
+      "description": "主镜镀膜校准"
+    },
+    {
+      "telescope_id": "guide",
+      "start_time": "2026-05-07 19:00:00",
+      "end_time": "2026-05-07 20:30:00",
+      "description": "导星镜对焦调试"
+    }
+  ]
+}
