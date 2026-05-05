@@ -1,0 +1,47 @@
+[
+  {
+    "employee_name": "张三",
+    "date": "2026-05-04",
+    "shift_type": "早班",
+    "start_time": "08:00",
+    "end_time": "16:00",
+    "assigned_greenhouses": ["A温室"],
+    "notes": "负责番茄授粉"
+  },
+  {
+    "employee_name": "李四",
+    "date": "2026-05-04",
+    "shift_type": "早班",
+    "start_time": "08:00",
+    "end_time": "16:00",
+    "assigned_greenhouses": ["B温室"],
+    "notes": "负责草莓区"
+  },
+  {
+    "employee_name": "王五",
+    "date": "2026-05-04",
+    "shift_type": "晚班",
+    "start_time": "14:00",
+    "end_time": "22:00",
+    "assigned_greenhouses": ["A温室", "B温室"],
+    "notes": "晚班轮值"
+  },
+  {
+    "employee_name": "张三",
+    "date": "2026-05-05",
+    "shift_type": "早班",
+    "start_time": "08:00",
+    "end_time": "16:00",
+    "assigned_greenhouses": ["A温室", "C温室"],
+    "notes": ""
+  },
+  {
+    "employee_name": "李四",
+    "date": "2026-05-05",
+    "shift_type": "早班",
+    "start_time": "08:00",
+    "end_time": "16:00",
+    "assigned_greenhouses": ["B温室"],
+    "notes": ""
+  }
+]

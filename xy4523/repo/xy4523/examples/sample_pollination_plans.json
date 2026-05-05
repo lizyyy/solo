@@ -1,0 +1,56 @@
+[
+  {
+    "seedbed_code": "A1",
+    "plant_name": "番茄",
+    "variety": "樱桃番茄",
+    "pollination_date": "2026-05-05",
+    "operator": "张三",
+    "priority": "high",
+    "notes": "优先处理，关键批次"
+  },
+  {
+    "seedbed_code": "A1",
+    "plant_name": "番茄",
+    "variety": "大果番茄",
+    "pollination_date": "2026-05-06",
+    "operator": "李四",
+    "priority": "medium",
+    "notes": "对照批次"
+  },
+  {
+    "seedbed_code": "A2",
+    "plant_name": "辣椒",
+    "variety": "朝天椒",
+    "pollination_date": "2026-05-03",
+    "operator": "王五",
+    "priority": "medium",
+    "notes": "需要检查温度"
+  },
+  {
+    "seedbed_code": "A2",
+    "plant_name": "茄子",
+    "variety": "紫长茄",
+    "pollination_date": "2026-05-08",
+    "operator": "张三",
+    "priority": "low",
+    "notes": "还未到盛花期"
+  },
+  {
+    "seedbed_code": "B1",
+    "plant_name": "草莓",
+    "variety": "章姬",
+    "pollination_date": "2026-05-02",
+    "operator": "李四",
+    "priority": "high",
+    "notes": "盛花期，蜜蜂活动频繁"
+  },
+  {
+    "seedbed_code": "B1",
+    "plant_name": "草莓",
+    "variety": "红颜",
+    "pollination_date": "2026-05-05",
+    "operator": "王五",
+    "priority": "medium",
+    "notes": "初花期"
+  }
+]
