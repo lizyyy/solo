@@ -1,0 +1,80 @@
+{
+  "restore_start_time": "2026-05-05T04:00:00Z",
+  "restore_end_time": "2026-05-05T04:18:45Z",
+  "database": "prod_db_restore_test",
+  "restored_database": "prod_db_restore_test",
+  "version": "14.5",
+  "restored_version": "14.5",
+  "tables_restored": 8,
+  "table_count": 8,
+  "table_count_restored": 8,
+  "rows_restored": 156234,
+  "row_count": 156234,
+  "row_count_restored": 156234,
+  "backup_source": "s3://prod-backup-bucket/prod_db_20260505/",
+  "restore_status": "success",
+  "spot_checks": [
+    {
+      "table": "users",
+      "table_name": "users",
+      "expected_rows": 15234,
+      "expected_row_count": 15234,
+      "actual_rows": 15234,
+      "actual_row_count": 15234,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "orders",
+      "table_name": "orders",
+      "expected_rows": 45678,
+      "expected_row_count": 45678,
+      "actual_rows": 45678,
+      "actual_row_count": 45678,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "products",
+      "table_name": "products",
+      "expected_rows": 8923,
+      "expected_row_count": 8923,
+      "actual_rows": 8923,
+      "actual_row_count": 8923,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "categories",
+      "table_name": "categories",
+      "expected_rows": 156,
+      "expected_row_count": 156,
+      "actual_rows": 156,
+      "actual_row_count": 156,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "order_items",
+      "table_name": "order_items",
+      "expected_rows": 78543,
+      "expected_row_count": 78543,
+      "actual_rows": 78543,
+      "actual_row_count": 78543,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "audit_logs",
+      "table_name": "audit_logs",
+      "expected_rows": 7700,
+      "expected_row_count": 7700,
+      "actual_rows": 7700,
+      "actual_row_count": 7700,
+      "checksum_match": true,
+      "checksum_ok": true
+    }
+  ],
+  "checked_tables": [],
+  "restore_agent": "restore_agent_v1.8.0"
+}

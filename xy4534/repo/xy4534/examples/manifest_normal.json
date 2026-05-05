@@ -1,0 +1,112 @@
+{
+  "bucket": "prod-backup-bucket",
+  "bucket_name": "prod-backup-bucket",
+  "date": "2026-05-05T02:15:30Z",
+  "manifest_date": "2026-05-05T02:15:30Z",
+  "total_shards": 8,
+  "shard_count": 8,
+  "total_size": 268435456,
+  "total_size_bytes": 268435456,
+  "backup_type": "pg_dump_full",
+  "database": "prod_db",
+  "backup_time": "2026-05-05T02:00:00Z",
+  "shards": [
+    {
+      "name": "prod_db_20260505_part_01.sql.gz",
+      "shard_name": "prod_db_20260505_part_01.sql.gz",
+      "key": "prod_db_20260505_part_01.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+      "etag": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+      "md5": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+      "upload_time": "2026-05-05T02:05:00Z",
+      "last_modified": "2026-05-05T02:05:00Z"
+    },
+    {
+      "name": "prod_db_20260505_part_02.sql.gz",
+      "shard_name": "prod_db_20260505_part_02.sql.gz",
+      "key": "prod_db_20260505_part_02.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e",
+      "etag": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e",
+      "md5": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e",
+      "upload_time": "2026-05-05T02:06:30Z",
+      "last_modified": "2026-05-05T02:06:30Z"
+    },
+    {
+      "name": "prod_db_20260505_part_03.sql.gz",
+      "shard_name": "prod_db_20260505_part_03.sql.gz",
+      "key": "prod_db_20260505_part_03.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+      "etag": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+      "md5": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+      "upload_time": "2026-05-05T02:08:00Z",
+      "last_modified": "2026-05-05T02:08:00Z"
+    },
+    {
+      "name": "prod_db_20260505_part_04.sql.gz",
+      "shard_name": "prod_db_20260505_part_04.sql.gz",
+      "key": "prod_db_20260505_part_04.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+      "etag": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+      "md5": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a",
+      "upload_time": "2026-05-05T02:09:30Z",
+      "last_modified": "2026-05-05T02:09:30Z"
+    },
+    {
+      "name": "prod_db_20260505_part_05.sql.gz",
+      "shard_name": "prod_db_20260505_part_05.sql.gz",
+      "key": "prod_db_20260505_part_05.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+      "etag": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+      "md5": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+      "upload_time": "2026-05-05T02:11:00Z",
+      "last_modified": "2026-05-05T02:11:00Z"
+    },
+    {
+      "name": "prod_db_20260505_part_06.sql.gz",
+      "shard_name": "prod_db_20260505_part_06.sql.gz",
+      "key": "prod_db_20260505_part_06.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c",
+      "etag": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c",
+      "md5": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c",
+      "upload_time": "2026-05-05T02:12:30Z",
+      "last_modified": "2026-05-05T02:12:30Z"
+    },
+    {
+      "name": "prod_db_20260505_part_07.sql.gz",
+      "shard_name": "prod_db_20260505_part_07.sql.gz",
+      "key": "prod_db_20260505_part_07.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
+      "etag": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
+      "md5": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d",
+      "upload_time": "2026-05-05T02:14:00Z",
+      "last_modified": "2026-05-05T02:14:00Z"
+    },
+    {
+      "name": "prod_db_20260505_part_08.sql.gz",
+      "shard_name": "prod_db_20260505_part_08.sql.gz",
+      "key": "prod_db_20260505_part_08.sql.gz",
+      "size": 33554432,
+      "size_bytes": 33554432,
+      "checksum": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e",
+      "etag": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e",
+      "md5": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e",
+      "upload_time": "2026-05-05T02:15:30Z",
+      "last_modified": "2026-05-05T02:15:30Z"
+    }
+  ],
+  "generated_by": "backup_agent_v2.3.0"
+}

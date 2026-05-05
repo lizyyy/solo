@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}备份演练核对工具 - 任务详情{% endblock %}
+
+{% block nav_extra %}
+<a href="{{ url_for('task_detail', task_id=task.id) }}">📋 {{ task.task_name }}</a>
+{% endblock %}
+
+{% block content %}
+<!-- 任务基本信息 -->
+<div class="card">
+    <h2 class="card-title">📋 任务信息</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ task.id }}</div>
+            <div class="stat-label">任务 ID</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">
+                {% if task.status == 'passed' %}
+                <span style="color: #28a745;">✅</span>
+                {% elif task.status == 'failed' %}
+                <span style="color: #dc3545;">❌</span>
+                {% else %}
+                <span style="color: #ffc107;">⏳</span>
+                {% endif %}
+            </div>
+            <div class="stat-label">
+                状态: 
+                {% if task.status == 'passed' %}通过
+                {% elif task.status == 'failed' %}失败
+                {% elif task.status == 'pending' %}待检查
+                {% else %}{{ task.status }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.passed }}/{{ stats.total }}</div>
+            <div class="stat-label">检查通过</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.reviewed }}/{{ stats.total }}</div>
+            <div class="stat-label">已复核</div>
+        </div>
+    </div>
+    
+    {% if task.summary %}
+    <div class="alert alert-info">
+        <strong>摘要:</strong> {{ task.summary }}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 操作栏 -->
+<div class="action-bar">
+    <form action="{{ url_for('run_check', task_id=task.id) }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-primary">🔄 执行检查</button>
+    </form>
+    <button onclick="exportMarkdown()" class="btn btn-secondary">📄 导出 Markdown</button>
+    <button onclick="exportJson()" class="btn btn-secondary">📦 导出 JSON</button>
+</div>
+
+<!-- 检查统计 -->
+<div class="card">
+    <h2 class="card-title">📊 检查统计</h2>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" style="color: #28a745;">{{ stats.passed }}</div>
+            <div class="stat-label">✅ 通过</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #ffc107;">{{ stats.warnings }}</div>
+            <div class="stat-label">⚠️ 警告</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: #dc3545;">{{ stats.failed }}</div>
+            <div class="stat-label">❌ 失败</div>
+        </div>
+    </div>
+</div>
+
+<!-- 检查结果 - 按风险等级分组 -->
+{% for risk_level in ['high', 'medium', 'low'] %}
+    {% set checks = risk_groups.get(risk_level, []) %}
+    {% if checks %}
+    <div class="card">
+        <h2 class="card-title">
+            {% if risk_level == 'high' %}🔴 高风险问题
+            {% elif risk_level == 'medium' %}🟡 中等风险问题
+            {% else %}🟢 低风险/通过
+            {% endif %}
+            <span class="badge {% if risk_level == 'high' %}badge-danger{% elif risk_level == 'medium' %}badge-warning{% else %}badge-success{% endif %}">
+                {{ checks|length }} 项
+            </span>
+        </h2>
+        
+        {% for check in checks %}
+        <div class="check-item {% if check.reviewed %}reviewed{% else %}pending-review{% endif %}">
+            <div class="check-header">
+                <div class="check-title">
+                    <span class="badge {% if check.status == 'pass' %}badge-success{% elif check.status == 'warn' %}badge-warning{% else %}badge-danger{% endif %}">
+                        {% if check.status == 'pass' %}通过
+                        {% elif check.status == 'warn' %}警告
+                        {% else %}失败
+                        {% endif %}
+                    </span>
+                    <strong>{{ check.check_name }}</strong>
+                    <span class="badge {% if check.reviewed %}badge-success{% else %}badge-secondary{% endif %}">
+                        {% if check.reviewed %}✓ 已复核{% else %}○ 待复核{% endif %}
+                    </span>
+                </div>
+                <div class="check-status">
+                    <span class="risk-{{ risk_level }}">{{ risk_level|upper }} 风险</span>
+                </div>
+            </div>
+            
+            <div class="check-message">{{ check.message }}</div>
+            <div class="check-meta">检查时间: {{ check.check_time }}</div>
+            
+            {% if check.review_note %}
+            <div style="background: #f0f8ff; padding: 8px 12px; border-radius: 4px; margin-bottom: 10px;">
+                <strong>复核备注:</strong> {{ check.review_note }}
+            </div>
+            {% endif %}
+            
+            <!-- 复核表单 -->
+            <div class="review-form">
+                <form action="{{ url_for('review_check', task_id=task.id, check_id=check.id) }}" method="post">
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="reviewed" {% if check.reviewed %}checked{% endif %}>
+                            标记为已复核
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <textarea name="review_note" class="form-control" placeholder="添加复核备注...">{{ check.review_note or '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">保存复核</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endfor %}
+
+<!-- 值班备注 -->
+<div class="card">
+    <h2 class="card-title">📝 值班备注</h2>
+    
+    <!-- 添加备注表单 -->
+    <form action="{{ url_for('add_note', task_id=task.id) }}" method="post" style="margin-bottom: 20px;">
+        <div class="form-group">
+            <label for="note">添加新备注:</label>
+            <textarea id="note" name="note" class="form-control" placeholder="记录值班备注、问题说明或处理意见..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="created_by">记录人:</label>
+            <input type="text" id="created_by" name="created_by" class="form-control" value="web" style="width: 200px;">
+        </div>
+        <button type="submit" class="btn btn-primary">💾 保存备注</button>
+    </form>
+    
+    <!-- 现有备注 -->
+    {% if task_data.duty_notes %}
+    <div style="margin-top: 20px;">
+        {% for note in task_data.duty_notes %}
+        <div class="note-item">
+            <div class="note-meta">
+                <strong>{{ note.created_by }}</strong> 在 {{ note.created_at }} 记录:
+            </div>
+            <div class="note-content">{{ note.note_text }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="padding: 20px;">
+        <p>暂无值班备注</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 数据详情 -->
+<div class="card">
+    <h2 class="card-title">📂 数据详情</h2>
+    
+    <!-- pg_dump 日志 -->
+    {% if task_data.pg_dump_logs %}
+    <div class="details-section">
+        <h4>📋 pg_dump 日志 ({{ task_data.pg_dump_logs|length }})</h4>
+        {% for log in task_data.pg_dump_logs %}
+        <div class="card" style="margin-bottom: 15px; background: #fafafa;">
+            <p><strong>数据库:</strong> {{ log.database_name or '未知' }}</p>
+            <p><strong>表数量:</strong> {{ log.table_count or 0 }}</p>
+            <p><strong>大小:</strong> {{ log.total_size_bytes or 0 }} 字节</p>
+            {% if log.dump_start_time %}
+            <p><strong>备份时间:</strong> {{ log.dump_start_time }} 至 {{ log.dump_end_time }}</p>
+            {% endif %}
+            <p><strong>文件:</strong> {{ log.file_path or '未知' }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 对象存储 manifest -->
+    {% if task_data.object_storage_manifests %}
+    <div class="details-section">
+        <h4>🪣 对象存储 Manifest ({{ task_data.object_storage_manifests|length }})</h4>
+        {% for manifest in task_data.object_storage_manifests %}
+        <div class="card" style="margin-bottom: 15px; background: #fafafa;">
+            <p><strong>Bucket:</strong> {{ manifest.bucket_name or '未知' }}</p>
+            <p><strong>期望分片数:</strong> {{ manifest.total_shards or 0 }}</p>
+            <p><strong>实际分片数:</strong> {{ manifest.shards|length if manifest.shards else 0 }}</p>
+            <p><strong>总大小:</strong> {{ manifest.total_size_bytes or 0 }} 字节</p>
+            <p><strong>文件:</strong> {{ manifest.file_path or '未知' }}</p>
+            
+            {% if manifest.shards %}
+            <details style="margin-top: 10px;">
+                <summary style="cursor: pointer; color: #667eea;">查看 {{ manifest.shards|length }} 个分片详情</summary>
+                <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 4px;">
+                    <table style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th>分片名称</th>
+                                <th>大小</th>
+                                <th>校验和</th>
+                                <th>上传时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for shard in manifest.shards %}
+                            <tr>
+                                <td>{{ shard.shard_name }}</td>
+                                <td>{{ shard.shard_size_bytes }}</td>
+                                <td><code style="font-size: 11px;">{{ shard.checksum or '-' }}</code></td>
+                                <td>{{ shard.upload_time or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- 还原演练结果 -->
+    {% if task_data.restore_results %}
+    <div class="details-section">
+        <h4>🔄 还原演练结果 ({{ task_data.restore_results|length }})</h4>
+        {% for result in task_data.restore_results %}
+        <div class="card" style="margin-bottom: 15px; background: #fafafa;">
+            <p><strong>还原数据库:</strong> {{ result.restored_database_name or '未知' }}</p>
+            <p><strong>版本:</strong> {{ result.restored_version or '未知' }}</p>
+            <p><strong>表数量:</strong> {{ result.table_count_restored or 0 }}</p>
+            <p><strong>总行数:</strong> {{ result.row_count_restored or 0 }}</p>
+            {% if result.restore_start_time %}
+            <p><strong>还原时间:</strong> {{ result.restore_start_time }} 至 {{ result.restore_end_time }}</p>
+            {% endif %}
+            <p><strong>文件:</strong> {{ result.file_path or '未知' }}</p>
+            
+            {% if result.spot_checked_tables %}
+            <details style="margin-top: 10px;">
+                <summary style="cursor: pointer; color: #667eea;">查看 {{ result.spot_checked_tables|length }} 个抽查表详情</summary>
+                <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 4px;">
+                    <table style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th>表名</th>
+                                <th>期望行数</th>
+                                <th>实际行数</th>
+                                <th>校验和匹配</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for table in result.spot_checked_tables %}
+                            <tr>
+                                <td>{{ table.table_name }}</td>
+                                <td>{{ table.expected_row_count }}</td>
+                                <td>{{ table.actual_row_count }}</td>
+                                <td>
+                                    {% if table.checksum_match %}
+                                    <span class="badge badge-success">✓ 匹配</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">✗ 不匹配</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if not task_data.pg_dump_logs and not task_data.object_storage_manifests and not task_data.restore_results %}
+    <div class="empty-state" style="padding: 20px;">
+        <p>暂无数据，请使用命令行工具导入 pg_dump 日志、对象存储 manifest 或还原演练结果</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 导出模态框（隐藏） -->
+<div id="exportModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="background: white; margin: 50px auto; max-width: 800px; max-height: 80vh; overflow: auto; border-radius: 8px; padding: 20px;">
+        <h3 id="exportTitle">导出结果</h3>
+        <pre id="exportContent" style="background: #f8f9fa; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-break: break-all; max-height: 400px; overflow: auto; font-size: 12px;"></pre>
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="copyExport()" class="btn btn-secondary">📋 复制</button>
+            <button onclick="downloadExport()" class="btn btn-primary">💾 下载</button>
+            <button onclick="closeExportModal()" class="btn btn-secondary">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let exportData = { content: '', filename: '', type: 'text' };
+
+async function exportMarkdown() {
+    const response = await fetch('/api/tasks/{{ task.id }}/export/markdown');
+    const data = await response.json();
+    showExportModal(data.content, 'backup_check_{{ task.id }}.md', 'text');
+}
+
+async function exportJson() {
+    const response = await fetch('/api/tasks/{{ task.id }}/export/json');
+    const data = await response.json();
+    showExportModal(data.content, 'backup_check_{{ task.id }}.json', 'json');
+}
+
+function showExportModal(content, filename, type) {
+    exportData = { content, filename, type };
+    document.getElementById('exportTitle').textContent = '导出: ' + filename;
+    document.getElementById('exportContent').textContent = content;
+    document.getElementById('exportModal').style.display = 'block';
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').style.display = 'none';
+}
+
+function copyExport() {
+    navigator.clipboard.writeText(exportData.content).then(() => {
+        alert('已复制到剪贴板');
+    });
+}
+
+function downloadExport() {
+    const blob = new Blob([exportData.content], { 
+        type: exportData.type === 'json' ? 'application/json' : 'text/markdown' 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = exportData.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// 点击模态框外部关闭
+document.getElementById('exportModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeExportModal();
+    }
+});
+</script>
+{% endblock %}

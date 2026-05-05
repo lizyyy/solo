@@ -1,0 +1,61 @@
+{
+  "restore_start_time": "2026-05-04T04:00:00Z",
+  "restore_end_time": "2026-05-04T04:15:30Z",
+  "database": "prod_db_restore_test",
+  "restored_database": "prod_db_restore_test",
+  "version": "14.4",
+  "restored_version": "14.4",
+  "tables_restored": 7,
+  "table_count": 7,
+  "table_count_restored": 7,
+  "rows_restored": 145234,
+  "row_count": 145234,
+  "row_count_restored": 145234,
+  "backup_source": "s3://prod-backup-bucket/prod_db_20260504/",
+  "restore_status": "partial_success",
+  "note": "这是一个有问题的样例：缺少一个表，关键表抽查有问题，版本落后",
+  "spot_checks": [
+    {
+      "table": "users",
+      "table_name": "users",
+      "expected_rows": 15234,
+      "expected_row_count": 15234,
+      "actual_rows": 15200,
+      "actual_row_count": 15200,
+      "checksum_match": true,
+      "checksum_ok": true
+    },
+    {
+      "table": "orders",
+      "table_name": "orders",
+      "expected_rows": 45678,
+      "expected_row_count": 45678,
+      "actual_rows": 45678,
+      "actual_row_count": 45678,
+      "checksum_match": false,
+      "checksum_ok": false
+    },
+    {
+      "table": "products",
+      "table_name": "products",
+      "expected_rows": 8923,
+      "expected_row_count": 8923,
+      "actual_rows": 8500,
+      "actual_row_count": 8500,
+      "checksum_match": false,
+      "checksum_ok": false
+    },
+    {
+      "table": "categories",
+      "table_name": "categories",
+      "expected_rows": 156,
+      "expected_row_count": 156,
+      "actual_rows": 156,
+      "actual_row_count": 156,
+      "checksum_match": true,
+      "checksum_ok": true
+    }
+  ],
+  "checked_tables": [],
+  "restore_agent": "restore_agent_v1.8.0"
+}
