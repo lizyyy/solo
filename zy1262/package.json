@@ -1,0 +1,40 @@
+{
+  "name": "lb-replay-api",
+  "version": "1.0.0",
+  "description": "本地负载均衡路由回放 API 服务 - 用于排查服务流量倾斜问题",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "seed": "ts-node src/utils/seed.ts"
+  },
+  "keywords": [
+    "load-balancer",
+    "replay",
+    "traffic-analysis",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "jsonlines": "^0.1.1",
+    "uuid": "^9.0.1",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jsonlines": "^0.1.5",
+    "@types/node": "^20.10.6",
+    "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
