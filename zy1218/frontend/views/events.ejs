@@ -1,0 +1,199 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-list text-primary me-2"></i>事件列表</h2>
+    <button class="btn btn-outline-primary" onclick="loadEvents()">
+      <i class="fa fa-refresh me-1"></i>刷新
+    </button>
+  </div>
+
+  <!-- 筛选器 -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3 mb-2">
+          <label class="form-label">选择实验</label>
+          <select class="form-select" id="experiment-select">
+            <option value="">所有实验...</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-2">
+          <label class="form-label">事件类型</label>
+          <select class="form-select" id="event-type-filter">
+            <option value="">所有类型...</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-2">
+          <label class="form-label">Goroutine ID</label>
+          <input type="number" class="form-control" id="gid-filter" placeholder="GID">
+        </div>
+        <div class="col-md-3 mb-2">
+          <label class="form-label">&nbsp;</label>
+          <button class="btn btn-primary w-100" onclick="loadEvents()">
+            <i class="fa fa-search me-1"></i>查询
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 事件列表 -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-table me-2"></i>事件记录
+      <span class="badge bg-secondary ms-2" id="event-count">0 条</span>
+    </div>
+    <div class="card-body">
+      <div id="events-container">
+        <div class="text-center py-5">
+          <span class="loading"></span>
+          <p class="mt-2 text-muted">加载中...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+  await loadEventTypes();
+  await loadEvents();
+});
+
+async function loadExperiments() {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const select = document.getElementById('experiment-select');
+    
+    let options = '<option value="">所有实验...</option>';
+    experiments.forEach(exp => {
+      options += `<option value="${exp.id}">${exp.name}</option>`;
+    });
+    
+    select.innerHTML = options;
+    
+  } catch (error) {
+    console.error('Failed to load experiments:', error);
+  }
+}
+
+async function loadEventTypes() {
+  const eventTypes = [
+    'G_CREATE', 'G_START', 'G_END', 'G_BLOCK', 'G_PREEMPT',
+    'P_ACQUIRE', 'P_RELEASE', 'P_STEAL', 'P_GC_ASSIST',
+    'M_ACQUIRE_P', 'M_RELEASE_P', 'M_PARK', 'M_UNPARK',
+    'SYSCALL_ENTER', 'SYSCALL_EXIT',
+    'NETPOLL_WAIT', 'NETPOLL_WAKEUP',
+    'GC_START', 'GC_END',
+    'PREEMPT_START', 'PREEMPT_END', 'SYSMON_PREEMPT',
+    'WORK_STEAL_START', 'WORK_STEAL_END'
+  ];
+  
+  const select = document.getElementById('event-type-filter');
+  let options = '<option value="">所有类型...</option>';
+  eventTypes.forEach(type => {
+    options += `<option value="${type}">${Utils.getEventTypeText(type)}</option>`;
+  });
+  select.innerHTML = options;
+}
+
+async function loadEvents() {
+  const container = document.getElementById('events-container');
+  const expId = document.getElementById('experiment-select').value;
+  const eventType = document.getElementById('event-type-filter').value;
+  const gid = document.getElementById('gid-filter').value;
+  
+  try {
+    container.innerHTML = `
+      <div class="text-center py-5">
+        <span class="loading"></span>
+        <p class="mt-2 text-muted">加载中...</p>
+      </div>
+    `;
+    
+    let events;
+    if (expId) {
+      const options = {};
+      if (eventType) options.type = eventType;
+      if (gid) options.gid = gid;
+      events = await API.Experiments.getEvents(parseInt(expId), { ...options, limit: 1000 });
+    } else {
+      events = await API.Events.getAll(1000);
+    }
+    
+    document.getElementById('event-count').textContent = `${events.length} 条`;
+    
+    if (events.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-list"></i>
+          <h4>暂无事件数据</h4>
+          <p>启动实验后可以在这里查看调度事件</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>时间</th>
+              <th>虚拟时间</th>
+              <th>实验ID</th>
+              <th>事件类型</th>
+              <th>G</th>
+              <th>P</th>
+              <th>M</th>
+              <th>原因</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    events.forEach((event, idx) => {
+      html += `
+        <tr>
+          <td><small>${idx + 1}</small></td>
+          <td><small>${Utils.formatDateTime(event.timestamp)}</small></td>
+          <td><small class="text-muted">${event.virtual_time}</small></td>
+          <td><small class="text-primary">#${event.experiment_id}</small></td>
+          <td>
+            <span class="badge ${Utils.getEventTypeBadgeClass(event.event_type)}">
+              ${Utils.getEventTypeText(event.event_type)}
+            </span>
+          </td>
+          <td>${event.gid ? `<span class="text-primary">G${event.gid}</span>` : '-'}</td>
+          <td>${event.pid ? `<span class="text-success">P${event.pid}</span>` : '-'}</td>
+          <td>${event.mid ? `<span class="text-info">M${event.mid}</span>` : '-'}</td>
+          <td><small class="text-muted">${event.reason || '-'}</small></td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+        <p class="text-muted small text-center mt-2">显示最近 ${events.length} 条事件</p>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+</script>
+
+<%- include('partials/footer') %>

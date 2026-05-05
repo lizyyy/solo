@@ -1,0 +1,414 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-camera text-primary me-2"></i>队列快照</h2>
+    <button class="btn btn-outline-primary" onclick="loadSnapshots()">
+      <i class="fa fa-refresh me-1"></i>刷新
+    </button>
+  </div>
+
+  <!-- 筛选器 -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-2">
+          <label class="form-label">选择实验</label>
+          <select class="form-select" id="experiment-select">
+            <option value="">所有实验...</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-2">
+          <label class="form-label">&nbsp;</label>
+          <button class="btn btn-primary w-100" onclick="loadSnapshots()">
+            <i class="fa fa-search me-1"></i>查询
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 队列统计 -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-primary" id="stat-avg-global">0</div>
+        <div class="stat-label">平均全局队列</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-info" id="stat-avg-netpoll">0</div>
+        <div class="stat-label">平均网络队列</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-success" id="stat-avg-idle">0</div>
+        <div class="stat-label">平均空闲 P</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-warning" id="stat-snapshot-count">0</div>
+        <div class="stat-label">快照数量</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快照列表 -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-history me-2"></i>队列快照历史
+    </div>
+    <div class="card-body">
+      <div id="snapshots-container">
+        <div class="text-center py-5">
+          <span class="loading"></span>
+          <p class="mt-2 text-muted">加载中...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+  await loadSnapshots();
+});
+
+async function loadExperiments() {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const select = document.getElementById('experiment-select');
+    
+    let options = '<option value="">所有实验...</option>';
+    experiments.forEach(exp => {
+      options += `<option value="${exp.id}">${exp.name} (${Utils.getStatusText(exp.status)})</option>`;
+    });
+    
+    select.innerHTML = options;
+    
+  } catch (error) {
+    console.error('Failed to load experiments:', error);
+  }
+}
+
+async function loadSnapshots() {
+  const container = document.getElementById('snapshots-container');
+  const expId = document.getElementById('experiment-select').value;
+  
+  try {
+    container.innerHTML = `
+      <div class="text-center py-5">
+        <span class="loading"></span>
+        <p class="mt-2 text-muted">加载中...</p>
+      </div>
+    `;
+    
+    let snapshots;
+    if (expId) {
+      snapshots = await API.Experiments.getSnapshots(parseInt(expId), 500);
+    } else {
+      snapshots = await API.Snapshots.getAll(500);
+    }
+    
+    // 更新统计
+    updateStatistics(snapshots);
+    
+    if (snapshots.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-camera"></i>
+          <h4>暂无队列快照</h4>
+          <p>启动实验后，队列状态快照将显示在这里</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>实验ID</th>
+              <th>虚拟时间</th>
+              <th>全局队列</th>
+              <th>网络队列</th>
+              <th>空闲 P</th>
+              <th>GC 阶段</th>
+              <th>时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    snapshots.forEach((snap, idx) => {
+      let idlePIDs = [];
+      try {
+        if (snap.idle_pids) {
+          idlePIDs = JSON.parse(snap.idle_pids);
+        }
+      } catch (e) {}
+      
+      html += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><span class="text-primary">#${snap.experiment_id}</span></td>
+          <td><span class="fw-bold">${snap.virtual_time}</span></td>
+          <td>
+            <span class="badge bg-primary">${snap.global_queue_size}</span>
+          </td>
+          <td>
+            <span class="badge bg-info">${snap.netpoll_queue_size}</span>
+          </td>
+          <td>
+            <span class="badge bg-secondary">${idlePIDs.length}</span>
+          </td>
+          <td>${snap.gc_phase ? `<span class="badge bg-dark">${snap.gc_phase}</span>` : '-'}</td>
+          <td><small>${Utils.formatDateTime(snap.timestamp)}</small></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" onclick="viewSnapshot(${idx})">
+              <i class="fa fa-eye me-1"></i>详情
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+        <p class="text-muted small text-center mt-2">显示最近 ${snapshots.length} 条快照</p>
+      </div>
+    `;
+    
+    // 保存快照数据到全局变量供详情查看
+    window.snapshotsData = snapshots;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+
+function updateStatistics(snapshots) {
+  document.getElementById('stat-snapshot-count').textContent = snapshots.length;
+  
+  if (snapshots.length === 0) {
+    document.getElementById('stat-avg-global').textContent = '0';
+    document.getElementById('stat-avg-netpoll').textContent = '0';
+    document.getElementById('stat-avg-idle').textContent = '0';
+    return;
+  }
+  
+  let totalGlobal = 0;
+  let totalNetpoll = 0;
+  let totalIdle = 0;
+  
+  snapshots.forEach(snap => {
+    totalGlobal += snap.global_queue_size;
+    totalNetpoll += snap.netpoll_queue_size;
+    
+    let idleCount = 0;
+    try {
+      if (snap.idle_pids) {
+        idleCount = JSON.parse(snap.idle_pids).length;
+      }
+    } catch (e) {}
+    totalIdle += idleCount;
+  });
+  
+  document.getElementById('stat-avg-global').textContent = (totalGlobal / snapshots.length).toFixed(1);
+  document.getElementById('stat-avg-netpoll').textContent = (totalNetpoll / snapshots.length).toFixed(1);
+  document.getElementById('stat-avg-idle').textContent = (totalIdle / snapshots.length).toFixed(1);
+}
+
+function viewSnapshot(index) {
+  if (!window.snapshotsData || !window.snapshotsData[index]) {
+    return;
+  }
+  
+  const snap = window.snapshotsData[index];
+  
+  let localQueues = {};
+  let globalGIDs = [];
+  let runningGIDs = [];
+  let netpollGIDs = [];
+  
+  try {
+    if (snap.local_queues) {
+      localQueues = JSON.parse(snap.local_queues);
+    }
+    if (snap.global_queue_gids) {
+      globalGIDs = JSON.parse(snap.global_queue_gids);
+    }
+    if (snap.running_gids) {
+      runningGIDs = JSON.parse(snap.running_gids);
+    }
+    if (snap.netpoll_queue_gids) {
+      netpollGIDs = JSON.parse(snap.netpoll_queue_gids);
+    }
+  } catch (e) {}
+  
+  // 生成本地队列 HTML
+  let localQueuesHtml = '';
+  Object.keys(localQueues).forEach(pid => {
+    const queue = localQueues[pid];
+    localQueuesHtml += `
+      <div class="mb-3">
+        <h6 class="text-success mb-2">
+          <i class="fa fa-microchip me-1"></i>P${pid} 本地队列
+          <span class="badge bg-success ms-2">${queue.size || 0} 个</span>
+        </h6>
+        <div class="queue-visual mb-2">
+    `;
+    
+    if (queue.gids && queue.gids.length > 0) {
+      queue.gids.forEach(gid => {
+        const isRunning = runningGIDs.includes(gid);
+        localQueuesHtml += `<div class="queue-item ${isRunning ? 'running' : ''}">G${gid}</div>`;
+      });
+    } else {
+      localQueuesHtml += `<small class="text-muted">队列为空</small>`;
+    }
+    
+    localQueuesHtml += `</div></div>`;
+  });
+  
+  // 创建模态框
+  const modal = document.createElement('div');
+  modal.className = 'modal fade';
+  modal.setAttribute('tabindex', '-1');
+  modal.innerHTML = `
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fa fa-camera me-2"></i>队列快照详情
+            <span class="badge bg-secondary ms-2">VT: ${snap.virtual_time}</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <strong>实验ID:</strong> #${snap.experiment_id}
+            </div>
+            <div class="col-md-3">
+              <strong>时间:</strong> ${Utils.formatDateTime(snap.timestamp)}
+            </div>
+            <div class="col-md-3">
+              <strong>GC 阶段:</strong> ${snap.gc_phase || '-'}
+            </div>
+            <div class="col-md-3">
+              <strong>GC Assist:</strong> ${snap.gc_assist_count || 0}
+            </div>
+          </div>
+          
+          <!-- 全局队列 -->
+          <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+              <i class="fa fa-globe me-2"></i>全局运行队列
+              <span class="badge bg-white text-primary ms-2">${snap.global_queue_size} 个</span>
+            </div>
+            <div class="card-body">
+              <div class="queue-visual">
+                ${globalGIDs.length > 0 
+                  ? globalGIDs.map(gid => `<div class="queue-item">G${gid}</div>`).join('')
+                  : '<small class="text-muted">全局队列为空</small>'
+                }
+              </div>
+            </div>
+          </div>
+          
+          <!-- 本地队列 -->
+          <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+              <i class="fa fa-server me-2"></i>本地运行队列
+            </div>
+            <div class="card-body">
+              ${Object.keys(localQueues).length > 0 
+                ? localQueuesHtml
+                : '<small class="text-muted">暂无本地队列数据</small>'
+              }
+            </div>
+          </div>
+          
+          <!-- 运行中的 G -->
+          <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+              <i class="fa fa-play me-2"></i>正在运行的 Goroutine
+              <span class="badge bg-white text-info ms-2">${runningGIDs.length} 个</span>
+            </div>
+            <div class="card-body">
+              <div class="queue-visual">
+                ${runningGIDs.length > 0 
+                  ? runningGIDs.map(gid => `<div class="queue-item running">G${gid}</div>`).join('')
+                  : '<small class="text-muted">暂无运行中的 Goroutine</small>'
+                }
+              </div>
+            </div>
+          </div>
+          
+          <!-- 网络轮询队列 -->
+          <div class="card mb-3">
+            <div class="card-header bg-secondary text-white">
+              <i class="fa fa-wifi me-2"></i>网络轮询队列
+              <span class="badge bg-white text-secondary ms-2">${snap.netpoll_queue_size} 个</span>
+            </div>
+            <div class="card-body">
+              <div class="queue-visual">
+                ${netpollGIDs.length > 0 
+                  ? netpollGIDs.map(gid => `<div class="queue-item blocked">G${gid}</div>`).join('')
+                  : '<small class="text-muted">网络队列为空</small>'
+                }
+              </div>
+            </div>
+          </div>
+          
+          <!-- 原始数据 -->
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-code me-2"></i>原始数据
+            </div>
+            <div class="card-body">
+              <pre class="bg-dark text-white p-3 rounded small" style="max-height: 300px; overflow-y: auto;"><code>${escapeHtml(JSON.stringify(snap, null, 2))}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  const bsModal = new bootstrap.Modal(modal);
+  bsModal.show();
+  
+  modal.addEventListener('hidden.bs.modal', () => {
+    modal.remove();
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,195 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-flask text-primary me-2"></i>实验管理</h2>
+    <a href="/experiments/new" class="btn btn-primary">
+      <i class="fa fa-plus-circle me-2"></i>新建实验
+    </a>
+  </div>
+
+  <!-- 实验列表 -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-list me-2"></i>实验列表
+    </div>
+    <div class="card-body">
+      <div id="experiments-container">
+        <div class="text-center py-5">
+          <span class="loading"></span>
+          <p class="mt-2 text-muted">加载中...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+});
+
+async function loadExperiments() {
+  const container = document.getElementById('experiments-container');
+  
+  try {
+    const experiments = await API.Experiments.getAll();
+    
+    if (experiments.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-flask"></i>
+          <h4>暂无实验</h4>
+          <p>点击上方按钮创建第一个实验</p>
+          <a href="/experiments/new" class="btn btn-primary mt-2">
+            <i class="fa fa-plus-circle me-2"></i>新建实验
+          </a>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>名称</th>
+              <th>配置</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    experiments.forEach(exp => {
+      const statusBadge = `<span class="badge ${Utils.getStatusBadgeClass(exp.status)} ${exp.status === 'running' ? 'bg-running' : ''}">
+        ${Utils.getStatusText(exp.status)}
+      </span>`;
+      
+      html += `
+        <tr>
+          <td>${exp.id}</td>
+          <td>
+            <a href="/experiments/${exp.id}" class="text-decoration-none">
+              <strong>${exp.name || '未命名实验'}</strong>
+            </a>
+            ${exp.description ? `<br><small class="text-muted">${exp.description}</small>` : ''}
+          </td>
+          <td>
+            <small>
+              <span class="text-primary">GOMAXPROCS: ${exp.gomaxprocs}</span><br>
+              <span class="text-success">P: ${exp.num_p}</span> | 
+              <span class="text-info">M: ${exp.num_m}</span> | 
+              <span class="text-warning">G: ${exp.num_g}</span>
+            </small>
+          </td>
+          <td>${statusBadge}</td>
+          <td><small>${Utils.formatDateTime(exp.created_at)}</small></td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <a href="/experiments/${exp.id}" class="btn btn-outline-primary" title="查看详情">
+                <i class="fa fa-eye"></i>
+              </a>
+              ${exp.status === 'created' || exp.status === 'paused' ? `
+                <button class="btn btn-outline-success" onclick="startExperiment(${exp.id})" title="开始">
+                  <i class="fa fa-play"></i>
+                </button>
+              ` : ''}
+              ${exp.status === 'running' ? `
+                <button class="btn btn-outline-warning" onclick="stopExperiment(${exp.id})" title="停止">
+                  <i class="fa fa-stop"></i>
+                </button>
+              ` : ''}
+              ${exp.status === 'created' ? `
+                <a href="/experiments/${exp.id}/edit" class="btn btn-outline-info" title="编辑">
+                  <i class="fa fa-pencil"></i>
+                </a>
+                <button class="btn btn-outline-danger" onclick="deleteExperiment(${exp.id})" title="删除">
+                  <i class="fa fa-trash"></i>
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+
+async function startExperiment(id) {
+  try {
+    const confirmed = await Common.confirmDialog(
+      '确定要启动这个实验吗？启动后将开始 GMP 调度仿真。',
+      '启动实验'
+    );
+    
+    if (!confirmed) return;
+    
+    await API.Experiments.start(id);
+    Common.showToast('实验已启动', 'success');
+    await loadExperiments();
+    
+  } catch (error) {
+    Common.showToast('启动失败: ' + error.message, 'error');
+  }
+}
+
+async function stopExperiment(id) {
+  try {
+    const confirmed = await Common.confirmDialog(
+      '确定要停止这个实验吗？',
+      '停止实验'
+    );
+    
+    if (!confirmed) return;
+    
+    await API.Experiments.stop(id);
+    Common.showToast('实验已停止', 'success');
+    await loadExperiments();
+    
+  } catch (error) {
+    Common.showToast('停止失败: ' + error.message, 'error');
+  }
+}
+
+async function deleteExperiment(id) {
+  try {
+    const confirmed = await Common.confirmDialog(
+      '确定要删除这个实验吗？此操作不可恢复！',
+      '删除实验'
+    );
+    
+    if (!confirmed) return;
+    
+    await API.Experiments.delete(id);
+    Common.showToast('实验已删除', 'success');
+    await loadExperiments();
+    
+  } catch (error) {
+    Common.showToast('删除失败: ' + error.message, 'error');
+  }
+}
+</script>
+
+<%- include('partials/footer') %>

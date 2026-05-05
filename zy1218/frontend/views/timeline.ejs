@@ -1,0 +1,201 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-clock-o text-primary me-2"></i>时间线可视化</h2>
+    <div>
+      <select class="form-select d-inline-block w-auto" id="experiment-select">
+        <option value="">选择实验...</option>
+      </select>
+      <button class="btn btn-outline-primary ms-2" onclick="loadTimeline()">
+        <i class="fa fa-refresh me-1"></i>刷新
+      </button>
+    </div>
+  </div>
+
+  <!-- 时间线展示 -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-history me-2"></i>调度事件时间线
+          <span class="badge bg-secondary ms-2" id="event-count">0 事件</span>
+        </div>
+        <div class="card-body">
+          <div id="timeline-container">
+            <div class="empty-state">
+              <i class="fa fa-clock-o"></i>
+              <h4>请选择一个实验</h4>
+              <p>从上方下拉框选择实验以查看调度时间线</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 图例 -->
+  <div class="row mt-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-info-circle me-2"></i>图例说明
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-primary me-2">G 相关</span>
+              <small class="text-muted">Goroutine 创建、开始、结束、阻塞</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-success me-2">P 相关</span>
+              <small class="text-muted">Processor 获取、释放、窃取</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-info me-2">M 相关</span>
+              <small class="text-muted">Machine 绑定、释放、挂起</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-warning me-2">系统调用</span>
+              <small class="text-muted">阻塞系统调用进入和退出</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-secondary me-2">网络轮询</span>
+              <small class="text-muted">netpoller 等待和唤醒</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-dark me-2">GC</span>
+              <small class="text-muted">垃圾回收开始、结束、协助</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge bg-danger me-2">抢占</span>
+              <small class="text-muted">sysmon 抢占、时间片用完</small>
+            </div>
+            <div class="col-md-3 mb-2">
+              <span class="badge" style="background-color: #6f42c1;">Work Steal</span>
+              <small class="text-muted">工作窃取开始和成功</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let selectedExperimentId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+});
+
+async function loadExperiments() {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const select = document.getElementById('experiment-select');
+    
+    let options = '<option value="">选择实验...</option>';
+    experiments.forEach(exp => {
+      options += `<option value="${exp.id}">
+        ${exp.name} (${Utils.getStatusText(exp.status)})
+      </option>`;
+    });
+    
+    select.innerHTML = options;
+    
+    select.addEventListener('change', () => {
+      selectedExperimentId = select.value ? parseInt(select.value) : null;
+      if (selectedExperimentId) {
+        loadTimeline();
+      }
+    });
+    
+  } catch (error) {
+    Common.showToast('加载实验列表失败: ' + error.message, 'error');
+  }
+}
+
+async function loadTimeline() {
+  if (!selectedExperimentId) {
+    return;
+  }
+  
+  const container = document.getElementById('timeline-container');
+  
+  try {
+    container.innerHTML = `
+      <div class="text-center py-5">
+        <span class="loading"></span>
+        <p class="mt-2 text-muted">加载中...</p>
+      </div>
+    `;
+    
+    const timeline = await API.Experiments.getTimeline(selectedExperimentId);
+    
+    if (!timeline.events || timeline.events.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-clock-o"></i>
+          <h4>暂无时间线数据</h4>
+          <p>该实验尚未产生调度事件</p>
+        </div>
+      `;
+      document.getElementById('event-count').textContent = '0 事件';
+      return;
+    }
+    
+    document.getElementById('event-count').textContent = `${timeline.events.length} 事件`;
+    
+    let html = `<div class="timeline">`;
+    
+    timeline.events.forEach((event, idx) => {
+      const typeClass = getTimelineClass(event.event_type);
+      
+      html += `
+        <div class="timeline-item ${typeClass}" data-index="${idx}">
+          <div class="d-flex justify-content-between">
+            <div>
+              <span class="badge ${Utils.getEventTypeBadgeClass(event.event_type)} me-2">
+                ${Utils.getEventTypeText(event.event_type)}
+              </span>
+              ${event.gid ? `<span class="text-primary fw-bold">G${event.gid}</span> ` : ''}
+              ${event.pid ? `<span class="text-success fw-bold">P${event.pid}</span> ` : ''}
+              ${event.mid ? `<span class="text-info fw-bold">M${event.mid}</span>` : ''}
+            </div>
+            <small class="text-muted">VT: ${event.virtual_time}</small>
+          </div>
+          ${event.reason ? `<small class="text-muted"><i class="fa fa-info-circle me-1"></i>${event.reason}</small>` : ''}
+          ${event.stolen_count ? `<small class="text-warning ms-2"><i class="fa fa-share-alt me-1"></i>窃取 ${event.stolen_count} 个 G</small>` : ''}
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+
+function getTimelineClass(eventType) {
+  if (eventType.startsWith('G_')) return 'timeline-g';
+  if (eventType.startsWith('P_')) return 'timeline-p';
+  if (eventType.startsWith('M_')) return 'timeline-m';
+  if (eventType.startsWith('SYSCALL')) return 'timeline-syscall';
+  if (eventType.startsWith('NETPOLL')) return 'timeline-netpoll';
+  if (eventType.startsWith('GC')) return 'timeline-gc';
+  if (eventType.startsWith('PREEMPT') || eventType.startsWith('SYSMON')) return 'timeline-preempt';
+  if (eventType.startsWith('WORK')) return 'timeline-steal';
+  return '';
+}
+</script>
+
+<%- include('partials/footer') %>

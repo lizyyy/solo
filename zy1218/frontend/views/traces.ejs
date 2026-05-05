@@ -1,0 +1,204 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-upload text-primary me-2"></i>Trace 导入</h2>
+  </div>
+
+  <!-- 导入说明 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card border-info">
+        <div class="card-header bg-info text-white">
+          <i class="fa fa-info-circle me-2"></i>关于 Trace 导入
+        </div>
+        <div class="card-body">
+          <p class="mb-0">
+            支持导入 Go 程序运行时生成的 <code>goroutine-trace.jsonl</code> 文件。
+            这些文件包含了程序执行期间的调度、同步、网络 I/O 等事件数据，
+            可以在这里进行可视化分析。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 上传区域 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-cloud-upload me-2"></i>上传 Trace 文件
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label class="form-label">选择文件</label>
+            <input type="file" class="form-control" id="trace-file" accept=".jsonl,.json">
+            <small class="text-muted">支持 .jsonl (每行一个 JSON) 和 .json 格式</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">关联到实验（可选）</label>
+            <select class="form-select" id="experiment-select">
+              <option value="">不关联到现有实验</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="upload-btn" onclick="uploadTrace()">
+            <i class="fa fa-upload me-2"></i>开始导入
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 导入历史 -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fa fa-history me-2"></i>导入历史</span>
+          <button class="btn btn-outline-primary btn-sm" onclick="loadImports()">
+            <i class="fa fa-refresh me-1"></i>刷新
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="imports-container">
+            <div class="text-center py-5">
+              <span class="loading"></span>
+              <p class="mt-2 text-muted">加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+  await loadImports();
+});
+
+async function loadExperiments() {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const select = document.getElementById('experiment-select');
+    
+    let options = '<option value="">不关联到现有实验</option>';
+    experiments.forEach(exp => {
+      options += `<option value="${exp.id}">${exp.name} (${Utils.getStatusText(exp.status)})</option>`;
+    });
+    
+    select.innerHTML = options;
+    
+  } catch (error) {
+    console.error('Failed to load experiments:', error);
+  }
+}
+
+async function loadImports() {
+  const container = document.getElementById('imports-container');
+  
+  try {
+    const imports = await API.Traces.getAll();
+    
+    if (imports.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-history"></i>
+          <h4>暂无导入历史</h4>
+          <p>上传 Trace 文件后，导入记录将显示在这里</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>文件名</th>
+              <th>大小</th>
+              <th>记录数</th>
+              <th>状态</th>
+              <th>导入时间</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    imports.forEach((imp, idx) => {
+      const statusBadge = imp.status === 'completed' 
+        ? '<span class="badge bg-success">已完成</span>'
+        : imp.status === 'failed'
+        ? '<span class="badge bg-danger">失败</span>'
+        : '<span class="badge bg-warning">处理中</span>';
+      
+      html += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><i class="fa fa-file-text-o me-2"></i>${imp.file_name}</td>
+          <td>${formatFileSize(imp.file_size)}</td>
+          <td>${imp.record_count}</td>
+          <td>${statusBadge}</td>
+          <td><small>${Utils.formatDateTime(imp.created_at)}</small></td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+
+async function uploadTrace() {
+  const fileInput = document.getElementById('trace-file');
+  const file = fileInput.files[0];
+  
+  if (!file) {
+    Common.showToast('请选择要上传的文件', 'warning');
+    return;
+  }
+  
+  try {
+    Common.setLoading('upload-btn', true);
+    
+    const result = await API.Traces.import(file);
+    
+    Common.showToast('导入成功！', 'success');
+    fileInput.value = '';
+    await loadImports();
+    
+  } catch (error) {
+    Common.showToast('导入失败: ' + error.message, 'error');
+  } finally {
+    Common.setLoading('upload-btn', false);
+  }
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+</script>
+
+<%- include('partials/footer') %>

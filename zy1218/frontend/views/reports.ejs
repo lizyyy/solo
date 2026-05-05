@@ -1,0 +1,271 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-file-text text-primary me-2"></i>报告导出</h2>
+  </div>
+
+  <!-- 生成新报告 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-plus-circle me-2"></i>生成新报告
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label">选择实验</label>
+              <select class="form-select" id="experiment-select">
+                <option value="">请选择实验...</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">报告标题（可选）</label>
+              <input type="text" class="form-control" id="report-title" placeholder="自定义标题">
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label">&nbsp;</label>
+              <div class="btn-group w-100">
+                <button class="btn btn-primary" onclick="generateReport('markdown')">
+                  <i class="fa fa-file-text-o me-1"></i>Markdown
+                </button>
+                <button class="btn btn-info" onclick="generateReport('json')">
+                  <i class="fa fa-code me-1"></i>JSON
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 报告列表 -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fa fa-list me-2"></i>已生成的报告</span>
+          <button class="btn btn-outline-primary btn-sm" onclick="loadReports()">
+            <i class="fa fa-refresh me-1"></i>刷新
+          </button>
+        </div>
+        <div class="card-body">
+          <div id="reports-container">
+            <div class="text-center py-5">
+              <span class="loading"></span>
+              <p class="mt-2 text-muted">加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiments();
+  await loadReports();
+});
+
+async function loadExperiments() {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const select = document.getElementById('experiment-select');
+    
+    let options = '<option value="">请选择实验...</option>';
+    experiments.forEach(exp => {
+      options += `<option value="${exp.id}">${exp.name} (${Utils.getStatusText(exp.status)})</option>`;
+    });
+    
+    select.innerHTML = options;
+    
+  } catch (error) {
+    console.error('Failed to load experiments:', error);
+  }
+}
+
+async function loadReports() {
+  const container = document.getElementById('reports-container');
+  
+  try {
+    const reports = await API.Reports.getAll();
+    
+    if (reports.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-file-text"></i>
+          <h4>暂无报告</h4>
+          <p>选择实验并点击上方按钮生成复盘报告</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>标题</th>
+              <th>实验ID</th>
+              <th>类型</th>
+              <th>大小</th>
+              <th>生成时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    reports.forEach((report, idx) => {
+      const typeBadge = report.report_type === 'markdown'
+        ? '<span class="badge bg-primary">Markdown</span>'
+        : '<span class="badge bg-info">JSON</span>';
+      
+      const ext = report.report_type === 'markdown' ? 'md' : 'json';
+      const fileName = `report-${report.id}.${ext}`;
+      const contentType = report.report_type === 'markdown' ? 'text/markdown' : 'application/json';
+      
+      html += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>
+            <strong>${report.title}</strong>
+            ${report.description ? `<br><small class="text-muted">${report.description}</small>` : ''}
+          </td>
+          <td><span class="text-primary">#${report.experiment_id}</span></td>
+          <td>${typeBadge}</td>
+          <td>${report.content ? formatFileSize(report.content.length) : '-'}</td>
+          <td><small>${Utils.formatDateTime(report.created_at)}</small></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary" 
+                    onclick="downloadReport('${report.content}', '${fileName}', '${contentType}')">
+              <i class="fa fa-download me-1"></i>下载
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" 
+                    onclick="viewReport(${report.id})">
+              <i class="fa fa-eye me-1"></i>查看
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+  } catch (error) {
+    container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fa fa-exclamation-circle me-2"></i>
+        加载失败: ${error.message}
+      </div>
+    `;
+  }
+}
+
+async function generateReport(type) {
+  const expId = document.getElementById('experiment-select').value;
+  const title = document.getElementById('report-title').value;
+  
+  if (!expId) {
+    Common.showToast('请选择要生成报告的实验', 'warning');
+    return;
+  }
+  
+  try {
+    Common.showToast(`正在生成${type.toUpperCase()}报告...`, 'info');
+    
+    let result;
+    if (type === 'markdown') {
+      result = await API.Reports.exportMarkdown(parseInt(expId), title);
+    } else {
+      result = await API.Reports.exportJSON(parseInt(expId), title);
+    }
+    
+    Common.showToast('报告生成成功！', 'success');
+    
+    // 自动下载
+    const ext = type === 'markdown' ? 'md' : 'json';
+    const contentType = type === 'markdown' ? 'text/markdown' : 'application/json';
+    Common.downloadFile(result.report.content, `report-${expId}.${ext}`, contentType);
+    
+    await loadReports();
+    
+  } catch (error) {
+    Common.showToast('生成失败: ' + error.message, 'error');
+  }
+}
+
+function downloadReport(content, fileName, contentType) {
+  Common.downloadFile(content, fileName, contentType);
+  Common.showToast('报告已下载', 'success');
+}
+
+async function viewReport(id) {
+  try {
+    const report = await API.Reports.getById(id);
+    
+    // 创建模态框显示内容
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.setAttribute('tabindex', '-1');
+    modal.innerHTML = `
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">${report.title}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            ${report.report_type === 'markdown' 
+              ? `<pre class="bg-light p-3 rounded"><code>${escapeHtml(report.content)}</code></pre>`
+              : `<pre class="bg-dark text-white p-3 rounded"><code>${escapeHtml(report.content)}</code></pre>`
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    modal.addEventListener('hidden.bs.modal', () => {
+      modal.remove();
+    });
+    
+  } catch (error) {
+    Common.showToast('加载报告失败: ' + error.message, 'error');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+</script>
+
+<%- include('partials/footer') %>

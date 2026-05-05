@@ -1,0 +1,188 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 欢迎区域 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="me-4">
+              <i class="fa fa-cogs text-primary" style="font-size: 4rem;"></i>
+            </div>
+            <div>
+              <h1 class="mb-2">GMP 调度模型演练台</h1>
+              <p class="text-muted mb-0">
+                可视化模拟 Go 语言 GMP (Goroutine-Machine-Processor) 调度模型。
+                配置参数、观察调度过程、分析队列变化，深入理解 Go 并发调度机制。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快速操作 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-bolt me-2"></i>快速操作
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <a href="/experiments/new" class="btn btn-primary w-100 py-3">
+                <i class="fa fa-plus-circle me-2"></i>新建实验
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="/experiments" class="btn btn-outline-primary w-100 py-3">
+                <i class="fa fa-flask me-2"></i>查看实验
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="/timeline" class="btn btn-outline-info w-100 py-3">
+                <i class="fa fa-clock-o me-2"></i>时间线可视化
+              </a>
+            </div>
+            <div class="col-md-3 mb-3">
+              <a href="/traces" class="btn btn-outline-success w-100 py-3">
+                <i class="fa fa-upload me-2"></i>导入 Trace
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value" id="stat-experiments">0</div>
+        <div class="stat-label">总实验数</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-success" id="stat-running">0</div>
+        <div class="stat-label">运行中</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-primary" id="stat-completed">0</div>
+        <div class="stat-label">已完成</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-info" id="stat-reports">0</div>
+        <div class="stat-label">生成报告</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GMP 概念介绍 -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-book me-2"></i>GMP 调度模型简介
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card border-primary">
+                <div class="card-body text-center">
+                  <i class="fa fa-user text-primary" style="font-size: 2.5rem;"></i>
+                  <h5 class="mt-2 text-primary">G (Goroutine)</h5>
+                  <p class="text-muted small mb-0">
+                    用户态轻量级线程，由 Go runtime 管理。
+                    拥有独立的栈空间，开销极小（初始 2KB）。
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card border-success">
+                <div class="card-body text-center">
+                  <i class="fa fa-microchip text-success" style="font-size: 2.5rem;"></i>
+                  <h5 class="mt-2 text-success">P (Processor)</h5>
+                  <p class="text-muted small mb-0">
+                    逻辑处理器，管理 Goroutine 运行队列。
+                    数量由 GOMAXPROCS 控制，默认为 CPU 核心数。
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card border-info">
+                <div class="card-body text-center">
+                  <i class="fa fa-server text-info" style="font-size: 2.5rem;"></i>
+                  <h5 class="mt-2 text-info">M (Machine)</h5>
+                  <p class="text-muted small mb-0">
+                    系统线程，实际执行代码的载体。
+                    必须绑定 P 才能运行 G，可动态创建和销毁。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <h5>核心调度机制</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <i class="fa fa-share-alt text-warning me-2"></i>
+                <strong>Work Stealing（工作窃取）</strong>: 当 P 的本地队列为空时，会从其他 P 的队列末尾窃取一半的 G
+              </li>
+              <li class="list-group-item">
+                <i class="fa fa-hand-stop-o text-danger me-2"></i>
+                <strong>抢占式调度</strong>: sysmon 监控长期运行的 G（>10ms），发出抢占信号
+              </li>
+              <li class="list-group-item">
+                <i class="fa fa-exchange text-primary me-2"></i>
+                <strong>系统调用处理</strong>: G 进入阻塞系统调用时，M 会释放 P，让其他 M 继续运行
+              </li>
+              <li class="list-group-item">
+                <i class="fa fa-refresh text-info me-2"></i>
+                <strong>网络轮询</strong>: 异步 I/O 通过 netpoller 处理，避免阻塞 M
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const experiments = await API.Experiments.getAll();
+    const reports = await API.Reports.getAll();
+    
+    let running = 0;
+    let completed = 0;
+    
+    experiments.forEach(exp => {
+      if (exp.status === 'running') running++;
+      if (exp.status === 'completed') completed++;
+    });
+    
+    document.getElementById('stat-experiments').textContent = experiments.length;
+    document.getElementById('stat-running').textContent = running;
+    document.getElementById('stat-completed').textContent = completed;
+    document.getElementById('stat-reports').textContent = reports.length;
+    
+  } catch (error) {
+    console.error('Failed to load statistics:', error);
+  }
+});
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,660 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2><i class="fa fa-flask text-primary me-2"></i>实验详情</h2>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="/">首页</a></li>
+          <li class="breadcrumb-item"><a href="/experiments">实验管理</a></li>
+          <li class="breadcrumb-item active" aria-current="page">实验 #<%= experimentId %></li>
+        </ol>
+      </nav>
+    </div>
+    <div class="btn-group">
+      <a href="/experiments" class="btn btn-outline-secondary">
+        <i class="fa fa-arrow-left me-2"></i>返回
+      </a>
+    </div>
+  </div>
+
+  <!-- 实验信息卡片 -->
+  <div class="row mb-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="fa fa-info-circle me-2"></i>实验信息</span>
+          <div id="experiment-actions"></div>
+        </div>
+        <div class="card-body">
+          <div id="experiment-info">
+            <div class="text-center py-5">
+              <span class="loading"></span>
+              <p class="mt-2 text-muted">加载中...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value" id="stat-total-events">0</div>
+        <div class="stat-label">总事件数</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-primary" id="stat-g-created">0</div>
+        <div class="stat-label">G 创建</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-success" id="stat-g-completed">0</div>
+        <div class="stat-label">G 完成</div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card stat-card">
+        <div class="stat-value text-warning" id="stat-steal-count">0</div>
+        <div class="stat-label">Work Steal</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 选项卡 -->
+  <div class="card">
+    <div class="card-header">
+      <ul class="nav nav-tabs card-header-tabs" id="experimentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline-tab-pane" type="button">
+            <i class="fa fa-clock-o me-1"></i>时间线
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="events-tab" data-bs-toggle="tab" data-bs-target="#events-tab-pane" type="button">
+            <i class="fa fa-list me-1"></i>事件列表
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="snapshots-tab" data-bs-toggle="tab" data-bs-target="#snapshots-tab-pane" type="button">
+            <i class="fa fa-camera me-1"></i>队列快照
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="charts-tab" data-bs-toggle="tab" data-bs-target="#charts-tab-pane" type="button">
+            <i class="fa fa-bar-chart me-1"></i>统计图表
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button">
+            <i class="fa fa-download me-1"></i>导出报告
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content" id="experimentTabContent">
+        <!-- 时间线 -->
+        <div class="tab-pane fade show active" id="timeline-tab-pane">
+          <div id="timeline-container">
+            <div class="empty-state">
+              <i class="fa fa-clock-o"></i>
+              <h4>暂无时间线数据</h4>
+              <p>启动实验后可以在这里查看调度过程</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 事件列表 -->
+        <div class="tab-pane fade" id="events-tab-pane">
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-md-3">
+                <select class="form-select" id="event-type-filter">
+                  <option value="">所有类型</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <button class="btn btn-outline-primary" onclick="loadEvents()">
+                  <i class="fa fa-refresh me-1"></i>刷新
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="events-container"></div>
+        </div>
+        
+        <!-- 队列快照 -->
+        <div class="tab-pane fade" id="snapshots-tab-pane">
+          <div id="snapshots-container"></div>
+        </div>
+        
+        <!-- 统计图表 -->
+        <div class="tab-pane fade" id="charts-tab-pane">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fa fa-pie-chart me-2"></i>事件类型分布
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="events-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fa fa-line-chart me-2"></i>队列大小变化
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="queue-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 导出报告 -->
+        <div class="tab-pane fade" id="export-tab-pane">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fa fa-file-text me-2"></i>Markdown 报告
+                </div>
+                <div class="card-body">
+                  <p class="text-muted">生成包含实验配置、统计数据和关键事件的 Markdown 格式复盘报告。</p>
+                  <div class="mb-3">
+                    <label class="form-label">报告标题</label>
+                    <input type="text" class="form-control" id="md-report-title" placeholder="可选，使用默认标题">
+                  </div>
+                  <button class="btn btn-primary" onclick="exportMarkdownReport()">
+                    <i class="fa fa-download me-2"></i>生成并下载
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <i class="fa fa-code me-2"></i>JSON 报告
+                </div>
+                <div class="card-body">
+                  <p class="text-muted">导出完整的实验数据，包括所有事件和队列快照，用于后续分析。</p>
+                  <div class="mb-3">
+                    <label class="form-label">报告标题</label>
+                    <input type="text" class="form-control" id="json-report-title" placeholder="可选，使用默认标题">
+                  </div>
+                  <button class="btn btn-info" onclick="exportJSONReport()">
+                    <i class="fa fa-download me-2"></i>生成并下载
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const experimentId = <%= experimentId %>;
+let eventsChart = null;
+let queueChart = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadExperiment();
+  await loadStatistics();
+});
+
+async function loadExperiment() {
+  try {
+    const exp = await API.Experiments.getById(experimentId);
+    
+    // 更新实验信息
+    const infoHtml = `
+      <div class="row">
+        <div class="col-md-8">
+          <h4>${exp.name}</h4>
+          ${exp.description ? `<p class="text-muted">${exp.description}</p>` : ''}
+          <div class="mt-2">
+            <span class="badge ${Utils.getStatusBadgeClass(exp.status)} ${exp.status === 'running' ? 'bg-running' : ''} me-2">
+              ${Utils.getStatusText(exp.status)}
+            </span>
+            <small class="text-muted">
+              创建于: ${Utils.formatDateTime(exp.created_at)}
+              ${exp.start_time ? ` | 开始于: ${Utils.formatDateTime(exp.start_time)}` : ''}
+              ${exp.end_time ? ` | 结束于: ${Utils.formatDateTime(exp.end_time)}` : ''}
+            </small>
+          </div>
+        </div>
+        <div class="col-md-4 text-end">
+          <div class="btn-group">
+            ${(exp.status === 'created' || exp.status === 'paused') ? `
+              <button class="btn btn-success" onclick="startExperiment()">
+                <i class="fa fa-play me-1"></i>启动
+              </button>
+            ` : ''}
+            ${exp.status === 'running' ? `
+              <button class="btn btn-warning" onclick="stopExperiment()">
+                <i class="fa fa-stop me-1"></i>停止
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-md-3">
+          <strong>GOMAXPROCS:</strong> <span class="text-primary">${exp.gomaxprocs}</span>
+        </div>
+        <div class="col-md-3">
+          <strong>P 数量:</strong> <span class="text-success">${exp.num_p}</span>
+        </div>
+        <div class="col-md-3">
+          <strong>M 数量:</strong> <span class="text-info">${exp.num_m}</span>
+        </div>
+        <div class="col-md-3">
+          <strong>G 数量:</strong> <span class="text-warning">${exp.num_g}</span>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-md-3">
+          <i class="fa ${exp.enable_syscall ? 'fa-check text-success' : 'fa-times text-muted'}"></i>
+          阻塞系统调用
+        </div>
+        <div class="col-md-3">
+          <i class="fa ${exp.enable_netpoll ? 'fa-check text-success' : 'fa-times text-muted'}"></i>
+          网络轮询
+        </div>
+        <div class="col-md-3">
+          <i class="fa ${exp.enable_gc_assist ? 'fa-check text-success' : 'fa-times text-muted'}"></i>
+          GC Assist
+        </div>
+        <div class="col-md-3">
+          <i class="fa ${exp.enable_preemption ? 'fa-check text-success' : 'fa-times text-muted'}"></i>
+          抢占式调度
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('experiment-info').innerHTML = infoHtml;
+    
+  } catch (error) {
+    Common.showToast('加载实验失败: ' + error.message, 'error');
+  }
+}
+
+async function loadStatistics() {
+  try {
+    const stats = await API.Experiments.getStatistics(experimentId);
+    
+    document.getElementById('stat-total-events').textContent = stats.total_events || 0;
+    document.getElementById('stat-g-created').textContent = stats.g_created || 0;
+    document.getElementById('stat-g-completed').textContent = stats.g_completed || 0;
+    document.getElementById('stat-steal-count').textContent = stats.total_stolen || 0;
+    
+    // 加载图表数据
+    await loadEvents();
+    await loadSnapshots();
+    await loadTimeline();
+    
+  } catch (error) {
+    console.error('Failed to load statistics:', error);
+  }
+}
+
+async function loadEvents() {
+  try {
+    const events = await API.Experiments.getEvents(experimentId, { limit: 500 });
+    
+    if (events.length === 0) {
+      document.getElementById('events-container').innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-list"></i>
+          <h4>暂无事件数据</h4>
+          <p>启动实验后可以在这里查看调度事件</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>虚拟时间</th>
+              <th>事件类型</th>
+              <th>G</th>
+              <th>P</th>
+              <th>M</th>
+              <th>原因</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    events.slice(0, 100).forEach(event => {
+      html += `
+        <tr>
+          <td><small>${Utils.formatDateTime(event.timestamp)}</small></td>
+          <td><small class="text-muted">${event.virtual_time}</small></td>
+          <td>
+            <span class="badge ${Utils.getEventTypeBadgeClass(event.event_type)}">
+              ${Utils.getEventTypeText(event.event_type)}
+            </span>
+          </td>
+          <td>${event.gid || '-'}</td>
+          <td>${event.pid || '-'}</td>
+          <td>${event.mid || '-'}</td>
+          <td><small class="text-muted">${event.reason || '-'}</small></td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+        <p class="text-muted small text-center">显示最新 100 条事件，共 ${events.length} 条</p>
+      </div>
+    `;
+    
+    document.getElementById('events-container').innerHTML = html;
+    
+    // 渲染图表
+    renderEventsChart(events);
+    
+  } catch (error) {
+    console.error('Failed to load events:', error);
+  }
+}
+
+async function loadSnapshots() {
+  try {
+    const snapshots = await API.Experiments.getSnapshots(experimentId);
+    
+    if (snapshots.length === 0) {
+      document.getElementById('snapshots-container').innerHTML = `
+        <div class="empty-state">
+          <i class="fa fa-camera"></i>
+          <h4>暂无队列快照</h4>
+          <p>启动实验后可以在这里查看队列状态</p>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="table-responsive">
+        <table class="table table-hover table-sm">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>虚拟时间</th>
+              <th>全局队列</th>
+              <th>网络队列</th>
+              <th>空闲 P</th>
+              <th>GC 阶段</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    
+    snapshots.forEach((snap, idx) => {
+      html += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><span class="text-primary">${snap.virtual_time}</span></td>
+          <td><span class="badge bg-primary">${snap.global_queue_size}</span></td>
+          <td><span class="badge bg-info">${snap.netpoll_queue_size}</span></td>
+          <td><span class="badge bg-secondary">${snap.idle_pids ? JSON.parse(snap.idle_pids).length : 0}</span></td>
+          <td>${snap.gc_phase || '-'}</td>
+        </tr>
+      `;
+    });
+    
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+    
+    document.getElementById('snapshots-container').innerHTML = html;
+    
+    // 渲染队列图表
+    renderQueueChart(snapshots);
+    
+  } catch (error) {
+    console.error('Failed to load snapshots:', error);
+  }
+}
+
+async function loadTimeline() {
+  try {
+    const timeline = await API.Experiments.getTimeline(experimentId);
+    
+    if (!timeline.events || timeline.events.length === 0) {
+      return;
+    }
+    
+    let html = `<div class="timeline">`;
+    
+    // 显示最近的 50 个事件
+    const recentEvents = timeline.events.slice(-50);
+    
+    recentEvents.forEach(event => {
+      const typeClass = getTimelineClass(event.event_type);
+      html += `
+        <div class="timeline-item ${typeClass}">
+          <div class="d-flex justify-content-between">
+            <div>
+              <span class="badge ${Utils.getEventTypeBadgeClass(event.event_type)} me-2">
+                ${Utils.getEventTypeText(event.event_type)}
+              </span>
+              ${event.gid ? `<span class="text-primary">G${event.gid}</span> ` : ''}
+              ${event.pid ? `<span class="text-success">P${event.pid}</span> ` : ''}
+              ${event.mid ? `<span class="text-info">M${event.mid}</span>` : ''}
+            </div>
+            <small class="text-muted">VT: ${event.virtual_time}</small>
+          </div>
+          ${event.reason ? `<small class="text-muted">${event.reason}</small>` : ''}
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+    
+    document.getElementById('timeline-container').innerHTML = html;
+    
+  } catch (error) {
+    console.error('Failed to load timeline:', error);
+  }
+}
+
+function getTimelineClass(eventType) {
+  if (eventType.startsWith('G_')) return 'timeline-g';
+  if (eventType.startsWith('P_')) return 'timeline-p';
+  if (eventType.startsWith('M_')) return 'timeline-m';
+  if (eventType.startsWith('SYSCALL')) return 'timeline-syscall';
+  if (eventType.startsWith('NETPOLL')) return 'timeline-netpoll';
+  if (eventType.startsWith('GC')) return 'timeline-gc';
+  if (eventType.startsWith('PREEMPT') || eventType.startsWith('SYSMON')) return 'timeline-preempt';
+  if (eventType.startsWith('WORK')) return 'timeline-steal';
+  return '';
+}
+
+function renderEventsChart(events) {
+  const ctx = document.getElementById('events-chart');
+  if (!ctx) return;
+  
+  // 统计事件类型
+  const counts = {};
+  events.forEach(e => {
+    counts[e.event_type] = (counts[e.event_type] || 0) + 1;
+  });
+  
+  const labels = Object.keys(counts).map(k => Utils.getEventTypeText(k));
+  const data = Object.values(counts);
+  
+  if (eventsChart) {
+    eventsChart.destroy();
+  }
+  
+  eventsChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          '#0d6efd', '#198754', '#0dcaf0', '#ffc107',
+          '#6c757d', '#212529', '#dc3545', '#6f42c1'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { size: 10 }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderQueueChart(snapshots) {
+  const ctx = document.getElementById('queue-chart');
+  if (!ctx || snapshots.length === 0) return;
+  
+  const labels = snapshots.map(s => s.virtual_time);
+  const globalData = snapshots.map(s => s.global_queue_size);
+  const netpollData = snapshots.map(s => s.netpoll_queue_size);
+  
+  if (queueChart) {
+    queueChart.destroy();
+  }
+  
+  queueChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '全局队列',
+          data: globalData,
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13, 110, 253, 0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: '网络队列',
+          data: netpollData,
+          borderColor: '#0dcaf0',
+          backgroundColor: 'rgba(13, 202, 240, 0.1)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+}
+
+async function startExperiment() {
+  try {
+    const confirmed = await Common.confirmDialog(
+      '确定要启动这个实验吗？',
+      '启动实验'
+    );
+    
+    if (!confirmed) return;
+    
+    await API.Experiments.start(experimentId);
+    Common.showToast('实验已启动', 'success');
+    setTimeout(() => location.reload(), 1000);
+    
+  } catch (error) {
+    Common.showToast('启动失败: ' + error.message, 'error');
+  }
+}
+
+async function stopExperiment() {
+  try {
+    const confirmed = await Common.confirmDialog(
+      '确定要停止这个实验吗？',
+      '停止实验'
+    );
+    
+    if (!confirmed) return;
+    
+    await API.Experiments.stop(experimentId);
+    Common.showToast('实验已停止', 'success');
+    setTimeout(() => location.reload(), 1000);
+    
+  } catch (error) {
+    Common.showToast('停止失败: ' + error.message, 'error');
+  }
+}
+
+async function exportMarkdownReport() {
+  try {
+    const title = document.getElementById('md-report-title').value;
+    const result = await API.Reports.exportMarkdown(experimentId, title);
+    
+    Common.downloadFile(result.report.content, `report-${experimentId}.md`, 'text/markdown');
+    Common.showToast('Markdown 报告已下载', 'success');
+    
+  } catch (error) {
+    Common.showToast('导出失败: ' + error.message, 'error');
+  }
+}
+
+async function exportJSONReport() {
+  try {
+    const title = document.getElementById('json-report-title').value;
+    const result = await API.Reports.exportJSON(experimentId, title);
+    
+    Common.downloadFile(result.report.content, `report-${experimentId}.json`, 'application/json');
+    Common.showToast('JSON 报告已下载', 'success');
+    
+  } catch (error) {
+    Common.showToast('导出失败: ' + error.message, 'error');
+  }
+}
+</script>
+
+<%- include('partials/footer') %>

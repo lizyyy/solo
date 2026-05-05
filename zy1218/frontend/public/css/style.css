@@ -1,0 +1,324 @@
+/* 全局样式 */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+main {
+  flex: 1;
+}
+
+/* 导航栏样式 */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.nav-link {
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+}
+
+/* 卡片样式 */
+.card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #e9ecef;
+  font-weight: 600;
+}
+
+/* 按钮样式 */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* 状态徽章 */
+.badge {
+  font-size: 0.85em;
+  padding: 0.4em 0.6em;
+}
+
+.badge.bg-running {
+  background-color: #198754 !important;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* 表格样式 */
+.table {
+  background-color: #fff;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* 表单样式 */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 时间线样式 */
+.timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #dee2e6;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #0d6efd;
+}
+
+.timeline-item.timeline-g::before { background-color: #0d6efd; box-shadow: 0 0 0 2px #0d6efd; }
+.timeline-item.timeline-p::before { background-color: #198754; box-shadow: 0 0 0 2px #198754; }
+.timeline-item.timeline-m::before { background-color: #0dcaf0; box-shadow: 0 0 0 2px #0dcaf0; }
+.timeline-item.timeline-syscall::before { background-color: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
+.timeline-item.timeline-netpoll::before { background-color: #6c757d; box-shadow: 0 0 0 2px #6c757d; }
+.timeline-item.timeline-gc::before { background-color: #212529; box-shadow: 0 0 0 2px #212529; }
+.timeline-item.timeline-preempt::before { background-color: #dc3545; box-shadow: 0 0 0 2px #dc3545; }
+.timeline-item.timeline-steal::before { background-color: #6f42c1; box-shadow: 0 0 0 2px #6f42c1; }
+
+/* 图表容器 */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-container-large {
+  height: 400px;
+}
+
+/* 统计卡片 */
+.stat-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #0d6efd;
+}
+
+.stat-card .stat-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* 加载动画 */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(13, 110, 253, 0.3);
+  border-radius: 50%;
+  border-top-color: #0d6efd;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 队列可视化 */
+.queue-visual {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: #e9ecef;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #495057;
+  transition: all 0.3s ease;
+}
+
+.queue-item:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+.queue-item.running {
+  background-color: #198754;
+  border-color: #198754;
+  color: #fff;
+}
+
+.queue-item.blocked {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .stat-card .stat-value {
+    font-size: 2rem;
+  }
+  
+  .card {
+    margin-bottom: 15px;
+  }
+  
+  .timeline {
+    padding-left: 20px;
+  }
+  
+  .timeline::before {
+    left: 4px;
+  }
+  
+  .timeline-item::before {
+    left: -18px;
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h4 {
+  margin-bottom: 10px;
+}
+
+/* 代码块 */
+pre {
+  background-color: #212529;
+  color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Toast 通知 */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.toast {
+  min-width: 300px;
+}
+
+/* 进度条动画 */
+.progress-bar-animated {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+  animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+  0% { background-position-x: 1rem; }
+}

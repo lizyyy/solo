@@ -1,0 +1,259 @@
+<%- include('partials/header') %>
+
+<main class="container mt-4 mb-4">
+  <!-- 页面标题 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa fa-plus-circle text-primary me-2"></i><%= title %></h2>
+    <a href="/experiments" class="btn btn-outline-secondary">
+      <i class="fa fa-arrow-left me-2"></i>返回列表
+    </a>
+  </div>
+
+  <!-- 实验表单 -->
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-cog me-2"></i>实验配置
+        </div>
+        <div class="card-body">
+          <form id="experiment-form">
+            <!-- 基本信息 -->
+            <div class="mb-4">
+              <h5 class="mb-3 text-primary">
+                <i class="fa fa-info-circle me-2"></i>基本信息
+              </h5>
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">实验名称 <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="name" name="name" 
+                         placeholder="输入实验名称" required>
+                </div>
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">描述</label>
+                  <textarea class="form-control" id="description" name="description" rows="2"
+                            placeholder="输入实验描述"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- GMP 配置 -->
+            <div class="mb-4">
+              <h5 class="mb-3 text-success">
+                <i class="fa fa-microchip me-2"></i>GMP 配置
+              </h5>
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label class="form-label">GOMAXPROCS</label>
+                  <input type="number" class="form-control" id="gomaxprocs" name="gomaxprocs" 
+                         value="4" min="1" max="64">
+                  <small class="text-muted">逻辑处理器数量</small>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label">P 数量</label>
+                  <input type="number" class="form-control" id="num_p" name="num_p" 
+                         value="4" min="1" max="64">
+                  <small class="text-muted">Processor 数量</small>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label">M 数量</label>
+                  <input type="number" class="form-control" id="num_m" name="num_m" 
+                         value="4" min="1" max="128">
+                  <small class="text-muted">Machine 数量</small>
+                </div>
+                <div class="col-md-3 mb-3">
+                  <label class="form-label">G 数量</label>
+                  <input type="number" class="form-control" id="num_g" name="num_g" 
+                         value="50" min="1" max="10000">
+                  <small class="text-muted">Goroutine 数量</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- 事件配置 -->
+            <div class="mb-4">
+              <h5 class="mb-3 text-warning">
+                <i class="fa fa-bolt me-2"></i>事件配置
+              </h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="enable_syscall" checked>
+                    <label class="form-check-label" for="enable_syscall">
+                      <i class="fa fa-exchange text-warning me-1"></i>
+                      启用阻塞系统调用
+                    </label>
+                    <br>
+                    <small class="text-muted">G 会随机进入阻塞系统调用，测试 P 释放和重新获取</small>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="enable_netpoll" checked>
+                    <label class="form-check-label" for="enable_netpoll">
+                      <i class="fa fa-wifi text-info me-1"></i>
+                      启用网络轮询
+                    </label>
+                    <br>
+                    <small class="text-muted">G 会进行网络 IO，测试 netpoller 唤醒机制</small>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="enable_gc_assist">
+                    <label class="form-check-label" for="enable_gc_assist">
+                      <i class="fa fa-refresh text-dark me-1"></i>
+                      启用 GC Assist
+                    </label>
+                    <br>
+                    <small class="text-muted">随机触发 GC，测试 P 协助 GC 的行为</small>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="enable_preemption" checked>
+                    <label class="form-check-label" for="enable_preemption">
+                      <i class="fa fa-hand-stop-o text-danger me-1"></i>
+                      启用抢占式调度
+                    </label>
+                    <br>
+                    <small class="text-muted">sysmon 监控并抢占长期运行的 G</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-outline-secondary me-2" onclick="history.back()">
+                <i class="fa fa-times me-2"></i>取消
+              </button>
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                <i class="fa fa-save me-2"></i>保存实验
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 配置说明 -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa fa-lightbulb-o me-2"></i>配置说明
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6><i class="fa fa-microchip text-primary me-1"></i>GOMAXPROCS</h6>
+            <p class="text-muted small">
+              控制同时执行用户级 Go 代码的操作系统线程数。
+              默认为 CPU 核心数。
+            </p>
+          </div>
+          <div class="mb-3">
+            <h6><i class="fa fa-microchip text-success me-1"></i>P (Processor)</h6>
+            <p class="text-muted small">
+              逻辑处理器，持有 Goroutine 运行队列。
+              M 必须绑定 P 才能执行 G。
+            </p>
+          </div>
+          <div class="mb-3">
+            <h6><i class="fa fa-server text-info me-1"></i>M (Machine)</h6>
+            <p class="text-muted small">
+              系统线程，实际执行代码的载体。
+              数量可动态调整，通常略多于 P。
+            </p>
+          </div>
+          <div class="mb-3">
+            <h6><i class="fa fa-user text-warning me-1"></i>G (Goroutine)</h6>
+            <p class="text-muted small">
+              用户态轻量级线程。初始栈 2KB，可动态增长。
+              由 Go runtime 调度，而非操作系统。
+            </p>
+          </div>
+          <hr>
+          <div class="alert alert-info small">
+            <i class="fa fa-info-circle me-1"></i>
+            <strong>提示：</strong>创建后可以在实验详情页查看调度过程的时间线、事件和队列快照。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const experimentId = '<%= typeof experimentId !== "undefined" ? experimentId : "" %>';
+  
+  if (experimentId) {
+    await loadExperiment(experimentId);
+  }
+  
+  document.getElementById('experiment-form').addEventListener('submit', handleSubmit);
+});
+
+async function loadExperiment(id) {
+  try {
+    const exp = await API.Experiments.getById(id);
+    
+    document.getElementById('name').value = exp.name || '';
+    document.getElementById('description').value = exp.description || '';
+    document.getElementById('gomaxprocs').value = exp.gomaxprocs || 4;
+    document.getElementById('num_p').value = exp.num_p || 4;
+    document.getElementById('num_m').value = exp.num_m || 4;
+    document.getElementById('num_g').value = exp.num_g || 50;
+    document.getElementById('enable_syscall').checked = exp.enable_syscall;
+    document.getElementById('enable_netpoll').checked = exp.enable_netpoll;
+    document.getElementById('enable_gc_assist').checked = exp.enable_gc_assist;
+    document.getElementById('enable_preemption').checked = exp.enable_preemption;
+    
+  } catch (error) {
+    Common.showToast('加载实验失败: ' + error.message, 'error');
+  }
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+  
+  const experimentId = '<%= typeof experimentId !== "undefined" ? experimentId : "" %>';
+  
+  const data = {
+    name: document.getElementById('name').value,
+    description: document.getElementById('description').value,
+    gomaxprocs: parseInt(document.getElementById('gomaxprocs').value) || 4,
+    num_p: parseInt(document.getElementById('num_p').value) || 4,
+    num_m: parseInt(document.getElementById('num_m').value) || 4,
+    num_g: parseInt(document.getElementById('num_g').value) || 50,
+    enable_syscall: document.getElementById('enable_syscall').checked,
+    enable_netpoll: document.getElementById('enable_netpoll').checked,
+    enable_gc_assist: document.getElementById('enable_gc_assist').checked,
+    enable_preemption: document.getElementById('enable_preemption').checked,
+  };
+  
+  try {
+    Common.setLoading('submit-btn', true);
+    
+    let result;
+    if (experimentId) {
+      result = await API.Experiments.update(experimentId, data);
+      Common.showToast('实验已更新', 'success');
+    } else {
+      result = await API.Experiments.create(data);
+      Common.showToast('实验已创建', 'success');
+    }
+    
+    setTimeout(() => {
+      window.location.href = '/experiments';
+    }, 1000);
+    
+  } catch (error) {
+    Common.showToast('保存失败: ' + error.message, 'error');
+  } finally {
+    Common.setLoading('submit-btn', false);
+  }
+}
+</script>
+
+<%- include('partials/footer') %>

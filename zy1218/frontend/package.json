@@ -1,0 +1,29 @@
+{
+  "name": "gmp-simulator-frontend",
+  "version": "1.0.0",
+  "description": "GMP Scheduler Simulator Frontend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "gmp",
+    "scheduler",
+    "simulator",
+    "go"
+  ],
+  "author": "",
+  "license": "MIT"
+}
