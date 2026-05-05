@@ -1,0 +1,25 @@
+{
+  "name": "insect-specimen-manager",
+  "version": "1.0.0",
+  "description": "昆虫标本馆管理工具",
+  "main": "dist-electron/main/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": ["insect", "specimen", "management", "electron", "vue"],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/compiler-sfc": "^3.5.33",
+    "electron": "^35.1.2",
+    "vite": "^6.2.3",
+    "vite-plugin-electron": "^0.29.1",
+    "vite-plugin-electron-renderer": "^0.14.7",
+    "vue": "^3.5.33",
+    "vue-router": "^4.5.0"
+  }
+}
