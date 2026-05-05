@@ -1,0 +1,8 @@
+{"connection_id": "conn-writer", "operation": "begin", "timestamp": "2026-05-05T10:00:00.000Z", "duration_ms": 2}
+{"connection_id": "conn-reader-1", "operation": "begin", "timestamp": "2026-05-05T10:00:00.010Z", "duration_ms": 2}
+{"connection_id": "conn-reader-1", "operation": "read", "timestamp": "2026-05-05T10:00:00.020Z", "duration_ms": 5000, "table": "hot_table", "row_id": "row-1"}
+{"connection_id": "conn-writer", "operation": "write", "timestamp": "2026-05-05T10:00:00.030Z", "duration_ms": 50, "table": "hot_table", "row_id": "row-2"}
+{"connection_id": "conn-reader-2", "operation": "begin", "timestamp": "2026-05-05T10:00:00.100Z", "duration_ms": 2}
+{"connection_id": "conn-reader-2", "operation": "read", "timestamp": "2026-05-05T10:00:00.110Z", "duration_ms": 5000, "table": "hot_table", "row_id": "row-3"}
+{"connection_id": "conn-reader-3", "operation": "begin", "timestamp": "2026-05-05T10:00:00.200Z", "duration_ms": 2}
+{"connection_id": "conn-reader-3", "operation": "read", "timestamp": "2026-05-05T10:00:00.210Z", "duration_ms": 5000, "table": "hot_table", "row_id": "row-4"}

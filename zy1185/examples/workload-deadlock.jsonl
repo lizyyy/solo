@@ -1,0 +1,6 @@
+{"connection_id": "conn-a", "operation": "begin", "timestamp": "2026-05-05T10:00:00.000Z", "duration_ms": 2}
+{"connection_id": "conn-b", "operation": "begin", "timestamp": "2026-05-05T10:00:00.010Z", "duration_ms": 2}
+{"connection_id": "conn-a", "operation": "read", "timestamp": "2026-05-05T10:00:00.020Z", "duration_ms": 10, "table": "table_a", "row_id": "row-1"}
+{"connection_id": "conn-b", "operation": "read", "timestamp": "2026-05-05T10:00:00.030Z", "duration_ms": 10, "table": "table_b", "row_id": "row-1"}
+{"connection_id": "conn-a", "operation": "write", "timestamp": "2026-05-05T10:00:00.050Z", "duration_ms": 20, "table": "table_b", "row_id": "row-2"}
+{"connection_id": "conn-b", "operation": "write", "timestamp": "2026-05-05T10:00:00.060Z", "duration_ms": 20, "table": "table_a", "row_id": "row-2"}

@@ -1,0 +1,7 @@
+{"connection_id": "conn-001", "operation": "begin", "timestamp": "2026-05-05T10:00:00.000Z", "duration_ms": 2}
+{"connection_id": "conn-001", "operation": "read", "timestamp": "2026-05-05T10:00:00.010Z", "duration_ms": 10, "table": "users", "row_id": "row-1"}
+{"connection_id": "conn-002", "operation": "begin", "timestamp": "2026-05-05T10:00:00.020Z", "duration_ms": 2}
+{"connection_id": "conn-002", "operation": "read", "timestamp": "2026-05-05T10:00:00.030Z", "duration_ms": 8, "table": "users", "row_id": "row-2"}
+{"connection_id": "conn-001", "operation": "read", "timestamp": "2026-05-05T10:00:00.050Z", "duration_ms": 5, "table": "orders", "row_id": "row-100"}
+{"connection_id": "conn-002", "operation": "commit", "timestamp": "2026-05-05T10:00:00.080Z", "duration_ms": 15}
+{"connection_id": "conn-001", "operation": "commit", "timestamp": "2026-05-05T10:00:00.100Z", "duration_ms": 15}

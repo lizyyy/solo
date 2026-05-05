@@ -1,0 +1,6 @@
+busy_timeout_ms: 5000
+max_shared_locks: 100
+enable_deadlock_detection: true
+starvation_threshold_ms: 30000
+lock_upgrade_enabled: true
+pending_lock_priority: true
