@@ -1,0 +1,54 @@
+{"type": "gil_acquire", "thread_id": 0, "timestamp": 0.0, "owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0001, "opcode": "BINARY_ADD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0002, "opcode": "LOAD_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0003, "opcode": "STORE_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0004, "opcode": "COMPARE_OP", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0005, "opcode": "JUMP_FORWARD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0006, "opcode": "BINARY_MULTIPLY", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0007, "opcode": "BINARY_ADD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0008, "opcode": "LOAD_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0009, "opcode": "STORE_FAST", "gil_owner": 0}
+{"type": "preemption", "thread_id": 0, "timestamp": 0.001, "instruction_count": 100}
+{"type": "gil_release", "thread_id": 0, "timestamp": 0.001, "released_by": 0, "reason": "preemption"}
+{"type": "gil_acquire", "thread_id": 1, "timestamp": 0.001, "owner": 1}
+{"type": "instruction", "thread_id": 1, "timestamp": 0.0011, "opcode": "BINARY_ADD", "gil_owner": 1}
+{"type": "instruction", "thread_id": 1, "timestamp": 0.0012, "opcode": "LOAD_FAST", "gil_owner": 1}
+{"type": "instruction", "thread_id": 1, "timestamp": 0.0013, "opcode": "STORE_FAST", "gil_owner": 1}
+{"type": "io_wait", "thread_id": 1, "timestamp": 0.0014, "duration": 0.05, "io_blocked_until": 0.0514}
+{"type": "gil_release", "thread_id": 1, "timestamp": 0.0014, "released_by": 1, "reason": "io_block"}
+{"type": "gil_acquire", "thread_id": 0, "timestamp": 0.0014, "owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0015, "opcode": "BINARY_ADD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0016, "opcode": "COMPARE_OP", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0017, "opcode": "JUMP_FORWARD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0018, "opcode": "LOAD_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0019, "opcode": "STORE_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.002, "opcode": "BINARY_MULTIPLY", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0021, "opcode": "BINARY_ADD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0022, "opcode": "LOAD_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0023, "opcode": "STORE_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0024, "opcode": "COMPARE_OP", "gil_owner": 0}
+{"type": "preemption", "thread_id": 0, "timestamp": 0.0025, "instruction_count": 100}
+{"type": "gil_release", "thread_id": 0, "timestamp": 0.0025, "released_by": 0, "reason": "preemption"}
+{"type": "gil_acquire", "thread_id": 2, "timestamp": 0.0025, "owner": 2}
+{"type": "instruction", "thread_id": 2, "timestamp": 0.0026, "opcode": "BINARY_ADD", "gil_owner": 2}
+{"type": "instruction", "thread_id": 2, "timestamp": 0.0027, "opcode": "LOAD_FAST", "gil_owner": 2}
+{"type": "instruction", "thread_id": 2, "timestamp": 0.0028, "opcode": "STORE_FAST", "gil_owner": 2}
+{"type": "instruction", "thread_id": 2, "timestamp": 0.0029, "opcode": "COMPARE_OP", "gil_owner": 2}
+{"type": "instruction", "thread_id": 2, "timestamp": 0.003, "opcode": "JUMP_FORWARD", "gil_owner": 2}
+{"type": "gil_release_c_extension", "thread_id": 2, "timestamp": 0.003, "reason": "c_extension_release"}
+{"type": "gil_release", "thread_id": 2, "timestamp": 0.003, "released_by": 2}
+{"type": "gil_acquire", "thread_id": 3, "timestamp": 0.003, "owner": 3}
+{"type": "instruction", "thread_id": 3, "timestamp": 0.0031, "opcode": "BINARY_ADD", "gil_owner": 3}
+{"type": "instruction", "thread_id": 3, "timestamp": 0.0032, "opcode": "LOAD_FAST", "gil_owner": 3}
+{"type": "instruction", "thread_id": 3, "timestamp": 0.0033, "opcode": "STORE_FAST", "gil_owner": 3}
+{"type": "lock_acquire", "thread_id": 3, "timestamp": 0.0034, "lock_id": 0}
+{"type": "instruction", "thread_id": 3, "timestamp": 0.0035, "opcode": "BINARY_ADD", "gil_owner": 3}
+{"type": "instruction", "thread_id": 3, "timestamp": 0.0036, "opcode": "COMPARE_OP", "gil_owner": 3}
+{"type": "preemption", "thread_id": 3, "timestamp": 0.0037, "instruction_count": 100}
+{"type": "gil_release", "thread_id": 3, "timestamp": 0.0037, "released_by": 3, "reason": "preemption"}
+{"type": "io_wake", "thread_id": 1, "timestamp": 0.0514}
+{"type": "gil_acquire", "thread_id": 0, "timestamp": 0.0514, "owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0515, "opcode": "BINARY_ADD", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0516, "opcode": "LOAD_FAST", "gil_owner": 0}
+{"type": "instruction", "thread_id": 0, "timestamp": 0.0517, "opcode": "STORE_FAST", "gil_owner": 0}
+{"type": "gil_release", "thread_id": 0, "timestamp": 0.0518, "released_by": 0}

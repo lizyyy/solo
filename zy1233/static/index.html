@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python GIL 机制演练台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #444;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #61dafb;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: #2a2a3a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .panel h2 {
+            color: #61dafb;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #61dafb;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #444;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #61dafb;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 60px;
+            text-align: center;
+            background: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #61dafb;
+        }
+        
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 1em;
+        }
+        
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #61dafb;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #61dafb 0%, #4a9eff 100%);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(97, 218, 251, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #444;
+            color: #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #555;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .validation-messages {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .validation-error {
+            background: rgba(255, 100, 100, 0.2);
+            border: 1px solid #ff6666;
+            color: #ff6666;
+        }
+        
+        .validation-warning {
+            background: rgba(255, 200, 100, 0.2);
+            border: 1px solid #ffcc66;
+            color: #ffcc66;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #444;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #333;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            margin-bottom: -2px;
+        }
+        
+        .tab.active {
+            background: #2a2a3a;
+            color: #61dafb;
+            border-bottom: 2px solid #61dafb;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #333 0%, #2a2a3a 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #61dafb;
+        }
+        
+        .stat-card h3 {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .value {
+            color: #61dafb;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .thread-stats {
+            margin-top: 20px;
+        }
+        
+        .thread-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #333;
+            border-radius: 6px;
+        }
+        
+        .thread-label {
+            min-width: 100px;
+            font-family: monospace;
+            color: #61dafb;
+        }
+        
+        .thread-bar-container {
+            flex: 1;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .thread-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #61dafb 0%, #4a9eff 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .thread-bar-fill.waiting {
+            background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+        }
+        
+        .risk-analysis {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(97, 218, 251, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #61dafb;
+            line-height: 1.6;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .timeline-events {
+            display: flex;
+            gap: 2px;
+            padding: 10px 0;
+            min-width: 100%;
+        }
+        
+        .timeline-event {
+            min-width: 8px;
+            height: 40px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .timeline-event:hover {
+            transform: scaleY(1.2);
+        }
+        
+        .timeline-event.gil-acquire { background: #4caf50; }
+        .timeline-event.gil-release { background: #f44336; }
+        .timeline-event.preemption { background: #ff9800; }
+        .timeline-event.io-wait { background: #9c27b0; }
+        .timeline-event.instruction { background: #607d8b; }
+        
+        .timeline-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 10px;
+            background: #333;
+            border-radius: 6px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+        
+        .experiments-list {
+            margin-top: 20px;
+        }
+        
+        .experiment-item {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .experiment-item:hover {
+            background: #444;
+        }
+        
+        .experiment-info h4 {
+            color: #61dafb;
+            margin-bottom: 5px;
+        }
+        
+        .experiment-info p {
+            color: #888;
+            font-size: 0.85em;
+        }
+        
+        .experiment-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #444;
+            border-top-color: #61dafb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        
+        .event-detail {
+            margin-top: 20px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        
+        .file-upload {
+            margin-top: 15px;
+            padding: 15px;
+            background: #333;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px dashed #555;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: #61dafb;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #444;
+            color: #e0e0e0;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .info-icon {
+            color: #61dafb;
+            font-size: 0.85em;
+        }
+        
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐍 Python GIL 机制演练台</h1>
+            <p class="subtitle">交互式模拟 Python 全局解释器锁的行为 - 可视化线程调度、GIL 争用与性能特性</p>
+        </header>
+        
+        <div class="main-grid">
+            <div class="panel">
+                <h2>⚙️ 实验配置</h2>
+                
+                <div class="form-group">
+                    <label for="experimentName">实验名称</label>
+                    <input type="text" id="experimentName" placeholder="输入实验名称（可选）">
+                </div>
+                
+                <div class="form-group">
+                    <label>工作负载类型
+                        <span class="tooltip">
+                            <span class="info-icon">ℹ️</span>
+                            <span class="tooltip-text">选择模拟的工作负载特征</span>
+                        </span>
+                    </label>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="cpuIntensive" checked>
+                        <label for="cpuIntensive">CPU 密集型</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="ioBlocking">
+                        <label for="ioBlocking">I/O 阻塞</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="cExtensionRelease">
+                        <label for="cExtensionRelease">C 扩展释放 GIL</label>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lockContention">
+                        <label for="lockContention">锁竞争</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="threadCount">线程数: <span id="threadCountValue" class="slider-value">4</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="threadCount" min="1" max="32" value="4">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="switchInterval">切换间隔 (秒): <span id="switchIntervalValue" class="slider-value">0.005</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="switchInterval" min="0.001" max="0.1" step="0.001" value="0.005">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="totalInstructions">总指令数: <span id="totalInstructionsValue" class="slider-value">10000</span></label>
+                    <div class="slider-container">
+                        <input type="range" id="totalInstructions" min="1000" max="100000" step="1000" value="10000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="seed">随机种子 (可选)</label>
+                    <input type="number" id="seed" placeholder="留空使用随机种子">
+                </div>
+                
+                <div id="validationMessages"></div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="runExperiment">
+                        🚀 运行实验
+                    </button>
+                </div>
+                
+                <div class="file-upload" id="fileUpload">
+                    <input type="file" id="importFile" accept=".jsonl">
+                    <span>📁 导入 gil-events.jsonl 文件</span>
+                </div>
+            </div>
+            
+            <div>
+                <div class="panel">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="results">📊 实验结果</button>
+                        <button class="tab" data-tab="timeline">📈 时间线</button>
+                        <button class="tab" data-tab="history">📚 历史实验</button>
+                    </div>
+                    
+                    <div id="tab-results" class="tab-content active">
+                        <div id="resultsContent" class="empty-state">
+                            <p>运行实验或选择历史实验查看结果</p>
+                        </div>
+                    </div>
+                    
+                    <div id="tab-timeline" class="tab-content">
+                        <div id="timelineContent" class="empty-state">
+                            <p>运行实验或选择历史实验查看时间线</p>
+                        </div>
+                    </div>
+                    
+                    <div id="tab-history" class="tab-content">
+                        <div id="historyContent" class="empty-state">
+                            <p>暂无历史实验</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class GILPlayground {
+            constructor() {
+                this.currentExperiment = null;
+                this.experiments = [];
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.loadExperiments();
+                this.updateSliderValues();
+            }
+            
+            bindEvents() {
+                document.querySelectorAll('.slider-container input[type="range"]').forEach(slider => {
+                    slider.addEventListener('input', (e) => {
+                        this.updateSliderValues();
+                        this.validateConfig();
+                    });
+                });
+                
+                document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', () => this.validateConfig());
+                });
+                
+                document.getElementById('runExperiment').addEventListener('click', () => this.runExperiment());
+                
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+                
+                const fileUpload = document.getElementById('fileUpload');
+                const importFile = document.getElementById('importFile');
+                
+                fileUpload.addEventListener('click', () => importFile.click());
+                importFile.addEventListener('change', (e) => this.importFile(e));
+            }
+            
+            updateSliderValues() {
+                const threadCount = document.getElementById('threadCount').value;
+                const switchInterval = document.getElementById('switchInterval').value;
+                const totalInstructions = document.getElementById('totalInstructions').value;
+                
+                document.getElementById('threadCountValue').textContent = threadCount;
+                document.getElementById('switchIntervalValue').textContent = switchInterval;
+                document.getElementById('totalInstructionsValue').textContent = totalInstructions;
+            }
+            
+            getConfig() {
+                return {
+                    name: document.getElementById('experimentName').value || undefined,
+                    cpu_intensive: document.getElementById('cpuIntensive').checked,
+                    io_blocking: document.getElementById('ioBlocking').checked,
+                    c_extension_gil_release: document.getElementById('cExtensionRelease').checked,
+                    lock_contention: document.getElementById('lockContention').checked,
+                    thread_count: parseInt(document.getElementById('threadCount').value),
+                    switch_interval: parseFloat(document.getElementById('switchInterval').value),
+                    total_instructions: parseInt(document.getElementById('totalInstructions').value),
+                    seed: document.getElementById('seed').value ? parseInt(document.getElementById('seed').value) : undefined
+                };
+            }
+            
+            async validateConfig() {
+                const config = this.getConfig();
+                const validationDiv = document.getElementById('validationMessages');
+                
+                try {
+                    const response = await fetch('/api/config/validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    let html = '';
+                    
+                    if (result.errors.length > 0) {
+                        html += `<div class="validation-messages validation-error">
+                            <strong>❌ 错误:</strong>
+                            <ul>${result.errors.map(e => `<li>${e}</li>`).join('')}</ul>
+                        </div>`;
+                    }
+                    
+                    if (result.warnings.length > 0) {
+                        html += `<div class="validation-messages validation-warning">
+                            <strong>⚠️ 警告:</strong>
+                            <ul>${result.warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+                        </div>`;
+                    }
+                    
+                    validationDiv.innerHTML = html;
+                    
+                    const runBtn = document.getElementById('runExperiment');
+                    runBtn.disabled = !result.valid;
+                    
+                } catch (error) {
+                    console.error('Validation error:', error);
+                }
+            }
+            
+            async runExperiment() {
+                const config = this.getConfig();
+                const runBtn = document.getElementById('runExperiment');
+                
+                runBtn.disabled = true;
+                runBtn.innerHTML = '⏳ 运行中...';
+                
+                this.showResultsLoading();
+                
+                try {
+                    const response = await fetch('/api/experiments', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Experiment failed');
+                    }
+                    
+                    const experiment = await response.json();
+                    this.currentExperiment = experiment;
+                    
+                    this.renderResults(experiment);
+                    this.renderTimeline(experiment);
+                    await this.loadExperiments();
+                    
+                } catch (error) {
+                    console.error('Experiment error:', error);
+                    document.getElementById('resultsContent').innerHTML = 
+                        `<div class="loading">❌ 实验运行失败: ${error.message}</div>`;
+                } finally {
+                    runBtn.disabled = false;
+                    runBtn.innerHTML = '🚀 运行实验';
+                }
+            }
+            
+            showResultsLoading() {
+                document.getElementById('resultsContent').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>正在模拟 GIL 行为...</p>
+                    </div>
+                `;
+            }
+            
+            renderResults(experiment) {
+                const results = experiment.results;
+                const config = experiment.config;
+                
+                const maxInstructions = Math.max(...results.thread_stats.map(t => t.instructions));
+                const maxWaitTime = Math.max(...results.thread_stats.map(t => t.wait_time)) || 1;
+                
+                let html = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>总指令数</h3>
+                            <div class="value">${results.total_instructions.toLocaleString()}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>总耗时</h3>
+                            <div class="value">${results.total_time.toFixed(4)}s</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>吞吐率</h3>
+                            <div class="value">${results.throughput.toFixed(0)}</div>
+                            <small>instructions/s</small>
+                        </div>
+                        <div class="stat-card">
+                            <h3>GIL 获取次数</h3>
+                            <div class="value">${results.gil_events.acquisitions}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>抢占次数</h3>
+                            <div class="value">${results.gil_events.preemptions}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>I/O 等待</h3>
+                            <div class="value">${results.gil_events.io_waits}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>锁等待</h3>
+                            <div class="value">${results.gil_events.lock_waits || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>GIL 释放</h3>
+                            <div class="value">${results.gil_events.releases}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="thread-stats">
+                        <h3>🧵 线程统计 - 指令执行</h3>
+                        ${results.thread_stats.map((stat, i) => `
+                            <div class="thread-bar">
+                                <span class="thread-label">Thread ${stat.thread_id || i}</span>
+                                <div class="thread-bar-container">
+                                    <div class="thread-bar-fill" style="width: ${(stat.instructions / maxInstructions) * 100}%"></div>
+                                </div>
+                                <span>${stat.instructions} (${stat.gil_acquisitions} 获取)</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="thread-stats">
+                        <h3>⏳ 线程统计 - 等待时间</h3>
+                        ${results.thread_stats.map((stat, i) => `
+                            <div class="thread-bar">
+                                <span class="thread-label">Thread ${stat.thread_id || i}</span>
+                                <div class="thread-bar-container">
+                                    <div class="thread-bar-fill waiting" style="width: ${(stat.wait_time / maxWaitTime) * 100}%"></div>
+                                </div>
+                                <span>${stat.wait_time.toFixed(4)}s</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="risk-analysis">
+                        <strong>🔍 风险分析:</strong><br><br>
+                        ${results.risk_analysis.replace(/\n\n/g, '<br><br>')}
+                    </div>
+                    
+                    <div class="btn-group" style="margin-top: 20px;">
+                        <button class="btn btn-secondary btn-small" onclick="playground.exportJSON(${experiment.id})">
+                            📥 导出 JSON
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="playground.exportMarkdown(${experiment.id})">
+                            📄 导出 Markdown
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('resultsContent').innerHTML = html;
+            }
+            
+            renderTimeline(experiment) {
+                const events = experiment.events || [];
+                
+                if (events.length === 0) {
+                    document.getElementById('timelineContent').innerHTML = 
+                        '<div class="empty-state"><p>暂无事件数据</p></div>';
+                    return;
+                }
+                
+                const eventTypes = {
+                    'gil_acquire': 'gil-acquire',
+                    'gil_release': 'gil-release',
+                    'preemption': 'preemption',
+                    'io_wait': 'io-wait',
+                    'instruction': 'instruction'
+                };
+                
+                const displayEvents = events.slice(0, 500);
+                
+                let html = `
+                    <div class="timeline">
+                        <h3>📈 事件时间线 (显示前 ${displayEvents.length} 个事件)</h3>
+                        <div class="timeline-events">
+                            ${displayEvents.map((event, i) => `
+                                <div class="timeline-event ${eventTypes[event.type] || 'instruction'}" 
+                                     title="${event.type} - Thread ${event.thread_id} @ ${event.timestamp.toFixed(4)}s"
+                                     onclick="playground.showEventDetail(${i})"
+                                     data-index="${i}">
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="timeline-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #4caf50;"></div>
+                                <span>GIL 获取</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f44336;"></div>
+                                <span>GIL 释放</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #ff9800;"></div>
+                                <span>抢占</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #9c27b0;"></div>
+                                <span>I/O 等待</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #607d8b;"></div>
+                                <span>指令</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="eventDetail" class="event-detail" style="display: none;"></div>
+                `;
+                
+                document.getElementById('timelineContent').innerHTML = html;
+                this.currentEvents = events;
+            }
+            
+            showEventDetail(index) {
+                if (!this.currentEvents) return;
+                
+                const event = this.currentEvents[index];
+                const detailDiv = document.getElementById('eventDetail');
+                
+                detailDiv.innerHTML = `
+                    <strong>Event #${index}</strong><br><br>
+                    ${JSON.stringify(event, null, 2).replace(/\n/g, '<br>').replace(/  /g, '&nbsp;&nbsp;')}
+                `;
+                detailDiv.style.display = 'block';
+            }
+            
+            async loadExperiments() {
+                try {
+                    const response = await fetch('/api/experiments');
+                    this.experiments = await response.json();
+                    this.renderHistory();
+                } catch (error) {
+                    console.error('Load experiments error:', error);
+                }
+            }
+            
+            renderHistory() {
+                if (this.experiments.length === 0) {
+                    document.getElementById('historyContent').innerHTML = 
+                        '<div class="empty-state"><p>暂无历史实验</p></div>';
+                    return;
+                }
+                
+                let html = `<div class="experiments-list">`;
+                
+                this.experiments.forEach(exp => {
+                    const config = exp.config;
+                    const results = exp.results;
+                    
+                    html += `
+                        <div class="experiment-item">
+                            <div class="experiment-info">
+                                <h4>${exp.name || `Experiment #${exp.id}`}</h4>
+                                <p>
+                                    ${config.thread_count} threads | 
+                                    ${results.total_instructions.toLocaleString()} instructions | 
+                                    ${new Date(exp.created_at).toLocaleString()}
+                                    ${exp.seed ? ` | Seed: ${exp.seed}` : ''}
+                                </p>
+                            </div>
+                            <div class="experiment-actions">
+                                <button class="btn btn-secondary btn-small" 
+                                        onclick="playground.loadExperiment(${exp.id})">
+                                    👁 查看
+                                </button>
+                                <button class="btn btn-secondary btn-small" 
+                                        onclick="playground.exportJSON(${exp.id})">
+                                    📥 JSON
+                                </button>
+                                <button class="btn btn-secondary btn-small" 
+                                        onclick="playground.exportMarkdown(${exp.id})">
+                                    📄 MD
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+                document.getElementById('historyContent').innerHTML = html;
+            }
+            
+            async loadExperiment(id) {
+                try {
+                    const response = await fetch(`/api/experiments/${id}`);
+                    const experiment = await response.json();
+                    
+                    this.currentExperiment = experiment;
+                    this.renderResults(experiment);
+                    this.renderTimeline(experiment);
+                    this.switchTab('results');
+                    
+                } catch (error) {
+                    console.error('Load experiment error:', error);
+                }
+            }
+            
+            exportJSON(id) {
+                window.open(`/api/experiments/${id}/export/json`, '_blank');
+            }
+            
+            exportMarkdown(id) {
+                window.open(`/api/experiments/${id}/export/markdown`, '_blank');
+            }
+            
+            async importFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const runBtn = document.getElementById('runExperiment');
+                runBtn.disabled = true;
+                runBtn.innerHTML = '⏳ 导入中...';
+                
+                try {
+                    const response = await fetch('/api/import', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Import failed');
+                    }
+                    
+                    const experiment = await response.json();
+                    this.currentExperiment = experiment;
+                    
+                    this.renderResults(experiment);
+                    this.renderTimeline(experiment);
+                    await this.loadExperiments();
+                    
+                    alert('导入成功!');
+                    
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert(`导入失败: ${error.message}`);
+                } finally {
+                    runBtn.disabled = false;
+                    runBtn.innerHTML = '🚀 运行实验';
+                    event.target.value = '';
+                }
+            }
+            
+            switchTab(tabName) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabName);
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.toggle('active', content.id === `tab-${tabName}`);
+                });
+            }
+        }
+        
+        const playground = new GILPlayground();
+    </script>
+</body>
+</html>
