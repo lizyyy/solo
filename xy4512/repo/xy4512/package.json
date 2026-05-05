@@ -1,0 +1,20 @@
+{
+  "name": "外墙检修排班工具",
+  "version": "1.0.0",
+  "description": "高层写字楼外墙检修班排班管理工具",
+  "main": "server/app.js",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "node server/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["外墙检修", "排班管理", "高空作业"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
