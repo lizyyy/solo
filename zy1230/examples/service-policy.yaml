@@ -1,0 +1,81 @@
+project_name: "multi-service-monorepo"
+
+modules:
+  - name: "internal"
+    path: "./internal"
+    type: "internal"
+    allowed_imports:
+      - "go-policy-scanner/internal/*"
+      - "go-policy-scanner/pkg/*"
+
+  - name: "pkg"
+    path: "./pkg"
+    type: "library"
+    allowed_imports:
+      - "go-policy-scanner/pkg/*"
+
+  - name: "cmd"
+    path: "./cmd"
+    type: "service"
+    allowed_imports:
+      - "go-policy-scanner/internal/*"
+      - "go-policy-scanner/pkg/*"
+      - "go-policy-scanner/cmd/*"
+
+  - name: "api"
+    path: "./api"
+    type: "api"
+    allowed_imports:
+      - "go-policy-scanner/pkg/*"
+
+check_rules:
+  enable_cyclic_dep_check: true
+  enable_cross_layer_check: true
+  enable_api_sync_check: true
+  enable_migration_check: true
+  enable_error_code_check: true
+  enable_log_field_check: true
+  max_allowed_dependencies: 30
+
+error_codes:
+  - code: "ERR-001"
+    message: "系统内部错误"
+    category: "system"
+
+  - code: "ERR-002"
+    message: "参数验证失败"
+    category: "validation"
+
+  - code: "ERR-003"
+    message: "资源不存在"
+    category: "resource"
+
+  - code: "ERR-004"
+    message: "权限不足"
+    category: "auth"
+
+log_fields:
+  - name: "trace_id"
+    type: "string"
+    required: true
+    description: "请求追踪ID"
+
+  - name: "user_id"
+    type: "string"
+    required: false
+    description: "用户ID"
+
+  - name: "service"
+    type: "string"
+    required: true
+    description: "服务名称"
+
+  - name: "timestamp"
+    type: "datetime"
+    required: true
+    description: "日志时间戳"
+
+  - name: "level"
+    type: "string"
+    required: true
+    description: "日志级别"
