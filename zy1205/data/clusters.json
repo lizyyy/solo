@@ -1,0 +1,29 @@
+[
+  {
+    "id": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "name": "订单服务集群",
+    "description": "处理订单创建、支付、查询等核心业务",
+    "loadBalancerStrategy": "ROUND_ROBIN",
+    "healthCheckInterval": 30000,
+    "createdAt": 1777968031866,
+    "updatedAt": 1777968031866
+  },
+  {
+    "id": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "name": "用户服务集群",
+    "description": "用户认证、信息管理、权限控制",
+    "loadBalancerStrategy": "WEIGHTED_ROUND_ROBIN",
+    "healthCheckInterval": 15000,
+    "createdAt": 1777968031871,
+    "updatedAt": 1777968031871
+  },
+  {
+    "id": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "name": "支付服务集群",
+    "description": "支付网关、支付回调、交易记录",
+    "loadBalancerStrategy": "LEAST_CONNECTIONS",
+    "healthCheckInterval": 20000,
+    "createdAt": 1777968031873,
+    "updatedAt": 1777968031873
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "name": "service-cluster-simulator",
+  "version": "1.0.0",
+  "description": "本地服务集群演练台 - 模拟服务实例主从关系、健康状态、故障转移和负载均衡",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "nodemon src/server/index.js",
+    "seed": "node src/server/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "service-discovery",
+    "load-balancer",
+    "failover",
+    "health-check",
+    "simulator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

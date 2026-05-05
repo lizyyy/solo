@@ -1,0 +1,291 @@
+[
+  {
+    "id": "aef3df96-664a-451b-9a7f-f845899e89d9",
+    "eventType": "CLUSTER_CREATED",
+    "severity": "INFO",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": null,
+    "message": "集群 订单服务集群 创建成功 (示例数据)",
+    "details": {
+      "name": "订单服务集群",
+      "description": "处理订单创建、支付、查询等核心业务",
+      "loadBalancerStrategy": "ROUND_ROBIN",
+      "healthCheckInterval": 30000,
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031867
+  },
+  {
+    "id": "9d290ada-16ea-49af-95b2-78deb8535c8b",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": "0261068d-0866-4444-80e8-3caa3bdbfcbc",
+    "message": "实例 order-master-01 注册成功 (示例数据)",
+    "details": {
+      "name": "order-master-01",
+      "host": "192.168.1.10",
+      "port": 8080,
+      "role": "MASTER",
+      "weight": 5,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031867
+  },
+  {
+    "id": "4a37e0fe-b2a4-4bb9-b8d3-45225649d3b2",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": "29805727-c8dc-4fe5-b8ce-54674f4e797f",
+    "message": "实例 order-slave-01 注册成功 (示例数据)",
+    "details": {
+      "name": "order-slave-01",
+      "host": "192.168.1.11",
+      "port": 8080,
+      "role": "SLAVE",
+      "weight": 3,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031868
+  },
+  {
+    "id": "e7a88133-a8c4-45db-afde-106947625583",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": "4d099d21-3e98-427e-a76a-29fc144e5f8d",
+    "message": "实例 order-slave-02 注册成功 (示例数据)",
+    "details": {
+      "name": "order-slave-02",
+      "host": "192.168.1.12",
+      "port": 8080,
+      "role": "SLAVE",
+      "weight": 3,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031868
+  },
+  {
+    "id": "b512bbf0-3a2f-4f45-976c-f27f06dd55c7",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": "7febabfa-9865-4712-b7d3-c2992ca40f61",
+    "message": "实例 order-slave-03 注册成功 (示例数据)",
+    "details": {
+      "name": "order-slave-03",
+      "host": "192.168.1.13",
+      "port": 8080,
+      "role": "SLAVE",
+      "weight": 2,
+      "status": "UNHEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031869
+  },
+  {
+    "id": "d3c659f5-e78d-4d43-a7c9-0fc3a5fd5dfe",
+    "eventType": "HEALTH_CHECK_FAILED",
+    "severity": "WARNING",
+    "clusterId": "489fd709-295b-4c80-a465-06fd5623d01f",
+    "instanceId": "7febabfa-9865-4712-b7d3-c2992ca40f61",
+    "message": "实例 order-slave-03 健康检查失败",
+    "details": {
+      "consecutiveFailedChecks": 3,
+      "maxFailedChecks": 3,
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031870
+  },
+  {
+    "id": "8c6d3f18-86fd-4d3e-ae30-e5bba74f2284",
+    "eventType": "CLUSTER_CREATED",
+    "severity": "INFO",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": null,
+    "message": "集群 用户服务集群 创建成功 (示例数据)",
+    "details": {
+      "name": "用户服务集群",
+      "description": "用户认证、信息管理、权限控制",
+      "loadBalancerStrategy": "WEIGHTED_ROUND_ROBIN",
+      "healthCheckInterval": 15000,
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031872
+  },
+  {
+    "id": "b1a38c0a-945e-47c1-85fb-52050aabbdb5",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": "cd648230-9078-43a6-afe2-488286ea6a01",
+    "message": "实例 user-master-01 注册成功 (示例数据)",
+    "details": {
+      "name": "user-master-01",
+      "host": "192.168.2.10",
+      "port": 8081,
+      "role": "MASTER",
+      "weight": 10,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031872
+  },
+  {
+    "id": "3fe39fb5-b443-4036-ae67-a9da805a0412",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": "240a18f7-d21c-4c9a-b695-774d06637e2e",
+    "message": "实例 user-slave-01 注册成功 (示例数据)",
+    "details": {
+      "name": "user-slave-01",
+      "host": "192.168.2.11",
+      "port": 8081,
+      "role": "SLAVE",
+      "weight": 8,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031872
+  },
+  {
+    "id": "8d5993ba-55fc-4b46-b331-695b715147b0",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": "9563fbfd-e9db-4fed-8a46-8d25e916ed1f",
+    "message": "实例 user-slave-02 注册成功 (示例数据)",
+    "details": {
+      "name": "user-slave-02",
+      "host": "192.168.2.12",
+      "port": 8081,
+      "role": "SLAVE",
+      "weight": 5,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031873
+  },
+  {
+    "id": "c0446680-1564-4ee7-98bb-cc23c17b8984",
+    "eventType": "CLUSTER_CREATED",
+    "severity": "INFO",
+    "clusterId": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "instanceId": null,
+    "message": "集群 支付服务集群 创建成功 (示例数据)",
+    "details": {
+      "name": "支付服务集群",
+      "description": "支付网关、支付回调、交易记录",
+      "loadBalancerStrategy": "LEAST_CONNECTIONS",
+      "healthCheckInterval": 20000,
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031873
+  },
+  {
+    "id": "16b9e2ec-b023-4032-a452-57c49f0843f2",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "instanceId": "ee95469e-b970-48bf-a239-cf26b9e54aac",
+    "message": "实例 pay-master-01 注册成功 (示例数据)",
+    "details": {
+      "name": "pay-master-01",
+      "host": "192.168.3.10",
+      "port": 8082,
+      "role": "MASTER",
+      "weight": 5,
+      "status": "HEALTHY",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031874
+  },
+  {
+    "id": "be56f465-3218-4f8b-8ce1-7d49a4cc14e7",
+    "eventType": "INSTANCE_REGISTERED",
+    "severity": "INFO",
+    "clusterId": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "instanceId": "6e39dd54-15e6-4ee4-8863-a95d260863ea",
+    "message": "实例 pay-slave-01 注册成功 (示例数据)",
+    "details": {
+      "name": "pay-slave-01",
+      "host": "192.168.3.11",
+      "port": 8082,
+      "role": "SLAVE",
+      "weight": 5,
+      "status": "DOWN",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031874
+  },
+  {
+    "id": "081c103c-ede0-4b72-9335-c0288bc2b8d9",
+    "eventType": "INSTANCE_EVICTED",
+    "severity": "ERROR",
+    "clusterId": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "instanceId": "6e39dd54-15e6-4ee4-8863-a95d260863ea",
+    "message": "实例 pay-slave-01 已被剔除",
+    "details": {
+      "consecutiveFailedChecks": 5,
+      "evictionThreshold": 5,
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031874
+  },
+  {
+    "id": "739216ff-2c76-4ebe-a035-40edcdab430f",
+    "eventType": "CONFIG_WARNING",
+    "severity": "WARNING",
+    "clusterId": "fc521cd5-1ddd-423b-aeb6-459206e8b536",
+    "instanceId": null,
+    "message": "集群 支付服务集群 超过半数实例不可用！",
+    "details": {
+      "totalInstances": 2,
+      "unhealthyInstances": 1,
+      "recommendation": "建议检查实例健康状态",
+      "source": "seed-data"
+    },
+    "timestamp": 1777968031875
+  },
+  {
+    "id": "78e0704d-f044-4825-a991-e39e5402d4b2",
+    "eventType": "MANUAL_OPERATION",
+    "severity": "WARNING",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": "cd648230-9078-43a6-afe2-488286ea6a01",
+    "message": "手动将实例 user-master-01 标记为宕机",
+    "details": {
+      "host": "192.168.2.10",
+      "port": 8081,
+      "previousStatus": "HEALTHY",
+      "newStatus": "DOWN",
+      "reason": "手动模拟故障",
+      "wasMaster": true
+    },
+    "timestamp": 1777968150030
+  },
+  {
+    "id": "b96e0917-958e-4853-a7f0-da54feb68105",
+    "eventType": "MASTER_FAILOVER",
+    "severity": "CRITICAL",
+    "clusterId": "1d6201b5-a06c-4c9d-99a0-51c1a59cc0a1",
+    "instanceId": "240a18f7-d21c-4c9a-b695-774d06637e2e",
+    "message": "故障转移成功：实例 user-slave-01 已提升为主节点",
+    "details": {
+      "oldMaster": "原主节点故障",
+      "newMaster": "user-slave-01",
+      "newMasterHost": "192.168.2.11",
+      "newMasterPort": 8081,
+      "selectionCriteria": [
+        "1. 优先选择权重高的实例",
+        "2. 权重相同则选择注册时间较早的实例"
+      ]
+    },
+    "timestamp": 1777968150033
+  }
+]
