@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口保护策略复盘台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>接口保护策略复盘台</h1>
+            <nav class="nav">
+                <button class="nav-btn active" data-page="dashboard">仪表盘</button>
+                <button class="nav-btn" data-page="experiments">实验管理</button>
+                <button class="nav-btn" data-page="policies">策略配置</button>
+                <button class="nav-btn" data-page="traces">流量追踪</button>
+            </nav>
+        </header>
+        
+        <main class="main">
+            <div id="page-dashboard" class="page active">
+                <h2>系统概览</h2>
+                <div class="stats-grid" id="dashboard-stats">
+                </div>
+                <div class="section">
+                    <h3>最近实验</h3>
+                    <div id="recent-experiments">
+                        <p class="loading">加载中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="page-experiments" class="page">
+                <div class="page-header">
+                    <h2>实验管理</h2>
+                    <button class="btn btn-primary" id="btn-create-experiment">+ 新建实验</button>
+                </div>
+                <div id="experiments-list">
+                    <p class="loading">加载中...</p>
+                </div>
+            </div>
+            
+            <div id="page-policies" class="page">
+                <div class="page-header">
+                    <h2>策略配置</h2>
+                    <button class="btn btn-primary" id="btn-create-policy">+ 新建策略</button>
+                </div>
+                <div id="policies-list">
+                    <p class="loading">加载中...</p>
+                </div>
+            </div>
+            
+            <div id="page-traces" class="page">
+                <div class="page-header">
+                    <h2>流量追踪</h2>
+                    <button class="btn btn-primary" id="btn-import-trace">+ 导入流量</button>
+                </div>
+                <div id="traces-list">
+                    <p class="loading">加载中...</p>
+                </div>
+            </div>
+            
+            <div id="page-experiment-result" class="page">
+                <div class="page-header">
+                    <h2 id="result-title">实验结果</h2>
+                    <div class="btn-group">
+                        <button class="btn" id="btn-back-to-experiments">返回列表</button>
+                        <button class="btn btn-success" id="btn-export-md">导出 Markdown</button>
+                        <button class="btn btn-info" id="btn-export-json">导出 JSON</button>
+                    </div>
+                </div>
+                <div id="experiment-result-content">
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "interface-protection-dashboard",
+  "version": "1.0.0",
+  "description": "接口保护策略复盘台 - 支持令牌桶、漏桶、滑动窗口限流，以及熔断、降级和过载保护",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "seed": "node src/seeders/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "sequelize": "^6.32.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3"
+  },
+  "author": "",
+  "license": "MIT"
+}
