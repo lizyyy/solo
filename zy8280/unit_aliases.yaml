@@ -1,0 +1,107 @@
+concentration:
+  mg/L:
+    - mg/l
+    - MG/L
+    - milligram per liter
+    - milligrams per liter
+  μg/mL:
+    - ug/ml
+    - microgram per milliliter
+    - micrograms per milliliter
+  mg/dm3:
+    - mg/dm³
+    - milligram per cubic decimeter
+  g/L:
+    - g/l
+    - gram per liter
+    - grams per liter
+  ppm:
+    - parts per million
+  ppb:
+    - parts per billion
+
+pressure:
+  kPa:
+    - kpa
+    - kilopascal
+    - kilopascals
+  bar:
+    - bars
+  Pa:
+    - pa
+    - pascal
+    - pascals
+  MPa:
+    - mpa
+    - megapascal
+    - megapascals
+  atm:
+    - atmosphere
+    - atmospheres
+  psi:
+    - pounds per square inch
+  mmHg:
+    - mm Hg
+    - millimeters of mercury
+
+temperature:
+  °C:
+    - celsius
+    - deg C
+    - degrees celsius
+    - °C
+    - ºC
+  K:
+    - kelvin
+    - kelvins
+    - deg K
+  °F:
+    - fahrenheit
+    - deg F
+    - degrees fahrenheit
+    - °F
+    - ºF
+
+flow:
+  m3/h:
+    - m³/h
+    - cubic meters per hour
+    - cubic meter per hour
+  L/min:
+    - l/min
+    - liters per minute
+    - liter per minute
+  L/s:
+    - l/s
+    - liters per second
+    - liter per second
+
+mass:
+  kg:
+    - kilogram
+    - kilograms
+  g:
+    - gram
+    - grams
+  mg:
+    - milligram
+    - milligrams
+  μg:
+    - microgram
+    - micrograms
+    - ug
+
+volume:
+  L:
+    - liter
+    - liters
+    - litre
+    - litres
+  m3:
+    - m³
+    - cubic meter
+    - cubic meters
+  mL:
+    - ml
+    - milliliter
+    - milliliters

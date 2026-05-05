@@ -1,0 +1,137 @@
+{
+  "ph": {
+    "target_unit": "°C",
+    "ranges": [
+      {
+        "status": "normal",
+        "min": 6.5,
+        "max": 8.0
+      },
+      {
+        "status": "warning",
+        "min": 8.0,
+        "max": 9.0
+      },
+      {
+        "status": "critical",
+        "min": 9.0,
+        "max": 14.0
+      },
+      {
+        "status": "critical",
+        "min": 0.0,
+        "max": 6.5
+      }
+    ]
+  },
+  "temperature": {
+    "target_unit": "°C",
+    "ranges": [
+      {
+        "status": "normal",
+        "min": 15.0,
+        "max": 30.0
+      },
+      {
+        "status": "warning",
+        "min": 30.0,
+        "max": 40.0
+      },
+      {
+        "status": "warning",
+        "min": 0.0,
+        "max": 15.0
+      },
+      {
+        "status": "critical",
+        "min": 40.0,
+        "max": 1000.0
+      },
+      {
+        "status": "critical",
+        "min": -273.15,
+        "max": 0.0
+      }
+    ]
+  },
+  "pressure": {
+    "target_unit": "kPa",
+    "ranges": [
+      {
+        "status": "normal",
+        "min": 90.0,
+        "max": 120.0
+      },
+      {
+        "status": "warning",
+        "min": 120.0,
+        "max": 150.0
+      },
+      {
+        "status": "warning",
+        "min": 80.0,
+        "max": 90.0
+      },
+      {
+        "status": "critical",
+        "min": 150.0,
+        "max": 10000.0
+      },
+      {
+        "status": "critical",
+        "min": 0.0,
+        "max": 80.0
+      }
+    ]
+  },
+  "concentration": {
+    "target_unit": "mg/L",
+    "ranges": [
+      {
+        "status": "normal",
+        "min": 0.0,
+        "max": 10.0
+      },
+      {
+        "status": "warning",
+        "min": 10.0,
+        "max": 30.0
+      },
+      {
+        "status": "critical",
+        "min": 30.0,
+        "max": 1000000.0
+      }
+    ]
+  },
+  "flow": {
+    "target_unit": "m3/h",
+    "ranges": [
+      {
+        "status": "normal",
+        "min": 5.0,
+        "max": 20.0
+      },
+      {
+        "status": "warning",
+        "min": 20.0,
+        "max": 30.0
+      },
+      {
+        "status": "warning",
+        "min": 1.0,
+        "max": 5.0
+      },
+      {
+        "status": "critical",
+        "min": 30.0,
+        "max": 1000000.0
+      },
+      {
+        "status": "critical",
+        "min": 0.0,
+        "max": 1.0
+      }
+    ]
+  }
+}
