@@ -1,0 +1,27 @@
+[project]
+name = "cli-contract-validator"
+version = "0.1.0"
+description = "本地 CLI 契约验收器 - 验证命令行工具的子命令参数、输出和返回码"
+requires-python = ">=3.8"
+dependencies = [
+    "pyyaml>=6.0",
+    "rich>=13.0",
+    "click>=8.0",
+]
+
+[project.scripts]
+ccv = "cli_contract_validator.cli:main"
+
+[build-system]
+requires = ["flit_core>=3.2"]
+build-backend = "flit_core.buildapi"
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

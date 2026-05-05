@@ -1,0 +1,296 @@
+name: "data-processor"
+version: "1.0.0"
+tool_path: "./examples/sample_cli.py"
+description: "数据处理工具 - 用于演示 CLI 契约验证"
+
+global_env:
+  PYTHONPATH: "."
+
+subcommands:
+  - name: "transform"
+    description: "数据转换子命令 - 将输入文件转换为指定格式"
+    
+    parameters:
+      - name: "input"
+        required: true
+        type: "file"
+        description: "输入文件路径"
+      
+      - name: "output"
+        required: true
+        type: "string"
+        description: "输出文件路径"
+      
+      - name: "format"
+        required: false
+        type: "string"
+        default: "json"
+        choices: ["json", "csv", "xml", "yaml"]
+        description: "输出格式"
+      
+      - name: "pretty"
+        required: false
+        type: "boolean"
+        default: false
+        description: "是否美化输出"
+      
+      - name: "indent"
+        required: false
+        type: "integer"
+        default: 2
+        description: "缩进级别 (仅用于 pretty 模式)"
+        depends_on: ["pretty"]
+      
+      - name: "compress"
+        required: false
+        type: "boolean"
+        default: false
+        description: "是否压缩输出"
+        mutually_exclusive_with: ["pretty"]
+      
+      - name: "encoding"
+        required: false
+        type: "string"
+        default: "utf-8"
+        description: "文件编码"
+    
+    test_cases:
+      - name: "正常转换 - JSON 格式"
+        command: "transform"
+        args:
+          - "--input"
+          - "input.txt"
+          - "--output"
+          - "output.json"
+          - "--format"
+          - "json"
+        input_files:
+          input.txt: |
+            name,age,city
+            Alice,25,Beijing
+            Bob,30,Shanghai
+        expected:
+          exit_code: 0
+          stdout_contains:
+            - "转换完成"
+            - "output.json"
+          stderr_not_contains:
+            - "错误"
+            - "Error"
+            - "Exception"
+        description: "正常的 CSV 转 JSON 转换测试"
+        tags:
+          - "normal"
+          - "smoke"
+      
+      - name: "正常转换 - 带美化输出"
+        command: "transform"
+        args:
+          - "--input"
+          - "input.csv"
+          - "--output"
+          - "output.json"
+          - "--pretty"
+          - "--indent"
+          - "4"
+        input_files:
+          input.csv: |
+            name,value
+            foo,1
+            bar,2
+        expected:
+          exit_code: 0
+          stdout_contains:
+            - "pretty"
+            - "indent=4"
+        tags:
+          - "normal"
+      
+      - name: "异常 - 缺少必填参数 input"
+        command: "transform"
+        args:
+          - "--output"
+          - "output.json"
+        expected:
+          exit_code: 2
+          stderr_contains:
+            - "--input"
+            - "required"
+            - "缺少"
+        description: "缺少必填参数时应返回错误码 2"
+        tags:
+          - "error"
+          - "parameter"
+      
+      - name: "异常 - 缺少必填参数 output"
+        command: "transform"
+        args:
+          - "--input"
+          - "input.txt"
+        expected:
+          exit_code: 2
+          stderr_contains:
+            - "--output"
+            - "required"
+        tags:
+          - "error"
+          - "parameter"
+      
+      - name: "异常 - 互斥参数同时使用 (pretty + compress)"
+        command: "transform"
+        args:
+          - "--input"
+          - "input.txt"
+          - "--output"
+          - "output.json"
+          - "--pretty"
+          - "--compress"
+        expected:
+          exit_code: 2
+          stderr_contains:
+            - "互斥"
+            - "mutually"
+            - "pretty"
+            - "compress"
+        description: "pretty 和 compress 互斥，不能同时使用"
+        tags:
+          - "error"
+          - "mutually-exclusive"
+      
+      - name: "异常 - 无效格式值"
+        command: "transform"
+        args:
+          - "--input"
+          - "input.txt"
+          - "--output"
+          - "output.txt"
+          - "--format"
+          - "invalid_format"
+        expected:
+          exit_code: 2
+          stderr_contains:
+            - "format"
+            - "invalid"
+            - "json"
+            - "csv"
+        description: "format 必须是 json/csv/xml/yaml 之一"
+        tags:
+          - "error"
+          - "parameter"
+      
+      - name: "异常 - 输入文件不存在"
+        command: "transform"
+        args:
+          - "--input"
+          - "nonexistent.txt"
+          - "--output"
+          - "output.json"
+        expected:
+          exit_code: 1
+          stderr_contains:
+            - "不存在"
+            - "not found"
+            - "No such file"
+        description: "输入文件不存在时应返回错误码 1"
+        tags:
+          - "error"
+          - "file"
+
+  - name: "validate"
+    description: "数据验证子命令 - 验证输入文件的格式和内容"
+    
+    parameters:
+      - name: "file"
+        required: true
+        type: "file"
+        description: "要验证的文件路径"
+      
+      - name: "schema"
+        required: false
+        type: "file"
+        description: "JSON Schema 文件路径"
+      
+      - name: "strict"
+        required: false
+        type: "boolean"
+        default: false
+        description: "严格模式 - 警告视为错误"
+      
+      - name: "quiet"
+        required: false
+        type: "boolean"
+        default: false
+        description: "静默模式 - 仅输出错误"
+    
+    test_cases:
+      - name: "正常 - 验证有效的 JSON 文件"
+        command: "validate"
+        args:
+          - "--file"
+          - "data.json"
+        input_files:
+          data.json: |
+            {
+              "name": "test",
+              "value": 123
+            }
+        expected:
+          exit_code: 0
+          stdout_contains:
+            - "验证通过"
+            - "valid"
+        tags:
+          - "normal"
+          - "smoke"
+      
+      - name: "正常 - 带 Schema 验证"
+        command: "validate"
+        args:
+          - "--file"
+          - "data.json"
+          - "--schema"
+          - "schema.json"
+        input_files:
+          data.json: |
+            {
+              "name": "Alice",
+              "age": 25
+            }
+          schema.json: |
+            {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "age": { "type": "number" }
+              },
+              "required": ["name"]
+            }
+        expected:
+          exit_code: 0
+          stdout_contains:
+            - "schema"
+            - "通过"
+        tags:
+          - "normal"
+      
+      - name: "异常 - 无效 JSON 格式"
+        command: "validate"
+        args:
+          - "--file"
+          - "invalid.json"
+        input_files:
+          invalid.json: |
+            {
+              name: "test"
+              missing colon
+            }
+        expected:
+          exit_code: 1
+          stderr_contains:
+            - "JSON"
+            - "解析"
+            - "错误"
+            - "parse"
+        description: "无效 JSON 应返回错误码 1"
+        tags:
+          - "error"
