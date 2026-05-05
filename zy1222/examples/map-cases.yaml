@@ -1,0 +1,59 @@
+id: hash-collision-demo
+name: 哈希冲突演示
+description: 演示哈希冲突如何导致性能下降
+seed: 42
+map_type: map[string]string
+initial_size: 0
+settings:
+  hash_function: fnv64a
+tags:
+  - collision
+  - performance
+---
+id: expand-trigger-demo
+name: 扩容触发演示
+description: 观察装载因子超过阈值时的扩容行为
+seed: 12345
+map_type: map[int]interface{}
+initial_size: 0
+settings:
+  expand_trigger: load_factor
+tags:
+  - expand
+  - load_factor
+---
+id: concurrent-write-risk
+name: 并发写入风险
+description: 展示 Go map 不是线程安全的
+seed: 99999
+map_type: map[string]int
+initial_size: 100
+settings:
+  concurrent: true
+tags:
+  - concurrent
+  - thread-safety
+---
+id: delete-tombstone
+name: 删除标记演示
+description: 观察删除操作留下的 tombstone 对性能的影响
+seed: 54321
+map_type: map[string]string
+initial_size: 0
+settings:
+  delete_optimization: false
+tags:
+  - delete
+  - tombstone
+---
+id: iteration-order
+name: 遍历顺序演示
+description: 展示 map 遍历的随机性
+seed: 77777
+map_type: map[string]int
+initial_size: 0
+settings:
+  iteration: random
+tags:
+  - iteration
+  - order
