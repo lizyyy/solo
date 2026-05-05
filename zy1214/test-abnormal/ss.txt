@@ -1,0 +1,14 @@
+Netid State      Recv-Q      Send-Q           Local Address:Port           Peer Address:Port  Process
+tcp   LISTEN     0           128                    0.0.0.0:22                  0.0.0.0:*      ino:16438 sk:1 <->
+tcp   LISTEN     0           4096                 127.0.0.1:631                 0.0.0.0:*      ino:19526 sk:2 <->
+tcp   SYN-SENT   0           1              192.168.1.100:45678         192.168.1.200:8080   
+tcp   SYN-SENT   0           1              192.168.1.100:45679         192.168.1.200:8080   
+tcp   SYN-SENT   0           1              192.168.1.100:45680         192.168.1.200:8080   
+tcp   SYN-RECV   0           0              192.168.1.100:22          10.0.0.50:12345   
+tcp   SYN-RECV   0           0              192.168.1.100:22          10.0.0.51:23456   
+tcp   TIME-WAIT  0           0              192.168.1.100:52341         151.101.1.69:443    
+tcp   TIME-WAIT  0           0              192.168.1.100:52342         151.101.1.69:443    
+tcp   TIME-WAIT  0           0              192.168.1.100:52343         151.101.1.69:443    
+tcp   TIME-WAIT  0           0              192.168.1.100:52344         151.101.1.69:443    
+tcp   TIME-WAIT  0           0              192.168.1.100:52345         151.101.1.69:443    
+... (5000+ more TIME_WAIT connections)

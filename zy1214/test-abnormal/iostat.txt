@@ -1,0 +1,8 @@
+Linux 5.15.0-91-generic (test-host) 	01/15/2024 	_x86_64_	(8 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          89.23    0.00    7.45    2.34    0.00    0.98
+
+Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+sda             234.56  567.89  12345.67  45678.90    12.34    56.78   5.01  9.08   45.23   67.89  23.45    52.63    80.45   2.34  95.67
+sdb               0.00    0.00      0.00      0.00     0.00     0.00   0.00   0.00    0.00    0.00   0.00     0.00     0.00   0.00   0.00
