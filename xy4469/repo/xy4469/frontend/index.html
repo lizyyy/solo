@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微塑料滤膜初筛台 - Microplastic Screener</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🔬 微塑料滤膜初筛台</h1>
+                    <span class="subtitle">Microplastic Filter Screener</span>
+                </div>
+                <div class="header-actions">
+                    <span class="status-indicator" id="connection-status">● 连接中...</span>
+                    <button class="btn btn-secondary" onclick="app.showHelpModal()">📖 帮助</button>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="batches" onclick="app.switchTab('batches')">
+                    📋 批次管理
+                </button>
+                <button class="nav-tab" data-tab="particles" onclick="app.switchTab('particles')">
+                    🔍 颗粒复核
+                </button>
+                <button class="nav-tab" data-tab="export" onclick="app.switchTab('export')">
+                    📤 导出报告
+                </button>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section id="tab-batches" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>导入数据</h2>
+                        <button class="btn btn-primary" onclick="app.showImportExamples()">
+                            📥 导入示例数据
+                        </button>
+                    </div>
+                    <div class="import-section">
+                        <div class="upload-area" id="batch-upload" ondrop="app.handleDrop(event, 'batch')" ondragover="app.handleDragOver(event)" ondragleave="app.handleDragLeave(event)">
+                            <div class="upload-icon">📁</div>
+                            <p>拖拽 CSV 文件到此处或点击选择</p>
+                            <p class="upload-hint">采样批次表 (batch_info.csv)</p>
+                            <input type="file" id="batch-file-input" accept=".csv" onchange="app.handleFileSelect(event, 'batch')" style="display:none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('batch-file-input').click()">选择文件</button>
+                        </div>
+                        <div class="upload-area" id="annotations-upload" ondrop="app.handleDrop(event, 'annotations')" ondragover="app.handleDragOver(event)" ondragleave="app.handleDragLeave(event)">
+                            <div class="upload-icon">📊</div>
+                            <p>拖拽 CSV 文件到此处或点击选择</p>
+                            <p class="upload-hint">人工标注 (annotations.csv) - 可选</p>
+                            <input type="file" id="annotations-file-input" accept=".csv" onchange="app.handleFileSelect(event, 'annotations')" style="display:none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('annotations-file-input').click()">选择文件</button>
+                        </div>
+                        <div class="upload-area" id="controls-upload" ondrop="app.handleDrop(event, 'controls')" ondragover="app.handleDragOver(event)" ondragleave="app.handleDragLeave(event)">
+                            <div class="upload-icon">⚪</div>
+                            <p>拖拽 CSV 文件到此处或点击选择</p>
+                            <p class="upload-hint">空白对照 (controls.csv) - 可选</p>
+                            <input type="file" id="controls-file-input" accept=".csv" onchange="app.handleFileSelect(event, 'controls')" style="display:none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('controls-file-input').click()">选择文件</button>
+                        </div>
+                    </div>
+                    <div class="import-actions">
+                        <div class="selected-files" id="selected-files"></div>
+                        <button class="btn btn-primary btn-lg" id="import-btn" onclick="app.importData()" disabled>
+                            开始导入
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>批次列表</h2>
+                        <div class="search-box">
+                            <input type="text" id="batch-search" placeholder="搜索批次编号、样本名称..." oninput="app.searchBatches()">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>批次编号</th>
+                                    <th>样本名称</th>
+                                    <th>采样地点</th>
+                                    <th>颗粒数</th>
+                                    <th>已复核</th>
+                                    <th>导入时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batches-table-body">
+                                <tr><td colspan="7" class="loading">加载中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="batches-pagination"></div>
+                </div>
+            </section>
+
+            <section id="tab-particles" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>颗粒复核</h2>
+                        <div class="filter-controls">
+                            <select id="filter-batch" onchange="app.filterParticles()">
+                                <option value="">选择批次...</option>
+                            </select>
+                            <select id="filter-classification" onchange="app.filterParticles()">
+                                <option value="">全部分类</option>
+                                <option value="fiber">纤维</option>
+                                <option value="particle">颗粒</option>
+                                <option value="bubble">气泡</option>
+                                <option value="scratch">划痕</option>
+                                <option value="unclear">未明确</option>
+                            </select>
+                            <select id="filter-risk" onchange="app.filterParticles()">
+                                <option value="">全部风险</option>
+                                <option value="high">高风险</option>
+                                <option value="medium">中风险</option>
+                                <option value="low">低风险</option>
+                            </select>
+                            <select id="filter-reviewed" onchange="app.filterParticles()">
+                                <option value="">全部状态</option>
+                                <option value="true">已复核</option>
+                                <option value="false">未复核</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="particles-grid" id="particles-grid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3>请先选择批次</h3>
+                            <p>从上方下拉框选择一个批次来查看颗粒</p>
+                        </div>
+                    </div>
+                    <div class="pagination" id="particles-pagination"></div>
+                </div>
+            </section>
+
+            <section id="tab-export" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>导出报告</h2>
+                    </div>
+                    <div class="export-section">
+                        <div class="form-group">
+                            <label for="export-batch">选择批次</label>
+                            <select id="export-batch">
+                                <option value="">选择批次...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="export-options">
+                        <div class="export-card">
+                            <div class="export-icon">📄</div>
+                            <h3>Markdown 质检单</h3>
+                            <p>生成完整的质检报告，包含统计摘要、分类统计、风险分析和高风险颗粒列表</p>
+                            <div class="export-actions">
+                                <button class="btn btn-secondary" onclick="app.previewReport('markdown')">预览</button>
+                                <button class="btn btn-primary" onclick="app.exportReport('markdown')">下载</button>
+                            </div>
+                        </div>
+                        <div class="export-card">
+                            <div class="export-icon">📊</div>
+                            <h3>CSV 风险清单</h3>
+                            <p>导出所有颗粒的详细风险信息，包含分类、置信度、风险等级、坐标等字段</p>
+                            <div class="export-actions">
+                                <button class="btn btn-secondary" onclick="app.previewReport('csv')">预览</button>
+                                <button class="btn btn-primary" onclick="app.exportReport('csv')">下载</button>
+                            </div>
+                        </div>
+                        <div class="export-card">
+                            <div class="export-icon">🔗</div>
+                            <h3>JSON 审计包</h3>
+                            <p>完整的审计数据包，包含所有特征数据、分类历史、复核记录和操作日志</p>
+                            <div class="export-actions">
+                                <button class="btn btn-secondary" onclick="app.previewReport('json')">预览</button>
+                                <button class="btn btn-primary" onclick="app.exportReport('json')">下载</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="particle-modal">
+        <div class="modal-backdrop" onclick="app.closeParticleModal()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="modal-particle-title">颗粒详情</h3>
+                <button class="btn-close" onclick="app.closeParticleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="particle-detail-layout">
+                    <div class="particle-image-section">
+                        <div class="particle-image-placeholder" id="modal-particle-image">
+                            <span>📷</span>
+                            <p>无图像</p>
+                        </div>
+                    </div>
+                    <div class="particle-info-section">
+                        <div class="info-group">
+                            <h4>基本信息</h4>
+                            <div class="info-grid" id="modal-basic-info"></div>
+                        </div>
+                        <div class="info-group">
+                            <h4>特征数据</h4>
+                            <div class="info-grid" id="modal-features-info"></div>
+                        </div>
+                        <div class="info-group">
+                            <h4>分类信息</h4>
+                            <div class="classification-compare" id="modal-classification-info"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-section">
+                    <h4>人工复核</h4>
+                    <div class="review-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>分类判定</label>
+                                <div class="classification-buttons" id="review-classification-buttons">
+                                    <button type="button" class="class-btn" data-class="fiber" onclick="app.selectReviewClass('fiber')">
+                                        🔴 纤维
+                                    </button>
+                                    <button type="button" class="class-btn" data-class="particle" onclick="app.selectReviewClass('particle')">
+                                        🟡 颗粒
+                                    </button>
+                                    <button type="button" class="class-btn" data-class="bubble" onclick="app.selectReviewClass('bubble')">
+                                        🔵 气泡
+                                    </button>
+                                    <button type="button" class="class-btn" data-class="scratch" onclick="app.selectReviewClass('scratch')">
+                                        ⚪ 划痕
+                                    </button>
+                                    <button type="button" class="class-btn" data-class="unclear" onclick="app.selectReviewClass('unclear')">
+                                        ⚫ 未明确
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>置信度</label>
+                                <div class="slider-container">
+                                    <input type="range" id="review-confidence" min="0" max="1" step="0.01" value="0.8" oninput="app.updateConfidenceDisplay()">
+                                    <span class="confidence-display" id="confidence-display">80%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>复核人</label>
+                                <input type="text" id="reviewer-name" placeholder="请输入姓名" value="操作员">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>复核备注</label>
+                            <textarea id="review-notes" placeholder="输入复核备注..."></textarea>
+                        </div>
+                        <div class="review-actions">
+                            <button class="btn btn-secondary" onclick="app.closeParticleModal()">取消</button>
+                            <button class="btn btn-primary" onclick="app.submitReview()">提交复核</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="preview-modal">
+        <div class="modal-backdrop" onclick="app.closePreviewModal()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="preview-title">预览</h3>
+                <button class="btn-close" onclick="app.closePreviewModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-container" id="preview-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closePreviewModal()">关闭</button>
+                <button class="btn btn-primary" id="preview-download-btn">下载</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="help-modal">
+        <div class="modal-backdrop" onclick="app.closeHelpModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>使用帮助</h3>
+                <button class="btn-close" onclick="app.closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body help-content">
+                <h4>📋 分类说明</h4>
+                <ul>
+                    <li><strong>🔴 纤维 (Fiber)</strong>: 细长条形，高宽比大于3，通常为高风险</li>
+                    <li><strong>🟡 颗粒 (Particle)</strong>: 不规则形状，面积较大，通常为中风险</li>
+                    <li><strong>🔵 气泡 (Bubble)</strong>: 圆形或近圆形，亮度高，通常为低风险</li>
+                    <li><strong>⚪ 划痕 (Scratch)</strong>: 极细长条形，通常为滤膜本身缺陷，低风险</li>
+                    <li><strong>⚫ 未明确 (Unclear)</strong>: 特征不明显，需要人工确认</li>
+                </ul>
+                <h4>⚠️ 风险等级</h4>
+                <ul>
+                    <li><strong>高风险</strong>: 纤维类，需要重点关注</li>
+                    <li><strong>中风险</strong>: 大型颗粒类</li>
+                    <li><strong>低风险</strong>: 气泡、划痕等非微塑料</li>
+                </ul>
+                <h4>📁 数据格式</h4>
+                <ul>
+                    <li><strong>批次表</strong>: batch_id, sample_name, collection_date, location 等</li>
+                    <li><strong>标注表</strong>: particle_id, area, perimeter, aspect_ratio, circularity, solidity, mean_intensity 等</li>
+                    <li><strong>对照表</strong>: control_type, control_name, particle_count, fiber_count, bubble_count 等</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="static/js/api.js"></script>
+    <script src="static/js/app.js"></script>
+</body>
+</html>
