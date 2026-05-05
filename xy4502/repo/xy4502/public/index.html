@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆夜间安保训练系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 主菜单 -->
+        <div id="main-menu" class="menu-screen">
+            <div class="menu-content">
+                <h1>🏛️ 博物馆夜间安保训练系统</h1>
+                <p class="subtitle">Museum Night Security Training System</p>
+                
+                <div class="menu-buttons">
+                    <button id="btn-new-game" class="btn btn-primary btn-large">
+                        🎮 开始新游戏
+                    </button>
+                    <button id="btn-load-game" class="btn btn-secondary btn-large">
+                        📂 加载存档
+                    </button>
+                    <button id="btn-import-museum" class="btn btn-secondary btn-large">
+                        📥 导入馆区数据
+                    </button>
+                </div>
+
+                <div class="game-info">
+                    <h3>📖 游戏说明</h3>
+                    <ul>
+                        <li>在有限时间和体力内处理各种安保事件</li>
+                        <li>点击巡逻点移动到不同区域</li>
+                        <li>对事件选择"派遣保安"或"区域封锁"</li>
+                        <li>及时处理事件获得分数，超时会扣分</li>
+                        <li>回到中控室可恢复体力</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 选择博物馆 -->
+        <div id="museum-select" class="menu-screen hidden">
+            <div class="menu-content">
+                <h2>选择馆区</h2>
+                <div id="museum-list" class="museum-list"></div>
+                <button id="btn-back-from-museum" class="btn btn-secondary">← 返回</button>
+            </div>
+        </div>
+
+        <!-- 选择存档 -->
+        <div id="save-select" class="menu-screen hidden">
+            <div class="menu-content">
+                <h2>选择存档</h2>
+                <div id="save-list" class="save-list"></div>
+                <button id="btn-back-from-save" class="btn btn-secondary">← 返回</button>
+            </div>
+        </div>
+
+        <!-- 导入博物馆数据 -->
+        <div id="import-screen" class="menu-screen hidden">
+            <div class="menu-content">
+                <h2>导入馆区数据</h2>
+                <div class="import-area">
+                    <textarea id="museum-json-input" placeholder="在此粘贴馆区JSON数据..."></textarea>
+                    <div class="import-buttons">
+                        <button id="btn-confirm-import" class="btn btn-primary">确认导入</button>
+                        <button id="btn-back-from-import" class="btn btn-secondary">返回</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏界面 -->
+        <div id="game-screen" class="hidden">
+            <!-- 顶部状态栏 -->
+            <div class="game-header">
+                <div class="header-left">
+                    <h2 id="museum-name">城市博物馆</h2>
+                    <div class="time-display">
+                        <span>⏱️ 时间: </span>
+                        <span id="game-time">00:00</span>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <div class="score-display">
+                        <span>🏆 得分: </span>
+                        <span id="game-score">0</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button id="btn-pause" class="btn btn-small btn-secondary">⏸️ 暂停</button>
+                    <button id="btn-save" class="btn btn-small btn-secondary">💾 保存</button>
+                </div>
+            </div>
+
+            <div class="game-main">
+                <!-- 左侧资源面板 -->
+                <div class="resource-panel">
+                    <h3>📊 资源状态</h3>
+                    
+                    <div class="resource-item">
+                        <div class="resource-label">⚡ 体力</div>
+                        <div class="resource-bar">
+                            <div id="stamina-bar" class="resource-fill stamina-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="resource-value"><span id="stamina-value">100</span>/100</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">👮 可用保安</div>
+                        <div class="resource-count" id="guards-count">3</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">🔒 锁区次数</div>
+                        <div class="resource-count" id="locks-count">2</div>
+                    </div>
+
+                    <div class="resource-item">
+                        <div class="resource-label">📍 当前位置</div>
+                        <div class="current-location" id="current-location">中控室</div>
+                    </div>
+
+                    <hr class="panel-divider">
+
+                    <h3>⚠️ 活跃事件</h3>
+                    <div id="active-events" class="events-list">
+                        <div class="no-events">暂无活跃事件</div>
+                    </div>
+                </div>
+
+                <!-- 中间地图区域 -->
+                <div class="map-container">
+                    <canvas id="game-map" width="800" height="500"></canvas>
+                    <div class="map-overlay" id="map-overlay" style="display: none;">
+                        <div class="event-popup">
+                            <h4 id="popup-event-name">事件名称</h4>
+                            <p id="popup-event-desc">事件描述</p>
+                            <div class="popup-actions">
+                                <button id="btn-dispatch" class="btn btn-primary btn-small">👮 派遣保安</button>
+                                <button id="btn-lock" class="btn btn-warning btn-small">🔒 区域封锁</button>
+                                <button id="btn-close-popup" class="btn btn-secondary btn-small">✕ 关闭</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧操作面板 -->
+                <div class="action-panel">
+                    <h3>🎯 操作指南</h3>
+                    <div class="action-guide">
+                        <div class="guide-item">
+                            <span class="guide-icon">📍</span>
+                            <span>点击地图上的巡逻点移动</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-icon">⚠️</span>
+                            <span>点击闪烁的事件标记查看详情</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-icon">👮</span>
+                            <span>派遣保安处理事件（消耗1名保安）</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-icon">🔒</span>
+                            <span>区域封锁（消耗1次锁区机会，分数降低20%）</span>
+                        </div>
+                        <div class="guide-item">
+                            <span class="guide-icon">🏠</span>
+                            <span>回到中控室可恢复体力</span>
+                        </div>
+                    </div>
+
+                    <hr class="panel-divider">
+
+                    <h3>📜 事件类型</h3>
+                    <div class="event-types">
+                        <div class="event-type-item critical">
+                            <span class="event-dot"></span>
+                            <span>安全入侵警报</span>
+                        </div>
+                        <div class="event-type-item high">
+                            <span class="event-dot"></span>
+                            <span>玻璃柜震动警报</span>
+                        </div>
+                        <div class="event-type-item high">
+                            <span class="event-dot"></span>
+                            <span>门禁刷卡异常</span>
+                        </div>
+                        <div class="event-type-item medium">
+                            <span class="event-dot"></span>
+                            <span>摄像头盲区警报</span>
+                        </div>
+                        <div class="event-type-item medium">
+                            <span class="event-dot"></span>
+                            <span>不明物体警报</span>
+                        </div>
+                    </div>
+
+                    <hr class="panel-divider">
+
+                    <h3>ℹ️ 图例</h3>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color patrol-point"></div>
+                            <span>巡逻点</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color base-point"></div>
+                            <span>中控室（基地）</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color zone-permanent"></div>
+                            <span>常设展区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color zone-temporary"></div>
+                            <span>临时展区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color camera"></div>
+                            <span>摄像头</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color blind-spot"></div>
+                            <span>盲区</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="game-over-screen" class="menu-screen hidden">
+            <div class="menu-content game-over-content">
+                <h1 id="game-over-title">训练结束</h1>
+                
+                <div class="score-summary">
+                    <div class="score-item">
+                        <div class="score-label">最终得分</div>
+                        <div class="score-value" id="final-score">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">扣分总计</div>
+                        <div class="score-value penalty" id="total-penalties">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">评级</div>
+                        <div class="score-value rating" id="final-rating">D</div>
+                    </div>
+                </div>
+
+                <div class="stats-summary">
+                    <h3>📊 事件统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">总事件数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value success" id="stat-resolved">0</div>
+                            <div class="stat-label">及时处理</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value danger" id="stat-expired">0</div>
+                            <div class="stat-label">超时遗漏</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-dispatches">0</div>
+                            <div class="stat-label">派遣保安</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-locks">0</div>
+                            <div class="stat-label">区域封锁</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-patrols">0</div>
+                            <div class="stat-label">巡逻次数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-buttons">
+                    <button id="btn-export-md" class="btn btn-primary">📄 导出 Markdown 复盘</button>
+                    <button id="btn-export-json" class="btn btn-secondary">📋 导出 JSON 事件记录</button>
+                </div>
+
+                <div class="menu-buttons">
+                    <button id="btn-back-to-menu" class="btn btn-secondary btn-large">🏠 返回主菜单</button>
+                    <button id="btn-play-again" class="btn btn-primary btn-large">🔄 再玩一次</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 暂停菜单 -->
+        <div id="pause-menu" class="overlay hidden">
+            <div class="overlay-content">
+                <h2>游戏暂停</h2>
+                <div class="menu-buttons">
+                    <button id="btn-resume" class="btn btn-primary btn-large">▶️ 继续游戏</button>
+                    <button id="btn-quit" class="btn btn-danger btn-large">🚪 退出游戏</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知消息 -->
+        <div id="notification" class="notification hidden">
+            <span id="notification-text"></span>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>

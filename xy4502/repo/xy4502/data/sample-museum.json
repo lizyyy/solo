@@ -1,0 +1,78 @@
+{
+  "museum": {
+    "name": "城市博物馆",
+    "floors": 1,
+    "zones": [
+      {
+        "id": "zone-1",
+        "name": "古代文明展区",
+        "type": "permanent",
+        "position": { "x": 10, "y": 10, "width": 150, "height": 100 },
+        "exhibits": [
+          { "id": "ex-1", "name": "青铜鼎", "value": "high", "isGlassCase": true },
+          { "id": "ex-2", "name": "陶罐", "value": "medium", "isGlassCase": true }
+        ],
+        "cameras": [
+          { "id": "cam-1", "position": { "x": 80, "y": 20 }, "coverage": 80 },
+          { "id": "cam-2", "position": { "x": 100, "y": 60 }, "coverage": 70 }
+        ],
+        "blindSpots": [
+          { "id": "bs-1", "position": { "x": 140, "y": 80 }, "size": 20 }
+        ]
+      },
+      {
+        "id": "zone-2",
+        "name": "书画艺术展区",
+        "type": "permanent",
+        "position": { "x": 180, "y": 10, "width": 150, "height": 100 },
+        "exhibits": [
+          { "id": "ex-3", "name": "山水画卷", "value": "high", "isGlassCase": false },
+          { "id": "ex-4", "name": "书法真迹", "value": "high", "isGlassCase": false }
+        ],
+        "cameras": [
+          { "id": "cam-3", "position": { "x": 250, "y": 20 }, "coverage": 75 }
+        ],
+        "blindSpots": [
+          { "id": "bs-2", "position": { "x": 200, "y": 40 }, "size": 15 },
+          { "id": "bs-3", "position": { "x": 300, "y": 80 }, "size": 18 }
+        ]
+      },
+      {
+        "id": "zone-3",
+        "name": "临时展览区",
+        "type": "temporary",
+        "position": { "x": 10, "y": 130, "width": 320, "height": 80 },
+        "exhibits": [
+          { "id": "ex-5", "name": "特展雕塑", "value": "high", "isGlassCase": true },
+          { "id": "ex-6", "name": "稀有文物", "value": "critical", "isGlassCase": true }
+        ],
+        "cameras": [
+          { "id": "cam-4", "position": { "x": 100, "y": 150 }, "coverage": 85 },
+          { "id": "cam-5", "position": { "x": 250, "y": 150 }, "coverage": 85 }
+        ],
+        "blindSpots": []
+      }
+    ],
+    "doors": [
+      { "id": "door-1", "name": "主入口", "position": { "x": 170, "y": 230 }, "isAccessControl": true },
+      { "id": "door-2", "name": "员工通道", "position": { "x": 10, "y": 120 }, "isAccessControl": true },
+      { "id": "door-3", "name": "展厅连接门", "position": { "x": 160, "y": 60 }, "isAccessControl": false }
+    ],
+    "patrolPoints": [
+      { "id": "pp-1", "name": "中控室", "position": { "x": 350, "y": 50 }, "isBase": true },
+      { "id": "pp-2", "name": "古代展区巡检点", "position": { "x": 80, "y": 50 } },
+      { "id": "pp-3", "name": "书画展区巡检点", "position": { "x": 250, "y": 50 } },
+      { "id": "pp-4", "name": "临展区巡检点", "position": { "x": 170, "y": 160 } }
+    ]
+  },
+  "gameSettings": {
+    "gameDuration": 300,
+    "initialStamina": 100,
+    "staminaPerMove": 5,
+    "staminaPerAction": 10,
+    "securityGuards": 3,
+    "lockdownZones": 2,
+    "eventInterval": 8,
+    "maxActiveEvents": 5
+  }
+}
