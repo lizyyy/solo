@@ -1,0 +1,12 @@
+# escape-analyzer/examples/bad
+./before.go:20:17: &StringProcessor{} escapes to heap
+./before.go:27:10: leaking param: name
+./before.go:28:9: &User{...} escapes to heap
+./before.go:36:10: result escapes to heap
+./before.go:44:6: items escapes to heap
+./before.go:52:9: func literal escapes to heap
+./before.go:53:33: data escapes to heap
+./before.go:71:6: w escapes to heap
+./before.go:20:17: &StringProcessor{} escapes to heap
+./before.go:28:9: &User{...} escapes to heap
+./before.go:53:33: string(data) escapes to heap
