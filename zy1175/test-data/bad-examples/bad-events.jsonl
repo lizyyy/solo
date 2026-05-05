@@ -1,0 +1,8 @@
+{"event_id":"evt_duplicate","event_name":"page_view","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"page_name":"home","page_path":"/"}}
+{"event_id":"evt_duplicate","event_name":"page_view","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"page_name":"home","page_path":"/"}}
+{"event_name":"missing_event_id","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"page_name":"home","page_path":"/"}}
+{"event_id":"evt_missing_required","event_name":"product_view","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"product_id":"prod_456"}}
+{"event_id":"evt_wrong_type","event_name":"add_to_cart","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"product_id":"prod_456","quantity":"1"}}
+{"event_id":"evt_wrong_enum","event_name":"checkout_start","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"cart_total":99.99,"payment_method":"bitcoin"}}
+{"event_id":"evt_old_event","event_name":"page_load","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"page_name":"home","page_path":"/"}}
+{"event_id":"evt_unknown_event","event_name":"custom_event_not_defined","timestamp":"2026-05-01T10:00:00Z","user_id":"user_123","session_id":"sess_001","app_version":"2.1.0","properties":{"custom_field":"value"}}

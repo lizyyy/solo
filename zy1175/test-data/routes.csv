@@ -1,0 +1,6 @@
+path,page_name,expected_events
+/,home,"page_view,product_view,add_to_cart"
+/products,products,"page_view,product_view"
+/cart,cart,"page_view,checkout_start"
+/checkout,checkout,"page_view,checkout_start,purchase_complete"
+/order-confirmation,order_confirmation,"page_view,purchase_complete"

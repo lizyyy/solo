@@ -1,0 +1,132 @@
+version: "1.0.0"
+commonFields:
+  - name: event_id
+    type: string
+    required: true
+    description: "Unique identifier for each event"
+  - name: event_name
+    type: string
+    required: true
+    description: "Name of the event"
+  - name: timestamp
+    type: string
+    required: true
+    description: "ISO 8601 timestamp of the event"
+  - name: user_id
+    type: string
+    required: true
+    description: "Unique identifier for the user"
+  - name: session_id
+    type: string
+    required: true
+    description: "Unique identifier for the session"
+  - name: app_version
+    type: string
+    required: true
+    description: "Version of the application"
+
+events:
+  - name: page_view
+    description: "User viewed a page"
+    version: "1.0.0"
+    required:
+      - page_name
+      - page_path
+    fields:
+      - name: page_name
+        type: string
+        description: "Name of the page"
+      - name: page_path
+        type: string
+        description: "Path of the page"
+      - name: referrer
+        type: string
+        description: "Referrer URL"
+
+  - name: product_view
+    description: "User viewed a product"
+    version: "1.0.0"
+    required:
+      - product_id
+      - product_name
+    fields:
+      - name: product_id
+        type: string
+        description: "Unique identifier for the product"
+      - name: product_name
+        type: string
+        description: "Name of the product"
+      - name: product_category
+        type: string
+        description: "Category of the product"
+      - name: price
+        type: number
+        description: "Price of the product"
+
+  - name: add_to_cart
+    description: "User added an item to cart"
+    version: "1.0.0"
+    required:
+      - product_id
+      - quantity
+    fields:
+      - name: product_id
+        type: string
+        description: "Unique identifier for the product"
+      - name: quantity
+        type: number
+        description: "Quantity added to cart"
+      - name: price
+        type: number
+        description: "Price per unit"
+
+  - name: checkout_start
+    description: "User started the checkout process"
+    version: "1.0.0"
+    required:
+      - cart_total
+    fields:
+      - name: cart_total
+        type: number
+        description: "Total amount in the cart"
+      - name: item_count
+        type: number
+        description: "Number of items in cart"
+      - name: payment_method
+        type: string
+        description: "Selected payment method"
+        enum:
+          - credit_card
+          - paypal
+          - apple_pay
+          - google_pay
+
+  - name: purchase_complete
+    description: "User completed a purchase"
+    version: "1.0.0"
+    required:
+      - order_id
+      - total_amount
+    fields:
+      - name: order_id
+        type: string
+        description: "Unique identifier for the order"
+      - name: total_amount
+        type: number
+        description: "Total amount of the order"
+      - name: currency
+        type: string
+        description: "Currency code"
+        enum:
+          - USD
+          - EUR
+          - GBP
+          - CNY
+      - name: payment_method
+        type: string
+        description: "Payment method used"
+        enum:
+          - credit_card
+          - paypal
+          - apple_pay
+          - google_pay

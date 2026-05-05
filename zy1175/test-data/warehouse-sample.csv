@@ -1,0 +1,10 @@
+event_id,event_name,timestamp,user_id,session_id,app_version
+evt_001,page_view,2026-05-01T10:00:00Z,user_123,sess_001,2.1.0
+evt_002,product_view,2026-05-01T10:05:00Z,user_123,sess_001,2.1.0
+evt_003,add_to_cart,2026-05-01T10:10:00Z,user_123,sess_001,2.1.0
+evt_004,checkout_start,2026-05-01T10:15:00Z,user_123,sess_001,2.1.0
+evt_005,purchase_complete,2026-05-01T10:20:00Z,user_123,sess_001,2.1.0
+evt_006,page_view,2026-05-01T11:00:00Z,user_456,sess_002,2.1.0
+evt_007,product_view,2026-05-01T11:05:00Z,user_456,sess_002,2.1.0
+evt_008,add_to_cart,2026-05-01T11:10:00Z,user_456,sess_002,2.1.0
+evt_010,extra_event,2026-05-01T12:00:00Z,user_789,sess_003,2.1.0
