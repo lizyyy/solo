@@ -1,0 +1,20 @@
+export const NOTIFICATION_STATUS = {
+  PENDING: 'pending',
+  SENDING: 'sending',
+  SUCCESS: 'success',
+  FAILED: 'failed',
+};
+
+export const STATUS_LABELS = {
+  [NOTIFICATION_STATUS.PENDING]: '待补发',
+  [NOTIFICATION_STATUS.SENDING]: '发送中',
+  [NOTIFICATION_STATUS.SUCCESS]: '已成功',
+  [NOTIFICATION_STATUS.FAILED]: '失败',
+};
+
+export const STATUS_COLORS = {
+  [NOTIFICATION_STATUS.PENDING]: 'default',
+  [NOTIFICATION_STATUS.SENDING]: 'processing',
+  [NOTIFICATION_STATUS.SUCCESS]: 'success',
+  [NOTIFICATION_STATUS.FAILED]: 'error',
+};
