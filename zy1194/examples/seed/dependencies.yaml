@@ -1,0 +1,95 @@
+# 任务依赖示例配置
+# 演示任务依赖关系和阻塞队列行为
+
+threadpool:
+  worker_count: 3
+  local_queue_capacity: 10
+  global_queue_capacity: 50
+
+queue:
+  use_work_stealing: true
+  steal_from: random
+
+backpressure:
+  strategy: block
+  max_wait_time: 120.0
+
+starvation:
+  threshold: 60.0
+
+simulation:
+  duration: 100.0
+  seed: 999
+
+# 任务配置：创建有依赖关系的任务
+# 场景：数据处理管道
+# 
+# 流程：
+#   data-source (t-0) ──┬──> validator-1 (t-1) ──> processor-1 (t-3) ──┐
+#                        ├──> validator-2 (t-2) ──> processor-2 (t-4) ──┼──> aggregator (t-5)
+#                        └──> validator-3 (t-6) ──> processor-3 (t-7) ──┘
+#
+# 最后还有一个独立的 cleanup 任务 (t-8)
+
+tasks:
+  # 数据源任务
+  - id: t-0
+    name: data-source
+    duration: 5.0
+    priority: 1
+    dependencies: []
+  
+  # 验证任务（并行执行）
+  - id: t-1
+    name: validator-1
+    duration: 3.0
+    priority: 0
+    dependencies: [t-0]
+  
+  - id: t-2
+    name: validator-2
+    duration: 4.0
+    priority: 0
+    dependencies: [t-0]
+  
+  - id: t-6
+    name: validator-3
+    duration: 2.0
+    priority: 0
+    dependencies: [t-0]
+  
+  # 处理任务（每个对应一个验证任务）
+  - id: t-3
+    name: processor-1
+    duration: 5.0
+    priority: 0
+    dependencies: [t-1]
+  
+  - id: t-4
+    name: processor-2
+    duration: 6.0
+    priority: 0
+    dependencies: [t-2]
+  
+  - id: t-7
+    name: processor-3
+    duration: 4.0
+    priority: 0
+    dependencies: [t-6]
+  
+  # 聚合任务（依赖所有处理任务）
+  - id: t-5
+    name: aggregator
+    duration: 8.0
+    priority: 1
+    dependencies: [t-3, t-4, t-7]
+  
+  # 清理任务（独立任务）
+  - id: t-8
+    name: cleanup
+    duration: 2.0
+    priority: 0
+    dependencies: []
+
+output:
+  verbose: true

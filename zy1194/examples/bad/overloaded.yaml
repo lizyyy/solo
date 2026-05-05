@@ -1,0 +1,150 @@
+# 过载配置示例（坏样例）
+# 问题：任务数量远超过系统处理能力，队列容量不足
+# 预期：大量任务被丢弃，背压机制触发
+
+threadpool:
+  worker_count: 2           # 过少的 Worker
+  local_queue_capacity: 2   # 非常小的本地队列
+  global_queue_capacity: 5  # 非常小的全局队列
+
+queue:
+  use_work_stealing: false  # 禁用工作窃取，无法平衡负载
+  steal_from: random
+
+backpressure:
+  strategy: drop            # 丢弃策略 - 队列满时直接丢弃
+  max_wait_time: 5.0       # 短超时
+
+starvation:
+  threshold: 10.0
+
+simulation:
+  duration: 30.0
+  seed: 1
+
+# 任务配置：30 个任务，执行时间较长
+# 这样会迅速填满队列并触发背压
+tasks:
+  - id: t-0
+    name: heavy-task-0
+    duration: 5.0
+    priority: 0
+  - id: t-1
+    name: heavy-task-1
+    duration: 5.0
+    priority: 0
+  - id: t-2
+    name: heavy-task-2
+    duration: 5.0
+    priority: 0
+  - id: t-3
+    name: heavy-task-3
+    duration: 5.0
+    priority: 0
+  - id: t-4
+    name: heavy-task-4
+    duration: 5.0
+    priority: 0
+  - id: t-5
+    name: heavy-task-5
+    duration: 5.0
+    priority: 0
+  - id: t-6
+    name: heavy-task-6
+    duration: 5.0
+    priority: 0
+  - id: t-7
+    name: heavy-task-7
+    duration: 5.0
+    priority: 0
+  - id: t-8
+    name: heavy-task-8
+    duration: 5.0
+    priority: 0
+  - id: t-9
+    name: heavy-task-9
+    duration: 5.0
+    priority: 0
+  - id: t-10
+    name: heavy-task-10
+    duration: 5.0
+    priority: 0
+  - id: t-11
+    name: heavy-task-11
+    duration: 5.0
+    priority: 0
+  - id: t-12
+    name: heavy-task-12
+    duration: 5.0
+    priority: 0
+  - id: t-13
+    name: heavy-task-13
+    duration: 5.0
+    priority: 0
+  - id: t-14
+    name: heavy-task-14
+    duration: 5.0
+    priority: 0
+  - id: t-15
+    name: heavy-task-15
+    duration: 5.0
+    priority: 0
+  - id: t-16
+    name: heavy-task-16
+    duration: 5.0
+    priority: 0
+  - id: t-17
+    name: heavy-task-17
+    duration: 5.0
+    priority: 0
+  - id: t-18
+    name: heavy-task-18
+    duration: 5.0
+    priority: 0
+  - id: t-19
+    name: heavy-task-19
+    duration: 5.0
+    priority: 0
+  - id: t-20
+    name: heavy-task-20
+    duration: 5.0
+    priority: 0
+  - id: t-21
+    name: heavy-task-21
+    duration: 5.0
+    priority: 0
+  - id: t-22
+    name: heavy-task-22
+    duration: 5.0
+    priority: 0
+  - id: t-23
+    name: heavy-task-23
+    duration: 5.0
+    priority: 0
+  - id: t-24
+    name: heavy-task-24
+    duration: 5.0
+    priority: 0
+  - id: t-25
+    name: heavy-task-25
+    duration: 5.0
+    priority: 0
+  - id: t-26
+    name: heavy-task-26
+    duration: 5.0
+    priority: 0
+  - id: t-27
+    name: heavy-task-27
+    duration: 5.0
+    priority: 0
+  - id: t-28
+    name: heavy-task-28
+    duration: 5.0
+    priority: 0
+  - id: t-29
+    name: heavy-task-29
+    duration: 5.0
+    priority: 0
+
+output:
+  verbose: true

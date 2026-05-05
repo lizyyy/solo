@@ -1,0 +1,108 @@
+# 基础线程池配置示例
+# 这是一个良好配置的示例：4 个 Worker，合理的队列容量
+
+threadpool:
+  worker_count: 4
+  local_queue_capacity: 10
+  global_queue_capacity: 100
+
+queue:
+  use_work_stealing: true
+  steal_from: random
+
+backpressure:
+  strategy: block
+  max_wait_time: 60.0
+
+starvation:
+  threshold: 30.0
+
+simulation:
+  duration: 50.0
+  seed: 42
+
+# 任务配置：20 个任务，执行时间 1-5 个时间单位
+tasks:
+  - id: t-0
+    name: task-0
+    duration: 2.0
+    priority: 0
+  - id: t-1
+    name: task-1
+    duration: 3.0
+    priority: 0
+  - id: t-2
+    name: task-2
+    duration: 1.0
+    priority: 1
+  - id: t-3
+    name: task-3
+    duration: 4.0
+    priority: 0
+  - id: t-4
+    name: task-4
+    duration: 2.0
+    priority: 0
+  - id: t-5
+    name: task-5
+    duration: 3.0
+    priority: 0
+  - id: t-6
+    name: task-6
+    duration: 1.0
+    priority: 0
+  - id: t-7
+    name: task-7
+    duration: 2.0
+    priority: 0
+  - id: t-8
+    name: task-8
+    duration: 3.0
+    priority: 0
+  - id: t-9
+    name: task-9
+    duration: 2.0
+    priority: 0
+  - id: t-10
+    name: task-10
+    duration: 1.0
+    priority: 0
+  - id: t-11
+    name: task-11
+    duration: 4.0
+    priority: 0
+  - id: t-12
+    name: task-12
+    duration: 2.0
+    priority: 0
+  - id: t-13
+    name: task-13
+    duration: 3.0
+    priority: 0
+  - id: t-14
+    name: task-14
+    duration: 1.0
+    priority: 0
+  - id: t-15
+    name: task-15
+    duration: 2.0
+    priority: 0
+  - id: t-16
+    name: task-16
+    duration: 3.0
+    priority: 0
+  - id: t-17
+    name: task-17
+    duration: 2.0
+    priority: 0
+  - id: t-18
+    name: task-18
+    duration: 1.0
+    priority: 0
+  - id: t-19
+    name: task-19
+    duration: 2.0
+    priority: 0
+
+output:
+  verbose: true

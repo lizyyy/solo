@@ -1,0 +1,91 @@
+# 循环依赖示例（坏样例）
+# 问题：任务之间形成循环依赖，导致永远无法执行
+# 预期：任务被永久阻塞，永远无法完成
+
+threadpool:
+  worker_count: 4
+  local_queue_capacity: 10
+  global_queue_capacity: 50
+
+queue:
+  use_work_stealing: true
+  steal_from: random
+
+backpressure:
+  strategy: block
+  max_wait_time: 60.0
+
+starvation:
+  threshold: 30.0
+
+simulation:
+  duration: 30.0
+  seed: 123
+
+# 任务配置：循环依赖
+# 场景：
+#   t-0 依赖 t-1
+#   t-1 依赖 t-2
+#   t-2 依赖 t-0
+# 结果：三个任务都无法开始执行，形成死锁
+
+tasks:
+  # 独立任务（会正常执行）
+  - id: t-normal
+    name: normal-task
+    duration: 2.0
+    priority: 0
+    dependencies: []
+  
+  # 循环依赖任务
+  - id: t-0
+    name: circular-0
+    duration: 1.0
+    priority: 0
+    dependencies: [t-1]    # 依赖 t-1
+  
+  - id: t-1
+    name: circular-1
+    duration: 1.0
+    priority: 0
+    dependencies: [t-2]    # 依赖 t-2
+  
+  - id: t-2
+    name: circular-2
+    duration: 1.0
+    priority: 0
+    dependencies: [t-0]    # 依赖 t-0
+  
+  # 长依赖链（也可能有问题）
+  - id: t-chain-0
+    name: chain-0
+    duration: 1.0
+    priority: 0
+    dependencies: []
+  
+  - id: t-chain-1
+    name: chain-1
+    duration: 1.0
+    priority: 0
+    dependencies: [t-chain-0]
+  
+  - id: t-chain-2
+    name: chain-2
+    duration: 1.0
+    priority: 0
+    dependencies: [t-chain-1]
+  
+  - id: t-chain-3
+    name: chain-3
+    duration: 1.0
+    priority: 0
+    dependencies: [t-chain-2]
+  
+  - id: t-chain-4
+    name: chain-4
+    duration: 1.0
+    priority: 0
+    dependencies: [t-chain-3]
+
+output:
+  verbose: true

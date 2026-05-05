@@ -1,0 +1,93 @@
+# 工作窃取示例配置
+# 演示工作窃取如何平衡 Worker 负载
+# 场景：任务不均匀分配，启用工作窃取后负载会自动平衡
+
+threadpool:
+  worker_count: 4
+  local_queue_capacity: 5
+  global_queue_capacity: 50
+
+queue:
+  use_work_stealing: true
+  steal_from: most_loaded
+
+backpressure:
+  strategy: block
+  max_wait_time: 60.0
+
+starvation:
+  threshold: 30.0
+
+simulation:
+  duration: 100.0
+  seed: 12345
+
+# 任务配置：创建不均匀的任务负载
+# 前 15 个任务耗时较短，后 5 个任务耗时很长
+tasks:
+  # Worker 0 会得到很多短任务
+  - id: t-short-0
+    name: short-task-0
+    duration: 1.0
+    priority: 0
+  - id: t-short-1
+    name: short-task-1
+    duration: 1.0
+    priority: 0
+  - id: t-short-2
+    name: short-task-2
+    duration: 1.0
+    priority: 0
+  - id: t-short-3
+    name: short-task-3
+    duration: 1.0
+    priority: 0
+  - id: t-short-4
+    name: short-task-4
+    duration: 1.0
+    priority: 0
+  - id: t-short-5
+    name: short-task-5
+    duration: 1.0
+    priority: 0
+  - id: t-short-6
+    name: short-task-6
+    duration: 1.0
+    priority: 0
+  - id: t-short-7
+    name: short-task-7
+    duration: 1.0
+    priority: 0
+  - id: t-short-8
+    name: short-task-8
+    duration: 1.0
+    priority: 0
+  - id: t-short-9
+    name: short-task-9
+    duration: 1.0
+    priority: 0
+  
+  # Worker 1 会得到几个长任务
+  - id: t-long-0
+    name: long-task-0
+    duration: 10.0
+    priority: 0
+  - id: t-long-1
+    name: long-task-1
+    duration: 10.0
+    priority: 0
+  - id: t-long-2
+    name: long-task-2
+    duration: 10.0
+    priority: 0
+  - id: t-long-3
+    name: long-task-3
+    duration: 10.0
+    priority: 0
+  - id: t-long-4
+    name: long-task-4
+    duration: 10.0
+    priority: 0
+
+output:
+  verbose: true

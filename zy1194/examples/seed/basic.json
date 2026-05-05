@@ -1,0 +1,63 @@
+{
+  "threadpool": {
+    "worker_count": 4,
+    "local_queue_capacity": 10,
+    "global_queue_capacity": 100
+  },
+  "queue": {
+    "use_work_stealing": true,
+    "steal_from": "random"
+  },
+  "backpressure": {
+    "strategy": "block",
+    "max_wait_time": 60.0
+  },
+  "starvation": {
+    "threshold": 30.0
+  },
+  "simulation": {
+    "duration": 50.0,
+    "seed": 42
+  },
+  "tasks": [
+    {
+      "id": "t-0",
+      "name": "task-0",
+      "duration": 2.0,
+      "priority": 0,
+      "dependencies": []
+    },
+    {
+      "id": "t-1",
+      "name": "task-1",
+      "duration": 3.0,
+      "priority": 0,
+      "dependencies": []
+    },
+    {
+      "id": "t-2",
+      "name": "task-2",
+      "duration": 1.0,
+      "priority": 1,
+      "dependencies": []
+    },
+    {
+      "id": "t-3",
+      "name": "task-3",
+      "duration": 4.0,
+      "priority": 0,
+      "dependencies": ["t-0"]
+    },
+    {
+      "id": "t-4",
+      "name": "task-4",
+      "duration": 2.0,
+      "priority": 0,
+      "dependencies": ["t-1", "t-2"]
+    }
+  ],
+  "producers": [],
+  "output": {
+    "verbose": true
+  }
+}

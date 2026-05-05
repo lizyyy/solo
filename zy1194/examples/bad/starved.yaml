@@ -1,0 +1,108 @@
+# 饥饿任务示例（坏样例）
+# 问题：低优先级任务被高优先级任务阻塞，长时间无法执行
+# 或者任务队列过长，某些任务永远得不到执行
+
+threadpool:
+  worker_count: 2           # 极少的 Worker
+  local_queue_capacity: 20
+  global_queue_capacity: 50
+
+queue:
+  use_work_stealing: false  # 禁用工作窃取
+  steal_from: random
+
+backpressure:
+  strategy: block           # 阻塞策略 - 任务会等待
+  max_wait_time: 120.0
+
+starvation:
+  threshold: 15.0           # 低阈值，更容易触发饥饿检测
+
+simulation:
+  duration: 50.0
+  seed: 42
+
+# 任务配置：
+# 场景1：2个 Worker，10个长耗时高优先级任务
+# 场景2：然后是很多低优先级短任务
+# 结果：低优先级任务会等待很长时间，触发饥饿
+
+tasks:
+  # 高优先级长任务（会占用所有 Worker）
+  - id: t-high-0
+    name: high-priority-long-0
+    duration: 10.0
+    priority: 10
+  - id: t-high-1
+    name: high-priority-long-1
+    duration: 10.0
+    priority: 10
+  - id: t-high-2
+    name: high-priority-long-2
+    duration: 10.0
+    priority: 10
+  - id: t-high-3
+    name: high-priority-long-3
+    duration: 10.0
+    priority: 10
+  - id: t-high-4
+    name: high-priority-long-4
+    duration: 10.0
+    priority: 10
+  - id: t-high-5
+    name: high-priority-long-5
+    duration: 10.0
+    priority: 10
+  - id: t-high-6
+    name: high-priority-long-6
+    duration: 10.0
+    priority: 10
+  - id: t-high-7
+    name: high-priority-long-7
+    duration: 10.0
+    priority: 10
+  
+  # 低优先级短任务（会被阻塞很长时间）
+  - id: t-low-0
+    name: low-priority-short-0
+    duration: 1.0
+    priority: 0
+  - id: t-low-1
+    name: low-priority-short-1
+    duration: 1.0
+    priority: 0
+  - id: t-low-2
+    name: low-priority-short-2
+    duration: 1.0
+    priority: 0
+  - id: t-low-3
+    name: low-priority-short-3
+    duration: 1.0
+    priority: 0
+  - id: t-low-4
+    name: low-priority-short-4
+    duration: 1.0
+    priority: 0
+  - id: t-low-5
+    name: low-priority-short-5
+    duration: 1.0
+    priority: 0
+  - id: t-low-6
+    name: low-priority-short-6
+    duration: 1.0
+    priority: 0
+  - id: t-low-7
+    name: low-priority-short-7
+    duration: 1.0
+    priority: 0
+  - id: t-low-8
+    name: low-priority-short-8
+    duration: 1.0
+    priority: 0
+  - id: t-low-9
+    name: low-priority-short-9
+    duration: 1.0
+    priority: 0
+
+output:
+  verbose: true
