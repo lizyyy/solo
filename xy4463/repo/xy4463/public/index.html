@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野鸟救助站放飞前复核系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>野鸟救助站放飞前复核系统</h1>
+            <div class="header-actions">
+                <button id="loadSampleData" class="btn btn-secondary">加载示例数据</button>
+                <button id="exportMarkdown" class="btn btn-primary">导出Markdown清单</button>
+                <button id="exportJson" class="btn btn-primary">导出JSON审计包</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="import-section">
+                    <h2>数据导入</h2>
+                    <div class="import-item">
+                        <label for="birdsFile">救助鸟档案</label>
+                        <input type="file" id="birdsFile" accept=".json,.ndjson">
+                        <div class="import-status" id="birdsStatus"></div>
+                    </div>
+                    <div class="import-item">
+                        <label for="vetRecordsFile">兽医用药记录</label>
+                        <input type="file" id="vetRecordsFile" accept=".json,.ndjson">
+                        <div class="import-status" id="vetRecordsStatus"></div>
+                    </div>
+                    <div class="import-item">
+                        <label for="weightRecordsFile">体重记录</label>
+                        <input type="file" id="weightRecordsFile" accept=".json,.ndjson">
+                        <div class="import-status" id="weightRecordsStatus"></div>
+                    </div>
+                    <div class="import-item">
+                        <label for="flightCageFile">飞行笼观察表</label>
+                        <input type="file" id="flightCageFile" accept=".json,.ndjson">
+                        <div class="import-status" id="flightCageStatus"></div>
+                    </div>
+                    <div class="import-item">
+                        <label for="ringNumbersFile">环志编号</label>
+                        <input type="file" id="ringNumbersFile" accept=".json,.ndjson">
+                        <div class="import-status" id="ringNumbersStatus"></div>
+                    </div>
+                    <div class="import-item">
+                        <label for="weatherFile">放飞点天气</label>
+                        <input type="file" id="weatherFile" accept=".json,.ndjson">
+                        <div class="import-status" id="weatherStatus"></div>
+                    </div>
+                </div>
+
+                <div class="statistics-section">
+                    <h2>统计信息</h2>
+                    <div class="stat-item">
+                        <span class="stat-label">总鸟类数量:</span>
+                        <span class="stat-value" id="totalBirds">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">可放飞:</span>
+                        <span class="stat-value approved" id="approvedBirds">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">需延后:</span>
+                        <span class="stat-value delayed" id="delayedBirds">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">需补检:</span>
+                        <span class="stat-value recheck" id="recheckBirds">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="filter-section">
+                    <label for="statusFilter">状态筛选:</label>
+                    <select id="statusFilter">
+                        <option value="all">全部</option>
+                        <option value="可放飞">可放飞</option>
+                        <option value="需延后">需延后</option>
+                        <option value="需补检">需补检</option>
+                        <option value="待评估">待评估</option>
+                    </select>
+                    <button id="runAssessment" class="btn btn-primary">运行放飞评估</button>
+                </div>
+
+                <div class="birds-list" id="birdsList">
+                    <div class="no-data">
+                        <p>暂无数据，请先导入救助鸟档案</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="birdModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">鸟类详情</h2>
+                    <span class="close">&times;</span>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- 动态内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button id="saveDecision" class="btn btn-primary">保存改判</button>
+                    <button id="closeModal" class="btn btn-secondary">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

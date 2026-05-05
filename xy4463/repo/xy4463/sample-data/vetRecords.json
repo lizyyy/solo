@@ -1,0 +1,58 @@
+[
+  {
+    "birdId": "B001",
+    "date": "2026-04-15",
+    "diagnosis": "轻微擦伤",
+    "medications": ["碘伏消毒"],
+    "vetName": "张医生"
+  },
+  {
+    "birdId": "B001",
+    "date": "2026-04-18",
+    "diagnosis": "恢复良好",
+    "medications": [],
+    "vetName": "张医生"
+  },
+  {
+    "birdId": "B002",
+    "date": "2026-04-10",
+    "diagnosis": "左翅闭合性骨折",
+    "medications": ["止痛药", "抗生素"],
+    "vetName": "李医生"
+  },
+  {
+    "birdId": "B002",
+    "date": "2026-04-20",
+    "diagnosis": "骨折愈合中，需继续观察",
+    "medications": ["钙片"],
+    "vetName": "李医生"
+  },
+  {
+    "birdId": "B003",
+    "date": "2026-04-20",
+    "diagnosis": "严重营养不良",
+    "medications": ["营养液", "维生素"],
+    "vetName": "王医生"
+  },
+  {
+    "birdId": "B004",
+    "date": "2026-03-20",
+    "diagnosis": "农药中毒",
+    "medications": ["解毒剂", "保肝药"],
+    "vetName": "李医生"
+  },
+  {
+    "birdId": "B004",
+    "date": "2026-03-30",
+    "diagnosis": "中毒症状消失，肝功能恢复中",
+    "medications": ["保肝药"],
+    "vetName": "李医生"
+  },
+  {
+    "birdId": "B004",
+    "date": "2026-04-15",
+    "diagnosis": "完全康复",
+    "medications": [],
+    "vetName": "李医生"
+  }
+]
