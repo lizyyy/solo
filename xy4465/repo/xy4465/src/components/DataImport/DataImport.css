@@ -1,0 +1,242 @@
+.data-import {
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.data-import__header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.25rem;
+  color: #1f2937;
+}
+
+.data-import__description {
+  margin: 0 0 20px 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.data-import__dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+}
+
+.data-import__dropzone:hover,
+.data-import__dropzone--dragging {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.data-import__icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.data-import__text {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.data-import__highlight {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.data-import__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.data-import__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.data-import__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.data-import__results {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.data-import__results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.data-import__results-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.data-import__clear-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.data-import__clear-btn:hover {
+  background: #fee2e2;
+}
+
+.data-import__results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-import__result-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 3px solid #d1d5db;
+}
+
+.data-import__result-item--success {
+  border-left-color: #22c55e;
+}
+
+.data-import__result-item--error {
+  border-left-color: #ef4444;
+}
+
+.data-import__result-icon {
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.data-import__result-content {
+  flex: 1;
+}
+
+.data-import__result-type {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.data-import__result-count {
+  font-weight: 400;
+  color: #6b7280;
+  margin-left: 4px;
+}
+
+.data-import__result-errors,
+.data-import__result-warnings {
+  margin-top: 8px;
+}
+
+.data-import__result-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #ef4444;
+  margin-bottom: 4px;
+}
+
+.data-import__result-warnings .data-import__result-label {
+  color: #f59e0b;
+}
+
+.data-import__result-errors ul,
+.data-import__result-warnings ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.data-import__tips {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f0f9ff;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.data-import__tips h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: #1e40af;
+}
+
+.data-import__tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.data-import__tip-item {
+  padding: 12px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e0f2fe;
+}
+
+.data-import__tip-item strong {
+  display: block;
+  color: #1e40af;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.data-import__tip-item p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .data-import {
+    padding: 16px;
+  }
+  
+  .data-import__dropzone {
+    padding: 30px 16px;
+  }
+  
+  .data-import__tips-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .data-import__result-item {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
