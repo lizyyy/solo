@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轮胎店寄存复核系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="main-menu" class="screen">
+            <div class="menu-container">
+                <h1>🚗 轮胎店寄存复核系统</h1>
+                <p class="subtitle">换季寄存 · 装车复核 · 风险预警</p>
+                <div class="menu-buttons">
+                    <button class="btn btn-primary" id="scan-enter">扫码录入</button>
+                    <button class="btn btn-secondary" id="view-appointments">预约列表</button>
+                    <button class="btn" id="view-history">历史记录</button>
+                </div>
+                <div class="system-info">
+                    <h3>📋 系统功能</h3>
+                    <ul>
+                        <li>✅ 轮胎组条码扫码/手动录入</li>
+                        <li>✅ 客户车辆、仓位信息管理</li>
+                        <li>✅ 磨损深度、胎压检测记录</li>
+                        <li>✅ 预约取胎单管理与查询</li>
+                        <li>⚠️ 智能风险识别：错仓、规格不匹配、胎压异常、磨损超限</li>
+                        <li>📝 人工改判与备注持久化</li>
+                        <li>📄 导出 Markdown 交接单 & JSON 审计明细</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="scan-screen" class="screen hidden">
+            <div class="screen-header">
+                <h2>📱 扫码录入</h2>
+                <button class="btn" id="back-from-scan">返回</button>
+            </div>
+            <div class="scan-container">
+                <div class="scan-section">
+                    <h3>条码输入</h3>
+                    <div class="input-group">
+                        <input type="text" id="barcode-input" placeholder="扫描或输入轮胎组条码" class="input-large">
+                        <button class="btn btn-primary" id="lookup-barcode">查询</button>
+                    </div>
+                    <div class="simulated-scanner">
+                        <p>模拟扫码 (快速录入常用条码):</p>
+                        <div class="quick-barcodes" id="quick-barcodes"></div>
+                    </div>
+                </div>
+
+                <div class="form-section" id="tire-set-form">
+                    <h3>轮胎组信息</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>条码</label>
+                            <input type="text" id="form-barcode" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>客户</label>
+                            <select id="form-customer">
+                                <option value="">选择客户</option>
+                            </select>
+                            <button class="btn btn-small" id="new-customer-btn">+ 新客户</button>
+                        </div>
+                        <div class="form-group">
+                            <label>仓位</label>
+                            <select id="form-location">
+                                <option value="">选择仓位</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>数量</label>
+                            <input type="number" id="form-quantity" value="4" min="1" max="8">
+                        </div>
+                    </div>
+
+                    <h4>轮胎规格 (4条)</h4>
+                    <div class="tire-specs-grid">
+                        <div class="tire-spec-item">
+                            <span class="tire-label">左前</span>
+                            <input type="text" class="spec-input" id="spec-0" placeholder="如: 225/50 R17">
+                            <input type="text" class="pattern-input" id="pattern-0" placeholder="花纹">
+                            <input type="text" class="brand-input" id="brand-0" placeholder="品牌">
+                        </div>
+                        <div class="tire-spec-item">
+                            <span class="tire-label">右前</span>
+                            <input type="text" class="spec-input" id="spec-1" placeholder="如: 225/50 R17">
+                            <input type="text" class="pattern-input" id="pattern-1" placeholder="花纹">
+                            <input type="text" class="brand-input" id="brand-1" placeholder="品牌">
+                        </div>
+                        <div class="tire-spec-item">
+                            <span class="tire-label">左后</span>
+                            <input type="text" class="spec-input" id="spec-2" placeholder="如: 225/50 R17">
+                            <input type="text" class="pattern-input" id="pattern-2" placeholder="花纹">
+                            <input type="text" class="brand-input" id="brand-2" placeholder="品牌">
+                        </div>
+                        <div class="tire-spec-item">
+                            <span class="tire-label">右后</span>
+                            <input type="text" class="spec-input" id="spec-3" placeholder="如: 225/50 R17">
+                            <input type="text" class="pattern-input" id="pattern-3" placeholder="花纹">
+                            <input type="text" class="brand-input" id="brand-3" placeholder="品牌">
+                        </div>
+                    </div>
+
+                    <h4>检测记录</h4>
+                    <div class="inspection-grid">
+                        <div class="inspection-item">
+                            <span class="tire-label">左前</span>
+                            <div class="inspection-inputs">
+                                <input type="number" class="wear-input" id="wear-0" placeholder="磨损(mm)" step="0.1" min="0">
+                                <input type="number" class="pressure-input" id="pressure-0" placeholder="胎压(bar)" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="inspection-item">
+                            <span class="tire-label">右前</span>
+                            <div class="inspection-inputs">
+                                <input type="number" class="wear-input" id="wear-1" placeholder="磨损(mm)" step="0.1" min="0">
+                                <input type="number" class="pressure-input" id="pressure-1" placeholder="胎压(bar)" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="inspection-item">
+                            <span class="tire-label">左后</span>
+                            <div class="inspection-inputs">
+                                <input type="number" class="wear-input" id="wear-2" placeholder="磨损(mm)" step="0.1" min="0">
+                                <input type="number" class="pressure-input" id="pressure-2" placeholder="胎压(bar)" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="inspection-item">
+                            <span class="tire-label">右后</span>
+                            <div class="inspection-inputs">
+                                <input type="number" class="wear-input" id="wear-3" placeholder="磨损(mm)" step="0.1" min="0">
+                                <input type="number" class="pressure-input" id="pressure-3" placeholder="胎压(bar)" step="0.1" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="form-notes" rows="3" placeholder="备注信息..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="save-tire-set">保存</button>
+                        <button class="btn" id="clear-form">清空</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="new-customer-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>新增客户</h3>
+                <div class="form-group">
+                    <label>姓名 *</label>
+                    <input type="text" id="new-customer-name" placeholder="客户姓名">
+                </div>
+                <div class="form-group">
+                    <label>电话</label>
+                    <input type="text" id="new-customer-phone" placeholder="联系电话">
+                </div>
+                <div class="form-group">
+                    <label>车牌号</label>
+                    <input type="text" id="new-customer-plate" placeholder="如: 京A12345">
+                </div>
+                <div class="form-group">
+                    <label>车型</label>
+                    <input type="text" id="new-customer-model" placeholder="如: 奥迪A4L">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="save-customer">保存</button>
+                    <button class="btn" id="cancel-customer">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="appointments-screen" class="screen hidden">
+            <div class="screen-header">
+                <h2>📋 预约列表</h2>
+                <div class="header-actions">
+                    <input type="date" id="filter-date">
+                    <select id="filter-status">
+                        <option value="">全部状态</option>
+                        <option value="pending">待装车</option>
+                        <option value="in_progress">装车中</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                    <button class="btn btn-primary" id="new-appointment">+ 新增预约</button>
+                    <button class="btn" id="back-from-appointments">返回</button>
+                </div>
+            </div>
+            <div class="appointments-list" id="appointments-list">
+                <p class="empty-message">暂无预约记录</p>
+            </div>
+        </div>
+
+        <div id="new-appointment-modal" class="modal hidden">
+            <div class="modal-content modal-large">
+                <h3>新增预约</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>客户 *</label>
+                        <select id="apt-customer">
+                            <option value="">选择客户</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>预约日期 *</label>
+                        <input type="date" id="apt-date">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>预期仓位</label>
+                    <select id="apt-location">
+                        <option value="">不指定</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>选择轮胎组 *</label>
+                    <div class="tire-sets-selection" id="apt-tire-sets">
+                        <p class="empty-message">请先选择客户</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="apt-notes" rows="2" placeholder="预约备注..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="save-appointment">创建预约</button>
+                    <button class="btn" id="cancel-appointment">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="review-screen" class="screen hidden">
+            <div class="screen-header">
+                <h2>🔍 装车复核</h2>
+                <div class="header-actions">
+                    <button class="btn" id="back-from-review">返回列表</button>
+                </div>
+            </div>
+            <div class="review-container">
+                <div class="review-info-card" id="review-info">
+                </div>
+
+                <div class="risk-summary" id="risk-summary">
+                </div>
+
+                <div class="tire-sets-review" id="tire-sets-review">
+                </div>
+
+                <div class="review-actions">
+                    <button class="btn btn-primary" id="complete-review">完成装车</button>
+                    <button class="btn btn-secondary" id="export-markdown-btn">导出 Markdown</button>
+                    <button class="btn" id="export-json-btn">导出 JSON</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-screen" class="screen hidden">
+            <div class="screen-header">
+                <h2>📚 历史记录</h2>
+                <button class="btn" id="back-from-history">返回</button>
+            </div>
+            <div class="history-tabs">
+                <button class="tab-btn active" data-tab="customers">客户</button>
+                <button class="tab-btn" data-tab="tire-sets">轮胎组</button>
+                <button class="tab-btn" data-tab="appointments">预约</button>
+            </div>
+            <div class="history-content">
+                <div id="tab-customers" class="tab-content active"></div>
+                <div id="tab-tire-sets" class="tab-content hidden"></div>
+                <div id="tab-appointments" class="tab-content hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
