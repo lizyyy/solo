@@ -1,0 +1,84 @@
+# 播客质量检查工具配置文件
+
+# 节目基础信息
+show:
+  name: "我的播客节目"
+  author: "主播名字"
+  email: "contact@example.com"
+
+# 命名规则配置
+naming:
+  # 必需文件类型及其命名模式
+  required_files:
+    # 音频文件命名规则
+    audio:
+      pattern: "^EP\\d{3}_.*\\.mp3$"
+      description: "EP开头 + 3位数字 + 下划线 + 节目名称 + .mp3"
+      examples:
+        - "EP001_第一期节目.mp3"
+        - "EP002_第二期_特别篇.mp3"
+    
+    # 封面图片命名规则
+    cover:
+      pattern: "^EP\\d{3}_cover\\.(jpg|jpeg|png)$"
+      description: "EP开头 + 3位数字 + _cover + .jpg/jpeg/png"
+      examples:
+        - "EP001_cover.jpg"
+        - "EP002_cover.png"
+    
+    # Shownotes命名规则
+    shownotes:
+      pattern: "^EP\\d{3}_shownotes\\.(md|txt)$"
+      description: "EP开头 + 3位数字 + _shownotes + .md/txt"
+      examples:
+        - "EP001_shownotes.md"
+        - "EP002_shownotes.txt"
+    
+    # 字幕文件命名规则
+    subtitles:
+      pattern: "^EP\\d{3}_subtitles\\.srt$"
+      description: "EP开头 + 3位数字 + _subtitles + .srt"
+      examples:
+        - "EP001_subtitles.srt"
+        - "EP002_subtitles.srt"
+  
+  # 授权素材文件夹命名规则
+  assets:
+    folder_pattern: "^EP\\d{3}_assets$"
+    description: "EP开头 + 3位数字 + _assets 文件夹"
+    examples:
+      - "EP001_assets"
+
+# 音频检查配置
+audio:
+  # 最小时长（秒）
+  min_duration: 300
+  # 最大时长（秒）
+  max_duration: 7200
+  # 目标比特率（kbps）
+  target_bitrate: 128
+  # 目标采样率（Hz）
+  target_sample_rate: 44100
+
+# 字幕检查配置
+subtitles:
+  # 允许的字幕与音频时长差（秒）
+  max_timing_deviation: 5
+  # 单条字幕最小时长（秒）
+  min_subtitle_duration: 1
+  # 单条字幕最大时长（秒）
+  max_subtitle_duration: 10
+
+# 检查历史配置
+history:
+  # 历史记录保存位置
+  storage_path: "./check_history"
+  # 保留的历史记录数量
+  keep_count: 50
+
+# 报告配置
+report:
+  # 报告输出目录
+  output_path: "./reports"
+  # 是否包含详细建议
+  include_suggestions: true
