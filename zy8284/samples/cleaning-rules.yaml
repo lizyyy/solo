@@ -1,0 +1,29 @@
+version: 1.0
+rules:
+  customer_id:
+    trim: true
+    uppercase: true
+    pattern: '^[A-Za-z]\d{3}$'
+    
+  order_date:
+    formats:
+      - '%Y-%m-%d'
+      - '%d/%m/%Y'
+      - '%Y/%m/%d'
+      - '%d-%m-%Y'
+    auto_parse: true
+    default: null
+    
+  order_amount:
+    remove_currency: true
+    remove_commas: true
+    default: 0
+    
+  status:
+    mapping:
+      'completed': 'COMPLETED'
+      'pending': 'PENDING'
+      'shipped': 'SHIPPED'
+      'cancelled': 'CANCELLED'
+      'processing': 'PROCESSING'
+    default: 'UNKNOWN'

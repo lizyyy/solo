@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据清洗追溯工作台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .upload-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .upload-area {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .upload-box {
+            flex: 1;
+            min-width: 250px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-box:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-box.dragover {
+            border-color: #667eea;
+            background-color: #e8ebff;
+        }
+        
+        .upload-box input {
+            display: none;
+        }
+        
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #dee2e6;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .data-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .data-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        td {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        td:hover {
+            background-color: #e9ecef;
+        }
+        
+        .has-override {
+            background-color: #fff3cd;
+            font-style: italic;
+        }
+        
+        .has-override:hover {
+            background-color: #ffeaa7;
+        }
+        
+        .conflict-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .lineage-info {
+            margin-bottom: 20px;
+        }
+        
+        .lineage-info h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .lineage-item {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .lineage-item.manual-override {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .lineage-column {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .lineage-transformation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+        
+        .original-value {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .arrow {
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .cleaned-value {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .rule-applied {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .override-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .override-form h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .conflict-item {
+            background-color: #fff3cd;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .conflict-item.resolved {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+        
+        .conflict-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .conflict-type {
+            font-weight: 600;
+            color: #856404;
+        }
+        
+        .resolved .conflict-type {
+            color: #155724;
+        }
+        
+        .conflict-details {
+            margin-bottom: 15px;
+        }
+        
+        .conflict-values {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        
+        .conflict-value {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            flex: 1;
+        }
+        
+        .conflict-value-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .conflict-value-content {
+            font-weight: 600;
+            font-family: monospace;
+        }
+        
+        .resolve-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .export-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .export-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 20px;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .export-card:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .export-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .export-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .export-desc {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .upload-area {
+                flex-direction: column;
+            }
+            
+            .conflict-values {
+                flex-direction: column;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 数据清洗追溯工作台</h1>
+            <p class="subtitle">上传数据文件和清洗规则，自动清洗并追踪每一步变换</p>
+        </header>
+        
+        <div class="upload-section">
+            <h2>📁 上传文件</h2>
+            <div id="status-message" class="status-message"></div>
+            <div class="upload-area">
+                <div class="upload-box" id="csv-upload-box">
+                    <input type="file" id="csv-file" accept=".csv">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-text">点击或拖拽上传 CSV 文件</div>
+                    <div class="upload-text" style="font-size: 12px; color: #999;">支持: .csv</div>
+                    <div class="file-name" id="csv-file-name"></div>
+                </div>
+                
+                <div class="upload-box" id="rules-upload-box">
+                    <input type="file" id="rules-file" accept=".yaml,.yml">
+                    <div class="upload-icon">⚙️</div>
+                    <div class="upload-text">点击或拖拽上传 清洗规则</div>
+                    <div class="upload-text" style="font-size: 12px; color: #999;">支持: .yaml, .yml</div>
+                    <div class="file-name" id="rules-file-name"></div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="upload-btn" disabled>开始清洗</button>
+                <button class="btn btn-danger" id="clear-btn">清空数据</button>
+            </div>
+        </div>
+        
+        <div class="data-section">
+            <div class="tabs">
+                <div class="tab active" data-tab="records">清洗后数据</div>
+                <div class="tab" data-tab="conflicts">冲突列表</div>
+            </div>
+            
+            <div class="tab-content active" id="records-tab">
+                <h2>✅ 清洗后数据</h2>
+                <div class="table-container">
+                    <table id="records-table">
+                        <thead>
+                            <tr>
+                                <th>行号</th>
+                                <th>客户 ID</th>
+                                <th>订单日期</th>
+                                <th>订单金额</th>
+                                <th>状态</th>
+                                <th>人工覆盖</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-tbody">
+                            <tr>
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">📭</div>
+                                        <p>暂无数据，请先上传文件并清洗</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="conflicts-tab">
+                <h2>⚠️ 冲突列表</h2>
+                <div id="conflicts-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>暂无冲突</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-section">
+            <h2>📥 导出结果</h2>
+            <div class="export-buttons">
+                <div class="export-card">
+                    <div class="export-icon">📄</div>
+                    <div class="export-name">cleaned.csv</div>
+                    <div class="export-desc">清洗后的标准数据表格</div>
+                    <button class="btn btn-success btn-sm" onclick="exportData('cleaned')">导出 CSV</button>
+                </div>
+                <div class="export-card">
+                    <div class="export-icon">🔗</div>
+                    <div class="export-name">lineage.json</div>
+                    <div class="export-desc">完整的数据血缘追溯信息</div>
+                    <button class="btn btn-success btn-sm" onclick="exportData('lineage')">导出 JSON</button>
+                </div>
+                <div class="export-card">
+                    <div class="export-icon">📋</div>
+                    <div class="export-name">audit.md</div>
+                    <div class="export-desc">审计报告（包含冲突和覆盖记录）</div>
+                    <button class="btn btn-success btn-sm" onclick="exportData('audit')">导出 MD</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="lineage-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔍 数据追溯详情</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="lineage-content">
+                <div class="lineage-info">
+                    <h4>原始记录信息</h4>
+                    <p><strong>行号:</strong> <span id="modal-line-number">-</span></p>
+                    <p><strong>原始数据:</strong> <span id="modal-raw-data">-</span></p>
+                </div>
+                <div class="lineage-info">
+                    <h4>变换记录</h4>
+                    <div id="modal-transformations"></div>
+                </div>
+                <div class="override-form">
+                    <h4>✏️ 人工覆盖</h4>
+                    <form id="override-form">
+                        <input type="hidden" id="override-record-id">
+                        <div class="form-group">
+                            <label for="override-column">选择字段</label>
+                            <select id="override-column">
+                                <option value="customer_id">客户 ID</option>
+                                <option value="order_date">订单日期</option>
+                                <option value="order_amount">订单金额</option>
+                                <option value="status">状态</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="override-new-value">新值</label>
+                            <input type="text" id="override-new-value" placeholder="输入新的值">
+                        </div>
+                        <div class="form-group">
+                            <label for="override-reason">原因（可选）</label>
+                            <textarea id="override-reason" placeholder="说明覆盖原因..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">应用覆盖</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+        
+        let csvFile = null;
+        let rulesFile = null;
+        let currentRecords = [];
+        let currentConflicts = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragDrop();
+            setupTabs();
+            setupFormHandlers();
+            loadData();
+        });
+        
+        function setupDragDrop() {
+            const csvBox = document.getElementById('csv-upload-box');
+            const rulesBox = document.getElementById('rules-upload-box');
+            const csvInput = document.getElementById('csv-file');
+            const rulesInput = document.getElementById('rules-file');
+            
+            [csvBox, rulesBox].forEach((box, index) => {
+                const input = index === 0 ? csvInput : rulesInput;
+                
+                box.addEventListener('click', () => input.click());
+                
+                box.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    box.classList.add('dragover');
+                });
+                
+                box.addEventListener('dragleave', () => {
+                    box.classList.remove('dragover');
+                });
+                
+                box.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    box.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        handleFileSelect(files[0], index);
+                    }
+                });
+            });
+            
+            csvInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0], 0);
+                }
+            });
+            
+            rulesInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0], 1);
+                }
+            });
+        }
+        
+        function handleFileSelect(file, type) {
+            if (type === 0) {
+                csvFile = file;
+                document.getElementById('csv-file-name').textContent = file.name;
+            } else {
+                rulesFile = file;
+                document.getElementById('rules-file-name').textContent = file.name;
+            }
+            
+            updateUploadButton();
+        }
+        
+        function updateUploadButton() {
+            const uploadBtn = document.getElementById('upload-btn');
+            uploadBtn.disabled = !(csvFile && rulesFile);
+        }
+        
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+        }
+        
+        function setupFormHandlers() {
+            document.getElementById('upload-btn').addEventListener('click', uploadAndProcess);
+            document.getElementById('clear-btn').addEventListener('click', clearData);
+            document.getElementById('override-form').addEventListener('submit', handleOverride);
+        }
+        
+        async function uploadAndProcess() {
+            const formData = new FormData();
+            formData.append('csv_file', csvFile);
+            formData.append('rules_file', rulesFile);
+            
+            showStatus('正在处理文件...', false);
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus(`处理成功！共清洗 ${result.cleaned_records_count} 条记录`, true);
+                    loadData();
+                } else {
+                    showStatus(result.message, false, true);
+                }
+            } catch (error) {
+                showStatus('网络错误，请检查后端服务是否启动', false, true);
+                console.error(error);
+            }
+        }
+        
+        async function clearData() {
+            if (!confirm('确定要清空所有数据吗？')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/clear`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus('数据已清空', true);
+                    csvFile = null;
+                    rulesFile = null;
+                    document.getElementById('csv-file-name').textContent = '';
+                    document.getElementById('rules-file-name').textContent = '';
+                    updateUploadButton();
+                    loadData();
+                }
+            } catch (error) {
+                showStatus('清空失败', false, true);
+                console.error(error);
+            }
+        }
+        
+        async function loadData() {
+            await loadRecords();
+            await loadConflicts();
+        }
+        
+        async function loadRecords() {
+            try {
+                const response = await fetch(`${API_BASE}/records`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    currentRecords = result.data;
+                    renderRecords();
+                }
+            } catch (error) {
+                console.error('加载记录失败:', error);
+            }
+        }
+        
+        function renderRecords() {
+            const tbody = document.getElementById('records-tbody');
+            
+            if (currentRecords.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <p>暂无数据，请先上传文件并清洗</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = currentRecords.map(record => `
+                <tr>
+                    <td onclick="showLineage(${record.id})">${record.line_number}</td>
+                    <td onclick="showLineage(${record.id})" class="${record.has_manual_override ? 'has-override' : ''}">${record.customer_id || '-'}</td>
+                    <td onclick="showLineage(${record.id})" class="${record.has_manual_override ? 'has-override' : ''}">${record.order_date || '-'}</td>
+                    <td onclick="showLineage(${record.id})" class="${record.has_manual_override ? 'has-override' : ''}">${record.order_amount !== null ? record.order_amount : '-'}</td>
+                    <td onclick="showLineage(${record.id})" class="${record.has_manual_override ? 'has-override' : ''}">${record.status || '-'}</td>
+                    <td onclick="showLineage(${record.id})">
+                        ${record.has_manual_override ? 
+                            '<span class="conflict-badge badge-warning">是</span>' : 
+                            '<span class="conflict-badge badge-success">否</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadConflicts() {
+            try {
+                const response = await fetch(`${API_BASE}/conflicts`);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    currentConflicts = result.data;
+                    renderConflicts();
+                }
+            } catch (error) {
+                console.error('加载冲突失败:', error);
+            }
+        }
+        
+        function renderConflicts() {
+            const container = document.getElementById('conflicts-container');
+            
+            if (currentConflicts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>暂无冲突</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = currentConflicts.map(conflict => `
+                <div class="conflict-item ${conflict.resolved ? 'resolved' : ''}">
+                    <div class="conflict-header">
+                        <span class="conflict-type">
+                            ${conflict.conflict_type === 'customer_id_conflict' ? 
+                                '🔄 客户 ID 重复冲突' : 
+                                '📅 日期格式歧义'}
+                        </span>
+                        <span class="conflict-badge ${conflict.resolved ? 'badge-success' : 'badge-warning'}">
+                            ${conflict.resolved ? '已解决' : '待解决'}
+                        </span>
+                    </div>
+                    <div class="conflict-details">
+                        <p><strong>客户 ID:</strong> ${conflict.customer_id}</p>
+                        <p><strong>冲突字段:</strong> ${conflict.field_name}</p>
+                        <div class="conflict-values">
+                            <div class="conflict-value">
+                                <div class="conflict-value-label">值 1 (行 ${conflict.source_line1})</div>
+                                <div class="conflict-value-content">${conflict.value1}</div>
+                            </div>
+                            <div class="conflict-value">
+                                <div class="conflict-value-label">值 2 (行 ${conflict.source_line2})</div>
+                                <div class="conflict-value-content">${conflict.value2}</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${!conflict.resolved ? `
+                        <div class="resolve-section">
+                            <div class="form-group">
+                                <label>选择正确的值</label>
+                                <select id="resolve-select-${conflict.id}" class="resolve-select">
+                                    <option value="${conflict.value1}">使用值 1: ${conflict.value1}</option>
+                                    <option value="${conflict.value2}">使用值 2: ${conflict.value2}</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="resolveConflict(${conflict.id})">
+                                解决冲突
+                            </button>
+                        </div>
+                    ` : `
+                        <p><strong>已解决值:</strong> ${conflict.resolved_value}</p>
+                    `}
+                </div>
+            `).join('');
+        }
+        
+        async function resolveConflict(conflictId) {
+            const select = document.getElementById(`resolve-select-${conflictId}`);
+            const resolvedValue = select.value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/conflicts/${conflictId}/resolve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ resolved_value: resolvedValue })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus('冲突已解决', true);
+                    loadConflicts();
+                }
+            } catch (error) {
+                showStatus('解决失败', false, true);
+                console.error(error);
+            }
+        }
+        
+        async function showLineage(recordId) {
+            try {
+                const response = await fetch(`${API_BASE}/lineage/${recordId}`);
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data.length > 0) {
+                    const lineage = result.data;
+                    const record = currentRecords.find(r => r.id === recordId);
+                    
+                    document.getElementById('modal-line-number').textContent = lineage[0].line_number;
+                    document.getElementById('modal-raw-data').textContent = lineage[0].raw_data;
+                    document.getElementById('override-record-id').value = recordId;
+                    
+                    const transformationsHtml = lineage.map(l => `
+                        <div class="lineage-item ${l.is_manual_override ? 'manual-override' : ''}">
+                            <div class="lineage-column">${getColumnName(l.column_name)}</div>
+                            <div class="lineage-transformation">
+                                <span class="original-value">${l.original_value || '(空)'}</span>
+                                <span class="arrow">→</span>
+                                <span class="cleaned-value">${l.cleaned_value || '(空)'}</span>
+                            </div>
+                            <div class="rule-applied">
+                                规则: ${l.rule_applied || '无'}
+                                ${l.is_manual_override ? ' <strong style="color: #ffc107;">(人工覆盖)</strong>' : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('modal-transformations').innerHTML = transformationsHtml;
+                    document.getElementById('lineage-modal').classList.add('active');
+                }
+            } catch (error) {
+                console.error('加载追溯信息失败:', error);
+            }
+        }
+        
+        function getColumnName(column) {
+            const names = {
+                'customer_id': '客户 ID',
+                'order_date': '订单日期',
+                'order_amount': '订单金额',
+                'status': '状态'
+            };
+            return names[column] || column;
+        }
+        
+        function closeModal() {
+            document.getElementById('lineage-modal').classList.remove('active');
+        }
+        
+        async function handleOverride(e) {
+            e.preventDefault();
+            
+            const recordId = document.getElementById('override-record-id').value;
+            const column = document.getElementById('override-column').value;
+            const newValue = document.getElementById('override-new-value').value;
+            const reason = document.getElementById('override-reason').value;
+            
+            if (!newValue) {
+                showStatus('请输入新值', false, true);
+                return;
+            }
+            
+            const record = currentRecords.find(r => r.id === parseInt(recordId));
+            let originalValue = record ? record[column] : null;
+            
+            try {
+                const response = await fetch(`${API_BASE}/override`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cleaned_record_id: parseInt(recordId),
+                        column_name: column,
+                        original_cleaned_value: originalValue,
+                        new_value: newValue,
+                        reason: reason
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showStatus('人工覆盖已应用', true);
+                    closeModal();
+                    loadData();
+                }
+            } catch (error) {
+                showStatus('覆盖失败', false, true);
+                console.error(error);
+            }
+        }
+        
+        function exportData(type) {
+            window.open(`${API_BASE}/export/${type}`, '_blank');
+        }
+        
+        function showStatus(message, success = false, error = false) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message';
+            
+            if (success) {
+                statusDiv.classList.add('success');
+            } else if (error) {
+                statusDiv.classList.add('error');
+            }
+            
+            if (success || error) {
+                setTimeout(() => {
+                    statusDiv.className = 'status-message';
+                }, 5000);
+            }
+        }
+        
+        document.getElementById('lineage-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
