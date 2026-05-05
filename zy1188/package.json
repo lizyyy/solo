@@ -1,0 +1,36 @@
+{
+  "name": "sql-injection-scanner",
+  "version": "1.0.0",
+  "description": "本地命令行工具，用于扫描项目中的SQL注入风险",
+  "main": "src/index.js",
+  "bin": {
+    "sql-scan": "./bin/sql-scan.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint src/ bin/ tests/"
+  },
+  "keywords": [
+    "sql-injection",
+    "security",
+    "scanner",
+    "audit"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "sql.js": "^1.8.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "tmp": "^0.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
