@@ -1,0 +1,15 @@
+{"Time":"2024-01-15T10:30:00.000000000+08:00","Action":"run","Package":"github.com/example/service","Test":"BenchmarkProcessData-8"}
+{"Time":"2024-01-15T10:30:00.123456789+08:00","Action":"output","Package":"github.com/example/service","Test":"BenchmarkProcessData-8","Output":"BenchmarkProcessData-8         	     100	  1250500000 ns/op	 256 B/op	   3 allocs/op	 128.5 MB/s\n"}
+{"Time":"2024-01-15T10:30:00.123456790+08:00","Action":"pass","Package":"github.com/example/service","Test":"BenchmarkProcessData-8","Elapsed":0.123}
+{"Time":"2024-01-15T10:30:00.123456791+08:00","Action":"run","Package":"github.com/example/service","Test":"BenchmarkSerializeJSON-8"}
+{"Time":"2024-01-15T10:30:00.234567890+08:00","Action":"output","Package":"github.com/example/service","Test":"BenchmarkSerializeJSON-8","Output":"BenchmarkSerializeJSON-8       	     100	   850250000 ns/op	 512 B/op	   5 allocs/op	 256.0 MB/s\n"}
+{"Time":"2024-01-15T10:30:00.234567891+08:00","Action":"pass","Package":"github.com/example/service","Test":"BenchmarkSerializeJSON-8","Elapsed":0.111}
+{"Time":"2024-01-15T10:30:00.234567892+08:00","Action":"run","Package":"github.com/example/service","Test":"BenchmarkParseRequest-8"}
+{"Time":"2024-01-15T10:30:00.345678901+08:00","Action":"output","Package":"github.com/example/service","Test":"BenchmarkParseRequest-8","Output":"BenchmarkParseRequest-8        	    1000	   450750000 ns/op	 128 B/op	   2 allocs/op\n"}
+{"Time":"2024-01-15T10:30:00.345678902+08:00","Action":"pass","Package":"github.com/example/service","Test":"BenchmarkParseRequest-8","Elapsed":0.111}
+{"Time":"2024-01-15T10:30:00.345678903+08:00","Action":"run","Package":"github.com/example/service","Test":"BenchmarkCacheGet-8"}
+{"Time":"2024-01-15T10:30:00.456789012+08:00","Action":"output","Package":"github.com/example/service","Test":"BenchmarkCacheGet-8","Output":"BenchmarkCacheGet-8            	    5000	   150000000 ns/op	  64 B/op	   1 allocs/op\n"}
+{"Time":"2024-01-15T10:30:00.456789013+08:00","Action":"pass","Package":"github.com/example/service","Test":"BenchmarkCacheGet-8","Elapsed":0.111}
+{"Time":"2024-01-15T10:30:00.456789014+08:00","Action":"output","Package":"github.com/example/service","Output":"PASS\n"}
+{"Time":"2024-01-15T10:30:00.456789015+08:00","Action":"output","Package":"github.com/example/service","Output":"ok  \tgithub.com/example/service\t4.567s\n"}
+{"Time":"2024-01-15T10:30:00.456789016+08:00","Action":"pass","Package":"github.com/example/service","Elapsed":4.567}
