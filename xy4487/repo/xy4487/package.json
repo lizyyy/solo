@@ -1,0 +1,27 @@
+{
+  "name": "agricultural-cooperative-tool",
+  "version": "1.0.0",
+  "description": "农机合作社作业派工管理工具",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server/index.js",
+    "client": "npm run dev --prefix client",
+    "install-all": "npm install && cd client && npm install"
+  },
+  "keywords": ["agriculture", "cooperative", "management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
