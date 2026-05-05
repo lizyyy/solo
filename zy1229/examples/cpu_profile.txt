@@ -1,0 +1,37 @@
+Type: cpu
+Time: May 5, 2026 at 10:00am (CST)
+Duration: 10s, Total samples = 10000
+Showing nodes accounting for 10000, 100% of 10000 total
+----------------------------------------------------------+-------------
+      flat  flat%   sum%        cum   cum%   calls calls% + context          
+----------------------------------------------------------+-------------
+      6000 60.00% 60.00%       6000 60.00%                | main.processData
+                                         6000 100%   6000 100% | main.handleRequest
+                                              0     0   6000 100% | main.main
+----------------------------------------------------------+-------------
+      2000 20.00% 80.00%       2000 20.00%                | main.calculateHash
+                                         2000 100%   2000 100% | main.processData
+                                              0     0   2000 100% | main.handleRequest
+----------------------------------------------------------+-------------
+      1000 10.00% 90.00%       1000 10.00%                | main.readDatabase
+                                         1000 100%   1000 100% | main.processData
+----------------------------------------------------------+-------------
+       500  5.00% 95.00%        500  5.00%                | main.writeResponse
+                                          500 100%    500 100% | main.handleRequest
+----------------------------------------------------------+-------------
+       500  5.00% 100.0%       500  5.00%                | runtime.gcBgMarkWorker
+                                          500 100%    500 100% | runtime.systemstack
+----------------------------------------------------------+-------------
+
+    main.processData
+        main/data_processor.go:120
+    main.calculateHash
+        main/hash_utils.go:45
+    main.readDatabase
+        main/db_access.go:88
+    main.writeResponse
+        main/http_handler.go:156
+    main.handleRequest
+        main/http_handler.go:78
+    main.main
+        main/main.go:35

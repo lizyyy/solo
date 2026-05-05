@@ -1,0 +1,29 @@
+Type: heap
+Time: May 5, 2026 at 10:05am (CST)
+Showing nodes accounting for 100MB, 100% of 100MB total
+----------------------------------------------------------+-------------
+      in-use-bytes    in-use-objects  alloc-bytes   alloc-objects  context
+----------------------------------------------------------+-------------
+        50MB            50000          100MB          100000        | main.processLargeData
+                                           0     0           100MB 100%  100000 100% | main.handleRequest
+----------------------------------------------------------+-------------
+        30MB            30000           60MB           60000        | main.parseJSON
+                                           0     0            60MB 100%   60000 100% | main.processLargeData
+----------------------------------------------------------+-------------
+        15MB            15000           30MB           30000        | main.createTemporaryObject
+                                           0     0            30MB 100%   30000 100% | main.processLargeData
+----------------------------------------------------------+-------------
+         5MB             5000           10MB           10000        | main.cacheData
+                                           0     0            10MB 100%   10000 100% | main.handleRequest
+----------------------------------------------------------+-------------
+
+    main.processLargeData
+        main/data_processor.go:200
+    main.parseJSON
+        main/json_parser.go:50
+    main.createTemporaryObject
+        main/temp_buffer.go:120
+    main.cacheData
+        main/cache_manager.go:85
+    main.handleRequest
+        main/http_handler.go:78

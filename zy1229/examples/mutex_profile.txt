@@ -1,0 +1,35 @@
+Type: mutex
+Time: May 5, 2026 at 10:15am (CST)
+Showing nodes accounting for 8000ms, 100% of 8000ms total
+----------------------------------------------------------+-------------
+      duration      count  context
+----------------------------------------------------------+-------------
+        4000ms      2000  | main.sharedMapLock
+                                     0     0   4000ms 100%   2000 100% | main.updateSharedMap
+----------------------------------------------------------+-------------
+        2500ms      1500  | main.configMutex
+                                     0     0   2500ms 100%   1500 100% | main.readConfig
+----------------------------------------------------------+-------------
+        1000ms       800  | main.cacheRWLock
+                                     0     0   1000ms 100%    800 100% | main.accessCache
+----------------------------------------------------------+-------------
+         500ms       300  | main.statsMutex
+                                     0     0    500ms 100%    300 100% | main.updateStatistics
+----------------------------------------------------------+-------------
+
+    main.sharedMapLock
+        main/shared_map.go:120
+    main.updateSharedMap
+        main/shared_map.go:65
+    main.configMutex
+        main/config_manager.go:95
+    main.readConfig
+        main/config_manager.go:45
+    main.cacheRWLock
+        main/cache.go:150
+    main.accessCache
+        main/cache.go:80
+    main.statsMutex
+        main/statistics.go:100
+    main.updateStatistics
+        main/statistics.go:55

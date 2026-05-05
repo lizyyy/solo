@@ -1,0 +1,38 @@
+# Go runtime trace events
+# This is a simplified representation of trace events
+
+# GC Events
+GC mark start G=0 time=0.1s duration=0.05s
+GC mark end G=0 time=0.15s duration=0s
+GC sweep start G=0 time=0.15s duration=0.02s
+GC sweep end G=0 time=0.17s duration=0s
+GC mark start G=0 time=0.5s duration=0.08s
+GC mark end G=0 time=0.58s duration=0s
+GC sweep start G=0 time=0.58s duration=0.03s
+GC sweep end G=0 time=0.61s duration=0s
+
+# Goroutine events
+GoroutineCreate G=1 time=0.01s stack: main.workerFunc
+GoroutineRunning G=1 time=0.01s duration=0.05s
+GoroutineBlocked G=1 time=0.06s duration=2.5s stack: main.waitForChannel
+GoroutineRunning G=1 time=2.56s duration=0.1s
+
+GoroutineCreate G=2 time=0.02s stack: main.httpHandler
+GoroutineRunning G=2 time=0.02s duration=0.03s
+GoroutineBlocked G=2 time=0.05s duration=1.2s stack: main.waitForDatabase
+GoroutineRunning G=2 time=1.25s duration=0.2s
+
+GoroutineCreate G=3 time=0.1s stack: main.cacheUpdater
+GoroutineRunning G=3 time=0.1s duration=0.02s
+GoroutineBlocked G=3 time=0.12s duration=5.0s stack: main.waitForMutex
+GoroutineRunning G=3 time=5.12s duration=0.05s
+
+# STW Events
+STW start G=0 time=0.1s duration=0.01s
+STW end G=0 time=0.11s duration=0s
+STW start G=0 time=0.5s duration=0.015s
+STW end G=0 time=0.515s duration=0s
+
+# Syscall events
+GoroutineSyscall G=1 time=0.03s duration=0.02s stack: syscall.Read
+GoroutineSyscall G=2 time=0.04s duration=0.01s stack: syscall.Write

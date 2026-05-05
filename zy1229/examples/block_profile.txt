@@ -1,0 +1,35 @@
+Type: block
+Time: May 5, 2026 at 10:10am (CST)
+Showing nodes accounting for 10000ms, 100% of 10000ms total
+----------------------------------------------------------+-------------
+      duration      count  context
+----------------------------------------------------------+-------------
+        5000ms      1000  | main.waitForDatabaseResponse
+                                     0     0   5000ms 100%   1000 100% | main.queryDatabase
+----------------------------------------------------------+-------------
+        3000ms       500  | main.readFromNetwork
+                                     0     0   3000ms 100%    500 100% | main.fetchRemoteData
+----------------------------------------------------------+-------------
+        1500ms       300  | main.waitForMutex
+                                     0     0   1500ms 100%    300 100% | main.accessSharedResource
+----------------------------------------------------------+-------------
+         500ms       200  | main.chanSend
+                                     0     0    500ms 100%    200 100% | main.sendToWorker
+----------------------------------------------------------+-------------
+
+    main.waitForDatabaseResponse
+        main/db_connector.go:150
+    main.queryDatabase
+        main/db_connector.go:80
+    main.readFromNetwork
+        main/network_client.go:120
+    main.fetchRemoteData
+        main/network_client.go:60
+    main.waitForMutex
+        main/resource_lock.go:95
+    main.accessSharedResource
+        main/resource_lock.go:45
+    main.chanSend
+        main/worker_pool.go:180
+    main.sendToWorker
+        main/worker_pool.go:120
