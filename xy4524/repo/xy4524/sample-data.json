@@ -1,0 +1,182 @@
+[
+  {
+    "order": {
+      "order_number": "JW20260501001",
+      "customer_name": "张三",
+      "phone": "13800138001",
+      "repair_type": "爪镶加固",
+      "description": "客户戒指爪镶松动，需要加固处理"
+    },
+    "certificates": [
+      {
+        "stone_number": "S001",
+        "certificate_number": "GIA1234567890",
+        "stone_type": "钻石",
+        "weight": 1.5,
+        "color": "D",
+        "clarity": "VVS1"
+      },
+      {
+        "stone_number": "S002",
+        "certificate_number": null,
+        "stone_type": "红宝石",
+        "weight": 0.8,
+        "color": "鸽血红",
+        "clarity": "VS"
+      }
+    ],
+    "weightRecords": [
+      {
+        "record_type": "before",
+        "weight": 5.2,
+        "recorded_at": "2026-05-01 10:00:00"
+      },
+      {
+        "record_type": "after",
+        "weight": 4.8,
+        "recorded_at": "2026-05-03 15:30:00"
+      }
+    ],
+    "processes": [
+      {
+        "process_name": "检测评估",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-05-01 10:00:00",
+        "completed_at": "2026-05-01 11:00:00"
+      },
+      {
+        "process_name": "爪镶加固",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-05-02 09:00:00",
+        "completed_at": "2026-05-02 16:00:00"
+      },
+      {
+        "process_name": "清洗抛光",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-05-03 10:00:00",
+        "completed_at": "2026-05-03 11:00:00"
+      }
+    ],
+    "deadline": {
+      "deadline_date": "2026-05-08",
+      "is_notified": false,
+      "notified_at": null
+    }
+  },
+  {
+    "order": {
+      "order_number": "JW20260501002",
+      "customer_name": "李四",
+      "phone": "13800138002",
+      "repair_type": "钻石改款",
+      "description": "将旧款戒指改款为新款式"
+    },
+    "certificates": [
+      {
+        "stone_number": "S003",
+        "certificate_number": "GIA0987654321",
+        "stone_type": "钻石",
+        "weight": 2.0,
+        "color": "E",
+        "clarity": "VS1"
+      }
+    ],
+    "weightRecords": [
+      {
+        "record_type": "before",
+        "weight": 6.0,
+        "recorded_at": "2026-04-28 09:00:00"
+      },
+      {
+        "record_type": "after",
+        "weight": 5.95,
+        "recorded_at": "2026-04-30 14:00:00"
+      }
+    ],
+    "processes": [
+      {
+        "process_name": "款式设计",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-04-28 10:00:00",
+        "completed_at": "2026-04-28 15:00:00"
+      },
+      {
+        "process_name": "拆石",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-04-29 09:00:00",
+        "completed_at": "2026-04-29 11:00:00"
+      },
+      {
+        "process_name": "爪镶镶嵌",
+        "status": "completed",
+        "is_reinspected": true,
+        "started_at": "2026-04-29 14:00:00",
+        "completed_at": "2026-04-30 12:00:00"
+      },
+      {
+        "process_name": "质检",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-04-30 14:00:00",
+        "completed_at": "2026-04-30 15:00:00"
+      }
+    ],
+    "deadline": {
+      "deadline_date": "2026-04-25",
+      "is_notified": false,
+      "notified_at": null
+    }
+  },
+  {
+    "order": {
+      "order_number": "JW20260501003",
+      "customer_name": "王五",
+      "phone": "13800138003",
+      "repair_type": "日常保养",
+      "description": "戒指清洗和抛光保养"
+    },
+    "certificates": [
+      {
+        "stone_number": "S004",
+        "certificate_number": "GIA1122334455",
+        "stone_type": "钻石",
+        "weight": 1.0,
+        "color": "F",
+        "clarity": "SI1"
+      }
+    ],
+    "weightRecords": [
+      {
+        "record_type": "before",
+        "weight": 4.5,
+        "recorded_at": "2026-05-05 10:00:00"
+      }
+    ],
+    "processes": [
+      {
+        "process_name": "清洗",
+        "status": "completed",
+        "is_reinspected": false,
+        "started_at": "2026-05-05 10:30:00",
+        "completed_at": "2026-05-05 11:00:00"
+      },
+      {
+        "process_name": "抛光",
+        "status": "in_progress",
+        "is_reinspected": false,
+        "started_at": "2026-05-05 11:15:00",
+        "completed_at": null
+      }
+    ],
+    "deadline": {
+      "deadline_date": "2026-05-10",
+      "is_notified": false,
+      "notified_at": null
+    }
+  }
+]
