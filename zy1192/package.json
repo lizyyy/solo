@@ -1,0 +1,32 @@
+{
+  "name": "concurrency-visualizer",
+  "version": "1.0.0",
+  "description": "并发原语可视化实验台 - 用于教学展示 mutex、读写锁、自旋锁、CAS、无锁队列和 ABA 问题",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "concurrency",
+    "mutex",
+    "rwlock",
+    "spinlock",
+    "CAS",
+    "lock-free",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
