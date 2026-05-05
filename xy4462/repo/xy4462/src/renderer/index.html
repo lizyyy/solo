@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区公益理发队管理工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>✂️ 社区公益理发队管理工具</h1>
+      <div class="header-actions">
+        <button id="newEventBtn" class="btn btn-primary">
+          <span>📅 新建活动</span>
+        </button>
+        <button id="importBtn" class="btn btn-success">
+          <span>📥 导入数据</span>
+        </button>
+        <button id="detectBtn" class="btn btn-warning">
+          <span>🔍 检测冲突</span>
+        </button>
+        <button id="exportMarkdownBtn" class="btn btn-info">
+          <span>📄 导出交接单</span>
+        </button>
+        <button id="exportJsonBtn" class="btn btn-secondary">
+          <span>📊 导出JSON</span>
+        </button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="overview">
+        <span>📊 总览</span>
+      </button>
+      <button class="tab-btn" data-tab="schedule">
+        <span>📋 排班视图</span>
+      </button>
+      <button class="tab-btn" data-tab="appointments">
+        <span>👥 预约名单</span>
+      </button>
+      <button class="tab-btn" data-tab="volunteers">
+        <span>👨‍👩‍👧 志愿者</span>
+      </button>
+      <button class="tab-btn" data-tab="elders">
+        <span>👴👵 老人信息</span>
+      </button>
+      <button class="tab-btn" data-tab="tools">
+        <span>🔧 工具管理</span>
+      </button>
+      <button class="tab-btn" data-tab="conflicts">
+        <span>⚠️ 冲突告警</span>
+      </button>
+    </nav>
+
+    <main class="content">
+      <div id="tab-overview" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total-appointments">0</div>
+              <div class="stat-label">总预约</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-volunteers">0</div>
+              <div class="stat-label">志愿者</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👴</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-elders">0</div>
+              <div class="stat-label">老人信息</div>
+            </div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-conflicts">0</div>
+              <div class="stat-label">待处理冲突</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>当前活动</h2>
+          <div id="current-event-info" class="event-info">
+            <p>暂无活动，请点击"新建活动"创建</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>最近活动</h2>
+          <div id="recent-events" class="event-list">
+            <p>暂无历史活动</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-schedule" class="tab-content">
+        <div class="schedule-controls">
+          <div class="control-group">
+            <label>日期:</label>
+            <input type="date" id="schedule-date">
+          </div>
+          <div class="control-group">
+            <label>视图:</label>
+            <select id="view-mode">
+              <option value="room">按房间</option>
+              <option value="time">按时段</option>
+            </select>
+          </div>
+          <button id="refresh-schedule" class="btn btn-primary">🔄 刷新</button>
+        </div>
+
+        <div id="schedule-grid" class="schedule-grid">
+          <p>暂无排班数据</p>
+        </div>
+      </div>
+
+      <div id="tab-appointments" class="tab-content">
+        <div class="filters">
+          <div class="filter-group">
+            <label>状态:</label>
+            <select id="appointment-status-filter">
+              <option value="">全部</option>
+              <option value="scheduled">待确认</option>
+              <option value="confirmed">已确认</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>房间:</label>
+            <select id="appointment-room-filter">
+              <option value="">全部</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>搜索:</label>
+            <input type="text" id="appointment-search" placeholder="搜索老人姓名...">
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>时段</th>
+                <th>老人</th>
+                <th>房间/床号</th>
+                <th>服务类型</th>
+                <th>志愿者</th>
+                <th>房间</th>
+                <th>状态</th>
+                <th>特殊需求</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="appointments-table-body">
+              <tr><td colspan="9">暂无预约数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-volunteers" class="tab-content">
+        <div class="section-header">
+          <button id="add-volunteer-btn" class="btn btn-success">➕ 添加志愿者</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>技能</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="volunteers-table-body">
+              <tr><td colspan="5">暂无志愿者数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-elders" class="tab-content">
+        <div class="section-header">
+          <button id="add-elder-btn" class="btn btn-success">➕ 添加老人</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>房间号</th>
+                <th>床号</th>
+                <th>过敏史</th>
+                <th>行动不便</th>
+                <th>上门服务</th>
+                <th>避开染烫</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="elders-table-body">
+              <tr><td colspan="9">暂无老人数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-tools" class="tab-content">
+        <div class="section-header">
+          <button id="add-tool-btn" class="btn btn-success">➕ 添加工具</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>工具名称</th>
+                <th>类型</th>
+                <th>编号</th>
+                <th>状态</th>
+                <th>上次消毒</th>
+                <th>下次消毒</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="tools-table-body">
+              <tr><td colspan="7">暂无工具数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-conflicts" class="tab-content">
+        <div class="conflict-filters">
+          <div class="filter-group">
+            <label>严重程度:</label>
+            <select id="conflict-severity-filter">
+              <option value="">全部</option>
+              <option value="high">🔴 高</option>
+              <option value="medium">🟡 中</option>
+              <option value="low">🟢 低</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="conflicts-list" class="conflicts-list">
+          <p>暂无冲突，请点击"检测冲突"按钮</p>
+        </div>
+      </div>
+    </main>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div id="modal-content" class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">标题</h2>
+          <button id="modal-close" class="modal-close">&times;</button>
+        </div>
+        <div id="modal-body" class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button id="modal-cancel" class="btn btn-secondary">取消</button>
+          <button id="modal-confirm" class="btn btn-primary">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

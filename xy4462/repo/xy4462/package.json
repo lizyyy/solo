@@ -1,0 +1,27 @@
+{
+  "name": "community-haircut-manager",
+  "version": "1.0.0",
+  "description": "社区公益理发队管理工具",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": [
+    "electron",
+    "haircut",
+    "community",
+    "volunteer"
+  ],
+  "author": "Community Volunteer Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.2.2",
+    "xlsx": "^0.18.5",
+    "papaparse": "^5.4.1",
+    "electron-store": "^8.1.0"
+  }
+}
