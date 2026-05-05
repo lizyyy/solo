@@ -1,0 +1,182 @@
+policies:
+  - key: "policy-users-read"
+    route_key: "GET:/api/v1/users"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 100
+      window_seconds: 60
+      burst: 20
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.5
+      min_requests: 10
+      half_open_max_requests: 3
+      open_duration_seconds: 30
+      sliding_window_size: 100
+    degradation:
+      enabled: true
+      fallback_type: "cached_response"
+      fallback_value:
+        users: []
+        from_cache: true
+  
+  - key: "policy-users-write"
+    route_key: "POST:/api/v1/users"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 50
+      window_seconds: 60
+      burst: 10
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.3
+      min_requests: 5
+      half_open_max_requests: 2
+      open_duration_seconds: 60
+      sliding_window_size: 50
+    degradation:
+      enabled: true
+      fallback_type: "default_response"
+      fallback_value:
+        success: false
+        message: "Service temporarily unavailable, please try again later"
+  
+  - key: "policy-users-get"
+    route_key: "GET:/api/v1/users/{id}"
+    rate_limit:
+      enabled: true
+      type: "token_bucket"
+      threshold: 200
+      window_seconds: 60
+      burst: 50
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.4
+      min_requests: 8
+      half_open_max_requests: 3
+      open_duration_seconds: 45
+      sliding_window_size: 80
+    degradation:
+      enabled: true
+      fallback_type: "static_data"
+      fallback_value:
+        id: "unknown"
+        name: "Guest User"
+        status: "degraded"
+  
+  - key: "policy-orders-read"
+    route_key: "GET:/api/v1/orders"
+    rate_limit:
+      enabled: true
+      type: "sliding_window"
+      threshold: 80
+      window_seconds: 60
+      burst: 15
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.6
+      min_requests: 15
+      half_open_max_requests: 4
+      open_duration_seconds: 20
+      sliding_window_size: 100
+    degradation:
+      enabled: true
+      fallback_type: "cached_response"
+      fallback_value:
+        orders: []
+        cached_at: "2026-05-05T10:00:00Z"
+  
+  - key: "policy-orders-write"
+    route_key: "POST:/api/v1/orders"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 30
+      window_seconds: 60
+      burst: 5
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.25
+      min_requests: 3
+      half_open_max_requests: 1
+      open_duration_seconds: 120
+      sliding_window_size: 30
+    degradation:
+      enabled: false
+      fallback_type: "default_response"
+      fallback_value: null
+  
+  - key: "policy-products"
+    route_key: "GET:/api/v1/products"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 500
+      window_seconds: 60
+      burst: 100
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.7
+      min_requests: 20
+      half_open_max_requests: 5
+      open_duration_seconds: 15
+      sliding_window_size: 200
+    degradation:
+      enabled: true
+      fallback_type: "static_data"
+      fallback_value:
+        products:
+          - id: "p1"
+            name: "Default Product"
+            price: 0
+          - id: "p2"
+            name: "Sample Product"
+            price: 99
+        from_degradation: true
+  
+  - key: "policy-payments"
+    route_key: "POST:/api/v1/payments"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 20
+      window_seconds: 60
+      burst: 3
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.2
+      min_requests: 2
+      half_open_max_requests: 1
+      open_duration_seconds: 300
+      sliding_window_size: 20
+    degradation:
+      enabled: true
+      fallback_type: "default_response"
+      fallback_value:
+        status: "pending"
+        message: "Payment processing degraded, will be processed asynchronously"
+        transaction_id: "deferred-xxxxxxxx"
+  
+  - key: "default"
+    route_key: "default"
+    rate_limit:
+      enabled: true
+      type: "fixed_window"
+      threshold: 1000
+      window_seconds: 60
+      burst: 100
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 0.5
+      min_requests: 10
+      half_open_max_requests: 3
+      open_duration_seconds: 30
+      sliding_window_size: 100
+    degradation:
+      enabled: true
+      fallback_type: "default_response"
+      fallback_value:
+        error: "Service unavailable"
+        code: 503
