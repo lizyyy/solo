@@ -1,0 +1,69 @@
+{
+  "name": "data-mask-desktop",
+  "version": "1.0.0",
+  "description": "客户会议素材脱敏打包工具",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:electron": "tsc --project tsconfig.electron.json && concurrently \"vite\" \"electron .\"",
+    "build:renderer": "vite build",
+    "build:electron": "tsc --project tsconfig.electron.json",
+    "build": "npm run build:renderer && npm run build:electron && electron-builder",
+    "build:dir": "npm run build:renderer && npm run build:electron && electron-builder --dir",
+    "lint": "eslint src electron --ext .ts,.tsx",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "uuid": "^9.0.1",
+    "date-fns": "^3.6.0",
+    "csv-writer": "^1.6.0",
+    "mime-types": "^2.1.35",
+    "fs-extra": "^11.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.73",
+    "@types/react-dom": "^18.2.23",
+    "@types/better-sqlite3": "^7.6.9",
+    "@types/uuid": "^9.0.8",
+    "@types/mime-types": "^2.1.4",
+    "@types/fs-extra": "^11.0.4",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "electron": "^29.2.0",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^5.4.3",
+    "vite": "^5.2.7",
+    "vitest": "^1.4.0",
+    "@vitest/coverage-v8": "^1.4.0"
+  },
+  "build": {
+    "appId": "com.datamask.desktop",
+    "productName": "DataMask Desktop",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    }
+  }
+}
