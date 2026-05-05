@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录音棚混响改造测算工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎙️ 录音棚混响改造测算工具</h1>
+            <div class="project-actions">
+                <div class="project-selector">
+                    <label for="projectSelect">方案：</label>
+                    <select id="projectSelect">
+                        <option value="">选择方案...</option>
+                    </select>
+                    <button id="newProjectBtn" class="btn btn-secondary">新建方案</button>
+                    <button id="renameProjectBtn" class="btn btn-secondary">重命名</button>
+                    <button id="deleteProjectBtn" class="btn btn-danger">删除方案</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="card">
+                    <h2>📐 房间参数</h2>
+                    <div class="form-group">
+                        <label for="roomLength">房间长度 (m)</label>
+                        <input type="number" id="roomLength" min="0.1" step="0.01" placeholder="例如：5.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="roomWidth">房间宽度 (m)</label>
+                        <input type="number" id="roomWidth" min="0.1" step="0.01" placeholder="例如：4.0">
+                    </div>
+                    <div class="form-group">
+                        <label for="roomHeight">房间高度 (m)</label>
+                        <input type="number" id="roomHeight" min="0.1" step="0.01" placeholder="例如：2.8">
+                    </div>
+                    <div class="room-volume" id="roomVolume">
+                        房间体积: -- m³
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🧱 表面材料</h2>
+                    <div class="material-section">
+                        <h3>墙面 (4个面)</h3>
+                        <div class="form-group">
+                            <label>选择墙面材料：</label>
+                            <select id="wallMaterial" class="material-select">
+                                <option value="">选择材料...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="wallArea">墙面总面积 (m²)</label>
+                            <input type="number" id="wallArea" min="0" step="0.01" placeholder="自动计算">
+                        </div>
+                        <div class="form-group">
+                            <label for="wallCoverage">改造覆盖面积 (m²)</label>
+                            <input type="number" id="wallCoverage" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>改造后材料：</label>
+                            <select id="wallNewMaterial" class="material-select">
+                                <option value="">不改造</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="material-section">
+                        <h3>地面</h3>
+                        <div class="form-group">
+                            <label>选择地面材料：</label>
+                            <select id="floorMaterial" class="material-select">
+                                <option value="">选择材料...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="floorArea">地面面积 (m²)</label>
+                            <input type="number" id="floorArea" min="0" step="0.01" placeholder="自动计算">
+                        </div>
+                        <div class="form-group">
+                            <label for="floorCoverage">改造覆盖面积 (m²)</label>
+                            <input type="number" id="floorCoverage" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>改造后材料：</label>
+                            <select id="floorNewMaterial" class="material-select">
+                                <option value="">不改造</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="material-section">
+                        <h3>天花板</h3>
+                        <div class="form-group">
+                            <label>选择天花板材料：</label>
+                            <select id="ceilingMaterial" class="material-select">
+                                <option value="">选择材料...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ceilingArea">天花板面积 (m²)</label>
+                            <input type="number" id="ceilingArea" min="0" step="0.01" placeholder="自动计算">
+                        </div>
+                        <div class="form-group">
+                            <label for="ceilingCoverage">改造覆盖面积 (m²)</label>
+                            <input type="number" id="ceilingCoverage" min="0" step="0.01" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>改造后材料：</label>
+                            <select id="ceilingNewMaterial" class="material-select">
+                                <option value="">不改造</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🪑 家具/物品</h2>
+                    <div id="furnitureList">
+                    </div>
+                    <button id="addFurnitureBtn" class="btn btn-secondary">添加家具</button>
+                </div>
+
+                <div class="card">
+                    <h2>📁 实测脉冲数据</h2>
+                    <div class="form-group">
+                        <label for="pulseFile">上传拍手脉冲 CSV 文件：</label>
+                        <input type="file" id="pulseFile" accept=".csv">
+                    </div>
+                    <div class="pulse-info" id="pulseInfo">
+                        未上传脉冲数据
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💰 预算设置</h2>
+                    <div class="form-group">
+                        <label for="budgetLimit">预算上限 (元)</label>
+                        <input type="number" id="budgetLimit" min="0" step="1" placeholder="例如：20000">
+                    </div>
+                    <div class="budget-info" id="budgetInfo">
+                        当前预算: -- 元
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📝 备注</h2>
+                    <textarea id="projectNotes" rows="6" placeholder="在此记录方案备注、特殊需求等..."></textarea>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="actions-bar">
+                    <button id="calculateBtn" class="btn btn-primary btn-large">📊 计算分析</button>
+                    <div class="export-buttons">
+                        <button id="exportMarkdownBtn" class="btn btn-secondary">导出 Markdown</button>
+                        <button id="exportJsonBtn" class="btn btn-secondary">导出 JSON</button>
+                    </div>
+                </div>
+
+                <div class="warnings-section" id="warningsSection">
+                    <h2>⚠️ 问题警告</h2>
+                    <div id="warningsList">
+                        <p class="no-warnings">暂无警告</p>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <h2>📈 计算结果</h2>
+                    
+                    <div class="result-card">
+                        <h3>🎵 驻波风险分析</h3>
+                        <div id="standingWaveResult">
+                            请先输入房间尺寸进行计算
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>⏱️ RT60 混响时间 (秒)</h3>
+                        <div class="rt60-table-container">
+                            <table class="rt60-table">
+                                <thead>
+                                    <tr>
+                                        <th>频率</th>
+                                        <th>改造前</th>
+                                        <th>改造后</th>
+                                        <th>目标值</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rt60TableBody">
+                                    <tr><td colspan="5" class="empty-cell">请先计算</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>💰 预算明细</h3>
+                        <div id="budgetResult">
+                            请先计算
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>📊 材料覆盖分析</h3>
+                        <div id="coverageResult">
+                            请先计算
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suggestions-section">
+                    <h2>💡 施工建议</h2>
+                    <div id="suggestionsContent">
+                        请先计算以获取施工建议
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
