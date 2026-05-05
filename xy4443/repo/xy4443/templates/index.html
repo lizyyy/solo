@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>潮间带样方复盘工具</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🌊 潮间带样方复盘工具</h1>
+            <p class="subtitle">志愿者巡护数据智能分析系统</p>
+        </header>
+
+        <main>
+            <!-- 导航标签 -->
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="upload">📁 数据导入</button>
+                <button class="tab-btn" data-tab="sessions">📋 历史会话</button>
+                <button class="tab-btn" data-tab="analysis">📊 数据分析</button>
+                <button class="tab-btn" data-tab="photos">📷 照片管理</button>
+                <button class="tab-btn" data-tab="export">📤 导出报告</button>
+            </nav>
+
+            <!-- 数据导入面板 -->
+            <section id="upload-panel" class="panel active">
+                <div class="upload-section">
+                    <h2>数据导入</h2>
+                    <p class="description">上传物种CSV、环境参数CSV和照片文件，系统将自动进行分析。</p>
+                    
+                    <div class="upload-form">
+                        <div class="form-group">
+                            <label for="species-file">物种调查CSV *</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="species-file" accept=".csv" required>
+                                <span class="file-label">选择物种CSV文件</span>
+                            </div>
+                            <small class="hint">支持列名：样方编号, 物种名称, 数量, 盖度, 备注</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="env-file">环境参数CSV *</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="env-file" accept=".csv" required>
+                                <span class="file-label">选择环境参数CSV文件</span>
+                            </div>
+                            <small class="hint">支持列名：样方编号, 水温, 盐度, pH值, 溶解氧, 备注</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="photo-files">照片文件（可选）</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="photo-files" accept="image/*" multiple>
+                                <span class="file-label">选择照片文件（可多选）</span>
+                            </div>
+                            <small class="hint">支持 JPG, PNG, GIF 格式</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="manual-notes">人工备注（可选）</label>
+                            <textarea id="manual-notes" rows="3" placeholder="输入本次巡护的人工备注..."></textarea>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="upload-btn" class="btn btn-primary">
+                                <span class="btn-icon">🚀</span> 上传并分析
+                            </button>
+                            <button id="load-sample-btn" class="btn btn-secondary">
+                                <span class="btn-icon">📋</span> 加载示例数据
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="upload-progress" class="progress-container" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p class="progress-text">正在处理数据...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 历史会话面板 -->
+            <section id="sessions-panel" class="panel">
+                <div class="sessions-section">
+                    <h2>历史会话</h2>
+                    <p class="description">查看和管理之前的数据分析会话。</p>
+                    
+                    <div id="sessions-list" class="sessions-list">
+                        <p class="empty-message">暂无历史会话</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据分析面板 -->
+            <section id="analysis-panel" class="panel">
+                <div class="analysis-section">
+                    <div id="no-data-message" class="no-data-message">
+                        <p>请先导入数据或选择历史会话</p>
+                    </div>
+
+                    <div id="analysis-content" style="display: none;">
+                        <!-- 概览卡片 -->
+                        <div class="overview-cards">
+                            <div class="card">
+                                <div class="card-icon">📐</div>
+                                <div class="card-info">
+                                    <div class="card-value" id="total-quadrats">0</div>
+                                    <div class="card-label">总样方数</div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon">🦀</div>
+                                <div class="card-info">
+                                    <div class="card-value" id="total-species">0</div>
+                                    <div class="card-label">总物种数</div>
+                                </div>
+                            </div>
+                            <div class="card card-warning">
+                                <div class="card-icon">⚠️</div>
+                                <div class="card-info">
+                                    <div class="card-value" id="flagged-count">0</div>
+                                    <div class="card-label">需关注样方</div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon">📈</div>
+                                <div class="card-info">
+                                    <div class="card-value" id="avg-richness">0</div>
+                                    <div class="card-label">平均丰富度</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 异常检测摘要 -->
+                        <div class="detection-summary">
+                            <h3>异常检测摘要</h3>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-icon">🔴</div>
+                                    <div class="summary-info">
+                                        <div class="summary-value" id="invasive-count">0</div>
+                                        <div class="summary-label">入侵种检测</div>
+                                    </div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-icon">❓</div>
+                                    <div class="summary-info">
+                                        <div class="summary-value" id="missing-count">0</div>
+                                        <div class="summary-label">数据缺测</div>
+                                    </div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-icon">💀</div>
+                                    <div class="summary-info">
+                                        <div class="summary-value" id="mortality-count">0</div>
+                                        <div class="summary-label">异常死亡</div>
+                                    </div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-icon">🌡️</div>
+                                    <div class="summary-info">
+                                        <div class="summary-value" id="env-anomaly-count">0</div>
+                                        <div class="summary-label">环境异常</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 样方列表 -->
+                        <div class="quadrats-section">
+                            <div class="section-header">
+                                <h3>样方详情</h3>
+                                <div class="filter-controls">
+                                    <select id="quadrat-filter">
+                                        <option value="all">全部样方</option>
+                                        <option value="flagged">需关注样方</option>
+                                        <option value="invasive">含入侵种</option>
+                                        <option value="missing">数据缺测</option>
+                                        <option value="mortality">异常死亡</option>
+                                        <option value="env">环境异常</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div id="quadrats-list" class="quadrats-list">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+
+                        <!-- 样方详情模态框 -->
+                        <div id="quadrat-modal" class="modal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="modal-quadrat-id">样方详情</h3>
+                                    <button class="modal-close">&times;</button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="modal-section">
+                                        <h4>基本信息</h4>
+                                        <div id="modal-basic-info" class="info-grid">
+                                            <!-- 动态生成 -->
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-section">
+                                        <h4>异常检测</h4>
+                                        <div id="modal-anomalies" class="anomalies-list">
+                                            <!-- 动态生成 -->
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-section">
+                                        <h4>物种列表</h4>
+                                        <div id="modal-species" class="species-table">
+                                            <!-- 动态生成 -->
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-section">
+                                        <h4>环境参数</h4>
+                                        <div id="modal-env" class="env-grid">
+                                            <!-- 动态生成 -->
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-section">
+                                        <h4>多样性分析</h4>
+                                        <div id="modal-diversity" class="diversity-info">
+                                            <!-- 动态生成 -->
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-section">
+                                        <h4>人工复核</h4>
+                                        <div class="review-form">
+                                            <div class="form-group">
+                                                <label>复核状态</label>
+                                                <select id="review-status">
+                                                    <option value="未复核">未复核</option>
+                                                    <option value="已确认">已确认</option>
+                                                    <option value="需跟进">需跟进</option>
+                                                    <option value="已解决">已解决</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>复核备注</label>
+                                                <textarea id="review-notes" rows="3" placeholder="输入复核备注..."></textarea>
+                                            </div>
+                                            <button id="save-review-btn" class="btn btn-primary">保存复核</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 照片管理面板 -->
+            <section id="photos-panel" class="panel">
+                <div class="photos-section">
+                    <div id="no-photos-message" class="no-data-message">
+                        <p>请先导入数据或选择历史会话</p>
+                    </div>
+
+                    <div id="photos-content" style="display: none;">
+                        <div class="section-header">
+                            <h3>照片管理</h3>
+                            <button id="upload-more-photos-btn" class="btn btn-secondary">
+                                <span class="btn-icon">📷</span> 上传更多照片
+                            </button>
+                        </div>
+
+                        <div id="photos-grid" class="photos-grid">
+                            <!-- 动态生成 -->
+                        </div>
+
+                        <!-- 照片查看模态框 -->
+                        <div id="photo-modal" class="modal photo-modal">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="photo-modal-title">照片查看</h3>
+                                    <button class="modal-close">&times;</button>
+                                </div>
+                                <div class="modal-body photo-body">
+                                    <img id="photo-modal-image" src="" alt="照片">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 导出报告面板 -->
+            <section id="export-panel" class="panel">
+                <div class="export-section">
+                    <div id="no-export-message" class="no-data-message">
+                        <p>请先导入数据或选择历史会话</p>
+                    </div>
+
+                    <div id="export-content" style="display: none;">
+                        <h2>导出报告</h2>
+                        <p class="description">选择导出格式，生成巡护复盘报告。</p>
+
+                        <div class="export-options">
+                            <div class="export-card">
+                                <div class="export-icon">📄</div>
+                                <h3>Markdown 报告</h3>
+                                <p>生成结构化的巡护复盘报告，包含异常检测摘要、样方详情和复核记录。</p>
+                                <button id="export-md-btn" class="btn btn-primary">
+                                    导出 Markdown
+                                </button>
+                            </div>
+
+                            <div class="export-card">
+                                <div class="export-icon">📋</div>
+                                <h3>JSON 明细</h3>
+                                <p>导出完整的分析数据，包含所有原始数据、分析结果和复核记录。</p>
+                                <button id="export-json-btn" class="btn btn-secondary">
+                                    导出 JSON
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="report-preview">
+                            <h3>报告预览</h3>
+                            <div id="report-preview-content" class="preview-content">
+                                <!-- 动态生成预览 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>🌊 潮间带样方复盘工具 | 志愿者巡护数据智能分析系统</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
