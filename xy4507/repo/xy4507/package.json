@@ -1,0 +1,36 @@
+{
+  "name": "opticare-audit",
+  "version": "1.0.0",
+  "description": "眼镜店订单复核与风险检测工具",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": ["眼镜店", "订单管理", "风险检测", "electron"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "sql.js": "^1.10.3",
+    "xlsx": "^0.18.5",
+    "papaparse": "^5.4.1",
+    "moment": "^2.30.1"
+  },
+  "build": {
+    "appId": "com.opticare.audit",
+    "productName": "Opticare Audit",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    }
+  }
+}

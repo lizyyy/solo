@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opticare Audit - 眼镜订单复核系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-left">
+        <h1>Opticare Audit</h1>
+        <span class="subtitle">眼镜订单复核系统</span>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-primary" onclick="app.showCreateOrderModal()">
+          <span class="icon">+</span> 新建订单
+        </button>
+        <button class="btn btn-secondary" onclick="app.importData()">
+          <span class="icon">📁</span> 导入数据
+        </button>
+        <button class="btn btn-secondary" onclick="app.exportAllData()">
+          <span class="icon">📄</span> 导出审计
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <aside class="sidebar">
+        <div class="stats-panel">
+          <h3>风险概览</h3>
+          <div class="stats-grid" id="riskStats">
+            <div class="stat-card">
+              <div class="stat-value loading">-</div>
+              <div class="stat-label">总订单</div>
+            </div>
+            <div class="stat-card risk-high">
+              <div class="stat-value loading">-</div>
+              <div class="stat-label">高风险</div>
+            </div>
+            <div class="stat-card risk-medium">
+              <div class="stat-value loading">-</div>
+              <div class="stat-label">中风险</div>
+            </div>
+            <div class="stat-card risk-low">
+              <div class="stat-value loading">-</div>
+              <div class="stat-label">低风险</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-panel">
+          <h3>筛选条件</h3>
+          <div class="filter-item">
+            <label>订单状态</label>
+            <select id="filterStatus" onchange="app.applyFilters()">
+              <option value="">全部</option>
+              <option value="pending">处理中</option>
+              <option value="completed">已完成</option>
+              <option value="delivered">已交付</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>风险状态</label>
+            <select id="filterRisk" onchange="app.applyFilters()">
+              <option value="">全部</option>
+              <option value="true">仅显示有风险</option>
+              <option value="false">无风险</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>日期范围</label>
+            <div class="date-range">
+              <input type="date" id="filterStartDate" onchange="app.applyFilters()">
+              <span>至</span>
+              <input type="date" id="filterEndDate" onchange="app.applyFilters()">
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-block" onclick="app.resetFilters()">
+            重置筛选
+          </button>
+        </div>
+      </aside>
+
+      <section class="content">
+        <div class="content-header">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索订单号、患者姓名、电话..." 
+                   oninput="app.searchOrders(this.value)">
+            <button class="search-btn" onclick="app.searchOrders(document.getElementById('searchInput').value)">
+              🔍
+            </button>
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" onclick="app.setView('list')">列表</button>
+            <button class="view-btn" onclick="app.setView('card')">卡片</button>
+          </div>
+        </div>
+
+        <div class="order-list" id="orderList">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="createOrderModal" class="modal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h2>新建订单</h2>
+        <button class="modal-close" onclick="app.closeModal('createOrderModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="orderForm">
+          <div class="form-section">
+            <h3>基本信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="orderNumber">订单号 *</label>
+                <input type="text" id="orderNumber" required>
+              </div>
+              <div class="form-group">
+                <label for="patientName">患者姓名 *</label>
+                <input type="text" id="patientName" required>
+              </div>
+              <div class="form-group">
+                <label for="phone">联系电话</label>
+                <input type="tel" id="phone">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="orderDate">下单日期</label>
+                <input type="date" id="orderDate">
+              </div>
+              <div class="form-group">
+                <label for="pickupDate">预计取镜日期</label>
+                <input type="date" id="pickupDate">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>处方信息</h3>
+            <div class="prescription-tabs">
+              <button type="button" class="presc-tab active" onclick="app.setPrescTab('left')">左眼 (OS)</button>
+              <button type="button" class="presc-tab" onclick="app.setPrescTab('right')">右眼 (OD)</button>
+            </div>
+            
+            <div id="prescLeft" class="presc-panel">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>球镜 (S)</label>
+                  <input type="number" step="0.25" id="leftSphere" placeholder="如: -2.50">
+                </div>
+                <div class="form-group">
+                  <label>柱镜 (C)</label>
+                  <input type="number" step="0.25" id="leftCylinder" placeholder="如: -0.75">
+                </div>
+                <div class="form-group">
+                  <label>轴位 (A)</label>
+                  <input type="number" min="0" max="180" id="leftAxis" placeholder="0-180">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>下加光 (ADD)</label>
+                  <input type="number" step="0.25" id="leftAdd" placeholder="老花镜专用">
+                </div>
+                <div class="form-group">
+                  <label>瞳距 (PD)</label>
+                  <input type="number" step="0.5" id="leftPd" placeholder="mm">
+                </div>
+                <div class="form-group">
+                  <label>瞳高 (PH)</label>
+                  <input type="number" step="0.5" id="leftPh" placeholder="mm">
+                </div>
+              </div>
+            </div>
+
+            <div id="prescRight" class="presc-panel hidden">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>球镜 (S)</label>
+                  <input type="number" step="0.25" id="rightSphere" placeholder="如: -2.50">
+                </div>
+                <div class="form-group">
+                  <label>柱镜 (C)</label>
+                  <input type="number" step="0.25" id="rightCylinder" placeholder="如: -0.75">
+                </div>
+                <div class="form-group">
+                  <label>轴位 (A)</label>
+                  <input type="number" min="0" max="180" id="rightAxis" placeholder="0-180">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>下加光 (ADD)</label>
+                  <input type="number" step="0.25" id="rightAdd" placeholder="老花镜专用">
+                </div>
+                <div class="form-group">
+                  <label>瞳距 (PD)</label>
+                  <input type="number" step="0.5" id="rightPd" placeholder="mm">
+                </div>
+                <div class="form-group">
+                  <label>瞳高 (PH)</label>
+                  <input type="number" step="0.5" id="rightPh" placeholder="mm">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>镜架信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>品牌</label>
+                <input type="text" id="frameBrand">
+              </div>
+              <div class="form-group">
+                <label>型号</label>
+                <input type="text" id="frameModel">
+              </div>
+              <div class="form-group">
+                <label>镜片宽度 (mm)</label>
+                <input type="number" id="frameLensWidth" placeholder="如: 52">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>镜框宽度 (mm)</label>
+                <input type="number" id="frameWidth">
+              </div>
+              <div class="form-group">
+                <label>鼻梁宽度 (mm)</label>
+                <input type="number" id="frameBridgeWidth">
+              </div>
+              <div class="form-group">
+                <label>镜腿长度 (mm)</label>
+                <input type="number" id="frameTempleLength">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>镜片信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>左眼 - 品牌</label>
+                <input type="text" id="leftLensBrand">
+              </div>
+              <div class="form-group">
+                <label>左眼 - 类型</label>
+                <select id="leftLensType">
+                  <option value="">请选择</option>
+                  <option value="球面">球面</option>
+                  <option value="非球面">非球面</option>
+                  <option value="抗蓝光">抗蓝光</option>
+                  <option value="渐进多焦点">渐进多焦点</option>
+                  <option value="变色">变色</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>左眼 - 直径 (mm)</label>
+                <input type="number" id="leftLensDiameter" placeholder="如: 70">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>右眼 - 品牌</label>
+                <input type="text" id="rightLensBrand">
+              </div>
+              <div class="form-group">
+                <label>右眼 - 类型</label>
+                <select id="rightLensType">
+                  <option value="">请选择</option>
+                  <option value="球面">球面</option>
+                  <option value="非球面">非球面</option>
+                  <option value="抗蓝光">抗蓝光</option>
+                  <option value="渐进多焦点">渐进多焦点</option>
+                  <option value="变色">变色</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>右眼 - 直径 (mm)</label>
+                <input type="number" id="rightLensDiameter" placeholder="如: 70">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>磨边加工日志</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>加工日期</label>
+                <input type="date" id="grindingDate">
+              </div>
+              <div class="form-group">
+                <label>磨边机型号</label>
+                <input type="text" id="grindingMachine">
+              </div>
+              <div class="form-group">
+                <label>操作员</label>
+                <input type="text" id="grindingOperator">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>成品宽度 (mm)</label>
+                <input type="number" id="lensSizeW">
+              </div>
+              <div class="form-group">
+                <label>成品高度 (mm)</label>
+                <input type="number" id="lensSizeH">
+              </div>
+              <div class="form-group">
+                <label>边缘厚度 (mm)</label>
+                <input type="number" step="0.1" id="edgeThickness">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>加工备注</label>
+              <textarea id="grindingRemarks" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>质检记录</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>质检日期</label>
+                <input type="date" id="qcDate">
+              </div>
+              <div class="form-group">
+                <label>质检人</label>
+                <input type="text" id="qcChecker">
+              </div>
+              <div class="form-group">
+                <label>总体结果</label>
+                <select id="qcResult">
+                  <option value="">请选择</option>
+                  <option value="通过">通过</option>
+                  <option value="不通过">不通过</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>左眼视力</label>
+                <input type="text" id="qcVaLeft" placeholder="如: 1.0">
+              </div>
+              <div class="form-group">
+                <label>右眼视力</label>
+                <input type="text" id="qcVaRight" placeholder="如: 1.0">
+              </div>
+              <div class="form-group">
+                <label>轴位验证</label>
+                <select id="qcAxisVerification">
+                  <option value="">请选择</option>
+                  <option value="通过">通过</option>
+                  <option value="不通过">不通过</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>质检备注</label>
+              <textarea id="qcRemarks" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('createOrderModal')">取消</button>
+        <button class="btn btn-primary" onclick="app.saveOrder()">保存订单</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="orderDetailModal" class="modal">
+    <div class="modal-content extra-large">
+      <div class="modal-header">
+        <h2 id="detailOrderTitle">订单详情</h2>
+        <button class="modal-close" onclick="app.closeModal('orderDetailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="orderDetailContent">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('orderDetailModal')">关闭</button>
+        <button class="btn btn-primary" onclick="app.exportCurrentOrderMarkdown()">导出交接单</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
