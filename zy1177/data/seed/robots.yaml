@@ -1,0 +1,60 @@
+robots:
+  - id: R001
+    name: "叉车一号"
+    x: 25
+    y: 2
+    orientation: 0.0
+    status: idle
+    battery: 100.0
+    max_speed: 1.5
+    payload_capacity: 50.0
+    type: "forklift"
+    model: "AGV-500"
+
+  - id: R002
+    name: "叉车二号"
+    x: 27
+    y: 2
+    orientation: 0.0
+    status: idle
+    battery: 95.0
+    max_speed: 1.5
+    payload_capacity: 50.0
+    type: "forklift"
+    model: "AGV-500"
+
+  - id: R003
+    name: "搬运车一号"
+    x: 25
+    y: 26
+    orientation: 180.0
+    status: idle
+    battery: 88.0
+    max_speed: 2.0
+    payload_capacity: 30.0
+    type: "porter"
+    model: "AGV-300"
+
+  - id: R004
+    name: "搬运车二号"
+    x: 27
+    y: 26
+    orientation: 180.0
+    status: idle
+    battery: 100.0
+    max_speed: 2.0
+    payload_capacity: 30.0
+    type: "porter"
+    model: "AGV-300"
+
+  - id: R005
+    name: "特种车一号"
+    x: 32
+    y: 15
+    orientation: 90.0
+    status: idle
+    battery: 75.0
+    max_speed: 1.2
+    payload_capacity: 100.0
+    type: "special"
+    model: "AGV-1000"

@@ -1,0 +1,36 @@
+robots:
+  - id: R001
+    name: "低电量机器人"
+    x: 5
+    y: 8
+    orientation: 0.0
+    status: idle
+    battery: 15.0
+    max_speed: 1.5
+    payload_capacity: 50.0
+    type: "test"
+    note: "电量仅15%，应该自动触发充电"
+
+  - id: R002
+    name: "正常电量机器人"
+    x: 12
+    y: 8
+    orientation: 0.0
+    status: idle
+    battery: 85.0
+    max_speed: 1.5
+    payload_capacity: 50.0
+    type: "test"
+    note: "电量85%，可以正常执行任务"
+
+  - id: R003
+    name: "充电中机器人"
+    x: 20
+    y: 2
+    orientation: 180.0
+    status: charging
+    battery: 45.0
+    max_speed: 1.5
+    payload_capacity: 50.0
+    type: "test"
+    note: "正在充电站充电"

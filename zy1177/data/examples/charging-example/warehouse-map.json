@@ -1,0 +1,53 @@
+{
+  "name": "充电测试场景",
+  "description": "用于测试机器人电量管理和充电逻辑的场景",
+  "width": 25,
+  "height": 20,
+  "grid_size": 1,
+  
+  "shelves": [
+    {"id": "S01", "x": 5, "y": 5, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S02", "x": 5, "y": 10, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S03", "x": 10, "y": 5, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S04", "x": 10, "y": 10, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"}
+  ],
+  
+  "stations": [
+    {"id": "P01", "name": "拣货站", "x": 8, "y": 8, "type": "pickup"},
+    {"id": "D01", "name": "集货站", "x": 18, "y": 8, "type": "dropoff"}
+  ],
+  
+  "charging_stations": [
+    {"id": "C01", "name": "充电站 1", "x": 20, "y": 2, "capacity": 2},
+    {"id": "C02", "name": "充电站 2", "x": 20, "y": 15, "capacity": 2}
+  ],
+  
+  "aisles": [
+    {"id": "A01", "name": "主通道", "start_x": 3, "start_y": 8, "end_x": 22, "end_y": 8, "width": 2, "direction": "horizontal"}
+  ],
+  
+  "narrow_passages": [],
+  
+  "obstacles": [],
+  
+  "grid": [],
+  
+  "test_scenario": {
+    "type": "charging",
+    "description": "机器人电量过低时应该自动前往充电站",
+    "low_battery_threshold": 20,
+    "charging_speed": 5.0,
+    "expected_actions": [
+      {
+        "robot": "R001",
+        "condition": "battery < 20%",
+        "expected_action": "自动前往充电站充电"
+      },
+      {
+        "robot": "R002",
+        "condition": "电量充足",
+        "expected_action": "继续执行任务"
+      }
+    ]
+  }
+}

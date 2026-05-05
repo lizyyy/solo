@@ -1,0 +1,24 @@
+robots:
+  - id: R001
+    name: "测试机器人A"
+    x: 2
+    y: 10
+    orientation: 0.0
+    status: idle
+    battery: 100.0
+    max_speed: 2.0
+    payload_capacity: 50.0
+    type: "test"
+    note: "将沿Y=10从左向右移动"
+
+  - id: R002
+    name: "测试机器人B"
+    x: 9
+    y: 2
+    orientation: 90.0
+    status: idle
+    battery: 100.0
+    max_speed: 2.0
+    payload_capacity: 50.0
+    type: "test"
+    note: "将沿X=9从下向上移动，预计在(9,10)与R001相遇"

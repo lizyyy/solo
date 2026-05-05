@@ -1,0 +1,5 @@
+id,priority,pickup_x,pickup_y,pickup_name,dropoff_x,dropoff_y,dropoff_name,cargo_type,cargo_weight,cargo_volume
+FLT001,1,5,10,"拣货站A",25,10,"集货站","紧急货物A",10.0,0.5
+FLT002,1,5,10,"拣货站A",25,10,"集货站","紧急货物B",15.0,0.8
+FLT003,2,10,10,"拣货站B",25,10,"集货站","普通货物",8.0,0.4
+FLT004,2,10,10,"拣货站B",25,10,"集货站","普通货物",12.0,0.6

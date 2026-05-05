@@ -1,0 +1,72 @@
+{
+  "name": "窄通道测试场景",
+  "description": "用于测试窄通道避让和通行管理的场景",
+  "width": 20,
+  "height": 25,
+  "grid_size": 1,
+  
+  "shelves": [
+    {"id": "S01", "x": 3, "y": 5, "width": 3, "height": 4, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S02", "x": 12, "y": 5, "width": 3, "height": 4, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S03", "x": 3, "y": 16, "width": 3, "height": 4, "depth": 1, "level": 3, "zone": "C"},
+    {"id": "S04", "x": 12, "y": 16, "width": 3, "height": 4, "depth": 1, "level": 3, "zone": "D"}
+  ],
+  
+  "stations": [
+    {"id": "P01", "name": "入口站", "x": 1, "y": 12, "type": "pickup"},
+    {"id": "D01", "name": "出口站", "x": 18, "y": 12, "type": "dropoff"}
+  ],
+  
+  "charging_stations": [],
+  
+  "aisles": [
+    {"id": "A01", "name": "北侧通道", "start_x": 0, "start_y": 3, "end_x": 19, "end_y": 3, "width": 2, "direction": "horizontal"},
+    {"id": "A02", "name": "南侧通道", "start_x": 0, "start_y": 21, "end_x": 19, "end_y": 21, "width": 2, "direction": "horizontal"},
+    {"id": "A03", "name": "中央窄通道", "start_x": 9, "start_y": 3, "end_x": 9, "end_y": 21, "width": 1.5, "direction": "vertical"}
+  ],
+  
+  "narrow_passages": [
+    {
+      "id": "N001", 
+      "name": "关键窄通道", 
+      "start_x": 9, 
+      "start_y": 8, 
+      "end_x": 9, 
+      "end_y": 16, 
+      "width": 1.5,
+      "max_safe_width": 1.8,
+      "priority_rule": "先到先得",
+      "queue_capacity": 5
+    }
+  ],
+  
+  "obstacles": [],
+  
+  "grid": [],
+  
+  "test_scenario": {
+    "type": "narrow_passage",
+    "description": "测试窄通道的通行管理和避让",
+    "passage_info": {
+      "id": "N001",
+      "width": 1.5,
+      "robot_width": 1.0,
+      "safe_margin": 0.25,
+      "can_pass_simultaneously": false
+    },
+    "expected_behaviors": [
+      {
+        "description": "机器人到达窄通道时应请求通行权",
+        "robots": ["R001", "R002"]
+      },
+      {
+        "description": "只能有一台机器人通过窄通道",
+        "max_robots_in_passage": 1
+      },
+      {
+        "description": "等待的机器人应排队，按顺序通行",
+        "queue_enabled": true
+      }
+    ]
+  }
+}

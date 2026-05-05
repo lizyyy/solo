@@ -1,0 +1,24 @@
+robots:
+  - id: R001
+    name: "窄通道测试A"
+    x: 5
+    y: 3
+    orientation: 90.0
+    status: idle
+    battery: 100.0
+    max_speed: 1.0
+    payload_capacity: 50.0
+    type: "test"
+    note: "从北侧向南行驶，将经过窄通道N001"
+
+  - id: R002
+    name: "窄通道测试B"
+    x: 14
+    y: 21
+    orientation: -90.0
+    status: idle
+    battery: 100.0
+    max_speed: 1.0
+    payload_capacity: 50.0
+    type: "test"
+    note: "从南侧向北行驶，将在窄通道与R001相遇"

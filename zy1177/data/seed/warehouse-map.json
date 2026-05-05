@@ -1,0 +1,66 @@
+{
+  "name": "自动化仓储中心 A区",
+  "description": "标准仓库布局，包含货架区、通道、工作站和充电区",
+  "width": 40,
+  "height": 30,
+  "grid_size": 1,
+  
+  "shelves": [
+    {"id": "S001", "x": 2, "y": 2, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S002", "x": 6, "y": 2, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S003", "x": 10, "y": 2, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S004", "x": 14, "y": 2, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "A"},
+    
+    {"id": "S005", "x": 2, "y": 8, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S006", "x": 6, "y": 8, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S007", "x": 10, "y": 8, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S008", "x": 14, "y": 8, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "B"},
+    
+    {"id": "S009", "x": 2, "y": 14, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "C"},
+    {"id": "S010", "x": 6, "y": 14, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "C"},
+    {"id": "S011", "x": 10, "y": 14, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "C"},
+    {"id": "S012", "x": 14, "y": 14, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "C"},
+    
+    {"id": "S013", "x": 2, "y": 20, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "D"},
+    {"id": "S014", "x": 6, "y": 20, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "D"},
+    {"id": "S015", "x": 10, "y": 20, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "D"},
+    {"id": "S016", "x": 14, "y": 20, "width": 2, "height": 2, "depth": 1, "level": 3, "zone": "D"}
+  ],
+  
+  "stations": [
+    {"id": "P001", "name": "拣货站 1", "x": 20, "y": 4, "type": "pickup"},
+    {"id": "P002", "name": "拣货站 2", "x": 20, "y": 10, "type": "pickup"},
+    {"id": "P003", "name": "拣货站 3", "x": 20, "y": 16, "type": "pickup"},
+    {"id": "P004", "name": "拣货站 4", "x": 20, "y": 22, "type": "pickup"},
+    
+    {"id": "D001", "name": "集货站 1", "x": 30, "y": 8, "type": "dropoff"},
+    {"id": "D002", "name": "集货站 2", "x": 30, "y": 18, "type": "dropoff"},
+    {"id": "D003", "name": "出库站", "x": 35, "y": 15, "type": "dropoff"}
+  ],
+  
+  "charging_stations": [
+    {"id": "C001", "name": "充电站 1", "x": 25, "y": 2, "capacity": 2},
+    {"id": "C002", "name": "充电站 2", "x": 25, "y": 26, "capacity": 2}
+  ],
+  
+  "aisles": [
+    {"id": "A001", "name": "主通道 1", "start_x": 0, "start_y": 5, "end_x": 35, "end_y": 5, "width": 2, "direction": "horizontal"},
+    {"id": "A002", "name": "主通道 2", "start_x": 0, "start_y": 11, "end_x": 35, "end_y": 11, "width": 2, "direction": "horizontal"},
+    {"id": "A003", "name": "主通道 3", "start_x": 0, "start_y": 17, "end_x": 35, "end_y": 17, "width": 2, "direction": "horizontal"},
+    {"id": "A004", "name": "主通道 4", "start_x": 0, "start_y": 23, "end_x": 35, "end_y": 23, "width": 2, "direction": "horizontal"},
+    
+    {"id": "A005", "name": "纵向通道 1", "start_x": 18, "start_y": 0, "end_x": 18, "end_y": 28, "width": 3, "direction": "vertical"},
+    {"id": "A006", "name": "纵向通道 2", "start_x": 28, "start_y": 0, "end_x": 28, "end_y": 28, "width": 3, "direction": "vertical"}
+  ],
+  
+  "narrow_passages": [
+    {"id": "N001", "name": "窄通道 1", "start_x": 18, "start_y": 5, "end_x": 18, "end_y": 6, "width": 1.5},
+    {"id": "N002", "name": "窄通道 2", "start_x": 18, "start_y": 17, "end_x": 18, "end_y": 18, "width": 1.5}
+  ],
+  
+  "obstacles": [
+    {"id": "O001", "name": "消防柱", "x": 22, "y": 12, "width": 1, "height": 1, "type": "pillar"}
+  ],
+  
+  "grid": []
+}

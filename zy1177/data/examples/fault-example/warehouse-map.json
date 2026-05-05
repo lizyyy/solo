@@ -1,0 +1,67 @@
+{
+  "name": "故障测试场景",
+  "description": "用于测试机器人故障处理和系统容错的场景",
+  "width": 30,
+  "height": 25,
+  "grid_size": 1,
+  
+  "shelves": [
+    {"id": "S01", "x": 3, "y": 5, "width": 2, "height": 3, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S02", "x": 3, "y": 14, "width": 2, "height": 3, "depth": 1, "level": 3, "zone": "A"},
+    {"id": "S03", "x": 8, "y": 5, "width": 2, "height": 3, "depth": 1, "level": 3, "zone": "B"},
+    {"id": "S04", "x": 8, "y": 14, "width": 2, "height": 3, "depth": 1, "level": 3, "zone": "B"}
+  ],
+  
+  "stations": [
+    {"id": "P01", "name": "拣货站A", "x": 5, "y": 10, "type": "pickup"},
+    {"id": "P02", "name": "拣货站B", "x": 10, "y": 10, "type": "pickup"},
+    {"id": "D01", "name": "集货站", "x": 25, "y": 10, "type": "dropoff"}
+  ],
+  
+  "charging_stations": [
+    {"id": "C01", "name": "充电站", "x": 27, "y": 2, "capacity": 2}
+  ],
+  
+  "aisles": [
+    {"id": "A01", "name": "主通道", "start_x": 0, "start_y": 10, "end_x": 28, "end_y": 10, "width": 2, "direction": "horizontal"}
+  ],
+  
+  "narrow_passages": [],
+  
+  "obstacles": [],
+  
+  "grid": [],
+  
+  "test_scenario": {
+    "type": "fault",
+    "description": "测试机器人故障时的任务重分配和系统容错",
+    "fault_config": {
+      "fault_types": [
+        "battery_critical",
+        "mechanical_failure",
+        "sensor_failure",
+        "communication_loss"
+      ],
+      "fault_detection_time": 2.0,
+      "recovery_attempts": 3
+    },
+    "expected_system_behavior": [
+      {
+        "action": "故障检测",
+        "description": "系统应在2秒内检测到机器人故障"
+      },
+      {
+        "action": "任务重分配",
+        "description": "故障机器人的任务应重新分配给其他可用机器人"
+      },
+      {
+        "action": "路径重新规划",
+        "description": "其他机器人应重新规划路径绕过故障机器人"
+      },
+      {
+        "action": "通知与报警",
+        "description": "系统应发出报警通知维护人员"
+      }
+    ]
+  }
+}

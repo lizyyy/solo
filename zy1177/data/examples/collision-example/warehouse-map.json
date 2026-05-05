@@ -1,0 +1,45 @@
+{
+  "name": "碰撞风险测试场景",
+  "description": "用于测试碰撞检测和避让算法的场景配置",
+  "width": 20,
+  "height": 20,
+  "grid_size": 1,
+  
+  "shelves": [
+    {"id": "S01", "x": 5, "y": 5, "width": 2, "height": 2, "depth": 1, "level": 2, "zone": "A"},
+    {"id": "S02", "x": 5, "y": 12, "width": 2, "height": 2, "depth": 1, "level": 2, "zone": "A"},
+    {"id": "S03", "x": 12, "y": 5, "width": 2, "height": 2, "depth": 1, "level": 2, "zone": "B"},
+    {"id": "S04", "x": 12, "y": 12, "width": 2, "height": 2, "depth": 1, "level": 2, "zone": "B"}
+  ],
+  
+  "stations": [
+    {"id": "P01", "name": "取货点", "x": 2, "y": 10, "type": "pickup"},
+    {"id": "D01", "name": "送货点", "x": 17, "y": 10, "type": "dropoff"}
+  ],
+  
+  "charging_stations": [],
+  
+  "aisles": [
+    {"id": "A01", "name": "中央通道", "start_x": 0, "start_y": 10, "end_x": 19, "end_y": 10, "width": 2, "direction": "horizontal"},
+    {"id": "A02", "name": "纵向通道1", "start_x": 9, "start_y": 0, "end_x": 9, "end_y": 19, "width": 2, "direction": "vertical"}
+  ],
+  
+  "narrow_passages": [],
+  
+  "obstacles": [],
+  
+  "grid": [],
+  
+  "test_scenario": {
+    "type": "collision_risk",
+    "description": "两个机器人在交叉点会有碰撞风险",
+    "expected_collisions": [
+      {
+        "robot1": "R001",
+        "robot2": "R002",
+        "position": {"x": 9, "y": 10},
+        "time_frame": "3-5秒"
+      }
+    ]
+  }
+}
