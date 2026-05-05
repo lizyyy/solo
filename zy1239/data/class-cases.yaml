@@ -1,0 +1,112 @@
+# Sample class definitions for metaclass analysis
+# This file contains various class definitions with different metaclass scenarios
+
+classes:
+  # Case 1: Simple class with default metaclass (type)
+  - name: SimpleClass
+    bases: []
+    metaclass: type
+    fields:
+      - name: x
+        value: 1
+        order: 1
+      - name: y
+        value: 2
+        order: 2
+    mro: [SimpleClass, object]
+    source: snippets/simple_class.py
+
+  # Case 2: Class with custom metaclass
+  - name: MetaClassExample
+    bases: []
+    metaclass: CustomMeta
+    fields:
+      - name: data
+        value: null
+        order: 1
+      - name: version
+        value: "1.0"
+        order: 2
+    mro: [MetaClassExample, object]
+    source: snippets/custom_metaclass.py
+    metaclass_details:
+      prepare_used: true
+      new_implemented: true
+      init_implemented: true
+
+  # Case 3: Class with inheritance
+  - name: DerivedClass
+    bases: [SimpleClass]
+    metaclass: type
+    fields:
+      - name: z
+        value: 3
+        order: 1
+    mro: [DerivedClass, SimpleClass, object]
+    source: snippets/inheritance.py
+
+  # Case 4: Class with multiple inheritance (potential metaclass conflict)
+  - name: MultiInheritClass
+    bases: [MetaClassExample, SimpleClass]
+    metaclass: null
+    fields:
+      - name: combined
+        value: true
+        order: 1
+    mro: [MultiInheritClass, MetaClassExample, SimpleClass, object]
+    source: snippets/multi_inherit.py
+    has_conflict: true
+    conflict_details: "Base classes have incompatible metaclasses: CustomMeta vs type"
+    base_metaclasses:
+      MetaClassExample: CustomMeta
+      SimpleClass: type
+
+  # Case 5: Class using __init_subclass__
+  - name: InitSubclassExample
+    bases: []
+    metaclass: type
+    fields:
+      - name: registry
+        value: []
+        order: 1
+    mro: [InitSubclassExample, object]
+    source: snippets/init_subclass.py
+    uses_init_subclass: true
+
+  # Case 6: Class with descriptors (uses __set_name__)
+  - name: DescriptorClass
+    bases: []
+    metaclass: type
+    fields:
+      - name: name
+        value: StringDescriptor()
+        order: 1
+        descriptor_type: StringDescriptor
+      - name: value
+        value: IntegerDescriptor()
+        order: 2
+        descriptor_type: IntegerDescriptor
+    mro: [DescriptorClass, object]
+    source: snippets/descriptors.py
+    uses_set_name: true
+
+  # Case 7: Class with custom prepare
+  - name: OrderedAttrClass
+    bases: []
+    metaclass: OrderedMeta
+    fields:
+      - name: first
+        value: 1
+        order: 1
+      - name: second
+        value: 2
+        order: 2
+      - name: third
+        value: 3
+        order: 3
+    mro: [OrderedAttrClass, object]
+    source: snippets/ordered_meta.py
+    metaclass_details:
+      prepare_used: true
+      prepare_returns: OrderedDict
+      field_order_preserved: true

@@ -1,0 +1,33 @@
+{"event_type": "__prepare__", "timestamp": "2026-05-01T10:00:01.0001", "class_name": "OrderedAttrClass", "metaclass_name": "OrderedMeta", "details": {"returns": "OrderedDict"}, "order": 1, "success": true}
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:01.0002", "class_name": "OrderedAttrClass", "metaclass_name": "OrderedMeta", "details": {"selected_from": "explicit_metaclass"}, "order": 2, "success": true}
+{"event_type": "__new__", "timestamp": "2026-05-01T10:00:01.0003", "class_name": "OrderedAttrClass", "metaclass_name": "OrderedMeta", "details": {"bases": [], "namespace_keys": ["__module__", "__qualname__", "first", "second", "third"]}, "order": 3, "success": true}
+{"event_type": "__init__", "timestamp": "2026-05-01T10:00:01.0004", "class_name": "OrderedAttrClass", "metaclass_name": "OrderedMeta", "details": {"class_obj_created": true}, "order": 4, "success": true}
+{"event_type": "class_created", "timestamp": "2026-05-01T10:00:01.0005", "class_name": "OrderedAttrClass", "metaclass_name": "OrderedMeta", "details": {"mro": ["OrderedAttrClass", "object"]}, "order": 5, "success": true}
+
+{"event_type": "__prepare__", "timestamp": "2026-05-01T10:00:02.0001", "class_name": "MetaClassExample", "metaclass_name": "CustomMeta", "details": {"returns": "dict"}, "order": 1, "success": true}
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:02.0002", "class_name": "MetaClassExample", "metaclass_name": "CustomMeta", "details": {"selected_from": "explicit_metaclass"}, "order": 2, "success": true}
+{"event_type": "__new__", "timestamp": "2026-05-01T10:00:02.0003", "class_name": "MetaClassExample", "metaclass_name": "CustomMeta", "details": {"bases": [], "namespace_keys": ["__module__", "__qualname__", "data", "version"]}, "order": 3, "success": true}
+{"event_type": "__init__", "timestamp": "2026-05-01T10:00:02.0004", "class_name": "MetaClassExample", "metaclass_name": "CustomMeta", "details": {"class_obj_created": true}, "order": 4, "success": true}
+{"event_type": "class_created", "timestamp": "2026-05-01T10:00:02.0005", "class_name": "MetaClassExample", "metaclass_name": "CustomMeta", "details": {"mro": ["MetaClassExample", "object"]}, "order": 5, "success": true}
+
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:03.0001", "class_name": "SimpleClass", "metaclass_name": "type", "details": {"selected_from": "default"}, "order": 1, "success": true}
+{"event_type": "__new__", "timestamp": "2026-05-01T10:00:03.0002", "class_name": "SimpleClass", "metaclass_name": "type", "details": {"bases": [], "namespace_keys": ["__module__", "__qualname__", "x", "y"]}, "order": 2, "success": true}
+{"event_type": "__init__", "timestamp": "2026-05-01T10:00:03.0003", "class_name": "SimpleClass", "metaclass_name": "type", "details": {"class_obj_created": true}, "order": 3, "success": true}
+{"event_type": "class_created", "timestamp": "2026-05-01T10:00:03.0004", "class_name": "SimpleClass", "metaclass_name": "type", "details": {"mro": ["SimpleClass", "object"]}, "order": 4, "success": true}
+
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:04.0001", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"selected_from": "inheritance", "from_base": "SimpleClass"}, "order": 1, "success": true}
+{"event_type": "mro_compute", "timestamp": "2026-05-01T10:00:04.0002", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"computed_mro": ["DerivedClass", "SimpleClass", "object"]}, "order": 2, "success": true}
+{"event_type": "__new__", "timestamp": "2026-05-01T10:00:04.0003", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"bases": ["SimpleClass"], "namespace_keys": ["__module__", "__qualname__", "z"]}, "order": 3, "success": true}
+{"event_type": "__init__", "timestamp": "2026-05-01T10:00:04.0004", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"class_obj_created": true}, "order": 4, "success": true}
+{"event_type": "__init_subclass__", "timestamp": "2026-05-01T10:00:04.0005", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"called_on": "SimpleClass"}, "order": 5, "success": true}
+{"event_type": "class_created", "timestamp": "2026-05-01T10:00:04.0006", "class_name": "DerivedClass", "metaclass_name": "type", "details": {"mro": ["DerivedClass", "SimpleClass", "object"]}, "order": 6, "success": true}
+
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:05.0001", "class_name": "MultiInheritClass", "metaclass_name": null, "details": {"base_metaclasses": {"MetaClassExample": "CustomMeta", "SimpleClass": "type"}}, "order": 1, "success": false, "error_message": "Metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases"}
+{"event_type": "metaclass_conflict", "timestamp": "2026-05-01T10:00:05.0002", "class_name": "MultiInheritClass", "metaclass_name": null, "details": {"conflicting_bases": ["MetaClassExample", "SimpleClass"], "metaclasses": ["CustomMeta", "type"]}, "order": 2, "success": false, "error_message": "Metaclass conflict detected"}
+
+{"event_type": "__set_name__", "timestamp": "2026-05-01T10:00:06.0001", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"descriptor": "name", "owner": "DescriptorClass"}, "order": 1, "success": true}
+{"event_type": "__set_name__", "timestamp": "2026-05-01T10:00:06.0002", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"descriptor": "value", "owner": "DescriptorClass"}, "order": 2, "success": true}
+{"event_type": "metaclass_select", "timestamp": "2026-05-01T10:00:06.0003", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"selected_from": "default"}, "order": 3, "success": true}
+{"event_type": "__new__", "timestamp": "2026-05-01T10:00:06.0004", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"bases": [], "namespace_keys": ["__module__", "__qualname__", "name", "value"]}, "order": 4, "success": true}
+{"event_type": "__init__", "timestamp": "2026-05-01T10:00:06.0005", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"class_obj_created": true}, "order": 5, "success": true}
+{"event_type": "class_created", "timestamp": "2026-05-01T10:00:06.0006", "class_name": "DescriptorClass", "metaclass_name": "type", "details": {"mro": ["DescriptorClass", "object"]}, "order": 6, "success": true}
