@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务集群演练台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: #2a2a4a;
+            border: none;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            background: #3a3a5a;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: white;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: #2a2a4a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            color: #00d4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #2a2a4a, #3a3a5a);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stats-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stats-card .label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .stats-card.blue .number { color: #00d4ff; }
+        .stats-card.green .number { color: #10b981; }
+        .stats-card.yellow .number { color: #f59e0b; }
+        .stats-card.red .number { color: #ef4444; }
+        .stats-card.purple .number { color: #7b2cbf; }
+
+        .cluster-item {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00d4ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cluster-item:hover {
+            transform: translateX(5px);
+            border-left-color: #7b2cbf;
+        }
+
+        .cluster-item.selected {
+            border-left-color: #7b2cbf;
+            background: #2a2a4a;
+        }
+
+        .cluster-item h4 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .cluster-item .meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: #888;
+            flex-wrap: wrap;
+        }
+
+        .instance-card {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #10b981;
+        }
+
+        .instance-card.master {
+            border-left-color: #f59e0b;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
+        }
+
+        .instance-card.unhealthy {
+            border-left-color: #f59e0b;
+            opacity: 0.8;
+        }
+
+        .instance-card.down {
+            border-left-color: #ef4444;
+            opacity: 0.6;
+        }
+
+        .instance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .instance-name {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .role-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        .role-badge.master {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .role-badge.slave {
+            background: #6b7280;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .status-badge.healthy { background: #10b981; color: white; }
+        .status-badge.unhealthy { background: #f59e0b; color: white; }
+        .status-badge.down { background: #ef4444; color: white; }
+        .status-badge.maintenance { background: #6b7280; color: white; }
+
+        .instance-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .instance-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .weight-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .weight-control input {
+            width: 60px;
+            padding: 4px 8px;
+            text-align: center;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+        }
+
+        .event-log {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #6b7280;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .event-log.info { border-left-color: #00d4ff; }
+        .event-log.warning { border-left-color: #f59e0b; }
+        .event-log.error { border-left-color: #ef4444; }
+        .event-log.critical { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+        .event-time {
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .event-message {
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .event-details {
+            color: #aaa;
+            background: #2a2a4a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #2a2a4a;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #00d4ff;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #e0e0e0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            color: #f59e0b;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .alert-info {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-item label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            padding: 6px 12px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+        }
+
+        .divider {
+            height: 1px;
+            background: #444;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: #2a2a4a;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success { border-left: 4px solid #10b981; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.warning { border-left: 4px solid #f59e0b; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #444;
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .connection-bar {
+            display: flex;
+            height: 8px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .connection-bar-fill {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            transition: width 0.3s ease;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖥️ 服务集群演练台</h1>
+            <p>模拟服务实例的主从关系、健康状态、故障转移和负载均衡决策</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-section="clusters">🏗️ 集群管理</button>
+            <button class="nav-tab" data-section="instances">⚙️ 实例控制</button>
+            <button class="nav-tab" data-section="simulation">🎮 演练模拟</button>
+            <button class="nav-tab" data-section="logs">📋 事件日志</button>
+            <button class="nav-tab" data-section="analysis">📊 分析报告</button>
+            <button class="nav-tab" data-section="export">📥 导出复盘</button>
+        </div>
+
+        <div class="section active" id="clusters-section">
+            <div class="grid">
+                <div class="stats-card blue">
+                    <div class="number" id="stat-clusters">0</div>
+                    <div class="label">集群总数</div>
+                </div>
+                <div class="stats-card purple">
+                    <div class="number" id="stat-instances">0</div>
+                    <div class="label">实例总数</div>
+                </div>
+                <div class="stats-card green">
+                    <div class="number" id="stat-healthy">0</div>
+                    <div class="label">健康实例</div>
+                </div>
+                <div class="stats-card red">
+                    <div class="number" id="stat-unhealthy">0</div>
+                    <div class="label">不健康实例</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📢 配置警告</h3>
+                <div id="warnings-container"></div>
+            </div>
+
+            <div class="two-column">
+                <div class="card">
+                    <h3>🆕 创建集群</h3>
+                    <form id="create-cluster-form">
+                        <div class="form-group">
+                            <label>集群名称 *</label>
+                            <input type="text" name="name" required placeholder="例如：订单服务集群">
+                        </div>
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea name="description" rows="3" placeholder="集群的用途和说明"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>负载均衡策略</label>
+                            <select name="loadBalancerStrategy">
+                                <option value="ROUND_ROBIN">🔄 轮询</option>
+                                <option value="WEIGHTED_ROUND_ROBIN">⚖️ 加权轮询</option>
+                                <option value="LEAST_CONNECTIONS">📊 最小连接数</option>
+                                <option value="RANDOM">🎲 随机</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>健康检查间隔 (ms)</label>
+                            <input type="number" name="healthCheckInterval" value="30000" min="5000" max="300000">
+                        </div>
+                        <button type="submit" class="btn btn-primary">创建集群</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>📋 集群列表</h3>
+                    <div id="clusters-container">
+                        <div class="empty-state">
+                            <div class="icon">🏗️</div>
+                            <p>暂无集群，创建一个开始演练</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="instances-section">
+            <div class="card">
+                <h3>📌 选择集群</h3>
+                <div class="form-group">
+                    <select id="instances-cluster-select">
+                        <option value="">请选择集群...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="instances-content" style="display: none;">
+                <div class="card">
+                    <h3>➕ 注册新实例</h3>
+                    <form id="register-instance-form">
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label>实例名称 *</label>
+                                <input type="text" name="name" required placeholder="例如：order-service-01">
+                            </div>
+                            <div class="form-group">
+                                <label>主机地址 *</label>
+                                <input type="text" name="host" required placeholder="例如：192.168.1.100">
+                            </div>
+                            <div class="form-group">
+                                <label>端口 *</label>
+                                <input type="number" name="port" required min="1" max="65535" placeholder="例如：8080">
+                            </div>
+                            <div class="form-group">
+                                <label>角色</label>
+                                <select name="role">
+                                    <option value="SLAVE">🔷 从节点</option>
+                                    <option value="MASTER">👑 主节点</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>权重 (1-100)</label>
+                                <input type="number" name="weight" value="1" min="1" max="100">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">注册实例</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 实例列表</h3>
+                    <div id="instances-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="simulation-section">
+            <div class="card">
+                <h3>🎯 演练目标</h3>
+                <div class="form-group">
+                    <select id="simulation-cluster-select">
+                        <option value="">请选择集群...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="simulation-content" style="display: none;">
+                <div class="two-column">
+                    <div class="card">
+                        <h3>📤 发送测试请求</h3>
+                        <p style="color: #888; margin-bottom: 15px;">模拟请求路由，观察负载均衡决策</p>
+                        <div class="form-group">
+                            <label>请求数量</label>
+                            <input type="number" id="request-count" value="1" min="1" max="100">
+                        </div>
+                        <button class="btn btn-primary" id="send-requests-btn">发送请求</button>
+                        <button class="btn btn-secondary" id="reset-connections-btn">重置连接数</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>👑 主节点操作</h3>
+                        <div id="current-master-info"></div>
+                        <div class="divider"></div>
+                        <button class="btn btn-danger" id="kill-master-btn">💀 让主节点宕机</button>
+                        <button class="btn btn-warning" id="elect-master-btn">🔄 手动选举主节点</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 当前负载均衡状态</h3>
+                    <div id="lb-stats-container"></div>
+                </div>
+
+                <div class="card">
+                    <h3>🎮 实例手动控制</h3>
+                    <p style="color: #888; margin-bottom: 15px;">选择实例进行手动控制，模拟故障和恢复场景</p>
+                    <div id="simulation-instances-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="logs-section">
+            <div class="card">
+                <h3>🔍 日志筛选</h3>
+                <div class="filters">
+                    <div class="filter-item">
+                        <label>集群</label>
+                        <select id="logs-cluster-select">
+                            <option value="">全部集群</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>事件类型</label>
+                        <select id="logs-event-type">
+                            <option value="">全部类型</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>严重级别</label>
+                        <select id="logs-severity">
+                            <option value="">全部级别</option>
+                            <option value="INFO">ℹ️ INFO</option>
+                            <option value="WARNING">⚠️ WARNING</option>
+                            <option value="ERROR">❌ ERROR</option>
+                            <option value="CRITICAL">🚨 CRITICAL</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>显示条数</label>
+                        <select id="logs-limit">
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                            <option value="500">500</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="refresh-logs-btn">🔄 刷新日志</button>
+                <button class="btn btn-danger" id="clear-logs-btn">🗑️ 清空日志</button>
+            </div>
+
+            <div class="card">
+                <h3>📋 事件日志</h3>
+                <div id="logs-container">
+                    <div class="empty-state">
+                        <div class="icon">📋</div>
+                        <p>暂无事件日志</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="analysis-section">
+            <div class="card">
+                <h3>📊 数据分析</h3>
+                <div class="form-group">
+                    <label>选择集群</label>
+                    <select id="analysis-cluster-select">
+                        <option value="">全部集群</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="analyze-btn">分析数据</button>
+            </div>
+
+            <div id="analysis-result" style="display: none;">
+                <div class="grid">
+                    <div class="stats-card blue">
+                        <div class="number" id="analysis-total">0</div>
+                        <div class="label">总事件数</div>
+                    </div>
+                    <div class="stats-card green">
+                        <div class="number" id="analysis-requests">0</div>
+                        <div class="label">请求路由</div>
+                    </div>
+                    <div class="stats-card yellow">
+                        <div class="number" id="analysis-failovers">0</div>
+                        <div class="label">故障转移</div>
+                    </div>
+                    <div class="stats-card red">
+                        <div class="number" id="analysis-warnings">0</div>
+                        <div class="label">配置警告</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📈 事件类型分布</h3>
+                    <div id="analysis-events-distribution"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="export-section">
+            <div class="card">
+                <h3>📥 导出复盘报告</h3>
+                <p style="color: #888; margin-bottom: 20px;">导出当前所有数据和事件日志，用于后续分析和复盘</p>
+                
+                <div class="form-group">
+                    <label>选择导出范围</label>
+                    <select id="export-cluster-select">
+                        <option value="">全部集群</option>
+                    </select>
+                </div>
+
+                <div class="divider"></div>
+
+                <h4 style="margin-bottom: 15px; color: #00d4ff;">导出格式</h4>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="export-json-btn">
+                        📄 导出 JSON
+                    </button>
+                    <button class="btn btn-primary" id="export-markdown-btn">
+                        📝 导出 Markdown
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🌱 加载示例数据</h3>
+                <p style="color: #888; margin-bottom: 20px;">加载预设的示例数据，快速体验演练台功能</p>
+                <button class="btn btn-success" id="load-seed-btn">🌱 加载示例数据</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
