@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纸箱厂品控数据分析工具</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 纸箱厂品控数据分析工具</h1>
+            <p class="subtitle">订单风险评估与质量监控系统</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="orders">订单列表</button>
+            <button class="tab-btn" data-tab="detail">订单详情</button>
+        </nav>
+
+        <!-- 仪表盘 -->
+        <section id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-orders">0</div>
+                    <div class="stat-label">总订单数</div>
+                </div>
+                <div class="stat-card risk-high">
+                    <div class="stat-value" id="high-risk">0</div>
+                    <div class="stat-label">高风险</div>
+                </div>
+                <div class="stat-card risk-medium">
+                    <div class="stat-value" id="medium-risk">0</div>
+                    <div class="stat-label">中风险</div>
+                </div>
+                <div class="stat-card risk-low">
+                    <div class="stat-value" id="low-risk">0</div>
+                    <div class="stat-label">低风险</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reviewed">0</div>
+                    <div class="stat-label">已复核</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>风险分布</h3>
+                    <canvas id="riskChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>风险趋势</h3>
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="actions-bar">
+                <button class="btn btn-primary" onclick="analyzeAllOrders()">
+                    🔍 重新分析所有订单
+                </button>
+                <button class="btn" onclick="refreshDashboard()">
+                    🔄 刷新数据
+                </button>
+            </div>
+        </section>
+
+        <!-- 数据导入 -->
+        <section id="import" class="tab-content">
+            <div class="import-section">
+                <h3>📥 导入示例数据</h3>
+                <p>点击下方按钮可快速导入预设的示例数据，用于测试系统功能</p>
+                <button class="btn btn-primary" onclick="importSampleData()">
+                    🚀 一键导入示例数据
+                </button>
+            </div>
+
+            <div class="import-section">
+                <h3>📄 CSV 文件导入</h3>
+                <div class="import-form">
+                    <div class="form-group">
+                        <label>数据类型</label>
+                        <select id="csv-data-type">
+                            <option value="orders">订单信息</option>
+                            <option value="batches">纸板批次</option>
+                            <option value="tests">测试结果</option>
+                            <option value="environment">温湿度记录</option>
+                            <option value="loading">装车清单</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>选择 CSV 文件</label>
+                        <input type="file" id="csv-file" accept=".csv">
+                    </div>
+                    <button class="btn btn-primary" onclick="importCSV()">
+                        导入 CSV
+                    </button>
+                </div>
+                <div class="format-info">
+                    <h4>CSV 格式说明</h4>
+                    <p><strong>订单信息:</strong> order_number, box_type, box_size, customer_name, quantity, production_date</p>
+                    <p><strong>纸板批次:</strong> batch_number, corrugated_type, paper_grade, manufacturer, production_date, expiration_date</p>
+                    <p><strong>测试结果:</strong> order_number, batch_number, edge_crush, edge_crush_min, burst_strength, burst_strength_min, test_date, tester</p>
+                    <p><strong>温湿度:</strong> record_date, temperature, humidity, location, recorded_by</p>
+                    <p><strong>装车清单:</strong> order_number, vehicle_number, loading_date, stack_layers, total_weight, destination</p>
+                </div>
+            </div>
+
+            <div class="import-section">
+                <h3>📋 JSON 文件导入</h3>
+                <div class="import-form">
+                    <div class="form-group">
+                        <label>选择 JSON 文件</label>
+                        <input type="file" id="json-file" accept=".json">
+                    </div>
+                    <button class="btn btn-primary" onclick="importJSON()">
+                        导入 JSON
+                    </button>
+                </div>
+                <div class="format-info">
+                    <h4>JSON 格式说明</h4>
+                    <pre>{
+  "orders": [...],
+  "batches": [...],
+  "tests": [...],
+  "environment": [...],
+  "loading": [...]
+}</pre>
+                </div>
+            </div>
+
+            <div id="import-result"></div>
+        </section>
+
+        <!-- 订单列表 -->
+        <section id="orders" class="tab-content">
+            <div class="filter-bar">
+                <div class="form-group">
+                    <label>风险筛选</label>
+                    <select id="risk-filter" onchange="loadOrders()">
+                        <option value="">全部</option>
+                        <option value="high">高风险</option>
+                        <option value="medium">中风险</option>
+                        <option value="low">低风险</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>搜索订单</label>
+                    <input type="text" id="order-search" placeholder="输入订单号或客户名..." onkeyup="loadOrders()">
+                </div>
+                <button class="btn" onclick="loadOrders()">
+                    🔄 刷新
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>箱型</th>
+                            <th>客户</th>
+                            <th>数量</th>
+                            <th>综合风险</th>
+                            <th>抗压风险</th>
+                            <th>受潮风险</th>
+                            <th>堆码风险</th>
+                            <th>复核状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 订单详情 -->
+        <section id="detail" class="tab-content">
+            <div class="detail-header">
+                <div class="form-group">
+                    <label>选择订单</label>
+                    <select id="detail-order-select" onchange="loadOrderDetail()">
+                        <option value="">请选择订单</option>
+                    </select>
+                </div>
+                <div class="detail-actions">
+                    <button class="btn" onclick="refreshOrderDetail()">
+                        🔄 刷新
+                    </button>
+                    <button class="btn" id="export-md-btn" onclick="exportMarkdown()">
+                        📄 导出放行单 (Markdown)
+                    </button>
+                    <button class="btn" id="export-json-btn" onclick="exportJSONAudit()">
+                        📋 导出审计明细 (JSON)
+                    </button>
+                </div>
+            </div>
+
+            <div id="order-detail-content">
+                <div class="empty-state">
+                    <p>请选择一个订单查看详情</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 人工改判模态框 -->
+        <div id="override-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>人工改判</h3>
+                    <span class="close" onclick="closeOverrideModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>当前订单</label>
+                        <input type="text" id="override-order-number" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>原评估结果</label>
+                        <input type="text" id="override-original" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>改判为</label>
+                        <select id="override-new">
+                            <option value="low">低风险</option>
+                            <option value="medium">中风险</option>
+                            <option value="high">高风险</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>改判理由</label>
+                        <textarea id="override-reason" rows="3" placeholder="请输入改判理由..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>复核人</label>
+                        <input type="text" id="override-by" placeholder="请输入复核人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="override-notes" rows="2" placeholder="其他备注信息..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeOverrideModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitOverride()">确认改判</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 消息提示 -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

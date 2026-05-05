@@ -1,0 +1,230 @@
+{
+  "orders": [
+    {
+      "order_number": "ORD-2026-001",
+      "box_type": "A楞",
+      "box_size": "50x30x40",
+      "customer_name": "阿里巴巴",
+      "quantity": 500,
+      "production_date": "2026-04-20"
+    },
+    {
+      "order_number": "ORD-2026-002",
+      "box_type": "B楞",
+      "box_size": "40x25x30",
+      "customer_name": "腾讯科技",
+      "quantity": 1000,
+      "production_date": "2026-04-22"
+    },
+    {
+      "order_number": "ORD-2026-003",
+      "box_type": "AB楞",
+      "box_size": "60x40x50",
+      "customer_name": "京东物流",
+      "quantity": 300,
+      "production_date": "2026-04-15"
+    },
+    {
+      "order_number": "ORD-2026-004",
+      "box_type": "E楞",
+      "box_size": "30x20x15",
+      "customer_name": "拼多多",
+      "quantity": 2000,
+      "production_date": "2026-04-25"
+    },
+    {
+      "order_number": "ORD-2026-005",
+      "box_type": "A楞",
+      "box_size": "45x35x45",
+      "customer_name": "美团优选",
+      "quantity": 800,
+      "production_date": "2026-04-10"
+    }
+  ],
+  "batches": [
+    {
+      "batch_number": "CB-2026-001",
+      "corrugated_type": "A楞",
+      "paper_grade": "K级",
+      "manufacturer": "华润纸业",
+      "production_date": "2026-04-01",
+      "expiration_date": "2026-06-30"
+    },
+    {
+      "batch_number": "CB-2026-002",
+      "corrugated_type": "B楞",
+      "paper_grade": "A级",
+      "manufacturer": "玖龙纸业",
+      "production_date": "2026-04-05",
+      "expiration_date": "2026-07-05"
+    },
+    {
+      "batch_number": "CB-2026-003",
+      "corrugated_type": "AB楞",
+      "paper_grade": "K级",
+      "manufacturer": "理文造纸",
+      "production_date": "2026-03-20",
+      "expiration_date": "2026-06-20"
+    },
+    {
+      "batch_number": "CB-2026-004",
+      "corrugated_type": "E楞",
+      "paper_grade": "B级",
+      "manufacturer": "山鹰纸业",
+      "production_date": "2026-04-10",
+      "expiration_date": "2026-07-10"
+    }
+  ],
+  "tests": [
+    {
+      "order_number": "ORD-2026-001",
+      "batch_number": "CB-2026-001",
+      "edge_crush": 85,
+      "edge_crush_min": 100,
+      "burst_strength": 180,
+      "burst_strength_min": 200,
+      "test_date": "2026-04-21",
+      "tester": "张三"
+    },
+    {
+      "order_number": "ORD-2026-002",
+      "batch_number": "CB-2026-002",
+      "edge_crush": 95,
+      "edge_crush_min": 90,
+      "burst_strength": 220,
+      "burst_strength_min": 180,
+      "test_date": "2026-04-23",
+      "tester": "李四"
+    },
+    {
+      "order_number": "ORD-2026-003",
+      "batch_number": "CB-2026-003",
+      "edge_crush": 65,
+      "edge_crush_min": 120,
+      "burst_strength": 150,
+      "burst_strength_min": 250,
+      "test_date": "2026-04-16",
+      "tester": "王五"
+    },
+    {
+      "order_number": "ORD-2026-004",
+      "batch_number": "CB-2026-004",
+      "edge_crush": 110,
+      "edge_crush_min": 80,
+      "burst_strength": 250,
+      "burst_strength_min": 150,
+      "test_date": "2026-04-26",
+      "tester": "赵六"
+    },
+    {
+      "order_number": "ORD-2026-005",
+      "batch_number": "CB-2026-001",
+      "edge_crush": 90,
+      "edge_crush_min": 100,
+      "burst_strength": 190,
+      "burst_strength_min": 200,
+      "test_date": "2026-04-11",
+      "tester": "张三"
+    }
+  ],
+  "environment": [
+    {
+      "record_date": "2026-04-20",
+      "temperature": 22,
+      "humidity": 65,
+      "location": "仓库A",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-21",
+      "temperature": 24,
+      "humidity": 72,
+      "location": "仓库A",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-22",
+      "temperature": 23,
+      "humidity": 68,
+      "location": "仓库A",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-23",
+      "temperature": 25,
+      "humidity": 85,
+      "location": "仓库B",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-24",
+      "temperature": 26,
+      "humidity": 82,
+      "location": "仓库B",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-25",
+      "temperature": 24,
+      "humidity": 70,
+      "location": "仓库A",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-26",
+      "temperature": 38,
+      "humidity": 60,
+      "location": "仓库C",
+      "recorded_by": "管理员"
+    },
+    {
+      "record_date": "2026-04-27",
+      "temperature": 36,
+      "humidity": 58,
+      "location": "仓库C",
+      "recorded_by": "管理员"
+    }
+  ],
+  "loading": [
+    {
+      "order_number": "ORD-2026-001",
+      "vehicle_number": "京A12345",
+      "loading_date": "2026-04-25",
+      "stack_layers": 8,
+      "total_weight": 1500,
+      "destination": "杭州"
+    },
+    {
+      "order_number": "ORD-2026-002",
+      "vehicle_number": "沪B67890",
+      "loading_date": "2026-04-26",
+      "stack_layers": 4,
+      "total_weight": 2200,
+      "destination": "深圳"
+    },
+    {
+      "order_number": "ORD-2026-003",
+      "vehicle_number": "粤C11111",
+      "loading_date": "2026-04-20",
+      "stack_layers": 6,
+      "total_weight": 1800,
+      "destination": "广州"
+    },
+    {
+      "order_number": "ORD-2026-004",
+      "vehicle_number": "苏D22222",
+      "loading_date": "2026-04-28",
+      "stack_layers": 3,
+      "total_weight": 800,
+      "destination": "南京"
+    },
+    {
+      "order_number": "ORD-2026-005",
+      "vehicle_number": "浙E33333",
+      "loading_date": "2026-04-15",
+      "stack_layers": 5,
+      "total_weight": 1200,
+      "destination": "上海"
+    }
+  ]
+}
