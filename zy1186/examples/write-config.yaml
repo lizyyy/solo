@@ -1,0 +1,79 @@
+# SQLite 写入优化顾问配置文件
+# 此文件控制基准测试的策略和参数
+
+benchmark:
+  # 预热运行次数（不计入最终结果，用于消除 JIT 和缓存影响）
+  warmupRuns: 1
+  
+  # 实际测试运行次数（取平均值作为最终结果）
+  testRuns: 2
+  
+  # 测试记录数（如果 workload 文件记录数少于此值，则使用实际记录数）
+  # 建议至少 1000 条以获得有意义的结果
+  recordCount: 1000
+
+strategies:
+  # 事务模式对比
+  # - single: 逐条提交（每次插入独立事务）
+  # - batch: 批量事务（批量提交）
+  transactionModes:
+    - single
+    - batch
+  
+  # 批量大小对比（每个事务中的记录数）
+  # 测试不同的 batch size 找到最优值
+  batchSizes:
+    - 100
+    - 500
+    - 1000
+    - 2000
+  
+  # Journal 模式对比
+  # - DELETE: 回滚日志模式（默认，写入性能较差）
+  # - WAL: 预写日志模式（推荐用于高并发写入）
+  # - MEMORY: 内存模式（最快但数据不持久化）
+  # - OFF: 关闭 journal（最快但有数据损坏风险）
+  journalModes:
+    - DELETE
+    - WAL
+  
+  # 连接模式对比
+  # - reuse: 连接复用（保持连接打开）
+  # - reopen: 反复开连接（每次操作重连）
+  connectionModes:
+    - reuse
+    - reopen
+  
+  # 语句执行模式对比
+  # - direct: 普通 SQL 语句（每次都解析编译）
+  # - prepared: 预编译语句（编译一次，执行多次）
+  statementModes:
+    - direct
+    - prepared
+
+indexAnalysis:
+  # 是否启用索引分析
+  enable: true
+  
+  # 测试无索引场景
+  # 对比有索引和无索引的写入性能差异
+  testWithoutIndexes: true
+  
+  # 测试额外索引场景
+  # 测试添加更多索引后的写入性能影响
+  testWithExtraIndexes: false
+  
+  # 额外索引的列名列表
+  # 仅当 testWithExtraIndexes 为 true 时生效
+  extraIndexColumns: []
+
+output:
+  # 输出格式
+  # 可选: markdown, json, csv
+  formats:
+    - markdown
+    - json
+    - csv
+  
+  # 输出目录
+  outputDir: ./reports
