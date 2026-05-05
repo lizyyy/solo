@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "perf-attrib"
+version = "0.1.0"
+description = "Python 性能优化归因 CLI 工具 - 用于团队复盘代码性能问题"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+    "sqlalchemy>=2.0",
+    "pandas>=2.0",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.0",
+]
+
+[project.scripts]
+perf-attrib = "perf_attrib.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["perf_attrib*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
