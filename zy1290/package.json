@@ -1,0 +1,20 @@
+{
+  "name": "warehouse-inventory",
+  "version": "1.0.0",
+  "description": "仓库盘点小后台 - 支持离线草稿队列和冲突处理",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "keywords": ["inventory", "warehouse", "sync", "offline-first"],
+  "author": "",
+  "license": "MIT"
+}
