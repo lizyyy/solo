@@ -1,0 +1,7 @@
+sample_id,sample_name,fabric_type
+TF-2024-001,纯棉白布,cotton
+INVALID@ID,无效编号测试,test
+,缺失编号,test
+TF-2024-002,A,test
+TF@TEST,包含特殊字符,test
+TF-2024-003,正常样本,wool
