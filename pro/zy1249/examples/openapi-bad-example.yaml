@@ -1,0 +1,247 @@
+openapi: "3.0.3"
+info:
+  title: 错误示例 API
+  description: 包含各种不符合 RESTful 规范的示例，用于测试校验器
+  version: "1.0"
+
+servers:
+  - url: https://api.example.com
+
+paths:
+  /api/getUser:
+    get:
+      summary: 获取用户
+      description: 错误示例：路径中包含动词，使用驼峰命名
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                      userName:
+                        type: string
+
+  /api/createUser:
+    post:
+      summary: 创建用户
+      description: 错误示例：路径中包含动词，无幂等键，状态码错误
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        "200":
+          description: 错误：创建资源应返回 201
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/UserList:
+    get:
+      summary: 获取用户列表
+      description: 错误示例：路径使用 PascalCase，无分页参数
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /api/users/{userId}/getOrders:
+    get:
+      summary: 获取用户订单
+      description: 错误示例：路径中包含动词，路径参数使用驼峰命名
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+
+  /api/delete_user/{id}:
+    delete:
+      summary: 删除用户
+      description: 错误示例：路径使用 snake_case，路径参数命名不规范
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 错误：删除资源应返回 204
+
+  /api/users:
+    post:
+      summary: 获取用户列表
+      description: 错误示例：使用 POST 获取资源列表
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                size:
+                  type: integer
+      responses:
+        "200":
+          description: 成功
+
+  /api/users/{id}:
+    get:
+      summary: 获取用户
+      description: 错误示例：缺少 404 响应
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+    put:
+      summary: 部分更新用户
+      description: 错误示例：使用 PUT 做部分更新，应使用 PATCH
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: 成功
+
+  /api/v2/users:
+    get:
+      summary: 获取用户列表 v2
+      description: 正确：URL 路径版本控制
+      responses:
+        "200":
+          description: 成功
+
+  /api/products:
+    get:
+      summary: 获取产品列表
+      description: 错误示例：没有版本控制
+      responses:
+        "200":
+          description: 成功
+
+  /api/orders:
+    get:
+      summary: 获取订单列表
+      description: 错误示例：状态码不完整，缺少 4xx、5xx 响应
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 成功
+
+  /api/search:
+    post:
+      summary: 搜索
+      description: 错误示例：复杂查询使用 POST，应考虑 GET 带参数
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                keywords:
+                  type: string
+                filters:
+                  type: object
+      responses:
+        "200":
+          description: 成功
+
+  /api/users/{id}/doSomething:
+    post:
+      summary: 执行操作
+      description: 错误示例：路径包含动作动词
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功
+
+  /api/orders/create:
+    post:
+      summary: 创建订单
+      description: 错误示例：路径包含动词，无幂等键
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: 错误：应返回 201
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: 错误信息
+      required:
+        - message

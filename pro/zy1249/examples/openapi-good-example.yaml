@@ -1,0 +1,615 @@
+openapi: "3.0.3"
+info:
+  title: 用户管理 API
+  description: 一个符合 RESTful 规范的用户管理 API 示例
+  version: "1.0.0"
+  contact:
+    name: API 团队
+    email: api-team@example.com
+  license:
+    name: MIT
+servers:
+  - url: https://api.example.com/v1
+    description: 生产环境
+  - url: https://api.staging.example.com/v1
+    description: 测试环境
+
+tags:
+  - name: Users
+    description: 用户管理相关接口
+  - name: Departments
+    description: 部门管理相关接口
+  - name: Orders
+    description: 订单管理相关接口
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: 获取用户列表
+      description: 获取所有用户的分页列表，支持筛选和排序
+      parameters:
+        - name: page
+          in: query
+          description: 页码，从 1 开始
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: page_size
+          in: query
+          description: 每页数量
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: sort
+          in: query
+          description: 排序字段，支持 created_at, updated_at, name
+          schema:
+            type: string
+            enum:
+              - created_at
+              - -created_at
+              - updated_at
+              - -updated_at
+              - name
+              - -name
+        - name: status
+          in: query
+          description: 用户状态筛选
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+              - suspended
+        - name: q
+          in: query
+          description: 搜索关键词，用于搜索用户名或邮箱
+          schema:
+            type: string
+            maxLength: 100
+      responses:
+        "200":
+          description: 成功返回用户列表
+          headers:
+            X-Total-Count:
+              description: 总记录数
+              schema:
+                type: integer
+            X-Page:
+              description: 当前页码
+              schema:
+                type: integer
+            X-Page-Size:
+              description: 每页数量
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "400":
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - Users
+      summary: 创建用户
+      description: 创建一个新用户
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          description: 幂等键，用于防止重复创建
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: 用户创建成功
+          headers:
+            Location:
+              description: 新创建用户的资源地址
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: 资源冲突（如邮箱已存在）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /users/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: 获取用户详情
+      description: 根据用户 ID 获取用户详细信息
+      parameters:
+        - name: user_id
+          in: path
+          description: 用户唯一标识符
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 成功返回用户详情
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+        - Users
+      summary: 更新用户信息
+      description: 全量更新用户信息
+      parameters:
+        - name: user_id
+          in: path
+          description: 用户唯一标识符
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      tags:
+        - Users
+      summary: 部分更新用户
+      description: 部分更新用户信息
+      parameters:
+        - name: user_id
+          in: path
+          description: 用户唯一标识符
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Users
+      summary: 删除用户
+      description: 删除指定用户（软删除）
+      parameters:
+        - name: user_id
+          in: path
+          description: 用户唯一标识符
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: 删除成功（无内容返回）
+        "404":
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /departments:
+    get:
+      tags:
+        - Departments
+      summary: 获取部门列表
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: 成功返回部门列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Department"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: 获取订单列表
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          description: 订单状态筛选
+          schema:
+            type: string
+            enum:
+              - pending
+              - paid
+              - shipped
+              - delivered
+              - cancelled
+      responses:
+        "200":
+          description: 成功返回订单列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+    post:
+      tags:
+        - Orders
+      summary: 创建订单
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: 订单创建成功
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+components:
+  schemas:
+    User:
+      type: object
+      description: 用户信息
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 用户唯一标识符
+        name:
+          type: string
+          description: 用户姓名
+        email:
+          type: string
+          format: email
+          description: 邮箱地址
+        phone:
+          type: string
+          description: 手机号码
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - suspended
+          description: 用户状态
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+      required:
+        - id
+        - name
+        - email
+        - status
+        - created_at
+        - updated_at
+
+    CreateUserRequest:
+      type: object
+      description: 创建用户请求
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        department_id:
+          type: string
+          format: uuid
+      required:
+        - name
+        - email
+
+    UpdateUserRequest:
+      type: object
+      description: 更新用户请求
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        phone:
+          type: string
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - suspended
+
+    Department:
+      type: object
+      description: 部门信息
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - created_at
+        - updated_at
+
+    Order:
+      type: object
+      description: 订单信息
+      properties:
+        id:
+          type: string
+          format: uuid
+        order_no:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - pending
+            - paid
+            - shipped
+            - delivered
+            - cancelled
+        total_amount:
+          type: number
+          format: decimal
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - order_no
+        - user_id
+        - status
+        - total_amount
+        - created_at
+        - updated_at
+
+    CreateOrderRequest:
+      type: object
+      description: 创建订单请求
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+      required:
+        - user_id
+        - items
+
+    Pagination:
+      type: object
+      description: 分页信息
+      properties:
+        page:
+          type: integer
+          description: 当前页码
+        page_size:
+          type: integer
+          description: 每页数量
+        total:
+          type: integer
+          description: 总记录数
+        total_pages:
+          type: integer
+          description: 总页数
+      required:
+        - page
+        - page_size
+        - total
+        - total_pages
+
+    ErrorResponse:
+      type: object
+      description: 错误响应
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: 错误码
+              example: USER_NOT_FOUND
+            message:
+              type: string
+              description: 错误描述
+              example: 用户不存在
+            details:
+              type: object
+              description: 额外的错误详情
+            request_id:
+              type: string
+              description: 请求 ID，用于排查问题
+          required:
+            - code
+            - message
+            - request_id

@@ -1,0 +1,243 @@
+# API 评审规则配置示例
+# 此文件定义了自定义的 API 设计规范规则
+# 可以在创建评审时上传此文件来自定义评审规则
+
+version: "1.0.0"
+description: "团队内部 RESTful API 设计规范规则配置"
+
+categories:
+  - id: resource-naming
+    name: 资源命名规范
+    description: 检查资源路径的命名规范
+    rules:
+      - id: RN-001
+        name: 路径应使用 kebab-case
+        description: 资源路径应使用 kebab-case 命名风格（如 /user-profiles）
+        severity: error
+        isEnabled: true
+        check:
+          pattern: "^/[a-z0-9]+(?:-[a-z0-9]+)*$"
+          matchType: pathSegment
+          
+      - id: RN-002
+        name: 路径中不应包含动词
+        description: RESTful API 应使用 HTTP 方法表达动作，而非路径中的动词
+        severity: error
+        isEnabled: true
+        check:
+          reservedWords:
+            - get
+            - create
+            - update
+            - delete
+            - add
+            - remove
+            - do
+            - make
+            - execute
+            - run
+            - process
+            - handle
+            
+      - id: RN-003
+        name: 资源名应使用复数形式
+        description: 集合资源应使用复数形式命名
+        severity: warning
+        isEnabled: true
+        check:
+          singularEndings:
+            - y
+            - s
+            - x
+            - z
+            - ch
+            - sh
+          exceptions:
+            - information
+            - equipment
+            - furniture
+            - advice
+            - news
+
+  - id: http-method
+    name: HTTP 方法规范
+    description: 检查 HTTP 方法的正确使用
+    rules:
+      - id: HM-001
+        name: GET 不应用于创建资源
+        description: GET 请求应该是安全的、幂等的，不应用于创建资源
+        severity: critical
+        isEnabled: true
+        
+      - id: HM-002
+        name: POST 应返回 201 状态码
+        description: 成功创建资源后应返回 201 Created 状态码
+        severity: error
+        isEnabled: true
+        
+      - id: HM-003
+        name: DELETE 应返回 204 状态码
+        description: 成功删除资源后应返回 204 No Content 状态码
+        severity: warning
+        isEnabled: true
+        
+      - id: HM-004
+        name: 部分更新应使用 PATCH
+        description: 部分更新资源应使用 PATCH 方法，而非 PUT
+        severity: error
+        isEnabled: true
+
+  - id: status-code
+    name: 状态码规范
+    description: 检查 HTTP 状态码的正确使用
+    rules:
+      - id: SC-001
+        name: 应包含错误响应
+        description: 接口应定义错误响应（4xx、5xx）
+        severity: warning
+        isEnabled: true
+        check:
+          requiredErrorCodes:
+            - "400"
+            - "401"
+            - "404"
+            - "500"
+            
+      - id: SC-002
+        name: 200 不应用于创建
+        description: 创建资源不应使用 200 OK，应使用 201 Created
+        severity: error
+        isEnabled: true
+        
+      - id: SC-003
+        name: 200 不应用于删除
+        description: 删除资源不应使用 200 OK，应使用 204 No Content
+        severity: warning
+        isEnabled: true
+
+  - id: pagination
+    name: 分页过滤规范
+    description: 检查分页和过滤参数的规范
+    rules:
+      - id: PG-001
+        name: 列表接口应有分页参数
+        description: 返回集合资源的接口应提供分页参数
+        severity: warning
+        isEnabled: true
+        check:
+          paginationParams:
+            - name: page
+              type: integer
+              description: 页码
+            - name: page_size
+              type: integer
+              description: 每页数量
+          alternativeParams:
+            - offset
+            - limit
+            
+      - id: PG-002
+        name: 分页参数应使用统一命名
+        description: 分页参数应使用统一的命名规范
+        severity: info
+        isEnabled: true
+        check:
+          recommendedParams:
+            - page
+            - page_size
+            - sort
+            - filter
+            
+      - id: PG-003
+        name: 列表响应应包含分页信息
+        description: 列表接口响应应包含分页元数据
+        severity: warning
+        isEnabled: true
+
+  - id: idempotency
+    name: 幂等键规范
+    description: 检查幂等性相关规范
+    rules:
+      - id: IP-001
+        name: 写操作应提供幂等键
+        description: 创建和更新操作应支持幂等键防止重复操作
+        severity: warning
+        isEnabled: true
+        check:
+          idempotencyHeader: Idempotency-Key
+          targetMethods:
+            - POST
+            - PATCH
+            
+      - id: IP-002
+        name: 幂等键应使用 UUID 格式
+        description: 幂等键建议使用 UUID 格式
+        severity: info
+        isEnabled: true
+
+  - id: error-code
+    name: 错误码规范
+    description: 检查错误响应格式规范
+    rules:
+      - id: EC-001
+        name: 错误响应应有统一格式
+        description: 错误响应应使用统一的 JSON 格式
+        severity: error
+        isEnabled: true
+        check:
+          requiredFields:
+            - code
+            - message
+          recommendedFields:
+            - request_id
+            - details
+            
+      - id: EC-002
+        name: 错误码应使用语义化命名
+        description: 错误码应使用大写字母和下划线，如 USER_NOT_FOUND
+        severity: info
+        isEnabled: true
+
+  - id: versioning
+    name: 版本控制与废弃策略
+    description: 检查 API 版本控制和废弃策略
+    rules:
+      - id: VN-001
+        name: API 应有版本控制
+        description: API 应提供版本控制机制
+        severity: error
+        isEnabled: true
+        check:
+          supportedMethods:
+            - path
+            - header
+            - query
+          pathPattern: "^/v\\d+"
+          headerName: X-API-Version
+          queryParam: api_version
+            
+      - id: VN-002
+        name: 废弃资源应有标记
+        description: 废弃的 API 应有明确的标记和替代方案说明
+        severity: warning
+        isEnabled: true
+        check:
+          deprecatedMarker: deprecated
+          alternativeField: x-alternative
+          sunsetField: x-sunset
+            
+      - id: VN-003
+        name: 版本号应使用数字
+        description: 版本号应使用整数，如 v1、v2
+        severity: info
+        isEnabled: true
+
+severityWeights:
+  critical: 10
+  error: 5
+  warning: 2
+  info: 1
+
+scoreThresholds:
+  pass: 80
+  warning: 60
