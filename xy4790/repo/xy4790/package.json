@@ -1,0 +1,16 @@
+{
+  "name": "tool-cabinet",
+  "version": "1.0.0",
+  "description": "社区共享工具柜全栈应用",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/test-concurrency.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "cors": "^2.8.5"
+  }
+}
