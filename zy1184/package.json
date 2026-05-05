@@ -1,0 +1,40 @@
+{
+  "name": "orm-query-analyzer",
+  "version": "1.0.0",
+  "description": "一个用于排查后端接口 ORM 查询慢和 N+1 问题的命令行工具",
+  "main": "dist/index.js",
+  "bin": {
+    "orm-analyzer": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "orm",
+    "query",
+    "analyzer",
+    "n+1",
+    "performance",
+    "database"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "yaml": "^2.3.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}
