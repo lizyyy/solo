@@ -1,0 +1,5 @@
+schedule_id,deceased_id,deceased_name,furnace_id,date,start_time,end_time,scheduled_by,status,notes
+CS001,D001,张三,F-01,2026-05-10,09:30,10:30,李主任,已排期,
+CS002,D002,李四,F-01,2026-05-10,10:00,11:00,王主任,已排期,与CS001冲突
+CS003,D003,王五,F-02,2026-05-11,15:30,16:30,张主任,已排期,
+CS004,D004,赵六,F-01,2026-05-12,13:00,14:00,刘主任,已排期,

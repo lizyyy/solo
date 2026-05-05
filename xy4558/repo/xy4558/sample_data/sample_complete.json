@@ -1,0 +1,462 @@
+{
+  "deceased": [
+    {
+      "deceased_id": "D001",
+      "name": "张三",
+      "gender": "男",
+      "age": 78,
+      "id_card": "110101194501011234",
+      "date_of_death": "2026-04-10",
+      "cause_of_death": "心脏病",
+      "contact_person": "张大明",
+      "contact_phone": "13800138001",
+      "cabinet_id": "C-01"
+    },
+    {
+      "deceased_id": "D002",
+      "name": "李四",
+      "gender": "女",
+      "age": 82,
+      "id_card": "110101194305052345",
+      "date_of_death": "2026-04-15",
+      "cause_of_death": "肺癌",
+      "contact_person": "李小华",
+      "contact_phone": "13800138002",
+      "cabinet_id": "C-02"
+    },
+    {
+      "deceased_id": "D003",
+      "name": "王五",
+      "gender": "男",
+      "age": 65,
+      "id_card": "110101195808083456",
+      "date_of_death": "2026-04-20",
+      "cause_of_death": "脑梗",
+      "contact_person": "王小刚",
+      "contact_phone": "13800138003",
+      "cabinet_id": "C-03"
+    },
+    {
+      "deceased_id": "D004",
+      "name": "赵六",
+      "gender": "女",
+      "age": 72,
+      "id_card": "110101195203034567",
+      "date_of_death": "2026-04-01",
+      "cause_of_death": "胃癌",
+      "contact_person": "赵小丽",
+      "contact_phone": "13800138004",
+      "cabinet_id": "C-04"
+    },
+    {
+      "deceased_id": "D005",
+      "name": "孙七",
+      "gender": "男",
+      "age": 85,
+      "id_card": "110101193911115678",
+      "date_of_death": "2026-04-25",
+      "cause_of_death": "自然死亡",
+      "contact_person": "孙小明",
+      "contact_phone": "13800138005",
+      "cabinet_id": "C-01"
+    }
+  ],
+  "cabinets": [
+    {
+      "cabinet_id": "C-01",
+      "location": "冷藏区A区",
+      "status": "使用中",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    },
+    {
+      "cabinet_id": "C-02",
+      "location": "冷藏区A区",
+      "status": "使用中",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    },
+    {
+      "cabinet_id": "C-03",
+      "location": "冷藏区A区",
+      "status": "使用中",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    },
+    {
+      "cabinet_id": "C-04",
+      "location": "冷藏区B区",
+      "status": "使用中",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    },
+    {
+      "cabinet_id": "C-05",
+      "location": "冷藏区B区",
+      "status": "空",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    },
+    {
+      "cabinet_id": "C-06",
+      "location": "冷藏区B区",
+      "status": "空",
+      "min_temp": -18.0,
+      "max_temp": -15.0
+    }
+  ],
+  "transport_orders": [
+    {
+      "order_id": "TR001",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "pickup_location": "北京市东城区某医院",
+      "pickup_time": "2026-04-10 14:30:00",
+      "transport_person": "王师傅",
+      "transport_phone": "13900139001",
+      "received_by": "李主任",
+      "received_time": "2026-04-10 16:00:00",
+      "signature_status": "已签收"
+    },
+    {
+      "order_id": "TR002",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "pickup_location": "北京市西城区某养老院",
+      "pickup_time": "2026-04-15 09:00:00",
+      "transport_person": "赵师傅",
+      "transport_phone": "13900139002",
+      "received_by": "",
+      "received_time": "",
+      "signature_status": "未签收",
+      "notes": "家属尚未确认"
+    },
+    {
+      "order_id": "TR003",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "pickup_location": "北京市朝阳区某医院",
+      "pickup_time": "2026-04-20 11:00:00",
+      "transport_person": "刘师傅",
+      "transport_phone": "13900139003",
+      "received_by": "张主任",
+      "received_time": "",
+      "signature_status": "部分签收",
+      "notes": "缺少部分证件"
+    },
+    {
+      "order_id": "TR004",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "pickup_location": "北京市海淀区某小区",
+      "pickup_time": "2026-04-01 16:00:00",
+      "transport_person": "陈师傅",
+      "transport_phone": "13900139004",
+      "received_by": "王主任",
+      "received_time": "2026-04-01 18:00:00",
+      "signature_status": "已签收"
+    }
+  ],
+  "temperature_records": [
+    {
+      "record_id": "T001",
+      "cabinet_id": "C-01",
+      "temperature": -16.5,
+      "record_time": "2026-05-05 08:00:00",
+      "recorded_by": "李师傅",
+      "status": "正常"
+    },
+    {
+      "record_id": "T002",
+      "cabinet_id": "C-02",
+      "temperature": -14.5,
+      "record_time": "2026-05-05 08:00:00",
+      "recorded_by": "李师傅",
+      "status": "异常"
+    },
+    {
+      "record_id": "T003",
+      "cabinet_id": "C-03",
+      "temperature": -17.0,
+      "record_time": "2026-05-05 08:00:00",
+      "recorded_by": "李师傅",
+      "status": "正常"
+    },
+    {
+      "record_id": "T004",
+      "cabinet_id": "C-04",
+      "temperature": -20.0,
+      "record_time": "2026-05-05 08:00:00",
+      "recorded_by": "李师傅",
+      "status": "异常"
+    },
+    {
+      "record_id": "T005",
+      "cabinet_id": "C-01",
+      "temperature": -16.0,
+      "record_time": "2026-05-05 12:00:00",
+      "recorded_by": "王师傅",
+      "status": "正常"
+    },
+    {
+      "record_id": "T006",
+      "cabinet_id": "C-02",
+      "temperature": -13.8,
+      "record_time": "2026-05-05 12:00:00",
+      "recorded_by": "王师傅",
+      "status": "异常"
+    },
+    {
+      "record_id": "T007",
+      "cabinet_id": "C-03",
+      "temperature": -16.8,
+      "record_time": "2026-05-05 12:00:00",
+      "recorded_by": "王师傅",
+      "status": "正常"
+    },
+    {
+      "record_id": "T008",
+      "cabinet_id": "C-04",
+      "temperature": -19.5,
+      "record_time": "2026-05-05 12:00:00",
+      "recorded_by": "王师傅",
+      "status": "异常"
+    }
+  ],
+  "farewell_bookings": [
+    {
+      "booking_id": "FB001",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "hall_id": "H-01",
+      "date": "2026-05-10",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "booked_by": "李主任",
+      "contact_phone": "13800138001",
+      "status": "已预约"
+    },
+    {
+      "booking_id": "FB002",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "hall_id": "H-01",
+      "date": "2026-05-10",
+      "start_time": "09:30",
+      "end_time": "10:30",
+      "booked_by": "王主任",
+      "contact_phone": "13800138002",
+      "status": "已预约",
+      "notes": "与FB001冲突"
+    },
+    {
+      "booking_id": "FB003",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "hall_id": "H-02",
+      "date": "2026-05-11",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "booked_by": "张主任",
+      "contact_phone": "13800138003",
+      "status": "已预约"
+    },
+    {
+      "booking_id": "FB004",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "hall_id": "H-01",
+      "date": "2026-05-12",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "booked_by": "刘主任",
+      "contact_phone": "13800138004",
+      "status": "已预约"
+    }
+  ],
+  "cremation_schedules": [
+    {
+      "schedule_id": "CS001",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "furnace_id": "F-01",
+      "date": "2026-05-10",
+      "start_time": "09:30",
+      "end_time": "10:30",
+      "scheduled_by": "李主任",
+      "status": "已排期"
+    },
+    {
+      "schedule_id": "CS002",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "furnace_id": "F-01",
+      "date": "2026-05-10",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "scheduled_by": "王主任",
+      "status": "已排期",
+      "notes": "与CS001冲突"
+    },
+    {
+      "schedule_id": "CS003",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "furnace_id": "F-02",
+      "date": "2026-05-11",
+      "start_time": "15:30",
+      "end_time": "16:30",
+      "scheduled_by": "张主任",
+      "status": "已排期"
+    },
+    {
+      "schedule_id": "CS004",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "furnace_id": "F-01",
+      "date": "2026-05-12",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "scheduled_by": "刘主任",
+      "status": "已排期"
+    }
+  ],
+  "documents": [
+    {
+      "doc_id": "DOC001",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "doc_type": "死亡证明",
+      "doc_name": "居民死亡医学证明(推断)书",
+      "status": "已提交",
+      "submitted_date": "2026-04-10"
+    },
+    {
+      "doc_id": "DOC002",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "doc_type": "身份证复印件",
+      "doc_name": "身份证复印件",
+      "status": "已提交",
+      "submitted_date": "2026-04-10"
+    },
+    {
+      "doc_id": "DOC003",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "doc_type": "火化申请表",
+      "doc_name": "火化申请审批表",
+      "status": "已提交",
+      "submitted_date": "2026-04-11"
+    },
+    {
+      "doc_id": "DOC004",
+      "deceased_id": "D001",
+      "deceased_name": "张三",
+      "doc_type": "委托书",
+      "doc_name": "家属委托书",
+      "status": "已提交",
+      "submitted_date": "2026-04-11"
+    },
+    {
+      "doc_id": "DOC005",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "doc_type": "死亡证明",
+      "doc_name": "居民死亡医学证明(推断)书",
+      "status": "已提交",
+      "submitted_date": "2026-04-15"
+    },
+    {
+      "doc_id": "DOC006",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "doc_type": "身份证复印件",
+      "doc_name": "身份证复印件",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC007",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "doc_type": "火化申请表",
+      "doc_name": "火化申请审批表",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC008",
+      "deceased_id": "D002",
+      "deceased_name": "李四",
+      "doc_type": "委托书",
+      "doc_name": "家属委托书",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC009",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "doc_type": "死亡证明",
+      "doc_name": "居民死亡医学证明(推断)书",
+      "status": "已提交",
+      "submitted_date": "2026-04-20"
+    },
+    {
+      "doc_id": "DOC010",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "doc_type": "身份证复印件",
+      "doc_name": "身份证复印件",
+      "status": "已提交",
+      "submitted_date": "2026-04-20"
+    },
+    {
+      "doc_id": "DOC011",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "doc_type": "火化申请表",
+      "doc_name": "火化申请审批表",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC012",
+      "deceased_id": "D003",
+      "deceased_name": "王五",
+      "doc_type": "委托书",
+      "doc_name": "家属委托书",
+      "status": "已提交",
+      "submitted_date": "2026-04-21"
+    },
+    {
+      "doc_id": "DOC013",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "doc_type": "死亡证明",
+      "doc_name": "居民死亡医学证明(推断)书",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC014",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "doc_type": "身份证复印件",
+      "doc_name": "身份证复印件",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC015",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "doc_type": "火化申请表",
+      "doc_name": "火化申请审批表",
+      "status": "未提交"
+    },
+    {
+      "doc_id": "DOC016",
+      "deceased_id": "D004",
+      "deceased_name": "赵六",
+      "doc_type": "委托书",
+      "doc_name": "家属委托书",
+      "status": "未提交"
+    }
+  ]
+}
