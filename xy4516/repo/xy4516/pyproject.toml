@@ -1,0 +1,20 @@
+[project]
+name = "kitchen-exhaust-inspector"
+version = "0.1.0"
+description = "餐饮连锁后厨油烟巡检归档工具"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+kitchen-inspector = "kitchen_exhaust_inspector.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
