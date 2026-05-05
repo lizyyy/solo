@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>露营地营位入住预检系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏕️ 露营地营位入住预检系统</h1>
+            <p class="subtitle">综合预订、设备、投诉、天气数据，智能判断营位入住状态</p>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="import">数据导入</button>
+            <button class="tab-btn" data-tab="rules">风险规则</button>
+            <button class="tab-btn" data-tab="checklist">预检列表</button>
+            <button class="tab-btn" data-tab="export">数据导出</button>
+        </nav>
+
+        <main>
+            <!-- 数据导入页面 -->
+            <section id="import" class="tab-content active">
+                <div class="import-section">
+                    <h2>📋 营位预订表</h2>
+                    <div class="import-controls">
+                        <textarea id="booking-input" placeholder="粘贴CSV数据：营位号,预订人,入住日期,离店日期,预订人数&#10;例如：&#10;A01,张三,2026-05-01,2026-05-03,2&#10;A02,李四,2026-05-02,2026-05-04,4"></textarea>
+                        <div class="import-actions">
+                            <button class="btn btn-primary" onclick="importBookingData()">导入预订数据</button>
+                            <button class="btn btn-secondary" onclick="clearData('booking')">清空预订数据</button>
+                        </div>
+                    </div>
+                    <div id="booking-preview" class="data-preview"></div>
+                </div>
+
+                <div class="import-section">
+                    <h2>🔌 炉具和移动电源借还表</h2>
+                    <div class="import-controls">
+                        <textarea id="equipment-input" placeholder="粘贴CSV数据：营位号,设备类型,设备编号,借出时间,预计归还,状态&#10;例如：&#10;A01,炉具,F001,2026-05-01 14:00,2026-05-03 12:00,借出中&#10;A01,移动电源,P002,2026-05-01 15:00,2026-05-02 15:00,已归还"></textarea>
+                        <div class="import-actions">
+                            <button class="btn btn-primary" onclick="importEquipmentData()">导入设备数据</button>
+                            <button class="btn btn-secondary" onclick="clearData('equipment')">清空设备数据</button>
+                        </div>
+                    </div>
+                    <div id="equipment-preview" class="data-preview"></div>
+                </div>
+
+                <div class="import-section">
+                    <h2>🔔 夜间噪音投诉记录</h2>
+                    <div class="import-controls">
+                        <textarea id="complaint-input" placeholder="粘贴CSV数据：投诉日期,投诉时间,被投诉营位,投诉人,投诉内容,处理状态&#10;例如：&#10;2026-05-01,23:30,A02,王阿姨,音乐声音过大,已处理&#10;2026-05-02,00:15,A01,张先生,大声喧哗,未处理"></textarea>
+                        <div class="import-actions">
+                            <button class="btn btn-primary" onclick="importComplaintData()">导入投诉数据</button>
+                            <button class="btn btn-secondary" onclick="clearData('complaint')">清空投诉数据</button>
+                        </div>
+                    </div>
+                    <div id="complaint-preview" class="data-preview"></div>
+                </div>
+
+                <div class="import-section">
+                    <h2>🌤️ 天气风力记录</h2>
+                    <div class="import-controls">
+                        <textarea id="weather-input" placeholder="粘贴CSV数据：日期,时间段,天气状况,风力等级,温度,湿度,预警信息&#10;例如：&#10;2026-05-01,白天,晴,3级,25°C,50%,无&#10;2026-05-01,夜间,多云,5级,18°C,65%,大风预警"></textarea>
+                        <div class="import-actions">
+                            <button class="btn btn-primary" onclick="importWeatherData()">导入天气数据</button>
+                            <button class="btn btn-secondary" onclick="clearData('weather')">清空天气数据</button>
+                        </div>
+                    </div>
+                    <div id="weather-preview" class="data-preview"></div>
+                </div>
+            </section>
+
+            <!-- 风险规则页面 -->
+            <section id="rules" class="tab-content">
+                <h2>⚖️ 风险判断规则配置</h2>
+                <div class="rules-container">
+                    <div class="rule-category">
+                        <h3>入住资格规则</h3>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-overbooking" checked>
+                                <span>营位超员预警（预订人数超过营位最大容量）</span>
+                            </label>
+                            <div class="rule-params">
+                                <label>营位最大容量：<input type="number" id="max-capacity" value="4" min="1" max="20"></label>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-unresolved-complaint" checked>
+                                <span>未处理噪音投诉限制入住</span>
+                            </label>
+                            <div class="rule-params">
+                                <label>未处理投诉数量阈值：<input type="number" id="complaint-threshold" value="2" min="1" max="10"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rule-category">
+                        <h3>禁火规则</h3>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-high-wind" checked>
+                                <span>大风天气禁止明火</span>
+                            </label>
+                            <div class="rule-params">
+                                <label>风力等级阈值：<input type="number" id="wind-threshold" value="5" min="1" max="12"></label>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-dry-weather" checked>
+                                <span>干燥天气禁火（低湿度）</span>
+                            </label>
+                            <div class="rule-params">
+                                <label>湿度阈值（%）：<input type="number" id="humidity-threshold" value="30" min="10" max="80"></label>
+                            </div>
+                        </div>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-weather-warning" checked>
+                                <span>天气预警禁火</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="rule-category">
+                        <h3>设备补充规则</h3>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-missing-equipment" checked>
+                                <span>预订但未借出设备提醒补充</span>
+                            </label>
+                        </div>
+                        <div class="rule-item">
+                            <label>
+                                <input type="checkbox" id="rule-overdue-equipment" checked>
+                                <span>设备逾期未归还提醒</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rules-actions">
+                    <button class="btn btn-primary" onclick="saveRules()">保存规则配置</button>
+                    <button class="btn btn-secondary" onclick="loadDefaultRules()">恢复默认规则</button>
+                </div>
+            </section>
+
+            <!-- 预检列表页面 -->
+            <section id="checklist" class="tab-content">
+                <div class="checklist-header">
+                    <h2>📋 营位预检列表</h2>
+                    <div class="filter-controls">
+                        <select id="status-filter" onchange="filterChecklist()">
+                            <option value="all">全部状态</option>
+                            <option value="normal">正常入住</option>
+                            <option value="warning">需要注意</option>
+                            <option value="restricted">限制入住</option>
+                            <option value="fire-ban">禁火</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="runPreCheck()">执行预检</button>
+                    </div>
+                </div>
+
+                <div class="checklist-stats">
+                    <div class="stat-item normal">
+                        <span class="stat-label">正常入住</span>
+                        <span class="stat-value" id="stat-normal">0</span>
+                    </div>
+                    <div class="stat-item warning">
+                        <span class="stat-label">需要注意</span>
+                        <span class="stat-value" id="stat-warning">0</span>
+                    </div>
+                    <div class="stat-item restricted">
+                        <span class="stat-label">限制入住</span>
+                        <span class="stat-value" id="stat-restricted">0</span>
+                    </div>
+                    <div class="stat-item fire-ban">
+                        <span class="stat-label">禁火</span>
+                        <span class="stat-value" id="stat-fire-ban">0</span>
+                    </div>
+                </div>
+
+                <div id="checklist-container" class="checklist-container">
+                    <div class="empty-state">
+                        <p>暂无营位数据，请先导入预订数据</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据导出页面 -->
+            <section id="export" class="tab-content">
+                <h2>📤 数据导出</h2>
+                
+                <div class="export-section">
+                    <h3>Markdown 交接单</h3>
+                    <p class="export-desc">生成包含营位状态、风险提示和待办事项的交接单，用于交接班使用</p>
+                    <div class="export-preview" id="markdown-preview">
+                        <pre>导出内容将显示在这里...</pre>
+                    </div>
+                    <div class="export-actions">
+                        <button class="btn btn-primary" onclick="generateMarkdown()">生成 Markdown</button>
+                        <button class="btn btn-secondary" onclick="copyToClipboard('markdown')">复制到剪贴板</button>
+                        <button class="btn btn-success" onclick="downloadMarkdown()">下载文件</button>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <h3>JSON 明细数据</h3>
+                    <p class="export-desc">导出所有营位的完整预检数据，包含详细的风险分析和人工改判记录</p>
+                    <div class="export-preview" id="json-preview">
+                        <pre>导出内容将显示在这里...</pre>
+                    </div>
+                    <div class="export-actions">
+                        <button class="btn btn-primary" onclick="generateJSON()">生成 JSON</button>
+                        <button class="btn btn-secondary" onclick="copyToClipboard('json')">复制到剪贴板</button>
+                        <button class="btn btn-success" onclick="downloadJSON()">下载文件</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 人工改判弹窗 -->
+        <div id="override-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">人工改判</h3>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>营位号</label>
+                        <input type="text" id="modal-site-id" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>原状态</label>
+                        <input type="text" id="modal-original-status" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>改判为</label>
+                        <select id="modal-new-status">
+                            <option value="normal">正常入住</option>
+                            <option value="warning">需要注意</option>
+                            <option value="restricted">限制入住</option>
+                            <option value="fire-ban">禁火</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>改判原因/备注</label>
+                        <textarea id="modal-note" rows="4" placeholder="请输入改判原因或备注信息..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveOverride()">保存改判</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
