@@ -1,0 +1,6 @@
+id,machine_id,machine_name,type,status,scheduled_date,start_time,end_time,technician,description
+MT001,M01,海德堡印刷机,preventive,scheduled,2026-05-06,09:00,12:00,张师傅,定期保养 - 更换油墨辊
+MT002,M02,裁切机,inspection,scheduled,2026-05-05,14:00,16:00,李师傅,安全检查
+MT003,M03,折页机,corrective,completed,2026-05-04,10:00,15:00,王师傅,故障修复 - 送纸机构
+MT004,M01,海德堡印刷机,calibration,scheduled,2026-05-07,08:00,10:00,张师傅,色彩校准
+MT005,M04,覆膜机,preventive,scheduled,2026-05-08,13:00,15:00,赵师傅,滚轮清洁
