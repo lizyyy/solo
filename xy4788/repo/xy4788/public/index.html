@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服工单系统联调工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group label .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.error {
+            border-color: #e74c3c;
+            background-color: #fef5f5;
+        }
+
+        select.form-control {
+            background-color: white;
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .response-container {
+            margin-top: 20px;
+        }
+
+        .response-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .response-tab {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .response-tab:hover {
+            background: #e9ecef;
+        }
+
+        .response-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .response-content {
+            display: none;
+        }
+
+        .response-content.active {
+            display: block;
+        }
+
+        .response-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .error-alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .error-alert .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .error-alert .content {
+            flex: 1;
+        }
+
+        .error-alert h4 {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .error-alert p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .error-alert .field-errors {
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .error-alert .field-error {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .error-alert .field-error:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-alert .field-name {
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .error-validation {
+            background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%);
+            color: white;
+        }
+
+        .error-auth {
+            background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+            color: white;
+        }
+
+        .error-permission {
+            background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%);
+            color: white;
+        }
+
+        .error-network {
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+            color: white;
+        }
+
+        .error-server {
+            background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+            color: white;
+        }
+
+        .error-success {
+            background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+            color: white;
+        }
+
+        .ticket-list {
+            margin-top: 20px;
+        }
+
+        .ticket-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .ticket-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .ticket-item.closed {
+            border-left-color: #9e9e9e;
+            opacity: 0.7;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .ticket-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .ticket-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .ticket-status.open {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .ticket-status.closed {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        .ticket-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .ticket-priority {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .priority-low {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .priority-medium {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .priority-high {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .priority-urgent {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .close-form {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .close-form.active {
+            display: block;
+        }
+
+        .debug-section {
+            margin-top: 20px;
+        }
+
+        .debug-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-method {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .method-get {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .method-post {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .method-put {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .method-delete {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .history-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .history-summary {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 5px;
+        }
+
+        .history-detail {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .history-detail.active {
+            display: block;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .file-input {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            border-color: #667eea;
+            background: #f5f7fa;
+        }
+
+        .file-label .icon {
+            font-size: 2rem;
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .file-info.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .trace-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trace-info .trace-id {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .trace-info .retryable {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .retryable-yes {
+            background: #4caf50;
+            color: white;
+        }
+
+        .retryable-no {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        .retry-button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>客服工单系统联调工具</h1>
+            <p>模拟API调用，查看原始错误与统一错误格式对照，支持联调记录持久化</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>🔑</span> 登录接口
+                    </h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginUsername">用户名 <span class="required">*</span></label>
+                            <input type="text" id="loginUsername" class="form-control" placeholder="admin 或 user">
+                            <div class="field-error" id="loginUsernameError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">密码 <span class="required">*</span></label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="admin123 或 user123">
+                            <div class="field-error" id="loginPasswordError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                        </div>
+                        <div id="loginError" class="error-container"></div>
+                        <button type="submit" class="btn btn-primary" id="loginBtn">
+                            <span>登录</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📋</span> 工单操作
+                    </h2>
+                    <div class="tabs">
+                        <button class="tab active" data-tab="create">创建工单</button>
+                        <button class="tab" data-tab="list">工单列表</button>
+                    </div>
+
+                    <div class="tab-content active" id="create-tab">
+                        <form id="ticketForm">
+                            <div class="form-group">
+                                <label for="ticketTitle">工单标题 <span class="required">*</span></label>
+                                <input type="text" id="ticketTitle" class="form-control" placeholder="至少5个字符">
+                                <div class="field-error" id="ticketTitleError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketDescription">工单描述 <span class="required">*</span></label>
+                                <textarea id="ticketDescription" class="form-control" placeholder="详细描述问题..."></textarea>
+                                <div class="field-error" id="ticketDescriptionError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketPriority">优先级 <span class="required">*</span></label>
+                                <select id="ticketPriority" class="form-control">
+                                    <option value="">请选择优先级</option>
+                                    <option value="low">低</option>
+                                    <option value="medium">中</option>
+                                    <option value="high">高</option>
+                                    <option value="urgent">紧急</option>
+                                </select>
+                                <div class="field-error" id="ticketPriorityError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="ticketCategory">分类</label>
+                                <select id="ticketCategory" class="form-control">
+                                    <option value="general">一般问题</option>
+                                    <option value="technical">技术支持</option>
+                                    <option value="billing">账单问题</option>
+                                    <option value="feature">功能建议</option>
+                                </select>
+                            </div>
+                            <div id="ticketError" class="error-container"></div>
+                            <button type="submit" class="btn btn-success" id="ticketBtn">
+                                <span>创建工单</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="tab-content" id="list-tab">
+                        <div id="ticketList" class="ticket-list">
+                            <div class="empty-state">
+                                <div class="icon">📭</div>
+                                <p>暂无工单，请先创建工单</p>
+                            </div>
+                        </div>
+                        <div id="closeTicketError" class="error-container" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📁</span> 上传附件
+                    </h2>
+                    <form id="uploadForm">
+                        <div class="form-group">
+                            <div class="file-input">
+                                <label class="file-label">
+                                    <span class="icon">📎</span>
+                                    <span>点击选择文件（支持 JPEG、PNG、GIF、PDF、TXT，最大 5MB）</span>
+                                    <input type="file" id="uploadFile" name="file" accept=".jpg,.jpeg,.png,.gif,.pdf,.txt">
+                                </label>
+                            </div>
+                            <div class="file-info" id="fileInfo">
+                                <span id="fileName">已选择文件</span>
+                            </div>
+                            <div class="field-error" id="uploadFileError" style="display: none; color: #e74c3c; font-size: 0.85rem; margin-top: 5px;"></div>
+                        </div>
+                        <div id="uploadError" class="error-container"></div>
+                        <button type="submit" class="btn btn-warning" id="uploadBtn">
+                            <span>上传文件</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>🧪</span> 错误类型测试
+                    </h2>
+                    <div class="debug-buttons">
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); color: white;" data-test="validation">
+                            字段验证错误
+                        </button>
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #ef5350 0%, #e53935 100%); color: white;" data-test="auth">
+                            认证错误
+                        </button>
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #ec407a 0%, #d81b60 100%); color: white;" data-test="permission">
+                            权限错误
+                        </button>
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%); color: white;" data-test="network">
+                            网络可重试错误
+                        </button>
+                        <button class="btn btn-sm" style="background: linear-gradient(135deg, #78909c 0%, #546e7a 100%); color: white;" data-test="server">
+                            服务器错误
+                        </button>
+                    </div>
+                    <div id="testError" class="error-container" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="section">
+                    <h2 class="section-title">
+                        <span>📊</span> 响应展示
+                    </h2>
+                    <div class="response-container" id="responseContainer">
+                        <div class="empty-state">
+                            <div class="icon">🚀</div>
+                            <p>发起请求后，这里将显示原始响应和统一响应的对照</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section history-section">
+                    <h2 class="section-title">
+                        <span>📜</span> 联调记录
+                        <button class="btn btn-sm btn-secondary" id="clearHistory" style="margin-left: auto;">
+                            清空记录
+                        </button>
+                    </h2>
+                    <div id="historyList">
+                        <div class="no-history">
+                            <p>暂无联调记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        const HISTORY_KEY = 'ticket_debug_history';
+        const MAX_HISTORY = 50;
+
+        let currentTickets = [];
+        let currentHistory = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+            renderHistory();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('ticketForm').addEventListener('submit', handleCreateTicket);
+            document.getElementById('uploadForm').addEventListener('submit', handleUpload);
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', handleTabClick);
+            });
+
+            document.getElementById('uploadFile').addEventListener('change', handleFileSelect);
+
+            document.querySelectorAll('[data-test]').forEach(btn => {
+                btn.addEventListener('click', () => handleTestError(btn.dataset.test));
+            });
+
+            document.getElementById('clearHistory').addEventListener('click', clearHistory);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            clearFieldErrors('login');
+
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            setLoading('loginBtn', true);
+
+            try {
+                const result = await apiRequest('POST', '/login', { username, password });
+                showResponse(result.original, result.unified, 'POST', '/login');
+                addToHistory('POST', '/login', { username, password }, result);
+
+                if (result.unified.code === 0) {
+                    showSuccess('登录成功！');
+                } else {
+                    showErrors('login', result.unified);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+            } finally {
+                setLoading('loginBtn', false);
+            }
+        }
+
+        async function handleCreateTicket(e) {
+            e.preventDefault();
+            clearFieldErrors('ticket');
+
+            const title = document.getElementById('ticketTitle').value;
+            const description = document.getElementById('ticketDescription').value;
+            const priority = document.getElementById('ticketPriority').value;
+            const category = document.getElementById('ticketCategory').value;
+
+            setLoading('ticketBtn', true);
+
+            try {
+                const result = await apiRequest('POST', '/tickets', {
+                    title,
+                    description,
+                    priority,
+                    category
+                });
+                showResponse(result.original, result.unified, 'POST', '/tickets');
+                addToHistory('POST', '/tickets', { title, description, priority, category }, result);
+
+                if (result.unified.code === 0) {
+                    showSuccess('工单创建成功！');
+                    await loadTickets();
+                    resetTicketForm();
+                } else {
+                    showErrors('ticket', result.unified);
+                }
+            } catch (error) {
+                console.error('Create ticket error:', error);
+            } finally {
+                setLoading('ticketBtn', false);
+            }
+        }
+
+        async function loadTickets() {
+            try {
+                const result = await apiRequest('GET', '/tickets');
+                if (result.unified.code === 0) {
+                    currentTickets = result.unified.data || [];
+                    renderTickets();
+                }
+            } catch (error) {
+                console.error('Load tickets error:', error);
+            }
+        }
+
+        function renderTickets() {
+            const container = document.getElementById('ticketList');
+
+            if (currentTickets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>暂无工单，请先创建工单</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentTickets.map(ticket => `
+                <div class="ticket-item ${ticket.status}">
+                    <div class="ticket-header">
+                        <span class="ticket-title">#${ticket.id} ${ticket.title}</span>
+                        <span class="ticket-status ${ticket.status}">${ticket.status === 'open' ? '进行中' : '已关闭'}</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span class="ticket-priority priority-${ticket.priority}">${getPriorityLabel(ticket.priority)}</span>
+                        <span>📂 ${ticket.category}</span>
+                        <span>🕐 ${formatDate(ticket.createdAt)}</span>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">${ticket.description}</p>
+                    ${ticket.status === 'open' ? `
+                        <div class="ticket-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="toggleCloseForm(${ticket.id})">
+                                关闭工单
+                            </button>
+                        </div>
+                        <div class="close-form" id="closeForm-${ticket.id}">
+                            <div class="form-group">
+                                <label for="closeReason-${ticket.id}">关闭原因 <span class="required">*</span></label>
+                                <input type="text" id="closeReason-${ticket.id}" class="form-control" placeholder="请输入关闭原因">
+                            </div>
+                            <button class="btn btn-sm btn-warning" onclick="handleCloseTicket(${ticket.id})">
+                                确认关闭
+                            </button>
+                        </div>
+                    ` : `
+                        <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+                            <strong>关闭原因：</strong>${ticket.closeReason || '无'}
+                            <br>
+                            <small style="color: #666;">关闭时间：${formatDate(ticket.closedAt)}</small>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = {
+                low: '低',
+                medium: '中',
+                high: '高',
+                urgent: '紧急'
+            };
+            return labels[priority] || priority;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function toggleCloseForm(ticketId) {
+            const form = document.getElementById(`closeForm-${ticketId}`);
+            form.classList.toggle('active');
+        }
+
+        async function handleCloseTicket(ticketId) {
+            const reasonInput = document.getElementById(`closeReason-${ticketId}`);
+            const reason = reasonInput.value;
+
+            if (!reason.trim()) {
+                reasonInput.classList.add('error');
+                return;
+            }
+
+            try {
+                const result = await apiRequest('POST', `/tickets/${ticketId}/close`, { reason });
+                showResponse(result.original, result.unified, 'POST', `/tickets/${ticketId}/close`);
+                addToHistory('POST', `/tickets/${ticketId}/close`, { reason }, result);
+
+                if (result.unified.code === 0) {
+                    showSuccess('工单关闭成功！');
+                    await loadTickets();
+                } else {
+                    showErrors('closeTicket', result.unified);
+                }
+            } catch (error) {
+                console.error('Close ticket error:', error);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+
+            if (file) {
+                fileName.textContent = `已选择：${file.name} (${formatFileSize(file.size)})`;
+                fileInfo.classList.add('active');
+            } else {
+                fileInfo.classList.remove('active');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        async function handleUpload(e) {
+            e.preventDefault();
+            clearFieldErrors('upload');
+
+            const fileInput = document.getElementById('uploadFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                document.getElementById('uploadFileError').textContent = '请选择要上传的文件';
+                document.getElementById('uploadFileError').style.display = 'block';
+                return;
+            }
+
+            setLoading('uploadBtn', true);
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const result = await apiRequest('POST', '/upload', formData, true);
+                showResponse(result.original, result.unified, 'POST', '/upload');
+                addToHistory('POST', '/upload', { filename: file.name, size: file.size }, result);
+
+                if (result.unified.code === 0) {
+                    showSuccess('文件上传成功！');
+                    resetUploadForm();
+                } else {
+                    showErrors('upload', result.unified);
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+            } finally {
+                setLoading('uploadBtn', false);
+            }
+        }
+
+        async function handleTestError(type) {
+            let endpoint;
+            let requestData = {};
+
+            switch (type) {
+                case 'validation':
+                    endpoint = '/tickets';
+                    requestData = { title: '短', description: '' };
+                    break;
+                case 'auth':
+                    endpoint = '/login';
+                    requestData = { username: 'wrong', password: 'wrong' };
+                    break;
+                case 'permission':
+                    endpoint = '/test/permission-error';
+                    break;
+                case 'network':
+                    endpoint = '/test/network-error';
+                    break;
+                case 'server':
+                    endpoint = '/test/server-error';
+                    break;
+                default:
+                    return;
+            }
+
+            try {
+                const result = await apiRequest('POST', endpoint, requestData);
+                showResponse(result.original, result.unified, 'POST', endpoint);
+                addToHistory('POST', endpoint, requestData, result);
+                showErrors('test', result.unified);
+            } catch (error) {
+                console.error('Test error:', error);
+            }
+        }
+
+        async function apiRequest(method, endpoint, data, isFormData = false) {
+            const url = `${API_BASE}${endpoint}`;
+            const options = {
+                method,
+                headers: {}
+            };
+
+            if (!isFormData && data) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(data);
+            } else if (isFormData) {
+                options.body = data;
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                return {
+                    original: result.original,
+                    unified: result.unified,
+                    status: response.status
+                };
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        function showResponse(original, unified, method, endpoint) {
+            const container = document.getElementById('responseContainer');
+            const isSuccess = unified.code === 0;
+
+            container.innerHTML = `
+                <div style="margin-bottom: 15px; padding: 10px; background: ${isSuccess ? '#e8f5e9' : '#ffebee'}; border-radius: 8px;">
+                    <strong>${method}</strong> ${endpoint}
+                    <span style="float: right; color: ${isSuccess ? '#388e3c' : '#d32f2f'}; font-weight: 600;">
+                        ${isSuccess ? '✅ 成功' : '❌ 失败'}
+                    </span>
+                </div>
+
+                <div class="response-tabs">
+                    <button class="response-tab active" data-response-tab="original">原始响应</button>
+                    <button class="response-tab" data-response-tab="unified">统一响应</button>
+                    <button class="response-tab" data-response-tab="comparison">对比视图</button>
+                </div>
+
+                <div class="response-content active" id="original-response">
+                    <div class="response-box">
+                        <pre>${JSON.stringify(original, null, 2)}</pre>
+                    </div>
+                </div>
+
+                <div class="response-content" id="unified-response">
+                    <div class="response-box">
+                        <pre>${JSON.stringify(unified, null, 2)}</pre>
+                    </div>
+                    ${unified.traceId ? `
+                        <div class="trace-info">
+                            <div>
+                                <strong>Trace ID:</strong>
+                                <span class="trace-id">${unified.traceId}</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <span class="retryable ${unified.retryable ? 'retryable-yes' : 'retryable-no'}">
+                                    ${unified.retryable ? '可重试' : '不可重试'}
+                                </span>
+                                ${unified.retryable ? `
+                                    <button class="btn btn-sm btn-success retry-button" onclick="retryLastRequest()">
+                                        重试请求
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="response-content" id="comparison-response">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <h4 style="margin-bottom: 10px; color: #666;">原始响应</h4>
+                            <div class="response-box" style="max-height: 500px;">
+                                <pre>${JSON.stringify(original, null, 2)}</pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 10px; color: #666;">统一响应</h4>
+                            <div class="response-box" style="max-height: 500px;">
+                                <pre>${JSON.stringify(unified, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelectorAll('.response-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabId = e.target.dataset.responseTab;
+                    document.querySelectorAll('.response-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.response-content').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    document.getElementById(`${tabId}-response`).classList.add('active');
+                });
+            });
+        }
+
+        function showSuccess(message) {
+            const container = document.createElement('div');
+            container.className = 'error-alert error-success';
+            container.innerHTML = `
+                <span class="icon">✅</span>
+                <div class="content">
+                    <h4>操作成功</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+
+            setTimeout(() => {
+                container.remove();
+            }, 3000);
+        }
+
+        function showErrors(context, unifiedError) {
+            let errorContainer;
+            let errorClass = 'error-server';
+            let icon = '⚠️';
+            let title = '错误';
+            let description = unifiedError.message || '未知错误';
+
+            if (unifiedError.code >= 40000 && unifiedError.code < 40100) {
+                errorClass = 'error-validation';
+                icon = '⚠️';
+                title = '字段验证错误';
+            } else if (unifiedError.code >= 40100 && unifiedError.code < 40200) {
+                errorClass = 'error-auth';
+                icon = '🔒';
+                title = '认证失败';
+            } else if (unifiedError.code >= 40300 && unifiedError.code < 40400) {
+                errorClass = 'error-permission';
+                icon = '🚫';
+                title = '权限不足';
+            } else if (unifiedError.code === 50001) {
+                errorClass = 'error-network';
+                icon = '🌐';
+                title = '网络错误';
+            } else if (unifiedError.code >= 50000) {
+                errorClass = 'error-server';
+                icon = '💥';
+                title = '服务器错误';
+            }
+
+            switch (context) {
+                case 'login':
+                    errorContainer = document.getElementById('loginError');
+                    break;
+                case 'ticket':
+                    errorContainer = document.getElementById('ticketError');
+                    break;
+                case 'upload':
+                    errorContainer = document.getElementById('uploadError');
+                    break;
+                case 'closeTicket':
+                    errorContainer = document.getElementById('closeTicketError');
+                    break;
+                case 'test':
+                    errorContainer = document.getElementById('testError');
+                    break;
+                default:
+                    return;
+            }
+
+            let fieldErrorsHtml = '';
+            if (unifiedError.fieldErrors && unifiedError.fieldErrors.length > 0) {
+                fieldErrorsHtml = `
+                    <div class="field-errors">
+                        ${unifiedError.fieldErrors.map(err => `
+                            <div class="field-error">
+                                <span class="field-name">${err.field}</span>
+                                <span>${err.message}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                unifiedError.fieldErrors.forEach(err => {
+                    const fieldId = `${context}${capitalizeFirst(err.field)}Error`;
+                    const fieldElement = document.getElementById(fieldId);
+                    if (fieldElement) {
+                        fieldElement.textContent = err.message;
+                        fieldElement.style.display = 'block';
+
+                        const inputId = `${context}${capitalizeFirst(err.field)}`;
+                        const inputElement = document.getElementById(inputId);
+                        if (inputElement) {
+                            inputElement.classList.add('error');
+                        }
+                    }
+                });
+            }
+
+            errorContainer.innerHTML = `
+                <div class="error-alert ${errorClass}">
+                    <span class="icon">${icon}</span>
+                    <div class="content">
+                        <h4>${title}</h4>
+                        <p>${description}</p>
+                        ${fieldErrorsHtml}
+                        ${unifiedError.retryable ? `
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="retryLastRequest()">
+                                    🔄 重试请求
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function capitalizeFirst(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function clearFieldErrors(context) {
+            const errorContainers = {
+                login: ['loginError', 'loginUsernameError', 'loginPasswordError'],
+                ticket: ['ticketError', 'ticketTitleError', 'ticketDescriptionError', 'ticketPriorityError'],
+                upload: ['uploadError', 'uploadFileError'],
+                closeTicket: ['closeTicketError'],
+                test: ['testError']
+            };
+
+            const fields = {
+                login: ['loginUsername', 'loginPassword'],
+                ticket: ['ticketTitle', 'ticketDescription', 'ticketPriority']
+            };
+
+            const containers = errorContainers[context] || [];
+            containers.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = '';
+                    el.style.display = 'none';
+                }
+            });
+
+            const fieldInputs = fields[context] || [];
+            fieldInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('error');
+                }
+            });
+        }
+
+        function handleTabClick(e) {
+            const tabId = e.target.dataset.tab;
+
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            e.target.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+
+            if (tabId === 'list') {
+                loadTickets();
+            }
+        }
+
+        function setLoading(btnId, isLoading) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+
+            if (isLoading) {
+                const originalText = btn.innerHTML;
+                btn.dataset.originalText = originalText;
+                btn.innerHTML = '<span class="loading"></span>';
+                btn.disabled = true;
+            } else {
+                btn.innerHTML = btn.dataset.originalText || btn.innerHTML;
+                btn.disabled = false;
+            }
+        }
+
+        function resetTicketForm() {
+            document.getElementById('ticketTitle').value = '';
+            document.getElementById('ticketDescription').value = '';
+            document.getElementById('ticketPriority').value = '';
+            document.getElementById('ticketCategory').value = 'general';
+        }
+
+        function resetUploadForm() {
+            document.getElementById('uploadFile').value = '';
+            document.getElementById('fileInfo').classList.remove('active');
+        }
+
+        function loadHistory() {
+            try {
+                const stored = localStorage.getItem(HISTORY_KEY);
+                currentHistory = stored ? JSON.parse(stored) : [];
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                currentHistory = [];
+            }
+        }
+
+        function addToHistory(method, endpoint, requestData, result) {
+            const historyItem = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                method,
+                endpoint,
+                request: requestData,
+                response: {
+                    original: result.original,
+                    unified: result.unified
+                },
+                status: result.status,
+                isSuccess: result.unified.code === 0
+            };
+
+            currentHistory.unshift(historyItem);
+
+            if (currentHistory.length > MAX_HISTORY) {
+                currentHistory = currentHistory.slice(0, MAX_HISTORY);
+            }
+
+            saveHistory();
+            renderHistory();
+        }
+
+        function saveHistory() {
+            try {
+                localStorage.setItem(HISTORY_KEY, JSON.stringify(currentHistory));
+            } catch (error) {
+                console.error('Failed to save history:', error);
+            }
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+
+            if (currentHistory.length === 0) {
+                container.innerHTML = `
+                    <div class="no-history">
+                        <p>暂无联调记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentHistory.map(item => `
+                <div class="history-item" onclick="toggleHistoryDetail(${item.id})">
+                    <div class="history-header">
+                        <span class="history-method method-${item.method.toLowerCase()}">${item.method}</span>
+                        <span class="history-time">${formatDate(item.timestamp)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600; color: #333;">${item.endpoint}</span>
+                        <span class="history-status ${item.isSuccess ? 'status-success' : 'status-error'}">
+                            ${item.isSuccess ? '成功' : '失败'}
+                        </span>
+                    </div>
+                    <div class="history-summary">
+                        ${item.isSuccess ? '✅ 操作成功' : `❌ ${item.response.unified.message || '操作失败'}`}
+                    </div>
+                    <div class="history-detail" id="historyDetail-${item.id}">
+                        <div style="margin-bottom: 15px;">
+                            <h4 style="margin-bottom: 10px; color: #666;">请求数据</h4>
+                            <div class="response-box" style="max-height: 200px;">
+                                <pre>${JSON.stringify(item.request, null, 2)}</pre>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div>
+                                <h4 style="margin-bottom: 10px; color: #666;">原始响应</h4>
+                                <div class="response-box" style="max-height: 250px;">
+                                    <pre>${JSON.stringify(item.response.original, null, 2)}</pre>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="margin-bottom: 10px; color: #666;">统一响应</h4>
+                                <div class="response-box" style="max-height: 250px;">
+                                    <pre>${JSON.stringify(item.response.unified, null, 2)}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); replayHistory(${item.id})">
+                                🔄 重新执行
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); deleteHistoryItem(${item.id})">
+                                🗑️ 删除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleHistoryDetail(id) {
+            const detail = document.getElementById(`historyDetail-${id}`);
+            detail.classList.toggle('active');
+        }
+
+        function replayHistory(id) {
+            const item = currentHistory.find(h => h.id === id);
+            if (!item) return;
+
+            showResponse(item.response.original, item.response.unified, item.method, item.endpoint);
+        }
+
+        function deleteHistoryItem(id) {
+            currentHistory = currentHistory.filter(h => h.id !== id);
+            saveHistory();
+            renderHistory();
+        }
+
+        function clearHistory() {
+            if (confirm('确定要清空所有联调记录吗？')) {
+                currentHistory = [];
+                saveHistory();
+                renderHistory();
+            }
+        }
+
+        function retryLastRequest() {
+            console.log('Retry last request - feature to be implemented');
+        }
+    </script>
+</body>
+</html>
