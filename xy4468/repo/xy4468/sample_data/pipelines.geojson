@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "pipeline_id": "PIPE-GAS-001",
+        "pipeline_type": "gas",
+        "material": "steel",
+        "diameter": 300,
+        "depth": 1.5,
+        "buffer_distance": 2.0,
+        "road_name": "中山路",
+        "road_section": "东段（人民路-解放路）"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [116.4074, 39.9042],
+          [116.4084, 39.9052],
+          [116.4094, 39.9062]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "pipeline_id": "PIPE-WATER-001",
+        "pipeline_type": "water",
+        "material": "PVC",
+        "diameter": 200,
+        "depth": 1.2,
+        "buffer_distance": 1.0,
+        "road_name": "中山路",
+        "road_section": "东段（人民路-解放路）"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [116.4074, 39.9042],
+          [116.4084, 39.9052],
+          [116.4094, 39.9062]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "pipeline_id": "PIPE-GAS-002",
+        "pipeline_type": "gas",
+        "material": "steel",
+        "diameter": 250,
+        "depth": 1.8,
+        "buffer_distance": 2.0,
+        "road_name": "人民路",
+        "road_section": "中段（中山路-北京路）"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [116.4064, 39.9032],
+          [116.4074, 39.9042],
+          [116.4084, 39.9052]
+        ]
+      }
+    }
+  ]
+}
