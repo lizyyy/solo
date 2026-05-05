@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>污水厂数据分析看板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group > div {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        select, input[type="date"], input[type="file"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        
+        select:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 65, 108, 0.4);
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .risk-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .risk-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .risk-item {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .risk-item.over_aeration {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+        
+        .risk-item.hypoxia {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        .risk-item.pump_anomaly {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+        }
+        
+        .risk-item.lab_mismatch {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .risk-count {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .risk-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .risk-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .risk-card {
+            background: #f8f9fa;
+            border-left: 4px solid;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        
+        .risk-card.over_aeration {
+            border-left-color: #f5576c;
+        }
+        
+        .risk-card.hypoxia {
+            border-left-color: #4facfe;
+        }
+        
+        .risk-card.pump_anomaly {
+            border-left-color: #f093fb;
+        }
+        
+        .risk-card.lab_mismatch {
+            border-left-color: #667eea;
+        }
+        
+        .risk-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .risk-type {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .risk-type.over_aeration {
+            background: #ffe0e0;
+            color: #d63031;
+        }
+        
+        .risk-type.hypoxia {
+            background: #e0f7ff;
+            color: #0984e3;
+        }
+        
+        .risk-type.pump_anomaly {
+            background: #fff0ff;
+            color: #8e44ad;
+        }
+        
+        .risk-type.lab_mismatch {
+            background: #f0f4ff;
+            color: #6c5ce7;
+        }
+        
+        .risk-time {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .risk-reason {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .remark-section {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .remark-text {
+            font-size: 13px;
+            color: #27ae60;
+            margin-bottom: 5px;
+        }
+        
+        .remark-operator {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 60px;
+        }
+        
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .import-section {
+            margin-bottom: 20px;
+        }
+        
+        .import-section h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .file-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .file-name {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>污水厂数据分析看板</h1>
+            <p>分析SCADA数据、鼓风机电表、回流泵运行记录和化验数据，自动识别曝气过量、缺氧、回流异常和化验结果偏差</p>
+        </header>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div>
+                    <label>选择日期</label>
+                    <select id="dateSelect">
+                        <option value="">请选择历史数据</option>
+                    </select>
+                </div>
+                <div>
+                    <label>或新建数据日期</label>
+                    <input type="date" id="newDate">
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <button class="btn-info" id="importSampleBtn">导入示例数据</button>
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <button class="btn-primary" id="importBtn">导入数据</button>
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <button class="btn-success" id="exportMdBtn">导出交班单</button>
+                </div>
+                <div>
+                    <label>&nbsp;</label>
+                    <button class="btn-info" id="exportJsonBtn">导出JSON明细</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="risk-summary" id="riskSummary" style="display: none;">
+            <div class="risk-item over_aeration">
+                <div class="risk-count" id="overAerationCount">0</div>
+                <div class="risk-label">曝气过量</div>
+            </div>
+            <div class="risk-item hypoxia">
+                <div class="risk-count" id="hypoxiaCount">0</div>
+                <div class="risk-label">缺氧风险</div>
+            </div>
+            <div class="risk-item pump_anomaly">
+                <div class="risk-count" id="pumpAnomalyCount">0</div>
+                <div class="risk-label">回流异常</div>
+            </div>
+            <div class="risk-item lab_mismatch">
+                <div class="risk-count" id="labMismatchCount">0</div>
+                <div class="risk-label">化验偏差</div>
+            </div>
+        </div>
+        
+        <div class="content" id="content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">溶解氧曲线</span>
+                    <select id="tankSelect">
+                        <option value="all">全部池组</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="doChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">氨氮曲线</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="nh3Chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">鼓风机功率</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="blowerChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">回流泵流量</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pumpChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <span class="card-title">风险事件列表</span>
+                    <div class="control-group">
+                        <select id="riskFilter">
+                            <option value="all">全部类型</option>
+                            <option value="over_aeration">曝气过量</option>
+                            <option value="hypoxia">缺氧风险</option>
+                            <option value="pump_anomaly">回流异常</option>
+                            <option value="lab_mismatch">化验偏差</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="risk-list" id="riskList">
+                </div>
+            </div>
+        </div>
+        
+        <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <h3>暂无数据</h3>
+            <p>请导入示例数据或上传您的SCADA CSV文件开始分析</p>
+        </div>
+    </div>
+    
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">导入数据</span>
+                <button class="modal-close" onclick="closeModal('importModal')">&times;</button>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <button class="tab active" data-tab="csv">CSV文件</button>
+                    <button class="tab" data-tab="json">JSON文件</button>
+                </div>
+                
+                <div class="tab-content active" id="csvTab">
+                    <div class="import-section">
+                        <h3>1. SCADA数据（溶解氧/氨氮）</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="scadaFile" accept=".csv">
+                            <span class="file-name" id="scadaFileName">未选择文件</span>
+                        </div>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h3>2. 鼓风机电表数据</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="blowerFile" accept=".csv">
+                            <span class="file-name" id="blowerFileName">未选择文件</span>
+                        </div>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h3>3. 回流泵运行记录</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="pumpFile" accept=".csv">
+                            <span class="file-name" id="pumpFileName">未选择文件</span>
+                        </div>
+                    </div>
+                    
+                    <div class="import-section">
+                        <h3>4. 化验复测备注</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="labFile" accept=".csv">
+                            <span class="file-name" id="labFileName">未选择文件</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="jsonTab">
+                    <div class="import-section">
+                        <h3>导入JSON数据文件</h3>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="jsonFile" accept=".json">
+                            <span class="file-name" id="jsonFileName">未选择文件</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-danger" onclick="closeModal('importModal')">取消</button>
+                <button class="btn-primary" id="confirmImportBtn">确认导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="remarkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">人工改判</span>
+                <button class="modal-close" onclick="closeModal('remarkModal')">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label>风险类型</label>
+                <input type="text" id="remarkType" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>时间</label>
+                <input type="text" id="remarkTime" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label>系统判断原因</label>
+                <textarea id="remarkOriginalReason" readonly></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>人工改判原因 *</label>
+                <textarea id="remarkNewReason" placeholder="请输入人工改判原因..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>操作人员 *</label>
+                <input type="text" id="remarkOperator" placeholder="请输入操作人员姓名">
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-danger" onclick="closeModal('remarkModal')">取消</button>
+                <button class="btn-primary" id="saveRemarkBtn">保存改判</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
