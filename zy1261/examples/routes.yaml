@@ -1,0 +1,48 @@
+routes:
+  - key: "GET:/api/v1/users"
+    path: "/api/v1/users"
+    method: "GET"
+    service_name: "user-service"
+    endpoint_name: "list_users"
+  
+  - key: "POST:/api/v1/users"
+    path: "/api/v1/users"
+    method: "POST"
+    service_name: "user-service"
+    endpoint_name: "create_user"
+  
+  - key: "GET:/api/v1/users/{id}"
+    path: "/api/v1/users/{id}"
+    method: "GET"
+    service_name: "user-service"
+    endpoint_name: "get_user"
+  
+  - key: "GET:/api/v1/orders"
+    path: "/api/v1/orders"
+    method: "GET"
+    service_name: "order-service"
+    endpoint_name: "list_orders"
+  
+  - key: "POST:/api/v1/orders"
+    path: "/api/v1/orders"
+    method: "POST"
+    service_name: "order-service"
+    endpoint_name: "create_order"
+  
+  - key: "GET:/api/v1/products"
+    path: "/api/v1/products"
+    method: "GET"
+    service_name: "product-service"
+    endpoint_name: "list_products"
+  
+  - key: "GET:/api/v1/payments"
+    path: "/api/v1/payments"
+    method: "GET"
+    service_name: "payment-service"
+    endpoint_name: "list_payments"
+  
+  - key: "POST:/api/v1/payments"
+    path: "/api/v1/payments"
+    method: "POST"
+    service_name: "payment-service"
+    endpoint_name: "create_payment"
