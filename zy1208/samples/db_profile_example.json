@@ -1,0 +1,160 @@
+{
+  "database": {
+    "type": "postgresql",
+    "version": "14.5",
+    "host": "db.example.com",
+    "port": 5432
+  },
+  "connectionPool": {
+    "currentMaxConnections": 50,
+    "suggestedMaxConnections": 150,
+    "maxConnectionsExplanation": "当前活跃连接数约 45，接近最大连接数限制 50，建议增加到 150",
+    "currentMinIdle": 5,
+    "suggestedMinIdle": 20,
+    "minIdleExplanation": "当前空闲连接数波动较大，建议增加最小空闲连接数",
+    "currentIdleTimeout": 30000,
+    "suggestedIdleTimeout": 60000,
+    "idleTimeoutExplanation": "空闲超时时间较短，适当延长可减少连接重建开销",
+    "activeConnections": 45,
+    "idleConnections": 3,
+    "waitTime": 250,
+    "timeouts": 12,
+    "leaks": 0,
+    "connectionIssues": [
+      "连接池利用率达到 90%，接近饱和状态",
+      "存在 12 次连接获取超时",
+      "平均等待时间 250ms，超过建议阈值 100ms"
+    ]
+  },
+  "slowQueryStats": {
+    "totalQueries": 15234,
+    "slowQueries": 856,
+    "slowQueryRate": 5.62,
+    "avgQueryTime": 125.5,
+    "maxQueryTime": 45000,
+    "topSlowQueries": [
+      {
+        "sql": "SELECT * FROM orders WHERE status = 'pending'",
+        "executionCount": 1234,
+        "avgTime": 8500,
+        "maxTime": 15000,
+        "totalRowsExamined": 1567890
+      },
+      {
+        "sql": "SELECT * FROM users WHERE username LIKE '%admin%'",
+        "executionCount": 567,
+        "avgTime": 3800,
+        "maxTime": 6200,
+        "totalRowsExamined": 892345
+      },
+      {
+        "sql": "SELECT * FROM logs WHERE created_at > '2024-01-01'",
+        "executionCount": 234,
+        "avgTime": 9200,
+        "maxTime": 18500,
+        "totalRowsExamined": 2345678
+      }
+    ]
+  },
+  "indexStats": {
+    "totalIndexes": 45,
+    "unusedIndexes": 8,
+    "duplicateIndexes": 3,
+    "tablesWithTooManyIndexes": [
+      {
+        "tableName": "orders",
+        "indexCount": 9,
+        "recommendation": "建议评估并删除未使用的索引"
+      }
+    ],
+    "missingIndexes": [
+      {
+        "tableName": "order_items",
+        "column": "order_id",
+        "reason": "外键列缺少索引"
+      },
+      {
+        "tableName": "products",
+        "column": "category_id",
+        "reason": "查询频繁但无索引"
+      },
+      {
+        "tableName": "users",
+        "column": "email",
+        "reason": "唯一查询列无索引"
+      }
+    ]
+  },
+  "writeStats": {
+    "totalWrites": 89234,
+    "inserts": 45678,
+    "updates": 32123,
+    "deletes": 11433,
+    "batchWrites": 8923,
+    "singleWrites": 80311,
+    "batchRatio": 10.0,
+    "recommendation": "批量写入占比过低(10%)，建议将单条写入合并为批量操作",
+    "hotSpotTables": [
+      {
+        "tableName": "user_points",
+        "writeCount": 45678,
+        "hotKey": "user_id=99999",
+        "writeRatio": 35.2,
+        "recommendation": "热点数据更新过于集中，考虑使用缓存或分片打散"
+      }
+    ]
+  },
+  "transactionStats": {
+    "totalTransactions": 23456,
+    "avgDuration": 125,
+    "maxDuration": 45000,
+    "longTransactions": 156,
+    "longTransactionRate": 0.67,
+    "issues": [
+      "存在 156 个长事务(>1秒)",
+      "最长事务持续 45 秒",
+      "检测到 SELECT ... FOR UPDATE 锁竞争"
+    ]
+  },
+  "readWriteRatio": {
+    "reads": 123456,
+    "writes": 23456,
+    "ratio": 5.26,
+    "recommendation": "读写比例 5.26:1，建议启用读写分离",
+    "issues": [
+      "读操作远多于写操作，但未利用读写分离",
+      "存在 SELECT ... FOR UPDATE 等读写混合查询"
+    ]
+  },
+  "shardingStats": {
+    "shardingEnabled": false,
+    "largeTables": [
+      {
+        "tableName": "logs",
+        "rowCount": 15678900,
+        "sizeGB": 12.5,
+        "recommendation": "表数据量较大，建议考虑分库分表"
+      },
+      {
+        "tableName": "orders",
+        "rowCount": 8923456,
+        "sizeGB": 8.2,
+        "recommendation": "表数据量增长较快，建议规划分片策略"
+      }
+    ],
+    "potentialHotSpots": [
+      {
+        "tableName": "user_points",
+        "issue": "单用户积分频繁更新，可能导致分片热点",
+        "suggestion": "考虑使用用户ID哈希分片，或引入缓存层"
+      }
+    ],
+    "crossShardRisks": [
+      {
+        "tables": ["orders", "order_items"],
+        "issue": "订单和订单项关联查询，分片后可能跨分片",
+        "suggestion": "考虑使用订单ID作为分片键，或数据冗余设计"
+      }
+    ]
+  }
+}

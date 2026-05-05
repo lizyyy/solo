@@ -1,0 +1,96 @@
+{
+  "table_name": "user_points",
+  "operation_type": "hot_spot_update",
+  "batch_size": 1,
+  "frequency": 5000,
+  "rows_count": 10,
+  "records": [
+    {
+      "user_id": 99999,
+      "points_change": 10,
+      "operation": "add",
+      "description": "签到奖励",
+      "created_at": "2024-01-15T10:00:01Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 50,
+      "operation": "add",
+      "description": "购物奖励",
+      "created_at": "2024-01-15T10:00:02Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 100,
+      "operation": "add",
+      "description": "邀请奖励",
+      "created_at": "2024-01-15T10:00:03Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 20,
+      "operation": "subtract",
+      "description": "积分消费",
+      "created_at": "2024-01-15T10:00:04Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 30,
+      "operation": "add",
+      "description": "活动奖励",
+      "created_at": "2024-01-15T10:00:05Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 15,
+      "operation": "add",
+      "description": "评论奖励",
+      "created_at": "2024-01-15T10:00:06Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 10,
+      "operation": "add",
+      "description": "分享奖励",
+      "created_at": "2024-01-15T10:00:07Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 5,
+      "operation": "add",
+      "description": "浏览奖励",
+      "created_at": "2024-01-15T10:00:08Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 25,
+      "operation": "add",
+      "description": "任务奖励",
+      "created_at": "2024-01-15T10:00:09Z"
+    },
+    {
+      "user_id": 99999,
+      "points_change": 10,
+      "operation": "add",
+      "description": "签到奖励",
+      "created_at": "2024-01-15T10:00:10Z"
+    }
+  ],
+  "analysis": {
+    "hot_spot_key": "user_id=99999",
+    "hot_spot_ratio": 100,
+    "risk_level": "critical",
+    "issues": [
+      "热点数据user_id=99999占据100%的写入操作",
+      "频繁更新同一行可能导致锁竞争",
+      "分库分表后可能形成分片热点",
+      "建议使用缓存层或异步队列"
+    ],
+    "suggestions": [
+      "使用Redis缓存积分余额，定期同步数据库",
+      "将积分变更操作放入消息队列异步处理",
+      "考虑使用一致性哈希分散热点数据",
+      "引入积分变更记录表，批量更新主表"
+    ]
+  }
+}
