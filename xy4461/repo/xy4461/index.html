@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆夜班巡查训练系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-panel {
+            width: 300px;
+            background-color: #16213e;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #0f3460;
+        }
+
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #e94560;
+            font-size: 1.5rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            background-color: #0f3460;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-label {
+            font-size: 0.8rem;
+            color: #a0a0a0;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .score {
+            color: #4ade80;
+        }
+
+        .time {
+            color: #60a5fa;
+        }
+
+        .events {
+            color: #f59e0b;
+        }
+
+        .game-map {
+            flex: 1;
+            background-color: #0f3460;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .exhibit-room {
+            position: absolute;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            background-color: rgba(30, 41, 59, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+
+        .exhibit-room.high-risk {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .exhibit-room.medium-risk {
+            border-color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .exhibit-room.active {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        }
+
+        .patroller {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #4ade80;
+            border-radius: 50%;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            z-index: 100;
+            border: 3px solid #22c55e;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease;
+        }
+
+        .patroller:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .patroller.moving {
+            background-color: #60a5fa;
+            border-color: #3b82f6;
+        }
+
+        .event-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            z-index: 90;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .event-temperature {
+            background-color: #ef4444;
+            border: 2px solid #dc2626;
+        }
+
+        .event-humidity {
+            background-color: #3b82f6;
+            border: 2px solid #2563eb;
+        }
+
+        .event-door {
+            background-color: #f59e0b;
+            border: 2px solid #d97706;
+        }
+
+        .event-item {
+            background-color: #8b5cf6;
+            border: 2px solid #7c3aed;
+        }
+
+        .event-left {
+            background-color: #06b6d4;
+            border: 2px solid #0891b2;
+        }
+
+        .control-panel {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: #e94560;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #d63752;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #0f3460;
+            color: white;
+            border: 1px solid #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a4a8a;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .event-log {
+            flex: 1;
+            margin-top: 20px;
+            background-color: #0f3460;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .event-log h3 {
+            margin-bottom: 10px;
+            color: #e94560;
+            font-size: 1rem;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: #16213e;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border-left: 4px solid #4a5568;
+        }
+
+        .log-entry.info {
+            border-left-color: #3b82f6;
+        }
+
+        .log-entry.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .log-entry.danger {
+            border-left-color: #ef4444;
+        }
+
+        .log-entry.success {
+            border-left-color: #22c55e;
+        }
+
+        .log-time {
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid #0f3460;
+        }
+
+        .modal-content h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .event-detail {
+            background-color: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .event-detail h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .event-detail p {
+            margin-bottom: 8px;
+            color: #d1d5db;
+        }
+
+        .event-detail .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .priority-high {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .priority-medium {
+            background-color: #f59e0b;
+            color: white;
+        }
+
+        .priority-low {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .game-over-stats {
+            margin-top: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #0f3460;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #d1d5db;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .stat-value.positive {
+            color: #22c55e;
+        }
+
+        .stat-value.negative {
+            color: #ef4444;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background-color: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background-color: #1a4a8a;
+            transform: translateX(5px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .history-date {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .history-score {
+            font-weight: bold;
+            color: #22c55e;
+        }
+
+        .history-details {
+            color: #d1d5db;
+            font-size: 0.85rem;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-screen h1 {
+            color: #e94560;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .welcome-screen p {
+            color: #d1d5db;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .game-instructions {
+            background-color: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .game-instructions h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+        }
+
+        .game-instructions ul {
+            list-style: none;
+        }
+
+        .game-instructions li {
+            padding: 8px 0;
+            border-bottom: 1px solid #1a4a8a;
+            color: #d1d5db;
+        }
+
+        .game-instructions li:last-child {
+            border-bottom: none;
+        }
+
+        .game-instructions .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+
+        .icon-temp {
+            background-color: #ef4444;
+        }
+
+        .icon-humid {
+            background-color: #3b82f6;
+        }
+
+        .icon-door {
+            background-color: #f59e0b;
+        }
+
+        .icon-item {
+            background-color: #8b5cf6;
+        }
+
+        .icon-left {
+            background-color: #06b6d4;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 26, 46, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-overlay.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #0f3460;
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #16213e;
+            border-left: 4px solid #e94560;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1500;
+            max-width: 350px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        .notification-message {
+            color: #d1d5db;
+            font-size: 0.9rem;
+        }
+
+        .map-label {
+            position: absolute;
+            background-color: rgba(15, 52, 96, 0.9);
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notificationTitle"></div>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+
+    <div class="game-container">
+        <div class="left-panel">
+            <h1>博物馆夜班巡查</h1>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="status-label">得分</span>
+                    <span class="status-value score" id="scoreDisplay">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">时间</span>
+                    <span class="status-value time" id="timeDisplay">00:00</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">待处理</span>
+                    <span class="status-value events" id="eventsDisplay">0</span>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <button class="btn btn-primary" id="startBtn">开始游戏</button>
+                <button class="btn btn-secondary" id="pauseBtn" disabled>暂停</button>
+                <button class="btn btn-warning" id="restartBtn" disabled>重新开始</button>
+                <button class="btn btn-secondary" id="historyBtn">历史记录</button>
+                <button class="btn btn-success" id="exportBtn" disabled>导出报告</button>
+            </div>
+
+            <div class="event-log">
+                <h3>事件日志</h3>
+                <div id="logContainer">
+                    <div class="log-entry info">
+                        <span class="log-time">[系统]</span> 欢迎使用博物馆夜班巡查训练系统
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="header">
+                <h2>展厅平面图</h2>
+                <div>
+                    <span style="color: #ef4444;">🔴 高风险展柜</span> | 
+                    <span style="color: #f59e0b;">🟡 中风险展柜</span> | 
+                    <span style="color: #22c55e;">🟢 巡查员</span>
+                </div>
+            </div>
+
+            <div class="game-map" id="gameMap">
+                <div class="map-container" id="mapContainer">
+                    <!-- 展厅将在JS中动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 事件详情模态框 -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <h2 id="eventModalTitle">事件详情</h2>
+            <div class="event-detail" id="eventDetail">
+                <!-- 事件详情将动态填充 -->
+            </div>
+            <div class="action-buttons" id="eventActions">
+                <!-- 操作按钮将动态填充 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏结束模态框 -->
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="gameOverTitle">训练结束</h2>
+            <div class="game-over-stats" id="gameOverStats">
+                <!-- 统计信息将动态填充 -->
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="playAgainBtn">再玩一次</button>
+                <button class="btn btn-success" id="exportGameOverBtn">导出报告</button>
+                <button class="btn btn-secondary" id="closeGameOverBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史记录模态框 -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <h2>历史训练记录</h2>
+            <div class="history-section" id="historyList">
+                <!-- 历史记录将动态填充 -->
+            </div>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button class="btn btn-secondary" id="closeHistoryBtn">关闭</button>
+                <button class="btn btn-warning" id="clearHistoryBtn">清空历史</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开始游戏模态框 -->
+    <div class="modal active" id="welcomeModal">
+        <div class="modal-content">
+            <div class="welcome-screen">
+                <h1>🏛️ 博物馆夜班巡查训练系统</h1>
+                <p>作为博物馆的夜班巡查员，你需要在有限时间内处理各种突发事件。<br>
+                拖动巡查员到报警位置，及时处理事件以获得高分！</p>
+                
+                <div class="game-instructions">
+                    <h3>游戏说明</h3>
+                    <ul>
+                        <li>
+                            <span class="icon icon-temp">🌡️</span>
+                            <strong>温湿度报警</strong> - 监控环境，及时调整（高风险）
+                        </li>
+                        <li>
+                            <span class="icon icon-humid">💧</span>
+                            <strong>湿度异常</strong> - 检查除湿设备（中风险）
+                        </li>
+                        <li>
+                            <span class="icon icon-door">🚪</span>
+                            <strong>展柜门磁报警</strong> - 检查是否有人闯入（高风险）
+                        </li>
+                        <li>
+                            <span class="icon icon-item">📦</span>
+                            <strong>临时展品归位</strong> - 将展品放回指定位置（中风险）
+                        </li>
+                        <li>
+                            <span class="icon icon-left">🎒</span>
+                            <strong>访客遗留物</strong> - 收集并登记遗失物品（低风险）
+                        </li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-primary" id="startGameBtn" style="font-size: 1.2rem; padding: 15px 40px;">
+                    开始训练
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MuseumNightPatrolGame {
+            constructor() {
+                this.gameState = {
+                    isRunning: false,
+                    isPaused: false,
+                    score: 0,
+                    time: 0,
+                    maxTime: 300, 
+                    events: [],
+                    resolvedEvents: [],
+                    missedEvents: [],
+                    gameHistory: [],
+                    patrollerPos: { x: 400, y: 300 }
+                };
+
+                this.exhibitRooms = [];
+                this.patroller = null;
+                this.eventMarkers = [];
+                this.gameInterval = null;
+                this.eventSpawnInterval = null;
+
+                this.eventTypes = {
+                    TEMPERATURE: {
+                        id: 'temperature',
+                        name: '温度报警',
+                        icon: '🌡️',
+                        color: 'event-temperature',
+                        priority: 'high',
+                        baseScore: 100,
+                        penalty: 200,
+                        description: '温度超出安全范围，需要立即检查温控设备',
+                        actions: ['检查温控设备', '调整温度设置', '记录异常情况']
+                    },
+                    HUMIDITY: {
+                        id: 'humidity',
+                        name: '湿度异常',
+                        icon: '💧',
+                        color: 'event-humidity',
+                        priority: 'medium',
+                        baseScore: 75,
+                        penalty: 150,
+                        description: '湿度异常，可能影响文物保存',
+                        actions: ['检查除湿设备', '查看是否有漏水', '记录湿度数据']
+                    },
+                    DOOR: {
+                        id: 'door',
+                        name: '展柜门磁报警',
+                        icon: '🚪',
+                        color: 'event-door',
+                        priority: 'high',
+                        baseScore: 150,
+                        penalty: 300,
+                        description: '展柜门被异常打开，可能有盗窃风险',
+                        actions: ['检查展柜状态', '查看是否有物品丢失', '联系安保部门', '记录事件详情']
+                    },
+                    ITEM: {
+                        id: 'item',
+                        name: '临时展品归位',
+                        icon: '📦',
+                        color: 'event-item',
+                        priority: 'medium',
+                        baseScore: 80,
+                        penalty: 120,
+                        description: '临时展出的物品需要放回指定位置',
+                        actions: ['确认物品归属', '检查物品完好性', '放回指定展柜', '更新展品清单']
+                    },
+                    LEFT: {
+                        id: 'left',
+                        name: '访客遗留物',
+                        icon: '🎒',
+                        color: 'event-left',
+                        priority: 'low',
+                        baseScore: 50,
+                        penalty: 100,
+                        description: '访客遗留的物品需要收集登记',
+                        actions: ['收集遗留物品', '详细登记物品信息', '放入失物招领处', '记录发现位置']
+                    }
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.setupDOM();
+                this.setupEventListeners();
+                this.loadGameHistory();
+                this.hideLoading();
+            }
+
+            setupDOM() {
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.restartBtn = document.getElementById('restartBtn');
+                this.historyBtn = document.getElementById('historyBtn');
+                this.exportBtn = document.getElementById('exportBtn');
+                this.startGameBtn = document.getElementById('startGameBtn');
+                this.playAgainBtn = document.getElementById('playAgainBtn');
+                this.exportGameOverBtn = document.getElementById('exportGameOverBtn');
+                this.closeGameOverBtn = document.getElementById('closeGameOverBtn');
+                this.closeHistoryBtn = document.getElementById('closeHistoryBtn');
+                this.clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+                this.scoreDisplay = document.getElementById('scoreDisplay');
+                this.timeDisplay = document.getElementById('timeDisplay');
+                this.eventsDisplay = document.getElementById('eventsDisplay');
+                this.logContainer = document.getElementById('logContainer');
+
+                this.gameMap = document.getElementById('gameMap');
+                this.mapContainer = document.getElementById('mapContainer');
+
+                this.welcomeModal = document.getElementById('welcomeModal');
+                this.eventModal = document.getElementById('eventModal');
+                this.gameOverModal = document.getElementById('gameOverModal');
+                this.historyModal = document.getElementById('historyModal');
+
+                this.notification = document.getElementById('notification');
+                this.notificationTitle = document.getElementById('notificationTitle');
+                this.notificationMessage = document.getElementById('notificationMessage');
+
+                this.loadingOverlay = document.getElementById('loadingOverlay');
+            }
+
+            setupEventListeners() {
+                this.startBtn.addEventListener('click', () => this.showWelcomeModal());
+                this.pauseBtn.addEventListener('click', () => this.togglePause());
+                this.restartBtn.addEventListener('click', () => this.restartGame());
+                this.historyBtn.addEventListener('click', () => this.showHistoryModal());
+                this.exportBtn.addEventListener('click', () => this.exportReport());
+
+                this.startGameBtn.addEventListener('click', () => this.startGame());
+                this.playAgainBtn.addEventListener('click', () => this.restartGame());
+                this.exportGameOverBtn.addEventListener('click', () => this.exportReport());
+                this.closeGameOverBtn.addEventListener('click', () => this.hideGameOverModal());
+                this.closeHistoryBtn.addEventListener('click', () => this.hideHistoryModal());
+                this.clearHistoryBtn.addEventListener('click', () => this.clearHistory());
+            }
+
+            hideLoading() {
+                setTimeout(() => {
+                    this.loadingOverlay.classList.add('hidden');
+                }, 500);
+            }
+
+            showWelcomeModal() {
+                this.welcomeModal.classList.add('active');
+            }
+
+            hideWelcomeModal() {
+                this.welcomeModal.classList.remove('active');
+            }
+
+            showHistoryModal() {
+                this.renderHistoryList();
+                this.historyModal.classList.add('active');
+            }
+
+            hideHistoryModal() {
+                this.historyModal.classList.remove('active');
+            }
+
+            showGameOverModal() {
+                this.renderGameOverStats();
+                this.gameOverModal.classList.add('active');
+            }
+
+            hideGameOverModal() {
+                this.gameOverModal.classList.remove('active');
+            }
+
+            showEventModal(event) {
+                this.renderEventModal(event);
+                this.eventModal.classList.add('active');
+            }
+
+            hideEventModal() {
+                this.eventModal.classList.remove('active');
+            }
+
+            showNotification(title, message) {
+                this.notificationTitle.textContent = title;
+                this.notificationMessage.textContent = message;
+                this.notification.classList.add('show');
+
+                setTimeout(() => {
+                    this.notification.classList.remove('show');
+                }, 3000);
+            }
+
+            addLogEntry(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const timeStr = this.formatTime(this.gameState.time);
+                entry.innerHTML = `<span class="log-time">[${timeStr}]</span> ${message}`;
+                this.logContainer.insertBefore(entry, this.logContainer.firstChild);
+
+                while (this.logContainer.children.length > 50) {
+                    this.logContainer.removeChild(this.logContainer.lastChild);
+                }
+            }
+
+            formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            createExhibitRooms() {
+                this.mapContainer.innerHTML = '';
+                this.exhibitRooms = [];
+
+                const mapWidth = this.mapContainer.offsetWidth || 800;
+                const mapHeight = this.mapContainer.offsetHeight || 600;
+
+                const rooms = [
+                    { id: 'room1', name: '青铜器展厅', risk: 'high', x: 50, y: 50, width: 200, height: 150 },
+                    { id: 'room2', name: '书画展厅', risk: 'high', x: 280, y: 50, width: 200, height: 150 },
+                    { id: 'room3', name: '陶瓷展厅', risk: 'medium', x: 510, y: 50, width: 200, height: 150 },
+                    { id: 'room4', name: '玉器展厅', risk: 'high', x: 50, y: 230, width: 150, height: 200 },
+                    { id: 'room5', name: '金银器展厅', risk: 'high', x: 230, y: 230, width: 150, height: 200 },
+                    { id: 'room6', name: '漆器展厅', risk: 'medium', x: 410, y: 230, width: 150, height: 200 },
+                    { id: 'room7', name: '临时展厅A', risk: 'medium', x: 580, y: 230, width: 130, height: 200 },
+                    { id: 'room8', name: '入口大厅', risk: 'low', x: 50, y: 460, width: 200, height: 100 },
+                    { id: 'room9', name: '休息区', risk: 'low', x: 280, y: 460, width: 200, height: 100 },
+                    { id: 'room10', name: '纪念品商店', risk: 'low', x: 510, y: 460, width: 200, height: 100 }
+                ];
+
+                rooms.forEach(room => {
+                    const roomElement = document.createElement('div');
+                    roomElement.className = `exhibit-room ${room.risk === 'high' ? 'high-risk' : room.risk === 'medium' ? 'medium-risk' : ''}`;
+                    roomElement.id = room.id;
+                    roomElement.style.left = `${room.x}px`;
+                    roomElement.style.top = `${room.y}px`;
+                    roomElement.style.width = `${room.width}px`;
+                    roomElement.style.height = `${room.height}px`;
+                    roomElement.innerHTML = `<span>${room.name}</span>`;
+                    roomElement.dataset.risk = room.risk;
+
+                    this.mapContainer.appendChild(roomElement);
+                    this.exhibitRooms.push({
+                        ...room,
+                        element: roomElement
+                    });
+                });
+
+                this.createPatroller();
+            }
+
+            createPatroller() {
+                this.patroller = document.createElement('div');
+                this.patroller.className = 'patroller';
+                this.patroller.id = 'patroller';
+                this.patroller.innerHTML = '👮';
+                
+                this.updatePatrollerPosition(
+                    this.gameState.patrollerPos.x,
+                    this.gameState.patrollerPos.y
+                );
+
+                this.mapContainer.appendChild(this.patroller);
+                this.setupDraggablePatroller();
+            }
+
+            setupDraggablePatroller() {
+                let isDragging = false;
+                let offsetX, offsetY;
+
+                const startDrag = (e) => {
+                    if (!this.gameState.isRunning || this.gameState.isPaused) return;
+                    
+                    isDragging = true;
+                    this.patroller.classList.add('moving');
+                    
+                    const rect = this.patroller.getBoundingClientRect();
+                    const mapRect = this.mapContainer.getBoundingClientRect();
+                    
+                    offsetX = (e.clientX || e.touches[0].clientX) - rect.left;
+                    offsetY = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                    e.preventDefault();
+                };
+
+                const drag = (e) => {
+                    if (!isDragging) return;
+
+                    const mapRect = this.mapContainer.getBoundingClientRect();
+                    let x = (e.clientX || e.touches[0].clientX) - mapRect.left - offsetX;
+                    let y = (e.clientY || e.touches[0].clientY) - mapRect.top - offsetY;
+
+                    const maxX = this.mapContainer.offsetWidth - this.patroller.offsetWidth;
+                    const maxY = this.mapContainer.offsetHeight - this.patroller.offsetHeight;
+
+                    x = Math.max(0, Math.min(x, maxX));
+                    y = Math.max(0, Math.min(y, maxY));
+
+                    this.updatePatrollerPosition(x, y);
+                    this.checkEventsCollision();
+                };
+
+                const endDrag = () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        this.patroller.classList.remove('moving');
+                    }
+                };
+
+                this.patroller.addEventListener('mousedown', startDrag);
+                this.patroller.addEventListener('touchstart', startDrag);
+
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('touchmove', drag);
+
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            updatePatrollerPosition(x, y) {
+                this.gameState.patrollerPos = { x, y };
+                this.patroller.style.left = `${x}px`;
+                this.patroller.style.top = `${y}px`;
+            }
+
+            checkEventsCollision() {
+                const patrollerRect = this.patroller.getBoundingClientRect();
+                const mapRect = this.mapContainer.getBoundingClientRect();
+
+                const patrollerCenterX = patrollerRect.left + patrollerRect.width / 2 - mapRect.left;
+                const patrollerCenterY = patrollerRect.top + patrollerRect.height / 2 - mapRect.top;
+
+                this.gameState.events.forEach(event => {
+                    if (event.handled) return;
+
+                    const eventX = event.position.x + 15;
+                    const eventY = event.position.y + 15;
+
+                    const distance = Math.sqrt(
+                        Math.pow(patrollerCenterX - eventX, 2) + 
+                        Math.pow(patrollerCenterY - eventY, 2)
+                    );
+
+                    if (distance < 50) {
+                        this.showEventModal(event);
+                    }
+                });
+            }
+
+            startGame() {
+                this.hideWelcomeModal();
+                this.resetGameState();
+                this.createExhibitRooms();
+                this.gameState.isRunning = true;
+                
+                this.startBtn.disabled = true;
+                this.pauseBtn.disabled = false;
+                this.restartBtn.disabled = false;
+                this.exportBtn.disabled = false;
+
+                this.addLogEntry('夜班巡查开始，请留意各个展厅的报警信息', 'info');
+                this.showNotification('训练开始', '请拖动巡查员处理各种突发事件');
+
+                this.startGameLoop();
+                this.startEventSpawning();
+            }
+
+            resetGameState() {
+                this.gameState.score = 0;
+                this.gameState.time = 0;
+                this.gameState.events = [];
+                this.gameState.resolvedEvents = [];
+                this.gameState.missedEvents = [];
+                this.gameState.isRunning = false;
+                this.gameState.isPaused = false;
+                this.gameState.patrollerPos = { x: 400, y: 300 };
+
+                this.updateUI();
+                this.clearEventMarkers();
+                this.logContainer.innerHTML = `
+                    <div class="log-entry info">
+                        <span class="log-time">[系统]</span> 欢迎使用博物馆夜班巡查训练系统
+                    </div>
+                `;
+            }
+
+            startGameLoop() {
+                this.gameInterval = setInterval(() => {
+                    if (!this.gameState.isPaused) {
+                        this.gameState.time++;
+                        this.updateUI();
+                        this.checkTimeouts();
+
+                        if (this.gameState.time >= this.gameState.maxTime) {
+                            this.endGame();
+                        }
+                    }
+                }, 1000);
+            }
+
+            startEventSpawning() {
+                this.spawnEvent();
+                this.eventSpawnInterval = setInterval(() => {
+                    if (!this.gameState.isPaused && this.gameState.isRunning) {
+                        if (this.gameState.events.filter(e => !e.handled).length < 5) {
+                            this.spawnEvent();
+                        }
+                    }
+                }, 8000);
+            }
+
+            spawnEvent() {
+                const eventTypeKeys = Object.keys(this.eventTypes);
+                const randomTypeKey = eventTypeKeys[Math.floor(Math.random() * eventTypeKeys.length)];
+                const eventType = this.eventTypes[randomTypeKey];
+
+                const room = this.exhibitRooms[Math.floor(Math.random() * this.exhibitRooms.length)];
+                
+                const position = {
+                    x: room.x + Math.random() * (room.width - 30),
+                    y: room.y + Math.random() * (room.height - 30)
+                };
+
+                const event = {
+                    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    type: eventType,
+                    room: room,
+                    position: position,
+                    startTime: this.gameState.time,
+                    timeout: eventType.priority === 'high' ? 45 : eventType.priority === 'medium' ? 60 : 90,
+                    handled: false,
+                    steps: [],
+                    penaltyReason: null
+                };
+
+                this.gameState.events.push(event);
+                this.createEventMarker(event);
+                this.activateRoom(room);
+
+                this.addLogEntry(
+                    `【${eventType.name}】在 ${room.name} 触发 - 优先级: ${this.getPriorityText(eventType.priority)}`,
+                    eventType.priority === 'high' ? 'danger' : eventType.priority === 'medium' ? 'warning' : 'info'
+                );
+
+                this.showNotification(
+                    `${eventType.icon} ${eventType.name}`,
+                    `${room.name} 发生 ${eventType.name}，请尽快处理！`
+                );
+
+                this.updateUI();
+            }
+
+            getPriorityText(priority) {
+                switch (priority) {
+                    case 'high': return '高风险';
+                    case 'medium': return '中风险';
+                    case 'low': return '低风险';
+                    default: return priority;
+                }
+            }
+
+            activateRoom(room) {
+                room.element.classList.add('active');
+            }
+
+            deactivateRoom(room) {
+                room.element.classList.remove('active');
+            }
+
+            createEventMarker(event) {
+                const marker = document.createElement('div');
+                marker.className = `event-marker ${event.type.color}`;
+                marker.id = event.id;
+                marker.style.left = `${event.position.x}px`;
+                marker.style.top = `${event.position.y}px`;
+                marker.innerHTML = event.type.icon;
+                marker.title = `${event.type.name} - ${event.room.name}`;
+
+                this.mapContainer.appendChild(marker);
+                this.eventMarkers.push({
+                    id: event.id,
+                    element: marker
+                });
+            }
+
+            clearEventMarkers() {
+                this.eventMarkers.forEach(marker => {
+                    if (marker.element && marker.element.parentNode) {
+                        marker.element.parentNode.removeChild(marker.element);
+                    }
+                });
+                this.eventMarkers = [];
+            }
+
+            removeEventMarker(eventId) {
+                const markerIndex = this.eventMarkers.findIndex(m => m.id === eventId);
+                if (markerIndex !== -1) {
+                    const marker = this.eventMarkers[markerIndex];
+                    if (marker.element && marker.element.parentNode) {
+                        marker.element.parentNode.removeChild(marker.element);
+                    }
+                    this.eventMarkers.splice(markerIndex, 1);
+                }
+            }
+
+            renderEventModal(event) {
+                const modalTitle = document.getElementById('eventModalTitle');
+                const eventDetail = document.getElementById('eventDetail');
+                const eventActions = document.getElementById('eventActions');
+
+                modalTitle.textContent = `${event.type.icon} ${event.type.name}`;
+
+                const timeElapsed = this.gameState.time - event.startTime;
+                const timeRemaining = Math.max(0, event.timeout - timeElapsed);
+
+                eventDetail.innerHTML = `
+                    <h3>${event.type.name}</h3>
+                    <p><strong>位置：</strong>${event.room.name}</p>
+                    <p><strong>描述：</strong>${event.type.description}</p>
+                    <p><strong>已触发时间：</strong>${timeElapsed} 秒</p>
+                    <p><strong>剩余处理时间：</strong><span style="color: ${timeRemaining < 10 ? '#ef4444' : '#ffffff'}">${timeRemaining} 秒</span></p>
+                    <p><strong>基础分值：</strong>${event.type.baseScore} 分</p>
+                    <span class="priority priority-${event.type.priority}">
+                        ${this.getPriorityText(event.type.priority)}
+                    </span>
+                `;
+
+                eventActions.innerHTML = '';
+                
+                event.type.actions.forEach((action, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `btn ${event.steps.includes(index) ? 'btn-success' : 'btn-secondary'}`;
+                    btn.textContent = action;
+                    btn.disabled = event.steps.includes(index);
+                    
+                    btn.addEventListener('click', () => {
+                        this.processEventStep(event, index, action);
+                    });
+
+                    eventActions.appendChild(btn);
+                });
+
+                const completeBtn = document.createElement('button');
+                completeBtn.className = 'btn btn-primary';
+                completeBtn.textContent = '完成处理';
+                completeBtn.style.marginTop = '10px';
+                completeBtn.style.width = '100%';
+                completeBtn.addEventListener('click', () => {
+                    this.completeEvent(event);
+                });
+
+                eventActions.appendChild(completeBtn);
+            }
+
+            processEventStep(event, stepIndex, action) {
+                if (event.steps.includes(stepIndex)) return;
+
+                event.steps.push(stepIndex);
+                this.addLogEntry(
+                    `执行步骤：${action} [${event.type.name} - ${event.room.name}]`,
+                    'info'
+                );
+
+                const timeBonus = Math.max(0, event.timeout - (this.gameState.time - event.startTime));
+                const stepScore = Math.floor(event.type.baseScore * 0.2 * (1 + timeBonus / 100));
+                this.gameState.score += stepScore;
+                
+                this.showNotification(
+                    '步骤完成',
+                    `完成 "${action}"，获得 ${stepScore} 分`
+                );
+
+                this.renderEventModal(event);
+                this.updateUI();
+            }
+
+            completeEvent(event) {
+                if (event.handled) return;
+
+                event.handled = true;
+                event.completionTime = this.gameState.time;
+                
+                const timeElapsed = event.completionTime - event.startTime;
+                const timeBonus = Math.max(0, event.timeout - timeElapsed);
+                
+                const stepsBonus = event.steps.length / event.type.actions.length;
+                const finalScore = Math.floor(event.type.baseScore * stepsBonus * (1 + timeBonus / 100));
+                
+                this.gameState.score += finalScore;
+                this.gameState.resolvedEvents.push(event);
+
+                this.removeEventMarker(event.id);
+                this.deactivateRoom(event.room);
+                this.hideEventModal();
+
+                this.addLogEntry(
+                    `【完成】${event.type.name} 在 ${event.room.name} 已处理完毕，获得 ${finalScore} 分`,
+                    'success'
+                );
+
+                this.showNotification(
+                    '事件处理完成',
+                    `${event.type.name} 处理完成，获得 ${finalScore} 分！`
+                );
+
+                this.updateUI();
+            }
+
+            checkTimeouts() {
+                this.gameState.events.forEach(event => {
+                    if (event.handled) return;
+
+                    const timeElapsed = this.gameState.time - event.startTime;
+                    if (timeElapsed >= event.timeout) {
+                        this.handleTimeout(event);
+                    }
+                });
+            }
+
+            handleTimeout(event) {
+                event.handled = true;
+                event.completionTime = this.gameState.time;
+                event.penaltyReason = `超时未处理（时限 ${event.timeout} 秒）`;
+
+                this.gameState.score = Math.max(0, this.gameState.score - event.type.penalty);
+                this.gameState.missedEvents.push(event);
+
+                this.removeEventMarker(event.id);
+                this.deactivateRoom(event.room);
+                this.hideEventModal();
+
+                this.addLogEntry(
+                    `【超时】${event.type.name} 在 ${event.room.name} 超时未处理，扣除 ${event.type.penalty} 分`,
+                    'danger'
+                );
+
+                this.showNotification(
+                    '⚠️ 事件超时',
+                    `${event.type.name} 超时未处理！扣除 ${event.type.penalty} 分`
+                );
+
+                this.updateUI();
+            }
+
+            togglePause() {
+                this.gameState.isPaused = !this.gameState.isPaused;
+                this.pauseBtn.textContent = this.gameState.isPaused ? '继续' : '暂停';
+                
+                if (this.gameState.isPaused) {
+                    this.addLogEntry('游戏已暂停', 'warning');
+                    this.showNotification('游戏暂停', '点击继续按钮恢复游戏');
+                } else {
+                    this.addLogEntry('游戏继续', 'info');
+                }
+            }
+
+            restartGame() {
+                this.endGameIntervals();
+                this.hideGameOverModal();
+                this.hideEventModal();
+                this.startGame();
+            }
+
+            endGameIntervals() {
+                if (this.gameInterval) {
+                    clearInterval(this.gameInterval);
+                    this.gameInterval = null;
+                }
+                if (this.eventSpawnInterval) {
+                    clearInterval(this.eventSpawnInterval);
+                    this.eventSpawnInterval = null;
+                }
+            }
+
+            endGame() {
+                this.endGameIntervals();
+                this.gameState.isRunning = false;
+
+                this.gameState.events.forEach(event => {
+                    if (!event.handled) {
+                        event.penaltyReason = '游戏结束时仍未处理';
+                        this.gameState.missedEvents.push(event);
+                        this.removeEventMarker(event.id);
+                        this.deactivateRoom(event.room);
+                    }
+                });
+
+                const gameRecord = {
+                    id: `record_${Date.now()}`,
+                    date: new Date().toLocaleString('zh-CN'),
+                    score: this.gameState.score,
+                    duration: this.gameState.time,
+                    resolvedEvents: this.gameState.resolvedEvents.length,
+                    missedEvents: this.gameState.missedEvents.length,
+                    totalEvents: this.gameState.resolvedEvents.length + this.gameState.missedEvents.length,
+                    details: {
+                        resolvedEvents: this.gameState.resolvedEvents.map(e => ({
+                            type: e.type.name,
+                            room: e.room.name,
+                            startTime: e.startTime,
+                            completionTime: e.completionTime,
+                            steps: e.steps.length,
+                            priority: e.type.priority
+                        })),
+                        missedEvents: this.gameState.missedEvents.map(e => ({
+                            type: e.type.name,
+                            room: e.room.name,
+                            startTime: e.startTime,
+                            penaltyReason: e.penaltyReason,
+                            priority: e.type.priority
+                        }))
+                    }
+                };
+
+                this.gameState.gameHistory.push(gameRecord);
+                this.saveGameHistory();
+
+                this.addLogEntry(
+                    `训练结束！最终得分: ${this.gameState.score} 分`,
+                    this.gameState.score >= 1000 ? 'success' : this.gameState.score >= 500 ? 'warning' : 'danger'
+                );
+
+                this.startBtn.disabled = false;
+                this.pauseBtn.disabled = true;
+
+                this.showGameOverModal();
+            }
+
+            renderGameOverStats() {
+                const statsContainer = document.getElementById('gameOverStats');
+                const title = document.getElementById('gameOverTitle');
+
+                const totalEvents = this.gameState.resolvedEvents.length + this.gameState.missedEvents.length;
+                const resolvedRate = totalEvents > 0 
+                    ? Math.round((this.gameState.resolvedEvents.length / totalEvents) * 100) 
+                    : 0;
+
+                let grade = '需要加强训练';
+                if (this.gameState.score >= 2000) grade = '优秀巡查员';
+                else if (this.gameState.score >= 1500) grade = '良好巡查员';
+                else if (this.gameState.score >= 1000) grade = '合格巡查员';
+                else if (this.gameState.score >= 500) grade = '需要更多练习';
+
+                title.textContent = `🏆 ${grade}`;
+
+                statsContainer.innerHTML = `
+                    <div class="stat-row">
+                        <span class="stat-label">最终得分</span>
+                        <span class="stat-value ${this.gameState.score >= 1000 ? 'positive' : 'negative'}">
+                            ${this.gameState.score} 分
+                        </span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">训练时长</span>
+                        <span class="stat-value">${this.formatTime(this.gameState.time)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">已处理事件</span>
+                        <span class="stat-value positive">${this.gameState.resolvedEvents.length} 个</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">遗漏事件</span>
+                        <span class="stat-value negative">${this.gameState.missedEvents.length} 个</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">处理率</span>
+                        <span class="stat-value ${resolvedRate >= 80 ? 'positive' : 'negative'}">${resolvedRate}%</span>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #0f3460;">
+                        <h4 style="margin-bottom: 10px; color: #e94560;">高风险展柜处理情况</h4>
+                        ${this.renderRiskAnalysis()}
+                    </div>
+                `;
+            }
+
+            renderRiskAnalysis() {
+                const highRiskRooms = this.exhibitRooms.filter(r => r.risk === 'high');
+                const allEvents = [...this.gameState.resolvedEvents, ...this.gameState.missedEvents];
+                
+                if (highRiskRooms.length === 0) {
+                    return '<p>无高风险展柜</p>';
+                }
+
+                let html = '';
+                highRiskRooms.forEach(room => {
+                    const roomEvents = allEvents.filter(e => e.room.id === room.id);
+                    const resolved = roomEvents.filter(e => !e.penaltyReason).length;
+                    const missed = roomEvents.filter(e => e.penaltyReason).length;
+
+                    html += `
+                        <div class="stat-row">
+                            <span class="stat-label">${room.name}</span>
+                            <span class="stat-value">
+                                已处理: <span class="positive">${resolved}</span> | 
+                                遗漏: <span class="negative">${missed}</span>
+                            </span>
+                        </div>
+                    `;
+                });
+
+                return html;
+            }
+
+            updateUI() {
+                this.scoreDisplay.textContent = this.gameState.score;
+                this.timeDisplay.textContent = this.formatTime(this.gameState.time);
+                
+                const pendingEvents = this.gameState.events.filter(e => !e.handled).length;
+                this.eventsDisplay.textContent = pendingEvents;
+            }
+
+            loadGameHistory() {
+                try {
+                    const saved = localStorage.getItem('museumNightPatrolHistory');
+                    if (saved) {
+                        this.gameState.gameHistory = JSON.parse(saved);
+                    }
+                } catch (error) {
+                    console.error('加载历史记录失败:', error);
+                    this.gameState.gameHistory = [];
+                }
+            }
+
+            saveGameHistory() {
+                try {
+                    localStorage.setItem('museumNightPatrolHistory', JSON.stringify(this.gameState.gameHistory));
+                } catch (error) {
+                    console.error('保存历史记录失败:', error);
+                }
+            }
+
+            renderHistoryList() {
+                const historyList = document.getElementById('historyList');
+                
+                if (this.gameState.gameHistory.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">暂无历史记录</p>';
+                    return;
+                }
+
+                historyList.innerHTML = '';
+                
+                this.gameState.gameHistory.slice().reverse().forEach(record => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    
+                    const resolvedRate = record.totalEvents > 0 
+                        ? Math.round((record.resolvedEvents / record.totalEvents) * 100) 
+                        : 0;
+
+                    item.innerHTML = `
+                        <div class="history-header">
+                            <span class="history-date">${record.date}</span>
+                            <span class="history-score">${record.score} 分</span>
+                        </div>
+                        <div class="history-details">
+                            时长: ${this.formatTime(record.duration)} | 
+                            处理率: ${resolvedRate}% | 
+                            已处理: ${record.resolvedEvents} | 遗漏: ${record.missedEvents}
+                        </div>
+                    `;
+
+                    item.addEventListener('click', () => {
+                        this.showHistoryDetail(record);
+                    });
+
+                    historyList.appendChild(item);
+                });
+            }
+
+            showHistoryDetail(record) {
+                const statsContainer = document.getElementById('gameOverStats');
+                const title = document.getElementById('gameOverTitle');
+
+                title.textContent = `📋 历史记录详情`;
+
+                statsContainer.innerHTML = `
+                    <div class="stat-row">
+                        <span class="stat-label">训练时间</span>
+                        <span class="stat-value">${record.date}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">得分</span>
+                        <span class="stat-value ${record.score >= 1000 ? 'positive' : 'negative'}">
+                            ${record.score} 分
+                        </span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">训练时长</span>
+                        <span class="stat-value">${this.formatTime(record.duration)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">已处理事件</span>
+                        <span class="stat-value positive">${record.resolvedEvents} 个</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">遗漏事件</span>
+                        <span class="stat-value negative">${record.missedEvents} 个</span>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #0f3460;">
+                        <h4 style="margin-bottom: 10px; color: #e94560;">详细事件记录</h4>
+                        
+                        <h5 style="margin: 15px 0 10px; color: #22c55e;">已处理事件：</h5>
+                        ${record.details.resolvedEvents.length > 0 
+                            ? record.details.resolvedEvents.map(e => `
+                                <div class="stat-row">
+                                    <span class="stat-label">${e.type} - ${e.room}</span>
+                                    <span class="stat-value positive">
+                                        用时: ${e.completionTime - e.startTime}秒 | 步骤: ${e.steps}
+                                    </span>
+                                </div>
+                            `).join('')
+                            : '<p style="color: #6b7280;">无</p>'
+                        }
+                        
+                        <h5 style="margin: 15px 0 10px; color: #ef4444;">遗漏事件：</h5>
+                        ${record.details.missedEvents.length > 0 
+                            ? record.details.missedEvents.map(e => `
+                                <div class="stat-row">
+                                    <span class="stat-label">${e.type} - ${e.room}</span>
+                                    <span class="stat-value negative">
+                                        原因: ${e.penaltyReason}
+                                    </span>
+                                </div>
+                            `).join('')
+                            : '<p style="color: #6b7280;">无</p>'
+                        }
+                    </div>
+                `;
+
+                this.hideHistoryModal();
+                this.showGameOverModal();
+            }
+
+            clearHistory() {
+                if (confirm('确定要清空所有历史记录吗？此操作不可撤销。')) {
+                    this.gameState.gameHistory = [];
+                    localStorage.removeItem('museumNightPatrolHistory');
+                    this.renderHistoryList();
+                    this.showNotification('历史记录已清空', '所有训练记录已被删除');
+                }
+            }
+
+            exportReport() {
+                if (this.gameState.resolvedEvents.length === 0 && this.gameState.missedEvents.length === 0) {
+                    this.showNotification('无数据可导出', '请先完成一次训练');
+                    return;
+                }
+
+                const markdown = this.generateMarkdownReport();
+                const jsonData = this.generateJSONReport();
+
+                this.downloadFile(markdown, `博物馆巡查训练复盘_${new Date().toISOString().slice(0, 10)}.md`, 'text/markdown');
+                
+                setTimeout(() => {
+                    this.downloadFile(jsonData, `博物馆巡查训练明细_${new Date().toISOString().slice(0, 10)}.json`, 'application/json');
+                }, 500);
+
+                this.showNotification('导出成功', 'Markdown复盘和JSON明细已下载');
+            }
+
+            generateMarkdownReport() {
+                const totalEvents = this.gameState.resolvedEvents.length + this.gameState.missedEvents.length;
+                const resolvedRate = totalEvents > 0 
+                    ? Math.round((this.gameState.resolvedEvents.length / totalEvents) * 100) 
+                    : 0;
+
+                let grade = '需要加强训练';
+                if (this.gameState.score >= 2000) grade = '优秀巡查员';
+                else if (this.gameState.score >= 1500) grade = '良好巡查员';
+                else if (this.gameState.score >= 1000) grade = '合格巡查员';
+                else if (this.gameState.score >= 500) grade = '需要更多练习';
+
+                let markdown = `# 博物馆夜班巡查训练复盘报告
+
+## 基本信息
+- **训练时间**: ${new Date().toLocaleString('zh-CN')}
+- **最终评分**: ${this.gameState.score} 分
+- **评定等级**: ${grade}
+- **训练时长**: ${this.formatTime(this.gameState.time)}
+
+## 统计数据
+| 指标 | 数值 |
+|------|------|
+| 总事件数 | ${totalEvents} 个 |
+| 已处理事件 | ${this.gameState.resolvedEvents.length} 个 |
+| 遗漏事件 | ${this.gameState.missedEvents.length} 个 |
+| 事件处理率 | ${resolvedRate}% |
+
+---
+
+## 已处理事件详情
+
+`;
+
+                if (this.gameState.resolvedEvents.length > 0) {
+                    this.gameState.resolvedEvents.forEach((event, index) => {
+                        const timeElapsed = event.completionTime - event.startTime;
+                        markdown += `### ${index + 1}. ${event.type.name} (${event.type.priority === 'high' ? '高风险' : event.type.priority === 'medium' ? '中风险' : '低风险'})
+
+- **位置**: ${event.room.name}
+- **触发时间**: 第 ${event.startTime} 秒
+- **完成时间**: 第 ${event.completionTime} 秒
+- **处理耗时**: ${timeElapsed} 秒
+- **执行步骤**: ${event.steps.length}/${event.type.actions.length} 个步骤
+
+`;
+                    });
+                } else {
+                    markdown += `> 无已处理事件
+
+`;
+                }
+
+                markdown += `---
+
+## 遗漏事件详情
+
+`;
+
+                if (this.gameState.missedEvents.length > 0) {
+                    this.gameState.missedEvents.forEach((event, index) => {
+                        markdown += `### ${index + 1}. ${event.type.name} (${event.type.priority === 'high' ? '高风险' : event.type.priority === 'medium' ? '中风险' : '低风险'})
+
+- **位置**: ${event.room.name}
+- **触发时间**: 第 ${event.startTime} 秒
+- **扣分原因**: ${event.penaltyReason}
+- **扣分分值**: ${event.type.penalty} 分
+
+`;
+                    });
+                } else {
+                    markdown += `> 无遗漏事件，表现优秀！
+
+`;
+                }
+
+                markdown += `---
+
+## 高风险展柜分析
+
+`;
+
+                const highRiskRooms = this.exhibitRooms.filter(r => r.risk === 'high');
+                const allEvents = [...this.gameState.resolvedEvents, ...this.gameState.missedEvents];
+
+                if (highRiskRooms.length > 0) {
+                    highRiskRooms.forEach(room => {
+                        const roomEvents = allEvents.filter(e => e.room.id === room.id);
+                        const resolved = roomEvents.filter(e => !e.penaltyReason).length;
+                        const missed = roomEvents.filter(e => e.penaltyReason).length;
+                        
+                        markdown += `### ${room.name}
+
+- **触发事件数**: ${roomEvents.length} 个
+- **已处理**: ${resolved} 个
+- **遗漏**: ${missed} 个
+- **状态**: ${missed > 0 ? '⚠️ 需要关注' : '✅ 处理良好'}
+
+`;
+                    });
+                } else {
+                    markdown += `> 本次训练未涉及高风险展柜事件
+
+`;
+                }
+
+                markdown += `---
+
+## 总结与建议
+
+`;
+
+                if (this.gameState.missedEvents.length === 0) {
+                    markdown += `✅ **表现优秀！** 所有事件均及时处理，展现了出色的应变能力和责任心。
+`;
+                } else {
+                    const highRiskMissed = this.gameState.missedEvents.filter(e => e.type.priority === 'high');
+                    if (highRiskMissed.length > 0) {
+                        markdown += `⚠️ **需要重点关注**：遗漏了 ${highRiskMissed.length} 个高风险事件。高风险展柜（如青铜器、书画、玉器、金银器展厅）需要优先处理。
+
+**建议**：
+1. 优先响应高风险展柜的报警
+2. 提高巡查速度，缩短响应时间
+3. 熟悉展厅布局，规划最优巡查路线
+`;
+                    } else {
+                        markdown += `📋 **整体表现良好**，但仍有改进空间。
+
+**建议**：
+1. 继续保持对高风险展柜的关注
+2. 尝试提高事件处理速度以获得更高分数
+3. 确保执行所有处理步骤以获得完整分数
+`;
+                    }
+                }
+
+                return markdown;
+            }
+
+            generateJSONReport() {
+                const totalEvents = this.gameState.resolvedEvents.length + this.gameState.missedEvents.length;
+                const resolvedRate = totalEvents > 0 
+                    ? Math.round((this.gameState.resolvedEvents.length / totalEvents) * 100) 
+                    : 0;
+
+                let grade = '需要加强训练';
+                if (this.gameState.score >= 2000) grade = '优秀巡查员';
+                else if (this.gameState.score >= 1500) grade = '良好巡查员';
+                else if (this.gameState.score >= 1000) grade = '合格巡查员';
+                else if (this.gameState.score >= 500) grade = '需要更多练习';
+
+                const report = {
+                    basicInfo: {
+                        trainingTime: new Date().toLocaleString('zh-CN'),
+                        finalScore: this.gameState.score,
+                        grade: grade,
+                        duration: this.formatTime(this.gameState.time),
+                        totalSeconds: this.gameState.time
+                    },
+                    statistics: {
+                        totalEvents: totalEvents,
+                        resolvedEvents: this.gameState.resolvedEvents.length,
+                        missedEvents: this.gameState.missedEvents.length,
+                        resolvedRate: resolvedRate
+                    },
+                    resolvedEvents: this.gameState.resolvedEvents.map(event => ({
+                        id: event.id,
+                        type: event.type.name,
+                        icon: event.type.icon,
+                        priority: event.type.priority,
+                        priorityText: this.getPriorityText(event.type.priority),
+                        room: event.room.name,
+                        roomRisk: event.room.risk,
+                        position: event.position,
+                        startTime: event.startTime,
+                        completionTime: event.completionTime,
+                        timeElapsed: event.completionTime - event.startTime,
+                        timeout: event.timeout,
+                        steps: event.steps.length,
+                        totalSteps: event.type.actions.length,
+                        baseScore: event.type.baseScore,
+                        actions: event.type.actions.filter((_, idx) => event.steps.includes(idx))
+                    })),
+                    missedEvents: this.gameState.missedEvents.map(event => ({
+                        id: event.id,
+                        type: event.type.name,
+                        icon: event.type.icon,
+                        priority: event.type.priority,
+                        priorityText: this.getPriorityText(event.type.priority),
+                        room: event.room.name,
+                        roomRisk: event.room.risk,
+                        position: event.position,
+                        startTime: event.startTime,
+                        timeout: event.timeout,
+                        penalty: event.type.penalty,
+                        penaltyReason: event.penaltyReason
+                    })),
+                    highRiskAnalysis: this.exhibitRooms
+                        .filter(r => r.risk === 'high')
+                        .map(room => {
+                            const allEvents = [...this.gameState.resolvedEvents, ...this.gameState.missedEvents];
+                            const roomEvents = allEvents.filter(e => e.room.id === room.id);
+                            const resolved = roomEvents.filter(e => !e.penaltyReason).length;
+                            const missed = roomEvents.filter(e => e.penaltyReason).length;
+                            
+                            return {
+                                room: room.name,
+                                roomId: room.id,
+                                risk: room.risk,
+                                totalEvents: roomEvents.length,
+                                resolved: resolved,
+                                missed: missed,
+                                status: missed > 0 ? '需要关注' : '处理良好'
+                            };
+                        })
+                };
+
+                return JSON.stringify(report, null, 2);
+            }
+
+            downloadFile(content, filename, mimeType) {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new MuseumNightPatrolGame();
+            window.gameInstance = game;
+        });
+    </script>
+</body>
+</html>
