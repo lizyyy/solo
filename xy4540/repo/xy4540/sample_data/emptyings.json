@@ -1,0 +1,51 @@
+[
+  {
+    "toilet_id": "T001",
+    "arrival_time": "2026-04-01 08:00:00",
+    "truck_id": "QT-001",
+    "volume_emptied": 12.5,
+    "notes": "正常清掏"
+  },
+  {
+    "toilet_id": "T001",
+    "arrival_time": "2026-04-10 09:30:00",
+    "truck_id": "QT-001",
+    "volume_emptied": 10.0,
+    "notes": "提前清掏"
+  },
+  {
+    "toilet_id": "T001",
+    "arrival_time": "2026-04-20 10:00:00",
+    "truck_id": "QT-001",
+    "volume_emptied": 11.0,
+    "notes": ""
+  },
+  {
+    "toilet_id": "T002",
+    "arrival_time": "2026-04-05 07:30:00",
+    "truck_id": "QT-002",
+    "volume_emptied": 18.0,
+    "notes": "客流量大，需要频繁清掏"
+  },
+  {
+    "toilet_id": "T002",
+    "arrival_time": "2026-04-25 08:00:00",
+    "truck_id": "QT-002",
+    "volume_emptied": 20.0,
+    "notes": "正常清掏"
+  },
+  {
+    "toilet_id": "T003",
+    "arrival_time": "2026-03-15 10:00:00",
+    "truck_id": "QT-003",
+    "volume_emptied": 15.0,
+    "notes": "停车场公厕，使用频率较高"
+  },
+  {
+    "toilet_id": "T004",
+    "arrival_time": "2026-02-01 09:00:00",
+    "truck_id": "QT-001",
+    "volume_emptied": 6.0,
+    "notes": "山顶公厕，运输困难"
+  }
+]
