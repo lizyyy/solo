@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>市民合唱团曲谱借阅与演出授权预检工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 10px;
+    }
+    
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 10px;
+      padding: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 12px 20px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .tab:hover {
+      background-color: #f0f2f5;
+    }
+    
+    .tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .card h3 {
+      margin-bottom: 15px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .import-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .import-box {
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    
+    .import-box:hover {
+      border-color: #667eea;
+      background-color: #f8f9ff;
+    }
+    
+    .import-box h4 {
+      margin-bottom: 15px;
+      color: #555;
+    }
+    
+    .import-box p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+    }
+    
+    .btn-success {
+      background: #28a745;
+    }
+    
+    .btn-warning {
+      background: #ffc107;
+      color: #333;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+    }
+    
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .summary-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .summary-card .number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .summary-card .label {
+      font-size: 0.95rem;
+      color: #666;
+    }
+    
+    .summary-card.high-risk .number {
+      color: #dc3545;
+    }
+    
+    .summary-card.medium-risk .number {
+      color: #ffc107;
+    }
+    
+    .summary-card.approved .number {
+      color: #28a745;
+    }
+    
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .risk-item {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-left: 5px solid;
+    }
+    
+    .risk-item.high-risk {
+      border-left-color: #dc3545;
+      background-color: #fff5f5;
+    }
+    
+    .risk-item.medium-risk {
+      border-left-color: #ffc107;
+      background-color: #fffbf0;
+    }
+    
+    .risk-item.approved {
+      border-left-color: #28a745;
+      background-color: #f0fff4;
+    }
+    
+    .risk-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .risk-item-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .status-badge.high-risk {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    .status-badge.medium-risk {
+      background-color: #ffc107;
+      color: #333;
+    }
+    
+    .status-badge.approved {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .status-badge.override {
+      background-color: #667eea;
+      color: white;
+    }
+    
+    .risk-details {
+      margin-bottom: 15px;
+    }
+    
+    .risk-details p {
+      margin-bottom: 5px;
+      color: #555;
+    }
+    
+    .risk-items {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+    
+    .risk-items li {
+      margin-bottom: 5px;
+      color: #666;
+    }
+    
+    .risk-items li.high {
+      color: #dc3545;
+      font-weight: 500;
+    }
+    
+    .risk-items li.medium {
+      color: #ffc107;
+    }
+    
+    .override-section {
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+    
+    .override-section h5 {
+      margin-bottom: 10px;
+      color: #555;
+    }
+    
+    .override-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .note-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      resize: vertical;
+      min-height: 60px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .data-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .data-table tr:hover {
+      background-color: #f8f9ff;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #333;
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+    
+    .toast.success {
+      background: #28a745;
+    }
+    
+    .toast.error {
+      background: #dc3545;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+    }
+    
+    .sample-data-btn {
+      margin-top: 15px;
+    }
+    
+    .filter-section {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-select {
+      padding: 8px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎵 市民合唱团曲谱借阅与演出授权预检工具</h1>
+      <p>节目单、曲谱借阅、授权到期、排练签到一站式风险评估</p>
+    </header>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="import">📥 数据导入</div>
+      <div class="tab" data-tab="overview">📊 风险概览</div>
+      <div class="tab" data-tab="details">📋 节目详情</div>
+      <div class="tab" data-tab="export">📤 导出</div>
+    </div>
+    
+    <div class="tab-content active" id="tab-import">
+      <div class="card">
+        <h3>导入数据</h3>
+        <p style="margin-bottom: 20px; color: #666;">请分别导入以下四类数据，支持CSV和JSON格式。导入后数据会自动保存，刷新页面不丢失。</p>
+        
+        <div class="import-section">
+          <div class="import-box">
+            <h4>🎭 节目单</h4>
+            <p>包含曲目名称、指挥、声部、演出日期等</p>
+            <div class="file-input-wrapper">
+              <button class="btn">选择文件 (CSV/JSON)</button>
+              <input type="file" accept=".csv,.json" onchange="importData('program', this)">
+            </div>
+            <div id="program-status" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+          </div>
+          
+          <div class="import-box">
+            <h4>📚 曲谱借出登记</h4>
+            <p>包含曲目、借阅人、声部、借出日期、应还日期等</p>
+            <div class="file-input-wrapper">
+              <button class="btn">选择文件 (CSV/JSON)</button>
+              <input type="file" accept=".csv,.json" onchange="importData('score-loans', this)">
+            </div>
+            <div id="score-loans-status" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+          </div>
+          
+          <div class="import-box">
+            <h4>📜 授权到期表</h4>
+            <p>包含曲目、授权方、到期日期等</p>
+            <div class="file-input-wrapper">
+              <button class="btn">选择文件 (CSV/JSON)</button>
+              <input type="file" accept=".csv,.json" onchange="importData('authorizations', this)">
+            </div>
+            <div id="authorizations-status" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+          </div>
+          
+          <div class="import-box">
+            <h4>📝 排练签到</h4>
+            <p>包含曲目、声部、签到状态等</p>
+            <div class="file-input-wrapper">
+              <button class="btn">选择文件 (CSV/JSON)</button>
+              <input type="file" accept=".csv,.json" onchange="importData('attendance', this)">
+            </div>
+            <div id="attendance-status" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+          </div>
+        </div>
+        
+        <div class="action-buttons" style="margin-top: 30px;">
+          <button class="btn btn-secondary" onclick="loadSampleData()">📋 加载示例数据</button>
+          <button class="btn btn-danger" onclick="resetData()">🗑️ 清空所有数据</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>数据格式说明</h3>
+        <h4 style="margin: 15px 0 10px;">节目单 (Program)</h4>
+        <table class="data-table">
+          <thead>
+            <tr><th>字段名</th><th>说明</th><th>示例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>index</td><td>节目序号</td><td>1</td></tr>
+            <tr><td>title</td><td>曲目名称</td><td>黄河大合唱</td></tr>
+            <tr><td>conductor</td><td>指挥</td><td>张指挥</td></tr>
+            <tr><td>voices</td><td>声部（逗号分隔）</td><td>S,A,T,B</td></tr>
+            <tr><td>performanceDate</td><td>演出日期</td><td>2024-12-31</td></tr>
+          </tbody>
+        </table>
+        
+        <h4 style="margin: 20px 0 10px;">曲谱借出登记 (Score Loans)</h4>
+        <table class="data-table">
+          <thead>
+            <tr><th>字段名</th><th>说明</th><th>示例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>title</td><td>曲目名称</td><td>黄河大合唱</td></tr>
+            <tr><td>borrower</td><td>借阅人</td><td>李小明</td></tr>
+            <tr><td>voice</td><td>声部</td><td>S</td></tr>
+            <tr><td>loanDate</td><td>借出日期</td><td>2024-01-01</td></tr>
+            <tr><td>dueDate</td><td>应还日期</td><td>2024-06-01</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="tab-overview">
+      <div id="overview-content">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="tab-details">
+      <div id="details-content">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>加载中...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="tab-export">
+      <div class="card">
+        <h3>导出数据</h3>
+        <p style="margin-bottom: 20px; color: #666;">导出当前评估结果，用于演出交接或存档。</p>
+        
+        <div class="action-buttons">
+          <button class="btn" onclick="exportMarkdown()">📄 导出 Markdown 交接单</button>
+          <button class="btn btn-secondary" onclick="exportJSON()">📋 导出 JSON 明细</button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+          <h4 style="margin-bottom: 15px;">预览：Markdown 交接单</h4>
+          <div id="markdown-preview" style="background: #f8f9fa; padding: 20px; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 0.9rem; max-height: 500px; overflow-y: auto;">
+            <div class="loading">
+              <p>请先导入数据并评估...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+  
+  <script>
+    let appData = null;
+    let riskAnalysis = null;
+    
+    const sampleData = {
+      program: [
+        { index: 1, title: "黄河大合唱", conductor: "张指挥", voices: "S,A,T,B", performanceDate: "2024-12-31" },
+        { index: 2, title: "我和我的祖国", conductor: "李指挥", voices: "S,A,T,B", performanceDate: "2024-12-31" },
+        { index: 3, title: "在太行山上", conductor: "张指挥", voices: "S,A", performanceDate: "2024-12-31" },
+        { index: 4, title: "歌唱祖国", conductor: "李指挥", voices: "S,A,T,B", performanceDate: "2024-12-31" }
+      ],
+      scoreLoans: [
+        { title: "黄河大合唱", borrower: "李小明", voice: "S", loanDate: "2024-01-01", dueDate: "2024-06-01" },
+        { title: "黄河大合唱", borrower: "王小红", voice: "S", loanDate: "2024-01-01", dueDate: "2024-06-01" },
+        { title: "黄河大合唱", borrower: "张小华", voice: "A", loanDate: "2024-01-01", dueDate: "2024-06-01" },
+        { title: "黄河大合唱", borrower: "王小红", voice: "S", loanDate: "2024-02-01", dueDate: "2024-07-01" },
+        { title: "我和我的祖国", borrower: "李小明", voice: "S", loanDate: "2024-11-01", dueDate: "2025-01-01" },
+        { title: "我和我的祖国", borrower: "王小红", voice: "A", loanDate: "2024-11-01", dueDate: "2025-01-01" },
+        { title: "我和我的祖国", borrower: "张小华", voice: "T", loanDate: "2024-11-01", dueDate: "2025-01-01" },
+        { title: "我和我的祖国", borrower: "赵小刚", voice: "B", loanDate: "2024-11-01", dueDate: "2025-01-01" },
+        { title: "在太行山上", borrower: "李小明", voice: "S", loanDate: "2024-11-01", dueDate: "2025-01-01" },
+        { title: "歌唱祖国", borrower: "赵小刚", voice: "B", loanDate: "2024-10-01", dueDate: "2024-11-01" }
+      ],
+      authorizations: [
+        { title: "黄河大合唱", authorizer: "中国音乐家协会", expiryDate: "2023-12-31" },
+        { title: "我和我的祖国", authorizer: "版权方", expiryDate: "2025-12-31" },
+        { title: "在太行山上", authorizer: "公共版权", expiryDate: "" }
+      ],
+      attendance: [
+        { title: "黄河大合唱", voice: "S", name: "李小明", status: "出席" },
+        { title: "黄河大合唱", voice: "S", name: "王小红", status: "出席" },
+        { title: "黄河大合唱", voice: "S", name: "陈小丽", status: "缺席" },
+        { title: "黄河大合唱", voice: "A", name: "张小华", status: "出席" },
+        { title: "黄河大合唱", voice: "T", name: "刘小强", status: "缺席" },
+        { title: "我和我的祖国", voice: "S", name: "李小明", status: "出席" },
+        { title: "我和我的祖国", voice: "S", name: "王小红", status: "出席" },
+        { title: "我和我的祖国", voice: "A", name: "张小华", status: "出席" },
+        { title: "我和我的祖国", voice: "T", name: "刘小强", status: "出席" },
+        { title: "我和我的祖国", voice: "B", name: "赵小刚", status: "出席" },
+        { title: "在太行山上", voice: "S", name: "李小明", status: "缺席" },
+        { title: "在太行山上", voice: "A", name: "张小华", status: "缺席" }
+      ]
+    };
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const tabName = this.dataset.tab;
+        switchTab(tabName);
+      });
+    });
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      
+      if (tabName === 'overview') {
+        renderOverview();
+      } else if (tabName === 'details') {
+        renderDetails();
+      } else if (tabName === 'export') {
+        refreshExportPreview();
+      }
+    }
+    
+    async function loadData() {
+      try {
+        const response = await fetch('/api/data');
+        const result = await response.json();
+        if (result.success) {
+          appData = result.data;
+          riskAnalysis = result.riskAnalysis;
+          updateImportStatus();
+          return true;
+        }
+      } catch (e) {
+        console.error('加载数据失败:', e);
+        showToast('加载数据失败', 'error');
+      }
+      return false;
+    }
+    
+    function updateImportStatus() {
+      if (!appData) return;
+      
+      document.getElementById('program-status').textContent = 
+        appData.program.length > 0 ? `✅ 已导入 ${appData.program.length} 个节目` : '';
+      document.getElementById('score-loans-status').textContent = 
+        appData.scoreLoans.length > 0 ? `✅ 已导入 ${appData.scoreLoans.length} 条记录` : '';
+      document.getElementById('authorizations-status').textContent = 
+        appData.authorizations.length > 0 ? `✅ 已导入 ${appData.authorizations.length} 条记录` : '';
+      document.getElementById('attendance-status').textContent = 
+        appData.attendance.length > 0 ? `✅ 已导入 ${appData.attendance.length} 条记录` : '';
+    }
+    
+    async function importData(type, fileInput) {
+      const file = fileInput.files[0];
+      if (!file) return;
+      
+      const format = file.name.endsWith('.csv') ? 'csv' : 'json';
+      const reader = new FileReader();
+      
+      reader.onload = async function(e) {
+        try {
+          const content = e.target.result;
+          const response = await fetch(`/api/import/${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content, format })
+          });
+          
+          const result = await response.json();
+          if (result.success) {
+            appData = result.data;
+            riskAnalysis = result.riskAnalysis;
+            updateImportStatus();
+            showToast(result.message, 'success');
+          } else {
+            showToast(result.message, 'error');
+          }
+        } catch (err) {
+          showToast('导入失败: ' + err.message, 'error');
+        }
+      };
+      
+      reader.readAsText(file);
+      fileInput.value = '';
+    }
+    
+    async function loadSampleData() {
+      try {
+        for (const [key, data] of Object.entries(sampleData)) {
+          const type = key === 'scoreLoans' ? 'score-loans' : key;
+          await fetch(`/api/import/${type}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: JSON.stringify(data), format: 'json' })
+          });
+        }
+        await loadData();
+        showToast('示例数据加载成功！', 'success');
+      } catch (err) {
+        showToast('加载示例数据失败: ' + err.message, 'error');
+      }
+    }
+    
+    async function resetData() {
+      if (!confirm('确定要清空所有数据吗？此操作不可恢复。')) return;
+      
+      try {
+        const response = await fetch('/api/reset', { method: 'POST' });
+        const result = await response.json();
+        if (result.success) {
+          appData = result.data;
+          riskAnalysis = result.riskAnalysis;
+          updateImportStatus();
+          showToast('数据已清空', 'success');
+        }
+      } catch (err) {
+        showToast('清空数据失败: ' + err.message, 'error');
+      }
+    }
+    
+    function renderOverview() {
+      const container = document.getElementById('overview-content');
+      
+      if (!riskAnalysis || !riskAnalysis.summary) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <h3>暂无数据</h3>
+            <p>请先在"数据导入"页面导入数据或加载示例数据</p>
+            <button class="btn sample-data-btn" onclick="loadSampleData(); setTimeout(() => renderOverview(), 500);">📋 加载示例数据</button>
+          </div>
+        `;
+        return;
+      }
+      
+      const summary = riskAnalysis.summary;
+      
+      let html = `
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="number">${summary.totalPrograms}</div>
+            <div class="label">总节目数</div>
+          </div>
+          <div class="summary-card high-risk">
+            <div class="number">${summary.highRiskCount}</div>
+            <div class="label">高风险节目</div>
+          </div>
+          <div class="summary-card medium-risk">
+            <div class="number">${summary.mediumRiskCount}</div>
+            <div class="label">中风险节目</div>
+          </div>
+          <div class="summary-card approved">
+            <div class="number">${summary.approvedCount}</div>
+            <div class="label">通过</div>
+          </div>
+        </div>
+      `;
+      
+      if (summary.overdueCount > 0) {
+        html += `
+          <div class="card">
+            <h3>⚠️ 超期待追回的谱子 (${summary.overdueCount}份)</h3>
+            <table class="data-table">
+              <thead>
+                <tr><th>曲目</th><th>借阅人</th><th>声部</th><th>应还日期</th><th>借出日期</th></tr>
+              </thead>
+              <tbody>
+        `;
+        
+        riskAnalysis.overdueLoans.forEach(loan => {
+          html += `
+            <tr>
+              <td>${loan.title}</td>
+              <td>${loan.borrower}</td>
+              <td>${loan.voice}</td>
+              <td><span style="color: #dc3545; font-weight: bold;">${loan.dueDate}</span></td>
+              <td>${loan.loanDate || '-'}</td>
+            </tr>
+          `;
+        });
+        
+        html += `</tbody></table></div>`;
+      }
+      
+      const highRiskPrograms = riskAnalysis.programRisks.filter(p => p.finalDecision === 'blocked');
+      const mediumRiskPrograms = riskAnalysis.programRisks.filter(p => p.finalDecision === 'warning');
+      
+      if (highRiskPrograms.length > 0) {
+        html += `
+          <div class="card">
+            <h3>🔴 高风险节目 (${highRiskPrograms.length}个)</h3>
+            <table class="data-table">
+              <thead>
+                <tr><th>序号</th><th>曲目</th><th>指挥</th><th>声部</th><th>主要风险</th></tr>
+              </thead>
+              <tbody>
+        `;
+        
+        highRiskPrograms.forEach(p => {
+          const mainRisks = p.risks.filter(r => r.severity === 'high').slice(0, 2);
+          html += `
+            <tr>
+              <td>${p.index}</td>
+              <td><strong>${p.title}</strong></td>
+              <td>${p.conductor || '-'}</td>
+              <td>${p.voices ? p.voices.join('、') : '-'}</td>
+              <td style="color: #dc3545;">${mainRisks.map(r => r.message).join('；')}</td>
+            </tr>
+          `;
+        });
+        
+        html += `</tbody></table></div>`;
+      }
+      
+      if (mediumRiskPrograms.length > 0) {
+        html += `
+          <div class="card">
+            <h3>🟡 中风险节目 (${mediumRiskPrograms.length}个)</h3>
+            <table class="data-table">
+              <thead>
+                <tr><th>序号</th><th>曲目</th><th>指挥</th><th>声部</th><th>主要风险</th></tr>
+              </thead>
+              <tbody>
+        `;
+        
+        mediumRiskPrograms.forEach(p => {
+          const mainRisks = p.risks.slice(0, 2);
+          html += `
+            <tr>
+              <td>${p.index}</td>
+              <td><strong>${p.title}</strong></td>
+              <td>${p.conductor || '-'}</td>
+              <td>${p.voices ? p.voices.join('、') : '-'}</td>
+              <td style="color: #ffc107;">${mainRisks.map(r => r.message).join('；')}</td>
+            </tr>
+          `;
+        });
+        
+        html += `</tbody></table></div>`;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    function renderDetails() {
+      const container = document.getElementById('details-content');
+      
+      if (!riskAnalysis || !riskAnalysis.programRisks || riskAnalysis.programRisks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h3>暂无数据</h3>
+            <p>请先在"数据导入"页面导入数据或加载示例数据</p>
+            <button class="btn sample-data-btn" onclick="loadSampleData(); setTimeout(() => renderDetails(), 500);">📋 加载示例数据</button>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = `
+        <div class="filter-section">
+          <label style="font-weight: 500;">筛选状态：</label>
+          <select class="filter-select" onchange="filterDetails(this.value)">
+            <option value="all">全部节目</option>
+            <option value="blocked">仅高风险</option>
+            <option value="warning">仅中风险</option>
+            <option value="approved">仅通过</option>
+          </select>
+        </div>
+        
+        <div id="details-list" class="risk-list">
+      `;
+      
+      const sortedRisks = [...riskAnalysis.programRisks].sort((a, b) => {
+        const order = { blocked: 0, warning: 1, pending: 2, approved: 3 };
+        return (order[a.finalDecision] || 0) - (order[b.finalDecision] || 0);
+      });
+      
+      sortedRisks.forEach(program => {
+        const riskClass = program.finalDecision === 'blocked' ? 'high-risk' : 
+                          program.finalDecision === 'warning' ? 'medium-risk' : 'approved';
+        const statusText = program.finalDecision === 'blocked' ? '高风险' :
+                           program.finalDecision === 'warning' ? '中风险' :
+                           program.finalDecision === 'approved' ? '通过' : '待确认';
+        
+        html += `
+          <div class="risk-item ${riskClass}" data-status="${program.finalDecision}" id="item-${program.id}">
+            <div class="risk-item-header">
+              <div class="risk-item-title">
+                <span style="font-size: 1.5rem;">${program.index ? program.index + '.' : ''}</span>
+                ${program.title}
+                ${program.override ? '<span class="status-badge override">人工判定</span>' : ''}
+              </div>
+              <span class="status-badge ${riskClass}">${statusText}</span>
+            </div>
+            
+            <div class="risk-details">
+              ${program.conductor ? `<p><strong>指挥：</strong>${program.conductor}</p>` : ''}
+              ${program.voices && program.voices.length > 0 ? `<p><strong>声部：</strong>${program.voices.join('、')}</p>` : ''}
+              ${program.performanceDate ? `<p><strong>演出日期：</strong>${program.performanceDate}</p>` : ''}
+              
+              ${program.risks.length > 0 ? `
+                <p><strong>风险提示：</strong></p>
+                <ul class="risk-items">
+                  ${program.risks.map(r => `
+                    <li class="${r.severity}">
+                      ${r.severity === 'high' ? '🔴' : '🟡'} ${r.message}
+                    </li>
+                  `).join('')}
+                </ul>
+              ` : ''}
+            </div>
+            
+            <div class="override-section">
+              <h5>人工改判 & 备注</h5>
+              <div class="override-buttons">
+                <button class="btn btn-sm ${program.override === 'blocked' ? 'btn-danger' : ''}" 
+                        onclick="setOverride('${program.id}', ${program.override === 'blocked' ? "null" : "'blocked'"})">
+                  🔴 不通过
+                </button>
+                <button class="btn btn-sm ${program.override === 'warning' ? 'btn-warning' : ''}" 
+                        onclick="setOverride('${program.id}', ${program.override === 'warning' ? "null" : "'warning'"})">
+                  🟡 需关注
+                </button>
+                <button class="btn btn-sm ${program.override === 'approved' ? 'btn-success' : ''}" 
+                        onclick="setOverride('${program.id}', ${program.override === 'approved' ? "null" : "'approved'"})">
+                  🟢 通过
+                </button>
+                ${program.override ? `
+                  <button class="btn btn-sm btn-secondary" onclick="setOverride('${program.id}', null)">
+                    清除改判
+                  </button>
+                ` : ''}
+              </div>
+              <textarea class="note-input" 
+                        placeholder="添加备注说明（如：已联系版权方补授权、谱子正在追回中...）"
+                        onchange="setNote('${program.id}', this.value)"
+                        onblur="setNote('${program.id}', this.value)">${program.note || ''}</textarea>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+    
+    function filterDetails(status) {
+      const items = document.querySelectorAll('#details-list .risk-item');
+      items.forEach(item => {
+        if (status === 'all' || item.dataset.status === status) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    async function setOverride(id, decision) {
+      try {
+        const response = await fetch('/api/override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, decision })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          appData = result.data;
+          riskAnalysis = result.riskAnalysis;
+          renderDetails();
+          showToast(decision ? '已更新人工判定' : '已清除改判', 'success');
+        }
+      } catch (err) {
+        showToast('操作失败: ' + err.message, 'error');
+      }
+    }
+    
+    async function setNote(id, note) {
+      try {
+        const response = await fetch('/api/note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, note: note || null })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          appData = result.data;
+          riskAnalysis = result.riskAnalysis;
+        }
+      } catch (err) {
+        console.error('保存备注失败:', err);
+      }
+    }
+    
+    function exportMarkdown() {
+      window.location.href = '/api/export/markdown';
+    }
+    
+    function exportJSON() {
+      window.location.href = '/api/export/json';
+    }
+    
+    async function refreshExportPreview() {
+      const preview = document.getElementById('markdown-preview');
+      
+      if (!riskAnalysis || !riskAnalysis.programRisks || riskAnalysis.programRisks.length === 0) {
+        preview.innerHTML = '<div class="loading"><p>请先导入数据并评估...</p></div>';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/export/markdown');
+        const markdown = await response.text();
+        preview.textContent = markdown;
+      } catch (err) {
+        preview.innerHTML = '<p>加载预览失败</p>';
+      }
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadData();
+    });
+  </script>
+</body>
+</html>
