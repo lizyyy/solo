@@ -1,0 +1,52 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.5, pytest-7.4.3, pluggy-1.3.0
+rootdir: /app
+plugins: rerunfailures-12.0
+collected 5 items
+
+auth/tests/test_login.py::TestLogin::test_locked_account FAILED
+auth/tests/test_login.py::TestLogin::test_locked_account RERUN (1/3)
+auth/tests/test_login.py::TestLogin::test_locked_account FAILED
+auth/tests/test_login.py::TestLogin::test_locked_account RERUN (2/3)
+auth/tests/test_login.py::TestLogin::test_locked_account PASSED
+payment/tests/test_processing.py::TestPayment::test_failed_payment FAILED
+payment/tests/test_processing.py::TestPayment::test_failed_payment RERUN (1/3)
+payment/tests/test_processing.py::TestPayment::test_failed_payment PASSED
+user/tests/test_profile.py::TestProfile::test_update_profile PASSED
+user/tests/test_profile.py::TestProfile::test_get_profile FAILED
+user/tests/test_profile.py::TestProfile::test_get_profile RERUN (1/3)
+user/tests/test_profile.py::TestProfile::test_get_profile RERUN (2/3)
+user/tests/test_profile.py::TestProfile::test_get_profile RERUN (3/3)
+user/tests/test_profile.py::TestProfile::test_get_profile FAILED
+
+================================== FAILURES ===================================
+____________________ TestLogin.test_locked_account ____________________
+Traceback (most recent call last):
+  File "/app/auth/tests/test_login.py", line 45, in test_locked_account
+    assert response.status_code == 403
+AssertionError: expected 403, got 401
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/app/auth/tests/test_login.py", line 48, in test_locked_account
+    assert response.json()['error'] == 'Account locked'
+KeyError: 'error'
+
+____________________ TestPayment.test_failed_payment ____________________
+Traceback (most recent call last):
+  File "/app/payment/tests/test_processing.py", line 78, in test_failed_payment
+    result = process_payment("4111-1111-1111-1111", 100.00)
+ValueError: Invalid card number format
+
+____________________ TestProfile.test_get_profile ____________________
+Traceback (most recent call last):
+  File "/app/user/tests/test_profile.py", line 23, in test_get_profile
+    assert profile['email'] == 'test@example.com'
+ConnectionError: Connection refused to database
+
+=========================== short test summary info ============================
+FAILED auth/tests/test_login.py::TestLogin::test_locked_account - AssertionError
+FAILED payment/tests/test_processing.py::TestPayment::test_failed_payment - ValueError
+FAILED user/tests/test_profile.py::TestProfile::test_get_profile - ConnectionError
+= 3 failed, 2 passed, 6 rerun in 12.34s =

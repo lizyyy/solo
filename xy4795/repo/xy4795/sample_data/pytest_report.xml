@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="pytest" errors="0" failures="2" skipped="1" tests="10" time="2.345" timestamp="2024-01-15T10:30:00">
+    <properties>
+      <property name="CI" value="true"/>
+      <property name="module" value="auth"/>
+      <property name="owner" value="alice"/>
+    </properties>
+    
+    <testcase classname="auth.tests.test_login.TestLogin" name="test_successful_login" time="0.123">
+      <system-out>
+<![CDATA[
+Testing login with valid credentials
+User authenticated successfully
+]]>
+      </system-out>
+    </testcase>
+    
+    <testcase classname="auth.tests.test_login.TestLogin" name="test_invalid_password" time="0.089">
+      <system-out>
+<![CDATA[
+Testing login with invalid password
+]]>
+      </system-out>
+    </testcase>
+    
+    <testcase classname="auth.tests.test_login.TestLogin" name="test_locked_account" time="0.234">
+      <failure message="AssertionError: expected 403, got 401" type="AssertionError">
+<![CDATA[
+Traceback (most recent call last):
+  File "/app/auth/tests/test_login.py", line 45, in test_locked_account
+    assert response.status_code == 403
+AssertionError: expected 403, got 401
+]]>
+      </failure>
+    </testcase>
+    
+    <testcase classname="auth.tests.test_token.TestToken" name="test_token_generation" time="0.156">
+    </testcase>
+    
+    <testcase classname="auth.tests.test_token.TestToken" name="test_token_expiry" time="0.312">
+      <skipped message="Skipped: Token expiry test requires real clock"/>
+    </testcase>
+    
+    <testcase classname="payment.tests.test_processing.TestPayment" name="test_credit_card_payment" time="0.456">
+    </testcase>
+    
+    <testcase classname="payment.tests.test_processing.TestPayment" name="test_failed_payment" time="0.234">
+      <failure message="ValueError: Invalid card number" type="ValueError">
+<![CDATA[
+Traceback (most recent call last):
+  File "/app/payment/tests/test_processing.py", line 78, in test_failed_payment
+    result = process_payment("4111-1111-1111-1111", 100.00)
+ValueError: Invalid card number format
+]]>
+      </failure>
+    </testcase>
+    
+    <testcase classname="payment.tests.test_refund.TestRefund" name="test_full_refund" time="0.345">
+    </testcase>
+    
+    <testcase classname="payment.tests.test_refund.TestRefund" name="test_partial_refund" time="0.289">
+    </testcase>
+    
+    <testcase classname="user.tests.test_profile.TestProfile" name="test_update_profile" time="0.198">
+    </testcase>
+    
+  </testsuite>
+</testsuites>
