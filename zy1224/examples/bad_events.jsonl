@@ -1,0 +1,6 @@
+{"timestamp": "2024-01-15T10:00:00Z", "event_type": "case_start", "case_name": "valid", "details": {}}
+这不是有效的 JSON
+{"timestamp": "2024-01-15T10:00:01Z", "event_type": "missing_event_type", "details": {}}
+{"timestamp": "2024-01-15T10:00:02Z", "event_type": "defer_exec", "case_name": "test", "details": {}}
+{"invalid_json":
+{"timestamp": "2024-01-15T10:00:03Z", "event_type": "case_end", "case_name": "test", "details": {"status": "completed"}}

@@ -1,0 +1,21 @@
+# 这是一个坏格式的 YAML 文件示例
+# 问题：缺少必要字段，格式不正确
+
+cases:
+  - name: incomplete_case
+    # 缺少 description 字段
+    # 缺少 snippet 字段 - 这是必需的
+    expected_status: normal
+
+  - # 缺少 name 字段 - 这是必需的
+    description: 缺少 name 的用例
+    snippet: snippets/basic_defer.go
+
+invalid_yaml:
+  - 这是一个无效的 YAML 结构
+    没有正确缩进
+
+# 下面的列表没有正确缩进
+- name: bad_indent
+  description: 缩进错误
+  snippet: snippets/basic_defer.go

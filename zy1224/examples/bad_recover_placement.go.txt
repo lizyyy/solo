@@ -1,0 +1,25 @@
+package main
+
+// 这是一个有问题的代码示例
+// 问题：recover 在非 defer 函数中调用，无法生效
+
+import "fmt"
+
+func badRecover() {
+	// 错误：recover 不在 defer 中
+	if r := recover(); r != nil {
+		fmt.Println("恢复:", r)
+	}
+
+	fmt.Println("开始执行...")
+	panic("出现问题！")
+}
+
+func main() {
+	badRecover()
+}
+
+// 关键点：
+// 1. recover() 只能在 defer 函数中生效
+// 2. 这里的 recover 在正常执行流中调用，返回 nil
+// 3. panic 不会被捕获，程序崩溃

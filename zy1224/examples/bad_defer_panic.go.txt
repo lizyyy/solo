@@ -1,0 +1,24 @@
+package main
+
+// 这是一个有问题的代码示例
+// 问题：defer 中的 panic 覆盖原始 panic
+
+func badDeferPanic() {
+	defer func() {
+		// 这个 defer 中的 panic 会覆盖原始的 panic
+		panic("defer 中的新 panic")
+	}()
+
+	panic("原始 panic")
+}
+
+func main() {
+	badDeferPanic()
+}
+
+// 关键点：
+// 1. panic("原始 panic") 触发
+// 2. 开始执行 defer
+// 3. defer 中的 panic("defer 中的新 panic") 覆盖了原始 panic
+// 4. 程序崩溃时只显示 "defer 中的新 panic"
+// 5. 原始错误信息丢失了！
