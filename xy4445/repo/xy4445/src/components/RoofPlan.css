@@ -1,0 +1,135 @@
+.roof-plan-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.roof-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.roof-plan-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.roof-plan-legend {
+  display: flex;
+  gap: 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-color.critical {
+  background-color: #ef4444;
+}
+
+.legend-color.at-risk {
+  background-color: #f59e0b;
+}
+
+.legend-color.healthy {
+  background-color: #10b981;
+}
+
+.roof-plan-svg-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #f9fafb;
+}
+
+.roof-plan-svg {
+  width: 100%;
+  min-width: 400px;
+  height: auto;
+}
+
+.hive-node {
+  transition: transform 0.2s ease;
+}
+
+.hive-node:hover {
+  transform: scale(1.1);
+}
+
+.hive-node.selected circle {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+}
+
+@keyframes pulseHigh {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulseMedium {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-high circle:first-of-type {
+  animation: pulseHigh 2s ease-in-out infinite;
+}
+
+.pulse-medium circle:first-of-type {
+  animation: pulseMedium 2s ease-in-out infinite;
+}
+
+.roof-plan-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  background-color: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+.roof-plan-empty p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.roof-plan-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.roof-plan-stats p {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
