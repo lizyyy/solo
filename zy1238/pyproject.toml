@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "concurrency-checker"
+version = "0.1.0"
+description = "Python 并发方案体检 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+    "pyyaml>=6.0",
+    "rich>=13.0",
+    "click>=8.0",
+    "aiofiles>=23.0",
+]
+
+[project.scripts]
+concurrency-checker = "concurrency_checker.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
