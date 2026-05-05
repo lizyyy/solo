@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>铁路货场调车演练系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="logo">
+                <h1>🚂 铁路货场调车演练</h1>
+            </div>
+            <div class="controls">
+                <button id="btn-new-game" class="btn btn-primary">新游戏</button>
+                <button id="btn-load-game" class="btn btn-secondary">读取存档</button>
+                <button id="btn-export-md" class="btn btn-secondary">导出复盘</button>
+                <button id="btn-export-json" class="btn btn-secondary">导出JSON</button>
+                <button id="btn-replay" class="btn btn-secondary" style="display:none;">复盘模式</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="sidebar">
+                <div class="info-panel">
+                    <h3>关卡信息</h3>
+                    <div class="info-item">
+                        <label>关卡:</label>
+                        <span id="current-level">1</span>
+                    </div>
+                    <div class="info-item">
+                        <label>时间:</label>
+                        <span id="game-time">00:00</span>
+                    </div>
+                    <div class="info-item">
+                        <label>时间窗:</label>
+                        <span id="time-window">10:00</span>
+                    </div>
+                </div>
+
+                <div class="score-panel">
+                    <h3>得分</h3>
+                    <div class="score-item">
+                        <label>当前得分:</label>
+                        <span id="current-score">0</span>
+                    </div>
+                    <div class="score-item">
+                        <label>违规次数:</label>
+                        <span id="violation-count">0</span>
+                    </div>
+                </div>
+
+                <div class="level-selector">
+                    <h3>选择关卡</h3>
+                    <select id="level-select" class="form-control">
+                    </select>
+                </div>
+
+                <div class="action-panel">
+                    <h3>操作说明</h3>
+                    <div class="instructions">
+                        <p>1. 选择机车</p>
+                        <p>2. 点击道岔切换方向</p>
+                        <p>3. 点击轨道推送/拉取车皮</p>
+                        <p>4. 将车皮送到目的股道</p>
+                    </div>
+                </div>
+
+                <div class="violations-panel" style="display:none;">
+                    <h3>违规记录</h3>
+                    <div id="violations-list"></div>
+                </div>
+            </aside>
+
+            <section class="game-area">
+                <canvas id="game-canvas" width="1000" height="600"></canvas>
+                <div class="game-overlay" id="game-overlay" style="display:none;">
+                    <div class="overlay-content">
+                        <h2 id="overlay-title">游戏结束</h2>
+                        <p id="overlay-message"></p>
+                        <div class="overlay-stats"></div>
+                        <button id="overlay-close" class="btn btn-primary">关闭</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="control-panel">
+                <div class="train-control">
+                    <h3>机车控制</h3>
+                    <div class="selected-train" id="selected-train-info">
+                        <p>未选择机车</p>
+                    </div>
+                    <div class="control-buttons">
+                        <button id="btn-push" class="btn btn-action" disabled>推送</button>
+                        <button id="btn-pull" class="btn btn-action" disabled>拉取</button>
+                        <button id="btn-couple" class="btn btn-action" disabled>连挂</button>
+                        <button id="btn-uncouple" class="btn btn-action" disabled>摘钩</button>
+                    </div>
+                </div>
+
+                <div class="cars-status">
+                    <h3>车皮状态</h3>
+                    <div id="cars-list"></div>
+                </div>
+
+                <div class="destinations">
+                    <h3>目的股道</h3>
+                    <div id="destinations-list"></div>
+                </div>
+
+                <div class="switch-status">
+                    <h3>道岔状态</h3>
+                    <div id="switches-list"></div>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="footer">
+            <p>铁路货场调车演练系统 v1.0 | 供培训使用</p>
+        </footer>
+    </div>
+
+    <script src="levels.js"></script>
+    <script src="engine.js"></script>
+    <script src="game.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
