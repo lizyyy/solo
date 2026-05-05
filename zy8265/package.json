@@ -1,0 +1,13 @@
+{
+  "name": "museum-heist-game",
+  "version": "1.0.0",
+  "description": "博物馆夜间文物搬运小游戏",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": ["game", "museum", "puzzle"],
+  "author": "",
+  "license": "MIT"
+}
