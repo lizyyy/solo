@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>采购立项申请系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>采购立项申请系统</h1>
+      <div class="header-actions">
+        <span id="save-status" class="save-status"></span>
+        <button id="manual-save-btn" class="btn btn-secondary" style="display: none;">
+          <span class="btn-icon">💾</span> 手动保存
+        </button>
+      </div>
+    </header>
+
+    <div id="schema-warning" class="warning-banner" style="display: none;">
+      <div class="warning-content">
+        <span class="warning-icon">⚠️</span>
+        <span id="schema-warning-text">该草稿数据格式较旧，请保存以更新到最新格式。</span>
+      </div>
+    </div>
+
+    <div id="conflict-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚠️ 版本冲突</h2>
+        </div>
+        <div class="modal-body">
+          <p>检测到其他标签页正在编辑同一草稿。请选择：</p>
+          <div class="conflict-options">
+            <button id="keep-local-btn" class="btn btn-warning btn-lg">
+              <span class="btn-icon">📝</span>
+              <div class="btn-text">保留本页</div>
+              <div class="btn-desc">覆盖服务器数据</div>
+            </button>
+            <button id="load-server-btn" class="btn btn-info btn-lg">
+              <span class="btn-icon">🔄</span>
+              <div class="btn-text">加载服务器版</div>
+              <div class="btn-desc">放弃本页修改</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="app-main">
+      <div id="home-view" class="view">
+        <div class="view-header">
+          <h2>草稿列表</h2>
+          <button id="new-draft-btn" class="btn btn-primary">
+            <span class="btn-icon">➕</span> 新建申请
+          </button>
+        </div>
+        
+        <div class="draft-list-container">
+          <div id="draft-list" class="draft-list">
+          </div>
+          <div id="empty-drafts" class="empty-state" style="display: none;">
+            <div class="empty-icon">📋</div>
+            <p>暂无草稿，点击"新建申请"开始</p>
+          </div>
+        </div>
+
+        <div class="submissions-section">
+          <h3>提交记录</h3>
+          <div id="submissions-list" class="submissions-list">
+          </div>
+        </div>
+      </div>
+
+      <div id="wizard-view" class="view" style="display: none;">
+        <button id="back-to-list-btn" class="btn btn-text">
+          <span class="btn-icon">←</span> 返回草稿列表
+        </button>
+
+        <div class="wizard-progress">
+          <div class="progress-steps">
+            <div class="step-indicator" data-step="0">
+              <div class="step-number">1</div>
+              <div class="step-label">申请信息</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-indicator" data-step="1">
+              <div class="step-number">2</div>
+              <div class="step-label">供应商比价</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-indicator" data-step="2">
+              <div class="step-number">3</div>
+              <div class="step-label">预算科目</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-indicator" data-step="3">
+              <div class="step-number">4</div>
+              <div class="step-label">附件清单</div>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-indicator" data-step="4">
+              <div class="step-number">5</div>
+              <div class="step-label">审批预览</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-content">
+          <div id="step-0" class="step-panel">
+            <h2>申请信息</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="applicant">申请人 <span class="required">*</span></label>
+                <input type="text" id="applicant" class="form-input" placeholder="请输入申请人姓名">
+              </div>
+              <div class="form-group">
+                <label for="department">申请部门 <span class="required">*</span></label>
+                <input type="text" id="department" class="form-input" placeholder="请输入申请部门">
+              </div>
+              <div class="form-group">
+                <label for="application-date">申请日期</label>
+                <input type="date" id="application-date" class="form-input">
+              </div>
+              <div class="form-group">
+                <label for="total-amount">预计总金额 (元)</label>
+                <input type="number" id="total-amount" class="form-input" placeholder="请输入预计总金额" min="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="project-name">项目名称 <span class="required">*</span></label>
+              <input type="text" id="project-name" class="form-input" placeholder="请输入项目名称">
+            </div>
+            <div class="form-group">
+              <label for="project-description">项目描述</label>
+              <textarea id="project-description" class="form-textarea" rows="4" placeholder="请详细描述采购需求"></textarea>
+            </div>
+          </div>
+
+          <div id="step-1" class="step-panel" style="display: none;">
+            <h2>供应商比价</h2>
+            <p class="step-description">请添加至少一家供应商信息进行比价</p>
+            
+            <div id="suppliers-container" class="suppliers-container">
+            </div>
+
+            <button id="add-supplier-btn" class="btn btn-secondary">
+              <span class="btn-icon">➕</span> 添加供应商
+            </button>
+          </div>
+
+          <div id="step-2" class="step-panel" style="display: none;">
+            <h2>预算科目</h2>
+            <p class="step-description">请选择或输入预算科目信息</p>
+            
+            <div id="budget-container" class="budget-container">
+            </div>
+
+            <button id="add-budget-btn" class="btn btn-secondary">
+              <span class="btn-icon">➕</span> 添加预算科目
+            </button>
+          </div>
+
+          <div id="step-3" class="step-panel" style="display: none;">
+            <h2>附件清单</h2>
+            <p class="step-description">请上传相关附件（支持多文件）</p>
+            
+            <div class="upload-area" id="upload-area">
+              <div class="upload-icon">📎</div>
+              <p>拖拽文件到此处或<span class="upload-link">点击选择文件</span></p>
+              <input type="file" id="file-input" multiple style="display: none;">
+            </div>
+
+            <div id="attachments-container" class="attachments-container">
+            </div>
+          </div>
+
+          <div id="step-4" class="step-panel" style="display: none;">
+            <h2>审批预览</h2>
+            <p class="step-description">请确认以下信息无误后提交申请</p>
+            
+            <div class="preview-summary">
+              <div class="preview-section">
+                <h3>📋 申请信息</h3>
+                <div id="preview-application" class="preview-content"></div>
+              </div>
+
+              <div class="preview-section">
+                <h3>🏢 供应商比价</h3>
+                <div id="preview-suppliers" class="preview-content"></div>
+              </div>
+
+              <div class="preview-section">
+                <h3>💰 预算科目</h3>
+                <div id="preview-budget" class="preview-content"></div>
+              </div>
+
+              <div class="preview-section">
+                <h3>📎 附件清单</h3>
+                <div id="preview-attachments" class="preview-content"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-footer">
+          <button id="prev-step-btn" class="btn btn-secondary" style="display: none;">
+            <span class="btn-icon">←</span> 上一步
+          </button>
+          <button id="next-step-btn" class="btn btn-primary">
+            下一步 <span class="btn-icon">→</span>
+          </button>
+          <button id="submit-btn" class="btn btn-success" style="display: none;">
+            <span class="btn-icon">✅</span> 提交申请
+          </button>
+        </div>
+      </div>
+
+      <div id="submitted-view" class="view" style="display: none;">
+        <div class="submitted-success">
+          <div class="success-icon">🎉</div>
+          <h2>提交成功！</h2>
+          <p id="submitted-title"></p>
+          <p id="submitted-time"></p>
+          <button id="back-home-btn" class="btn btn-primary">
+            <span class="btn-icon">🏠</span> 返回首页
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <template id="supplier-template">
+    <div class="supplier-card">
+      <div class="card-header">
+        <h4>供应商 #{{index}}</h4>
+        <button class="btn btn-remove" data-supplier-index="{{index}}">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>供应商名称</label>
+          <input type="text" class="form-input supplier-name" placeholder="供应商名称">
+        </div>
+        <div class="form-group">
+          <label>联系人</label>
+          <input type="text" class="form-input supplier-contact" placeholder="联系人">
+        </div>
+        <div class="form-group">
+          <label>联系电话</label>
+          <input type="tel" class="form-input supplier-phone" placeholder="联系电话">
+        </div>
+        <div class="form-group">
+          <label>产品名称</label>
+          <input type="text" class="form-input supplier-product" placeholder="产品名称">
+        </div>
+        <div class="form-group">
+          <label>单价 (元)</label>
+          <input type="number" class="form-input supplier-price" placeholder="单价" min="0">
+        </div>
+        <div class="form-group">
+          <label>数量</label>
+          <input type="number" class="form-input supplier-quantity" placeholder="数量" min="1">
+        </div>
+        <div class="form-group">
+          <label>交货天数</label>
+          <input type="number" class="form-input supplier-delivery" placeholder="交货天数" min="1">
+        </div>
+        <div class="form-group">
+          <label>质保期</label>
+          <input type="text" class="form-input supplier-warranty" placeholder="如：1年">
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="budget-template">
+    <div class="budget-item">
+      <div class="budget-header">
+        <h4>预算科目 #{{index}}</h4>
+        <button class="btn btn-remove" data-budget-index="{{index}}">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>科目编码</label>
+          <input type="text" class="form-input budget-code" placeholder="如：660201">
+        </div>
+        <div class="form-group">
+          <label>科目名称</label>
+          <input type="text" class="form-input budget-name" placeholder="如：办公设备购置费">
+        </div>
+        <div class="form-group">
+          <label>金额 (元)</label>
+          <input type="number" class="form-input budget-amount" placeholder="金额" min="0">
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <input type="text" class="form-input budget-remark" placeholder="备注">
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="attachment-template">
+    <div class="attachment-item">
+      <div class="attachment-icon">📄</div>
+      <div class="attachment-info">
+        <div class="attachment-name">{{name}}</div>
+        <div class="attachment-size">{{size}}</div>
+      </div>
+      <button class="btn btn-remove" data-attachment-index="{{index}}">✕</button>
+    </div>
+  </template>
+
+  <script src="js/api.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/wizard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
