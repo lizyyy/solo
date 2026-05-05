@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>面试反馈一致性审计台</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>面试反馈一致性审计台</h1>
+      <p class="subtitle">检测面试状态、评分、报告之间的一致性问题</p>
+    </header>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-item">
+        <span class="stat-label">候选人</span>
+        <span class="stat-value" id="statCandidates">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">面试反馈</span>
+        <span class="stat-value" id="statInterviews">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">审计日志</span>
+        <span class="stat-value" id="statAudits">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Offer审批</span>
+        <span class="stat-value" id="statApprovals">0</span>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="upload">数据导入</button>
+      <button class="tab-btn" data-tab="issues">问题检测</button>
+      <button class="tab-btn" data-tab="candidates">候选人列表</button>
+      <button class="tab-btn" data-tab="export">导出报告</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- 数据导入 Tab -->
+      <div id="upload" class="tab-content active">
+        <div class="upload-section">
+          <h3>导入候选人 CSV</h3>
+          <div class="upload-area" id="uploadCandidates">
+            <p>拖拽或点击上传 CSV 文件</p>
+            <p class="hint">支持字段: candidate_id, name, email, phone, position</p>
+          </div>
+          <input type="file" id="fileCandidates" accept=".csv" style="display: none;">
+          <div class="upload-result" id="resultCandidates"></div>
+        </div>
+
+        <div class="upload-section">
+          <h3>导入面试反馈 JSONL</h3>
+          <div class="upload-area" id="uploadInterviews">
+            <p>拖拽或点击上传 JSONL 文件</p>
+            <p class="hint">每行一个 JSON 对象，包含 candidate_id, feedback_id, status, rating 等</p>
+          </div>
+          <input type="file" id="fileInterviews" accept=".jsonl,.json,.txt" style="display: none;">
+          <div class="upload-result" id="resultInterviews"></div>
+        </div>
+
+        <div class="upload-section">
+          <h3>导入审计日志 JSONL</h3>
+          <div class="upload-area" id="uploadAudits">
+            <p>拖拽或点击上传 JSONL 文件</p>
+            <p class="hint">每行一个 JSON 对象，包含 candidate_id, action, field_name 等</p>
+          </div>
+          <input type="file" id="fileAudits" accept=".jsonl,.json,.txt" style="display: none;">
+          <div class="upload-result" id="resultAudits"></div>
+        </div>
+
+        <div class="upload-section">
+          <h3>导入 Offer 审批备注 JSONL</h3>
+          <div class="upload-area" id="uploadApprovals">
+            <p>拖拽或点击上传 JSONL 文件</p>
+            <p class="hint">每行一个 JSON 对象，包含 candidate_id, approval_status 等</p>
+          </div>
+          <input type="file" id="fileApprovals" accept=".jsonl,.json,.txt" style="display: none;">
+          <div class="upload-result" id="resultApprovals"></div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-danger" id="btnClearData">清空所有数据</button>
+          <button class="btn btn-primary" id="btnRefreshStats">刷新统计</button>
+        </div>
+      </div>
+
+      <!-- 问题检测 Tab -->
+      <div id="issues" class="tab-content">
+        <div class="issues-header">
+          <button class="btn btn-primary" id="btnRunCheck">运行一致性检测</button>
+          <div class="issue-stats" id="issueStats"></div>
+        </div>
+        <div class="issues-list" id="issuesList">
+          <p class="empty-state">点击"运行一致性检测"按钮开始检测</p>
+        </div>
+      </div>
+
+      <!-- 候选人列表 Tab -->
+      <div id="candidates" class="tab-content">
+        <div class="candidates-header">
+          <button class="btn btn-primary" id="btnRefreshCandidates">刷新列表</button>
+        </div>
+        <div class="candidates-list" id="candidatesList">
+          <p class="empty-state">暂无候选人数据</p>
+        </div>
+      </div>
+
+      <!-- 导出报告 Tab -->
+      <div id="export" class="tab-content">
+        <div class="export-section">
+          <h3>导出审计报告</h3>
+          <div class="export-buttons">
+            <button class="btn btn-primary" id="btnExportMarkdown">
+              导出 Markdown 报告
+            </button>
+            <button class="btn btn-secondary" id="btnExportJSON">
+              导出 JSON 审计包
+            </button>
+          </div>
+          <p class="hint">Markdown 报告包含问题概览和详细说明，JSON 包包含所有原始数据和检测结果</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- 候选人详情模态框 -->
+    <div class="modal" id="candidateModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">候选人详情</h3>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- 动态填充 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 评论输入模态框 -->
+    <div class="modal" id="commentModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>添加复核备注</h3>
+          <button class="modal-close" id="commentModalClose">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>问题描述</label>
+            <p id="commentIssueDesc" class="issue-desc"></p>
+          </div>
+          <div class="form-group">
+            <label for="commentText">备注内容</label>
+            <textarea id="commentText" rows="4" placeholder="输入复核备注..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="reviewerName">复核人（可选）</label>
+            <input type="text" id="reviewerName" placeholder="您的姓名">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="commentCancel">取消</button>
+          <button class="btn btn-primary" id="commentSubmit">提交</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
