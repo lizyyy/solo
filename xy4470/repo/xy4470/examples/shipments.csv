@@ -1,0 +1,5 @@
+shipment_id,shipment_date,store_name,items,total_quantity,recipient,contact,address,courier,tracking_number,status
+SH-2024-001,2024-01-25,国贸店,"[{""roast_batch_id"":""R-2024-001"",""product_name"":""耶加雪菲 日晒"",""quantity"":50,""unit_price"":128}]",50,王店长,13800138001,北京市朝阳区国贸中心1层,顺丰,SF1234567890,delivered
+SH-2024-002,2024-01-26,三里屯店,"[{""roast_batch_id"":""R-2024-002"",""product_name"":""哥伦比亚 慧兰"",""quantity"":30,""unit_price"":98}]",30,李店长,13800138002,北京市朝阳区三里屯太古里南区,顺丰,SF1234567891,delivered
+SH-2024-003,2024-01-28,朝阳大悦城店,"[{""roast_batch_id"":""R-2024-003"",""product_name"":""肯尼亚 AA"",""quantity"":40,""unit_price"":138}]",40,张店长,13800138003,北京市朝阳区朝阳大悦城B1层,顺丰,SF1234567892,in_transit
+SH-2024-004,2024-02-08,国贸店,"[{""roast_batch_id"":""R-2024-004"",""product_name"":""巴西 喜拉多"",""quantity"":100,""unit_price"":88}]",100,王店长,13800138001,北京市朝阳区国贸中心1层,顺丰,SF1234567893,shipped

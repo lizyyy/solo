@@ -1,0 +1,5 @@
+roast_batch_id,green_batch_ids,roast_date,green_weight_kg,roasted_weight_kg,roast_curve_points,first_crack_time,first_crack_temp,second_crack_time,second_crack_temp,drop_temp,drop_time,roast_level,roaster
+R-2024-001,GB-2024-001,2024-01-20,12.0,9.6,"[{""time"":0,""temp"":180},{""time"":60,""temp"":195},{""time"":300,""temp"":200},{""time"":540,""temp"":205}]",300,200,,205,540,City,张师傅
+R-2024-002,GB-2024-002,2024-01-22,10.0,7.0,"[{""time"":0,""temp"":180},{""time"":120,""temp"":200}]",120,200,,250,180,Full City,李师傅
+R-2024-003,"GB-2024-003,GB-2024-999",2024-01-25,15.0,11.0,"[{""time"":0,""temp"":180}]",360,195,,210,600,City+,张师傅
+R-2024-004,GB-2024-004,2024-02-05,20.0,15.8,"[{""time"":0,""temp"":180}]",330,198,,208,570,City,王师傅

@@ -1,0 +1,78 @@
+[
+  {
+    "roast_batch_id": "R-2024-001",
+    "green_batch_ids": ["GB-2024-001"],
+    "roast_date": "2024-01-20",
+    "green_weight_kg": 12.0,
+    "roasted_weight_kg": 9.6,
+    "roast_curve_points": [
+      {"time": 0, "temp": 180},
+      {"time": 60, "temp": 195},
+      {"time": 300, "temp": 200},
+      {"time": 540, "temp": 205}
+    ],
+    "first_crack_time": 300,
+    "first_crack_temp": 200.0,
+    "second_crack_time": null,
+    "second_crack_temp": null,
+    "drop_temp": 205.0,
+    "drop_time": 540,
+    "roast_level": "City",
+    "roaster": "张师傅"
+  },
+  {
+    "roast_batch_id": "R-2024-002",
+    "green_batch_ids": ["GB-2024-002"],
+    "roast_date": "2024-01-22",
+    "green_weight_kg": 10.0,
+    "roasted_weight_kg": 7.0,
+    "roast_curve_points": [
+      {"time": 0, "temp": 180},
+      {"time": 120, "temp": 200}
+    ],
+    "first_crack_time": 120,
+    "first_crack_temp": 200.0,
+    "second_crack_time": null,
+    "second_crack_temp": null,
+    "drop_temp": 250.0,
+    "drop_time": 180,
+    "roast_level": "Full City",
+    "roaster": "李师傅"
+  },
+  {
+    "roast_batch_id": "R-2024-003",
+    "green_batch_ids": ["GB-2024-003", "GB-2024-999"],
+    "roast_date": "2024-01-25",
+    "green_weight_kg": 15.0,
+    "roasted_weight_kg": 11.0,
+    "roast_curve_points": [
+      {"time": 0, "temp": 180}
+    ],
+    "first_crack_time": 360,
+    "first_crack_temp": 195.0,
+    "second_crack_time": null,
+    "second_crack_temp": null,
+    "drop_temp": 210.0,
+    "drop_time": 600,
+    "roast_level": "City+",
+    "roaster": "张师傅"
+  },
+  {
+    "roast_batch_id": "R-2024-004",
+    "green_batch_ids": ["GB-2024-004"],
+    "roast_date": "2024-02-05",
+    "green_weight_kg": 20.0,
+    "roasted_weight_kg": 15.8,
+    "roast_curve_points": [
+      {"time": 0, "temp": 180}
+    ],
+    "first_crack_time": 330,
+    "first_crack_temp": 198.0,
+    "second_crack_time": null,
+    "second_crack_temp": null,
+    "drop_temp": 208.0,
+    "drop_time": 570,
+    "roast_level": "City",
+    "roaster": "王师傅"
+  }
+]

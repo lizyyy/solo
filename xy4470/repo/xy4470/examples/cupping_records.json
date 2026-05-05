@@ -1,0 +1,91 @@
+[
+  {
+    "roast_batch_id": "R-2024-001",
+    "cupping_date": "2024-01-22",
+    "cupper": "陈杯测师",
+    "dry_aroma": 8.5,
+    "wet_aroma": 8.75,
+    "flavor": 8.5,
+    "aftertaste": 8.25,
+    "acidity": 8.5,
+    "body": 8.25,
+    "uniformity": 8.5,
+    "clean_cup": 8.5,
+    "sweetness": 8.5,
+    "overall": 8.4,
+    "defects": [],
+    "total_defect_points": 0.0,
+    "notes": "花香馥郁，柑橘酸质明亮"
+  },
+  {
+    "roast_batch_id": "R-2024-002",
+    "cupping_date": "2024-01-24",
+    "cupper": "陈杯测师",
+    "dry_aroma": 7.0,
+    "wet_aroma": 7.25,
+    "flavor": 7.0,
+    "aftertaste": 6.75,
+    "acidity": 6.5,
+    "body": 7.0,
+    "uniformity": 7.0,
+    "clean_cup": 7.0,
+    "sweetness": 7.25,
+    "overall": 7.0,
+    "defects": [
+      {
+        "type": "发霉味",
+        "points": 2.0,
+        "description": "轻微霉味，可能存储不当"
+      }
+    ],
+    "total_defect_points": 2.0,
+    "notes": "有轻微存储问题"
+  },
+  {
+    "roast_batch_id": "R-2024-003",
+    "cupping_date": "2024-01-27",
+    "cupper": "陈杯测师",
+    "dry_aroma": 6.0,
+    "wet_aroma": 6.5,
+    "flavor": 6.0,
+    "aftertaste": 5.75,
+    "acidity": 5.5,
+    "body": 6.0,
+    "uniformity": 6.0,
+    "clean_cup": 5.5,
+    "sweetness": 6.0,
+    "overall": 6.0,
+    "defects": [
+      {
+        "type": "发酵过度",
+        "points": 3.0,
+        "description": "过发酵味，酒精感强"
+      },
+      {
+        "type": "涩味",
+        "points": 3.0,
+        "description": "明显涩感"
+      }
+    ],
+    "total_defect_points": 6.0,
+    "notes": "杯测表现不佳，需复检"
+  },
+  {
+    "roast_batch_id": "R-2024-004",
+    "cupping_date": "2024-02-07",
+    "cupper": "陈杯测师",
+    "dry_aroma": 8.0,
+    "wet_aroma": 8.25,
+    "flavor": 8.0,
+    "aftertaste": 7.75,
+    "acidity": 8.0,
+    "body": 8.0,
+    "uniformity": 8.0,
+    "clean_cup": 8.0,
+    "sweetness": 8.25,
+    "overall": 8.0,
+    "defects": [],
+    "total_defect_points": 0.0,
+    "notes": "坚果巧克力调性，醇厚度好"
+  }
+]
