@@ -1,0 +1,19 @@
+{
+  "name": "io-model-lab",
+  "version": "1.0.0",
+  "description": "I/O 模型对比实验台 - 用于展示阻塞 I/O、非阻塞 I/O、I/O 多路复用和异步 I/O 的差异",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "keywords": ["io", "networking", "blocking", "non-blocking", "multiplexing", "async"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0"
+  }
+}
