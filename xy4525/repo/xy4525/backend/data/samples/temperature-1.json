@@ -1,0 +1,21 @@
+{
+  "warehouse": "1号仓",
+  "grainType": "小麦",
+  "measurementDate": "2026-05-01",
+  "zones": [
+    {"id": "A1", "name": "上层-东北", "temperature": 21.5, "depth": "0.5m"},
+    {"id": "A2", "name": "上层-东南", "temperature": 22.8, "depth": "0.5m"},
+    {"id": "A3", "name": "上层-西北", "temperature": 20.8, "depth": "0.5m"},
+    {"id": "A4", "name": "上层-西南", "temperature": 22.0, "depth": "0.5m"},
+    {"id": "B1", "name": "中层-东北", "temperature": 23.2, "depth": "2.0m"},
+    {"id": "B2", "name": "中层-东南", "temperature": 25.8, "depth": "2.0m"},
+    {"id": "B3", "name": "中层-西北", "temperature": 22.5, "depth": "2.0m"},
+    {"id": "B4", "name": "中层-西南", "temperature": 24.1, "depth": "2.0m"}
+  ],
+  "statistics": {
+    "average": 22.5,
+    "max": 25.8,
+    "min": 19.8,
+    "standardDeviation": 1.8
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "warehouse": "2号仓",
+  "grainType": "水稻",
+  "measurementDate": "2026-05-01",
+  "zones": [
+    {"id": "A1", "name": "上层-东北", "temperature": 27.5, "depth": "0.5m"},
+    {"id": "A2", "name": "上层-东南", "temperature": 29.8, "depth": "0.5m"},
+    {"id": "A3", "name": "上层-西北", "temperature": 26.8, "depth": "0.5m"},
+    {"id": "A4", "name": "上层-西南", "temperature": 28.2, "depth": "0.5m"},
+    {"id": "B1", "name": "中层-东北", "temperature": 30.1, "depth": "2.0m"},
+    {"id": "B2", "name": "中层-东南", "temperature": 32.3, "depth": "2.0m"},
+    {"id": "B3", "name": "中层-西北", "temperature": 28.5, "depth": "2.0m"},
+    {"id": "B4", "name": "中层-西南", "temperature": 30.8, "depth": "2.0m"}
+  ],
+  "statistics": {
+    "average": 28.5,
+    "max": 32.3,
+    "min": 24.2,
+    "standardDeviation": 2.5
+  }
+}

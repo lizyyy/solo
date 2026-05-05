@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>县粮库质检员本地AI初筛工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🌾 县粮库质检员本地AI初筛工具</h1>
+            <div class="header-actions">
+                <button id="importSamplesBtn" class="btn btn-secondary">导入示例数据</button>
+                <button id="newBatchBtn" class="btn btn-primary">新建批次</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <section class="batch-list-section">
+                <h2>📋 抽检批次列表</h2>
+                <div class="batch-filters">
+                    <select id="riskFilter" class="filter-select">
+                        <option value="all">全部风险等级</option>
+                        <option value="high">🔴 高风险</option>
+                        <option value="medium">🟡 中风险</option>
+                        <option value="low">🟢 低风险</option>
+                    </select>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">全部状态</option>
+                        <option value="pending">⏳ 待复核</option>
+                        <option value="reviewed">✍️ 已复核</option>
+                        <option value="pass">✅ 合格</option>
+                        <option value="fail">❌ 不合格</option>
+                    </select>
+                </div>
+                <div id="batchList" class="batch-list">
+                    <div class="empty-state">
+                        <p>暂无批次数据，请点击"导入示例数据"开始使用</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="batch-detail-section" id="batchDetailSection" style="display: none;">
+                <div class="detail-header">
+                    <h2 id="detailBatchTitle">批次详情</h2>
+                    <div class="detail-actions">
+                        <button id="exportMarkdownBtn" class="btn btn-secondary">导出Markdown</button>
+                        <button id="exportJsonBtn" class="btn btn-secondary">导出JSON</button>
+                        <button id="closeDetailBtn" class="btn btn-icon">✕</button>
+                    </div>
+                </div>
+                <div id="batchDetail" class="batch-detail-content">
+                </div>
+            </section>
+
+            <section class="new-batch-section" id="newBatchSection" style="display: none;">
+                <div class="detail-header">
+                    <h2>📝 新建抽检批次</h2>
+                    <button id="closeNewBatchBtn" class="btn btn-icon">✕</button>
+                </div>
+                <form id="newBatchForm" class="new-batch-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="batchNumber">批次号 *</label>
+                            <input type="text" id="batchNumber" name="batchNumber" required placeholder="例如: 2026-05-05-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="warehouse">粮仓 *</label>
+                            <select id="warehouse" name="warehouse" required>
+                                <option value="">请选择粮仓</option>
+                                <option value="1号仓">1号仓</option>
+                                <option value="2号仓">2号仓</option>
+                                <option value="3号仓">3号仓</option>
+                                <option value="4号仓">4号仓</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="grainType">粮食品种 *</label>
+                            <select id="grainType" name="grainType" required>
+                                <option value="">请选择品种</option>
+                                <option value="小麦">小麦</option>
+                                <option value="水稻">水稻</option>
+                                <option value="玉米">玉米</option>
+                                <option value="大豆">大豆</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inspectionDate">检验日期 *</label>
+                            <input type="date" id="inspectionDate" name="inspectionDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📷 谷粒托盘照片</h3>
+                        <div class="file-upload-area" id="imageUploadArea">
+                            <input type="file" id="trayImage" name="trayImage" accept="image/*" class="file-input">
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📷</span>
+                                <p>点击或拖拽上传谷粒托盘照片</p>
+                                <span class="upload-hint">支持 JPG、PNG、JPEG 格式</span>
+                            </div>
+                            <div class="upload-preview" id="imagePreview" style="display: none;">
+                                <img id="previewImg" src="" alt="预览">
+                                <button type="button" id="removeImageBtn" class="btn btn-danger">移除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📊 水分仪 CSV 数据</h3>
+                        <div class="file-upload-area" id="csvUploadArea">
+                            <input type="file" id="moistureCsv" name="moistureCsv" accept=".csv" class="file-input">
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📊</span>
+                                <p>点击或拖拽上传水分仪 CSV 文件</p>
+                                <span class="upload-hint">支持 CSV 格式</span>
+                            </div>
+                            <div class="upload-preview" id="csvPreview" style="display: none;">
+                                <span class="file-icon">📄</span>
+                                <span id="csvFileName">文件名.csv</span>
+                                <button type="button" id="removeCsvBtn" class="btn btn-danger">移除</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🌡️ 仓温记录</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="avgTemperature">平均仓温 (℃)</label>
+                                <input type="number" id="avgTemperature" name="avgTemperature" step="0.1" placeholder="例如: 22.5">
+                            </div>
+                            <div class="form-group">
+                                <label for="maxTemperature">最高仓温 (℃)</label>
+                                <input type="number" id="maxTemperature" name="maxTemperature" step="0.1" placeholder="例如: 25.8">
+                            </div>
+                            <div class="form-group">
+                                <label for="minTemperature">最低仓温 (℃)</label>
+                                <input type="number" id="minTemperature" name="minTemperature" step="0.1" placeholder="例如: 19.8">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-large">创建批次并开始分析</button>
+                        <button type="button" id="cancelNewBatchBtn" class="btn btn-secondary">取消</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loadingText">处理中...</p>
+        </div>
+    </div>
+
+    <div id="notification" class="notification" style="display: none;"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
