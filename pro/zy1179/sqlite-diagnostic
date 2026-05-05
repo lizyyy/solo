@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""
+SQLite Diagnostic CLI - 诊断 SQLite 数据库锁问题、WAL 增长、迁移风险等
+"""
+
+import click
+from sqlitediagnostic.cli import cli
+
+if __name__ == "__main__":
+    cli()
