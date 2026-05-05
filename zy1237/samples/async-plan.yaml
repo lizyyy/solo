@@ -1,0 +1,19 @@
+# Asyncio 分析计划配置
+analysis:
+  enabled_checks:
+    - event_loop_blocking
+    - await_boundary
+    - create_task_leak
+    - gather_exception
+    - timeout_propagation
+    - queue_backpressure
+    - connection_pool_exhaustion
+
+  thresholds:
+    blocking_duration_ms: 100
+    task_leak_risk_score: 0.7
+    queue_backpressure_ratio: 0.8
+
+  exclude_patterns:
+    - "test_*.py"
+    - "*_test.py"
