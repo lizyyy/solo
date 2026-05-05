@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Eppendorf 5810R 角转子",
+        "holes": 24,
+        "maxRpm": 14000,
+        "radius": 110,
+        "maxWeight": 400,
+        "tubeTypes": ["1.5ml", "2ml", "5ml", "15ml"],
+        "description": "24孔角转子，最大14000RPM"
+    },
+    {
+        "name": "Eppendorf 5810R 水平转子",
+        "holes": 4,
+        "maxRpm": 4000,
+        "radius": 200,
+        "maxWeight": 800,
+        "tubeTypes": ["15ml", "50ml"],
+        "description": "4孔水平转子，最大4000RPM"
+    },
+    {
+        "name": "Thermo ST16R 角转子",
+        "holes": 12,
+        "maxRpm": 16000,
+        "radius": 95,
+        "maxWeight": 240,
+        "tubeTypes": ["1.5ml", "2ml"],
+        "description": "12孔高速角转子"
+    },
+    {
+        "name": "Beckman JA-20 角转子",
+        "holes": 8,
+        "maxRpm": 20000,
+        "radius": 108,
+        "maxWeight": 400,
+        "tubeTypes": ["50ml", "30ml"],
+        "description": "8孔高速角转子，最大20000RPM"
+    }
+]

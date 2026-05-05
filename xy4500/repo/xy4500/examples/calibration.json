@@ -1,0 +1,68 @@
+{
+    "machineId": "CENT-001",
+    "machineName": "Eppendorf 5810R 离心机",
+    "lastCalibrationDate": "2026-04-15",
+    "nextCalibrationDue": "2026-10-15",
+    "balanceThreshold": 0.5,
+    "maxImbalanceTolerance": 2.0,
+    "calibrationRecords": [
+        {
+            "date": "2026-04-15",
+            "technician": "张技师",
+            "notes": "常规校准，所有参数正常",
+            "rpmAccuracy": {
+                "setPoint": 10000,
+                "measured": 9985,
+                "tolerancePercent": 2.0
+            },
+            "temperatureAccuracy": {
+                "setPoint": 25,
+                "measured": 24.8,
+                "toleranceCelsius": 1.0
+            }
+        },
+        {
+            "date": "2026-01-20",
+            "technician": "李技师",
+            "notes": "更换碳刷后校准",
+            "rpmAccuracy": {
+                "setPoint": 8000,
+                "measured": 7990,
+                "tolerancePercent": 2.0
+            },
+            "temperatureAccuracy": {
+                "setPoint": 4,
+                "measured": 4.2,
+                "toleranceCelsius": 1.0
+            }
+        }
+    ],
+    "maintenanceHistory": [
+        {
+            "date": "2026-04-15",
+            "type": "常规维护",
+            "description": "清洁转子腔，检查密封圈",
+            "technician": "张技师"
+        },
+        {
+            "date": "2026-01-20",
+            "type": "零部件更换",
+            "description": "更换电机碳刷",
+            "technician": "李技师"
+        }
+    ],
+    "riskAlerts": [
+        {
+            "id": "ALERT-001",
+            "type": "使用提醒",
+            "message": "建议每次使用前检查转子是否有裂纹",
+            "severity": "low"
+        },
+        {
+            "id": "ALERT-002",
+            "type": "维护提醒",
+            "message": "距离下次校准还有约6个月",
+            "severity": "info"
+        }
+    ]
+}

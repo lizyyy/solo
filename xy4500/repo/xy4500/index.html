@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检验科离心计算工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>检验科离心计算工具</h1>
+            <p class="subtitle">夜班加急样本处理助手 - 配平方案、RCF/RPM转换、风险提示</p>
+        </header>
+
+        <section class="import-section">
+            <h2>数据导入</h2>
+            <div class="import-grid">
+                <div class="import-card">
+                    <h3>样本数据 (CSV)</h3>
+                    <input type="file" id="sampleCsv" accept=".csv">
+                    <p class="hint">包含样本ID、重量、离心管类型等</p>
+                </div>
+                <div class="import-card">
+                    <h3>转子规格 (JSON)</h3>
+                    <input type="file" id="rotorJson" accept=".json">
+                    <p class="hint">包含转子类型、孔数、最大转速、半径等</p>
+                </div>
+                <div class="import-card">
+                    <h3>机器校准记录 (JSON)</h3>
+                    <input type="file" id="calibrationJson" accept=".json">
+                    <p class="hint">包含机器校准数据、不平衡阈值等</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="selection-section">
+            <h2>离心参数设置</h2>
+            <div class="selection-grid">
+                <div class="selection-item">
+                    <label for="rotorSelect">选择转子:</label>
+                    <select id="rotorSelect">
+                        <option value="">-- 请先导入转子数据 --</option>
+                    </select>
+                </div>
+                <div class="selection-item">
+                    <label for="tubeType">离心管类型:</label>
+                    <select id="tubeType">
+                        <option value="">-- 请选择 --</option>
+                    </select>
+                </div>
+                <div class="selection-item">
+                    <label for="targetType">目标参数:</label>
+                    <select id="targetType">
+                        <option value="rcf">RCF (相对离心力)</option>
+                        <option value="rpm">RPM (每分钟转速)</option>
+                    </select>
+                </div>
+                <div class="selection-item">
+                    <label for="targetValue">目标值:</label>
+                    <input type="number" id="targetValue" placeholder="输入数值">
+                </div>
+                <div class="selection-item">
+                    <label for="centrifugeTime">离心时间 (分钟):</label>
+                    <input type="number" id="centrifugeTime" placeholder="输入时间">
+                </div>
+            </div>
+            <button id="calculateBtn" class="primary-btn">计算配平方案</button>
+        </section>
+
+        <section class="results-section">
+            <h2>计算结果</h2>
+            
+            <div class="result-card" id="rpmRcfResult">
+                <h3>转速/离心力转换</h3>
+                <div class="result-content" id="rpmRcfContent">
+                    <p class="empty-message">请先输入参数并计算</p>
+                </div>
+            </div>
+
+            <div class="result-card" id="balanceResult">
+                <h3>配平方案</h3>
+                <div class="result-content" id="balanceContent">
+                    <p class="empty-message">请先导入样本数据并计算</p>
+                </div>
+            </div>
+
+            <div class="result-card" id="riskResult">
+                <h3>风险提示</h3>
+                <div class="result-content" id="riskContent">
+                    <p class="empty-message">暂无风险提示</p>
+                </div>
+            </div>
+
+            <div class="result-card" id="sampleList">
+                <h3>样本详情</h3>
+                <div class="result-content" id="sampleContent">
+                    <p class="empty-message">请先导入样本数据</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="notes-section">
+            <h2>人工改判与备注</h2>
+            <div class="notes-content">
+                <div class="notes-item">
+                    <label>改判说明:</label>
+                    <textarea id="overrideNotes" rows="3" placeholder="如对计算结果有调整，请在此说明..."></textarea>
+                </div>
+                <div class="notes-item">
+                    <label>交接备注:</label>
+                    <textarea id="handoverNotes" rows="3" placeholder="需要向下一班交代的事项..."></textarea>
+                </div>
+                <button id="saveNotesBtn" class="primary-btn">保存备注</button>
+            </div>
+        </section>
+
+        <section class="export-section">
+            <h2>数据导出</h2>
+            <div class="export-buttons">
+                <button id="exportMarkdownBtn" class="export-btn">导出交接单 (Markdown)</button>
+                <button id="exportJsonBtn" class="export-btn">导出明细 (JSON)</button>
+                <button id="clearDataBtn" class="clear-btn">清除所有数据</button>
+            </div>
+        </section>
+
+        <footer>
+            <p>检验科离心计算工具 v1.0 | 数据保存在本地浏览器中</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
