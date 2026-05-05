@@ -1,0 +1,166 @@
+{
+  "declarations": [
+    {
+      "athlete_id": "A001",
+      "athlete_name": "李小雅",
+      "event": "自由操",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "C",
+          "declared_value": 0.3,
+          "description": "前手翻",
+          "start_time": "00:15",
+          "end_time": "00:22"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "D",
+          "declared_value": 0.4,
+          "description": "后空翻转体180",
+          "start_time": "00:25",
+          "end_time": "00:35"
+        },
+        {
+          "segment_number": 3,
+          "declared_difficulty": "B",
+          "declared_value": 0.2,
+          "description": "单腿转体360",
+          "start_time": "00:40",
+          "end_time": "00:48"
+        }
+      ]
+    },
+    {
+      "athlete_id": "A001",
+      "athlete_name": "李小雅",
+      "event": "跳马",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "C",
+          "declared_value": 0.3,
+          "description": "助跑",
+          "start_time": "00:05",
+          "end_time": "00:10"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "E",
+          "declared_value": 0.5,
+          "description": "前手翻前空翻转体360",
+          "start_time": "00:12",
+          "end_time": "00:20"
+        }
+      ]
+    },
+    {
+      "athlete_id": "A002",
+      "athlete_name": "陈思琪",
+      "event": "高低杠",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "B",
+          "declared_value": 0.2,
+          "description": "跳上高杠",
+          "start_time": "00:10",
+          "end_time": "00:15"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "C",
+          "declared_value": 0.3,
+          "description": "大回环",
+          "start_time": "00:18",
+          "end_time": "00:25"
+        },
+        {
+          "segment_number": 3,
+          "declared_difficulty": "D",
+          "declared_value": 0.4,
+          "description": "特卡切夫腾越",
+          "start_time": "00:30",
+          "end_time": "00:38"
+        }
+      ]
+    },
+    {
+      "athlete_id": "A003",
+      "athlete_name": "王梓萱",
+      "event": "平衡木",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "C",
+          "declared_value": 0.3,
+          "description": "侧手翻",
+          "start_time": "00:08",
+          "end_time": "00:15"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "D",
+          "declared_value": 0.4,
+          "description": "后空翻",
+          "start_time": "00:20",
+          "end_time": "00:28"
+        },
+        {
+          "segment_number": 3,
+          "declared_difficulty": "B",
+          "declared_value": 0.2,
+          "description": "前手翻",
+          "start_time": "00:35",
+          "end_time": "00:42"
+        }
+      ]
+    },
+    {
+      "athlete_id": "A004",
+      "athlete_name": "张雨涵",
+      "event": "自由操",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "B",
+          "declared_value": 0.2,
+          "description": "前手翻",
+          "start_time": "00:12",
+          "end_time": "00:18"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "C",
+          "declared_value": 0.3,
+          "description": "后空翻",
+          "start_time": "00:22",
+          "end_time": "00:30"
+        }
+      ]
+    },
+    {
+      "athlete_id": "A005",
+      "athlete_name": "刘梦瑶",
+      "event": "高低杠",
+      "segments": [
+        {
+          "segment_number": 1,
+          "declared_difficulty": "E",
+          "declared_value": 0.5,
+          "description": "大回环转体360",
+          "start_time": "00:15",
+          "end_time": "00:25"
+        },
+        {
+          "segment_number": 2,
+          "declared_difficulty": "D",
+          "declared_value": 0.4,
+          "description": "腾越",
+          "start_time": "00:30",
+          "end_time": "00:38"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "appeals": [
+    {
+      "appeal_id": "AP001",
+      "athlete_id": "A001",
+      "athlete_name": "李小雅",
+      "event": "跳马",
+      "submit_time": "2024-06-15 16:30",
+      "submitter": "张三（教练）",
+      "status": "待复核",
+      "timecodes": {
+        "start": "00:12",
+        "end": "00:20"
+      },
+      "complaint": "跳马动作难度申报应为E组（0.5分），但裁判3（J03）打分时难度分按3.6计算，可能存在难度组别识别错误。",
+      "related_segment": 2,
+      "segment_description": "前手翻前空翻转体360",
+      "evidence": "视频显示动作完成度符合E组标准",
+      "review_status": "未处理",
+      "review_notes": ""
+    },
+    {
+      "appeal_id": "AP002",
+      "athlete_id": "A001",
+      "athlete_name": "李小雅",
+      "event": "跳马",
+      "submit_time": "2024-06-15 16:35",
+      "submitter": "李华（家长）",
+      "status": "待复核",
+      "timecodes": {
+        "start": "00:12",
+        "end": "00:20"
+      },
+      "complaint": "跳马动作难度分应该更高，孩子动作完成得很好。",
+      "related_segment": 2,
+      "segment_description": "前手翻前空翻转体360",
+      "evidence": "同一段视频",
+      "review_status": "未处理",
+      "review_notes": "",
+      "is_duplicate": true,
+      "original_appeal_id": "AP001"
+    },
+    {
+      "appeal_id": "AP003",
+      "athlete_id": "A001",
+      "athlete_name": "李小雅",
+      "event": "高低杠",
+      "submit_time": "2024-06-15 17:10",
+      "submitter": "王五（教练）",
+      "status": "待复核",
+      "timecodes": {
+        "start": "00:45",
+        "end": "00:50"
+      },
+      "complaint": "下法动作被判扣0.1分，但视频显示落地稳定，没有明显失误。请求复核扣分是否合理。",
+      "related_segment": null,
+      "segment_description": "下法动作",
+      "evidence": "慢动作回放显示双脚同时落地，没有屈膝超过90度",
+      "review_status": "未处理",
+      "review_notes": ""
+    },
+    {
+      "appeal_id": "AP004",
+      "athlete_id": "A002",
+      "athlete_name": "陈思琪",
+      "event": "高低杠",
+      "submit_time": "2024-06-15 17:30",
+      "submitter": "赵六（家长）",
+      "status": "待复核",
+      "timecodes": {
+        "start": "00:30",
+        "end": "00:38"
+      },
+      "complaint": "特卡切夫腾越动作应该是D组难度，但裁判打分时难度分计算可能有误。",
+      "related_segment": 3,
+      "segment_description": "特卡切夫腾越",
+      "evidence": "动作符合D组标准",
+      "review_status": "未处理",
+      "review_notes": ""
+    },
+    {
+      "appeal_id": "AP005",
+      "athlete_id": "A003",
+      "athlete_name": "王梓萱",
+      "event": "平衡木",
+      "submit_time": "2024-06-15 18:00",
+      "submitter": "孙七（教练）",
+      "status": "待复核",
+      "timecodes": {
+        "start": "00:20",
+        "end": "00:28"
+      },
+      "complaint": "后空翻动作完成质量高，但执行分偏低。请求复核裁判打分是否一致。",
+      "related_segment": 2,
+      "segment_description": "后空翻",
+      "evidence": "视频对比其他运动员相似动作得分",
+      "review_status": "未处理",
+      "review_notes": ""
+    }
+  ]
+}
