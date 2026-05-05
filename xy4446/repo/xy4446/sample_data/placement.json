@@ -1,0 +1,98 @@
+[
+  {
+    "id": "work_001",
+    "name": "青花瓷瓶",
+    "artist": "张三",
+    "layer": 1,
+    "layerIndex": 1,
+    "positionCode": "A1",
+    "zone": "前",
+    "glazes": ["glaze_001", "glaze_003"],
+    "clayType": "紫砂泥",
+    "thickness": 6
+  },
+  {
+    "id": "work_002",
+    "name": "哑光茶碗",
+    "artist": "李四",
+    "layer": 1,
+    "layerIndex": 1,
+    "positionCode": "A2",
+    "zone": "前",
+    "glazes": ["glaze_002"],
+    "clayType": "陶泥",
+    "thickness": 8
+  },
+  {
+    "id": "work_003",
+    "name": "钧瓷花瓶",
+    "artist": "王五",
+    "layer": 2,
+    "layerIndex": 2,
+    "positionCode": "B1",
+    "zone": "中",
+    "glazes": ["glaze_004"],
+    "clayType": "瓷泥",
+    "thickness": 5
+  },
+  {
+    "id": "work_004",
+    "name": "青瓷茶壶",
+    "artist": "赵六",
+    "layer": 2,
+    "layerIndex": 2,
+    "positionCode": "B2",
+    "zone": "中",
+    "glazes": ["glaze_003"],
+    "clayType": "紫砂泥",
+    "thickness": 7
+  },
+  {
+    "id": "work_005",
+    "name": "透明釉大盘",
+    "artist": "张三",
+    "layer": 3,
+    "layerIndex": 3,
+    "positionCode": "C1",
+    "zone": "中",
+    "glazes": ["glaze_001"],
+    "clayType": "瓷泥",
+    "thickness": 4
+  },
+  {
+    "id": "work_006",
+    "name": "哑光笔筒",
+    "artist": "李四",
+    "layer": 3,
+    "layerIndex": 3,
+    "positionCode": "C2",
+    "zone": "后",
+    "glazes": ["glaze_002", "glaze_001"],
+    "clayType": "陶泥",
+    "thickness": 9
+  },
+  {
+    "id": "work_007",
+    "name": "青瓷花瓶",
+    "artist": "王五",
+    "layer": 4,
+    "layerIndex": 4,
+    "positionCode": "D1",
+    "zone": "后",
+    "glazes": ["glaze_003"],
+    "clayType": "瓷泥",
+    "thickness": 6
+  },
+  {
+    "id": "work_008",
+    "name": "钧瓷茶盏",
+    "artist": "赵六",
+    "layer": 4,
+    "layerIndex": 4,
+    "positionCode": "D2",
+    "zone": "边缘",
+    "glazes": ["glaze_004"],
+    "clayType": "陶泥",
+    "thickness": 11
+  }
+]

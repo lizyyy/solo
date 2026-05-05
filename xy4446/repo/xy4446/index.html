@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>窑烧复盘工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>窑烧复盘工具</h1>
+            <div class="header-actions">
+                <button id="exportMarkdownBtn" class="btn btn-secondary">导出 Markdown 复盘单</button>
+                <button id="exportJsonBtn" class="btn btn-secondary">导出 JSON 审计包</button>
+                <button id="clearAllBtn" class="btn btn-danger">清空所有数据</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="import-section">
+                <h2>数据导入</h2>
+                <div class="import-controls">
+                    <div class="import-item">
+                        <label for="kilnTempCsv">窑温曲线 CSV</label>
+                        <input type="file" id="kilnTempCsv" accept=".csv">
+                    </div>
+                    <div class="import-item">
+                        <label for="glazeJson">釉料配方 JSON</label>
+                        <input type="file" id="glazeJson" accept=".json">
+                    </div>
+                    <div class="import-item">
+                        <label for="placementJson">窑位摆放表 JSON</label>
+                        <input type="file" id="placementJson" accept=".json">
+                    </div>
+                    <div class="import-item">
+                        <label for="photosDir">成品照片目录</label>
+                        <input type="file" id="photosDir" webkitdirectory directory multiple>
+                    </div>
+                </div>
+                <div class="import-status" id="importStatus">
+                    请导入上述数据文件开始使用
+                </div>
+            </section>
+
+            <section class="view-toggle">
+                <button id="layerViewBtn" class="btn btn-toggle active">窑层视图</button>
+                <button id="workViewBtn" class="btn btn-toggle">作品视图</button>
+            </section>
+
+            <section class="content-area">
+                <div id="layerView" class="view-container active">
+                    <div class="layer-list" id="layerList">
+                        <p class="empty-message">请先导入窑位摆放数据</p>
+                    </div>
+                    <div class="layer-detail" id="layerDetail">
+                        <p class="empty-message">选择一个窑层查看详情</p>
+                    </div>
+                </div>
+
+                <div id="workView" class="view-container">
+                    <div class="work-list" id="workList">
+                        <p class="empty-message">请先导入窑位摆放数据</p>
+                    </div>
+                    <div class="work-detail" id="workDetail">
+                        <p class="empty-message">选择一个作品查看详情</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
