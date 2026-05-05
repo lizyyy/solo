@@ -1,0 +1,163 @@
+/* 自定义样式 */
+.tab-content {
+    transition: opacity 0.3s ease;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* 时间线样式 */
+.timeline-item {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    z-index: 1;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 24px;
+    width: 2px;
+    height: calc(100% + 8px);
+    background-color: #e5e7eb;
+    z-index: 0;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+/* 内存可视化 */
+.memory-block {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 2px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    text-align: center;
+}
+
+.memory-block.free {
+    background-color: #f0fdf4;
+    border: 1px solid #22c55e;
+    color: #15803d;
+}
+
+.memory-block.used {
+    background-color: #eff6ff;
+    border: 1px solid #3b82f6;
+    color: #1d4ed8;
+}
+
+.memory-block.fragmented {
+    background-color: #fef2f2;
+    border: 1px solid #ef4444;
+    color: #dc2626;
+}
+
+/* 页表样式 */
+.page-table-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.page-table-row:hover {
+    background-color: #f9fafb;
+}
+
+.page-table-cell {
+    flex: 1;
+    padding: 0 8px;
+    font-family: monospace;
+}
+
+/* TLB 样式 */
+.tlb-entry {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.tlb-entry.active {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+}
+
+.tlb-entry.inactive {
+    background-color: #f9fafb;
+    opacity: 0.6;
+}
+
+/* 内存池槽位 */
+.pool-slot {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.pool-slot.free {
+    background-color: #f0fdf4;
+    border-color: #22c55e;
+}
+
+.pool-slot.used {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+}
+
+.pool-slot.padding {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.highlight {
+    animation: pulse 0.5s ease-in-out;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .memory-block {
+        display: block;
+        margin: 4px 0;
+    }
+    
+    .page-table-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .page-table-cell {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+}
