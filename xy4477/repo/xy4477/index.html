@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天文社观测夜排班系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #4fc3f7, #7c4dff, #4fc3f7);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+            100% { background-position: 0% center; }
+        }
+        .subtitle {
+            color: #90a4ae;
+            font-size: 1.1rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #90a4ae;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #7c4dff 0%, #536dfe 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .card-title {
+            font-size: 1.3rem;
+            color: #4fc3f7;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, #7c4dff, #4fc3f7);
+            border-radius: 2px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            color: #90a4ae;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        .form-textarea:focus {
+            outline: none;
+            border-color: #7c4dff;
+        }
+        .form-textarea::placeholder {
+            color: #607d8b;
+        }
+        .btn {
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c4dff 0%, #536dfe 100%);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 77, 255, 0.3);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
+            color: #fff;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9100 0%, #ffab40 100%);
+            color: #fff;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 145, 0, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff5252 0%, #ff8a80 100%);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 82, 82, 0.3);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #e0e0e0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .status-success {
+            background: rgba(0, 200, 83, 0.2);
+            color: #69f0ae;
+            border: 1px solid rgba(105, 240, 174, 0.3);
+        }
+        .status-warning {
+            background: rgba(255, 145, 0, 0.2);
+            color: #ffd54f;
+            border: 1px solid rgba(255, 213, 79, 0.3);
+        }
+        .status-danger {
+            background: rgba(255, 82, 82, 0.2);
+            color: #ff8a80;
+            border: 1px solid rgba(255, 138, 128, 0.3);
+        }
+        .status-neutral {
+            background: rgba(144, 164, 174, 0.2);
+            color: #90a4ae;
+            border: 1px solid rgba(144, 164, 174, 0.3);
+        }
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .alert-danger {
+            background: rgba(255, 82, 82, 0.15);
+            border-left: 4px solid #ff5252;
+            color: #ff8a80;
+        }
+        .alert-warning {
+            background: rgba(255, 145, 0, 0.15);
+            border-left: 4px solid #ff9100;
+            color: #ffd54f;
+        }
+        .alert-success {
+            background: rgba(0, 200, 83, 0.15);
+            border-left: 4px solid #00c853;
+            color: #69f0ae;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        th {
+            background: rgba(255,255,255,0.03);
+            color: #90a4ae;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        td {
+            color: #e0e0e0;
+        }
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+        .observation-site {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .site-header {
+            padding: 20px 24px;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .site-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .site-status {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .site-body {
+            padding: 24px;
+        }
+        .site-alerts {
+            margin-bottom: 20px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .detail-card {
+            padding: 16px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .detail-label {
+            font-size: 0.85rem;
+            color: #90a4ae;
+            margin-bottom: 8px;
+        }
+        .detail-value {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        .manual-override {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(124, 77, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(124, 77, 255, 0.2);
+        }
+        .override-label {
+            color: #b388ff;
+            font-size: 0.95rem;
+        }
+        .form-select {
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: #7c4dff;
+        }
+        .form-input {
+            padding: 10px 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #7c4dff;
+        }
+        .export-section {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .export-card {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .export-preview {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .export-preview pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .helper-text {
+            color: #607d8b;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #4fc3f7, #7c4dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: #90a4ae;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .tabs { gap: 8px; }
+            .tab-btn { padding: 10px 16px; font-size: 0.9rem; }
+            .site-header { flex-direction: column; align-items: flex-start; }
+            .footer-actions { flex-direction: column; gap: 16px; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌌 天文社观测夜排班系统</h1>
+            <p class="subtitle">智能排班 · 设备放行 · 安全观测</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="import">📥 数据导入</button>
+            <button class="tab-btn" data-tab="analysis">🔍 智能分析</button>
+            <button class="tab-btn" data-tab="export">📤 数据导出</button>
+        </div>
+
+        <div id="import" class="tab-content active">
+            <div class="card">
+                <div class="card-title">报名名单</div>
+                <div class="form-group">
+                    <label class="form-label">
+                        输入报名人员信息（每行一人，格式：姓名,经验等级,是否领队,联系方式）<br>
+                        经验等级：newbie（新手）/ experienced（有经验）/ leader（领队）
+                    </label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="membersInput"
+                        placeholder="张三,newbie,false,13800138000&#10;李四,experienced,false,13800138001&#10;王五,leader,true,13800138002"
+                    ></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loadSampleMembers()">加载示例</button>
+                    <button class="btn btn-secondary" onclick="clearField('membersInput')">清空</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">设备库存</div>
+                <div class="form-group">
+                    <label class="form-label">
+                        望远镜和相机电池信息（每行一项，格式：设备名称,类型,电量百分比,是否可用）<br>
+                        类型：telescope（望远镜）/ camera_battery（相机电池）
+                    </label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="equipmentInput"
+                        placeholder="小黑150/750,telescope,100,true&#10;星特朗80EQ,telescope,95,true&#10;佳能LP-E6_1,camera_battery,85,true&#10;佳能LP-E6_2,camera_battery,20,false"
+                    ></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loadSampleEquipment()">加载示例</button>
+                    <button class="btn btn-secondary" onclick="clearField('equipmentInput')">清空</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">车辆座位</div>
+                <div class="form-group">
+                    <label class="form-label">
+                        车辆信息（每行一辆，格式：车牌号,司机姓名,座位数）
+                    </label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="vehiclesInput"
+                        placeholder="京A12345,赵六,5&#10;京B67890,孙七,7"
+                    ></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loadSampleVehicles()">加载示例</button>
+                    <button class="btn btn-secondary" onclick="clearField('vehiclesInput')">清空</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">观测点天气</div>
+                <div class="form-group">
+                    <label class="form-label">
+                        观测点天气信息（每行一个观测点，格式：观测点名称,天气类型,开始时间,结束时间,透明度,视宁度,距离公里）<br>
+                        天气类型：clear（晴天）/ partly_cloudy（少云）/ cloudy（多云）/ rainy（雨天）
+                    </label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="weatherInput"
+                        placeholder="石塘路,clear,20:00,04:00,8/10,7/10,80&#10;密云水库,partly_cloudy,21:00,02:00,6/10,6/10,60&#10;怀柔九渡河,cloudy,19:00,23:00,4/10,5/10,50"
+                    ></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loadSampleWeather()">加载示例</button>
+                    <button class="btn btn-secondary" onclick="clearField('weatherInput')">清空</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">观测点分配</div>
+                <div class="form-group">
+                    <label class="form-label">
+                        人员-观测点分配（每行一条，格式：姓名,观测点名称）
+                    </label>
+                    <textarea 
+                        class="form-textarea" 
+                        id="assignmentInput"
+                        placeholder="张三,石塘路&#10;李四,石塘路&#10;王五,密云水库"
+                    ></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loadSampleAssignment()">加载示例</button>
+                    <button class="btn btn-secondary" onclick="clearField('assignmentInput')">清空</button>
+                </div>
+            </div>
+
+            <div class="btn-group" style="margin-top: 20px;">
+                <button class="btn btn-success" style="font-size: 1.1rem; padding: 16px 40px;" onclick="saveAndAnalyze()">
+                    💾 保存并分析
+                </button>
+            </div>
+        </div>
+
+        <div id="analysis" class="tab-content">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalMembers">0</div>
+                    <div class="stat-label">报名人数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalSites">0</div>
+                    <div class="stat-label">观测点数量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="approvedSites">0</div>
+                    <div class="stat-label">可放行观测点</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="alertCount">0</div>
+                    <div class="stat-label">告警数量</div>
+                </div>
+            </div>
+
+            <div id="observationSites"></div>
+        </div>
+
+        <div id="export" class="tab-content">
+            <div class="export-section">
+                <div class="export-card">
+                    <div class="card-title" style="margin-top: 0;">📋 Markdown 出发清单</div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="generateMarkdown()">生成预览</button>
+                        <button class="btn btn-primary" onclick="downloadMarkdown()">下载文件</button>
+                    </div>
+                    <div class="export-preview" id="markdownPreview">
+                        点击"生成预览"查看Markdown格式的出发清单
+                    </div>
+                </div>
+
+                <div class="export-card">
+                    <div class="card-title" style="margin-top: 0;">📊 JSON 审计明细</div>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="generateJson()">生成预览</button>
+                        <button class="btn btn-primary" onclick="downloadJson()">下载文件</button>
+                    </div>
+                    <div class="export-preview" id="jsonPreview">
+                        点击"生成预览"查看JSON格式的审计明细
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="exportAllData()">📥 导出所有数据</button>
+                <button class="btn btn-warning" onclick="importAllData()">📤 导入数据备份</button>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-danger" onclick="confirmClearAll()">🗑️ 清空所有数据</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none;" accept=".json" onchange="handleFileImport(event)">
+
+    <script>
+        const STORAGE_KEY = 'astro_observation_data';
+        const EXAMPLE_MEMBERS = `张三,newbie,false,13800138000
+李四,newbie,false,13800138001
+王五,newbie,false,13800138002
+赵六,experienced,false,13800138003
+孙七,experienced,false,13800138004
+周八,leader,true,13800138005
+吴九,leader,true,13800138006`;
+
+        const EXAMPLE_EQUIPMENT = `小黑150/750,telescope,100,true
+星特朗80EQ,telescope,95,true
+信达小黑,telescope,80,true
+佳能LP-E6_1,camera_battery,90,true
+佳能LP-E6_2,camera_battery,85,true
+佳能LP-E6_3,camera_battery,15,false
+尼康EN-EL15_1,camera_battery,95,true`;
+
+        const EXAMPLE_VEHICLES = `京A12345,周八,5
+京B67890,吴九,7`;
+
+        const EXAMPLE_WEATHER = `石塘路,clear,20:00,04:00,8/10,7/10,80
+密云水库,partly_cloudy,21:00,02:00,6/10,6/10,60
+怀柔九渡河,cloudy,19:00,23:00,4/10,5/10,50`;
+
+        const EXAMPLE_ASSIGNMENT = `张三,石塘路
+李四,石塘路
+王五,石塘路
+赵六,石塘路
+孙七,密云水库
+周八,石塘路
+吴九,密云水库`;
+
+        function loadSampleMembers() {
+            document.getElementById('membersInput').value = EXAMPLE_MEMBERS;
+        }
+        function loadSampleEquipment() {
+            document.getElementById('equipmentInput').value = EXAMPLE_EQUIPMENT;
+        }
+        function loadSampleVehicles() {
+            document.getElementById('vehiclesInput').value = EXAMPLE_VEHICLES;
+        }
+        function loadSampleWeather() {
+            document.getElementById('weatherInput').value = EXAMPLE_WEATHER;
+        }
+        function loadSampleAssignment() {
+            document.getElementById('assignmentInput').value = EXAMPLE_ASSIGNMENT;
+        }
+        function clearField(id) {
+            document.getElementById(id).value = '';
+        }
+
+        function parseMembers(text) {
+            const members = [];
+            const lines = text.trim().split('\n').filter(l => l.trim());
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 3) {
+                    members.push({
+                        name: parts[0],
+                        level: parts[1] || 'newbie',
+                        isLeader: parts[2] === 'true' || parts[2] === '是' || parts[1] === 'leader',
+                        phone: parts[3] || '',
+                        originalLevel: parts[1]
+                    });
+                }
+            }
+            return members;
+        }
+
+        function parseEquipment(text) {
+            const equipment = [];
+            const lines = text.trim().split('\n').filter(l => l.trim());
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 3) {
+                    equipment.push({
+                        name: parts[0],
+                        type: parts[1],
+                        battery: parseInt(parts[2]) || 0,
+                        available: parts[3] !== 'false' && parts[3] !== '否',
+                        id: `eq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                    });
+                }
+            }
+            return equipment;
+        }
+
+        function parseVehicles(text) {
+            const vehicles = [];
+            const lines = text.trim().split('\n').filter(l => l.trim());
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 3) {
+                    vehicles.push({
+                        plate: parts[0],
+                        driver: parts[1],
+                        seats: parseInt(parts[2]) || 0,
+                        assigned: []
+                    });
+                }
+            }
+            return vehicles;
+        }
+
+        function parseWeather(text) {
+            const weather = [];
+            const lines = text.trim().split('\n').filter(l => l.trim());
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 4) {
+                    weather.push({
+                        siteName: parts[0],
+                        weatherType: parts[1],
+                        startTime: parts[2],
+                        endTime: parts[3],
+                        transparency: parts[4] || 'N/A',
+                        seeing: parts[5] || 'N/A',
+                        distance: parseFloat(parts[6]) || 0
+                    });
+                }
+            }
+            return weather;
+        }
+
+        function parseAssignment(text) {
+            const assignment = [];
+            const lines = text.trim().split('\n').filter(l => l.trim());
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 2) {
+                    assignment.push({
+                        name: parts[0],
+                        siteName: parts[1]
+                    });
+                }
+            }
+            return assignment;
+        }
+
+        function saveToStorage(data) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return {
+                members: [],
+                equipment: [],
+                vehicles: [],
+                weather: [],
+                assignments: [],
+                overrides: {},
+                notes: {}
+            };
+        }
+
+        function saveAndAnalyze() {
+            const members = parseMembers(document.getElementById('membersInput').value);
+            const equipment = parseEquipment(document.getElementById('equipmentInput').value);
+            const vehicles = parseVehicles(document.getElementById('vehiclesInput').value);
+            const weather = parseWeather(document.getElementById('weatherInput').value);
+            const assignments = parseAssignment(document.getElementById('assignmentInput').value);
+
+            const existing = loadFromStorage();
+            const data = {
+                members,
+                equipment,
+                vehicles,
+                weather,
+                assignments,
+                overrides: existing.overrides || {},
+                notes: existing.notes || {},
+                lastUpdated: new Date().toISOString()
+            };
+
+            saveToStorage(data);
+            updateUIWithData(data);
+            switchTab('analysis');
+            showNotification('数据已保存，正在分析...');
+        }
+
+        function updateUIWithData(data) {
+            document.getElementById('membersInput').value = membersToText(data.members);
+            document.getElementById('equipmentInput').value = equipmentToText(data.equipment);
+            document.getElementById('vehiclesInput').value = vehiclesToText(data.vehicles);
+            document.getElementById('weatherInput').value = weatherToText(data.weather);
+            document.getElementById('assignmentInput').value = assignmentToText(data.assignments);
+
+            renderAnalysis(data);
+        }
+
+        function membersToText(members) {
+            return members.map(m => 
+                `${m.name},${m.originalLevel || m.level},${m.isLeader ? 'true' : 'false'},${m.phone || ''}`
+            ).join('\n');
+        }
+
+        function equipmentToText(equipment) {
+            return equipment.map(e => 
+                `${e.name},${e.type},${e.battery},${e.available ? 'true' : 'false'}`
+            ).join('\n');
+        }
+
+        function vehiclesToText(vehicles) {
+            return vehicles.map(v => 
+                `${v.plate},${v.driver},${v.seats}`
+            ).join('\n');
+        }
+
+        function weatherToText(weather) {
+            return weather.map(w => 
+                `${w.siteName},${w.weatherType},${w.startTime},${w.endTime},${w.transparency},${w.seeing},${w.distance}`
+            ).join('\n');
+        }
+
+        function assignmentToText(assignments) {
+            return assignments.map(a => 
+                `${a.name},${a.siteName}`
+            ).join('\n');
+        }
+
+        function analyzeSite(siteData, allData) {
+            const alerts = [];
+            const warnings = [];
+            let canGo = true;
+
+            const siteMembers = allData.assignments
+                .filter(a => a.siteName === siteData.siteName)
+                .map(a => allData.members.find(m => m.name === a.name))
+                .filter(m => m);
+
+            const newbies = siteMembers.filter(m => m.level === 'newbie' || !m.isLeader && m.level !== 'experienced');
+            const leaders = siteMembers.filter(m => m.isLeader || m.level === 'leader');
+            const experienced = siteMembers.filter(m => m.level === 'experienced' && !m.isLeader);
+
+            if (newbies.length > 0 && leaders.length === 0 && experienced.length === 0) {
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ 新手无人带队：有 ${newbies.length} 名新手但没有领队或有经验者`
+                });
+                canGo = false;
+            }
+
+            if (newbies.length > 0 && leaders.length === 0 && experienced.length > 0) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 建议配备领队：有 ${newbies.length} 名新手，只有 ${experienced.length} 名有经验者`
+                });
+            }
+
+            const totalSeats = allData.vehicles.reduce((sum, v) => sum + v.seats, 0);
+            const totalPeople = allData.members.length;
+            if (totalPeople > totalSeats) {
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ 缺车位：总人数 ${totalPeople}，总座位 ${totalSeats}，缺 ${totalPeople - totalSeats} 个座位`
+                });
+                canGo = false;
+            } else if (totalPeople === totalSeats) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 座位紧张：人数等于座位数，没有空余`
+                });
+            }
+
+            const weatherHours = calculateWeatherHours(siteData.startTime, siteData.endTime);
+            const MIN_HOURS = 4;
+            if (weatherHours < MIN_HOURS) {
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ 天气窗口太短：只有 ${weatherHours.toFixed(1)} 小时观测时间（建议至少 ${MIN_HOURS} 小时）`
+                });
+                canGo = false;
+            }
+
+            if (siteData.weatherType === 'rainy') {
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ 天气不适合：雨天，无法观测`
+                });
+                canGo = false;
+            } else if (siteData.weatherType === 'cloudy') {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 天气一般：多云，可能影响观测效果`
+                });
+            }
+
+            const transparency = parseRating(siteData.transparency);
+            const seeing = parseRating(siteData.seeing);
+            if (transparency < 5) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 透明度较差：${siteData.transparency}，可能影响深空天体观测`
+                });
+            }
+            if (seeing < 5) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 视宁度一般：${siteData.seeing}，可能影响行星观测`
+                });
+            }
+
+            const availableTelescopes = allData.equipment.filter(e => 
+                e.type === 'telescope' && e.available
+            );
+            const lowBatteryTelescopes = availableTelescopes.filter(e => e.battery < 50);
+            const availableBatteries = allData.equipment.filter(e => 
+                e.type === 'camera_battery' && e.available && e.battery >= 50
+            );
+
+            if (availableTelescopes.length === 0) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 没有可用的望远镜`
+                });
+            }
+
+            if (lowBatteryTelescopes.length > 0) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 望远镜电量不足：${lowBatteryTelescopes.map(t => t.name).join('、')}（电量 < 50%）`
+                });
+            }
+
+            if (availableBatteries.length < 2) {
+                warnings.push({
+                    type: 'warning',
+                    message: `⚠️ 相机电池储备不足：只有 ${availableBatteries.length} 块可用电池（电量 ≥ 50%）`
+                });
+            }
+
+            const key = `site_${siteData.siteName}`;
+            const override = allData.overrides[key];
+            const note = allData.notes[key] || '';
+
+            let finalStatus = canGo ? 'approved' : 'rejected';
+            let statusReason = canGo ? '所有条件满足' : '存在关键问题';
+
+            if (override) {
+                finalStatus = override.status;
+                statusReason = override.reason || '人工改判';
+            }
+
+            return {
+                siteName: siteData.siteName,
+                siteData,
+                members: siteMembers,
+                newbies: newbies.length,
+                leaders: leaders.length,
+                experienced: experienced.length,
+                weatherHours,
+                alerts,
+                warnings,
+                canGo,
+                finalStatus,
+                statusReason,
+                override,
+                note,
+                storageKey: key
+            };
+        }
+
+        function calculateWeatherHours(start, end) {
+            const parseTime = (t) => {
+                const [h, m] = t.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            let startMin = parseTime(start);
+            let endMin = parseTime(end);
+
+            if (endMin <= startMin) {
+                endMin += 24 * 60;
+            }
+
+            return (endMin - startMin) / 60;
+        }
+
+        function parseRating(rating) {
+            if (!rating) return 5;
+            const match = rating.match(/(\d+)/);
+            return match ? parseInt(match[1]) : 5;
+        }
+
+        function renderAnalysis(data) {
+            const sitesContainer = document.getElementById('observationSites');
+            
+            if (data.weather.length === 0) {
+                sitesContainer.innerHTML = `
+                    <div class="card">
+                        <div class="alert alert-warning">
+                            <strong>提示：</strong>请先导入天气数据和观测点信息
+                        </div>
+                    </div>
+                `;
+                updateStats({ members: data.members, sites: 0, approved: 0, alerts: 0 });
+                return;
+            }
+
+            let totalAlerts = 0;
+            let approvedSites = 0;
+            const siteAnalyses = [];
+
+            for (const siteWeather of data.weather) {
+                const analysis = analyzeSite(siteWeather, data);
+                siteAnalyses.push(analysis);
+                totalAlerts += analysis.alerts.length;
+                if (analysis.finalStatus === 'approved') {
+                    approvedSites++;
+                }
+            }
+
+            updateStats({
+                members: data.members.length,
+                sites: data.weather.length,
+                approved: approvedSites,
+                alerts: totalAlerts
+            });
+
+            sitesContainer.innerHTML = siteAnalyses.map(analysis => renderSiteCard(analysis, data)).join('');
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalMembers').textContent = stats.members;
+            document.getElementById('totalSites').textContent = stats.sites;
+            document.getElementById('approvedSites').textContent = stats.approved;
+            document.getElementById('alertCount').textContent = stats.alerts;
+        }
+
+        function renderSiteCard(analysis, data) {
+            const statusBadge = analysis.finalStatus === 'approved' 
+                ? '<span class="status-badge status-success">✅ 可以成行</span>'
+                : '<span class="status-badge status-danger">❌ 暂不适合</span>';
+
+            const allAlerts = [...analysis.alerts, ...analysis.warnings];
+            const alertsHtml = allAlerts.length > 0 
+                ? allAlerts.map(alert => `
+                    <div class="alert alert-${alert.type}">
+                        ${alert.message}
+                    </div>
+                `).join('')
+                : '<div class="alert alert-success">✅ 所有条件满足</div>';
+
+            const memberList = analysis.members.length > 0
+                ? analysis.members.map(m => {
+                    let badge = '';
+                    if (m.isLeader || m.level === 'leader') {
+                        badge = '<span class="status-badge status-success" style="font-size: 0.7rem;">领队</span>';
+                    } else if (m.level === 'experienced') {
+                        badge = '<span class="status-badge status-neutral" style="font-size: 0.7rem;">有经验</span>';
+                    } else {
+                        badge = '<span class="status-badge status-warning" style="font-size: 0.7rem;">新手</span>';
+                    }
+                    return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span>${m.name}</span>
+                        ${badge}
+                    </div>`;
+                }).join('')
+                : '<div style="color: #607d8b; padding: 16px 0;">暂无分配人员</div>';
+
+            const weatherDesc = {
+                'clear': '☀️ 晴天（推荐）',
+                'partly_cloudy': '⛅ 少云',
+                'cloudy': '☁️ 多云',
+                'rainy': '🌧️ 雨天'
+            };
+
+            return `
+                <div class="observation-site" id="site-${analysis.siteName.replace(/\s/g, '_')}">
+                    <div class="site-header">
+                        <div>
+                            <div class="site-name">📍 ${analysis.siteName}</div>
+                            <div style="color: #90a4ae; font-size: 0.9rem; margin-top: 4px;">
+                                ${weatherDesc[analysis.siteData.weatherType] || analysis.siteData.weatherType} · 
+                                ${analysis.siteData.startTime} - ${analysis.siteData.endTime} · 
+                                距离 ${analysis.siteData.distance} 公里
+                            </div>
+                        </div>
+                        <div class="site-status">
+                            ${statusBadge}
+                            ${analysis.override ? '<span class="status-badge status-warning" style="font-size: 0.75rem;">🔧 已改判</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="site-body">
+                        <div class="site-alerts">
+                            ${alertsHtml}
+                        </div>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-card">
+                                <div class="detail-label">👥 人员配置</div>
+                                <div class="detail-value">
+                                    ${analysis.members.length} 人
+                                    <span style="color: #90a4ae; font-size: 0.85rem;">
+                                        （${analysis.leaders} 领队 / ${analysis.experienced} 有经验 / ${analysis.newbies} 新手）
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">⏰ 观测窗口</div>
+                                <div class="detail-value">
+                                    ${analysis.weatherHours.toFixed(1)} 小时
+                                    <span style="color: #90a4ae; font-size: 0.85rem;">
+                                        （${analysis.siteData.startTime} - ${analysis.siteData.endTime}）
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">🌫️ 透明度 / 视宁度</div>
+                                <div class="detail-value">
+                                    ${analysis.siteData.transparency} / ${analysis.siteData.seeing}
+                                </div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-label">📍 距离</div>
+                                <div class="detail-value">
+                                    ${analysis.siteData.distance} 公里
+                                    <span style="color: #90a4ae; font-size: 0.85rem;">
+                                        （单程约 ${Math.ceil(analysis.siteData.distance / 80)} 小时）
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <div class="card-title" style="font-size: 1rem;">分配人员</div>
+                            <div style="padding: 0 12px;">
+                                ${memberList}
+                            </div>
+                        </div>
+
+                        <div class="manual-override">
+                            <span class="override-label">人工改判：</span>
+                            <select class="form-select" id="override-${analysis.storageKey}" onchange="handleOverrideChange('${analysis.storageKey}')">
+                                <option value="" ${!analysis.override ? 'selected' : ''}>自动判断</option>
+                                <option value="approved" ${analysis.override?.status === 'approved' ? 'selected' : ''}>强制放行</option>
+                                <option value="rejected" ${analysis.override?.status === 'rejected' ? 'selected' : ''}>强制拒绝</option>
+                            </select>
+                            <input 
+                                type="text" 
+                                class="form-input" 
+                                placeholder="改判原因（可选）" 
+                                id="overrideReason-${analysis.storageKey}"
+                                value="${analysis.override?.reason || ''}"
+                                onchange="handleOverrideReasonChange('${analysis.storageKey}')"
+                            >
+                        </div>
+
+                        <div style="margin-top: 16px;">
+                            <div class="form-label">备注：</div>
+                            <textarea 
+                                class="form-textarea" 
+                                placeholder="添加备注信息..." 
+                                style="min-height: 60px;"
+                                id="note-${analysis.storageKey}"
+                                onchange="handleNoteChange('${analysis.storageKey}')"
+                            >${analysis.note}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleOverrideChange(key) {
+            const data = loadFromStorage();
+            const select = document.getElementById(`override-${key}`);
+            const reasonInput = document.getElementById(`overrideReason-${key}`);
+            const value = select.value;
+
+            if (!value) {
+                delete data.overrides[key];
+            } else {
+                data.overrides[key] = {
+                    status: value,
+                    reason: reasonInput.value,
+                    timestamp: new Date().toISOString()
+                };
+            }
+
+            saveToStorage(data);
+            renderAnalysis(data);
+            showNotification('改判已保存');
+        }
+
+        function handleOverrideReasonChange(key) {
+            const data = loadFromStorage();
+            const reasonInput = document.getElementById(`overrideReason-${key}`);
+            
+            if (data.overrides[key]) {
+                data.overrides[key].reason = reasonInput.value;
+                saveToStorage(data);
+            }
+        }
+
+        function handleNoteChange(key) {
+            const data = loadFromStorage();
+            const noteInput = document.getElementById(`note-${key}`);
+            data.notes[key] = noteInput.value;
+            saveToStorage(data);
+            showNotification('备注已保存');
+        }
+
+        function generateMarkdown() {
+            const data = loadFromStorage();
+            if (data.weather.length === 0) {
+                document.getElementById('markdownPreview').textContent = '请先导入数据并保存';
+                return;
+            }
+
+            let md = `# 🌌 天文社观测夜出发清单\n\n`;
+            md += `**生成时间：** ${new Date().toLocaleString('zh-CN')}\n\n`;
+            md += `---\n\n`;
+
+            md += `## 📊 总体情况\n\n`;
+            md += `- **报名人数：** ${data.members.length} 人\n`;
+            md += `- **观测点数量：** ${data.weather.length} 个\n`;
+            
+            let approvedCount = 0;
+            for (const siteWeather of data.weather) {
+                const analysis = analyzeSite(siteWeather, data);
+                if (analysis.finalStatus === 'approved') approvedCount++;
+            }
+            md += `- **可放行观测点：** ${approvedCount} 个\n\n`;
+
+            md += `---\n\n`;
+
+            md += `## 🚗 车辆信息\n\n`;
+            md += `| 车牌号 | 司机 | 座位数 |\n`;
+            md += `|--------|------|--------|\n`;
+            for (const v of data.vehicles) {
+                md += `| ${v.plate} | ${v.driver} | ${v.seats} |\n`;
+            }
+            const totalSeats = data.vehicles.reduce((sum, v) => sum + v.seats, 0);
+            md += `\n**总座位数：** ${totalSeats} | **总人数：** ${data.members.length}\n\n`;
+
+            md += `---\n\n`;
+
+            md += `## 🔭 设备清单\n\n`;
+            
+            md += `### 望远镜\n\n`;
+            md += `| 名称 | 电量 | 状态 |\n`;
+            md += `|------|------|------|\n`;
+            for (const e of data.equipment.filter(e => e.type === 'telescope')) {
+                const status = e.available ? (e.battery >= 50 ? '✅ 可用' : '⚠️ 低电量') : '❌ 不可用';
+                md += `| ${e.name} | ${e.battery}% | ${status} |\n`;
+            }
+
+            md += `\n### 相机电池\n\n`;
+            md += `| 名称 | 电量 | 状态 |\n`;
+            md += `|------|------|------|\n`;
+            for (const e of data.equipment.filter(e => e.type === 'camera_battery')) {
+                const status = e.available ? (e.battery >= 50 ? '✅ 可用' : '⚠️ 低电量') : '❌ 不可用';
+                md += `| ${e.name} | ${e.battery}% | ${status} |\n`;
+            }
+
+            md += `---\n\n`;
+
+            md += `## 📍 观测点详情\n\n`;
+
+            for (const siteWeather of data.weather) {
+                const analysis = analyzeSite(siteWeather, data);
+                const statusEmoji = analysis.finalStatus === 'approved' ? '✅' : '❌';
+                const statusText = analysis.finalStatus === 'approved' ? '可以成行' : '暂不适合';
+
+                md += `### ${statusEmoji} ${analysis.siteName} - ${statusText}\n\n`;
+                
+                const weatherDesc = {
+                    'clear': '晴天',
+                    'partly_cloudy': '少云',
+                    'cloudy': '多云',
+                    'rainy': '雨天'
+                };
+
+                md += `- **天气：** ${weatherDesc[analysis.siteData.weatherType] || analysis.siteData.weatherType}\n`;
+                md += `- **观测窗口：** ${analysis.siteData.startTime} - ${analysis.siteData.endTime}（${analysis.weatherHours.toFixed(1)} 小时）\n`;
+                md += `- **透明度：** ${analysis.siteData.transparency}\n`;
+                md += `- **视宁度：** ${analysis.siteData.seeing}\n`;
+                md += `- **距离：** ${analysis.siteData.distance} 公里\n\n`;
+
+                if (analysis.alerts.length > 0 || analysis.warnings.length > 0) {
+                    md += `**⚠️ 注意事项：**\n\n`;
+                    for (const alert of analysis.alerts) {
+                        md += `- 🔴 ${alert.message.replace(/⚠️ /, '')}\n`;
+                    }
+                    for (const warning of analysis.warnings) {
+                        md += `- 🟡 ${warning.message.replace(/⚠️ /, '')}\n`;
+                    }
+                    md += `\n`;
+                }
+
+                if (analysis.members.length > 0) {
+                    md += `**分配人员（${analysis.members.length} 人）：**\n\n`;
+                    for (const m of analysis.members) {
+                        let role = '';
+                        if (m.isLeader || m.level === 'leader') role = '（领队）';
+                        else if (m.level === 'experienced') role = '（有经验）';
+                        else role = '（新手）';
+                        md += `- ${m.name} ${role}\n`;
+                    }
+                    md += `\n`;
+                }
+
+                if (analysis.override) {
+                    md += `**🔧 人工改判：** ${analysis.override.status === 'approved' ? '强制放行' : '强制拒绝'}\n`;
+                    if (analysis.override.reason) {
+                        md += `**改判原因：** ${analysis.override.reason}\n`;
+                    }
+                    md += `\n`;
+                }
+
+                if (analysis.note) {
+                    md += `**📝 备注：** ${analysis.note}\n\n`;
+                }
+
+                md += `---\n\n`;
+            }
+
+            md += `## 👥 完整人员名单\n\n`;
+            md += `| 姓名 | 经验等级 | 是否领队 | 联系方式 |\n`;
+            md += `|------|----------|----------|----------|\n`;
+            for (const m of data.members) {
+                const levelDesc = {
+                    'newbie': '新手',
+                    'experienced': '有经验',
+                    'leader': '领队'
+                };
+                md += `| ${m.name} | ${levelDesc[m.level] || m.level} | ${m.isLeader ? '是' : '否'} | ${m.phone || '-'} |\n`;
+            }
+
+            document.getElementById('markdownPreview').textContent = md;
+        }
+
+        function generateJson() {
+            const data = loadFromStorage();
+            if (data.weather.length === 0) {
+                document.getElementById('jsonPreview').textContent = '请先导入数据并保存';
+                return;
+            }
+
+            const siteAnalyses = [];
+            for (const siteWeather of data.weather) {
+                const analysis = analyzeSite(siteWeather, data);
+                siteAnalyses.push({
+                    siteName: analysis.siteName,
+                    weather: {
+                        type: analysis.siteData.weatherType,
+                        startTime: analysis.siteData.startTime,
+                        endTime: analysis.siteData.endTime,
+                        hours: analysis.weatherHours,
+                        transparency: analysis.siteData.transparency,
+                        seeing: analysis.siteData.seeing,
+                        distance: analysis.siteData.distance
+                    },
+                    members: analysis.members.map(m => ({
+                        name: m.name,
+                        level: m.level,
+                        isLeader: m.isLeader,
+                        phone: m.phone
+                    })),
+                    stats: {
+                        total: analysis.members.length,
+                        leaders: analysis.leaders,
+                        experienced: analysis.experienced,
+                        newbies: analysis.newbies
+                    },
+                    issues: {
+                        critical: analysis.alerts.map(a => a.message),
+                        warnings: analysis.warnings.map(w => w.message)
+                    },
+                    autoDecision: analysis.canGo ? 'approved' : 'rejected',
+                    finalDecision: analysis.finalStatus,
+                    override: analysis.override,
+                    note: analysis.note
+                });
+            }
+
+            const auditData = {
+                auditId: `audit_${Date.now()}`,
+                generatedAt: new Date().toISOString(),
+                summary: {
+                    totalMembers: data.members.length,
+                    totalSites: data.weather.length,
+                    approvedSites: siteAnalyses.filter(s => s.finalDecision === 'approved').length,
+                    rejectedSites: siteAnalyses.filter(s => s.finalDecision === 'rejected').length,
+                    totalCriticalIssues: siteAnalyses.reduce((sum, s) => sum + s.issues.critical.length, 0),
+                    totalWarnings: siteAnalyses.reduce((sum, s) => sum + s.issues.warnings.length, 0)
+                },
+                rawData: {
+                    members: data.members,
+                    equipment: data.equipment,
+                    vehicles: data.vehicles,
+                    weather: data.weather,
+                    assignments: data.assignments
+                },
+                siteAnalyses,
+                overrides: data.overrides,
+                notes: data.notes,
+                lastUpdated: data.lastUpdated
+            };
+
+            document.getElementById('jsonPreview').textContent = JSON.stringify(auditData, null, 2);
+        }
+
+        function downloadMarkdown() {
+            const preview = document.getElementById('markdownPreview').textContent;
+            if (!preview || preview.includes('请先导入')) {
+                generateMarkdown();
+                setTimeout(() => downloadMarkdown(), 100);
+                return;
+            }
+
+            const blob = new Blob([preview], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `观测夜出发清单_${new Date().toISOString().slice(0, 10)}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Markdown 文件已下载');
+        }
+
+        function downloadJson() {
+            const preview = document.getElementById('jsonPreview').textContent;
+            if (!preview || preview.includes('请先导入')) {
+                generateJson();
+                setTimeout(() => downloadJson(), 100);
+                return;
+            }
+
+            const blob = new Blob([preview], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `观测夜审计明细_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('JSON 审计文件已下载');
+        }
+
+        function exportAllData() {
+            const data = loadFromStorage();
+            const exportData = {
+                ...data,
+                exportTime: new Date().toISOString(),
+                version: '1.0'
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `天文社观测数据备份_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('数据备份已导出');
+        }
+
+        function importAllData() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    saveToStorage(data);
+                    updateUIWithData(data);
+                    showNotification('数据导入成功');
+                } catch (err) {
+                    showNotification('导入失败：文件格式错误', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function confirmClearAll() {
+            if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
+                localStorage.removeItem(STORAGE_KEY);
+                document.getElementById('membersInput').value = '';
+                document.getElementById('equipmentInput').value = '';
+                document.getElementById('vehiclesInput').value = '';
+                document.getElementById('weatherInput').value = '';
+                document.getElementById('assignmentInput').value = '';
+                document.getElementById('observationSites').innerHTML = '';
+                updateStats({ members: 0, sites: 0, approved: 0, alerts: 0 });
+                showNotification('数据已清空');
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'rgba(0, 200, 83, 0.9)' : 'rgba(255, 82, 82, 0.9)'};
+                color: #fff;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                font-weight: 500;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchTab(btn.dataset.tab);
+                });
+            });
+
+            const savedData = loadFromStorage();
+            if (savedData.members.length > 0 || savedData.weather.length > 0) {
+                updateUIWithData(savedData);
+                showNotification('已加载保存的数据');
+            }
+        });
+    </script>
+</body>
+</html>
