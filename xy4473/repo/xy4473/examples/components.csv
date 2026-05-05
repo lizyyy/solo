@@ -1,0 +1,16 @@
+id,name,type,positionX,positionY,positionZ,width,length,height
+deck-1,第一跨桥面,deck,0,0,0,15,30,0.5
+deck-2,第二跨桥面,deck,0,0,35,15,30,0.5
+deck-3,第三跨桥面,deck,0,0,70,15,30,0.5
+pier-1,1号桥墩,pier,-15,0,0,0,0,8
+pier-2,2号桥墩,pier,15,0,0,0,0,8
+pier-3,3号桥墩,pier,-15,0,35,0,0,8
+pier-4,4号桥墩,pier,15,0,35,0,0,8
+pier-5,5号桥墩,pier,-15,0,70,0,0,8
+pier-6,6号桥墩,pier,15,0,70,0,0,8
+girder-1,左主梁-1,girder,-6,0.5,0,2,30,1.5
+girder-2,右主梁-1,girder,6,0.5,0,2,30,1.5
+girder-3,左主梁-2,girder,-6,0.5,35,2,30,1.5
+girder-4,右主梁-2,girder,6,0.5,35,2,30,1.5
+girder-5,左主梁-3,girder,-6,0.5,70,2,30,1.5
+girder-6,右主梁-3,girder,6,0.5,70,2,30,1.5
