@@ -1,0 +1,49 @@
+{
+  "scenes": [
+    {
+      "id": "S001",
+      "name": "开场全亮",
+      "intensity": 100,
+      "color_temperature": 5500,
+      "channels": {
+        "front": 100,
+        "back": 80,
+        "side": 70
+      },
+      "notes": "演出开始时的基础照明"
+    },
+    {
+      "id": "S002",
+      "name": "主持人聚光灯",
+      "intensity": 90,
+      "color_temperature": 3200,
+      "channels": {
+        "spot": 100,
+        "front": 30
+      },
+      "notes": "主持人上场时使用"
+    },
+    {
+      "id": "S003",
+      "name": "演员上场区",
+      "intensity": 85,
+      "color_temperature": 4000,
+      "channels": {
+        "left_entry": 100,
+        "right_entry": 100
+      },
+      "notes": "演员上下场通道"
+    },
+    {
+      "id": "S004",
+      "name": "中场休息",
+      "intensity": 60,
+      "color_temperature": 3000,
+      "channels": {
+        "house": 60,
+        "stage": 20
+      },
+      "notes": "中场休息时的灯光"
+    }
+  ]
+}
