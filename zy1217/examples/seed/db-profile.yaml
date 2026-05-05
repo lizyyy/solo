@@ -1,0 +1,23 @@
+database:
+  type: mysql
+  host: localhost
+  port: 3306
+  database: ecommerce
+
+connectionPool:
+  maxConnections: 50
+  minConnections: 10
+  maxWaitQueueSize: 100
+  connectionTimeoutMs: 30000
+  idleTimeoutMs: 600000
+
+readWriteSeparation:
+  enabled: true
+  readReplicas: 3
+  routingStrategy: round-robin
+
+sharding:
+  enabled: true
+  shardCount: 4
+  shardKey: user_id
+  algorithm: hash

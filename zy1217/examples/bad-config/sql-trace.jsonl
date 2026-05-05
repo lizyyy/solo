@@ -1,0 +1,4 @@
+{"timestamp": -1000, "traceId": "", "sql": "", "params": [], "durationMs": -50, "connectionId": "conn-001", "isRead": true}
+{"timestamp": 1704067200000, "traceId": "trace-001", "sql": "SELECT * FROM users", "params": [], "durationMs": 100, "connectionId": "conn-001", "isRead": null}
+{"timestamp": 1704067201000, "traceId": "trace-001", "sql": "INSERT INTO orders VALUES (1, 2, 3)", "params": [], "durationMs": 50, "connectionId": "conn-001", "isRead": false, "rowsReturned": -5}
+{"timestamp": 1704067202000, "traceId": "trace-002", "sql": "UPDATE users SET email = 'test@test.com'", "params": [], "durationMs": 200, "connectionId": "conn-002", "isRead": false, "rowsAffected": -1}
