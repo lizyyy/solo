@@ -1,0 +1,103 @@
+{
+  "week": "2024年第1周",
+  "period": "2024-01-01 至 2024-01-03",
+  "metrics": [
+    {
+      "metric_name": "gmv",
+      "display_name": "GMV",
+      "value": 900.0,
+      "source_text": "GMV: 900.0元"
+    },
+    {
+      "metric_name": "net_sales",
+      "display_name": "净销售额",
+      "value": 900.0,
+      "source_text": "净销售额: 900.0元"
+    },
+    {
+      "metric_name": "total_orders",
+      "display_name": "订单数",
+      "value": 15,
+      "source_text": "订单数: 15单"
+    },
+    {
+      "metric_name": "average_order_value",
+      "display_name": "客单价",
+      "value": 60.0,
+      "source_text": "客单价: 60.0元"
+    },
+    {
+      "metric_name": "total_refunds",
+      "display_name": "退款金额",
+      "value": 73.8,
+      "source_text": "退款金额: 73.8元"
+    },
+    {
+      "metric_name": "refund_rate",
+      "display_name": "退款率",
+      "value": 5.0,
+      "source_text": "退款率: 5.0%"
+    },
+    {
+      "metric_name": "total_labor_cost",
+      "display_name": "人工成本",
+      "value": 3972.0,
+      "source_text": "人工成本: 3972.0元"
+    },
+    {
+      "metric_name": "labor_cost_rate",
+      "display_name": "人工成本率",
+      "value": 450.0,
+      "source_text": "人工成本率: 450.0%"
+    }
+  ],
+  "store_metrics": {
+    "S001": {
+      "gmv": {
+        "metric_name": "gmv",
+        "display_name": "GMV",
+        "value": 200.0,
+        "source_text": "S001 GMV: 200.0"
+      },
+      "net_sales": {
+        "metric_name": "net_sales",
+        "display_name": "净销售额",
+        "value": 200.0,
+        "source_text": "S001 净销售额: 200.0"
+      }
+    },
+    "S002": {
+      "gmv": {
+        "metric_name": "gmv",
+        "display_name": "GMV",
+        "value": 250.0,
+        "source_text": "S002 GMV: 250.0"
+      },
+      "net_sales": {
+        "metric_name": "net_sales",
+        "display_name": "净销售额",
+        "value": 250.0,
+        "source_text": "S002 净销售额: 250.0"
+      }
+    },
+    "S003": {
+      "gmv": {
+        "metric_name": "gmv",
+        "display_name": "GMV",
+        "value": 450.0,
+        "source_text": "S003 GMV: 450.0"
+      },
+      "net_sales": {
+        "metric_name": "net_sales",
+        "display_name": "净销售额",
+        "value": 450.0,
+        "source_text": "S003 净销售额: 450.0"
+      }
+    }
+  },
+  "summary": {
+    "total_stores": 3,
+    "period_days": 3,
+    "comments": "本周经营情况良好，GMV 保持稳定增长。"
+  }
+}

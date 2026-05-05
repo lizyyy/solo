@@ -1,0 +1,81 @@
+metrics:
+  - name: default
+    display_name: 默认规则
+    formula: ""
+    description: 默认四舍五入规则
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: SUM
+
+  - name: gmv
+    display_name: GMV
+    formula: "sum(orders.total_amount)"
+    description: 总商品交易额（Gross Merchandise Value）
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: SUM
+
+  - name: net_sales
+    display_name: 净销售额
+    formula: "GMV - 总退款金额"
+    description: 扣除退款后的实际销售额
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: SUM
+
+  - name: average_order_value
+    display_name: 客单价
+    formula: "GMV / 订单数"
+    description: 平均每单消费金额
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: AVERAGE
+
+  - name: refund_rate
+    display_name: 退款率
+    formula: "总退款金额 / GMV * 100"
+    description: 退款金额占 GMV 的百分比
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: AVERAGE
+
+  - name: labor_cost_rate
+    display_name: 人工成本率
+    formula: "人工成本 / 净销售额 * 100"
+    description: 人工成本占净销售额的百分比
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: AVERAGE
+
+  - name: total_orders
+    display_name: 订单数
+    formula: "count(orders)"
+    description: 订单总数量
+    tolerance: 0
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 0
+    store_aggregation: SUM
+
+  - name: total_refunds
+    display_name: 退款金额
+    formula: "sum(refunds.refund_amount)"
+    description: 退款总金额
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: SUM
+
+  - name: total_labor_cost
+    display_name: 人工成本
+    formula: "sum(labor_costs.total_cost)"
+    description: 人工成本总金额
+    tolerance: 0.01
+    rounding_method: ROUND_HALF_UP
+    decimal_places: 2
+    store_aggregation: SUM
