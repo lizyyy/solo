@@ -1,0 +1,108 @@
+cases:
+  - case_id: case_001
+    name: 简单 SELECT 等价性验证
+    description: 验证基本 SELECT 语句的等价性，列顺序不影响结果
+    tags: ['basic', 'select']
+    original_sql: SELECT id, name, email FROM users
+    optimized_sql: SELECT name, email, id FROM users
+  
+  - case_id: case_002
+    name: WHERE 条件过滤验证
+    description: 验证带 WHERE 条件的过滤是否正确
+    tags: ['where', 'filter']
+    original_sql: SELECT name, age FROM users WHERE age > 30
+    optimized_sql: SELECT name, age FROM users WHERE NOT (age <= 30)
+  
+  - case_id: case_003
+    name: COUNT(*) 与 COUNT(column) 差异（应失败）
+    description: COUNT(*) 统计所有行包括 NULL，COUNT(email) 不统计 NULL 值的行
+    tags: ['aggregation', 'null-handling', 'bad-case']
+    original_sql: SELECT COUNT(*) as total FROM users
+    optimized_sql: SELECT COUNT(email) as total FROM users
+  
+  - case_id: case_004
+    name: INNER JOIN 验证
+    description: 验证 INNER JOIN 的正确性
+    tags: ['join', 'inner-join']
+    original_sql: |
+      SELECT u.name, o.product_name, o.amount
+      FROM users u
+      INNER JOIN orders o ON u.id = o.user_id
+    optimized_sql: |
+      SELECT u.name, o.product_name, o.amount
+      FROM orders o
+      JOIN users u ON o.user_id = u.id
+  
+  - case_id: case_005
+    name: LEFT JOIN 改 INNER JOIN（应失败）
+    description: LEFT JOIN 改成 INNER JOIN 会丢失没有订单的用户，结果不等价
+    tags: ['join', 'bad-case', 'regression']
+    original_sql: |
+      SELECT u.name, o.product_name
+      FROM users u
+      LEFT JOIN orders o ON u.id = o.user_id
+    optimized_sql: |
+      SELECT u.name, o.product_name
+      FROM users u
+      JOIN orders o ON u.id = o.user_id
+  
+  - case_id: case_006
+    name: ORDER BY 排序敏感验证
+    description: 有 ORDER BY 时，结果顺序是语义的一部分
+    tags: ['order-by', 'sort', 'pagination']
+    original_sql: SELECT name, age FROM users ORDER BY age DESC
+    optimized_sql: SELECT name, age FROM users ORDER BY age ASC
+  
+  - case_id: case_007
+    name: LIMIT 与 ORDER BY 结合验证
+    description: 当有 LIMIT 时，ORDER BY 决定返回哪些行，去掉 ORDER BY 会改变语义
+    tags: ['limit', 'order-by', 'pagination', 'bad-case']
+    original_sql: SELECT name FROM users ORDER BY age DESC LIMIT 3
+    optimized_sql: SELECT name FROM users LIMIT 3
+  
+  - case_id: case_008
+    name: SUM 聚合验证
+    description: 验证 SUM 聚合函数的正确性
+    tags: ['aggregation', 'sum']
+    original_sql: SELECT SUM(amount) as total FROM orders WHERE status = 'completed'
+    optimized_sql: SELECT SUM(amount) as total FROM orders WHERE status != 'pending' AND status != 'cancelled'
+  
+  - case_id: case_009
+    name: GROUP BY 验证
+    description: 验证 GROUP BY 聚合的正确性
+    tags: ['aggregation', 'group-by']
+    original_sql: |
+      SELECT user_id, COUNT(*) as order_count, SUM(amount) as total_spent
+      FROM orders
+      GROUP BY user_id
+    optimized_sql: |
+      SELECT user_id, COUNT(1) as order_count, SUM(amount) as total_spent
+      FROM orders
+      GROUP BY user_id
+  
+  - case_id: case_010
+    name: 子查询 vs JOIN 优化
+    description: 验证子查询重写为 JOIN 的等价性
+    tags: ['subquery', 'join', 'optimization']
+    original_sql: |
+      SELECT name, email FROM users
+      WHERE id IN (SELECT user_id FROM orders WHERE status = 'completed')
+    optimized_sql: |
+      SELECT DISTINCT u.name, u.email
+      FROM users u
+      JOIN orders o ON u.id = o.user_id
+      WHERE o.status = 'completed'
+  
+  - case_id: case_011
+    name: NULL 条件修改（应失败）
+    description: IS NULL 不能用 = NULL 替代，SQL 中 NULL = NULL 结果为 UNKNOWN
+    tags: ['null-handling', 'bad-case']
+    original_sql: SELECT name FROM users WHERE email IS NULL
+    optimized_sql: SELECT name FROM users WHERE email = NULL
+  
+  - case_id: case_012
+    name: DISTINCT 保留验证
+    description: 验证去重操作的等价性
+    tags: ['distinct', 'deduplication']
+    original_sql: SELECT DISTINCT status FROM orders
+    optimized_sql: SELECT status FROM orders GROUP BY status
