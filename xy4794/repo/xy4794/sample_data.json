@@ -1,0 +1,105 @@
+{
+  "name": "SaaS 小团队",
+  "contacts": [
+    {
+      "import_key": "contact_zhang",
+      "name": "张三",
+      "email": "zhangsan@acme.com",
+      "phone": "13800138001",
+      "role": "CTO"
+    },
+    {
+      "import_key": "contact_li",
+      "name": "李四",
+      "email": "lisi@beta.com",
+      "phone": "13800138002",
+      "role": "产品经理"
+    },
+    {
+      "import_key": "contact_wang",
+      "name": "王五",
+      "email": "wangwu@gamma.com",
+      "phone": "13800138003",
+      "role": "技术总监"
+    }
+  ],
+  "contracts": [
+    {
+      "import_key": "contract_acme",
+      "contact_import_key": "contact_zhang",
+      "contract_number": "CN-2024-001",
+      "start_date": "2024-01-01",
+      "end_date": "2026-06-01",
+      "value": 120000.00,
+      "status": "active"
+    },
+    {
+      "import_key": "contract_beta",
+      "contact_import_key": "contact_li",
+      "contract_number": "CN-2024-002",
+      "start_date": "2024-06-01",
+      "end_date": "2026-05-20",
+      "value": 60000.00,
+      "status": "active"
+    },
+    {
+      "import_key": "contract_gamma",
+      "contact_import_key": "contact_wang",
+      "contract_number": "CN-2023-003",
+      "start_date": "2023-01-01",
+      "end_date": "2026-01-05",
+      "value": 80000.00,
+      "status": "active"
+    }
+  ],
+  "usage_snapshots": [
+    {
+      "contract_import_key": "contract_acme",
+      "snapshot_date": "2026-03-01",
+      "active_users": 120,
+      "api_calls": 45000,
+      "storage_usage": 250.5,
+      "feature_usage": {"dashboard": 80, "reports": 60, "api": 100}
+    },
+    {
+      "contract_import_key": "contract_acme",
+      "snapshot_date": "2026-04-01",
+      "active_users": 115,
+      "api_calls": 42000,
+      "storage_usage": 248.3,
+      "feature_usage": {"dashboard": 75, "reports": 55, "api": 95}
+    },
+    {
+      "contract_import_key": "contract_beta",
+      "snapshot_date": "2026-03-01",
+      "active_users": 45,
+      "api_calls": 12000,
+      "storage_usage": 80.0,
+      "feature_usage": {"dashboard": 30, "reports": 20}
+    },
+    {
+      "contract_import_key": "contract_beta",
+      "snapshot_date": "2026-04-01",
+      "active_users": 30,
+      "api_calls": 8000,
+      "storage_usage": 75.0,
+      "feature_usage": {"dashboard": 15, "reports": 10}
+    },
+    {
+      "contract_import_key": "contract_gamma",
+      "snapshot_date": "2026-03-01",
+      "active_users": 0,
+      "api_calls": 0,
+      "storage_usage": 0,
+      "feature_usage": {}
+    },
+    {
+      "contract_import_key": "contract_gamma",
+      "snapshot_date": "2026-04-01",
+      "active_users": 0,
+      "api_calls": 0,
+      "storage_usage": 0,
+      "feature_usage": {}
+    }
+  ]
+}
