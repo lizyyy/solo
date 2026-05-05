@@ -1,0 +1,4 @@
+malicious.sh;main;do_work;malicious_loop 5000
+miner;worker_thread;mine_hash;SHA256_Update;sha256_transform 3500
+kjournald2;find_get_page;__lock_page;wait_on_page_bit;io_schedule 2000
+firefox;JS::Call;JS::CallInterpreted 50

@@ -1,0 +1,16 @@
+malicious.s  9876 [000] 12345.678901:     100000 cycles:
+            55555567890a malicious_loop (/home/user/malicious.sh)
+            555555678950 do_work (/home/user/malicious.sh)
+            555555678990 main (/home/user/malicious.sh)
+
+miner        8765 [001] 12345.678910:     100000 cycles:
+            7ffff2345678 sha256_transform (/usr/lib/libcrypto.so.1.1)
+            7ffff2345901 SHA256_Update (/usr/lib/libcrypto.so.1.1)
+            7ffff2345b23 mine_hash (/home/user/miner)
+            7ffff2345d45 worker_thread (/home/user/miner)
+
+kjournald2    7654 [002] 12345.678920:     100000 cycles:
+            7ffff0abcdef io_schedule (/boot/vmlinuz-5.15.0-91-generic)
+            7ffff0ab1234 wait_on_page_bit (/boot/vmlinuz-5.15.0-91-generic)
+            7ffff0ab5678 __lock_page (/boot/vmlinuz-5.15.0-91-generic)
+            7ffff0ab9abc find_get_page (/boot/vmlinuz-5.15.0-91-generic)
