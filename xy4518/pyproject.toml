@@ -1,0 +1,28 @@
+[project]
+name = "answer-sheet-checker"
+version = "1.0.0"
+description = "答题卡回收核对自动化工具 - 用于高校教务老师纸笔考试后核查答题卡"
+requires-python = ">=3.9"
+dependencies = [
+    "flask>=3.0.0",
+    "pypdf>=4.0.0",
+    "pillow>=10.0.0",
+    "pyzbar>=0.1.9",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+asc = "answer_sheet_checker.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
