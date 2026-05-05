@@ -1,0 +1,25 @@
+{
+  "name": "os-simulator",
+  "version": "1.0.0",
+  "description": "操作系统机制实验台 - 用于演示进程、线程、协程的运行机制",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "install": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "start": "cd backend && npm run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
