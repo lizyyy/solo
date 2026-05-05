@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>假发定制工坊 - 订单管理系统</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1 class="app-title">💇 假发定制工坊 - 订单管理系统</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="showAddOrderModal()">
+            ➕ 新建订单
+          </button>
+          <button class="btn btn-secondary" onclick="initSampleData()">
+            📦 初始化示例数据
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="orders" onclick="switchTab('orders')">
+        📋 订单列表
+      </button>
+      <button class="tab-btn" data-tab="inventory" onclick="switchTab('inventory')">
+        📦 库存管理
+      </button>
+      <button class="tab-btn" data-tab="reviews" onclick="switchTab('reviews')">
+        📝 复核记录
+      </button>
+    </nav>
+
+    <main class="main-content">
+      <!-- 订单列表页面 -->
+      <div id="orders-tab" class="tab-content active">
+        <div class="filters">
+          <div class="filter-group">
+            <label for="status-filter">状态筛选：</label>
+            <select id="status-filter" onchange="filterOrders()">
+              <option value="">全部</option>
+              <option value="ready">✅ 可开工</option>
+              <option value="needs_material">⚠️ 需补料</option>
+              <option value="needs_communication">❌ 需返沟通</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="search-input">搜索：</label>
+            <input type="text" id="search-input" placeholder="搜索客户姓名、订单号..." oninput="filterOrders()">
+          </div>
+        </div>
+
+        <div class="orders-grid" id="orders-grid">
+          <!-- 订单卡片将在这里动态生成 -->
+        </div>
+      </div>
+
+      <!-- 库存管理页面 -->
+      <div id="inventory-tab" class="tab-content">
+        <div class="inventory-header">
+          <h2>库存管理</h2>
+          <button class="btn btn-primary" onclick="showAddInventoryModal()">
+            ➕ 添加库存
+          </button>
+        </div>
+        
+        <div class="inventory-sections">
+          <div class="inventory-section">
+            <h3>🧵 发丝批次</h3>
+            <div class="inventory-list" id="hair-batches-list">
+              <!-- 发丝批次列表 -->
+            </div>
+          </div>
+          
+          <div class="inventory-section">
+            <h3>🕸️ 蕾丝网底</h3>
+            <div class="inventory-list" id="lace-nets-list">
+              <!-- 蕾丝网底列表 -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 复核记录页面 -->
+      <div id="reviews-tab" class="tab-content">
+        <h2>复核记录</h2>
+        <div class="reviews-list" id="reviews-list">
+          <!-- 复核记录列表 -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 新建订单模态框 -->
+  <div id="add-order-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📝 新建订单</h2>
+        <button class="close-btn" onclick="closeModal('add-order-modal')">&times;</button>
+      </div>
+      <form id="add-order-form" class="form">
+        <div class="form-section">
+          <h3>客户信息</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customerName">客户姓名 *</label>
+              <input type="text" id="customerName" name="customerName" required>
+            </div>
+            <div class="form-group">
+              <label for="customerPhone">联系电话</label>
+              <input type="tel" id="customerPhone" name="customerPhone">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>尺寸信息</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="headCircumferenceMin">头围最小值 (cm) *</label>
+              <input type="number" id="headCircumferenceMin" name="headCircumferenceMin" required min="0">
+            </div>
+            <div class="form-group">
+              <label for="headCircumferenceMax">头围最大值 (cm) *</label>
+              <input type="number" id="headCircumferenceMax" name="headCircumferenceMax" required min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="headMoldFrontBack">头模前后径 (cm)</label>
+              <input type="number" id="headMoldFrontBack" name="headMoldFrontBack" min="0">
+            </div>
+            <div class="form-group">
+              <label for="headMoldLeftRight">头模左右径 (cm)</label>
+              <input type="number" id="headMoldLeftRight" name="headMoldLeftRight" min="0">
+            </div>
+            <div class="form-group">
+              <label for="headMoldEarDistance">头模耳上距 (cm)</label>
+              <input type="number" id="headMoldEarDistance" name="headMoldEarDistance" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>产品规格</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="hairBatch">发丝批次 *</label>
+              <select id="hairBatch" name="hairBatch" required>
+                <option value="">请选择发丝批次</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="hairQuantity">发丝数量 (g) *</label>
+              <input type="number" id="hairQuantity" name="hairQuantity" required min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="colorCurve">染色曲线</label>
+              <select id="colorCurve" name="colorCurve">
+                <option value="">请选择染色曲线</option>
+                <option value="natural_black">自然黑</option>
+                <option value="dark_brown">深棕</option>
+                <option value="medium_brown">中棕</option>
+                <option value="light_brown">浅棕</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="laceNetSku">蕾丝网底SKU *</label>
+              <select id="laceNetSku" name="laceNetSku" required>
+                <option value="">请选择蕾丝网底</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="laceNetQuantity">网底数量 (片) *</label>
+              <input type="number" id="laceNetQuantity" name="laceNetQuantity" required min="1">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>其他信息</h3>
+          <div class="form-group">
+            <label for="deadline">发货期限 *</label>
+            <input type="date" id="deadline" name="deadline" required>
+          </div>
+          <div class="form-group">
+            <label for="fittingPhotos">试戴照片 (URL, 用逗号分隔)</label>
+            <input type="text" id="fittingPhotos" name="fittingPhotos" placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg">
+          </div>
+          <div class="form-group">
+            <label for="fittingNotes">照片备注</label>
+            <input type="text" id="fittingNotes" name="fittingNotes" placeholder="试戴照片的备注说明">
+          </div>
+          <div class="form-group">
+            <label for="notes">备注</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="订单备注信息..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('add-order-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">创建订单</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 订单详情模态框 -->
+  <div id="order-detail-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>📋 订单详情</h2>
+        <button class="close-btn" onclick="closeModal('order-detail-modal')">&times;</button>
+      </div>
+      <div id="order-detail-content">
+        <!-- 订单详情内容 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加库存模态框 -->
+  <div id="add-inventory-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📦 添加库存</h2>
+        <button class="close-btn" onclick="closeModal('add-inventory-modal')">&times;</button>
+      </div>
+      <form id="add-inventory-form" class="form">
+        <div class="form-section">
+          <div class="form-group">
+            <label for="inventoryType">库存类型 *</label>
+            <select id="inventoryType" name="inventoryType" required onchange="toggleInventoryFields()">
+              <option value="">请选择类型</option>
+              <option value="hair_batch">发丝批次</option>
+              <option value="lace_net">蕾丝网底</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="hair-fields" style="display: none;">
+          <div class="form-section">
+            <h3>发丝批次信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hairBatchNumber">批次编号 *</label>
+                <input type="text" id="hairBatchNumber" name="hairBatchNumber" placeholder="HB-2024-001">
+              </div>
+              <div class="form-group">
+                <label for="hairName">名称 *</label>
+                <input type="text" id="hairName" name="hairName" placeholder="巴西顺发 20寸 自然黑">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="hairColor">颜色代码</label>
+                <input type="text" id="hairColor" name="hairColor" placeholder="#1B">
+              </div>
+              <div class="form-group">
+                <label for="hairQuantityInventory">数量 (g) *</label>
+                <input type="number" id="hairQuantityInventory" name="hairQuantityInventory" min="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>支持的染色曲线</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="colorCurves" value="natural_black"> 自然黑</label>
+                <label><input type="checkbox" name="colorCurves" value="dark_brown"> 深棕</label>
+                <label><input type="checkbox" name="colorCurves" value="medium_brown"> 中棕</label>
+                <label><input type="checkbox" name="colorCurves" value="light_brown"> 浅棕</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="hairSupplier">供应商</label>
+              <input type="text" id="hairSupplier" name="hairSupplier" placeholder="供应商名称">
+            </div>
+          </div>
+        </div>
+
+        <div id="lace-fields" style="display: none;">
+          <div class="form-section">
+            <h3>蕾丝网底信息</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="laceSku">SKU *</label>
+                <input type="text" id="laceSku" name="laceSku" placeholder="LN-SWISS-001">
+              </div>
+              <div class="form-group">
+                <label for="laceName">名称 *</label>
+                <input type="text" id="laceName" name="laceName" placeholder="瑞士网 13x4 透明色">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="laceMaterial">材质</label>
+                <select id="laceMaterial" name="laceMaterial">
+                  <option value="">请选择</option>
+                  <option value="swiss_lace">瑞士网</option>
+                  <option value="hd_lace">HD网</option>
+                  <option value="transparent_lace">透明网</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="laceSize">尺寸</label>
+                <input type="text" id="laceSize" name="laceSize" placeholder="13x4, 4x4, 360">
+              </div>
+              <div class="form-group">
+                <label for="laceColor">颜色</label>
+                <select id="laceColor" name="laceColor">
+                  <option value="">请选择</option>
+                  <option value="transparent">透明色</option>
+                  <option value="light_brown">浅棕色</option>
+                  <option value="medium_brown">中棕色</option>
+                  <option value="dark_brown">深棕色</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="laceQuantity">数量 (片) *</label>
+                <input type="number" id="laceQuantity" name="laceQuantity" min="0">
+              </div>
+              <div class="form-group">
+                <label for="laceSupplier">供应商</label>
+                <input type="text" id="laceSupplier" name="laceSupplier" placeholder="供应商名称">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('add-inventory-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">添加库存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 人工改判模态框 -->
+  <div id="manual-status-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔧 人工改判订单状态</h2>
+        <button class="close-btn" onclick="closeModal('manual-status-modal')">&times;</button>
+      </div>
+      <form id="manual-status-form" class="form">
+        <input type="hidden" id="manualOrderId" name="orderId">
+        <div class="form-section">
+          <div class="form-group">
+            <label for="manualStatus">新状态 *</label>
+            <select id="manualStatus" name="manualStatus" required>
+              <option value="">请选择状态</option>
+              <option value="ready">✅ 可开工</option>
+              <option value="needs_material">⚠️ 需补料</option>
+              <option value="needs_communication">❌ 需返沟通</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="manualNote">改判备注</label>
+            <textarea id="manualNote" name="manualNote" rows="3" placeholder="请输入改判原因..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('manual-status-modal')">取消</button>
+          <button type="submit" class="btn btn-primary">确认改判</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
