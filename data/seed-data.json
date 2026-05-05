@@ -1,0 +1,173 @@
+{
+    "virtualMemory": {
+        "examples": [
+            {
+                "name": "基础示例 - 顺序访问",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 4096, 8192, 12288, 0, 4096, 16384, 0, 4096, 8192, 12288, 16384]
+                },
+                "description": "演示基本的虚拟地址翻译过程，包含TLB命中、缺页和置换"
+            },
+            {
+                "name": "LRU vs FIFO 对比",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 3,
+                    "tlbSize": 0,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 4096, 8192, 0, 12288, 4096, 16384, 0, 4096, 12288, 16384]
+                },
+                "description": "经典的Belady异常示例序列，用于对比不同置换策略"
+            },
+            {
+                "name": "高TLB命中率场景",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 8,
+                    "tlbSize": 8,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 4096, 8192, 0, 4096, 8192, 0, 4096, 8192, 0, 4096, 8192]
+                },
+                "description": "重复访问少数页面，展示TLB缓存的效果"
+            },
+            {
+                "name": "大量缺页场景",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 2,
+                    "tlbSize": 2,
+                    "replacementPolicy": "fifo",
+                    "accessSequence": [0, 4096, 8192, 12288, 16384, 20480, 24576, 28672]
+                },
+                "description": "物理内存小，访问序列长，导致频繁缺页和置换"
+            },
+            {
+                "name": "Optimal 最优策略演示",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 3,
+                    "tlbSize": 0,
+                    "replacementPolicy": "optimal",
+                    "accessSequence": [0, 4096, 8192, 0, 12288, 4096, 16384, 0, 4096, 12288, 16384]
+                },
+                "description": "展示Optimal策略如何实现最少的缺页次数"
+            }
+        ],
+        "testCases": [
+            {
+                "name": "简单地址翻译测试",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 100, 4096, 4100, 8192]
+                },
+                "expected": {
+                    "totalAccesses": 5,
+                    "pageFaults": 3,
+                    "pageFaultRate": "60.00"
+                }
+            }
+        ]
+    },
+    "memoryPool": {
+        "examples": [
+            {
+                "name": "对象池基础示例",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 200 },
+                        { "type": "alloc", "size": 150 },
+                        { "type": "alloc", "size": 256 },
+                        { "type": "free", "allocationId": 1 },
+                        { "type": "alloc", "size": 100 },
+                        { "type": "free", "allocationId": 0 },
+                        { "type": "alloc", "size": 200 }
+                    ]
+                },
+                "description": "演示对象池的分配和释放，展示内部碎片"
+            },
+            {
+                "name": "内存池外部碎片示例",
+                "config": {
+                    "poolType": "memory",
+                    "totalSize": 4096,
+                    "objectSize": 0,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "alloc", "size": 512 },
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "free", "allocationId": 0 },
+                        { "type": "free", "allocationId": 2 },
+                        { "type": "alloc", "size": 1500 }
+                    ]
+                },
+                "description": "演示内存池的外部碎片问题，总空闲空间足够但无法分配"
+            },
+            {
+                "name": "对齐规则演示",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 1024,
+                    "objectSize": 100,
+                    "alignment": 16,
+                    "operations": [
+                        { "type": "alloc", "size": 50 },
+                        { "type": "alloc", "size": 100 },
+                        { "type": "alloc", "size": 33 }
+                    ]
+                },
+                "description": "演示16字节对齐如何影响实际分配大小和内部碎片"
+            },
+            {
+                "name": "内存池合并演示",
+                "config": {
+                    "poolType": "memory",
+                    "totalSize": 8192,
+                    "objectSize": 0,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "free", "allocationId": 0 },
+                        { "type": "free", "allocationId": 2 },
+                        { "type": "free", "allocationId": 1 },
+                        { "type": "alloc", "size": 3000 }
+                    ]
+                },
+                "description": "演示相邻空闲块的合并机制"
+            }
+        ],
+        "testCases": [
+            {
+                "name": "简单分配测试",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 1024,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 200 },
+                        { "type": "alloc", "size": 150 }
+                    ]
+                },
+                "expected": {
+                    "totalAllocations": 2,
+                    "allocationFailures": 0,
+                    "usedSlots": 2
+                }
+            }
+        ]
+    }
+}

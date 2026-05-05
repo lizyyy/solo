@@ -1,0 +1,203 @@
+{
+    "virtualMemory": {
+        "badExamples": [
+            {
+                "name": "无效页大小",
+                "config": {
+                    "pageSize": 0,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 4096, 8192]
+                },
+                "error": "页大小必须大于0",
+                "description": "演示页大小为0的错误配置"
+            },
+            {
+                "name": "物理页数为0",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 0,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, 4096, 8192]
+                },
+                "error": "物理页数必须大于0",
+                "description": "演示物理页数为0的错误配置"
+            },
+            {
+                "name": "空访问序列",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": []
+                },
+                "error": "访问序列为空",
+                "description": "演示空访问序列的情况"
+            },
+            {
+                "name": "无效置换策略",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "invalid",
+                    "accessSequence": [0, 4096, 8192]
+                },
+                "error": "无效的置换策略，默认使用LRU",
+                "description": "演示无效置换策略的处理"
+            },
+            {
+                "name": "负虚拟地址",
+                "config": {
+                    "pageSize": 4096,
+                    "physicalFrames": 4,
+                    "tlbSize": 4,
+                    "replacementPolicy": "lru",
+                    "accessSequence": [0, -4096, 8192]
+                },
+                "error": "虚拟地址不能为负数",
+                "description": "演示负数虚拟地址的错误处理"
+            }
+        ]
+    },
+    "memoryPool": {
+        "badExamples": [
+            {
+                "name": "总池大小为0",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 0,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 100 }
+                    ]
+                },
+                "error": "总池大小必须大于0",
+                "description": "演示总池大小为0的错误配置"
+            },
+            {
+                "name": "对象大小为0",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 0,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 100 }
+                    ]
+                },
+                "error": "对象大小必须大于0",
+                "description": "演示对象大小为0的错误配置"
+            },
+            {
+                "name": "对象大小大于总池大小",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 1024,
+                    "objectSize": 2048,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 100 }
+                    ]
+                },
+                "error": "对象大小不能大于总池大小",
+                "description": "演示对象大小超过总池大小的情况"
+            },
+            {
+                "name": "无效对齐值",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": -4,
+                    "operations": [
+                        { "type": "alloc", "size": 100 }
+                    ]
+                },
+                "error": "对齐值必须大于0",
+                "description": "演示负数对齐值的错误处理"
+            },
+            {
+                "name": "分配大小为0",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 0 }
+                    ]
+                },
+                "error": "分配大小必须大于0",
+                "description": "演示分配大小为0的错误情况"
+            },
+            {
+                "name": "分配大小超过对象大小",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 300 }
+                    ]
+                },
+                "error": "分配大小不能超过对象大小",
+                "description": "演示对象池中分配超过对象大小的情况"
+            },
+            {
+                "name": "释放不存在的分配",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "free", "allocationId": 999 }
+                    ]
+                },
+                "error": "分配ID不存在",
+                "description": "演示释放不存在的分配ID"
+            },
+            {
+                "name": "双重释放",
+                "config": {
+                    "poolType": "object",
+                    "totalSize": 65536,
+                    "objectSize": 256,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 100 },
+                        { "type": "free", "allocationId": 0 },
+                        { "type": "free", "allocationId": 0 }
+                    ]
+                },
+                "error": "槽位已释放",
+                "description": "演示双重释放的错误情况"
+            },
+            {
+                "name": "内存池外部碎片导致分配失败",
+                "config": {
+                    "poolType": "memory",
+                    "totalSize": 4096,
+                    "objectSize": 0,
+                    "alignment": 4,
+                    "operations": [
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "alloc", "size": 1024 },
+                        { "type": "free", "allocationId": 0 },
+                        { "type": "free", "allocationId": 2 },
+                        { "type": "alloc", "size": 1500 }
+                    ]
+                },
+                "error": "外部碎片：总空闲空间(2048字节)足够，但没有连续的空闲块",
+                "description": "演示外部碎片导致分配失败的经典场景"
+            }
+        ]
+    }
+}

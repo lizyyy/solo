@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虚拟内存和内存池实验台</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div id="app">
+        <!-- 头部导航 -->
+        <header class="bg-blue-600 text-white py-4 shadow-lg">
+            <div class="container mx-auto px-4">
+                <h1 class="text-2xl font-bold">虚拟内存和内存池实验台</h1>
+                <p class="text-blue-200">探索虚拟地址翻译、页表、TLB、置换算法与内存池管理</p>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="container mx-auto px-4 py-6">
+            <!-- 标签页导航 -->
+            <div class="mb-6">
+                <ul class="flex border-b">
+                    <li class="mr-1">
+                        <button id="tab-vm" class="bg-white inline-block py-2 px-4 text-blue-500 hover:text-blue-800 font-semibold border-l border-t border-r rounded-t" onclick="switchTab('vm')">
+                            虚拟内存模拟器
+                        </button>
+                    </li>
+                    <li class="mr-1">
+                        <button id="tab-pool" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-800" onclick="switchTab('pool')">
+                            内存池模拟器
+                        </button>
+                    </li>
+                    <li class="mr-1">
+                        <button id="tab-experiments" class="inline-block py-2 px-4 text-gray-500 hover:text-gray-800" onclick="switchTab('experiments')">
+                            实验管理
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 虚拟内存模拟器内容 -->
+            <div id="content-vm" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 配置面板 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">实验配置</h2>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                页大小 (字节)
+                            </label>
+                            <select id="vm-page-size" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="1024">1 KB (1024 字节)</option>
+                                <option value="2048">2 KB (2048 字节)</option>
+                                <option value="4096" selected>4 KB (4096 字节)</option>
+                                <option value="8192">8 KB (8192 字节)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                物理页数
+                            </label>
+                            <input type="number" id="vm-physical-frames" value="4" min="1" max="32" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                TLB 容量 (条目数)
+                            </label>
+                            <input type="number" id="vm-tlb-size" value="4" min="0" max="16" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                置换策略
+                            </label>
+                            <select id="vm-replacement-policy" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="fifo">FIFO (先进先出)</option>
+                                <option value="lru" selected>LRU (最近最少使用)</option>
+                                <option value="optimal">Optimal (最优)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                访问序列 (虚拟地址，空格分隔)
+                            </label>
+                            <textarea id="vm-access-sequence" rows="4" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="例如: 0 4096 8192 12288 0 4096 16384 0 4096 8192 12288 16384"></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                随机种子 (留空使用当前时间)
+                            </label>
+                            <input type="number" id="vm-random-seed" placeholder="可选" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button id="vm-run" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="runVirtualMemorySimulation()">
+                                运行模拟
+                            </button>
+                            <button id="vm-reset" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="resetVirtualMemorySimulation()">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 结果展示 -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">模拟结果</h2>
+                        
+                        <!-- 统计信息 -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-blue-600">TLB 命中率</h3>
+                                <p id="vm-tlb-hit-rate" class="text-2xl font-bold text-blue-800">0%</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-green-600">缺页率</h3>
+                                <p id="vm-page-fault-rate" class="text-2xl font-bold text-green-800">0%</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-yellow-600">总访问次数</h3>
+                                <p id="vm-total-accesses" class="text-2xl font-bold text-yellow-800">0</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-red-600">置换次数</h3>
+                                <p id="vm-replacement-count" class="text-2xl font-bold text-red-800">0</p>
+                            </div>
+                        </div>
+
+                        <!-- 时间线 -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">访问时间线</h3>
+                            <div id="vm-timeline" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+
+                        <!-- 页表状态 -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">最终页表状态</h3>
+                            <div id="vm-page-table" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+
+                        <!-- TLB 状态 -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">最终 TLB 状态</h3>
+                            <div id="vm-tlb" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+
+                        <!-- 物理内存状态 -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">最终物理内存状态</h3>
+                            <div id="vm-physical-memory" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内存池模拟器内容 -->
+            <div id="content-pool" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 配置面板 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">实验配置</h2>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                            池类型
+                            </label>
+                            <select id="pool-type" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="memory">内存池 (可变大小)</option>
+                                <option value="object" selected>对象池 (固定大小)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                总池大小 (字节)
+                            </label>
+                            <input type="number" id="pool-total-size" value="65536" min="1024" max="1048576" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                对象/块大小 (字节)
+                            </label>
+                            <input type="number" id="pool-object-size" value="256" min="8" max="65536" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                对齐规则 (字节)
+                            </label>
+                            <select id="pool-alignment" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <option value="1">1 字节 (无对齐)</option>
+                                <option value="2">2 字节</option>
+                                <option value="4" selected>4 字节</option>
+                                <option value="8">8 字节</option>
+                                <option value="16">16 字节</option>
+                                <option value="32">32 字节</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                分配/释放序列 (格式: 操作:大小 或 操作:索引)
+                            </label>
+                            <textarea id="pool-operations" rows="4" class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="例如: alloc:256 alloc:512 free:0 alloc:128 free:1 alloc:256"></textarea>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button id="pool-run" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="runMemoryPoolSimulation()">
+                                运行模拟
+                            </button>
+                            <button id="pool-reset" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="resetMemoryPoolSimulation()">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 结果展示 -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">模拟结果</h2>
+                        
+                        <!-- 统计信息 -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-blue-600">总空间使用率</h3>
+                                <p id="pool-utilization-rate" class="text-2xl font-bold text-blue-800">0%</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-green-600">内部碎片率</h3>
+                                <p id="pool-internal-fragmentation" class="text-2xl font-bold text-green-800">0%</p>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-yellow-600">外部碎片</h3>
+                                <p id="pool-external-fragmentation" class="text-2xl font-bold text-yellow-800">0 字节</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h3 class="text-sm font-semibold text-red-600">分配失败次数</h3>
+                                <p id="pool-allocation-failures" class="text-2xl font-bold text-red-800">0</p>
+                            </div>
+                        </div>
+
+                        <!-- 池槽位状态 -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">池槽位状态</h3>
+                            <div id="pool-slots" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+
+                        <!-- 内存映射 -->
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">内存映射</h3>
+                            <div id="pool-memory-map" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+
+                        <!-- 操作时间线 -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">操作时间线</h3>
+                            <div id="pool-timeline" class="overflow-x-auto">
+                                <div class="text-center text-gray-500 py-8">请先运行模拟</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实验管理内容 -->
+            <div id="content-experiments" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">实验管理</h2>
+                    
+                    <!-- 保存实验 -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-700">保存当前实验</h3>
+                        <div class="flex space-x-4">
+                            <input type="text" id="experiment-name" placeholder="实验名称" class="shadow border rounded flex-1 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <button id="save-experiment" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="saveCurrentExperiment()">
+                                保存
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 已保存实验列表 -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-700">已保存实验</h3>
+                        <div id="saved-experiments" class="overflow-x-auto">
+                            <div class="text-center text-gray-500 py-8">暂无保存的实验</div>
+                        </div>
+                    </div>
+
+                    <!-- 对比实验 -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-2 text-gray-700">对比实验</h3>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                选择要对比的实验 (按住 Ctrl 多选)
+                            </label>
+                            <select id="compare-experiments" multiple class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" size="5">
+                            </select>
+                        </div>
+                        <button id="compare-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="compareExperiments()">
+                            对比选中实验
+                        </button>
+                    </div>
+
+                    <!-- 导出功能 -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 text-gray-700">导出实验报告</h3>
+                        <div class="flex space-x-4">
+                            <button id="export-json" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="exportExperiment('json')">
+                                导出 JSON
+                            </button>
+                            <button id="export-markdown" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onclick="exportExperiment('markdown')">
+                                导出 Markdown
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 对比结果 -->
+                <div id="comparison-result" class="mt-6 bg-white p-6 rounded-lg shadow-md hidden">
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">对比结果</h2>
+                    <div id="comparison-content"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="bg-gray-800 text-white py-6 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p>虚拟内存和内存池实验台 &copy; 2026</p>
+                <p class="text-gray-400 text-sm mt-2">用于教学和实验目的</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 脚本 -->
+    <script src="js/core/virtual-memory.js"></script>
+    <script src="js/core/memory-pool.js"></script>
+    <script src="js/core/utils.js"></script>
+    <script src="js/ui/vm-simulator.js"></script>
+    <script src="js/ui/pool-simulator.js"></script>
+    <script src="js/ui/experiment-manager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
