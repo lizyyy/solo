@@ -1,0 +1,9 @@
+{
+  "title": "生产环境CPU飙高事故",
+  "description": "2024年1月15日，生产环境某应用节点CPU突然飙升至95%以上，持续约15分钟，导致部分请求超时。",
+  "incidentTime": "2024-01-15T14:30:00",
+  "severity": "CRITICAL",
+  "environment": "PRODUCTION",
+  "affectedServices": ["order-service", "payment-service"],
+  "tags": ["CPU", "性能", "紧急"]
+}

@@ -1,0 +1,21 @@
+2024-01-15 14:30:01.123 [http-nio-8080-exec-1] INFO  c.e.o.c.OrderController - GET /api/orders/12345 - 200 OK - 1234ms
+2024-01-15 14:30:02.456 [http-nio-8080-exec-2] INFO  c.e.o.c.OrderController - POST /api/orders - 201 Created - 5678ms
+2024-01-15 14:30:03.789 [http-nio-8080-exec-3] ERROR c.e.p.c.PaymentController - POST /api/payments - 500 Internal Server Error - 12000ms
+2024-01-15 14:30:04.123 [http-nio-8080-exec-4] INFO  c.e.o.c.OrderController - GET /api/orders?status=pending - 200 OK - 890ms
+2024-01-15 14:30:05.456 [http-nio-8080-exec-5] WARN  c.e.p.c.PaymentController - POST /api/payments/refund - 400 Bad Request - 3456ms
+2024-01-15 14:30:10.123 [http-nio-8080-exec-6] INFO  c.e.o.c.OrderController - GET /api/orders/12346 - 200 OK - 1500ms
+2024-01-15 14:30:15.456 [http-nio-8080-exec-7] ERROR c.e.o.c.OrderController - PUT /api/orders/12347 - 503 Service Unavailable - 25000ms
+2024-01-15 14:30:20.789 [http-nio-8080-exec-8] INFO  c.e.u.c.UserController - GET /api/users/1 - 200 OK - 234ms
+2024-01-15 14:30:25.123 [http-nio-8080-exec-9] INFO  c.e.o.c.OrderController - GET /api/orders/12348 - 200 OK - 3200ms
+2024-01-15 14:30:30.456 [http-nio-8080-exec-10] WARN  c.e.p.c.PaymentController - POST /api/payments - 408 Request Timeout - 45000ms
+
+# 详细慢请求日志格式
+# 时间戳 | 方法 | URI | 状态码 | 总耗时(ms) | DNS(ms) | TCP(ms) | TLS(ms) | 等待(ms) | 传输(ms) | 客户端IP | 用户Agent
+
+2024-01-15T14:30:01.123+0800 | GET | /api/orders/12345 | 200 | 1234 | 15 | 25 | 0 | 1100 | 94 | 192.168.1.100 | Mozilla/5.0
+2024-01-15T14:30:02.456+0800 | POST | /api/orders | 201 | 5678 | 10 | 20 | 100 | 5400 | 148 | 192.168.1.101 | curl/7.68.0
+2024-01-15T14:30:03.789+0800 | POST | /api/payments | 500 | 12000 | 20 | 30 | 150 | 11600 | 200 | 192.168.1.102 | Apache-HttpClient/4.5
+2024-01-15T14:30:05.456+0800 | POST | /api/payments/refund | 400 | 3456 | 12 | 18 | 0 | 3350 | 76 | 192.168.1.103 | PostmanRuntime/7.26
+2024-01-15T14:30:15.456+0800 | PUT | /api/orders/12347 | 503 | 25000 | 30 | 50 | 200 | 24600 | 120 | 192.168.1.104 | okhttp/4.9.0
+2024-01-15T14:30:25.123+0800 | GET | /api/orders/12348 | 200 | 3200 | 8 | 15 | 0 | 3100 | 77 | 192.168.1.105 | python-requests/2.25
+2024-01-15T14:30:30.456+0800 | POST | /api/payments | 408 | 45000 | 25 | 40 | 180 | 44500 | 255 | 192.168.1.106 | Java/17.0.5

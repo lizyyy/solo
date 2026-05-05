@@ -1,0 +1,68 @@
+2024-01-15 14:30:01.123 [main] WARN  c.e.i.FileIO - Slow disk I/O detected: reading file /data/orders/2024/01/15/order_12345.dat took 1250ms
+   Thread: http-nio-8080-exec-1
+   Operation: READ
+   Resource: /data/orders/2024/01/15/order_12345.dat
+   Block Time: 1250ms
+   Data Size: 2.5MB
+   Stack Trace:
+      at java.base@17.0.5/sun.nio.ch.FileDispatcherImpl.read0(Native Method)
+      at java.base@17.0.5/sun.nio.ch.FileDispatcherImpl.read(FileDispatcherImpl.java:48)
+      at java.base@17.0.5/sun.nio.ch.IOUtil.readIntoNativeBuffer(IOUtil.java:276)
+      at java.base@17.0.5/sun.nio.ch.IOUtil.read(IOUtil.java:236)
+      at java.base@17.0.5/sun.nio.ch.FileChannelImpl.read(FileChannelImpl.java:232)
+      at com.example.io.FileIO.readFile(FileIO.java:45)
+      at com.example.order.service.OrderService.loadOrder(OrderService.java:125)
+      ...
+
+2024-01-15 14:30:02.456 [main] ERROR c.e.i.DatabaseIO - Database query timeout: SELECT * FROM orders WHERE status = 'PENDING' FOR UPDATE took 8500ms
+   Thread: http-nio-8080-exec-2
+   Operation: DATABASE_QUERY
+   Resource: jdbc:mysql://db.example.com:3306/orders
+   Block Time: 8500ms
+   Query: SELECT * FROM orders WHERE status = 'PENDING' FOR UPDATE
+   Stack Trace:
+      at java.base@17.0.5/java.net.SocketInputStream.socketRead0(Native Method)
+      at java.base@17.0.5/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
+      at java.base@17.0.5/java.net.SocketInputStream.read(SocketInputStream.java:168)
+      at java.base@17.0.5/java.net.SocketInputStream.read(SocketInputStream.java:140)
+      at com.mysql.cj.protocol.ReadAheadInputStream.fill(ReadAheadInputStream.java:107)
+      at com.mysql.cj.protocol.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:147)
+      at com.mysql.cj.protocol.ReadAheadInputStream.read(ReadAheadInputStream.java:187)
+      at com.mysql.cj.protocol.a.SimplePacketReader.readHeader(SimplePacketReader.java:63)
+      ...
+
+2024-01-15 14:30:05.789 [main] WARN  c.e.i.NetworkIO - Slow network I/O: connecting to cache.example.com:6379 took 3200ms
+   Thread: http-nio-8080-exec-3
+   Operation: CONNECT
+   Resource: cache.example.com:6379
+   Block Time: 3200ms
+   Stack Trace:
+      at java.base@17.0.5/java.net.PlainSocketImpl.socketConnect(Native Method)
+      at java.base@17.0.5/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+      at java.base@17.0.5/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+      at java.base@17.0.5/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+      at java.base@17.0.5/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+      at java.base@17.0.5/java.net.Socket.connect(Socket.java:633)
+      at io.lettuce.core.RedisClient.connect(RedisClient.java:210)
+      ...
+
+2024-01-15 14:30:10.123 [main] WARN  c.e.i.FileIO - Slow disk I/O detected: writing file /data/orders/2024/01/15/order_12346.dat took 2100ms
+   Thread: http-nio-8080-exec-4
+   Operation: WRITE
+   Resource: /data/orders/2024/01/15/order_12346.dat
+   Block Time: 2100ms
+   Data Size: 5.2MB
+
+2024-01-15 14:30:15.456 [main] ERROR c.e.i.DatabaseIO - Database transaction timeout: BEGIN; UPDATE orders SET status = 'PROCESSED' WHERE id = 12345; COMMIT took 15000ms
+   Thread: http-nio-8080-exec-5
+   Operation: DATABASE_TRANSACTION
+   Resource: jdbc:mysql://db.example.com:3306/orders
+   Block Time: 15000ms
+   Query: BEGIN; UPDATE orders SET status = 'PROCESSED' WHERE id = 12345; COMMIT
+
+# 简单格式的IO阻塞日志
+# 时间 | 类型 | 资源 | 阻塞时间(ms) | 线程 | 数据量
+
+2024-01-15T14:30:20.123+0800 | FILE_READ | /data/logs/app.log | 890 | http-nio-8080-exec-6 | 1.2MB
+2024-01-15T14:30:25.456+0800 | DATABASE_QUERY | jdbc:postgresql://pg.example.com:5432/payments | 4500 | http-nio-8080-exec-7 | 0
+2024-01-15T14:30:30.789+0800 | NETWORK_CONNECT | api.external-service.com:443 | 6200 | http-nio-8080-exec-8 | 0

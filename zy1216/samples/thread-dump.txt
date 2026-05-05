@@ -1,0 +1,85 @@
+2024-01-15 14:32:05
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (17.0.5+8-LTS-237 mixed mode, sharing):
+
+Threads class SMR info:
+_java_thread_list=0x0000600003e18200, length=23, elements={
+0x00007fb3a8008200, 0x00007fb3a8009800, 0x00007fb3a800aa00, 0x00007fb3a800bc00,
+...
+}
+
+"http-nio-8080-exec-1" #25 daemon prio=5 os_prio=31 cpu=5678.90ms elapsed=1234.56s tid=0x00007fb3a8008200 nid=0x6703 waiting on condition  [0x0000700009a95000]
+   java.lang.Thread.State: RUNNABLE
+	at com.example.order.service.OrderService.processOrder(OrderService.java:125)
+	at com.example.order.service.OrderService$$FastClassBySpringCGLIB$$123456.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:218)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:793)
+	...
+   Locked ownable synchronizers:
+	- <0x000000070a123456> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+
+"http-nio-8080-exec-2" #26 daemon prio=5 os_prio=31 cpu=1234.56ms elapsed=2345.67s tid=0x00007fb3a8009800 nid=0x6903 waiting for monitor entry  [0x0000700009b98000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+	at com.example.payment.service.PaymentService.charge(PaymentService.java:89)
+	- waiting to lock <0x000000070b456789> (a java.lang.Object)
+	at com.example.payment.service.PaymentService$$FastClassBySpringCGLIB$$789012.invoke(<generated>)
+	...
+   Locked ownable synchronizers:
+	- None
+
+"http-nio-8080-exec-3" #27 daemon prio=5 os_prio=31 cpu=3456.78ms elapsed=3456.78s tid=0x00007fb3a800aa00 nid=0x6b03 runnable  [0x0000700009c9b000]
+   java.lang.Thread.State: RUNNABLE
+	at java.base@17.0.5/java.util.HashMap.get(HashMap.java:556)
+	at java.base@17.0.5/java.util.HashMap.containsKey(HashMap.java:596)
+	at com.example.cache.CacheManager.get(CacheManager.java:67)
+	at com.example.order.controller.OrderController.getOrder(OrderController.java:45)
+	...
+   Locked ownable synchronizers:
+	- None
+
+"http-nio-8080-exec-4" #28 daemon prio=5 os_prio=31 cpu=0.12ms elapsed=4567.89s tid=0x00007fb3a800bc00 nid=0x6d03 waiting on condition  [0x0000700009d9e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@17.0.5/Native Method)
+	- parking to wait for  <0x000000070c789012> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.base@17.0.5/java.util.concurrent.locks.LockSupport.park(LockSupport.java:341)
+	at java.base@17.0.5/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionNode.block(AbstractQueuedSynchronizer.java:506)
+	at java.base@17.0.5/java.util.concurrent.ForkJoinPool.awaitWork(ForkJoinPool.java:1724)
+	...
+   Locked ownable synchronizers:
+	- None
+
+"http-nio-8080-exec-5" #29 daemon prio=5 os_prio=31 cpu=8901.23ms elapsed=5678.90s tid=0x00007fb3a800ce00 nid=0x6f03 runnable  [0x0000700009ea1000]
+   java.lang.Thread.State: RUNNABLE
+	at java.base@17.0.5/java.lang.String.replace(String.java:2840)
+	at com.example.util.StringUtils.sanitize(StringUtils.java:32)
+	at com.example.order.service.OrderService.validateRequest(OrderService.java:256)
+	at com.example.order.service.OrderService.createOrder(OrderService.java:89)
+	...
+   Locked ownable synchronizers:
+	- None
+
+Found one Java-level deadlock:
+=============================
+"http-nio-8080-exec-10":
+  waiting to lock monitor 0x00007fb3a0012340 (object 0x000000070d012345, a java.lang.Object),
+  which is held by "http-nio-8080-exec-11"
+"http-nio-8080-exec-11":
+  waiting to lock monitor 0x00007fb3a0012348 (object 0x000000070d012346, a java.lang.Object),
+  which is held by "http-nio-8080-exec-10"
+
+Java stack information for the threads listed above:
+===================================================
+"http-nio-8080-exec-10":
+	at com.example.service.ServiceA.methodA(ServiceA.java:45)
+	- waiting to lock <0x000000070d012345> (a java.lang.Object)
+	- locked <0x000000070d012346> (a java.lang.Object)
+	at com.example.service.ServiceA$$FastClassBySpringCGLIB$$abc123.invoke(<generated>)
+	...
+
+"http-nio-8080-exec-11":
+	at com.example.service.ServiceB.methodB(ServiceB.java:67)
+	- waiting to lock <0x000000070d012346> (a java.lang.Object)
+	- locked <0x000000070d012345> (a java.lang.Object)
+	at com.example.service.ServiceB$$FastClassBySpringCGLIB$$def456.invoke(<generated>)
+	...
+
+Found 1 deadlock.
