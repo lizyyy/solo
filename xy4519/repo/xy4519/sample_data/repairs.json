@@ -1,0 +1,81 @@
+[
+  {
+    "id": "REP001",
+    "route_id": "R001",
+    "wall": "A区",
+    "type": "hold_damage",
+    "description": "第3个抓点松动，需要重新拧紧",
+    "report_time": "2024-01-10 14:30:00",
+    "status": "pending",
+    "priority": "high",
+    "reporter": "会员投诉"
+  },
+  {
+    "id": "REP002",
+    "route_id": "R002",
+    "wall": "A区",
+    "type": "tape_wear",
+    "description": "标记胶带磨损严重，需要重新粘贴",
+    "report_time": "2024-01-12 10:00:00",
+    "status": "in-progress",
+    "priority": "medium",
+    "reporter": "教练巡检"
+  },
+  {
+    "id": "REP003",
+    "route_id": "R003",
+    "wall": "B区",
+    "type": "hold_damage",
+    "description": "第5个抓点开裂，需要更换",
+    "report_time": "2024-01-15 16:00:00",
+    "status": "completed",
+    "priority": "high",
+    "reporter": "会员投诉",
+    "resolved_time": "2024-01-16 11:00:00"
+  },
+  {
+    "id": "REP004",
+    "route_id": "R005",
+    "wall": "C区",
+    "type": "route_replacement",
+    "description": "线路老化，抓点磨损严重，建议更换",
+    "report_time": "2024-01-18 09:00:00",
+    "status": "pending",
+    "priority": "medium",
+    "reporter": "定线员建议"
+  },
+  {
+    "id": "REP005",
+    "route_id": "R001",
+    "wall": "A区",
+    "type": "hold_damage",
+    "description": "第7个抓点表面磨损，抓握感下降",
+    "report_time": "2024-01-20 15:00:00",
+    "status": "pending",
+    "priority": "medium",
+    "reporter": "教练反馈"
+  },
+  {
+    "id": "REP006",
+    "route_id": "R004",
+    "wall": "B区",
+    "type": "tape_wear",
+    "description": "起点标记胶带脱落",
+    "report_time": "2024-01-22 10:30:00",
+    "status": "completed",
+    "priority": "low",
+    "reporter": "前台记录",
+    "resolved_time": "2024-01-22 14:00:00"
+  },
+  {
+    "id": "REP007",
+    "route_id": "R006",
+    "wall": "C区",
+    "type": "hold_damage",
+    "description": "第2个动态点松动，存在安全隐患",
+    "report_time": "2024-01-24 16:00:00",
+    "status": "in-progress",
+    "priority": "high",
+    "reporter": "会员投诉"
+  }
+]

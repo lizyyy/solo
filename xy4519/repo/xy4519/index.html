@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>室内攀岩馆复盘工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f7fa;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .main-content {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .sidebar {
+      width: 300px;
+      flex-shrink: 0;
+    }
+    
+    .content-area {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .file-upload {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.3s;
+      margin-bottom: 15px;
+    }
+    
+    .file-upload:hover {
+      border-color: #667eea;
+    }
+    
+    .file-upload input[type="file"] {
+      display: none;
+    }
+    
+    .file-upload-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .file-upload-label:hover {
+      background: #5a6fd8;
+    }
+    
+    .file-upload-info {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .file-status {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .file-status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .file-status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 16px;
+      color: #666;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .tab.active {
+      color: #667eea;
+    }
+    
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .filter-bar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-item label {
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    .filter-item select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    .data-table th, .data-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .data-table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .data-table tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .priority-input {
+      width: 60px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .note-input {
+      width: 150px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5a6fd8;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .priority-high {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .priority-medium {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .priority-low {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .stat-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .chart-container {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+    
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    
+    .heatmap-day {
+      text-align: center;
+      font-weight: 500;
+      padding: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+    }
+    
+    .heatmap-cell {
+      height: 40px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: white;
+    }
+    
+    .heatmap-cell.level-0 { background-color: #e9ecef; color: #333; }
+    .heatmap-cell.level-1 { background-color: #c8e6c9; color: #333; }
+    .heatmap-cell.level-2 { background-color: #81c784; color: white; }
+    .heatmap-cell.level-3 { background-color: #4caf50; color: white; }
+    .heatmap-cell.level-4 { background-color: #388e3c; color: white; }
+    .heatmap-cell.level-5 { background-color: #2e7d32; color: white; }
+    
+    .congestion-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      height: 200px;
+      margin-top: 20px;
+    }
+    
+    .congestion-bar {
+      flex: 1;
+      background: #667eea;
+      border-radius: 5px 5px 0 0;
+      position: relative;
+      transition: height 0.3s;
+    }
+    
+    .congestion-bar-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    .congestion-bar-value {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    @media (max-width: 1200px) {
+      .main-content {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+      }
+      
+      .filter-bar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>室内攀岩馆复盘工具</h1>
+      <p class="header-subtitle">数据分析 · 线路管理 · 维修规划</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="sidebar">
+        <div class="card">
+          <h2 class="card-title">数据导入</h2>
+          
+          <div class="file-upload">
+            <label for="csv-file" class="file-upload-label">上传打卡CSV</label>
+            <input type="file" id="csv-file" accept=".csv">
+            <p class="file-upload-info">会员打卡记录</p>
+            <div id="csv-status" class="file-status" style="display: none;"></div>
+          </div>
+          
+          <div class="file-upload">
+            <label for="json-file" class="file-upload-label">上传线路JSON</label>
+            <input type="file" id="json-file" accept=".json">
+            <p class="file-upload-info">线路难度信息</p>
+            <div id="json-status" class="file-status" style="display: none;"></div>
+          </div>
+          
+          <div class="file-upload">
+            <label for="repair-file" class="file-upload-label">上传维修记录</label>
+            <input type="file" id="repair-file" accept=".json,.csv">
+            <p class="file-upload-info">刷点维修记录</p>
+            <div id="repair-status" class="file-status" style="display: none;"></div>
+          </div>
+          
+          <div class="file-upload">
+            <label for="schedule-file" class="file-upload-label">上传教练课表</label>
+            <input type="file" id="schedule-file" accept=".json,.csv">
+            <p class="file-upload-info">教练课程安排</p>
+            <div id="schedule-status" class="file-status" style="display: none;"></div>
+          </div>
+          
+          <div class="btn-group">
+            <button id="load-sample" class="btn btn-primary">加载示例数据</button>
+            <button id="clear-data" class="btn btn-danger">清除所有数据</button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-title">数据统计</h2>
+          
+          <div class="stat-card">
+            <div>
+              <p class="stat-label">线路总数</p>
+              <p id="total-routes" class="stat-value">0</p>
+            </div>
+            <div>
+              <p class="stat-label">打卡记录</p>
+              <p id="total-checkins" class="stat-value">0</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div>
+              <p class="stat-label">维修记录</p>
+              <p id="total-repairs" class="stat-value">0</p>
+            </div>
+            <div>
+              <p class="stat-label">待换线路</p>
+              <p id="pending-replacement" class="stat-value">0</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2 class="card-title">导出功能</h2>
+          
+          <div class="btn-group" style="flex-direction: column;">
+            <button id="export-markdown" class="btn btn-success">导出Markdown换线清单</button>
+            <button id="export-json" class="btn btn-success">导出JSON明细</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="content-area">
+        <div class="card">
+          <div class="tabs">
+            <button class="tab active" data-tab="heat">热度分析</button>
+            <button class="tab" data-tab="congestion">拥堵时段</button>
+            <button class="tab" data-tab="complaints">掉点投诉</button>
+            <button class="tab" data-tab="priority">换线优先级</button>
+          </div>
+          
+          <div id="heat-tab" class="tab-content active">
+            <div class="filter-bar">
+              <div class="filter-item">
+                <label for="heat-wall-filter">墙面:</label>
+                <select id="heat-wall-filter">
+                  <option value="all">所有墙面</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label for="heat-difficulty-filter">难度:</label>
+                <select id="heat-difficulty-filter">
+                  <option value="all">所有难度</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="heat-content">
+              <div class="no-data">请先上传数据或加载示例数据</div>
+            </div>
+          </div>
+          
+          <div id="congestion-tab" class="tab-content">
+            <div class="filter-bar">
+              <div class="filter-item">
+                <label for="congestion-wall-filter">墙面:</label>
+                <select id="congestion-wall-filter">
+                  <option value="all">所有墙面</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label for="congestion-day-filter">星期:</label>
+                <select id="congestion-day-filter">
+                  <option value="all">所有星期</option>
+                  <option value="0">星期日</option>
+                  <option value="1">星期一</option>
+                  <option value="2">星期二</option>
+                  <option value="3">星期三</option>
+                  <option value="4">星期四</option>
+                  <option value="5">星期五</option>
+                  <option value="6">星期六</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="congestion-content">
+              <div class="no-data">请先上传数据或加载示例数据</div>
+            </div>
+          </div>
+          
+          <div id="complaints-tab" class="tab-content">
+            <div class="filter-bar">
+              <div class="filter-item">
+                <label for="complaints-status-filter">状态:</label>
+                <select id="complaints-status-filter">
+                  <option value="all">所有状态</option>
+                  <option value="pending">待处理</option>
+                  <option value="in-progress">处理中</option>
+                  <option value="completed">已完成</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="complaints-content">
+              <div class="no-data">请先上传数据或加载示例数据</div>
+            </div>
+          </div>
+          
+          <div id="priority-tab" class="tab-content">
+            <div class="filter-bar">
+              <div class="filter-item">
+                <label for="priority-wall-filter">墙面:</label>
+                <select id="priority-wall-filter">
+                  <option value="all">所有墙面</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label for="priority-level-filter">优先级:</label>
+                <select id="priority-level-filter">
+                  <option value="all">所有优先级</option>
+                  <option value="high">高优先级</option>
+                  <option value="medium">中优先级</option>
+                  <option value="low">低优先级</option>
+                </select>
+              </div>
+            </div>
+            
+            <div id="priority-content">
+              <div class="no-data">请先上传数据或加载示例数据</div>
+            </div>
+            
+            <div class="btn-group">
+              <button id="save-priorities" class="btn btn-primary">保存优先级调整</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 全局数据对象
+    const appData = {
+      checkins: [],        // 打卡记录
+      routes: [],          // 线路信息
+      repairs: [],         // 维修记录
+      schedules: [],       // 教练课表
+      priorities: {},      // 优先级调整
+      notes: {},           // 备注
+      walls: [],           // 墙面列表
+      difficulties: []     // 难度列表
+    };
+    
+    // 本地存储键名
+    const STORAGE_KEYS = {
+      CHECKINS: 'climbing_checkins',
+      ROUTES: 'climbing_routes',
+      REPAIRS: 'climbing_repairs',
+      SCHEDULES: 'climbing_schedules',
+      PRIORITIES: 'climbing_priorities',
+      NOTES: 'climbing_notes'
+    };
+    
+    // 初始化应用
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFromStorage();
+      setupEventListeners();
+      updateStats();
+      renderAllTabs();
+    });
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+      // 文件上传事件
+      document.getElementById('csv-file').addEventListener('change', handleCsvUpload);
+      document.getElementById('json-file').addEventListener('change', handleJsonUpload);
+      document.getElementById('repair-file').addEventListener('change', handleRepairUpload);
+      document.getElementById('schedule-file').addEventListener('change', handleScheduleUpload);
+      
+      // 按钮事件
+      document.getElementById('load-sample').addEventListener('click', loadSampleData);
+      document.getElementById('clear-data').addEventListener('click', clearAllData);
+      document.getElementById('save-priorities').addEventListener('click', savePriorities);
+      document.getElementById('export-markdown').addEventListener('click', exportMarkdown);
+      document.getElementById('export-json').addEventListener('click', exportJson);
+      
+      // 标签页切换
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+          
+          this.classList.add('active');
+          const tabId = this.dataset.tab + '-tab';
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // 筛选器事件
+      document.getElementById('heat-wall-filter').addEventListener('change', renderHeatAnalysis);
+      document.getElementById('heat-difficulty-filter').addEventListener('change', renderHeatAnalysis);
+      document.getElementById('congestion-wall-filter').addEventListener('change', renderCongestionAnalysis);
+      document.getElementById('congestion-day-filter').addEventListener('change', renderCongestionAnalysis);
+      document.getElementById('complaints-status-filter').addEventListener('change', renderComplaints);
+      document.getElementById('priority-wall-filter').addEventListener('change', renderPriorities);
+      document.getElementById('priority-level-filter').addEventListener('change', renderPriorities);
+    }
+    
+    // 处理CSV文件上传（打卡记录）
+    function handleCsvUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const csvData = e.target.result;
+          appData.checkins = parseCsv(csvData);
+          saveToStorage(STORAGE_KEYS.CHECKINS, appData.checkins);
+          updateFileStatus('csv-status', `成功加载 ${appData.checkins.length} 条打卡记录`, true);
+          updateStats();
+          updateFilters();
+          renderAllTabs();
+        } catch (error) {
+          updateFileStatus('csv-status', `解析失败: ${error.message}`, false);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // 处理JSON文件上传（线路信息）
+    function handleJsonUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          appData.routes = JSON.parse(e.target.result);
+          saveToStorage(STORAGE_KEYS.ROUTES, appData.routes);
+          updateFileStatus('json-status', `成功加载 ${appData.routes.length} 条线路信息`, true);
+          updateStats();
+          updateFilters();
+          renderAllTabs();
+        } catch (error) {
+          updateFileStatus('json-status', `解析失败: ${error.message}`, false);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // 处理维修记录上传
+    function handleRepairUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          let repairData;
+          if (file.name.endsWith('.json')) {
+            repairData = JSON.parse(e.target.result);
+          } else {
+            repairData = parseCsv(e.target.result);
+          }
+          appData.repairs = repairData;
+          saveToStorage(STORAGE_KEYS.REPAIRS, appData.repairs);
+          updateFileStatus('repair-status', `成功加载 ${appData.repairs.length} 条维修记录`, true);
+          updateStats();
+          renderAllTabs();
+        } catch (error) {
+          updateFileStatus('repair-status', `解析失败: ${error.message}`, false);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // 处理教练课表上传
+    function handleScheduleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          let scheduleData;
+          if (file.name.endsWith('.json')) {
+            scheduleData = JSON.parse(e.target.result);
+          } else {
+            scheduleData = parseCsv(e.target.result);
+          }
+          appData.schedules = scheduleData;
+          saveToStorage(STORAGE_KEYS.SCHEDULES, appData.schedules);
+          updateFileStatus('schedule-status', `成功加载 ${appData.schedules.length} 条教练课表`, true);
+          updateStats();
+          renderAllTabs();
+        } catch (error) {
+          updateFileStatus('schedule-status', `解析失败: ${error.message}`, false);
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    // 解析CSV文件
+    function parseCsv(csvText) {
+      const lines = csvText.trim().split('\n');
+      if (lines.length < 2) return [];
+      
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+      const data = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        const row = {};
+        
+        headers.forEach((header, index) => {
+          row[header] = values[index] || '';
+        });
+        
+        data.push(row);
+      }
+      
+      return data;
+    }
+    
+    // 更新文件状态显示
+    function updateFileStatus(elementId, message, isSuccess) {
+      const statusElement = document.getElementById(elementId);
+      statusElement.textContent = message;
+      statusElement.className = `file-status ${isSuccess ? 'success' : 'error'}`;
+      statusElement.style.display = 'block';
+      
+      // 5秒后隐藏
+      setTimeout(() => {
+        statusElement.style.display = 'none';
+      }, 5000);
+    }
+    
+    // 加载示例数据
+    function loadSampleData() {
+      // 示例打卡数据
+      appData.checkins = [
+        { id: '1', member_id: 'M001', member_name: '张三', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-15 10:30:00', day_of_week: 1, hour: 10 },
+        { id: '2', member_id: 'M002', member_name: '李四', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-15 11:15:00', day_of_week: 1, hour: 11 },
+        { id: '3', member_id: 'M003', member_name: '王五', route_id: 'R002', wall: 'A区', difficulty: 'V2', checkin_time: '2024-01-15 14:00:00', day_of_week: 1, hour: 14 },
+        { id: '4', member_id: 'M001', member_name: '张三', route_id: 'R003', wall: 'B区', difficulty: 'V3', checkin_time: '2024-01-15 15:30:00', day_of_week: 1, hour: 15 },
+        { id: '5', member_id: 'M004', member_name: '赵六', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-16 09:00:00', day_of_week: 2, hour: 9 },
+        { id: '6', member_id: 'M005', member_name: '钱七', route_id: 'R004', wall: 'B区', difficulty: 'V2', checkin_time: '2024-01-16 10:30:00', day_of_week: 2, hour: 10 },
+        { id: '7', member_id: 'M002', member_name: '李四', route_id: 'R002', wall: 'A区', difficulty: 'V2', checkin_time: '2024-01-16 14:00:00', day_of_week: 2, hour: 14 },
+        { id: '8', member_id: 'M003', member_name: '王五', route_id: 'R005', wall: 'C区', difficulty: 'V4', checkin_time: '2024-01-17 10:00:00', day_of_week: 3, hour: 10 },
+        { id: '9', member_id: 'M006', member_name: '孙八', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-17 11:00:00', day_of_week: 3, hour: 11 },
+        { id: '10', member_id: 'M001', member_name: '张三', route_id: 'R004', wall: 'B区', difficulty: 'V2', checkin_time: '2024-01-18 09:30:00', day_of_week: 4, hour: 9 },
+        { id: '11', member_id: 'M007', member_name: '周九', route_id: 'R006', wall: 'C区', difficulty: 'V5', checkin_time: '2024-01-18 14:00:00', day_of_week: 4, hour: 14 },
+        { id: '12', member_id: 'M004', member_name: '赵六', route_id: 'R002', wall: 'A区', difficulty: 'V2', checkin_time: '2024-01-19 10:00:00', day_of_week: 5, hour: 10 },
+        { id: '13', member_id: 'M002', member_name: '李四', route_id: 'R003', wall: 'B区', difficulty: 'V3', checkin_time: '2024-01-19 15:00:00', day_of_week: 5, hour: 15 },
+        { id: '14', member_id: 'M008', member_name: '吴十', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-20 11:00:00', day_of_week: 6, hour: 11 },
+        { id: '15', member_id: 'M001', member_name: '张三', route_id: 'R005', wall: 'C区', difficulty: 'V4', checkin_time: '2024-01-20 14:00:00', day_of_week: 6, hour: 14 },
+        { id: '16', member_id: 'M003', member_name: '王五', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-21 10:00:00', day_of_week: 0, hour: 10 },
+        { id: '17', member_id: 'M005', member_name: '钱七', route_id: 'R004', wall: 'B区', difficulty: 'V2', checkin_time: '2024-01-21 15:00:00', day_of_week: 0, hour: 15 },
+        { id: '18', member_id: 'M006', member_name: '孙八', route_id: 'R002', wall: 'A区', difficulty: 'V2', checkin_time: '2024-01-22 11:00:00', day_of_week: 1, hour: 11 },
+        { id: '19', member_id: 'M009', member_name: '郑十一', route_id: 'R003', wall: 'B区', difficulty: 'V3', checkin_time: '2024-01-22 14:00:00', day_of_week: 1, hour: 14 },
+        { id: '20', member_id: 'M001', member_name: '张三', route_id: 'R001', wall: 'A区', difficulty: 'V1', checkin_time: '2024-01-23 09:30:00', day_of_week: 2, hour: 9 }
+      ];
+      
+      // 示例线路数据
+      appData.routes = [
+        { id: 'R001', name: '入门线路1', wall: 'A区', difficulty: 'V1', color: '红色', set_date: '2023-12-01', status: 'active', total_checkins: 7, description: '适合初学者的基础线路' },
+        { id: 'R002', name: '入门线路2', wall: 'A区', difficulty: 'V2', color: '蓝色', set_date: '2023-12-05', status: 'active', total_checkins: 4, description: '稍有难度的入门线路' },
+        { id: 'R003', name: '进阶线路1', wall: 'B区', difficulty: 'V3', color: '绿色', set_date: '2023-12-10', status: 'active', total_checkins: 3, description: '需要一定技巧的线路' },
+        { id: 'R004', name: '进阶线路2', wall: 'B区', difficulty: 'V2', color: '黄色', set_date: '2023-12-15', status: 'active', total_checkins: 3, description: '适合进阶者练习的线路' },
+        { id: 'R005', name: '高级线路1', wall: 'C区', difficulty: 'V4', color: '紫色', set_date: '2023-12-20', status: 'active', total_checkins: 2, description: '高难度线路，需要良好的力量和技巧' },
+        { id: 'R006', name: '专业线路1', wall: 'C区', difficulty: 'V5', color: '黑色', set_date: '2023-12-25', status: 'active', total_checkins: 1, description: '专业级难度，只有高手才能尝试' }
+      ];
+      
+      // 示例维修记录
+      appData.repairs = [
+        { id: 'REP001', route_id: 'R001', wall: 'A区', type: 'hold_damage', description: '第3个抓点松动', report_time: '2024-01-10 14:30:00', status: 'pending', priority: 'high', reporter: '会员投诉' },
+        { id: 'REP002', route_id: 'R002', wall: 'A区', type: 'tape_wear', description: '标记胶带磨损严重', report_time: '2024-01-12 10:00:00', status: 'in-progress', priority: 'medium', reporter: '教练巡检' },
+        { id: 'REP003', route_id: 'R003', wall: 'B区', type: 'hold_damage', description: '第5个抓点开裂', report_time: '2024-01-15 16:00:00', status: 'completed', priority: 'high', reporter: '会员投诉', resolved_time: '2024-01-16 11:00:00' },
+        { id: 'REP004', route_id: 'R005', wall: 'C区', type: 'route_replacement', description: '线路老化，建议更换', report_time: '2024-01-18 09:00:00', status: 'pending', priority: 'medium', reporter: '定线员建议' }
+      ];
+      
+      // 示例教练课表
+      appData.schedules = [
+        { id: 'SCH001', coach_name: '李教练', day_of_week: 1, start_time: '10:00', end_time: '12:00', wall: 'A区', class_type: '初级班', max_students: 8, enrolled: 6 },
+        { id: 'SCH002', coach_name: '王教练', day_of_week: 1, start_time: '14:00', end_time: '16:00', wall: 'B区', class_type: '进阶班', max_students: 6, enrolled: 4 },
+        { id: 'SCH003', coach_name: '张教练', day_of_week: 2, start_time: '09:00', end_time: '11:00', wall: 'A区', class_type: '少儿班', max_students: 10, enrolled: 8 },
+        { id: 'SCH004', coach_name: '李教练', day_of_week: 3, start_time: '10:00', end_time: '12:00', wall: 'A区', class_type: '初级班', max_students: 8, enrolled: 5 },
+        { id: 'SCH005', coach_name: '王教练', day_of_week: 4, start_time: '14:00', end_time: '16:00', wall: 'C区', class_type: '高级班', max_students: 4, enrolled: 2 },
+        { id: 'SCH006', coach_name: '张教练', day_of_week: 5, start_time: '10:00', end_time: '12:00', wall: 'B区', class_type: '进阶班', max_students: 6, enrolled: 3 },
+        { id: 'SCH007', coach_name: '李教练', day_of_week: 6, start_time: '09:00', end_time: '11:00', wall: 'A区', class_type: '周末初级班', max_students: 10, enrolled: 9 },
+        { id: 'SCH008', coach_name: '王教练', day_of_week: 0, start_time: '14:00', end_time: '16:00', wall: 'C区', class_type: '周末高级班', max_students: 4, enrolled: 3 }
+      ];
+      
+      // 保存到本地存储
+      saveToStorage(STORAGE_KEYS.CHECKINS, appData.checkins);
+      saveToStorage(STORAGE_KEYS.ROUTES, appData.routes);
+      saveToStorage(STORAGE_KEYS.REPAIRS, appData.repairs);
+      saveToStorage(STORAGE_KEYS.SCHEDULES, appData.schedules);
+      
+      // 更新状态
+      updateStats();
+      updateFilters();
+      renderAllTabs();
+      
+      alert('示例数据加载成功！');
+    }
+    
+    // 清除所有数据
+    function clearAllData() {
+      if (confirm('确定要清除所有数据吗？此操作不可恢复。')) {
+        appData.checkins = [];
+        appData.routes = [];
+        appData.repairs = [];
+        appData.schedules = [];
+        appData.priorities = {};
+        appData.notes = {};
+        appData.walls = [];
+        appData.difficulties = [];
+        
+        // 清除本地存储
+        Object.values(STORAGE_KEYS).forEach(key => {
+          localStorage.removeItem(key);
+        });
+        
+        // 更新状态
+        updateStats();
+        updateFilters();
+        renderAllTabs();
+        
+        alert('所有数据已清除！');
+      }
+    }
+    
+    // 保存优先级调整
+    function savePriorities() {
+      const priorityInputs = document.querySelectorAll('.priority-input');
+      const noteInputs = document.querySelectorAll('.note-input');
+      
+      priorityInputs.forEach(input => {
+        const routeId = input.dataset.routeId;
+        appData.priorities[routeId] = input.value;
+      });
+      
+      noteInputs.forEach(input => {
+        const routeId = input.dataset.routeId;
+        appData.notes[routeId] = input.value;
+      });
+      
+      saveToStorage(STORAGE_KEYS.PRIORITIES, appData.priorities);
+      saveToStorage(STORAGE_KEYS.NOTES, appData.notes);
+      
+      alert('优先级和备注已保存！');
+    }
+    
+    // 导出Markdown换线清单
+    function exportMarkdown() {
+      if (appData.routes.length === 0) {
+        alert('没有可导出的数据');
+        return;
+      }
+      
+      let markdown = '# 攀岩馆换线清单\n\n';
+      markdown += `生成时间: ${new Date().toLocaleString()}\n\n`;
+      markdown += `## 换线优先级统计\n\n`;
+      markdown += `- 高优先级线路: ${countPrioritiesByLevel('high')} 条\n`;
+      markdown += `- 中优先级线路: ${countPrioritiesByLevel('medium')} 条\n`;
+      markdown += `- 低优先级线路: ${countPrioritiesByLevel('low')} 条\n\n`;
+      
+      // 按优先级分组
+      const highPriority = getRoutesByPriority('high');
+      const mediumPriority = getRoutesByPriority('medium');
+      const lowPriority = getRoutesByPriority('low');
+      
+      if (highPriority.length > 0) {
+        markdown += `## 高优先级换线线路\n\n`;
+        highPriority.forEach(route => {
+          const note = appData.notes[route.id] || '无备注';
+          const routeRepairs = appData.repairs.filter(r => r.route_id === route.id && r.status !== 'completed');
+          
+          markdown += `### ${route.name} (${route.id})\n\n`;
+          markdown += `- **墙面**: ${route.wall}\n`;
+          markdown += `- **难度**: ${route.difficulty}\n`;
+          markdown += `- **颜色**: ${route.color}\n`;
+          markdown += `- **设置日期**: ${route.set_date}\n`;
+          markdown += `- **打卡次数**: ${route.total_checkins}\n`;
+          markdown += `- **备注**: ${note}\n`;
+          
+          if (routeRepairs.length > 0) {
+            markdown += `- **待处理维修**: ${routeRepairs.length} 项\n`;
+            routeRepairs.forEach(repair => {
+              markdown += `  - ${repair.description} (${repair.type})\n`;
+            });
+          }
+          
+          markdown += '\n';
+        });
+      }
+      
+      if (mediumPriority.length > 0) {
+        markdown += `## 中优先级换线线路\n\n`;
+        mediumPriority.forEach(route => {
+          const note = appData.notes[route.id] || '无备注';
+          const routeRepairs = appData.repairs.filter(r => r.route_id === route.id && r.status !== 'completed');
+          
+          markdown += `### ${route.name} (${route.id})\n\n`;
+          markdown += `- **墙面**: ${route.wall}\n`;
+          markdown += `- **难度**: ${route.difficulty}\n`;
+          markdown += `- **颜色**: ${route.color}\n`;
+          markdown += `- **设置日期**: ${route.set_date}\n`;
+          markdown += `- **打卡次数**: ${route.total_checkins}\n`;
+          markdown += `- **备注**: ${note}\n`;
+          
+          if (routeRepairs.length > 0) {
+            markdown += `- **待处理维修**: ${routeRepairs.length} 项\n`;
+            routeRepairs.forEach(repair => {
+              markdown += `  - ${repair.description} (${repair.type})\n`;
+            });
+          }
+          
+          markdown += '\n';
+        });
+      }
+      
+      if (lowPriority.length > 0) {
+        markdown += `## 低优先级换线线路\n\n`;
+        lowPriority.forEach(route => {
+          const note = appData.notes[route.id] || '无备注';
+          const routeRepairs = appData.repairs.filter(r => r.route_id === route.id && r.status !== 'completed');
+          
+          markdown += `### ${route.name} (${route.id})\n\n`;
+          markdown += `- **墙面**: ${route.wall}\n`;
+          markdown += `- **难度**: ${route.difficulty}\n`;
+          markdown += `- **颜色**: ${route.color}\n`;
+          markdown += `- **设置日期**: ${route.set_date}\n`;
+          markdown += `- **打卡次数**: ${route.total_checkins}\n`;
+          markdown += `- **备注**: ${note}\n`;
+          
+          if (routeRepairs.length > 0) {
+            markdown += `- **待处理维修**: ${routeRepairs.length} 项\n`;
+            routeRepairs.forEach(repair => {
+              markdown += `  - ${repair.description} (${repair.type})\n`;
+            });
+          }
+          
+          markdown += '\n';
+        });
+      }
+      
+      // 下载Markdown文件
+      downloadFile(markdown, '换线清单.md', 'text/markdown');
+    }
+    
+    // 导出JSON明细
+    function exportJson() {
+      const exportData = {
+        export_time: new Date().toISOString(),
+        checkins: appData.checkins,
+        routes: appData.routes,
+        repairs: appData.repairs,
+        schedules: appData.schedules,
+        priorities: appData.priorities,
+        notes: appData.notes,
+        statistics: {
+          total_routes: appData.routes.length,
+          total_checkins: appData.checkins.length,
+          total_repairs: appData.repairs.length,
+          pending_repairs: appData.repairs.filter(r => r.status === 'pending').length,
+          high_priority_routes: countPrioritiesByLevel('high'),
+          medium_priority_routes: countPrioritiesByLevel('medium'),
+          low_priority_routes: countPrioritiesByLevel('low')
+        }
+      };
+      
+      const jsonString = JSON.stringify(exportData, null, 2);
+      downloadFile(jsonString, '攀岩馆数据明细.json', 'application/json');
+    }
+    
+    // 下载文件
+    function downloadFile(content, filename, contentType) {
+      const blob = new Blob([content], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    // 按优先级级别统计数量
+    function countPrioritiesByLevel(level) {
+      return appData.routes.filter(route => {
+        const priority = appData.priorities[route.id] || calculateDefaultPriority(route);
+        return priority === level;
+      }).length;
+    }
+    
+    // 按优先级级别获取线路
+    function getRoutesByPriority(level) {
+      return appData.routes.filter(route => {
+        const priority = appData.priorities[route.id] || calculateDefaultPriority(route);
+        return priority === level;
+      });
+    }
+    
+    // 计算默认优先级
+    function calculateDefaultPriority(route) {
+      // 高优先级条件：打卡次数多 (>5) 或有待处理维修
+      const hasPendingRepair = appData.repairs.some(r => r.route_id === route.id && r.status === 'pending');
+      const hasHighPriorityRepair = appData.repairs.some(r => r.route_id === route.id && r.priority === 'high' && r.status !== 'completed');
+      
+      if (hasHighPriorityRepair || route.total_checkins > 10) {
+        return 'high';
+      } else if (hasPendingRepair || route.total_checkins > 5) {
+        return 'medium';
+      } else {
+        return 'low';
+      }
+    }
+    
+    // 保存到本地存储
+    function saveToStorage(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        console.error('保存到本地存储失败:', error);
+      }
+    }
+    
+    // 从本地存储加载
+    function loadFromStorage() {
+      try {
+        const checkins = localStorage.getItem(STORAGE_KEYS.CHECKINS);
+        const routes = localStorage.getItem(STORAGE_KEYS.ROUTES);
+        const repairs = localStorage.getItem(STORAGE_KEYS.REPAIRS);
+        const schedules = localStorage.getItem(STORAGE_KEYS.SCHEDULES);
+        const priorities = localStorage.getItem(STORAGE_KEYS.PRIORITIES);
+        const notes = localStorage.getItem(STORAGE_KEYS.NOTES);
+        
+        if (checkins) appData.checkins = JSON.parse(checkins);
+        if (routes) appData.routes = JSON.parse(routes);
+        if (repairs) appData.repairs = JSON.parse(repairs);
+        if (schedules) appData.schedules = JSON.parse(schedules);
+        if (priorities) appData.priorities = JSON.parse(priorities);
+        if (notes) appData.notes = JSON.parse(notes);
+        
+        // 提取墙面和难度列表
+        updateWallsAndDifficulties();
+      } catch (error) {
+        console.error('从本地存储加载失败:', error);
+      }
+    }
+    
+    // 更新墙面和难度列表
+    function updateWallsAndDifficulties() {
+      const wallsSet = new Set();
+      const difficultiesSet = new Set();
+      
+      appData.routes.forEach(route => {
+        wallsSet.add(route.wall);
+        difficultiesSet.add(route.difficulty);
+      });
+      
+      appData.walls = Array.from(wallsSet).sort();
+      appData.difficulties = Array.from(difficultiesSet).sort();
+    }
+    
+    // 更新统计信息
+    function updateStats() {
+      document.getElementById('total-routes').textContent = appData.routes.length;
+      document.getElementById('total-checkins').textContent = appData.checkins.length;
+      document.getElementById('total-repairs').textContent = appData.repairs.length;
+      
+      // 计算待换线路数量
+      const pendingRoutes = new Set();
+      appData.repairs.forEach(repair => {
+        if (repair.status === 'pending') {
+          pendingRoutes.add(repair.route_id);
+        }
+      });
+      document.getElementById('pending-replacement').textContent = pendingRoutes.size;
+    }
+    
+    // 更新筛选器选项
+    function updateFilters() {
+      updateWallsAndDifficulties();
+      
+      // 更新墙面筛选器
+      const wallFilters = ['heat-wall-filter', 'congestion-wall-filter', 'priority-wall-filter'];
+      wallFilters.forEach(filterId => {
+        const select = document.getElementById(filterId);
+        const currentValue = select.value;
+        
+        // 清空现有选项
+        select.innerHTML = '<option value="all">所有墙面</option>';
+        
+        // 添加新选项
+        appData.walls.forEach(wall => {
+          const option = document.createElement('option');
+          option.value = wall;
+          option.textContent = wall;
+          if (wall === currentValue) option.selected = true;
+          select.appendChild(option);
+        });
+      });
+      
+      // 更新难度筛选器
+      const difficultyFilter = document.getElementById('heat-difficulty-filter');
+      const currentDifficulty = difficultyFilter.value;
+      
+      difficultyFilter.innerHTML = '<option value="all">所有难度</option>';
+      appData.difficulties.forEach(difficulty => {
+        const option = document.createElement('option');
+        option.value = difficulty;
+        option.textContent = difficulty;
+        if (difficulty === currentDifficulty) option.selected = true;
+        difficultyFilter.appendChild(option);
+      });
+    }
+    
+    // 渲染所有标签页
+    function renderAllTabs() {
+      renderHeatAnalysis();
+      renderCongestionAnalysis();
+      renderComplaints();
+      renderPriorities();
+    }
+    
+    // 渲染热度分析
+    function renderHeatAnalysis() {
+      const content = document.getElementById('heat-content');
+      
+      if (appData.routes.length === 0 || appData.checkins.length === 0) {
+        content.innerHTML = '<div class="no-data">请先上传数据或加载示例数据</div>';
+        return;
+      }
+      
+      // 获取筛选条件
+      const wallFilter = document.getElementById('heat-wall-filter').value;
+      const difficultyFilter = document.getElementById('heat-difficulty-filter').value;
+      
+      // 筛选数据
+      let filteredRoutes = appData.routes;
+      if (wallFilter !== 'all') {
+        filteredRoutes = filteredRoutes.filter(route => route.wall === wallFilter);
+      }
+      if (difficultyFilter !== 'all') {
+        filteredRoutes = filteredRoutes.filter(route => route.difficulty === difficultyFilter);
+      }
+      
+      // 按打卡次数排序
+      filteredRoutes.sort((a, b) => b.total_checkins - a.total_checkins);
+      
+      // 生成热度表
+      let html = `
+        <div class="chart-container">
+          <h3 class="chart-title">线路热度排行</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>线路名称</th>
+                <th>墙面</th>
+                <th>难度</th>
+                <th>颜色</th>
+                <th>打卡次数</th>
+                <th>热度等级</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      filteredRoutes.forEach((route, index) => {
+        const heatLevel = getHeatLevel(route.total_checkins);
+        const heatClass = `heatmap-cell level-${heatLevel}`;
+        
+        html += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${route.name} (${route.id})</td>
+            <td>${route.wall}</td>
+            <td>${route.difficulty}</td>
+            <td>${route.color}</td>
+            <td>${route.total_checkins}</td>
+            <td><span class="${heatClass}" style="display: inline-block; width: 80px; padding: 5px;">${getHeatDescription(heatLevel)}</span></td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      // 生成按星期和小时的热度图
+      const heatmapData = calculateHeatmapData();
+      html += `
+        <div class="chart-container" style="margin-top: 20px;">
+          <h3 class="chart-title">一周各时段热度分布</h3>
+          <div class="heatmap">
+            <div class="heatmap-day"></div>
+            <div class="heatmap-day">周一</div>
+            <div class="heatmap-day">周二</div>
+            <div class="heatmap-day">周三</div>
+            <div class="heatmap-day">周四</div>
+            <div class="heatmap-day">周五</div>
+            <div class="heatmap-day">周六</div>
+            <div class="heatmap-day">周日</div>
+      `;
+      
+      // 按小时生成
+      for (let hour = 9; hour <= 18; hour++) {
+        html += `<div class="heatmap-day">${hour}:00</div>`;
+        
+        for (let day = 1; day <= 7; day++) {
+          const dayKey = day === 7 ? 0 : day; // 周日是0
+          const count = heatmapData[dayKey]?.[hour] || 0;
+          const level = getHeatLevel(count);
+          html += `<div class="heatmap-cell level-${level}">${count > 0 ? count : ''}</div>`;
+        }
+      }
+      
+      html += `
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+    }
+    
+    // 计算热度图数据
+    function calculateHeatmapData() {
+      const heatmapData = {};
+      
+      appData.checkins.forEach(checkin => {
+        const day = checkin.day_of_week;
+        const hour = checkin.hour;
+        
+        if (!heatmapData[day]) heatmapData[day] = {};
+        if (!heatmapData[day][hour]) heatmapData[day][hour] = 0;
+        heatmapData[day][hour]++;
+      });
+      
+      return heatmapData;
+    }
+    
+    // 获取热度等级
+    function getHeatLevel(count) {
+      if (count === 0) return 0;
+      if (count <= 2) return 1;
+      if (count <= 5) return 2;
+      if (count <= 10) return 3;
+      if (count <= 15) return 4;
+      return 5;
+    }
+    
+    // 获取热度描述
+    function getHeatDescription(level) {
+      const descriptions = ['无', '低', '中低', '中', '中高', '高'];
+      return descriptions[level] || '未知';
+    }
+    
+    // 渲染拥堵时段分析
+    function renderCongestionAnalysis() {
+      const content = document.getElementById('congestion-content');
+      
+      if (appData.checkins.length === 0) {
+        content.innerHTML = '<div class="no-data">请先上传数据或加载示例数据</div>';
+        return;
+      }
+      
+      // 获取筛选条件
+      const wallFilter = document.getElementById('congestion-wall-filter').value;
+      const dayFilter = document.getElementById('congestion-day-filter').value;
+      
+      // 计算拥堵数据
+      const congestionData = calculateCongestionData(wallFilter, dayFilter);
+      
+      // 生成拥堵图表
+      let html = `
+        <div class="chart-container">
+          <h3 class="chart-title">各时段拥堵情况</h3>
+          <div class="congestion-chart" style="position: relative; padding-top: 30px;">
+      `;
+      
+      // 找到最大值来计算高度
+      const maxCount = Math.max(...Object.values(congestionData), 1);
+      
+      // 按小时显示
+      for (let hour = 9; hour <= 18; hour++) {
+        const count = congestionData[hour] || 0;
+        const heightPercent = (count / maxCount) * 100;
+        
+        html += `
+          <div class="congestion-bar" style="height: ${heightPercent}%;">
+            <div class="congestion-bar-value">${count}</div>
+            <div class="congestion-bar-label">${hour}:00</div>
+          </div>
+        `;
+      }
+      
+      html += `
+          </div>
+        </div>
+      `;
+      
+      // 生成教练课表影响分析
+      html += `
+        <div class="chart-container" style="margin-top: 20px;">
+          <h3 class="chart-title">教练课表对拥堵的影响</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>教练</th>
+                <th>星期</th>
+                <th>时间</th>
+                <th>墙面</th>
+                <th>课程类型</th>
+                <th>已报名/最大</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      appData.schedules.forEach(schedule => {
+        const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        html += `
+          <tr>
+            <td>${schedule.coach_name}</td>
+            <td>${dayNames[schedule.day_of_week]}</td>
+            <td>${schedule.start_time} - ${schedule.end_time}</td>
+            <td>${schedule.wall}</td>
+            <td>${schedule.class_type}</td>
+            <td>${schedule.enrolled}/${schedule.max_students}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+    }
+    
+    // 计算拥堵数据
+    function calculateCongestionData(wallFilter, dayFilter) {
+      const congestionData = {};
+      
+      appData.checkins.forEach(checkin => {
+        // 应用墙面筛选
+        if (wallFilter !== 'all' && checkin.wall !== wallFilter) return;
+        
+        // 应用星期筛选
+        if (dayFilter !== 'all' && checkin.day_of_week !== parseInt(dayFilter)) return;
+        
+        const hour = checkin.hour;
+        if (!congestionData[hour]) congestionData[hour] = 0;
+        congestionData[hour]++;
+      });
+      
+      return congestionData;
+    }
+    
+    // 渲染掉点投诉
+    function renderComplaints() {
+      const content = document.getElementById('complaints-content');
+      
+      if (appData.repairs.length === 0) {
+        content.innerHTML = '<div class="no-data">请先上传数据或加载示例数据</div>';
+        return;
+      }
+      
+      // 获取筛选条件
+      const statusFilter = document.getElementById('complaints-status-filter').value;
+      
+      // 筛选数据
+      let filteredRepairs = appData.repairs;
+      if (statusFilter !== 'all') {
+        filteredRepairs = filteredRepairs.filter(repair => repair.status === statusFilter);
+      }
+      
+      // 生成表格
+      let html = `
+        <div class="chart-container">
+          <h3 class="chart-title">掉点投诉和维修记录</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>线路</th>
+                <th>墙面</th>
+                <th>类型</th>
+                <th>描述</th>
+                <th>报告时间</th>
+                <th>状态</th>
+                <th>优先级</th>
+                <th>报告人</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      filteredRepairs.forEach(repair => {
+        const statusClass = repair.status === 'completed' ? 'priority-low' : 
+                          repair.status === 'in-progress' ? 'priority-medium' : 'priority-high';
+        const priorityClass = repair.priority === 'high' ? 'priority-high' : 
+                            repair.priority === 'medium' ? 'priority-medium' : 'priority-low';
+        
+        html += `
+          <tr>
+            <td>${repair.id}</td>
+            <td>${repair.route_id}</td>
+            <td>${repair.wall}</td>
+            <td>${repair.type === 'hold_damage' ? '抓点损坏' : repair.type === 'tape_wear' ? '胶带磨损' : '线路更换'}</td>
+            <td>${repair.description}</td>
+            <td>${repair.report_time}</td>
+            <td><span class="${statusClass}" style="padding: 4px 8px; border-radius: 4px;">${repair.status === 'completed' ? '已完成' : repair.status === 'in-progress' ? '处理中' : '待处理'}</span></td>
+            <td><span class="${priorityClass}" style="padding: 4px 8px; border-radius: 4px;">${repair.priority === 'high' ? '高' : repair.priority === 'medium' ? '中' : '低'}</span></td>
+            <td>${repair.reporter}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      // 统计信息
+      const pendingCount = appData.repairs.filter(r => r.status === 'pending').length;
+      const inProgressCount = appData.repairs.filter(r => r.status === 'in-progress').length;
+      const completedCount = appData.repairs.filter(r => r.status === 'completed').length;
+      
+      html += `
+        <div class="stat-card" style="margin-top: 20px;">
+          <div>
+            <p class="stat-label">待处理</p>
+            <p class="stat-value" style="color: #dc3545;">${pendingCount}</p>
+          </div>
+          <div>
+            <p class="stat-label">处理中</p>
+            <p class="stat-value" style="color: #ffc107;">${inProgressCount}</p>
+          </div>
+          <div>
+            <p class="stat-label">已完成</p>
+            <p class="stat-value" style="color: #28a745;">${completedCount}</p>
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+    }
+    
+    // 渲染换线优先级
+    function renderPriorities() {
+      const content = document.getElementById('priority-content');
+      
+      if (appData.routes.length === 0) {
+        content.innerHTML = '<div class="no-data">请先上传数据或加载示例数据</div>';
+        return;
+      }
+      
+      // 获取筛选条件
+      const wallFilter = document.getElementById('priority-wall-filter').value;
+      const levelFilter = document.getElementById('priority-level-filter').value;
+      
+      // 筛选数据
+      let filteredRoutes = appData.routes;
+      if (wallFilter !== 'all') {
+        filteredRoutes = filteredRoutes.filter(route => route.wall === wallFilter);
+      }
+      
+      // 按优先级排序
+      filteredRoutes.sort((a, b) => {
+        const priorityA = appData.priorities[a.id] || calculateDefaultPriority(a);
+        const priorityB = appData.priorities[b.id] || calculateDefaultPriority(b);
+        
+        const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2 };
+        return priorityOrder[priorityA] - priorityOrder[priorityB];
+      });
+      
+      // 按优先级级别筛选
+      if (levelFilter !== 'all') {
+        filteredRoutes = filteredRoutes.filter(route => {
+          const priority = appData.priorities[route.id] || calculateDefaultPriority(route);
+          return priority === levelFilter;
+        });
+      }
+      
+      // 生成表格
+      let html = `
+        <div class="chart-container">
+          <h3 class="chart-title">换线优先级列表</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>线路ID</th>
+                <th>线路名称</th>
+                <th>墙面</th>
+                <th>难度</th>
+                <th>颜色</th>
+                <th>打卡次数</th>
+                <th>待处理维修</th>
+                <th>当前优先级</th>
+                <th>调整优先级</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      filteredRoutes.forEach(route => {
+        const priority = appData.priorities[route.id] || calculateDefaultPriority(route);
+        const note = appData.notes[route.id] || '';
+        const pendingRepairs = appData.repairs.filter(r => r.route_id === route.id && r.status !== 'completed').length;
+        
+        const priorityClass = priority === 'high' ? 'priority-high' : 
+                            priority === 'medium' ? 'priority-medium' : 'priority-low';
+        const priorityText = priority === 'high' ? '高' : 
+                           priority === 'medium' ? '中' : '低';
+        
+        html += `
+          <tr>
+            <td>${route.id}</td>
+            <td>${route.name}</td>
+            <td>${route.wall}</td>
+            <td>${route.difficulty}</td>
+            <td>${route.color}</td>
+            <td>${route.total_checkins}</td>
+            <td>${pendingRepairs}</td>
+            <td><span class="${priorityClass}" style="padding: 4px 8px; border-radius: 4px;">${priorityText}</span></td>
+            <td>
+              <select class="priority-input" data-route-id="${route.id}">
+                <option value="high" ${priority === 'high' ? 'selected' : ''}>高</option>
+                <option value="medium" ${priority === 'medium' ? 'selected' : ''}>中</option>
+                <option value="low" ${priority === 'low' ? 'selected' : ''}>低</option>
+              </select>
+            </td>
+            <td>
+              <input type="text" class="note-input" data-route-id="${route.id}" value="${note}" placeholder="添加备注">
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

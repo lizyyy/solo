@@ -1,0 +1,112 @@
+[
+  {
+    "id": "SCH001",
+    "coach_name": "李教练",
+    "day_of_week": 1,
+    "start_time": "10:00",
+    "end_time": "12:00",
+    "wall": "A区",
+    "class_type": "初级班",
+    "max_students": 8,
+    "enrolled": 6
+  },
+  {
+    "id": "SCH002",
+    "coach_name": "王教练",
+    "day_of_week": 1,
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "wall": "B区",
+    "class_type": "进阶班",
+    "max_students": 6,
+    "enrolled": 4
+  },
+  {
+    "id": "SCH003",
+    "coach_name": "张教练",
+    "day_of_week": 2,
+    "start_time": "09:00",
+    "end_time": "11:00",
+    "wall": "A区",
+    "class_type": "少儿班",
+    "max_students": 10,
+    "enrolled": 8
+  },
+  {
+    "id": "SCH004",
+    "coach_name": "李教练",
+    "day_of_week": 3,
+    "start_time": "10:00",
+    "end_time": "12:00",
+    "wall": "A区",
+    "class_type": "初级班",
+    "max_students": 8,
+    "enrolled": 5
+  },
+  {
+    "id": "SCH005",
+    "coach_name": "王教练",
+    "day_of_week": 4,
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "wall": "C区",
+    "class_type": "高级班",
+    "max_students": 4,
+    "enrolled": 2
+  },
+  {
+    "id": "SCH006",
+    "coach_name": "张教练",
+    "day_of_week": 5,
+    "start_time": "10:00",
+    "end_time": "12:00",
+    "wall": "B区",
+    "class_type": "进阶班",
+    "max_students": 6,
+    "enrolled": 3
+  },
+  {
+    "id": "SCH007",
+    "coach_name": "李教练",
+    "day_of_week": 6,
+    "start_time": "09:00",
+    "end_time": "11:00",
+    "wall": "A区",
+    "class_type": "周末初级班",
+    "max_students": 10,
+    "enrolled": 9
+  },
+  {
+    "id": "SCH008",
+    "coach_name": "王教练",
+    "day_of_week": 0,
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "wall": "C区",
+    "class_type": "周末高级班",
+    "max_students": 4,
+    "enrolled": 3
+  },
+  {
+    "id": "SCH009",
+    "coach_name": "张教练",
+    "day_of_week": 6,
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "wall": "B区",
+    "class_type": "周末进阶班",
+    "max_students": 8,
+    "enrolled": 6
+  },
+  {
+    "id": "SCH010",
+    "coach_name": "李教练",
+    "day_of_week": 0,
+    "start_time": "10:00",
+    "end_time": "12:00",
+    "wall": "A区",
+    "class_type": "周末少儿班",
+    "max_students": 12,
+    "enrolled": 10
+  }
+]

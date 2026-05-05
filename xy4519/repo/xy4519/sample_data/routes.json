@@ -1,0 +1,90 @@
+[
+  {
+    "id": "R001",
+    "name": "入门线路1",
+    "wall": "A区",
+    "difficulty": "V1",
+    "color": "红色",
+    "set_date": "2023-12-01",
+    "status": "active",
+    "total_checkins": 12,
+    "description": "适合初学者的基础线路，角度平缓，抓点较大"
+  },
+  {
+    "id": "R002",
+    "name": "入门线路2",
+    "wall": "A区",
+    "difficulty": "V2",
+    "color": "蓝色",
+    "set_date": "2023-12-05",
+    "status": "active",
+    "total_checkins": 5,
+    "description": "稍有难度的入门线路，需要一些基本技巧"
+  },
+  {
+    "id": "R003",
+    "name": "进阶线路1",
+    "wall": "B区",
+    "difficulty": "V3",
+    "color": "绿色",
+    "set_date": "2023-12-10",
+    "status": "active",
+    "total_checkins": 5,
+    "description": "需要一定技巧的线路，包含一些小抓点"
+  },
+  {
+    "id": "R004",
+    "name": "进阶线路2",
+    "wall": "B区",
+    "difficulty": "V2",
+    "color": "黄色",
+    "set_date": "2023-12-15",
+    "status": "active",
+    "total_checkins": 5,
+    "description": "适合进阶者练习的线路，角度适中"
+  },
+  {
+    "id": "R005",
+    "name": "高级线路1",
+    "wall": "C区",
+    "difficulty": "V4",
+    "color": "紫色",
+    "set_date": "2023-12-20",
+    "status": "active",
+    "total_checkins": 3,
+    "description": "高难度线路，需要良好的力量和技巧，角度较陡"
+  },
+  {
+    "id": "R006",
+    "name": "专业线路1",
+    "wall": "C区",
+    "difficulty": "V5",
+    "color": "黑色",
+    "set_date": "2023-12-25",
+    "status": "active",
+    "total_checkins": 1,
+    "description": "专业级难度，只有高手才能尝试，包含动态动作"
+  },
+  {
+    "id": "R007",
+    "name": "入门线路3",
+    "wall": "A区",
+    "difficulty": "V1",
+    "color": "橙色",
+    "set_date": "2023-12-28",
+    "status": "active",
+    "total_checkins": 0,
+    "description": "新增的入门线路，专为新手设计"
+  },
+  {
+    "id": "R008",
+    "name": "进阶线路3",
+    "wall": "B区",
+    "difficulty": "V3",
+    "color": "粉色",
+    "set_date": "2023-12-30",
+    "status": "active",
+    "total_checkins": 0,
+    "description": "新增的进阶线路，包含一些难点组合"
+  }
+]
