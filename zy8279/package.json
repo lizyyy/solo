@@ -1,0 +1,45 @@
+{
+  "name": "wave-rule-validator",
+  "version": "1.0.0",
+  "description": "仓库订单分拣波次规则优先级冲突校验CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "wave-validator": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build",
+    "test": "tsc && node dist/index.js validate --samples"
+  },
+  "keywords": [
+    "warehouse",
+    "wms",
+    "wave-picking",
+    "rule-engine",
+    "conflict-detection"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "js-yaml": "^4.1.0",
+    "fast-csv": "^4.3.6",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6",
+    "@types/js-yaml": "^4.0.9",
+    "@types/chalk": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist/",
+    "samples/"
+  ]
+}

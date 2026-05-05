@@ -1,0 +1,225 @@
+{
+  "rules": [
+    {
+      "id": "RULE_VIP_PRIORITY",
+      "name": "VIP订单优先处理",
+      "description": "VIP客户订单进入VIP优先区",
+      "priority": 1,
+      "conditions": [
+        {
+          "field": "customerType",
+          "operator": "equals",
+          "value": "VIP"
+        }
+      ],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_C"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "VIP_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_ELECTRONICS_HOT",
+      "name": "热销电子产品分配",
+      "description": "热销电子产品进入普通分拣区A",
+      "priority": 1,
+      "conditions": [
+        {
+          "field": "skuTags",
+          "operator": "contains",
+          "value": "电子产品"
+        },
+        {
+          "field": "skuTags",
+          "operator": "contains",
+          "value": "热销品"
+        }
+      ],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_A"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "HOT_SALE"
+        }
+      ],
+      "mutuallyExclusiveTags": ["易碎"],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_EXPRESS_SHIP",
+      "name": "快递订单快速处理",
+      "description": "快递配送的订单优先分配到分拣区A",
+      "priority": 1,
+      "conditions": [
+        {
+          "field": "shippingMethod",
+          "operator": "equals",
+          "value": "express"
+        }
+      ],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_A"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "EXPRESS_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_COLD_CHAIN",
+      "name": "冷链商品专区分配",
+      "description": "冷链商品必须进入冷链专区",
+      "priority": 2,
+      "conditions": [
+        {
+          "field": "skuTags",
+          "operator": "in",
+          "value": ["冷链", "冷藏", "冷冻"]
+        }
+      ],
+      "conditionLogic": "OR",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_D"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "COLD_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_B2B_LARGE",
+      "name": "B2B大件商品处理",
+      "description": "B2B订单或大件商品进入大宗区",
+      "priority": 2,
+      "conditions": [
+        {
+          "field": "customerType",
+          "operator": "equals",
+          "value": "B2B"
+        },
+        {
+          "field": "skuTags",
+          "operator": "in",
+          "value": ["大件", "超重", "超体积"]
+        }
+      ],
+      "conditionLogic": "OR",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_E"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "B2B_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": ["易碎"],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_STANDARD_CLOTHING",
+      "name": "标准服装处理",
+      "description": "服装类标准品进入分拣区B",
+      "priority": 3,
+      "conditions": [
+        {
+          "field": "skuTags",
+          "operator": "contains",
+          "value": "服装"
+        },
+        {
+          "field": "skuTags",
+          "operator": "contains",
+          "value": "标准品"
+        }
+      ],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_B"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "STANDARD_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_FRAGILE_EXCLUDE",
+      "name": "易碎品排除",
+      "description": "易碎品排除普通分拣区B",
+      "priority": 1,
+      "conditions": [
+        {
+          "field": "skuTags",
+          "operator": "contains",
+          "value": "易碎"
+        }
+      ],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "excludeZone",
+          "value": "ZONE_B"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": false,
+      "enabled": true
+    },
+    {
+      "id": "RULE_DEFAULT",
+      "name": "默认兜底规则",
+      "description": "未匹配任何规则的订单进入备用分拣区",
+      "priority": 100,
+      "conditions": [],
+      "conditionLogic": "AND",
+      "actions": [
+        {
+          "type": "assignZone",
+          "value": "ZONE_F"
+        },
+        {
+          "type": "setWaveLabel",
+          "value": "DEFAULT_WAVE"
+        }
+      ],
+      "mutuallyExclusiveTags": [],
+      "isDefault": true,
+      "enabled": true
+    }
+  ]
+}

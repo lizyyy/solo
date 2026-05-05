@@ -1,0 +1,93 @@
+zones:
+  - zoneId: ZONE_A
+    zoneName: 普通分拣区A
+    maxOrders: 10
+    maxWeight: 100
+    maxVolume: 10
+    supportedTags:
+      - 电子产品
+      - 服装
+      - 日用品
+      - 标准品
+      - 热销品
+    excludedTags:
+      - 冷链
+      - 冷藏
+      - 冷冻
+      - 大件
+      - 超重
+      - 超体积
+    priority: 1
+
+  - zoneId: ZONE_B
+    zoneName: 普通分拣区B
+    maxOrders: 5
+    maxWeight: 50
+    maxVolume: 5
+    supportedTags:
+      - 电子产品
+      - 服装
+      - 日用品
+      - 标准品
+    excludedTags:
+      - 冷链
+      - 冷藏
+      - 冷冻
+      - 大件
+      - 超重
+      - 超体积
+    priority: 2
+
+  - zoneId: ZONE_C
+    zoneName: VIP优先区
+    maxOrders: 3
+    maxWeight: 30
+    maxVolume: 3
+    supportedTags:
+      - 贵重品
+      - 奢侈品
+    excludedTags:
+      - 冷链
+      - 大件
+    priority: 0
+
+  - zoneId: ZONE_D
+    zoneName: 冷链专区
+    maxOrders: 5
+    maxWeight: 50
+    maxVolume: 5
+    supportedTags:
+      - 冷链
+      - 冷藏
+      - 冷冻
+      - 食品
+    excludedTags:
+      - 电子产品
+      - 贵重品
+    priority: 1
+
+  - zoneId: ZONE_E
+    zoneName: B2B大宗区
+    maxOrders: 10
+    maxWeight: 500
+    maxVolume: 50
+    supportedTags:
+      - 大件
+      - 超重
+      - 超体积
+      - 工业用品
+      - 家具
+    excludedTags: []
+    priority: 1
+
+  - zoneId: ZONE_F
+    zoneName: 备用分拣区
+    maxOrders: 20
+    maxWeight: 200
+    maxVolume: 20
+    supportedTags:
+      - 标准品
+    excludedTags:
+      - 冷链
+      - 贵重品
+    priority: 10
