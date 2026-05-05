@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会展数据分析与可视化工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-high {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        .status-medium {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        .status-low {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        .status-resolved {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 12px;
+        }
+        .filter-tag button {
+            margin-left: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">会展数据分析与可视化工具</h1>
+                    <p class="text-gray-600 mt-1">展位验收表、物料清单、照片标注、扣罚明细合并分析</p>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="exportMarkdownBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        导出 Markdown
+                    </button>
+                    <button id="exportJsonBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        导出 JSON
+                    </button>
+                    <button id="clearAllBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        清除数据
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="bg-white rounded-lg shadow-sm mb-6">
+            <div class="flex border-b">
+                <button class="tab-button active px-6 py-3 font-medium text-gray-600 hover:text-blue-600 transition" data-tab="overview">
+                    可视化总览
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-600 hover:text-blue-600 transition" data-tab="data-import">
+                    数据导入
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-600 hover:text-blue-600 transition" data-tab="booth-details">
+                    展位明细
+                </button>
+                <button class="tab-button px-6 py-3 font-medium text-gray-600 hover:text-blue-600 transition" data-tab="review">
+                    人工复核
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="tab-content-overview" class="tab-content active">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">总展位数</p>
+                            <p id="totalBooths" class="text-3xl font-bold text-gray-800">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">有扣罚展位数</p>
+                            <p id="penalizedBooths" class="text-3xl font-bold text-red-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">总扣罚金额</p>
+                            <p id="totalPenalty" class="text-3xl font-bold text-orange-600">¥0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">待复核展位数</p>
+                            <p id="pendingReview" class="text-3xl font-bold text-purple-600">0</p>
+                        </div>
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">扣罚原因分布</h3>
+                    <canvas id="penaltyReasonChart" height="300"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">扣罚金额分布</h3>
+                    <canvas id="penaltyAmountChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">展位扣罚严重程度</h3>
+                    <canvas id="penaltySeverityChart" height="300"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">物料归还情况</h3>
+                    <canvas id="materialReturnChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-data-import" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">数据导入</h2>
+                <p class="text-gray-600 mb-6">请上传以下表格文件，系统将自动合并分析。支持 .xlsx, .xls, .csv 格式。</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 展位验收表 -->
+                    <div class="border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">展位验收表</h3>
+                        <p class="text-sm text-gray-600 mb-4">包含展位号、验收状态、验收时间、验收人员等信息</p>
+                        <div id="acceptanceUploadZone" class="upload-zone rounded-lg p-8 text-center cursor-pointer mb-4">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">点击或拖拽文件到此处上传</p>
+                            <p class="text-sm text-gray-400 mt-1">支持 .xlsx, .xls, .csv</p>
+                        </div>
+                        <input type="file" id="acceptanceFileInput" class="hidden" accept=".xlsx,.xls,.csv">
+                        <div id="acceptanceFileInfo" class="text-sm text-gray-600"></div>
+                    </div>
+
+                    <!-- 物料借出归还清单 -->
+                    <div class="border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">物料借出归还清单</h3>
+                        <p class="text-sm text-gray-600 mb-4">包含物料名称、借出数量、归还数量、展位号等信息</p>
+                        <div id="materialUploadZone" class="upload-zone rounded-lg p-8 text-center cursor-pointer mb-4">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">点击或拖拽文件到此处上传</p>
+                            <p class="text-sm text-gray-400 mt-1">支持 .xlsx, .xls, .csv</p>
+                        </div>
+                        <input type="file" id="materialFileInput" class="hidden" accept=".xlsx,.xls,.csv">
+                        <div id="materialFileInfo" class="text-sm text-gray-600"></div>
+                    </div>
+
+                    <!-- 现场照片标注 -->
+                    <div class="border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">现场照片标注</h3>
+                        <p class="text-sm text-gray-600 mb-4">包含照片编号、展位号、标注内容、拍摄时间等信息</p>
+                        <div id="photoUploadZone" class="upload-zone rounded-lg p-8 text-center cursor-pointer mb-4">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">点击或拖拽文件到此处上传</p>
+                            <p class="text-sm text-gray-400 mt-1">支持 .xlsx, .xls, .csv</p>
+                        </div>
+                        <input type="file" id="photoFileInput" class="hidden" accept=".xlsx,.xls,.csv">
+                        <div id="photoFileInfo" class="text-sm text-gray-600"></div>
+                    </div>
+
+                    <!-- 场馆扣罚明细 -->
+                    <div class="border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">场馆扣罚明细</h3>
+                        <p class="text-sm text-gray-600 mb-4">包含展位号、扣罚原因、扣罚金额、扣罚时间等信息</p>
+                        <div id="penaltyUploadZone" class="upload-zone rounded-lg p-8 text-center cursor-pointer mb-4">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="text-gray-600">点击或拖拽文件到此处上传</p>
+                            <p class="text-sm text-gray-400 mt-1">支持 .xlsx, .xls, .csv</p>
+                        </div>
+                        <input type="file" id="penaltyFileInput" class="hidden" accept=".xlsx,.xls,.csv">
+                        <div id="penaltyFileInfo" class="text-sm text-gray-600"></div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button id="analyzeDataBtn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        开始分析
+                    </button>
+                </div>
+
+                <!-- 数据预览 -->
+                <div id="dataPreview" class="mt-8 hidden">
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">数据预览</h3>
+                    <div class="border rounded-lg overflow-hidden">
+                        <div class="table-container">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">展位号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">验收状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">扣罚原因</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">扣罚金额</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">照片数量</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataPreviewTableBody" class="bg-white divide-y divide-gray-200">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-booth-details" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">展位明细</h2>
+
+                <!-- 筛选器 -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">筛选条件</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">展位号</label>
+                            <input type="text" id="filterBoothNumber" placeholder="输入展位号" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">扣罚原因</label>
+                            <select id="filterPenaltyReason" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">全部</option>
+                                <option value="墙板破损">墙板破损</option>
+                                <option value="灯具未归还">灯具未归还</option>
+                                <option value="超时撤场">超时撤场</option>
+                                <option value="照片证据不足">照片证据不足</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">严重程度</label>
+                            <select id="filterSeverity" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">全部</option>
+                                <option value="high">高</option>
+                                <option value="medium">中</option>
+                                <option value="low">低</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">复核状态</label>
+                            <select id="filterReviewStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">全部</option>
+                                <option value="pending">待复核</option>
+                                <option value="reviewed">已复核</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div id="activeFilters" class="flex flex-wrap gap-2">
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="clearFiltersBtn" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition">
+                                清除筛选
+                            </button>
+                            <button id="applyFiltersBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                应用筛选
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 展位列表 -->
+                <div class="border rounded-lg overflow-hidden">
+                    <div class="table-container">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">展位号</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">扣罚原因</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">扣罚金额</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">严重程度</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">照片证据</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物料状态</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">复核状态</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="boothDetailsTableBody" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div class="mt-4 flex justify-between items-center">
+                    <div class="text-sm text-gray-700">
+                        显示 <span id="currentStart">0</span> - <span id="currentEnd">0</span> 条，共 <span id="totalItems">0</span> 条
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="prevPageBtn" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            上一页
+                        </button>
+                        <span id="pageIndicator" class="px-3 py-1 text-gray-700">第 1 页</span>
+                        <button id="nextPageBtn" class="px-3 py-1 border border-gray-300 rounded-md hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            下一页
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-content-review" class="tab-content">
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">人工复核</h2>
+
+                <!-- 展位选择 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">选择展位</label>
+                    <select id="reviewBoothSelect" class="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">请选择展位</option>
+                    </select>
+                </div>
+
+                <!-- 展位详情 -->
+                <div id="boothReviewDetails" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- 基本信息 -->
+                        <div class="border rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">基本信息</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">展位号：</span>
+                                    <span id="reviewBoothNumber" class="font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">验收状态：</span>
+                                    <span id="reviewAcceptanceStatus" class="font-medium">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">扣罚金额：</span>
+                                    <span id="reviewPenaltyAmount" class="font-medium text-red-600">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">严重程度：</span>
+                                    <span id="reviewSeverity" class="font-medium">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 扣罚详情 -->
+                        <div class="border rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">扣罚详情</h3>
+                            <div id="reviewPenaltyDetails" class="space-y-3">
+                                <p class="text-gray-500">暂无扣罚记录</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- 物料信息 -->
+                        <div class="border rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">物料借出归还情况</h3>
+                            <div id="reviewMaterialDetails" class="space-y-3">
+                                <p class="text-gray-500">暂无物料记录</p>
+                            </div>
+                        </div>
+
+                        <!-- 照片信息 -->
+                        <div class="border rounded-lg p-6">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4">现场照片标注</h3>
+                            <div id="reviewPhotoDetails" class="space-y-3">
+                                <p class="text-gray-500">暂无照片记录</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 复核备注 -->
+                    <div class="border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">复核备注</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">复核状态</label>
+                                <select id="reviewStatusSelect" class="w-full md:w-1/3 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="pending">待复核</option>
+                                    <option value="reviewed">已复核</option>
+                                    <option value="resolved">已处理</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">复核备注</label>
+                                <textarea id="reviewNotes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="输入复核备注信息..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">申诉建议</label>
+                                <textarea id="reviewAppealSuggestion" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="输入申诉建议..."></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button id="saveReviewBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    保存复核
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 历史复核记录 -->
+                    <div class="mt-6 border rounded-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">历史复核记录</h3>
+                        <div id="reviewHistory" class="space-y-4">
+                            <p class="text-gray-500">暂无历史记录</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 展位详情模态框 -->
+    <div id="boothModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 id="modalBoothTitle" class="text-xl font-semibold text-gray-800">展位详情</h3>
+                    <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div id="modalContent" class="space-y-6">
+                    <!-- 动态内容 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
