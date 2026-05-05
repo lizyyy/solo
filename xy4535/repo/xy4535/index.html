@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海盐晒场卤水结晶进度管理工具</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>海盐晒场卤水结晶进度管理工具</h1>
+            <p class="subtitle">帮助场长复盘每天的卤水结晶进度</p>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" data-tab="import">数据导入</button>
+            <button class="nav-btn" data-tab="dashboard">盐池总览</button>
+            <button class="nav-btn" data-tab="export">数据导出</button>
+        </nav>
+
+        <main>
+            <!-- 数据导入页面 -->
+            <section id="import-tab" class="tab-content active">
+                <div class="import-section">
+                    <h2>数据导入</h2>
+                    <p class="description">请导入以下数据文件，支持 CSV 格式。数据将保存在本地，刷新页面不会丢失。</p>
+                    
+                    <div class="import-grid">
+                        <div class="import-card">
+                            <h3>盐池分区表</h3>
+                            <p class="format-hint">格式：盐池编号, 分区名称, 面积(亩), 卤水深度(cm)</p>
+                            <input type="file" id="pond-csv" accept=".csv" />
+                            <div class="import-status" id="pond-status">未导入</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>卤度计 CSV</h3>
+                            <p class="format-hint">格式：盐池编号, 测量时间, 卤度(°Be'), 温度(°C)</p>
+                            <input type="file" id="salinity-csv" accept=".csv" />
+                            <div class="import-status" id="salinity-status">未导入</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>天气站记录</h3>
+                            <p class="format-hint">格式：日期, 天气类型, 气温(°C), 湿度(%), 风速(m/s), 降水量(mm)</p>
+                            <input type="file" id="weather-csv" accept=".csv" />
+                            <div class="import-status" id="weather-status">未导入</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>闸门放卤日志</h3>
+                            <p class="format-hint">格式：日期, 操作时间, 操作人, 来源盐池, 目标盐池, 放卤量(m³), 备注</p>
+                            <input type="file" id="gate-csv" accept=".csv" />
+                            <div class="import-status" id="gate-status">未导入</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>收盐批次记录</h3>
+                            <p class="format-hint">格式：批次号, 盐池编号, 收盐日期, 收盐量(吨), 盐质等级, 操作人</p>
+                            <input type="file" id="harvest-csv" accept=".csv" />
+                            <div class="import-status" id="harvest-status">未导入</div>
+                        </div>
+                    </div>
+
+                    <div class="import-actions">
+                        <button id="load-sample-data">加载示例数据</button>
+                        <button id="clear-all-data">清除所有数据</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 盐池总览页面 -->
+            <section id="dashboard-tab" class="tab-content">
+                <div class="dashboard-section">
+                    <div class="dashboard-header">
+                        <h2>盐池总览</h2>
+                        <div class="filter-controls">
+                            <select id="filter-pond">
+                                <option value="all">所有盐池</option>
+                            </select>
+                            <select id="filter-status">
+                                <option value="all">所有状态</option>
+                                <option value="normal">正常浓缩</option>
+                                <option value="diluted">雨后稀释</option>
+                                <option value="risk">可收盐风险</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="pond-overview" class="pond-grid">
+                        <!-- 盐池卡片将动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 盐池详情模态框 -->
+                <div id="pond-detail-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-pond-title">盐池详情</h3>
+                            <button class="close-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="detail-section">
+                                <h4>基本信息</h4>
+                                <div id="basic-info" class="info-grid"></div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>浓缩进度</h4>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div id="concentration-progress" class="progress-fill"></div>
+                                    </div>
+                                    <div id="progress-text" class="progress-text">0%</div>
+                                </div>
+                                <div id="concentration-history" class="history-chart"></div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>雨后稀释</h4>
+                                <div id="dilution-info" class="info-block"></div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>错池放卤</h4>
+                                <div id="transfer-info" class="info-block"></div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>可收盐风险</h4>
+                                <div id="risk-info" class="info-block"></div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>人工改判</h4>
+                                <div class="judgment-controls">
+                                    <label>
+                                        人工状态判断：
+                                        <select id="manual-status">
+                                            <option value="">系统判断</option>
+                                            <option value="normal">正常浓缩</option>
+                                            <option value="diluted">雨后稀释</option>
+                                            <option value="risk">可收盐风险</option>
+                                            <option value="harvest">可收盐</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h4>备注</h4>
+                                <textarea id="pond-notes" placeholder="输入备注信息..." rows="4"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="save-changes">保存修改</button>
+                            <button id="cancel-changes">取消</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 数据导出页面 -->
+            <section id="export-tab" class="tab-content">
+                <div class="export-section">
+                    <h2>数据导出</h2>
+                    <p class="description">导出数据用于交接和审计，包含所有盐池的详细信息、人工改判记录和备注。</p>
+                    
+                    <div class="export-grid">
+                        <div class="export-card">
+                            <h3>Markdown 交接单</h3>
+                            <p class="format-hint">适合打印或在线阅读的交接单，包含盐池总览和关键信息</p>
+                            <button id="export-markdown">导出 Markdown</button>
+                        </div>
+
+                        <div class="export-card">
+                            <h3>JSON 审计明细</h3>
+                            <p class="format-hint">完整的结构化数据，包含所有导入数据、计算结果和人工修改</p>
+                            <button id="export-json">导出 JSON</button>
+                        </div>
+                    </div>
+
+                    <div class="export-preview">
+                        <h3>导出预览</h3>
+                        <div id="export-preview-content">
+                            <p>选择导出类型后，将在此处显示预览</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>海盐晒场卤水结晶进度管理工具 | 本地运行，数据保存在浏览器本地存储</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
