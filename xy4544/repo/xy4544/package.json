@@ -1,0 +1,29 @@
+{
+  "name": "cabin-maintenance-tool",
+  "version": "1.0.0",
+  "description": "邮轮客舱工程组维护工具 - 用于分析客舱温湿度传感器数据、巡检表、报警和客诉，判断优先检修和误报",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "nodemon server/index.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd client && npm install"
+  },
+  "keywords": ["cruise", "cabin", "maintenance", "sensor", "analysis"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "date-fns": "^2.30.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.0"
+  }
+}
