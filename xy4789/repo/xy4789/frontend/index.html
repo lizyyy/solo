@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博物馆文物入库管理系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>博物馆文物入库管理系统</h1>
+      <nav>
+        <button class="nav-btn active" data-tab="upload">文件上传</button>
+        <button class="nav-btn" data-tab="batches">批次列表</button>
+      </nav>
+    </header>
+
+    <!-- 上传页面 -->
+    <div id="upload-tab" class="tab-content active">
+      <div class="upload-section">
+        <h2>上传到馆清单</h2>
+        <p>支持CSV和JSON格式的文件，文件大小不超过10MB</p>
+        <div class="upload-area" id="upload-area">
+          <input type="file" id="file-input" accept=".csv,.json" hidden>
+          <div class="upload-icon">📁</div>
+          <p>点击或拖拽文件到此处上传</p>
+          <small>支持 .csv 和 .json 格式</small>
+        </div>
+        <div id="file-info" class="file-info" style="display: none;">
+          <span id="file-name"></span>
+          <button id="cancel-upload" class="btn btn-small">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 预览页面 -->
+    <div id="preview-tab" class="tab-content">
+      <div class="preview-section">
+        <div class="preview-header">
+          <h2>数据预览</h2>
+          <div class="validation-summary" id="validation-summary"></div>
+        </div>
+        
+        <div class="preview-actions">
+          <div class="batch-info">
+            <label for="batch-name">批次名称:</label>
+            <input type="text" id="batch-name" placeholder="请输入批次名称">
+          </div>
+          <div class="batch-notes">
+            <label for="batch-notes">备注:</label>
+            <input type="text" id="batch-notes" placeholder="可选备注信息">
+          </div>
+          <div class="action-buttons">
+            <button id="back-to-upload" class="btn btn-secondary">返回上传</button>
+            <button id="confirm-batch" class="btn btn-primary">确认入库</button>
+          </div>
+        </div>
+
+        <div class="data-table-container">
+          <table id="preview-table" class="data-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>箱号</th>
+                <th>藏品号</th>
+                <th>保险值</th>
+                <th>库位</th>
+                <th>有证</th>
+                <th>状态</th>
+                <th>验证状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="preview-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批次列表页面 -->
+    <div id="batches-tab" class="tab-content">
+      <div class="batches-section">
+        <h2>入库批次列表</h2>
+        <div id="batches-list" class="batches-list">
+          <p class="loading">加载中...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批次详情页面 -->
+    <div id="batch-detail-tab" class="tab-content">
+      <div class="batch-detail-section">
+        <div class="detail-header">
+          <h2 id="detail-batch-name">批次详情</h2>
+          <div class="detail-actions">
+            <button id="back-to-batches" class="btn btn-secondary">返回列表</button>
+            <button id="export-markdown" class="btn btn-success">导出交接单</button>
+            <button id="export-json" class="btn btn-info">导出JSON</button>
+          </div>
+        </div>
+        
+        <div id="batch-info" class="batch-info-panel"></div>
+        
+        <div class="data-table-container">
+          <h3>藏品明细</h3>
+          <table id="detail-table" class="data-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>箱号</th>
+                <th>藏品号</th>
+                <th>保险值</th>
+                <th>库位</th>
+                <th>有证</th>
+                <th>状态</th>
+                <th>验证问题</th>
+                <th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="detail-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 编辑弹窗 -->
+    <div id="edit-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>编辑藏品信息</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-form">
+            <div class="form-group">
+              <label for="edit-box-number">箱号:</label>
+              <input type="text" id="edit-box-number" name="boxNumber">
+            </div>
+            <div class="form-group">
+              <label for="edit-artifact-number">藏品号:</label>
+              <input type="text" id="edit-artifact-number" name="artifactNumber">
+            </div>
+            <div class="form-group">
+              <label for="edit-insurance-value">保险值:</label>
+              <input type="number" id="edit-insurance-value" name="insuranceValue" step="0.01">
+            </div>
+            <div class="form-group">
+              <label for="edit-location">库位:</label>
+              <input type="text" id="edit-location" name="location">
+            </div>
+            <div class="form-group">
+              <label for="edit-has-certificate">有证:</label>
+              <select id="edit-has-certificate" name="hasCertificate">
+                <option value="true">是</option>
+                <option value="false">否</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-notes">备注:</label>
+              <textarea id="edit-notes" name="notes" rows="2"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary close-modal">取消</button>
+          <button class="btn btn-primary" id="save-edit">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
