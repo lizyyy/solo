@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行李转运班管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>行李转运班管理系统</h1>
+            <div class="header-actions">
+                <button id="importSample" class="btn btn-secondary">导入示例数据</button>
+                <button id="exportJSON" class="btn btn-secondary">导出JSON</button>
+                <button id="exportMarkdown" class="btn btn-primary">导出交接单(MD)</button>
+            </div>
+        </header>
+
+        <div class="stats-cards" id="statsCards">
+            <div class="stat-card">
+                <span class="stat-value" id="statFlights">0</span>
+                <span class="stat-label">航班数</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statBaggage">0</span>
+                <span class="stat-label">总行李</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statTransfer">0</span>
+                <span class="stat-label">中转行李</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statOversize">0</span>
+                <span class="stat-label">超大件</span>
+            </div>
+            <div class="stat-card stat-warning">
+                <span class="stat-value" id="statAlerts">0</span>
+                <span class="stat-label">风险预警</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statLoaded">0</span>
+                <span class="stat-label">已装车</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="flights">航班管理</button>
+            <button class="tab-btn" data-tab="baggage">行李管理</button>
+            <button class="tab-btn" data-tab="carousel">转盘分配</button>
+            <button class="tab-btn" data-tab="alerts">风险预警</button>
+        </div>
+
+        <div class="tab-content active" id="flightsTab">
+            <div class="section-header">
+                <h2>到港航班清单</h2>
+                <button id="addFlightBtn" class="btn btn-primary">添加航班</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>航班号</th>
+                            <th>到达时间</th>
+                            <th>出发地</th>
+                            <th>目的地</th>
+                            <th>转盘</th>
+                            <th>行李数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flightsTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="baggageTab">
+            <div class="section-header">
+                <h2>行李条码扫描</h2>
+                <button id="addBaggageBtn" class="btn btn-primary">扫描条码</button>
+            </div>
+            <div class="filters">
+                <select id="filterFlight">
+                    <option value="">所有航班</option>
+                </select>
+                <select id="filterCarousel">
+                    <option value="">所有转盘</option>
+                </select>
+                <input type="text" id="searchBarcode" placeholder="搜索条码...">
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>条码</th>
+                            <th>航班</th>
+                            <th>中转航班</th>
+                            <th>转盘</th>
+                            <th>中转</th>
+                            <th>超大件</th>
+                            <th>已装车</th>
+                            <th>异常</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="baggageTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="carouselTab">
+            <div class="section-header">
+                <h2>转盘分配表</h2>
+                <button id="assignCarouselBtn" class="btn btn-primary">分配转盘</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>转盘号</th>
+                            <th>航班</th>
+                            <th>行李数</th>
+                            <th>中转行李</th>
+                            <th>超大件</th>
+                        </tr>
+                    </thead>
+                    <tbody id="carouselTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="alertsTab">
+            <div class="section-header">
+                <h2>风险预警</h2>
+            </div>
+            <div class="alerts-container" id="alertsContainer">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加航班</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
