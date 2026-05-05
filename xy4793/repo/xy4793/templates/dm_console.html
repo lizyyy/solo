@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>剧本杀 DM 控制台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .connection-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-indicator.connected {
+            background: #44ff44;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .session-selector {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .session-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .session-info-card h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .session-info-card p {
+            font-size: 0.9rem;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .session-info-card .label {
+            color: #666;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-scheduled { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .status-in_progress { background: rgba(68, 255, 68, 0.2); color: #44ff44; }
+        .status-paused { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .status-ended { background: rgba(102, 102, 102, 0.2); color: #666; }
+        
+        .control-section {
+            margin-bottom: 20px;
+        }
+        
+        .control-section h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .action-btn {
+            padding: 20px 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #44ff44 0%, #00cc00 100%);
+            color: #000;
+        }
+        
+        .btn-pause {
+            background: linear-gradient(135deg, #ffaa00 0%, #ff6600 100%);
+            color: #000;
+        }
+        
+        .btn-resume {
+            background: linear-gradient(135deg, #44ff44 0%, #00cc00 100%);
+            color: #000;
+        }
+        
+        .btn-end {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: #fff;
+        }
+        
+        .btn-help {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: #fff;
+        }
+        
+        .btn-props {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: #fff;
+        }
+        
+        .btn-icon {
+            font-size: 1.5rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 25px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #00d4ff;
+            font-size: 1.1rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-actions .btn {
+            flex: 1;
+            padding: 12px;
+        }
+        
+        .btn {
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+        }
+        
+        .notifications-list {
+            margin-top: 20px;
+        }
+        
+        .notification-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .notification-item.notification {
+            border-left-color: #00d4ff;
+        }
+        
+        .notification-item.help {
+            border-left-color: #ff4444;
+        }
+        
+        .notification-item.props {
+            border-left-color: #ffaa00;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .notification-type {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .notification-content {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .disconnected-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 68, 68, 0.95);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .disconnected-banner.show {
+            display: block;
+        }
+        
+        .timer-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 3000;
+            animation: toastIn 0.3s ease;
+        }
+        
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        
+        .help-modal-content {
+            border-left: 4px solid #ff4444;
+        }
+        
+        .props-modal-content {
+            border-left: 4px solid #ffaa00;
+        }
+    </style>
+</head>
+<body>
+    <div class="disconnected-banner" id="disconnectedBanner">
+        ⚠️ 与服务器连接已断开，请检查网络
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎭 DM 控制台</h1>
+            <div class="connection-status">
+                <div class="connection-indicator" id="connectionIndicator"></div>
+                <span id="connectionStatus">连接中...</span>
+            </div>
+        </div>
+        
+        <div class="session-selector" id="sessionSelector">
+            <div class="form-group">
+                <label>选择场次</label>
+                <select id="sessionSelect">
+                    <option value="">请选择场次</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="selectSession()">
+                确认选择
+            </button>
+        </div>
+        
+        <div id="sessionControls" style="display: none;">
+            <div class="session-info-card">
+                <h3 id="sessionTitle">场次信息</h3>
+                <p><span class="label">剧本:</span> <span id="infoScript">-</span></p>
+                <p><span class="label">房间:</span> <span id="infoRoom">-</span></p>
+                <p><span class="label">状态:</span> <span class="status-badge" id="infoStatus">-</span></p>
+                <div class="timer-display" id="timerDisplay">00:00:00</div>
+            </div>
+            
+            <div class="control-section">
+                <h3>📋 场次控制</h3>
+                <div class="action-grid">
+                    <button class="action-btn btn-start" id="btnStart" onclick="sendEvent('start')">
+                        <span class="btn-icon">▶️</span>
+                        <span>开场</span>
+                    </button>
+                    <button class="action-btn btn-pause" id="btnPause" onclick="showConfirmModal('pause')" style="display: none;">
+                        <span class="btn-icon">⏸️</span>
+                        <span>暂停</span>
+                    </button>
+                    <button class="action-btn btn-resume" id="btnResume" onclick="showConfirmModal('resume')" style="display: none;">
+                        <span class="btn-icon">▶️</span>
+                        <span>继续</span>
+                    </button>
+                    <button class="action-btn btn-end" id="btnEnd" onclick="showConfirmModal('end')">
+                        <span class="btn-icon">⏹️</span>
+                        <span>结束</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>🆘 求助与道具</h3>
+                <div class="action-grid">
+                    <button class="action-btn btn-help" id="btnHelp" onclick="showHelpModal()">
+                        <span class="btn-icon">🆘</span>
+                        <span>求助</span>
+                    </button>
+                    <button class="action-btn btn-props" id="btnProps" onclick="showPropsModal()">
+                        <span class="btn-icon">🎭</span>
+                        <span>换道具</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="notifications-list">
+                <h3>📢 收到的通知</h3>
+                <div id="notificationsContainer">
+                    <p style="color: #666; text-align: center; padding: 20px;">暂无通知</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认模态框 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">确认操作</h3>
+                <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+            </div>
+            <p id="confirmMessage" style="color: #ccc; margin-bottom: 20px;"></p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeConfirmModal()">取消</button>
+                <button class="btn btn-danger" id="confirmActionBtn" onclick="executeConfirmAction()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 求助模态框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content help-modal-content">
+            <div class="modal-header">
+                <h3>🆘 求助前台</h3>
+                <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>求助内容</label>
+                <textarea id="helpContent" placeholder="描述需要的帮助..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeHelpModal()">取消</button>
+                <button class="btn btn-danger" onclick="sendHelp()">发送求助</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 换道具模态框 -->
+    <div class="modal" id="propsModal">
+        <div class="modal-content props-modal-content">
+            <div class="modal-header">
+                <h3>🎭 换道具</h3>
+                <button class="modal-close" onclick="closePropsModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>道具描述</label>
+                <textarea id="propsContent" placeholder="描述需要更换的道具..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closePropsModal()">取消</button>
+                <button class="btn btn-primary" onclick="sendProps()">发送请求</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let ws = null;
+        let clientId = 'dm_' + Math.random().toString(36).substr(2, 9);
+        let currentSessionId = null;
+        let currentSession = null;
+        let sessions = [];
+        let rooms = [];
+        let notifications = [];
+        let timerInterval = null;
+        let startTime = null;
+        let pendingAction = null;
+        let lastMessageTimestamp = null;
+        
+        function setConnected(isConnected) {
+            const indicator = document.getElementById('connectionIndicator');
+            const status = document.getElementById('connectionStatus');
+            const banner = document.getElementById('disconnectedBanner');
+            
+            if (isConnected) {
+                indicator.classList.add('connected');
+                status.textContent = '已连接';
+                banner.classList.remove('show');
+            } else {
+                indicator.classList.remove('connected');
+                status.textContent = '已断开';
+                banner.classList.add('show');
+            }
+        }
+        
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let wsUrl = `${wsProtocol}//${window.location.host}/ws/${clientId}?user_type=dm`;
+            if (currentSession) {
+                wsUrl += `&room_id=${currentSession.room_id}`;
+            }
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket 连接已建立');
+                setConnected(true);
+                
+                if (lastMessageTimestamp) {
+                    ws.send(JSON.stringify({
+                        type: 'missing_messages',
+                        last_timestamp: lastMessageTimestamp
+                    }));
+                }
+                
+                setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'heartbeat' }));
+                    }
+                }, 30000);
+            };
+            
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                lastMessageTimestamp = message.timestamp;
+                handleWebSocketMessage(message);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket 连接已关闭');
+                setConnected(false);
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket 错误:', error);
+                setConnected(false);
+            };
+        }
+        
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'connection_ack':
+                    console.log('连接确认:', message.client_id);
+                    break;
+                case 'event':
+                    handleNewEvent(message.data);
+                    break;
+                case 'status_update':
+                    handleStatusUpdate(message.data);
+                    break;
+                case 'acknowledge':
+                    handleAcknowledge(message.data);
+                    break;
+                case 'missing_messages':
+                    console.log('收到补发消息:', message.count, '条');
+                    message.messages.forEach(msg => handleWebSocketMessage(msg));
+                    break;
+            }
+        }
+        
+        function handleNewEvent(event) {
+            if (event.event_type === 'notification' && event.session_id === currentSessionId) {
+                addNotification(event);
+                showToast('收到新通知');
+            }
+        }
+        
+        function handleStatusUpdate(data) {
+            if (data.session_id === currentSessionId) {
+                refreshSessionInfo();
+            }
+        }
+        
+        function handleAcknowledge(data) {
+            showToast('前台已确认处理');
+        }
+        
+        function addNotification(event) {
+            notifications.unshift(event);
+            if (notifications.length > 20) {
+                notifications = notifications.slice(0, 20);
+            }
+            renderNotifications();
+        }
+        
+        function renderNotifications() {
+            const container = document.getElementById('notificationsContainer');
+            
+            if (notifications.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">暂无通知</p>';
+                return;
+            }
+            
+            container.innerHTML = notifications.map(n => `
+                <div class="notification-item ${n.event_type}">
+                    <div class="notification-header">
+                        <span class="notification-type">${getEventTypeName(n.event_type)}</span>
+                        <span class="notification-time">${formatTime(n.created_at)}</span>
+                    </div>
+                    <div class="notification-content">${n.content || '无详细内容'}</div>
+                </div>
+            `).join('');
+        }
+        
+        function getEventTypeName(type) {
+            const names = {
+                'help': '🆘 求助',
+                'change_props': '🎭 换道具',
+                'notification': '📢 通知'
+            };
+            return names[type] || type;
+        }
+        
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        async function loadSessions() {
+            try {
+                const [sessionsResponse, roomsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/api/sessions/today`),
+                    fetch(`${API_BASE}/api/rooms/`)
+                ]);
+                
+                sessions = await sessionsResponse.json();
+                rooms = await roomsResponse.json();
+                
+                const select = document.getElementById('sessionSelect');
+                select.innerHTML = '<option value="">请选择场次</option>' + 
+                    sessions.filter(s => ['scheduled', 'in_progress', 'paused'].includes(s.status))
+                    .map(s => {
+                        const room = rooms.find(r => r.id === s.room_id);
+                        return `<option value="${s.id}">${s.script_name} - ${room?.name || '房间' + s.room_id} (${getStatusText(s.status)})</option>`;
+                    }).join('');
+            } catch (error) {
+                console.error('加载场次失败:', error);
+                showToast('加载失败', 'error');
+            }
+        }
+        
+        function getStatusText(status) {
+            const texts = {
+                'scheduled': '待开始',
+                'in_progress': '进行中',
+                'paused': '已暂停',
+                'ended': '已结束'
+            };
+            return texts[status] || status;
+        }
+        
+        async function selectSession() {
+            const select = document.getElementById('sessionSelect');
+            const sessionId = select.value;
+            
+            if (!sessionId) {
+                showToast('请选择场次', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions/${sessionId}`);
+                currentSession = await response.json();
+                currentSessionId = currentSession.id;
+                
+                document.getElementById('sessionSelector').style.display = 'none';
+                document.getElementById('sessionControls').style.display = 'block';
+                
+                refreshSessionInfo();
+                connectWebSocket();
+                
+            } catch (error) {
+                console.error('选择场次失败:', error);
+                showToast('选择失败', 'error');
+            }
+        }
+        
+        function refreshSessionInfo() {
+            if (!currentSession) return;
+            
+            const room = rooms.find(r => r.id === currentSession.room_id);
+            
+            document.getElementById('infoScript').textContent = currentSession.script_name;
+            document.getElementById('infoRoom').textContent = room?.name || '房间' + currentSession.room_id;
+            
+            const statusBadge = document.getElementById('infoStatus');
+            statusBadge.className = `status-badge status-${currentSession.status}`;
+            statusBadge.textContent = getStatusText(currentSession.status);
+            
+            updateButtonStates();
+            updateTimer();
+        }
+        
+        function updateButtonStates() {
+            const btnStart = document.getElementById('btnStart');
+            const btnPause = document.getElementById('btnPause');
+            const btnResume = document.getElementById('btnResume');
+            const btnEnd = document.getElementById('btnEnd');
+            const btnHelp = document.getElementById('btnHelp');
+            const btnProps = document.getElementById('btnProps');
+            
+            switch (currentSession.status) {
+                case 'scheduled':
+                    btnStart.style.display = 'flex';
+                    btnPause.style.display = 'none';
+                    btnResume.style.display = 'none';
+                    btnEnd.disabled = true;
+                    btnHelp.disabled = true;
+                    btnProps.disabled = true;
+                    break;
+                    
+                case 'in_progress':
+                    btnStart.style.display = 'none';
+                    btnPause.style.display = 'flex';
+                    btnResume.style.display = 'none';
+                    btnEnd.disabled = false;
+                    btnHelp.disabled = false;
+                    btnProps.disabled = false;
+                    break;
+                    
+                case 'paused':
+                    btnStart.style.display = 'none';
+                    btnPause.style.display = 'none';
+                    btnResume.style.display = 'flex';
+                    btnEnd.disabled = false;
+                    btnHelp.disabled = false;
+                    btnProps.disabled = false;
+                    break;
+                    
+                case 'ended':
+                    btnStart.style.display = 'none';
+                    btnPause.style.display = 'none';
+                    btnResume.style.display = 'none';
+                    btnEnd.disabled = true;
+                    btnHelp.disabled = true;
+                    btnProps.disabled = true;
+                    break;
+            }
+        }
+        
+        function updateTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            const timerDisplay = document.getElementById('timerDisplay');
+            
+            if (currentSession.status === 'scheduled') {
+                timerDisplay.textContent = '00:00:00';
+                return;
+            }
+            
+            if (currentSession.status === 'ended') {
+                if (currentSession.actual_start_time && currentSession.actual_end_time) {
+                    const duration = new Date(currentSession.actual_end_time) - new Date(currentSession.actual_start_time);
+                    timerDisplay.textContent = formatDuration(duration);
+                }
+                return;
+            }
+            
+            if (currentSession.actual_start_time) {
+                startTime = new Date(currentSession.actual_start_time);
+                
+                timerInterval = setInterval(() => {
+                    const now = new Date();
+                    const duration = now - startTime;
+                    timerDisplay.textContent = formatDuration(duration);
+                }, 1000);
+                
+                const now = new Date();
+                const duration = now - startTime;
+                timerDisplay.textContent = formatDuration(duration);
+            }
+        }
+        
+        function formatDuration(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+        
+        async function sendEvent(eventType) {
+            if (!currentSessionId) return;
+            
+            try {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'event',
+                        data: {
+                            session_id: currentSessionId,
+                            event_type: eventType
+                        }
+                    }));
+                }
+                
+                const response = await fetch(`${API_BASE}/api/events/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        event_type: eventType,
+                        sender: 'dm'
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('操作成功');
+                    
+                    if (eventType === 'start') {
+                        currentSession.status = 'in_progress';
+                        currentSession.actual_start_time = new Date().toISOString();
+                    } else if (eventType === 'pause') {
+                        currentSession.status = 'paused';
+                    } else if (eventType === 'resume') {
+                        currentSession.status = 'in_progress';
+                    } else if (eventType === 'end') {
+                        currentSession.status = 'ended';
+                        currentSession.actual_end_time = new Date().toISOString();
+                    }
+                    
+                    refreshSessionInfo();
+                } else {
+                    showToast('操作失败', 'error');
+                }
+            } catch (error) {
+                console.error('发送事件失败:', error);
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        function showConfirmModal(action) {
+            pendingAction = action;
+            const modal = document.getElementById('confirmModal');
+            const title = document.getElementById('confirmTitle');
+            const message = document.getElementById('confirmMessage');
+            const actionBtn = document.getElementById('confirmActionBtn');
+            
+            switch (action) {
+                case 'pause':
+                    title.textContent = '⏸️ 确认暂停';
+                    message.textContent = '确定要暂停当前场次吗？';
+                    actionBtn.className = 'btn btn-danger';
+                    break;
+                case 'resume':
+                    title.textContent = '▶️ 确认继续';
+                    message.textContent = '确定要继续当前场次吗？';
+                    actionBtn.className = 'btn btn-primary';
+                    break;
+                case 'end':
+                    title.textContent = '⏹️ 确认结束';
+                    message.textContent = '确定要结束当前场次吗？此操作不可撤销。';
+                    actionBtn.className = 'btn btn-danger';
+                    break;
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            pendingAction = null;
+        }
+        
+        function executeConfirmAction() {
+            if (pendingAction) {
+                sendEvent(pendingAction);
+                closeConfirmModal();
+            }
+        }
+        
+        function showHelpModal() {
+            document.getElementById('helpModal').classList.add('active');
+        }
+        
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('active');
+            document.getElementById('helpContent').value = '';
+        }
+        
+        async function sendHelp() {
+            const content = document.getElementById('helpContent').value;
+            
+            if (!currentSessionId) return;
+            
+            try {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'event',
+                        data: {
+                            session_id: currentSessionId,
+                            event_type: 'help',
+                            content: content
+                        }
+                    }));
+                }
+                
+                const response = await fetch(`${API_BASE}/api/events/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        event_type: 'help',
+                        sender: 'dm',
+                        content: content
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('求助已发送');
+                    closeHelpModal();
+                } else {
+                    showToast('发送失败', 'error');
+                }
+            } catch (error) {
+                console.error('发送求助失败:', error);
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        function showPropsModal() {
+            document.getElementById('propsModal').classList.add('active');
+        }
+        
+        function closePropsModal() {
+            document.getElementById('propsModal').classList.remove('active');
+            document.getElementById('propsContent').value = '';
+        }
+        
+        async function sendProps() {
+            const content = document.getElementById('propsContent').value;
+            
+            if (!currentSessionId) return;
+            
+            try {
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'event',
+                        data: {
+                            session_id: currentSessionId,
+                            event_type: 'change_props',
+                            content: content
+                        }
+                    }));
+                }
+                
+                const response = await fetch(`${API_BASE}/api/events/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        event_type: 'change_props',
+                        sender: 'dm',
+                        content: content
+                    })
+                });
+                
+                if (response.ok) {
+                    showToast('换道具请求已发送');
+                    closePropsModal();
+                } else {
+                    showToast('发送失败', 'error');
+                }
+            } catch (error) {
+                console.error('发送换道具请求失败:', error);
+                showToast('网络错误', 'error');
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'error' ? 'rgba(255, 68, 68, 0.95)' : 'rgba(68, 255, 68, 0.95)';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        loadSessions();
+        connectWebSocket();
+    </script>
+</body>
+</html>

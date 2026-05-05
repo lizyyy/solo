@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>剧本杀房间调度台 - 前台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: #00d4ff;
+        }
+        
+        .header .status {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .connection-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-indicator.connected {
+            background: #44ff44;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+        }
+        
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .room-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .room-card.status-scheduled {
+            border-left: 4px solid #ffaa00;
+        }
+        
+        .room-card.status-in_progress {
+            border-left: 4px solid #44ff44;
+        }
+        
+        .room-card.status-paused {
+            border-left: 4px solid #ffaa00;
+            animation: paused-blink 1s infinite;
+        }
+        
+        .room-card.status-ended {
+            border-left: 4px solid #666;
+            opacity: 0.7;
+        }
+        
+        @keyframes paused-blink {
+            0%, 100% { border-left-color: #ffaa00; }
+            50% { border-left-color: #ff6600; }
+        }
+        
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .room-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .room-status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-badge-scheduled {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+        
+        .status-badge-in_progress {
+            background: rgba(68, 255, 68, 0.2);
+            color: #44ff44;
+        }
+        
+        .status-badge-paused {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+        
+        .status-badge-ended {
+            background: rgba(102, 102, 102, 0.2);
+            color: #666;
+        }
+        
+        .session-info {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        
+        .session-info p {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .session-info span.label {
+            color: #666;
+        }
+        
+        .room-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #44ff44 0%, #00cc00 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(68, 255, 68, 0.4);
+        }
+        
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .notifications-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00d4ff;
+        }
+        
+        .notification-item.help {
+            border-left-color: #ff4444;
+        }
+        
+        .notification-item.props {
+            border-left-color: #ffaa00;
+        }
+        
+        .notification-item.acknowledged {
+            opacity: 0.6;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .notification-type {
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        
+        .notification-content {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 4px 10px;
+            font-size: 0.75rem;
+        }
+        
+        .create-session-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-group label {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .today-sessions {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .today-session-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .today-session-info {
+            font-size: 0.85rem;
+        }
+        
+        .today-session-time {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+        
+        .modal-header h2 {
+            color: #00d4ff;
+            font-size: 1.3rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+        }
+        
+        .timeline-item.start::before { background: #44ff44; }
+        .timeline-item.pause::before { background: #ffaa00; }
+        .timeline-item.resume::before { background: #44ff44; }
+        .timeline-item.help::before { background: #ff4444; }
+        .timeline-item.change_props::before { background: #ffaa00; }
+        .timeline-item.end::before { background: #666; }
+        .timeline-item.notification::before { background: #00d4ff; }
+        
+        .timeline-time {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-type {
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-content {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .export-btn {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .disconnected-warning {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 68, 68, 0.9);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 100;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .disconnected-warning.show {
+            display: block;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(-50%); }
+            25% { transform: translateX(-50%) translateX(-10px); }
+            75% { transform: translateX(-50%) translateX(10px); }
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🎭 剧本杀房间调度台</h1>
+        <div class="status">
+            <div class="connection-status">
+                <div class="connection-indicator" id="connectionIndicator"></div>
+                <span id="connectionStatus">连接中...</span>
+            </div>
+            <span id="currentTime"></span>
+        </div>
+    </header>
+    
+    <div class="disconnected-warning" id="disconnectedWarning">
+        ⚠️ 与服务器连接已断开，请检查网络或刷新页面
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value" id="totalRooms">0</div>
+            <div class="stat-label">总房间</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="activeSessions">0</div>
+            <div class="stat-label">进行中</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="pendingNotifications">0</div>
+            <div class="stat-label">待处理</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="onlineClients">0</div>
+            <div class="stat-label">在线</div>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="panel">
+                <h3>📋 房间状态</h3>
+                <div class="rooms-grid" id="roomsGrid">
+                    <!-- 房间卡片将通过 JavaScript 动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="panel">
+                <h3>➕ 创建今日场次</h3>
+                <form class="create-session-form" id="createSessionForm">
+                    <div class="form-group">
+                        <label>选择房间</label>
+                        <select id="roomSelect" required>
+                            <option value="">请选择房间</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>剧本名称</label>
+                        <input type="text" id="scriptName" placeholder="如：《死者在幻夜中醒来》" required>
+                    </div>
+                    <div class="form-group">
+                        <label>DM 姓名</label>
+                        <input type="text" id="dmName" placeholder="如：小明" required>
+                    </div>
+                    <div class="form-group">
+                        <label>玩家人数</label>
+                        <input type="number" id="playerCount" placeholder="6" min="1" max="20" required>
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间</label>
+                        <input type="datetime-local" id="scheduledTime" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">创建场次</button>
+                </form>
+            </div>
+            
+            <div class="panel">
+                <h3>📅 今日场次</h3>
+                <div class="today-sessions" id="todaySessions">
+                    <!-- 今日场次列表 -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>📢 实时通知</h3>
+                <div class="notifications-list" id="notificationsList">
+                    <!-- 通知列表 -->
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3>📤 广播通知</h3>
+                <form class="create-session-form" id="broadcastForm">
+                    <div class="form-group">
+                        <label>选择房间</label>
+                        <select id="broadcastRoomSelect" required>
+                            <option value="">请选择房间</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>通知内容</label>
+                        <textarea id="broadcastContent" placeholder="输入通知内容..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">发送通知</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 时间线模态框 -->
+    <div class="modal" id="timelineModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">场次时间线</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="timeline" id="timelineContent">
+                <!-- 时间线内容 -->
+            </div>
+            <button class="btn btn-primary export-btn" onclick="exportMarkdown()">导出 Markdown 交班单</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let ws = null;
+        let clientId = 'front_desk_' + Math.random().toString(36).substr(2, 9);
+        let lastMessageTimestamp = null;
+        let currentSessionId = null;
+        let rooms = [];
+        let sessions = [];
+        let notifications = [];
+        
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString('zh-CN');
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        function setConnected(isConnected) {
+            const indicator = document.getElementById('connectionIndicator');
+            const status = document.getElementById('connectionStatus');
+            const warning = document.getElementById('disconnectedWarning');
+            
+            if (isConnected) {
+                indicator.classList.add('connected');
+                status.textContent = '已连接';
+                warning.classList.remove('show');
+            } else {
+                indicator.classList.remove('connected');
+                status.textContent = '已断开';
+                warning.classList.add('show');
+            }
+        }
+        
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${wsProtocol}//${window.location.host}/ws/${clientId}?user_type=front_desk`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket 连接已建立');
+                setConnected(true);
+                
+                if (lastMessageTimestamp) {
+                    ws.send(JSON.stringify({
+                        type: 'missing_messages',
+                        last_timestamp: lastMessageTimestamp
+                    }));
+                }
+                
+                setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'heartbeat' }));
+                    }
+                }, 30000);
+            };
+            
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                lastMessageTimestamp = message.timestamp;
+                handleWebSocketMessage(message);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket 连接已关闭');
+                setConnected(false);
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket 错误:', error);
+                setConnected(false);
+            };
+        }
+        
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'connection_ack':
+                    console.log('连接确认:', message.client_id);
+                    break;
+                case 'event':
+                    handleNewEvent(message.data);
+                    break;
+                case 'status_update':
+                    handleStatusUpdate(message.data);
+                    break;
+                case 'acknowledge':
+                    handleAcknowledge(message.data);
+                    break;
+                case 'missing_messages':
+                    console.log('收到补发消息:', message.count, '条');
+                    message.messages.forEach(msg => handleWebSocketMessage(msg));
+                    break;
+                case 'disconnection_notice':
+                    handleDisconnectionNotice(message.data);
+                    break;
+            }
+            updateStats();
+        }
+        
+        function handleNewEvent(event) {
+            refreshAll();
+            
+            if (['help', 'change_props', 'notification'].includes(event.event_type)) {
+                addNotification(event);
+            }
+            
+            showToast(getEventToastMessage(event));
+        }
+        
+        function getEventToastMessage(event) {
+            const messages = {
+                'start': '场次已开始',
+                'pause': '场次已暂停',
+                'resume': '场次已恢复',
+                'end': '场次已结束',
+                'help': '收到求助请求',
+                'change_props': '收到换道具请求',
+                'notification': '收到新通知'
+            };
+            return messages[event.event_type] || '新事件';
+        }
+        
+        function handleStatusUpdate(data) {
+            refreshRooms();
+        }
+        
+        function handleAcknowledge(data) {
+            const notification = notifications.find(n => n.id === data.event_id);
+            if (notification) {
+                notification.is_acknowledged = true;
+                notification.acknowledged_by = data.acknowledged_by;
+                notification.acknowledged_at = data.acknowledged_at;
+                renderNotifications();
+            }
+        }
+        
+        function handleDisconnectionNotice(data) {
+            showToast(`⚠️ ${data.message}`, 'warning');
+        }
+        
+        function addNotification(event) {
+            notifications.unshift(event);
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+            renderNotifications();
+        }
+        
+        function renderNotifications() {
+            const container = document.getElementById('notificationsList');
+            const pending = notifications.filter(n => !n.is_acknowledged);
+            
+            if (pending.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">暂无待处理通知</p>';
+                return;
+            }
+            
+            container.innerHTML = pending.map(n => `
+                <div class="notification-item ${getNotificationClass(n)}">
+                    <div class="notification-header">
+                        <span class="notification-type">${getEventTypeName(n.event_type)}</span>
+                        <span class="notification-time">${formatTime(n.created_at)}</span>
+                    </div>
+                    <div class="notification-content">
+                        ${n.content || '无详细内容'}
+                        ${(n.event_metadata || n.metadata) ? `<br><small style="color:#888;">${JSON.stringify(n.event_metadata || n.metadata)}</small>` : ''}
+                    </div>
+                    <div class="notification-actions">
+                        ${!n.is_acknowledged ? `
+                            <button class="btn btn-success btn-small" onclick="acknowledgeEvent(${n.id})">确认处理</button>
+                        ` : `<span style="color:#888; font-size:0.8rem;">已由 ${n.acknowledged_by} 处理</span>`}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getNotificationClass(event) {
+            if (event.is_acknowledged) return 'acknowledged';
+            if (event.event_type === 'help') return 'help';
+            if (event.event_type === 'change_props') return 'props';
+            return '';
+        }
+        
+        function getEventTypeName(type) {
+            const names = {
+                'help': '🆘 求助',
+                'change_props': '🎭 换道具',
+                'notification': '📢 通知',
+                'start': '▶️ 开始',
+                'pause': '⏸️ 暂停',
+                'resume': '▶️ 恢复',
+                'end': '⏹️ 结束'
+            };
+            return names[type] || type;
+        }
+        
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        async function acknowledgeEvent(eventId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/events/${eventId}/acknowledge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acknowledged_by: '前台' })
+                });
+                
+                if (response.ok) {
+                    const event = notifications.find(n => n.id === eventId);
+                    if (event) {
+                        event.is_acknowledged = true;
+                        event.acknowledged_by = '前台';
+                    }
+                    renderNotifications();
+                    
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'acknowledge',
+                            event_id: eventId
+                        }));
+                    }
+                    
+                    showToast('已确认处理');
+                }
+            } catch (error) {
+                console.error('确认事件失败:', error);
+                showToast('操作失败', 'error');
+            }
+        }
+        
+        async function refreshAll() {
+            await Promise.all([
+                refreshRooms(),
+                refreshTodaySessions(),
+                refreshOnlineClients()
+            ]);
+        }
+        
+        async function refreshRooms() {
+            try {
+                const response = await fetch(`${API_BASE}/api/rooms/status/all`);
+                rooms = await response.json();
+                renderRooms();
+            } catch (error) {
+                console.error('获取房间状态失败:', error);
+            }
+        }
+        
+        function renderRooms() {
+            const container = document.getElementById('roomsGrid');
+            
+            if (rooms.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; grid-column: 1/-1;">暂无房间，请先创建房间</p>';
+                return;
+            }
+            
+            container.innerHTML = rooms.map(room => `
+                <div class="room-card status-${room.current_session?.status || 'idle'}">
+                    <div class="room-header">
+                        <span class="room-name">${room.name}</span>
+                        <span class="room-status-badge status-badge-${room.current_session?.status || 'idle'}">
+                            ${getStatusText(room.current_session?.status)}
+                        </span>
+                    </div>
+                    ${room.current_session ? `
+                        <div class="session-info">
+                            <p><span class="label">剧本:</span> <span>${room.current_session.script_name}</span></p>
+                            <p><span class="label">DM:</span> <span>${room.current_session.dm_name}</span></p>
+                            <p><span class="label">开始时间:</span> <span>${formatTime(room.current_session.actual_start_time || room.current_session.scheduled_time)}</span></p>
+                        </div>
+                        <div class="room-actions">
+                            <button class="btn btn-primary" onclick="viewTimeline(${room.current_session.id})">查看时间线</button>
+                        </div>
+                    ` : `
+                        <div class="session-info">
+                            <p style="color: #666; text-align: center;">暂无进行中的场次</p>
+                            <p><span class="label">容量:</span> <span>${room.capacity} 人</span></p>
+                        </div>
+                    `}
+                </div>
+            `).join('');
+            
+            updateRoomSelects();
+        }
+        
+        function getStatusText(status) {
+            const texts = {
+                'scheduled': '待开始',
+                'in_progress': '进行中',
+                'paused': '已暂停',
+                'ended': '已结束'
+            };
+            return texts[status] || '空闲';
+        }
+        
+        function updateRoomSelects() {
+            const roomSelect = document.getElementById('roomSelect');
+            const broadcastSelect = document.getElementById('broadcastRoomSelect');
+            
+            const options = rooms.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+            
+            roomSelect.innerHTML = '<option value="">请选择房间</option>' + options;
+            broadcastSelect.innerHTML = '<option value="">请选择房间</option>' + options;
+        }
+        
+        async function refreshTodaySessions() {
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions/today`);
+                sessions = await response.json();
+                renderTodaySessions();
+            } catch (error) {
+                console.error('获取今日场次失败:', error);
+            }
+        }
+        
+        function renderTodaySessions() {
+            const container = document.getElementById('todaySessions');
+            
+            if (sessions.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">今日暂无场次</p>';
+                return;
+            }
+            
+            const roomMap = {};
+            rooms.forEach(r => roomMap[r.id] = r.name);
+            
+            container.innerHTML = sessions.map(s => `
+                <div class="today-session-item">
+                    <div class="today-session-info">
+                        <div style="font-weight: bold;">${s.script_name}</div>
+                        <div style="color: #888; font-size: 0.8rem;">
+                            ${roomMap[s.room_id] || `房间${s.room_id}`} | ${s.dm_name} | ${s.player_count}人
+                        </div>
+                    </div>
+                    <div class="today-session-time">${formatTime(s.scheduled_time)}</div>
+                </div>
+            `).join('');
+        }
+        
+        async function refreshOnlineClients() {
+            try {
+                const response = await fetch(`${API_BASE}/api/online-clients`);
+                const data = await response.json();
+                document.getElementById('onlineClients').textContent = data.clients.length;
+            } catch (error) {
+                console.error('获取在线客户端失败:', error);
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalRooms').textContent = rooms.length;
+            document.getElementById('activeSessions').textContent = rooms.filter(r => 
+                r.current_session && ['in_progress', 'paused'].includes(r.current_session.status)
+            ).length;
+            document.getElementById('pendingNotifications').textContent = notifications.filter(n => !n.is_acknowledged).length;
+        }
+        
+        document.getElementById('createSessionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const sessionData = {
+                room_id: parseInt(document.getElementById('roomSelect').value),
+                script_name: document.getElementById('scriptName').value,
+                dm_name: document.getElementById('dmName').value,
+                player_count: parseInt(document.getElementById('playerCount').value),
+                scheduled_time: new Date(document.getElementById('scheduledTime').value).toISOString()
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionData)
+                });
+                
+                if (response.ok) {
+                    showToast('场次创建成功！');
+                    e.target.reset();
+                    refreshAll();
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || '创建失败', 'error');
+                }
+            } catch (error) {
+                console.error('创建场次失败:', error);
+                showToast('网络错误', 'error');
+            }
+        });
+        
+        document.getElementById('broadcastForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const roomId = document.getElementById('broadcastRoomSelect').value;
+            const content = document.getElementById('broadcastContent').value;
+            
+            if (!roomId) {
+                showToast('请选择房间', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(
+                    `${API_BASE}/api/events/broadcast?room_id=${roomId}&content=${encodeURIComponent(content)}`,
+                    { method: 'POST' }
+                );
+                
+                if (response.ok) {
+                    showToast('通知已发送！');
+                    document.getElementById('broadcastContent').value = '';
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || '发送失败', 'error');
+                }
+            } catch (error) {
+                console.error('发送通知失败:', error);
+                showToast('网络错误', 'error');
+            }
+        });
+        
+        async function viewTimeline(sessionId) {
+            currentSessionId = sessionId;
+            
+            try {
+                const [sessionResponse, eventsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/api/sessions/${sessionId}`),
+                    fetch(`${API_BASE}/api/sessions/${sessionId}/events`)
+                ]);
+                
+                const session = await sessionResponse.json();
+                const events = await eventsResponse.json();
+                
+                document.getElementById('modalTitle').textContent = `场次时间线 - ${session.script_name}`;
+                
+                const room = rooms.find(r => r.id === session.room_id);
+                
+                const timelineHtml = events.map(e => `
+                    <div class="timeline-item ${e.event_type}">
+                        <div class="timeline-time">${formatDateTime(e.created_at)}</div>
+                        <div class="timeline-type">${getEventTypeName(e.event_type)}</div>
+                        <div class="timeline-content">
+                            ${e.content || '无详细内容'}
+                            ${(e.event_metadata || e.metadata) ? `<br><small style="color:#888;">${JSON.stringify(e.event_metadata || e.metadata)}</small>` : ''}
+                            <div style="margin-top: 5px; font-size: 0.8rem; color: #666;">
+                                发送者: ${e.sender}
+                                ${e.is_acknowledged ? ` | 已确认: ${e.acknowledged_by}` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('timelineContent').innerHTML = timelineHtml || 
+                    '<p style="color: #666; text-align: center; padding: 20px;">暂无事件记录</p>';
+                
+                document.getElementById('timelineModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('获取时间线失败:', error);
+                showToast('获取数据失败', 'error');
+            }
+        }
+        
+        function formatDateTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('timelineModal').classList.remove('active');
+        }
+        
+        async function exportMarkdown() {
+            if (!currentSessionId) return;
+            
+            try {
+                const [sessionResponse, eventsResponse] = await Promise.all([
+                    fetch(`${API_BASE}/api/sessions/${currentSessionId}`),
+                    fetch(`${API_BASE}/api/sessions/${currentSessionId}/events`)
+                ]);
+                
+                const session = await sessionResponse.json();
+                const events = await eventsResponse.json();
+                const room = rooms.find(r => r.id === session.room_id);
+                
+                let markdown = `# 剧本杀场次交班单\n\n`;
+                markdown += `## 基本信息\n\n`;
+                markdown += `- **剧本名称**: ${session.script_name}\n`;
+                markdown += `- **房间**: ${room?.name || `房间${session.room_id}`}\n`;
+                markdown += `- **DM**: ${session.dm_name}\n`;
+                markdown += `- **玩家人数**: ${session.player_count}人\n`;
+                markdown += `- **计划开始时间**: ${formatDateTime(session.scheduled_time)}\n`;
+                markdown += `- **实际开始时间**: ${formatDateTime(session.actual_start_time) || '未开始'}\n`;
+                markdown += `- **实际结束时间**: ${formatDateTime(session.actual_end_time) || '未结束'}\n`;
+                markdown += `- **状态**: ${getStatusText(session.status)}\n\n`;
+                
+                markdown += `## 事件时间线\n\n`;
+                if (events.length === 0) {
+                    markdown += `暂无事件记录\n`;
+                } else {
+                    events.forEach((e, index) => {
+                        markdown += `### ${index + 1}. ${getEventTypeName(e.event_type)}\n\n`;
+                        markdown += `- **时间**: ${formatDateTime(e.created_at)}\n`;
+                        markdown += `- **发送者**: ${e.sender}\n`;
+                        if (e.content) {
+                            markdown += `- **内容**: ${e.content}\n`;
+                        }
+                        if (e.event_metadata || e.metadata) {
+                            markdown += `- **元数据**: \`${JSON.stringify(e.event_metadata || e.metadata)}\`\n`;
+                        }
+                        if (e.is_acknowledged) {
+                            markdown += `- **处理状态**: 已由 ${e.acknowledged_by} 于 ${formatDateTime(e.acknowledged_at)} 确认\n`;
+                        } else {
+                            markdown += `- **处理状态**: 待处理\n`;
+                        }
+                        markdown += `\n`;
+                    });
+                }
+                
+                markdown += `\n---\n`;
+                markdown += `*交班单生成时间: ${new Date().toLocaleString('zh-CN')}*\n`;
+                
+                const blob = new Blob([markdown], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `交班单_${session.script_name}_${new Date().toISOString().slice(0, 10)}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('交班单已导出！');
+            } catch (error) {
+                console.error('导出交班单失败:', error);
+                showToast('导出失败', 'error');
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'error' ? 'rgba(255, 68, 68, 0.9)' : type === 'warning' ? 'rgba(255, 170, 0, 0.9)' : 'rgba(68, 255, 68, 0.9)'};
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 2000;
+                animation: toastIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes toastIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes toastOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.getElementById('timelineModal').addEventListener('click', (e) => {
+            if (e.target.id === 'timelineModal') {
+                closeModal();
+            }
+        });
+        
+        const now = new Date();
+        document.getElementById('scheduledTime').value = now.toISOString().slice(0, 16);
+        
+        refreshAll();
+        connectWebSocket();
+    </script>
+</body>
+</html>
