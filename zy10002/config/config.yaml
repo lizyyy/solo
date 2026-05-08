@@ -1,0 +1,58 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  dbname: chaos_payment
+  max_open_conns: 20
+  max_idle_conns: 10
+  conn_max_lifetime: 60
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 20
+
+order:
+  default_amount: 100.00
+  duplicate_callback_delay: 3000
+  callback_timeout: 5000
+
+chaos:
+  enabled: true
+  scenarios:
+    connection_pool_exhaustion:
+      enabled: false
+      delay_ms: 5000
+      trigger_count: 10
+    
+    message_backlog:
+      enabled: false
+      queue_size: 1000
+      processing_delay_ms: 2000
+    
+    goroutine_leak:
+      enabled: false
+      leak_rate: 0.1
+    
+    database_lock_wait:
+      enabled: false
+      lock_hold_time_ms: 10000
+    
+    cache_dirty_data:
+      enabled: false
+      dirty_rate: 0.3
+    
+    config_drift:
+      enabled: false
+      drift_interval_ms: 30000
+
+monitoring:
+  enable_prometheus: true
+  metric_path: /metrics

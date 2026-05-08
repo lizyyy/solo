@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Payment - 支付混沌工程平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e4e4e4;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #00d9ff;
+        }
+
+        .header .status {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section h3 {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 239, 125, 0.4);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 1rem;
+        }
+
+        .orders-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .orders-panel h2 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #00d9ff;
+        }
+
+        .orders-list {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .order-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 200px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .order-card:hover {
+            border-color: #667eea;
+        }
+
+        .order-card.active {
+            border-color: #00d9ff;
+        }
+
+        .order-card .order-id {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-card .order-amount {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        .order-card .order-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .status-pending { background: #fbbf24; color: #1a1a2e; }
+        .status-processing { background: #60a5fa; color: white; }
+        .status-success { background: #4ade80; color: #1a1a2e; }
+        .status-failed { background: #f87171; color: white; }
+
+        .timeline-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .timeline-panel h2 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #00d9ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .timeline-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .timeline-controls button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e4e4e4;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .timeline-controls button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            margin-left: 1rem;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 1rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+
+        .timeline-item.event-order-created::before { background: #4ade80; }
+        .timeline-item.event-order-status-changed::before { background: #60a5fa; }
+        .timeline-item.event-payment-callback::before { background: #fbbf24; }
+        .timeline-item.event-duplicate-callback::before { background: #f87171; }
+        .timeline-item.event-chaos-injected::before { background: #f093fb; }
+        .timeline-item.event-recovery-action::before { background: #38ef7d; }
+        .timeline-item.event-cache-write::before { background: #a78bfa; }
+        .timeline-item.event-cache-read::before { background: #c084fc; }
+        .timeline-item.event-db-transaction::before { background: #f59e0b; }
+        .timeline-item.event-goroutine-spawned::before { background: #14b8a6; }
+        .timeline-item.event-goroutine-leaked::before { background: #ef4444; }
+
+        .timeline-time {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #888;
+            min-width: 80px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-type {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-source {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .timeline-details {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 0.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .metrics-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            display: flex;
+            gap: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            color: #00d9ff;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e4e4e4;
+            font-size: 0.875rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .scenario-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .scenario-toggle span {
+            font-size: 0.875rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #555;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-error {
+            background: rgba(248, 113, 113, 0.2);
+            border: 1px solid #f87171;
+            color: #f87171;
+        }
+
+        .alert-success {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid #4ade80;
+            color: #4ade80;
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🔮 Chaos Payment - 支付混沌工程平台</h1>
+        <div class="status">
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span>服务正常</span>
+            </div>
+            <div class="status-item">
+                <span id="ws-status">连接中...</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>订单操作</h3>
+                <button class="btn btn-primary" onclick="openCreateOrderModal()">创建订单</button>
+                <button class="btn btn-primary" onclick="simulateDuplicateCallback()">模拟重复回调</button>
+                <button class="btn btn-primary" onclick="verifyConsistency()">验证一致性</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>混沌场景</h3>
+                
+                <div class="scenario-toggle">
+                    <span>连接池耗尽</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-connection-pool" onchange="toggleScenario('connection_pool_exhaustion', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="scenario-toggle">
+                    <span>消息积压</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-message-backlog" onchange="toggleScenario('message_backlog', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="scenario-toggle">
+                    <span>Goroutine 泄漏</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-goroutine-leak" onchange="toggleScenario('goroutine_leak', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="scenario-toggle">
+                    <span>数据库锁等待</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-db-lock" onchange="toggleScenario('database_lock_wait', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="scenario-toggle">
+                    <span>缓存脏数据</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-cache-dirty" onchange="toggleScenario('cache_dirty_data', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="scenario-toggle">
+                    <span>配置漂移</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="scenario-config-drift" onchange="toggleScenario('config_drift', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>故障注入</h3>
+                <button class="btn btn-danger" onclick="openInjectModal('connection-pool')">注入连接池耗尽</button>
+                <button class="btn btn-danger" onclick="openInjectModal('message-backlog')">注入消息积压</button>
+                <button class="btn btn-danger" onclick="openInjectModal('goroutine-leak')">注入Goroutine泄漏</button>
+                <button class="btn btn-danger" onclick="openInjectModal('db-lock')">注入数据库锁</button>
+                <button class="btn btn-danger" onclick="openInjectModal('cache-dirty')">注入缓存脏数据</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>异常恢复</h3>
+                <button class="btn btn-success" onclick="openReplayModal()">事件回放</button>
+                <button class="btn btn-success" onclick="openRevertModal()">回滚到快照</button>
+                <button class="btn btn-success" onclick="fixDuplicates()">修复重复回调</button>
+                <button class="btn btn-success" onclick="fixCache()">修复缓存脏数据</button>
+                <button class="btn btn-success" onclick="analyzeAnomalies()">分析异常</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="orders-panel">
+                <h2>订单列表</h2>
+                <div class="orders-list" id="orders-list">
+                </div>
+            </div>
+
+            <div class="timeline-panel">
+                <h2>
+                    事件时间线
+                    <div class="timeline-controls">
+                        <button onclick="loadTimeline()">刷新</button>
+                        <button onclick="clearTimeline()">清空</button>
+                    </div>
+                </h2>
+                <div class="timeline" id="timeline">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="metrics-panel">
+        <div class="metric">
+            <div class="metric-value" id="metric-goroutines">-</div>
+            <div class="metric-label">活跃Goroutine</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value" id="metric-leaks">-</div>
+            <div class="metric-label">泄漏Goroutine</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value" id="metric-orders">-</div>
+            <div class="metric-label">订单总数</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value" id="metric-events">-</div>
+            <div class="metric-label">事件总数</div>
+        </div>
+    </div>
+
+    <div class="modal" id="createOrderModal">
+        <div class="modal-content">
+            <h3>创建订单</h3>
+            <div class="form-group">
+                <label>金额 (元)</label>
+                <input type="number" id="order-amount" value="100.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>支付方式</label>
+                <select id="order-method">
+                    <option value="alipay">支付宝</option>
+                    <option value="wechat">微信支付</option>
+                    <option value="card">银行卡</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('createOrderModal')">取消</button>
+                <button class="btn btn-primary" onclick="createOrder()">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="injectModal">
+        <div class="modal-content">
+            <h3 id="injectModalTitle">故障注入</h3>
+            <div id="injectForm"></div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('injectModal')">取消</button>
+                <button class="btn btn-danger" onclick="executeInjection()">执行</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="replayModal">
+        <div class="modal-content">
+            <h3>事件回放</h3>
+            <div class="form-group">
+                <label>开始时间 (RFC3339)</label>
+                <input type="text" id="replay-start" placeholder="2024-01-01T00:00:00Z">
+            </div>
+            <div class="form-group">
+                <label>结束时间 (RFC3339)</label>
+                <input type="text" id="replay-end" placeholder="2024-01-02T00:00:00Z">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('replayModal')">取消</button>
+                <button class="btn btn-success" onclick="executeReplay()">执行回放</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="revertModal">
+        <div class="modal-content">
+            <h3>回滚到快照</h3>
+            <div class="form-group">
+                <label>快照时间 (RFC3339)</label>
+                <input type="text" id="revert-time" placeholder="选择快照时间">
+            </div>
+            <div id="snapshots-list" style="margin-top: 1rem; max-height: 200px; overflow-y: auto;"></div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('revertModal')">取消</button>
+                <button class="btn btn-success" onclick="executeRevert()">执行回滚</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <script>
+        const API_BASE = '/api';
+        let selectedOrderId = null;
+        let ws = null;
+        let eventCount = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+            loadTimeline();
+            loadScenarioStatus();
+            connectWebSocket();
+            setInterval(updateMetrics, 5000);
+            setInterval(loadOrders, 10000);
+        });
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}${API_BASE}/events/ws`;
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                document.getElementById('ws-status').textContent = 'WebSocket: 已连接';
+                document.getElementById('ws-status').style.color = '#4ade80';
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    addTimelineEvent(data);
+                    eventCount++;
+                    document.getElementById('metric-events').textContent = eventCount;
+                } catch (e) {
+                    console.error('WebSocket message parse error:', e);
+                }
+            };
+            
+            ws.onclose = () => {
+                document.getElementById('ws-status').textContent = 'WebSocket: 断开连接';
+                document.getElementById('ws-status').style.color = '#f87171';
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        async function loadOrders() {
+            try {
+                const response = await fetch(`${API_BASE}/orders`);
+                const data = await response.json();
+                
+                const list = document.getElementById('orders-list');
+                list.innerHTML = '';
+                
+                document.getElementById('metric-orders').textContent = data.total || 0;
+                
+                data.orders.forEach(order => {
+                    const card = document.createElement('div');
+                    card.className = `order-card ${order.id === selectedOrderId ? 'active' : ''}`;
+                    card.onclick = () => selectOrder(order.id);
+                    
+                    const statusClass = `status-${order.status.toLowerCase()}`;
+                    
+                    card.innerHTML = `
+                        <div class="order-id">${order.id.substring(0, 8)}...</div>
+                        <div class="order-amount">¥${order.amount.toFixed(2)}</div>
+                        <div class="order-status ${statusClass}">${order.status}</div>
+                        <div style="font-size: 0.7rem; color: #888; margin-top: 0.25rem;">
+                            回调: ${order.callback_count}次
+                        </div>
+                    `;
+                    
+                    list.appendChild(card);
+                });
+            } catch (error) {
+                showAlert('加载订单失败', 'error');
+            }
+        }
+
+        function selectOrder(orderId) {
+            selectedOrderId = orderId;
+            loadOrders();
+            loadTimeline();
+        }
+
+        async function loadTimeline() {
+            try {
+                const params = new URLSearchParams();
+                if (selectedOrderId) {
+                }
+                
+                const response = await fetch(`${API_BASE}/events/timeline?${params}`);
+                const events = await response.json();
+                
+                const timeline = document.getElementById('timeline');
+                timeline.innerHTML = '';
+                
+                events.forEach(event => {
+                    addTimelineEvent(event, false);
+                });
+            } catch (error) {
+                console.error('Load timeline error:', error);
+            }
+        }
+
+        function addTimelineEvent(event, prepend = true) {
+            const timeline = document.getElementById('timeline');
+            const item = document.createElement('div');
+            
+            const eventTypeClass = event.event_type.toLowerCase().replace(/_/g, '-');
+            item.className = `timeline-item event-${eventTypeClass}`;
+            
+            const time = new Date(event.timestamp);
+            const timeStr = time.toLocaleTimeString('zh-CN', { hour12: false });
+            
+            let details = '';
+            if (event.new_value) {
+                try {
+                    const parsed = JSON.parse(event.new_value);
+                    details = JSON.stringify(parsed, null, 2);
+                } catch {
+                    details = event.new_value;
+                }
+            }
+            
+            item.innerHTML = `
+                <div class="timeline-time">${timeStr}</div>
+                <div class="timeline-content">
+                    <div class="timeline-type">${formatEventType(event.event_type)}</div>
+                    <div class="timeline-source">来源: ${event.source || 'unknown'} | 实体: ${event.entity_id?.substring(0, 8) || 'N/A'}</div>
+                    ${details ? `<div class="timeline-details">${escapeHtml(details)}</div>` : ''}
+                </div>
+            `;
+            
+            if (prepend) {
+                timeline.insertBefore(item, timeline.firstChild);
+            } else {
+                timeline.appendChild(item);
+            }
+        }
+
+        function formatEventType(type) {
+            const map = {
+                'ORDER_CREATED': '📦 订单创建',
+                'ORDER_STATUS_CHANGED': '🔄 状态变更',
+                'PAYMENT_CALLBACK': '💰 支付回调',
+                'DUPLICATE_CALLBACK': '⚠️ 重复回调',
+                'STATE_SNAPSHOT': '📸 状态快照',
+                'CHAOS_INJECTED': '🔥 混沌注入',
+                'RECOVERY_ACTION': '✅ 恢复操作',
+                'CACHE_WRITE': '💾 缓存写入',
+                'CACHE_READ': '📖 缓存读取',
+                'DB_TRANSACTION': '🗄️ 数据库事务',
+                'GOROUTINE_SPAWNED': '🟢 Goroutine创建',
+                'GOROUTINE_LEAKED': '🔴 Goroutine泄漏'
+            };
+            return map[type] || type;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function clearTimeline() {
+            document.getElementById('timeline').innerHTML = '';
+            eventCount = 0;
+            document.getElementById('metric-events').textContent = '0';
+        }
+
+        async function loadScenarioStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/chaos/status`);
+                const status = await response.json();
+                
+                document.getElementById('scenario-connection-pool').checked = status.connection_pool_exhaustion;
+                document.getElementById('scenario-message-backlog').checked = status.message_backlog;
+                document.getElementById('scenario-goroutine-leak').checked = status.goroutine_leak;
+                document.getElementById('scenario-db-lock').checked = status.database_lock_wait;
+                document.getElementById('scenario-cache-dirty').checked = status.cache_dirty_data;
+                document.getElementById('scenario-config-drift').checked = status.config_drift;
+            } catch (error) {
+                console.error('Load scenario status error:', error);
+            }
+        }
+
+        async function toggleScenario(name, enabled) {
+            try {
+                await fetch(`${API_BASE}/chaos/scenarios/${name}/toggle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled })
+                });
+                showAlert(`场景 ${name} 已${enabled ? '启用' : '禁用'}`, 'success');
+            } catch (error) {
+                showAlert('切换场景失败', 'error');
+            }
+        }
+
+        async function updateMetrics() {
+            try {
+                const response = await fetch(`${API_BASE}/chaos/metrics`);
+                const metrics = await response.json();
+                
+                document.getElementById('metric-goroutines').textContent = metrics.active_goroutines?.toFixed(0) || '-';
+                document.getElementById('metric-leaks').textContent = metrics.active_leaks?.toFixed(0) || '-';
+            } catch (error) {
+                console.error('Update metrics error:', error);
+            }
+        }
+
+        function openCreateOrderModal() {
+            document.getElementById('createOrderModal').classList.add('active');
+        }
+
+        async function createOrder() {
+            const amount = parseFloat(document.getElementById('order-amount').value);
+            const method = document.getElementById('order-method').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, payment_method: method })
+                });
+                
+                const order = await response.json();
+                selectedOrderId = order.id;
+                closeModal('createOrderModal');
+                loadOrders();
+                showAlert('订单创建成功', 'success');
+            } catch (error) {
+                showAlert('创建订单失败', 'error');
+            }
+        }
+
+        async function simulateDuplicateCallback() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/orders/${selectedOrderId}/simulate-duplicate`, {
+                    method: 'POST'
+                });
+                showAlert('重复回调模拟已启动', 'success');
+            } catch (error) {
+                showAlert('模拟失败', 'error');
+            }
+        }
+
+        async function verifyConsistency() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/orders/${selectedOrderId}/verify`);
+                const data = await response.json();
+                
+                if (data.is_consistent) {
+                    showAlert(data.details, 'success');
+                } else {
+                    showAlert(data.details || data.error || '订单状态不一致', 'error');
+                }
+            } catch (error) {
+                showAlert('验证失败', 'error');
+            }
+        }
+
+        let currentInjectionType = null;
+
+        function openInjectModal(type) {
+            currentInjectionType = type;
+            const modal = document.getElementById('injectModal');
+            const form = document.getElementById('injectForm');
+            const title = document.getElementById('injectModalTitle');
+            
+            let formHtml = '';
+            
+            switch(type) {
+                case 'connection-pool':
+                    title.textContent = '注入连接池耗尽';
+                    formHtml = `
+                        <div class="form-group">
+                            <label>持续时间 (毫秒)</label>
+                            <input type="number" id="inject-duration" value="30000">
+                        </div>
+                    `;
+                    break;
+                case 'message-backlog':
+                    title.textContent = '注入消息积压';
+                    formHtml = `
+                        <div class="form-group">
+                            <label>队列大小</label>
+                            <input type="number" id="inject-queue-size" value="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>处理延迟 (毫秒)</label>
+                            <input type="number" id="inject-delay" value="2000">
+                        </div>
+                    `;
+                    break;
+                case 'goroutine-leak':
+                    title.textContent = '注入Goroutine泄漏';
+                    formHtml = `
+                        <div class="form-group">
+                            <label>泄漏率 (0-1)</label>
+                            <input type="number" id="inject-leak-rate" value="0.1" step="0.1" min="0" max="1">
+                        </div>
+                    `;
+                    break;
+                case 'db-lock':
+                    title.textContent = '注入数据库锁';
+                    if (!selectedOrderId) {
+                        formHtml = '<div class="alert alert-warning">请先选择一个订单</div>';
+                    } else {
+                        formHtml = `
+                            <div class="form-group">
+                                <label>锁持有时间 (毫秒)</label>
+                                <input type="number" id="inject-lock-time" value="10000">
+                            </div>
+                        `;
+                    }
+                    break;
+                case 'cache-dirty':
+                    title.textContent = '注入缓存脏数据';
+                    if (!selectedOrderId) {
+                        formHtml = '<div class="alert alert-warning">请先选择一个订单</div>';
+                    } else {
+                        formHtml = `
+                            <div class="form-group">
+                                <label>脏数据率 (0-1)</label>
+                                <input type="number" id="inject-dirty-rate" value="0.5" step="0.1" min="0" max="1">
+                            </div>
+                        `;
+                    }
+                    break;
+            }
+            
+            form.innerHTML = formHtml;
+            modal.classList.add('active');
+        }
+
+        async function executeInjection() {
+            if (!currentInjectionType) return;
+            
+            let url = '';
+            let body = {};
+            
+            switch(currentInjectionType) {
+                case 'connection-pool':
+                    url = `${API_BASE}/chaos/inject/connection-pool`;
+                    body = { duration_ms: parseInt(document.getElementById('inject-duration').value) };
+                    break;
+                case 'message-backlog':
+                    url = `${API_BASE}/chaos/inject/message-backlog`;
+                    body = {
+                        queue_size: parseInt(document.getElementById('inject-queue-size').value),
+                        processing_delay_ms: parseInt(document.getElementById('inject-delay').value)
+                    };
+                    break;
+                case 'goroutine-leak':
+                    url = `${API_BASE}/chaos/inject/goroutine-leak`;
+                    body = { leak_rate: parseFloat(document.getElementById('inject-leak-rate').value) };
+                    break;
+                case 'db-lock':
+                    if (!selectedOrderId) {
+                        showAlert('请先选择一个订单', 'warning');
+                        return;
+                    }
+                    url = `${API_BASE}/chaos/inject/db-lock/${selectedOrderId}`;
+                    body = { lock_hold_time_ms: parseInt(document.getElementById('inject-lock-time').value) };
+                    break;
+                case 'cache-dirty':
+                    if (!selectedOrderId) {
+                        showAlert('请先选择一个订单', 'warning');
+                        return;
+                    }
+                    url = `${API_BASE}/chaos/inject/cache-dirty/${selectedOrderId}`;
+                    body = { dirty_rate: parseFloat(document.getElementById('inject-dirty-rate').value) };
+                    break;
+            }
+            
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                closeModal('injectModal');
+                showAlert('故障注入成功', 'success');
+            } catch (error) {
+                showAlert('故障注入失败', 'error');
+            }
+        }
+
+        function openReplayModal() {
+            document.getElementById('replayModal').classList.add('active');
+        }
+
+        async function executeReplay() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            const startTime = document.getElementById('replay-start').value;
+            const endTime = document.getElementById('replay-end').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/recovery/replay/${selectedOrderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ start_time: startTime, end_time: endTime })
+                });
+                
+                const result = await response.json();
+                closeModal('replayModal');
+                showAlert(`回放完成: 处理了 ${result.events_processed} 个事件`, 'success');
+            } catch (error) {
+                showAlert('回放失败', 'error');
+            }
+        }
+
+        async function openRevertModal() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/orders/${selectedOrderId}/snapshots`);
+                const snapshots = await response.json();
+                
+                const list = document.getElementById('snapshots-list');
+                list.innerHTML = '';
+                
+                snapshots.forEach(snap => {
+                    const div = document.createElement('div');
+                    div.className = 'scenario-toggle';
+                    div.style.cursor = 'pointer';
+                    div.onclick = () => {
+                        document.getElementById('revert-time').value = snap.timestamp;
+                    };
+                    
+                    const time = new Date(snap.timestamp);
+                    div.innerHTML = `
+                        <span>${time.toLocaleString('zh-CN')}</span>
+                        <span style="font-size: 0.75rem; color: #888;">点击选择</span>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Load snapshots error:', error);
+            }
+            
+            document.getElementById('revertModal').classList.add('active');
+        }
+
+        async function executeRevert() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            const snapshotTime = document.getElementById('revert-time').value;
+            if (!snapshotTime) {
+                showAlert('请选择快照时间', 'warning');
+                return;
+            }
+            
+            try {
+                await fetch(`${API_BASE}/recovery/revert/${selectedOrderId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ snapshot_time: snapshotTime })
+                });
+                
+                closeModal('revertModal');
+                loadOrders();
+                showAlert('回滚成功', 'success');
+            } catch (error) {
+                showAlert('回滚失败', 'error');
+            }
+        }
+
+        async function fixDuplicates() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/recovery/fix-duplicates/${selectedOrderId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.fixed) {
+                    loadOrders();
+                    showAlert('重复回调已修复', 'success');
+                } else {
+                    showAlert('没有需要修复的重复回调', 'warning');
+                }
+            } catch (error) {
+                showAlert('修复失败', 'error');
+            }
+        }
+
+        async function fixCache() {
+            if (!selectedOrderId) {
+                showAlert('请先选择一个订单', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/recovery/fix-cache/${selectedOrderId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.fixed) {
+                    showAlert('缓存已与数据库同步', 'success');
+                } else {
+                    showAlert('缓存已正常', 'warning');
+                }
+            } catch (error) {
+                showAlert('修复失败', 'error');
+            }
+        }
+
+        async function analyzeAnomalies() {
+            try {
+                const response = await fetch(`${API_BASE}/recovery/anomalies`);
+                const anomalies = await response.json();
+                
+                if (anomalies.length === 0) {
+                    showAlert('未检测到异常', 'success');
+                } else {
+                    alert(`检测到 ${anomalies.length} 个异常:\n\n` + 
+                        anomalies.map(a => `- ${a.message} (${a.type})`).join('\n'));
+                }
+            } catch (error) {
+                showAlert('分析失败', 'error');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.position = 'fixed';
+            alert.style.top = '80px';
+            alert.style.right = '20px';
+            alert.style.zIndex = '2000';
+            alert.style.animation = 'slideIn 0.3s ease';
+            
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.3s';
+                setTimeout(() => alert.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
