@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package payment;
+option go_package = "github.com/chaos-simulator/chaos-simulator/api/proto;payment";
+
+message ProcessPaymentRequest {
+  string trace_id = 1;
+  string order_id = 2;
+  string user_id = 3;
+  int64 amount = 4;
+  string currency = 5;
+  string payment_method = 6;
+  map<string, string> metadata = 7;
+}
+
+message ProcessPaymentResponse {
+  string payment_id = 1;
+  string status = 2;
+  string message = 3;
+  int64 processed_at = 4;
+  string transaction_id = 5;
+}
+
+message RefundPaymentRequest {
+  string trace_id = 1;
+  string payment_id = 2;
+  string order_id = 3;
+  int64 amount = 4;
+  string reason = 5;
+}
+
+message RefundPaymentResponse {
+  bool success = 1;
+  string refund_id = 2;
+  string message = 3;
+}
+
+message GetPaymentStatusRequest {
+  string trace_id = 1;
+  string payment_id = 2;
+}
+
+message GetPaymentStatusResponse {
+  string payment_id = 1;
+  string order_id = 2;
+  string status = 3;
+  int64 amount = 4;
+  int64 created_at = 5;
+}
+
+service PaymentService {
+  rpc ProcessPayment(ProcessPaymentRequest) returns (ProcessPaymentResponse);
+  rpc RefundPayment(RefundPaymentRequest) returns (RefundPaymentResponse);
+  rpc GetPaymentStatus(GetPaymentStatusRequest) returns (GetPaymentStatusResponse);
+}

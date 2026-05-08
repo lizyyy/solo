@@ -1,0 +1,60 @@
+server:
+  gateway:
+    port: 8080
+    grpc_port: 50051
+  order_service:
+    port: 50052
+  payment_service:
+    port: 50053
+  inventory_service:
+    port: 50054
+  control_center:
+    port: 8081
+
+database:
+  type: sqlite
+  sqlite:
+    path: ./data/chaos_simulator.db
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  vhost: /
+  exchange: chaos_exchange
+  queue:
+    order: order_queue
+    payment: payment_queue
+    inventory: inventory_queue
+    dead_letter: dead_letter_queue
+
+tracing:
+  enabled: true
+  otel:
+    endpoint: localhost:4317
+    service_name: chaos-simulator
+  business:
+    enabled: true
+    storage: database
+
+chaos:
+  default_timeout_ms: 1000
+  max_retries: 3
+  retry_backoff_ms: 100
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 0.5
+    success_threshold: 0.8
+    timeout_ms: 5000
+
+logging:
+  level: info
+  format: json
+  output: stdout

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package inventory;
+option go_package = "github.com/chaos-simulator/chaos-simulator/api/proto;inventory";
+
+message DeductStockRequest {
+  string trace_id = 1;
+  string order_id = 2;
+  repeated StockItem items = 3;
+  string operation_id = 4;
+}
+
+message StockItem {
+  string product_id = 1;
+  int32 quantity = 2;
+}
+
+message DeductStockResponse {
+  bool success = 1;
+  string message = 2;
+  string operation_id = 3;
+  repeated StockItem failed_items = 4;
+}
+
+message AddStockRequest {
+  string trace_id = 1;
+  string operation_id = 2;
+  repeated StockItem items = 3;
+  string reason = 4;
+}
+
+message AddStockResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message GetStockRequest {
+  string trace_id = 1;
+  repeated string product_ids = 2;
+}
+
+message GetStockResponse {
+  repeated StockInfo stocks = 1;
+}
+
+message StockInfo {
+  string product_id = 1;
+  int32 available = 2;
+  int32 reserved = 3;
+  int32 total = 4;
+}
+
+service InventoryService {
+  rpc DeductStock(DeductStockRequest) returns (DeductStockResponse);
+  rpc AddStock(AddStockRequest) returns (AddStockResponse);
+  rpc GetStock(GetStockRequest) returns (GetStockResponse);
+}
