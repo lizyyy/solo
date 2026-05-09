@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistChaos - 分布式系统混沌工程平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        
+        .header .status {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+        }
+        
+        .status-online {
+            background-color: #064e3b;
+            color: #6ee7b7;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: calc(100vh - 73px);
+        }
+        
+        .sidebar {
+            background-color: #1e293b;
+            border-right: 1px solid #334155;
+            padding: 1.5rem;
+        }
+        
+        .sidebar h2 {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .chaos-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background-color: #334155;
+            border: 1px solid #475569;
+            border-radius: 0.5rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .chaos-btn:hover {
+            background-color: #475569;
+            border-color: #60a5fa;
+        }
+        
+        .chaos-btn.active {
+            background-color: #1e40af;
+            border-color: #3b82f6;
+        }
+        
+        .main-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+        }
+        
+        .card {
+            background-color: #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #334155;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.75rem;
+            top: 1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            border: 2px solid #1e293b;
+        }
+        
+        .timeline-item.success::before { background-color: #10b981; }
+        .timeline-item.failed::before { background-color: #ef4444; }
+        .timeline-item.pending::before { background-color: #f59e0b; }
+        .timeline-item.retrying::before { background-color: #8b5cf6; }
+        
+        .timeline-item h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .timeline-item .meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-item .payload {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #60a5fa;
+            background-color: #0f172a;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            word-break: break-all;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid #334155;
+        }
+        
+        .metric-card .label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        
+        .metric-card.warning .value { color: #f59e0b; }
+        .metric-card.danger .value { color: #ef4444; }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #334155;
+            }
+        }
+        
+        .log-panel {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .log-entry .timestamp {
+            color: #64748b;
+            margin-right: 0.5rem;
+        }
+        
+        .log-entry .level-success { color: #10b981; }
+        .log-entry .level-error { color: #ef4444; }
+        .log-entry .level-warning { color: #f59e0b; }
+        .log-entry .level-info { color: #60a5fa; }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #e2e8f0;
+        }
+        
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔥 DistChaos - 分布式系统混沌工程平台</h1>
+        <div class="status">
+            <span class="status-badge status-online">● 服务运行中</span>
+            <span id="eventCount" class="status-badge" style="background: #1e3a8a; color: #93c5fd;">事件: 0</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h2>混沌实验</h2>
+            <button class="chaos-btn" onclick="injectChaos('connection_pool')">
+                🔌 连接池耗尽
+            </button>
+            <button class="chaos-btn" onclick="injectChaos('message_backlog')">
+                📨 消息积压
+            </button>
+            <button class="chaos-btn" onclick="injectChaos('goroutine_leak')">
+                🧵 Goroutine泄漏
+            </button>
+            <button class="chaos-btn" onclick="injectChaos('db_lock_wait')">
+                🔒 数据库锁等待
+            </button>
+            <button class="chaos-btn" onclick="injectChaos('cache_dirty_data')">
+                💾 缓存脏数据
+            </button>
+            <button class="chaos-btn" onclick="injectChaos('config_drift')">
+                ⚙️ 配置漂移
+            </button>
+            
+            <h2 style="margin-top: 2rem;">业务操作</h2>
+            <button class="chaos-btn" onclick="createOrder(1, 1, 1)">
+                📦 创建正常订单
+            </button>
+            <button class="chaos-btn" onclick="createOrder(1, 1, 200)">
+                ❌ 库存不足 (模拟失败)
+            </button>
+            
+            <h2 style="margin-top: 2rem;">系统操作</h2>
+            <button class="chaos-btn" onclick="stopAllChaos()">
+                🛑 停止所有实验
+            </button>
+            <button class="chaos-btn" onclick="refreshEvents()">
+                🔄 刷新事件
+            </button>
+        </div>
+        
+        <div class="main-content">
+            <div class="section">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="label">总事件数</div>
+                        <div class="value" id="metric-events">0</div>
+                    </div>
+                    <div class="metric-card" id="metric-goroutine-card">
+                        <div class="label">Goroutine数</div>
+                        <div class="value" id="metric-goroutines">-</div>
+                    </div>
+                    <div class="metric-card" id="metric-connections-card">
+                        <div class="label">连接池状态</div>
+                        <div class="value" id="metric-connections">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">活跃场景</div>
+                        <div class="value" id="metric-scenarios">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('timeline')">事件时间线</button>
+                        <button class="tab" onclick="switchTab('trace')">链路追踪</button>
+                        <button class="tab" onclick="switchTab('replay')">状态回放</button>
+                        <button class="tab" onclick="switchTab('logs')">实时日志</button>
+                    </div>
+                    
+                    <div id="tab-timeline" class="tab-content active">
+                        <div class="section-title">实时事件时间线</div>
+                        <div id="timeline" class="timeline">
+                            <p style="color: #94a3b8; text-align: center; padding: 2rem;">
+                                暂无事件，请先执行业务操作或注入混沌实验
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div id="tab-trace" class="tab-content">
+                        <div class="section-title">链路追踪</div>
+                        <div class="form-group">
+                            <label>输入 Trace ID 查看完整链路</label>
+                            <input type="text" id="traceIdInput" placeholder="例如: a1b2c3d4-..." />
+                        </div>
+                        <button class="btn btn-primary" onclick="queryTrace()">查询链路</button>
+                        <div id="traceResult" style="margin-top: 1.5rem;"></div>
+                    </div>
+                    
+                    <div id="tab-replay" class="tab-content">
+                        <div class="section-title">状态回放</div>
+                        <div class="form-group">
+                            <label>输入 Trace ID 进行回放</label>
+                            <input type="text" id="replayTraceId" placeholder="输入要回放的 Trace ID" />
+                        </div>
+                        <button class="btn btn-success" onclick="replayTrace()">开始回放</button>
+                        <div id="replayResult" style="margin-top: 1.5rem;"></div>
+                    </div>
+                    
+                    <div id="tab-logs" class="tab-content">
+                        <div class="section-title">实时日志流</div>
+                        <div id="logPanel" class="log-panel">
+                            <div class="log-entry">
+                                <span class="timestamp">[系统]</span>
+                                <span class="level-info">等待事件流...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div class="card">
+                    <div class="section-title">混沌实验参数配置</div>
+                    <div class="form-group">
+                        <label>实验类型</label>
+                        <select id="chaosType">
+                            <option value="connection_pool">连接池耗尽</option>
+                            <option value="message_backlog">消息积压</option>
+                            <option value="goroutine_leak">Goroutine泄漏</option>
+                            <option value="db_lock_wait">数据库锁等待</option>
+                            <option value="cache_dirty_data">缓存脏数据</option>
+                            <option value="config_drift">配置漂移</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>持续时间</label>
+                        <select id="chaosDuration">
+                            <option value="10s">10秒</option>
+                            <option value="30s" selected>30秒</option>
+                            <option value="1m">1分钟</option>
+                            <option value="5m">5分钟</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>自定义参数 (JSON)</label>
+                        <input type="text" id="chaosParams" placeholder='{"leak_count": 100}' />
+                    </div>
+                    <button class="btn btn-primary" onclick="injectChaosCustom()">开始实验</button>
+                    <button class="btn btn-danger" onclick="stopChaos()" style="margin-left: 0.5rem;">停止实验</button>
+                </div>
+                
+                <div class="card">
+                    <div class="section-title">系统状态</div>
+                    <pre id="systemStatus" style="font-family: monospace; font-size: 0.85rem; color: #60a5fa; background: #0f172a; padding: 1rem; border-radius: 0.5rem;">
+点击刷新查看状态
+                    </pre>
+                    <button class="btn btn-primary" onclick="getSystemStatus()" style="margin-top: 1rem;">刷新状态</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080/api/v1';
+        let sseConnection = null;
+        
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    ...options
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return { error: error.message };
+            }
+        }
+        
+        async function createOrder(userId, productId, quantity) {
+            const result = await apiCall('/orders', {
+                method: 'POST',
+                body: JSON.stringify({ user_id: userId, product_id: productId, quantity })
+            });
+            addLog('info', `创建订单: ${JSON.stringify(result)}`);
+            if (result.trace_id) {
+                addLog('info', `Trace ID: ${result.trace_id}`);
+            }
+            refreshEvents();
+            return result;
+        }
+        
+        async function injectChaos(type) {
+            document.getElementById('chaosType').value = type;
+            const result = await apiCall('/chaos/inject', {
+                method: 'POST',
+                body: JSON.stringify({ type, duration: '30s' })
+            });
+            addLog('warning', `注入混沌实验: ${type}`);
+            refreshEvents();
+            getSystemStatus();
+            return result;
+        }
+        
+        async function injectChaosCustom() {
+            const type = document.getElementById('chaosType').value;
+            const duration = document.getElementById('chaosDuration').value;
+            let params = {};
+            try {
+                const paramsStr = document.getElementById('chaosParams').value;
+                if (paramsStr) {
+                    params = JSON.parse(paramsStr);
+                }
+            } catch (e) {
+                addLog('error', '参数格式错误');
+                return;
+            }
+            
+            const result = await apiCall('/chaos/inject', {
+                method: 'POST',
+                body: JSON.stringify({ type, duration, params })
+            });
+            addLog('warning', `注入混沌实验: ${type}, 时长: ${duration}`);
+            refreshEvents();
+            getSystemStatus();
+            return result;
+        }
+        
+        async function stopChaos() {
+            const type = document.getElementById('chaosType').value;
+            const result = await apiCall(`/chaos/stop/${type}`, {
+                method: 'POST'
+            });
+            addLog('success', `停止混沌实验: ${type}`);
+            refreshEvents();
+            getSystemStatus();
+            return result;
+        }
+        
+        async function stopAllChaos() {
+            const types = ['connection_pool', 'message_backlog', 'goroutine_leak', 'db_lock_wait', 'cache_dirty_data', 'config_drift'];
+            for (const type of types) {
+                await apiCall(`/chaos/stop/${type}`, { method: 'POST' });
+            }
+            addLog('success', '已停止所有混沌实验');
+            refreshEvents();
+            getSystemStatus();
+        }
+        
+        async function refreshEvents() {
+            const result = await apiCall('/events?limit=50');
+            if (result.events) {
+                renderTimeline(result.events);
+                updateMetrics(result.events);
+            }
+        }
+        
+        async function getSystemStatus() {
+            const result = await apiCall('/chaos/status');
+            document.getElementById('systemStatus').textContent = JSON.stringify(result, null, 2);
+            
+            if (result.goroutine_leak) {
+                const gCount = result.goroutine_leak.total_goroutines || 0;
+                document.getElementById('metric-goroutines').textContent = gCount;
+                const card = document.getElementById('metric-goroutine-card');
+                card.className = gCount > 100 ? 'metric-card danger' : 'metric-card';
+            }
+            
+            if (result.connection_pool) {
+                const conn = result.connection_pool;
+                document.getElementById('metric-connections').textContent = 
+                    `${conn.current_connections || 0}/${conn.max_connections || 10}`;
+            }
+            
+            if (result.active_scenarios) {
+                const count = Object.keys(result.active_scenarios).length;
+                document.getElementById('metric-scenarios').textContent = count;
+            }
+        }
+        
+        async function queryTrace() {
+            const traceId = document.getElementById('traceIdInput').value;
+            if (!traceId) {
+                addLog('error', '请输入 Trace ID');
+                return;
+            }
+            
+            const result = await apiCall(`/events/${traceId}`);
+            const container = document.getElementById('traceResult');
+            
+            if (result.events && result.events.length > 0) {
+                container.innerHTML = `
+                    <h4 style="margin-bottom: 1rem; color: #60a5fa;">
+                        链路追踪结果 (${result.events.length} 个事件)
+                    </h4>
+                    <div class="timeline">
+                        ${result.events.map(renderTimelineItem).join('')}
+                    </div>
+                `;
+                addLog('success', `查询到 ${result.events.length} 个事件`);
+            } else {
+                container.innerHTML = '<p style="color: #94a3b8;">未找到该 Trace ID 的事件</p>';
+            }
+        }
+        
+        async function replayTrace() {
+            const traceId = document.getElementById('replayTraceId').value;
+            if (!traceId) {
+                addLog('error', '请输入 Trace ID');
+                return;
+            }
+            
+            const result = await apiCall(`/events/${traceId}/replay`, {
+                method: 'POST'
+            });
+            
+            document.getElementById('replayResult').innerHTML = `
+                <pre style="font-family: monospace; background: #0f172a; padding: 1rem; border-radius: 0.5rem;">
+${JSON.stringify(result, null, 2)}
+                </pre>
+            `;
+            
+            addLog('info', `开始回放: ${traceId}`);
+            setTimeout(refreshEvents, 1000);
+        }
+        
+        function renderTimeline(events) {
+            const container = document.getElementById('timeline');
+            document.getElementById('metric-events').textContent = events.length;
+            document.getElementById('eventCount').textContent = `事件: ${events.length}`;
+            
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <p style="color: #94a3b8; text-align: center; padding: 2rem;">
+                        暂无事件，请先执行业务操作或注入混沌实验
+                    </p>
+                `;
+                return;
+            }
+            
+            const sortedEvents = [...events].sort((a, b) => 
+                new Date(a.timestamp) - new Date(b.timestamp)
+            );
+            
+            container.innerHTML = sortedEvents.map(renderTimelineItem).join('');
+        }
+        
+        function renderTimelineItem(event) {
+            const statusClass = event.status.toLowerCase();
+            const typeColor = getTypeColor(event.type);
+            const time = new Date(event.timestamp).toLocaleTimeString('zh-CN');
+            
+            return `
+                <div class="timeline-item ${statusClass}">
+                    <h4 style="color: ${typeColor};">
+                        ${event.type}
+                        <span style="font-size: 0.75rem; color: #64748b; margin-left: 0.5rem;">
+                            [${event.status}]
+                        </span>
+                    </h4>
+                    <div class="meta">
+                        <span>服务: ${event.service}</span> | 
+                        <span>时间: ${time}</span>
+                        ${event.duration ? `| 耗时: ${event.duration}` : ''}
+                    </div>
+                    ${event.error ? `<div style="color: #ef4444; margin: 0.5rem 0;">错误: ${event.error}</div>` : ''}
+                    <div class="payload">
+                        ${JSON.stringify(event.payload || {}, null, 2)}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getTypeColor(type) {
+            const colors = {
+                'inventory_reserved': '#10b981',
+                'inventory_released': '#f59e0b',
+                'order_created': '#3b82f6',
+                'order_failed': '#ef4444',
+                'payment_succeeded': '#10b981',
+                'payment_failed': '#ef4444',
+                'compensation_start': '#8b5cf6',
+                'compensation_retry': '#f59e0b',
+                'compensation_failed': '#ef4444',
+                'compensation_success': '#10b981',
+                'chaos_inject': '#f59e0b',
+                'chaos_recover': '#10b981',
+                'connection_exhausted': '#ef4444',
+                'message_backlog': '#f59e0b',
+                'goroutine_leak': '#ef4444',
+                'db_lock_wait': '#f59e0b',
+                'cache_dirty': '#ef4444',
+                'config_drift': '#f59e0b',
+            };
+            return colors[type] || '#60a5fa';
+        }
+        
+        function updateMetrics(events) {
+            document.getElementById('metric-events').textContent = events.length;
+        }
+        
+        function addLog(level, message) {
+            const panel = document.getElementById('logPanel');
+            const timestamp = new Date().toLocaleTimeString('zh-CN');
+            const levelClass = `level-${level}`;
+            const levelText = {
+                'info': 'INFO',
+                'success': 'SUCCESS',
+                'warning': 'WARNING',
+                'error': 'ERROR'
+            }[level] || 'INFO';
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="timestamp">[${timestamp}]</span>
+                <span class="${levelClass}">[${levelText}]</span>
+                <span>${message}</span>
+            `;
+            
+            panel.appendChild(entry);
+            panel.scrollTop = panel.scrollHeight;
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        function connectSSE() {
+            if (typeof EventSource !== 'undefined') {
+                try {
+                    sseConnection = new EventSource(`${API_BASE}/sse/events`);
+                    sseConnection.onmessage = function(e) {
+                        try {
+                            const events = JSON.parse(e.data);
+                            renderTimeline(events);
+                        } catch (err) {
+                            console.error('SSE Parse Error:', err);
+                        }
+                    };
+                    sseConnection.onerror = function(e) {
+                        console.error('SSE Error:', e);
+                        setTimeout(connectSSE, 5000);
+                    };
+                    addLog('info', '已连接实时事件流');
+                } catch (e) {
+                    console.error('SSE Connection Error:', e);
+                    setTimeout(connectSSE, 5000);
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshEvents();
+            getSystemStatus();
+            connectSSE();
+            
+            setInterval(refreshEvents, 5000);
+            setInterval(getSystemStatus, 10000);
+        });
+    </script>
+</body>
+</html>
