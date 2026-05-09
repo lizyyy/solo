@@ -1,0 +1,14 @@
+2024-01-15 10:00:00 INFO app.main - 系统启动成功
+2024-01-15 10:00:01 DEBUG app.config - 加载配置文件
+2024-01-15 10:00:02 INFO app.database - 数据库连接成功
+2024-01-15 10:00:05 WARNING app.cache - 缓存服务器响应较慢，耗时 1500ms
+2024-01-15 10:00:10 INFO app.api - 处理请求 /api/users
+2024-01-15 10:00:15 ERROR app.api - 用户不存在: user_123
+Traceback (most recent call last):
+  File "app.py", line 45, in get_user
+    raise UserNotFoundError("用户不存在")
+UserNotFoundError: 用户不存在
+2024-01-15 10:00:20 INFO app.api - 处理请求 /api/orders
+2024-01-15 10:00:25 CRITICAL app.system - 数据库连接池已满，请检查连接配置
+2024-01-15 10:00:30 INFO app.main - 系统运行正常
+2024-01-15 10:00:35 DEBUG app.monitor - 内存使用率: 65%

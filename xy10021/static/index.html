@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日志分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: #fff;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #d0d0d0;
+        }
+        
+        .tab-content {
+            display: none;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            font-family: monospace;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        button.danger {
+            background: #e74c3c;
+        }
+        
+        button.danger:hover {
+            background: #c0392b;
+        }
+        
+        button.success {
+            background: #27ae60;
+        }
+        
+        button.success:hover {
+            background: #229954;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-DEBUG { background: #95a5a6; color: #fff; }
+        .badge-INFO { background: #3498db; color: #fff; }
+        .badge-WARNING { background: #f39c12; color: #fff; }
+        .badge-ERROR { background: #e74c3c; color: #fff; }
+        .badge-CRITICAL { background: #8e44ad; color: #fff; }
+        
+        .badge-pending { background: #95a5a6; color: #fff; }
+        .badge-running { background: #3498db; color: #fff; }
+        .badge-completed { background: #27ae60; color: #fff; }
+        .badge-failed { background: #e74c3c; color: #fff; }
+        .badge-retrying { background: #f39c12; color: #fff; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-buttons button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .pagination button {
+            padding: 5px 10px;
+        }
+        
+        .pagination button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .pre-wrap {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>日志分析系统</h1>
+            <button onclick="loadDashboard()">刷新</button>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')">概览</button>
+            <button class="tab" onclick="switchTab('sources')">日志源</button>
+            <button class="tab" onclick="switchTab('logs')">日志查询</button>
+            <button class="tab" onclick="switchTab('tasks')">任务管理</button>
+            <button class="tab" onclick="switchTab('reports')">报告导出</button>
+            <button class="tab" onclick="switchTab('audit')">操作历史</button>
+        </div>
+        
+        <div id="dashboard" class="tab-content active">
+            <h2>系统概览</h2>
+            <div id="dashboard-stats" class="stats-grid"></div>
+        </div>
+        
+        <div id="sources" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>日志源管理</h2>
+                <button onclick="showCreateSourceModal()">+ 添加日志源</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>版本</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="sources-list"></tbody>
+            </table>
+        </div>
+        
+        <div id="logs" class="tab-content">
+            <h2>日志查询</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                <div class="form-group">
+                    <label>日志源</label>
+                    <select id="log-source-filter">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>日志级别</label>
+                    <select id="log-level-filter">
+                        <option value="">全部</option>
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="INFO">INFO</option>
+                        <option value="WARNING">WARNING</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>关键词</label>
+                    <input type="text" id="log-keyword" placeholder="搜索消息内容">
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="log-start-time">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="log-end-time">
+                </div>
+            </div>
+            <button onclick="searchLogs()">查询</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>时间</th>
+                        <th>级别</th>
+                        <th>模块</th>
+                        <th>消息</th>
+                        <th>Trace ID</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-list"></tbody>
+            </table>
+            <div id="logs-pagination" class="pagination"></div>
+        </div>
+        
+        <div id="tasks" class="tab-content">
+            <h2>任务管理</h2>
+            <div style="margin-bottom: 15px;">
+                <label>状态筛选：</label>
+                <select id="task-status-filter" onchange="loadTasks()">
+                    <option value="">全部</option>
+                    <option value="pending">待处理</option>
+                    <option value="running">运行中</option>
+                    <option value="completed">已完成</option>
+                    <option value="failed">失败</option>
+                    <option value="retrying">重试中</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>任务ID</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>重试次数</th>
+                        <th>创建时间</th>
+                        <th>完成时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tasks-list"></tbody>
+            </table>
+        </div>
+        
+        <div id="reports" class="tab-content">
+            <h2>报告导出</h2>
+            <div id="report-summary"></div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                <div class="form-group">
+                    <label>日志源</label>
+                    <select id="report-source">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>日志级别</label>
+                    <select id="report-level">
+                        <option value="">全部</option>
+                        <option value="ERROR">仅错误</option>
+                        <option value="WARNING">警告及以上</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>开始时间</label>
+                    <input type="datetime-local" id="report-start-time">
+                </div>
+                <div class="form-group">
+                    <label>结束时间</label>
+                    <input type="datetime-local" id="report-end-time">
+                </div>
+            </div>
+            <button class="success" onclick="generateSummary()">生成摘要</button>
+            <button onclick="exportReport('excel')">导出Excel</button>
+            <button onclick="exportReport('json')">导出JSON</button>
+        </div>
+        
+        <div id="audit" class="tab-content">
+            <h2>操作历史</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                <div class="form-group">
+                    <label>资源类型</label>
+                    <select id="audit-resource-type">
+                        <option value="">全部</option>
+                        <option value="log_source">日志源</option>
+                        <option value="log_entry">日志</option>
+                        <option value="report">报告</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>操作类型</label>
+                    <select id="audit-action">
+                        <option value="">全部</option>
+                        <option value="create">创建</option>
+                        <option value="update">更新</option>
+                        <option value="delete">删除</option>
+                        <option value="ingest">写入</option>
+                        <option value="export">导出</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="loadAuditLogs()">查询</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>操作</th>
+                        <th>资源类型</th>
+                        <th>资源ID</th>
+                        <th>IP地址</th>
+                        <th>时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="audit-list"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="source-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="source-modal-title">添加日志源</h3>
+                <span class="close" onclick="closeModal('source-modal')">&times;</span>
+            </div>
+            <div id="source-form-message" class="message"></div>
+            <form id="source-form" onsubmit="return saveSource(event)">
+                <input type="hidden" id="source-id">
+                <input type="hidden" id="source-version">
+                
+                <div class="form-group">
+                    <label>名称 *</label>
+                    <input type="text" id="source-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>类型 *</label>
+                    <select id="source-type" required onchange="updateConfigPlaceholder()">
+                        <option value="file">文件</option>
+                        <option value="database">数据库</option>
+                        <option value="api">API</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>配置 (JSON) *</label>
+                    <textarea id="source-config" required placeholder='{"file_path": "/path/to/logfile.log"}'></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="source-description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><input type="checkbox" id="source-active" checked> 启用</label>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit">保存</button>
+                    <button type="button" class="danger" onclick="closeModal('source-modal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detail-modal-title">详情</h3>
+                <span class="close" onclick="closeModal('detail-modal')">&times;</span>
+            </div>
+            <pre id="detail-content" class="pre-wrap"></pre>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        let currentLogPage = 1;
+        let currentAuditPage = 1;
+        const PAGE_SIZE = 20;
+        
+        async function apiRequest(url, options = {}) {
+            const response = await fetch(API_BASE + url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            if (!response.ok && response.status !== 409) {
+                const error = await response.text();
+                throw new Error(error || '请求失败');
+            }
+            
+            return response;
+        }
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'dashboard') loadDashboard();
+            if (tabId === 'sources') loadSources();
+            if (tabId === 'logs') { loadSourceFilters(); searchLogs(); }
+            if (tabId === 'tasks') loadTasks();
+            if (tabId === 'reports') { loadSourceFilters(); generateSummary(); }
+            if (tabId === 'audit') loadAuditLogs();
+        }
+        
+        async function loadDashboard() {
+            try {
+                const [sourcesRes, logsRes, tasksRes] = await Promise.all([
+                    apiRequest('/sources'),
+                    apiRequest('/logs/search', { method: 'POST', body: JSON.stringify({ page: 1, page_size: 1 }) }),
+                    apiRequest('/tasks?page_size=100')
+                ]);
+                
+                const sources = await sourcesRes.json();
+                const logs = await logsRes.json();
+                const tasks = await tasksRes.json();
+                
+                const failedTasks = tasks.filter(t => t.status === 'failed').length;
+                const runningTasks = tasks.filter(t => t.status === 'running').length;
+                
+                document.getElementById('dashboard-stats').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${sources.length}</div>
+                        <div class="stat-label">日志源数量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${logs.total.toLocaleString()}</div>
+                        <div class="stat-label">日志总条数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${tasks.length}</div>
+                        <div class="stat-label">任务总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: ${runningTasks > 0 ? '#3498db' : '#27ae60'}">${runningTasks}</div>
+                        <div class="stat-label">运行中任务</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: ${failedTasks > 0 ? '#e74c3c' : '#27ae60'}">${failedTasks}</div>
+                        <div class="stat-label">失败任务</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('加载概览失败:', error);
+            }
+        }
+        
+        async function loadSources() {
+            try {
+                const response = await apiRequest('/sources');
+                const sources = await response.json();
+                
+                document.getElementById('sources-list').innerHTML = sources.map(source => `
+                    <tr>
+                        <td>${source.id}</td>
+                        <td>${source.name}</td>
+                        <td>${source.source_type}</td>
+                        <td><span class="badge ${source.is_active ? 'badge-completed' : 'badge-failed'}">${source.is_active ? '启用' : '禁用'}</span></td>
+                        <td>${source.version}</td>
+                        <td>${new Date(source.created_at).toLocaleString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button onclick="editSource(${source.id})">编辑</button>
+                                <button class="success" onclick="collectLogs(${source.id})">采集</button>
+                                <button class="danger" onclick="deleteSource(${source.id})">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载日志源失败:', error);
+            }
+        }
+        
+        async function loadSourceFilters() {
+            try {
+                const response = await apiRequest('/sources');
+                const sources = await response.json();
+                
+                const options = '<option value="">全部</option>' + sources.map(s => 
+                    `<option value="${s.id}">${s.name}</option>`
+                ).join('');
+                
+                document.getElementById('log-source-filter').innerHTML = options;
+                document.getElementById('report-source').innerHTML = options;
+            } catch (error) {
+                console.error('加载日志源筛选失败:', error);
+            }
+        }
+        
+        function showCreateSourceModal() {
+            document.getElementById('source-modal-title').textContent = '添加日志源';
+            document.getElementById('source-form').reset();
+            document.getElementById('source-id').value = '';
+            document.getElementById('source-version').value = '';
+            document.getElementById('source-active').checked = true;
+            updateConfigPlaceholder();
+            document.getElementById('source-form-message').className = 'message';
+            document.getElementById('source-modal').classList.add('active');
+        }
+        
+        function updateConfigPlaceholder() {
+            const type = document.getElementById('source-type').value;
+            const configField = document.getElementById('source-config');
+            
+            const placeholders = {
+                file: '{\n  "file_path": "/path/to/logfile.log",\n  "log_pattern": "(?P<time>\\\\d{4}-\\\\d{2}-\\\\d{2}\\\\s+\\\\d{2}:\\\\d{2}:\\\\d{2})\\\\s+(?P<level>[A-Z]+)\\\\s+(?P<module>[\\\\w\\\\.]+)\\\\s*[-:]\\\\s*(?P<message>.+)",\n  "time_format": "%Y-%m-%d %H:%M:%S"\n}',
+                database: '{\n  "db_url": "mysql+pymysql://user:pass@host:3306/db",\n  "table_name": "logs",\n  "query": "SELECT * FROM logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)"\n}',
+                api: '{\n  "endpoint": "https://api.example.com/logs",\n  "method": "GET",\n  "headers": {\n    "Authorization": "Bearer token"\n  }\n}'
+            };
+            
+            configField.placeholder = placeholders[type] || '';
+        }
+        
+        async function editSource(id) {
+            try {
+                const response = await apiRequest(`/sources/${id}`);
+                const source = await response.json();
+                
+                document.getElementById('source-modal-title').textContent = '编辑日志源';
+                document.getElementById('source-id').value = source.id;
+                document.getElementById('source-version').value = source.version;
+                document.getElementById('source-name').value = source.name;
+                document.getElementById('source-type').value = source.source_type;
+                document.getElementById('source-config').value = JSON.stringify(source.config, null, 2);
+                document.getElementById('source-description').value = source.description || '';
+                document.getElementById('source-active').checked = source.is_active;
+                document.getElementById('source-form-message').className = 'message';
+                document.getElementById('source-modal').classList.add('active');
+            } catch (error) {
+                alert('加载日志源失败: ' + error.message);
+            }
+        }
+        
+        async function saveSource(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('source-id').value;
+            const version = document.getElementById('source-version').value;
+            const messageDiv = document.getElementById('source-form-message');
+            
+            const data = {
+                name: document.getElementById('source-name').value,
+                source_type: document.getElementById('source-type').value,
+                config: JSON.parse(document.getElementById('source-config').value),
+                description: document.getElementById('source-description').value,
+                is_active: document.getElementById('source-active').checked
+            };
+            
+            try {
+                let response;
+                if (id) {
+                    data.version = parseInt(version);
+                    response = await apiRequest(`/sources/${id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await apiRequest('/sources', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                }
+                
+                if (response.status === 409) {
+                    const error = await response.json();
+                    messageDiv.textContent = error.detail || '操作失败';
+                    messageDiv.className = 'message error';
+                    return false;
+                }
+                
+                messageDiv.textContent = '保存成功';
+                messageDiv.className = 'message success';
+                
+                setTimeout(() => {
+                    closeModal('source-modal');
+                    loadSources();
+                }, 500);
+            } catch (error) {
+                messageDiv.textContent = '保存失败: ' + error.message;
+                messageDiv.className = 'message error';
+            }
+            
+            return false;
+        }
+        
+        async function deleteSource(id) {
+            if (!confirm('确定要删除这个日志源吗？所有关联的日志也会被删除。')) return;
+            
+            try {
+                await apiRequest(`/sources/${id}`, { method: 'DELETE' });
+                loadSources();
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
+        
+        async function collectLogs(id) {
+            try {
+                const response = await apiRequest(`/sources/${id}/collect`, { method: 'POST' });
+                const result = await response.json();
+                alert(result.message + '\\n任务ID: ' + result.task_id);
+            } catch (error) {
+                alert('触发采集失败: ' + error.message);
+            }
+        }
+        
+        async function searchLogs() {
+            const data = {
+                source_id: document.getElementById('log-source-filter').value || null,
+                log_level: document.getElementById('log-level-filter').value || null,
+                keyword: document.getElementById('log-keyword').value || null,
+                start_time: document.getElementById('log-start-time').value || null,
+                end_time: document.getElementById('log-end-time').value || null,
+                page: currentLogPage,
+                page_size: PAGE_SIZE
+            };
+            
+            if (data.start_time) data.start_time += ':00';
+            if (data.end_time) data.end_time += ':00';
+            
+            try {
+                const response = await apiRequest('/logs/search', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                document.getElementById('logs-list').innerHTML = result.data.map(log => `
+                    <tr>
+                        <td>${log.id}</td>
+                        <td>${new Date(log.log_time).toLocaleString()}</td>
+                        <td><span class="badge badge-${log.log_level}">${log.log_level}</span></td>
+                        <td>${log.module || '-'}</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${log.message}</td>
+                        <td>${log.trace_id || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button onclick="viewLogDetail(${log.id})">详情</button>
+                                <button class="danger" onclick="deleteLog(${log.id})">删除</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                const totalPages = Math.ceil(result.total / PAGE_SIZE);
+                let paginationHtml = '';
+                if (totalPages > 1) {
+                    paginationHtml = `
+                        <button ${currentLogPage === 1 ? 'disabled' : ''} onclick="changeLogPage(${currentLogPage - 1})">上一页</button>
+                        <span>第 ${currentLogPage} / ${totalPages} 页</span>
+                        <button ${currentLogPage >= totalPages ? 'disabled' : ''} onclick="changeLogPage(${currentLogPage + 1})">下一页</button>
+                    `;
+                }
+                document.getElementById('logs-pagination').innerHTML = paginationHtml;
+            } catch (error) {
+                console.error('查询日志失败:', error);
+            }
+        }
+        
+        function changeLogPage(page) {
+            currentLogPage = page;
+            searchLogs();
+        }
+        
+        async function viewLogDetail(id) {
+            try {
+                const response = await apiRequest(`/logs/${id}`);
+                const log = await response.json();
+                
+                document.getElementById('detail-modal-title').textContent = '日志详情';
+                document.getElementById('detail-content').textContent = JSON.stringify(log, null, 2);
+                document.getElementById('detail-modal').classList.add('active');
+            } catch (error) {
+                alert('加载日志详情失败: ' + error.message);
+            }
+        }
+        
+        async function deleteLog(id) {
+            if (!confirm('确定要删除这条日志吗？')) return;
+            
+            try {
+                await apiRequest(`/logs/${id}`, { method: 'DELETE' });
+                searchLogs();
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
+        
+        async function loadTasks() {
+            const status = document.getElementById('task-status-filter').value;
+            let url = '/tasks?page_size=100';
+            if (status) url += `&status=${status}`;
+            
+            try {
+                const response = await apiRequest(url);
+                const tasks = await response.json();
+                
+                document.getElementById('tasks-list').innerHTML = tasks.map(task => `
+                    <tr>
+                        <td style="font-family: monospace; font-size: 12px;">${task.id.substring(0, 20)}...</td>
+                        <td>${task.task_type}</td>
+                        <td><span class="badge badge-${task.status}">${task.status}</span></td>
+                        <td>${task.retry_count}/${task.max_retries}</td>
+                        <td>${new Date(task.created_at).toLocaleString()}</td>
+                        <td>${task.completed_at ? new Date(task.completed_at).toLocaleString() : '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button onclick="viewTaskDetail('${task.id}')">详情</button>
+                                ${task.status === 'failed' && task.retry_count < task.max_retries ? 
+                                    `<button class="success" onclick="retryTask('${task.id}')">重试</button>` : ''}
+                                ${task.status !== 'running' ? 
+                                    `<button class="danger" onclick="cancelTask('${task.id}')">取消</button>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载任务失败:', error);
+            }
+        }
+        
+        async function viewTaskDetail(id) {
+            try {
+                const response = await apiRequest(`/tasks/${id}`);
+                const task = await response.json();
+                
+                document.getElementById('detail-modal-title').textContent = '任务详情';
+                document.getElementById('detail-content').textContent = JSON.stringify(task, null, 2);
+                document.getElementById('detail-modal').classList.add('active');
+            } catch (error) {
+                alert('加载任务详情失败: ' + error.message);
+            }
+        }
+        
+        async function retryTask(id) {
+            try {
+                const response = await apiRequest(`/tasks/${id}/retry`, { method: 'POST' });
+                const result = await response.json();
+                alert(result.message);
+                loadTasks();
+            } catch (error) {
+                alert('重试失败: ' + error.message);
+            }
+        }
+        
+        async function cancelTask(id) {
+            if (!confirm('确定要取消这个任务吗？')) return;
+            
+            try {
+                await apiRequest(`/tasks/${id}`, { method: 'DELETE' });
+                loadTasks();
+            } catch (error) {
+                alert('取消失败: ' + error.message);
+            }
+        }
+        
+        function getReportParams() {
+            const now = new Date();
+            const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            
+            return {
+                source_id: document.getElementById('report-source').value || null,
+                log_level: document.getElementById('report-level').value || null,
+                start_time: document.getElementById('report-start-time').value 
+                    ? document.getElementById('report-start-time').value + ':00'
+                    : yesterday.toISOString().slice(0, 16) + ':00',
+                end_time: document.getElementById('report-end-time').value
+                    ? document.getElementById('report-end-time').value + ':00'
+                    : now.toISOString().slice(0, 16) + ':00',
+                report_type: 'summary'
+            };
+        }
+        
+        async function generateSummary() {
+            const params = getReportParams();
+            
+            try {
+                const response = await apiRequest('/reports/summary', {
+                    method: 'POST',
+                    body: JSON.stringify(params)
+                });
+                const summary = await response.json();
+                
+                let levelHtml = '';
+                for (const [level, count] of Object.entries(summary.level_distribution || {})) {
+                    levelHtml += `<span class="badge badge-${level}" style="margin-right: 10px;">${level}: ${count}</span>`;
+                }
+                
+                let moduleHtml = '';
+                for (const [module, count] of Object.entries(summary.top_modules || {})) {
+                    moduleHtml += `<li>${module}: ${count}</li>`;
+                }
+                
+                let errorHtml = '';
+                for (const error of summary.recent_errors || []) {
+                    errorHtml += `<li>[${new Date(error.log_time).toLocaleString()}] ${error.log_level}: ${error.message}</li>`;
+                }
+                
+                document.getElementById('report-summary').innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${summary.total_logs.toLocaleString()}</div>
+                            <div class="stat-label">总日志数</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h3>级别分布</h3>
+                        <div style="margin-top: 10px;">${levelHtml || '暂无数据'}</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <h3>Top 模块</h3>
+                        <ul style="margin-top: 10px; margin-left: 20px;">${moduleHtml || '<li>暂无数据</li>'}</ul>
+                    </div>
+                    <div>
+                        <h3>最近错误 (Top 50)</h3>
+                        <ul style="margin-top: 10px; margin-left: 20px; max-height: 200px; overflow-y: auto;">${errorHtml || '<li>暂无错误</li>'}</ul>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('生成摘要失败:', error);
+            }
+        }
+        
+        async function exportReport(format) {
+            const params = getReportParams();
+            
+            try {
+                const response = await apiRequest(`/reports/export/${format}`, {
+                    method: 'POST',
+                    body: JSON.stringify(params)
+                });
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `log_report.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('导出失败: ' + error.message);
+            }
+        }
+        
+        async function loadAuditLogs() {
+            let url = `/audit?page=${currentAuditPage}&page_size=${PAGE_SIZE}`;
+            
+            const resourceType = document.getElementById('audit-resource-type').value;
+            const action = document.getElementById('audit-action').value;
+            
+            if (resourceType) url += `&resource_type=${resourceType}`;
+            if (action) url += `&action=${action}`;
+            
+            try {
+                const response = await apiRequest(url);
+                const result = await response.json();
+                
+                document.getElementById('audit-list').innerHTML = result.data.map(log => `
+                    <tr>
+                        <td>${log.id}</td>
+                        <td>${log.action}</td>
+                        <td>${log.resource_type}</td>
+                        <td>${log.resource_id || '-'}</td>
+                        <td>${log.ip_address || '-'}</td>
+                        <td>${new Date(log.created_at).toLocaleString()}</td>
+                        <td>
+                            <button onclick="viewAuditDetail(${log.id})">详情</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('加载审计日志失败:', error);
+            }
+        }
+        
+        async function viewAuditDetail(id) {
+            try {
+                const response = await apiRequest(`/audit?resource_id=${id}`);
+                const result = await response.json();
+                
+                const allLogs = result.data || [];
+                const log = allLogs.find(l => l.id === id) || allLogs[0];
+                
+                if (log) {
+                    document.getElementById('detail-modal-title').textContent = '审计日志详情';
+                    document.getElementById('detail-content').textContent = JSON.stringify(log, null, 2);
+                    document.getElementById('detail-modal').classList.add('active');
+                }
+            } catch (error) {
+                alert('加载审计日志详情失败: ' + error.message);
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        window.onload = function() {
+            loadDashboard();
+        };
+    </script>
+</body>
+</html>
