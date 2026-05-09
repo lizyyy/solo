@@ -1,0 +1,22 @@
+{
+  "name": "live-push-system",
+  "version": "1.0.0",
+  "description": "直播推送系统 - 高可用、可追踪的消息推送平台",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:backend": "yarn workspace @live-push/backend dev",
+    "dev:frontend": "yarn workspace @live-push/frontend dev",
+    "build:backend": "yarn workspace @live-push/backend build",
+    "build:frontend": "yarn workspace @live-push/frontend build",
+    "lint": "eslint packages/**/*.ts packages/**/*.tsx"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "eslint": "^8.56.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0"
+  }
+}
