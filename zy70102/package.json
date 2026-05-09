@@ -1,0 +1,19 @@
+{
+  "name": "pump-audit-api",
+  "version": "1.0.0",
+  "description": "水泵远程启停审计 API 系统 - 指令、回执、报警一致性管控",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "init-db": "node src/database/init.js"
+  },
+  "keywords": ["pump", "audit", "api", "plc", "interlock"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1"
+  }
+}
