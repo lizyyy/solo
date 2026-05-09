@@ -1,0 +1,23 @@
+[project]
+name = "procurement-fulfillment-warning"
+version = "0.1.0"
+description = "采购合同履约预警服务"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.110.0",
+    "uvicorn[standard]==0.29.0",
+    "sqlalchemy==2.0.29",
+    "pydantic==2.6.4",
+    "python-dateutil==2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
