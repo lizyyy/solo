@@ -1,0 +1,30 @@
+server:
+  grpc_port: 50051
+  http_port: 8080
+  mock_port: 8081
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  dbname: api_guardian
+  sslmode: disable
+
+tracing:
+  enabled: true
+  jaeger_endpoint: "http://localhost:14268/api/traces"
+  service_name: "api-guardian"
+
+mock:
+  default_delay_ms: 0
+  max_delay_ms: 30000
+  enable_fault_injection: true
+
+traffic:
+  max_concurrent_requests: 10000
+  default_timeout_ms: 30000
+
+logging:
+  level: info
+  format: json

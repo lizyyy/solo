@@ -1,0 +1,140 @@
+{
+  "apis": [
+    {
+      "name": "用户信息接口",
+      "method": "GET",
+      "path": "/api/v1/users/{id}",
+      "description": "获取指定用户的详细信息",
+      "version": "v1",
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "created_at": { "type": "string", "format": "datetime" },
+          "is_active": { "type": "boolean" }
+        },
+        "required": ["id", "name", "email"]
+      },
+      "mock_responses": [
+        {
+          "name": "成功响应",
+          "status_code": 200,
+          "response_body": {
+            "id": 1,
+            "name": "张三",
+            "email": "zhangsan@example.com",
+            "created_at": "2024-01-15T10:30:00Z",
+            "is_active": true
+          },
+          "delay_ms": 100,
+          "is_default": true
+        },
+        {
+          "name": "超时模拟",
+          "status_code": 504,
+          "response_body": {
+            "error": "Gateway Timeout",
+            "message": "服务响应超时"
+          },
+          "delay_ms": 0,
+          "is_default": false,
+          "fault_injection": {
+            "enabled": true,
+            "timeout_ms": 30000,
+            "error_rate": 0,
+            "error_status_code": 504,
+            "disconnect_rate": 0,
+            "retry_count": 3
+          }
+        },
+        {
+          "name": "高错误率模拟",
+          "status_code": 200,
+          "response_body": {
+            "id": 1,
+            "name": "张三"
+          },
+          "delay_ms": 50,
+          "is_default": false,
+          "fault_injection": {
+            "enabled": true,
+            "timeout_ms": 0,
+            "error_rate": 0.3,
+            "error_status_code": 500,
+            "disconnect_rate": 0.1,
+            "retry_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "订单查询接口",
+      "method": "POST",
+      "path": "/api/v1/orders/search",
+      "description": "根据条件查询订单列表",
+      "version": "v1",
+      "request_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "integer" },
+          "status": { "type": "string", "enum": ["pending", "paid", "shipped", "completed", "cancelled"] },
+          "page": { "type": "integer", "minimum": 1 },
+          "page_size": { "type": "integer", "minimum": 1, "maximum": 100 }
+        },
+        "required": ["user_id"]
+      },
+      "response_schema": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer" },
+          "page": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "order_id": { "type": "string" },
+                "user_id": { "type": "integer" },
+                "total_amount": { "type": "number" },
+                "status": { "type": "string" },
+                "created_at": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "mock_responses": [
+        {
+          "name": "成功响应",
+          "status_code": 200,
+          "response_body": {
+            "total": 2,
+            "page": 1,
+            "page_size": 10,
+            "items": [
+              {
+                "order_id": "ORD202401150001",
+                "user_id": 1,
+                "total_amount": 299.99,
+                "status": "paid",
+                "created_at": "2024-01-15T09:00:00Z"
+              },
+              {
+                "order_id": "ORD202401150002",
+                "user_id": 1,
+                "total_amount": 599.00,
+                "status": "shipped",
+                "created_at": "2024-01-15T10:30:00Z"
+              }
+            ]
+          },
+          "delay_ms": 150,
+          "is_default": true
+        }
+      ]
+    }
+  ]
+}

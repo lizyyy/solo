@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-guardian-config
+  namespace: api-guardian
+data:
+  config.yaml: |
+    server:
+      grpc_port: 50051
+      http_port: 8080
+      mock_port: 8081
+
+    database:
+      host: postgres
+      port: 5432
+      user: postgres
+      password: postgres
+      dbname: api_guardian
+      sslmode: disable
+
+    tracing:
+      enabled: true
+      jaeger_endpoint: "http://jaeger:14268/api/traces"
+      service_name: "api-guardian"
+
+    mock:
+      default_delay_ms: 0
+      max_delay_ms: 30000
+      enable_fault_injection: true
+
+    traffic:
+      max_concurrent_requests: 10000
+      default_timeout_ms: 30000
+
+    logging:
+      level: info
+      format: json
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-guardian
+  namespace: api-guardian
+  labels:
+    app: api-guardian
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-guardian
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: api-guardian
+    spec:
+      containers:
+        - name: api-guardian
+          image: api-guardian:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 8081
+              name: mock
+            - containerPort: 50051
+              name: grpc
+          env:
+            - name: API_GUARDIAN_DATABASE_HOST
+              value: postgres
+            - name: API_GUARDIAN_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: username
+            - name: API_GUARDIAN_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: password
+            - name: API_GUARDIAN_DATABASE_DBNAME
+              value: api_guardian
+            - name: API_GUARDIAN_TRACING_JAEGER_ENDPOINT
+              value: http://jaeger:14268/api/traces
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: api-guardian-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-guardian
+  namespace: api-guardian
+  labels:
+    app: api-guardian
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+      protocol: TCP
+    - port: 8081
+      targetPort: 8081
+      name: mock
+      protocol: TCP
+    - port: 50051
+      targetPort: 50051
+      name: grpc
+      protocol: TCP
+  selector:
+    app: api-guardian
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-guardian-hpa
+  namespace: api-guardian
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-guardian
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-guardian-ingress
+  namespace: api-guardian
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: api-guardian.local
+      http:
+        paths:
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: api-guardian
+                port:
+                  number: 8080
+          - path: /mock/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: api-guardian
+                port:
+                  number: 8081

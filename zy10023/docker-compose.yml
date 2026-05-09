@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: api_guardian
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api-guardian
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api-guardian
+
+  api-guardian:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "50051:50051"
+    environment:
+      API_GUARDIAN_DATABASE_HOST: postgres
+      API_GUARDIAN_DATABASE_PORT: 5432
+      API_GUARDIAN_DATABASE_USER: postgres
+      API_GUARDIAN_DATABASE_PASSWORD: postgres
+      API_GUARDIAN_DATABASE_DBNAME: api_guardian
+      API_GUARDIAN_TRACING_JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    depends_on:
+      postgres:
+        condition: service_healthy
+      jaeger:
+        condition: service_healthy
+    networks:
+      - api-guardian
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  api-guardian:
+    driver: bridge
