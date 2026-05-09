@@ -1,0 +1,257 @@
+{
+  "casings": {
+    "C001": {
+      "casing_id": "C001",
+      "source": "顺丰物流",
+      "model": "12R22.5",
+      "spec": "295/80R22.5",
+      "inbound_date": "2026-05-01",
+      "initial_condition": "胎面磨损80%，胎侧无损伤"
+    },
+    "C002": {
+      "casing_id": "C002",
+      "source": "圆通快递",
+      "model": "12R22.5",
+      "spec": "315/80R22.5",
+      "inbound_date": "2026-05-02",
+      "initial_condition": "胎面磨损70%，有一处小损伤"
+    },
+    "C003": {
+      "casing_id": "C003",
+      "source": "中通快运",
+      "model": "11R22.5",
+      "spec": "275/80R22.5",
+      "inbound_date": "2026-05-03",
+      "initial_condition": "胎面磨损60%，胎体完好"
+    }
+  },
+  "processes": [
+    {
+      "casing_id": "C001",
+      "process_name": "初检",
+      "batch_id": "B001",
+      "operator": "张三",
+      "start_time": "2026-05-01 09:00",
+      "end_time": "2026-05-01 09:30",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "打磨",
+      "batch_id": "B002",
+      "operator": "李四",
+      "start_time": "2026-05-01 10:00",
+      "end_time": "2026-05-01 11:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "补洞",
+      "batch_id": "B003",
+      "operator": "王五",
+      "start_time": "2026-05-01 14:00",
+      "end_time": "2026-05-01 15:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "硫化",
+      "batch_id": "B004",
+      "operator": "赵六",
+      "start_time": "2026-05-02 08:00",
+      "end_time": "2026-05-02 10:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "终检",
+      "batch_id": "B005",
+      "operator": "钱七",
+      "start_time": "2026-05-02 14:00",
+      "end_time": "2026-05-02 15:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "初检",
+      "batch_id": "B001",
+      "operator": "张三",
+      "start_time": "2026-05-02 09:00",
+      "end_time": "2026-05-02 09:30",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "打磨",
+      "batch_id": "B002",
+      "operator": "李四",
+      "start_time": "2026-05-02 10:00",
+      "end_time": "2026-05-02 11:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "补洞",
+      "batch_id": "B006",
+      "operator": "王五",
+      "start_time": "2026-05-03 08:00",
+      "end_time": "2026-05-03 09:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "硫化",
+      "batch_id": "B004",
+      "operator": "赵六",
+      "start_time": "2026-05-03 10:00",
+      "end_time": "2026-05-03 12:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "初检",
+      "batch_id": "B007",
+      "operator": "孙八",
+      "start_time": "2026-05-04 09:00",
+      "end_time": "2026-05-04 09:30",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "打磨",
+      "batch_id": "B008",
+      "operator": "周九",
+      "start_time": "2026-05-04 10:00",
+      "end_time": "2026-05-04 11:00",
+      "status": "完成"
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "补洞",
+      "batch_id": "",
+      "operator": "王五",
+      "start_time": "2026-05-05 08:00",
+      "end_time": "2026-05-05 09:00",
+      "status": "完成"
+    }
+  ],
+  "inspections": [
+    {
+      "casing_id": "C001",
+      "process_name": "初检",
+      "inspection_time": "2026-05-01 09:35",
+      "inspector": "质检A",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "打磨",
+      "inspection_time": "2026-05-01 11:15",
+      "inspector": "质检A",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "补洞",
+      "inspection_time": "2026-05-01 15:20",
+      "inspector": "质检B",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "硫化",
+      "inspection_time": "2026-05-02 10:30",
+      "inspector": "质检B",
+      "result": "不合格",
+      "defect_desc": "硫化不充分，有气泡",
+      "is_rework": true,
+      "rework_reason": "硫化时间不足，赵六操作失误"
+    },
+    {
+      "casing_id": "C001",
+      "process_name": "终检",
+      "inspection_time": "2026-05-02 15:30",
+      "inspector": "质检C",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "初检",
+      "inspection_time": "2026-05-02 09:40",
+      "inspector": "质检A",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "打磨",
+      "inspection_time": "2026-05-02 11:20",
+      "inspector": "质检A",
+      "result": "不合格",
+      "defect_desc": "打磨不均，有凹陷",
+      "is_rework": true,
+      "rework_reason": "李四打磨操作不规范"
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "补洞",
+      "inspection_time": "2026-05-03 09:20",
+      "inspector": "质检B",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C002",
+      "process_name": "硫化",
+      "inspection_time": "2026-05-03 12:30",
+      "inspector": "质检B",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "初检",
+      "inspection_time": "2026-05-04 09:45",
+      "inspector": "质检C",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "打磨",
+      "inspection_time": "2026-05-04 11:25",
+      "inspector": "质检C",
+      "result": "合格",
+      "defect_desc": "",
+      "is_rework": false,
+      "rework_reason": ""
+    },
+    {
+      "casing_id": "C003",
+      "process_name": "补洞",
+      "inspection_time": "",
+      "inspector": "质检A",
+      "result": "合格"
+    }
+  ]
+}

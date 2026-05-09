@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2026-05-10T02:55:27.499484",
+    "action": "init",
+    "details": "初始化样例数据完成，异常样例保存在 /Users/mac/pro/solo/workspaces/xy10254/data/error_samples"
+  },
+  {
+    "timestamp": "2026-05-10T02:55:33.490631",
+    "action": "check",
+    "details": "检查完成，发现 0 个问题，2 条返修记录"
+  },
+  {
+    "timestamp": "2026-05-10T02:55:38.565001",
+    "action": "check",
+    "details": "检查完成，发现 0 个问题，1 条返修记录"
+  },
+  {
+    "timestamp": "2026-05-10T02:56:02.614719",
+    "action": "import",
+    "details": "从 data/error_samples/duplicate_data.json 导入 23 条记录，跳过 3 条重复胎体"
+  },
+  {
+    "timestamp": "2026-05-10T02:56:09.402887",
+    "action": "check",
+    "details": "检查完成，发现 22 个问题，4 条返修记录"
+  },
+  {
+    "timestamp": "2026-05-10T02:56:23.623271",
+    "action": "export",
+    "details": "导出 all 数据到 all_data.json (json 格式)"
+  },
+  {
+    "timestamp": "2026-05-10T02:56:23.916909",
+    "action": "export",
+    "details": "导出 reworks 数据到 reworks.csv (csv 格式)"
+  },
+  {
+    "timestamp": "2026-05-10T02:57:31.874477",
+    "action": "init",
+    "details": "初始化样例数据完成，异常样例保存在 /Users/mac/pro/solo/workspaces/xy10254/data/error_samples"
+  },
+  {
+    "timestamp": "2026-05-10T02:57:37.942185",
+    "action": "import",
+    "details": "从 data/error_samples/missing_fields.json 导入 24 条记录，跳过 3 条重复胎体"
+  },
+  {
+    "timestamp": "2026-05-10T02:57:38.115436",
+    "action": "check",
+    "details": "检查完成，发现 24 个问题，4 条返修记录"
+  }
+]
