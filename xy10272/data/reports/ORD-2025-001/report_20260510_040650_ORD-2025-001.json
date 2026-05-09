@@ -1,0 +1,31 @@
+{
+  "report_id": "RPT_b640752e",
+  "order_id": "ORD-2025-001",
+  "generated_at": "2026-05-10T04:06:50.796475",
+  "total_samples": 4,
+  "approved_samples": 3,
+  "rejected_samples": 0,
+  "pending_review": 0,
+  "max_delta_e2000": 3.151894245964852,
+  "min_delta_e2000": 0.13054965762565673,
+  "avg_delta_e2000": 1.1564705067288916,
+  "paper_batches_used": [
+    "PAPER-2025-A001"
+  ],
+  "adjustments_applied": 2,
+  "alert_summary": {
+    "CRITICAL": 0,
+    "WARNING": 1,
+    "NORMAL": 3
+  },
+  "recommendations": [
+    "色差呈改善趋势，当前调整方向正确"
+  ],
+  "records": [
+    "REC_b9938bc1",
+    "REC_6e96e0a5",
+    "REC_048b310b",
+    "REC_a0eb4b63"
+  ],
+  "metadata": {}
+}

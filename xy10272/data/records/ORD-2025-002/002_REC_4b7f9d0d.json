@@ -1,0 +1,70 @@
+{
+  "record_id": "REC_4b7f9d0d",
+  "sequence_number": 2,
+  "batch_info": {
+    "batch_id": "BATCH_19ad4ee1",
+    "order_id": "ORD-2025-002",
+    "product_name": "企业宣传册封面",
+    "paper_type": "哑粉纸",
+    "ink_type": "胶印油墨",
+    "print_machine": "小森LS440",
+    "operator": "王师傅",
+    "created_at": "2026-05-10T04:06:50.804373",
+    "notes": "第2次打样，第二次打样：纸张批次变更，ΔE2000约4.5，偏亮偏红偏黄"
+  },
+  "paper_batch": {
+    "paper_id": "PAPER_4a50374d",
+    "batch_code": "PAPER-2025-B002",
+    "manufacturer": "太阳纸业",
+    "weight": 200.0,
+    "whiteness": null,
+    "gloss": null,
+    "received_date": null,
+    "notes": null
+  },
+  "reference_sample": {
+    "sample_id": "REF_aaae5240",
+    "lab_l": 45.0,
+    "lab_a": 58.0,
+    "lab_b": 35.0,
+    "measured_at": "2026-05-10T04:06:50.804460",
+    "measurement_conditions": {}
+  },
+  "measured_sample": {
+    "sample_id": "MEAS_4ee20e7b",
+    "lab_l": 48.0,
+    "lab_a": 65.0,
+    "lab_b": 42.0,
+    "measured_at": "2026-05-10T04:06:50.804472",
+    "measurement_conditions": {}
+  },
+  "color_delta": {
+    "delta_e76": 10.344080432788601,
+    "delta_e2000": 3.872753780989659,
+    "delta_l": 3.0,
+    "delta_a": 7.0,
+    "delta_b": 7.0,
+    "delta_c": 9.646471438023625,
+    "delta_h": 1.7598701048223613
+  },
+  "adjustments": [
+    {
+      "adjustment_id": "ADJ_4cebf297",
+      "color_channel": "M",
+      "before_value": 88.0,
+      "after_value": 82.0,
+      "adjustment_reason": "品红偏多，减少",
+      "adjusted_by": "王师傅",
+      "adjusted_at": "2026-05-10T04:06:50.804532",
+      "expected_improvement": null
+    }
+  ],
+  "status": "已拒绝",
+  "alert_level": "警告",
+  "created_at": "2026-05-10T04:06:50.804516",
+  "updated_at": "2026-05-10T04:06:50.808612",
+  "reviewer": "李主管",
+  "review_notes": "纸张批次变更导致颜色偏亮偏红，需要重新调整配方",
+  "approved": false,
+  "metadata": {}
+}

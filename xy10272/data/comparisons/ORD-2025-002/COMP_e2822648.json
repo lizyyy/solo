@@ -1,0 +1,93 @@
+{
+  "comparison_id": "COMP_e2822648",
+  "order_id": "ORD-2025-002",
+  "records": [
+    "REC_6a40642f",
+    "REC_4b7f9d0d",
+    "REC_82dd996f",
+    "REC_f6b4bf2a"
+  ],
+  "delta_trend": {
+    "delta_e2000": [
+      3.981244178123757,
+      3.872753780989659,
+      2.8826439979870115,
+      1.5310455804298069
+    ],
+    "delta_e76": [
+      9.695359714832659,
+      10.344080432788601,
+      6.87386354243376,
+      3.7416573867739413
+    ],
+    "delta_l": [
+      -3.0,
+      3.0,
+      2.5,
+      1.0
+    ],
+    "delta_a": [
+      -6.0,
+      7.0,
+      5.0,
+      -2.0
+    ],
+    "delta_b": [
+      -7.0,
+      7.0,
+      4.0,
+      -3.0
+    ]
+  },
+  "adjustments_summary": {
+    "total_adjustments": 4,
+    "by_channel": {
+      "M": 2,
+      "Y": 1,
+      "K": 1
+    },
+    "by_record": [
+      {
+        "record_id": "REC_6a40642f",
+        "sequence": 1,
+        "adjustments": [
+          {
+            "channel": "M",
+            "change": 10.0,
+            "reason": "品红严重不足，大幅增加"
+          },
+          {
+            "channel": "Y",
+            "change": 10.0,
+            "reason": "黄色严重不足，大幅增加"
+          },
+          {
+            "channel": "K",
+            "change": -7.0,
+            "reason": "黑色过重，需要减少"
+          }
+        ]
+      },
+      {
+        "record_id": "REC_4b7f9d0d",
+        "sequence": 2,
+        "adjustments": [
+          {
+            "channel": "M",
+            "change": -6.0,
+            "reason": "品红偏多，减少"
+          }
+        ]
+      }
+    ],
+    "cumulative_changes": {
+      "M": 4.0,
+      "Y": 10.0,
+      "K": -7.0
+    }
+  },
+  "paper_batch_changes": [
+    "第2次打样: PAPER-2025-B001 -> PAPER-2025-B002"
+  ],
+  "created_at": "2026-05-10T04:07:31.294252"
+}

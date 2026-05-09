@@ -1,0 +1,59 @@
+{
+  "record_id": "REC_a0eb4b63",
+  "sequence_number": 4,
+  "batch_info": {
+    "batch_id": "BATCH_1768a031",
+    "order_id": "ORD-2025-001",
+    "product_name": "高端化妆品包装盒",
+    "paper_type": "铜版纸",
+    "ink_type": "UV油墨",
+    "print_machine": "海德堡XL105",
+    "operator": "李师傅",
+    "created_at": "2026-05-10T04:06:50.789082",
+    "notes": "第4次打样，第四次打样：ΔE2000约0.15，完全符合标准"
+  },
+  "paper_batch": {
+    "paper_id": "PAPER_d1761eed",
+    "batch_code": "PAPER-2025-A001",
+    "manufacturer": "金东纸业",
+    "weight": 250.0,
+    "whiteness": null,
+    "gloss": null,
+    "received_date": null,
+    "notes": null
+  },
+  "reference_sample": {
+    "sample_id": "REF_30d272bd",
+    "lab_l": 52.0,
+    "lab_a": 28.0,
+    "lab_b": -16.0,
+    "measured_at": "2026-05-10T04:06:50.789106",
+    "measurement_conditions": {}
+  },
+  "measured_sample": {
+    "sample_id": "MEAS_b5ab423d",
+    "lab_l": 51.9,
+    "lab_a": 28.1,
+    "lab_b": -15.9,
+    "measured_at": "2026-05-10T04:06:50.789115",
+    "measurement_conditions": {}
+  },
+  "color_delta": {
+    "delta_e76": 0.17320508075688917,
+    "delta_e2000": 0.13054965762565673,
+    "delta_l": -0.10000000000000142,
+    "delta_a": 0.10000000000000142,
+    "delta_b": 0.09999999999999964,
+    "delta_c": 0.03749870573752645,
+    "delta_h": 0.24212440374884067
+  },
+  "adjustments": [],
+  "status": "已通过",
+  "alert_level": "正常",
+  "created_at": "2026-05-10T04:06:50.789146",
+  "updated_at": "2026-05-10T04:06:50.793855",
+  "reviewer": "张主管",
+  "review_notes": "色差符合标准，通过",
+  "approved": true,
+  "metadata": {}
+}

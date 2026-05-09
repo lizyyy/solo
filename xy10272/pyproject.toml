@@ -1,0 +1,22 @@
+[project]
+name = "color-tracking-cli"
+version = "1.0.0"
+description = "印刷厂色差追样CLI工具 - 管理打样记录、色差计算和批次对比"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "colormath>=3.0",
+    "pandas>=1.0",
+    "rich>=10.0",
+]
+
+[project.scripts]
+color-tracking = "color_tracking.cli.main:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["color_tracking*"]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

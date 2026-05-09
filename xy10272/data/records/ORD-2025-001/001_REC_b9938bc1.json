@@ -1,0 +1,80 @@
+{
+  "record_id": "REC_b9938bc1",
+  "sequence_number": 1,
+  "batch_info": {
+    "batch_id": "BATCH_8417efce",
+    "order_id": "ORD-2025-001",
+    "product_name": "高端化妆品包装盒",
+    "paper_type": "铜版纸",
+    "ink_type": "UV油墨",
+    "print_machine": "海德堡XL105",
+    "operator": "李师傅",
+    "created_at": "2026-05-10T04:06:50.786983",
+    "notes": "第1次打样，第一次打样：ΔE2000约2.5，接近警戒值，偏亮偏蓝"
+  },
+  "paper_batch": {
+    "paper_id": "PAPER_6b694db4",
+    "batch_code": "PAPER-2025-A001",
+    "manufacturer": "金东纸业",
+    "weight": 250.0,
+    "whiteness": null,
+    "gloss": null,
+    "received_date": null,
+    "notes": null
+  },
+  "reference_sample": {
+    "sample_id": "REF_21b0117a",
+    "lab_l": 52.0,
+    "lab_a": 28.0,
+    "lab_b": -16.0,
+    "measured_at": "2026-05-10T04:06:50.787026",
+    "measurement_conditions": {}
+  },
+  "measured_sample": {
+    "sample_id": "MEAS_ea364dd1",
+    "lab_l": 54.5,
+    "lab_a": 26.0,
+    "lab_b": -18.5,
+    "measured_at": "2026-05-10T04:06:50.787036",
+    "measurement_conditions": {}
+  },
+  "color_delta": {
+    "delta_e76": 4.06201920231798,
+    "delta_e2000": 3.151894245964852,
+    "delta_l": 2.5,
+    "delta_a": -2.0,
+    "delta_b": -2.5,
+    "delta_c": -0.3390012219764955,
+    "delta_h": -5.6884327133433645
+  },
+  "adjustments": [
+    {
+      "adjustment_id": "ADJ_84a9881c",
+      "color_channel": "M",
+      "before_value": 85.0,
+      "after_value": 92.0,
+      "adjustment_reason": "品红不足，需要增加",
+      "adjusted_by": "李师傅",
+      "adjusted_at": "2026-05-10T04:06:50.787116",
+      "expected_improvement": null
+    },
+    {
+      "adjustment_id": "ADJ_6a36810b",
+      "color_channel": "Y",
+      "before_value": 45.0,
+      "after_value": 48.0,
+      "adjustment_reason": "黄色略浅，微调",
+      "adjusted_by": "李师傅",
+      "adjusted_at": "2026-05-10T04:06:50.787128",
+      "expected_improvement": null
+    }
+  ],
+  "status": "调整已应用",
+  "alert_level": "警告",
+  "created_at": "2026-05-10T04:06:50.787093",
+  "updated_at": "2026-05-10T04:06:50.787130",
+  "reviewer": null,
+  "review_notes": null,
+  "approved": null,
+  "metadata": {}
+}

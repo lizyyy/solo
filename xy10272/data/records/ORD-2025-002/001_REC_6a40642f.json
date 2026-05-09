@@ -1,0 +1,90 @@
+{
+  "record_id": "REC_6a40642f",
+  "sequence_number": 1,
+  "batch_info": {
+    "batch_id": "BATCH_dc27ffe5",
+    "order_id": "ORD-2025-002",
+    "product_name": "企业宣传册封面",
+    "paper_type": "哑粉纸",
+    "ink_type": "胶印油墨",
+    "print_machine": "小森LS440",
+    "operator": "王师傅",
+    "created_at": "2026-05-10T04:06:50.803415",
+    "notes": "第1次打样，第一次打样：ΔE2000约5.0，严重超标，偏暗偏绿偏蓝"
+  },
+  "paper_batch": {
+    "paper_id": "PAPER_20786f5e",
+    "batch_code": "PAPER-2025-B001",
+    "manufacturer": "太阳纸业",
+    "weight": 200.0,
+    "whiteness": null,
+    "gloss": null,
+    "received_date": null,
+    "notes": null
+  },
+  "reference_sample": {
+    "sample_id": "REF_e38815d1",
+    "lab_l": 45.0,
+    "lab_a": 58.0,
+    "lab_b": 35.0,
+    "measured_at": "2026-05-10T04:06:50.803449",
+    "measurement_conditions": {}
+  },
+  "measured_sample": {
+    "sample_id": "MEAS_d24807b4",
+    "lab_l": 42.0,
+    "lab_a": 52.0,
+    "lab_b": 28.0,
+    "measured_at": "2026-05-10T04:06:50.803460",
+    "measurement_conditions": {}
+  },
+  "color_delta": {
+    "delta_e76": 9.695359714832659,
+    "delta_e2000": 3.981244178123757,
+    "delta_l": -3.0,
+    "delta_a": -6.0,
+    "delta_b": -7.0,
+    "delta_c": -8.682865976826193,
+    "delta_h": -2.808053062538762
+  },
+  "adjustments": [
+    {
+      "adjustment_id": "ADJ_90f793bd",
+      "color_channel": "M",
+      "before_value": 78.0,
+      "after_value": 88.0,
+      "adjustment_reason": "品红严重不足，大幅增加",
+      "adjusted_by": "王师傅",
+      "adjusted_at": "2026-05-10T04:06:50.803543",
+      "expected_improvement": null
+    },
+    {
+      "adjustment_id": "ADJ_24a080ac",
+      "color_channel": "Y",
+      "before_value": 62.0,
+      "after_value": 72.0,
+      "adjustment_reason": "黄色严重不足，大幅增加",
+      "adjusted_by": "王师傅",
+      "adjusted_at": "2026-05-10T04:06:50.803558",
+      "expected_improvement": null
+    },
+    {
+      "adjustment_id": "ADJ_4d2fe7aa",
+      "color_channel": "K",
+      "before_value": 35.0,
+      "after_value": 28.0,
+      "adjustment_reason": "黑色过重，需要减少",
+      "adjusted_by": "王师傅",
+      "adjusted_at": "2026-05-10T04:06:50.803569",
+      "expected_improvement": null
+    }
+  ],
+  "status": "已拒绝",
+  "alert_level": "警告",
+  "created_at": "2026-05-10T04:06:50.803521",
+  "updated_at": "2026-05-10T04:06:50.806061",
+  "reviewer": "李主管",
+  "review_notes": "色差严重超标，ΔE2000约5.0，必须重新调整",
+  "approved": false,
+  "metadata": {}
+}
