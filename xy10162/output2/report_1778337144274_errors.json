@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "type": "金额合计不一致",
+    "message": "金额不一致: 计算值 904.00 ≠ 申报值 905.00",
+    "field": "totalAmount",
+    "relatedInvoiceId": "fd212712-8e48-4b2c-9a4f-bdae982119ca"
+  },
+  {
+    "id": 2,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "bfb7b5c6-7789-41b2-b9cd-7eddc8283754"
+  },
+  {
+    "id": 3,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "a18891b9-fc1e-4363-ab5b-6b544d4292c5"
+  }
+]
