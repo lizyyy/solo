@@ -1,0 +1,17 @@
+{
+  "name": "inventory-system",
+  "version": "1.0.0",
+  "description": "仓库盘点系统 - 支持离线操作、并发控制、历史记录和报告导出",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run serve\"",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["inventory", "warehouse", "盘点系统"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
