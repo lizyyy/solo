@@ -1,0 +1,22 @@
+{
+  "name": "meeting-room-conflict-api",
+  "version": "1.0.0",
+  "description": "会议室资源冲突 API - 处理房间、投屏设备和茶歇资源的冲突检测与事务管理",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node scripts/test-all.js",
+    "test:curl": "bash scripts/test-curl.sh"
+  },
+  "keywords": ["meeting-room", "resource-lock", "conflict-detection", "transaction", "saga"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.1.2",
+    "uuid": "^9.0.1",
+    "date-fns": "^3.6.0",
+    "axios": "^1.7.2"
+  }
+}
