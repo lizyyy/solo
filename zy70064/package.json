@@ -1,0 +1,14 @@
+{
+  "name": "internship-quota-service",
+  "version": "1.0.0",
+  "description": "实习岗位名额锁定服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "yargs": "^17.7.2"
+  }
+}
