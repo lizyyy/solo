@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>山地步道救援定位板</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>⛰️ 山地步道救援定位板</h1>
+    <div class="status-bar">
+      <span id="total-nodes" class="status-item">节点: 0</span>
+      <span id="standby-teams" class="status-item standby">待命队伍: 0</span>
+      <span id="moving-teams" class="status-item moving">移动中: 0</span>
+      <span id="pending-alarms" class="status-item alarm">待处理报警: 0</span>
+      <span id="assigned-alarms" class="status-item assigned">已分配: 0</span>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <aside class="sidebar">
+      <div class="panel">
+        <h2>📋 报警列表</h2>
+        <div id="alarms-list" class="list-container"></div>
+        <button id="assign-best-team-btn" class="btn btn-primary">自动分配最佳队伍</button>
+      </div>
+
+      <div class="panel">
+        <h2>🚁 救援队伍</h2>
+        <div id="teams-list" class="list-container"></div>
+      </div>
+
+      <div class="panel">
+        <h2>⚙️ 参数调节</h2>
+        <div class="parameter-item">
+          <label>主救援队速度: <span id="speed-team-a">8.0</span> km/h</label>
+          <input type="range" id="range-team-a" min="2" max="20" step="0.5" value="8">
+        </div>
+        <div class="parameter-item">
+          <label>快速反应队速度: <span id="speed-team-b">12.0</span> km/h</label>
+          <input type="range" id="range-team-b" min="2" max="20" step="0.5" value="12">
+        </div>
+        <div class="parameter-item">
+          <label>高空专业队速度: <span id="speed-team-c">6.0</span> km/h</label>
+          <input type="range" id="range-team-c" min="2" max="20" step="0.5" value="6">
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>🔴 风险标记</h2>
+        <div class="risk-controls">
+          <select id="risk-node-select">
+            <option value="">-- 选择节点 --</option>
+          </select>
+          <input type="range" id="risk-level-range" min="0" max="5" step="1" value="0">
+          <span id="risk-level-display">0</span>
+          <button id="mark-risk-btn" class="btn btn-secondary">标记风险</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main-content">
+      <div class="canvas-container">
+        <h2>🗺️ 山地地形图 (可拖拽救援队)</h2>
+        <canvas id="map-canvas" width="750" height="520"></canvas>
+        <div class="canvas-legend">
+          <span class="legend-item"><span class="legend-dot supply"></span> 补给点</span>
+          <span class="legend-item"><span class="legend-dot normal"></span> 普通节点</span>
+          <span class="legend-item"><span class="legend-dot alarm"></span> 报警点</span>
+          <span class="legend-item"><span class="legend-dot team"></span> 救援队</span>
+          <span class="legend-item"><span class="legend-dot route"></span> 救援路线</span>
+        </div>
+      </div>
+
+      <div class="stats-panel">
+        <h2>📊 关键指标</h2>
+        <div id="stats-container" class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">总爬升高度</div>
+            <div id="stat-elevation-gain" class="stat-value">0 m</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">总下降高度</div>
+            <div id="stat-elevation-loss" class="stat-value">0 m</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">预计到达时间</div>
+            <div id="stat-eta" class="stat-value">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">路线风险等级</div>
+            <div id="stat-risk" class="stat-value">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-panel">
+        <h2>📝 路线报告</h2>
+        <div id="report-container" class="report-content">
+          <p>请先分配救援队，然后查看路线报告</p>
+        </div>
+        <button id="generate-report-btn" class="btn btn-info">生成最新报告</button>
+      </div>
+    </section>
+
+    <aside class="right-sidebar">
+      <div class="panel">
+        <h2>🔍 节点详情</h2>
+        <div id="node-details" class="details-panel">
+          <p>点击地图上的节点查看详情</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>📈 海拔剖面图</h2>
+        <canvas id="elevation-canvas" width="280" height="180"></canvas>
+      </div>
+
+      <div class="panel">
+        <h2>🧪 异常操作测试</h2>
+        <button id="test-no-path" class="btn btn-danger">测试: 无路径情况</button>
+        <button id="test-no-teams" class="btn btn-danger">测试: 无待命队伍</button>
+        <button id="test-invalid-node" class="btn btn-danger">测试: 无效节点</button>
+        <button id="reset-data-btn" class="btn btn-secondary">重置所有数据</button>
+      </div>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="src/browser-app.js" type="module"></script>
+</body>
+</html>

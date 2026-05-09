@@ -1,0 +1,36 @@
+{
+  "nodes": [
+    {"id": "N1", "name": "山底入口", "x": 50, "y": 450, "elevation": 200, "type": "supply", "riskLevel": 0},
+    {"id": "N2", "name": "第一休息站", "x": 120, "y": 380, "elevation": 450, "type": "supply", "riskLevel": 1},
+    {"id": "N3", "name": "溪流过桥点", "x": 200, "y": 420, "elevation": 380, "type": "normal", "riskLevel": 2},
+    {"id": "N4", "name": "第二休息站", "x": 280, "y": 320, "elevation": 680, "type": "supply", "riskLevel": 1},
+    {"id": "N5", "name": "峭壁路段", "x": 360, "y": 280, "elevation": 850, "type": "normal", "riskLevel": 4},
+    {"id": "N6", "name": "山脊观景台", "x": 420, "y": 200, "elevation": 1100, "type": "normal", "riskLevel": 2},
+    {"id": "N7", "name": "紧急避险点", "x": 480, "y": 250, "elevation": 980, "type": "supply", "riskLevel": 1},
+    {"id": "N8", "name": "乱石堆", "x": 550, "y": 180, "elevation": 1250, "type": "normal", "riskLevel": 3},
+    {"id": "N9", "name": "顶峰前平台", "x": 620, "y": 120, "elevation": 1420, "type": "normal", "riskLevel": 2},
+    {"id": "N10", "name": "山顶观景点", "x": 700, "y": 80, "elevation": 1580, "type": "supply", "riskLevel": 1}
+  ],
+  "connections": [
+    {"from": "N1", "to": "N2"},
+    {"from": "N2", "to": "N3"},
+    {"from": "N3", "to": "N4"},
+    {"from": "N4", "to": "N5"},
+    {"from": "N5", "to": "N6"},
+    {"from": "N6", "to": "N7"},
+    {"from": "N7", "to": "N8"},
+    {"from": "N8", "to": "N9"},
+    {"from": "N9", "to": "N10"},
+    {"from": "N4", "to": "N7"},
+    {"from": "N2", "to": "N4"}
+  ],
+  "teams": [
+    {"id": "TEAM_A", "name": "主救援队", "currentNodeId": "N1", "speed": 8.0, "status": "standby"},
+    {"id": "TEAM_B", "name": "快速反应队", "currentNodeId": "N4", "speed": 12.0, "status": "standby"},
+    {"id": "TEAM_C", "name": "高空专业队", "currentNodeId": "N10", "speed": 6.0, "status": "standby"}
+  ],
+  "alarms": [
+    {"id": "ALARM_001", "nodeId": "N6", "severity": "high", "description": "登山者摔伤，无法移动", "timestamp": 1778350000000, "status": "pending"},
+    {"id": "ALARM_002", "nodeId": "N8", "severity": "medium", "description": "迷路，需要引导", "timestamp": 1778351000000, "status": "pending"}
+  ]
+}

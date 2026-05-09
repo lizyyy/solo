@@ -1,0 +1,16 @@
+{
+  "name": "mountain-trail-rescue-dashboard",
+  "version": "1.0.0",
+  "description": "山地步道救援定位板 - 高差路径上的救援定位系统",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/test-core.js",
+    "lint": "echo 'No linting configured'"
+  },
+  "keywords": ["rescue", "mountain", "trail", "dashboard"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
