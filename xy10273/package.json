@@ -1,0 +1,26 @@
+{
+  "name": "store-sample-archive-api",
+  "version": "1.0.0",
+  "description": "门店试吃样品留样 API - 用于食品门店试吃活动样品留样、批次记录、销毁管理和投诉追溯",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --verbose",
+    "init-data": "node scripts/init-data.js",
+    "demo-main": "node scripts/demo-main-flow.js",
+    "demo-errors": "node scripts/demo-error-cases.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "joi": "^17.11.0",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  }
+}
