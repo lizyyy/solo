@@ -1,0 +1,25 @@
+{
+  "name": "claim-allocation-api",
+  "version": "1.0.0",
+  "description": "赔付案件分摊 API - 处理商家、仓库、配送方的责任比例和金额分摊",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest --runInBand",
+    "seed": "node src/seed.js"
+  },
+  "keywords": ["claim", "allocation", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
