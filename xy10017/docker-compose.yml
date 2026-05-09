@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: live-push-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: live_push
+
+  redis:
+    image: redis:7-alpine
+    container_name: live-push-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  backend:
+    build: ./backend
+    container_name: live-push-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGO_URI=mongodb://mongo:27017/live_push
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - MAX_RETRY_ATTEMPTS=${MAX_RETRY_ATTEMPTS:-3}
+      - RETRY_DELAY_MS=${RETRY_DELAY_MS:-5000}
+      - CONSUMER_GROUP=${CONSUMER_GROUP:-push-consumers}
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    container_name: live-push-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mongo-data:
+  redis-data:

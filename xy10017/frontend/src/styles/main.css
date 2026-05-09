@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.container {
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.filter-bar {
+  background: #f5f7fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status-tag {
+  font-size: 12px;
+}
+
+.status-pending {
+  color: #909399;
+  background: #f4f4f5;
+}
+
+.status-queued {
+  color: #e6a23c;
+  background: #fdf6ec;
+}
+
+.status-processing {
+  color: #409eff;
+  background: #ecf5ff;
+}
+
+.status-sent {
+  color: #67c23a;
+  background: #f0f9eb;
+}
+
+.status-failed {
+  color: #f56c6c;
+  background: #fef0f0;
+}
+
+.status-cancelled {
+  color: #909399;
+  background: #f4f4f5;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-box {
+  width: 400px;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card .label {
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 8px;
+}
+
+.stat-card .value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
