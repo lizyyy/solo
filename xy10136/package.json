@@ -1,0 +1,21 @@
+{
+  "name": "customs-inspection-game",
+  "version": "1.0.0",
+  "description": "海关查验队列游戏",
+  "main": "index.html",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "start": "python3 -m http.server 3000"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@babel/preset-env": "^7.23.0"
+  },
+  "babel": {
+    "presets": [["@babel/preset-env", {"targets": {"node": "current"}}]]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
