@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乡村民宿柴火消耗台账 - 2026-05-10</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #5d4e37 0%, #8b7355 100%); color: #fff; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 20px; color: #333; margin-bottom: 20px; border-bottom: 2px solid #e8e8e0; padding-bottom: 12px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .stat-card { background: linear-gradient(135deg, #f8f4ec 0%, #f0e8d8 100%); border-left: 4px solid #8b7355; padding: 20px; border-radius: 8px; }
+        .stat-card .label { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #5d4e37; }
+        .stat-card .unit { font-size: 14px; color: #888; margin-left: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e8e8e0; }
+        th { background: #f8f4ec; font-weight: 600; color: #5d4e37; }
+        tr:hover { background: #faf8f4; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-high { background: #ffebee; color: #c62828; }
+        .badge-medium { background: #fff3e0; color: #ef6c00; }
+        .badge-low { background: #e8f5e9; color: #2e7d32; }
+        .badge-info { background: #e3f2fd; color: #1565c0; }
+        .anomaly-item { padding: 12px 16px; background: #fff8e1; border-left: 4px solid #ff9800; margin-bottom: 8px; border-radius: 4px; }
+        .anomaly-item.high { background: #ffebee; border-left-color: #f44336; }
+        .section-title { font-size: 16px; font-weight: 600; color: #5d4e37; margin: 20px 0 12px 0; }
+        .progress-bar { height: 8px; background: #e8e8e0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #8b7355, #a1887f); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 乡村民宿柴火消耗台账</h1>
+            <p>报告生成时间: 2026-05-10 04:11:28</p>
+            <p>数据周期: 全部 至 至今</p>
+        </div>
+
+        <div class="card">
+            <h2>📊 库存概览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">总入库量</div>
+                    <div class="value">2900.0<span class="unit">公斤</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">估算消耗</div>
+                    <div class="value">973.0<span class="unit">公斤</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">库存结余</div>
+                    <div class="value" style="color: #2e7d32">
+                        1927.0<span class="unit">公斤</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="card">
+            <h2>⚠️ 异常检查</h2>
+            <p style="color: #2e7d32; font-weight: 500;">✅ 未发现异常记录</p>
+        </div>
+            
+        
+        <div class="card">
+            <h2>🔥 炉具类型消耗分析</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>炉具类型</th>
+                        <th>入住次数</th>
+                        <th>日均消耗</th>
+                        <th>总消耗</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td><strong>壁炉</strong></td>
+                        <td>3 次</td>
+                        <td>6.0 公斤/天</td>
+                        <td>834.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 85.71428571428571%"></div>
+                                </div>
+                                <span>85.7%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>火炉</strong></td>
+                        <td>3 次</td>
+                        <td>5.0 公斤/天</td>
+                        <td>50.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 5.138746145940391%"></div>
+                                </div>
+                                <span>5.1%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>地暖</strong></td>
+                        <td>1 次</td>
+                        <td>7.0 公斤/天</td>
+                        <td>49.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 5.0359712230215825%"></div>
+                                </div>
+                                <span>5.0%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>土炕</strong></td>
+                        <td>1 次</td>
+                        <td>4.0 公斤/天</td>
+                        <td>40.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 4.110996916752312%"></div>
+                                </div>
+                                <span>4.1%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        
+        <div class="card">
+            <h2>🛏️ 房间消耗排行</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>房间</th>
+                        <th>名称</th>
+                        <th>入住次数</th>
+                        <th>总消耗</th>
+                        <th>占比</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td><strong>201</strong></td>
+                        <td>豪华套房</td>
+                        <td>1 次</td>
+                        <td>792.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 81.39773895169579%"></div>
+                                </div>
+                                <span>81.4%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>101</strong></td>
+                        <td>山景套房</td>
+                        <td>2 次</td>
+                        <td>77.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 7.913669064748201%"></div>
+                                </div>
+                                <span>7.9%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>103</strong></td>
+                        <td>家庭房</td>
+                        <td>1 次</td>
+                        <td>49.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 5.0359712230215825%"></div>
+                                </div>
+                                <span>5.0%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>202</strong></td>
+                        <td>暖炕房</td>
+                        <td>1 次</td>
+                        <td>40.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 4.110996916752312%"></div>
+                                </div>
+                                <span>4.1%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                    <tr>
+                        <td><strong>102</strong></td>
+                        <td>园景标间</td>
+                        <td>1 次</td>
+                        <td>15.0 公斤</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="progress-bar" style="width: 100px;">
+                                    <div class="progress-fill" style="width: 1.5416238437821173%"></div>
+                                </div>
+                                <span>1.5%</span>
+                            </div>
+                        </td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+        
+        <div class="card">
+            <h2>📋 入住记录明细</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>入住编码</th>
+                        <th>房间</th>
+                        <th>客人</th>
+                        <th>人数</th>
+                        <th>入住日期</th>
+                        <th>退房日期</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+        
+                    <tr>
+                        <td><code>STAY-20251125-006</code></td>
+                        <td>101 山景套房</td>
+                        <td>周八</td>
+                        <td>2</td>
+                        <td>2025-11-25</td>
+                        <td>2025-11-28</td>
+                        <td><span class="badge badge-low">已退房</span></td>
+                    </tr>
+            
+                    <tr>
+                        <td><code>STAY-20251120-005</code></td>
+                        <td>201 豪华套房</td>
+                        <td>孙七</td>
+                        <td>2</td>
+                        <td>2025-11-20</td>
+                        <td>-</td>
+                        <td><span class="badge badge-info">在住</span></td>
+                    </tr>
+            
+                    <tr>
+                        <td><code>STAY-20251115-004</code></td>
+                        <td>103 家庭房</td>
+                        <td>赵六</td>
+                        <td>3</td>
+                        <td>2025-11-15</td>
+                        <td>2025-11-22</td>
+                        <td><span class="badge badge-low">已退房</span></td>
+                    </tr>
+            
+                    <tr>
+                        <td><code>STAY-20251110-003</code></td>
+                        <td>202 暖炕房</td>
+                        <td>王五一家</td>
+                        <td>4</td>
+                        <td>2025-11-10</td>
+                        <td>2025-11-20</td>
+                        <td><span class="badge badge-low">已退房</span></td>
+                    </tr>
+            
+                    <tr>
+                        <td><code>STAY-20251105-002</code></td>
+                        <td>102 园景标间</td>
+                        <td>李四</td>
+                        <td>2</td>
+                        <td>2025-11-05</td>
+                        <td>2025-11-08</td>
+                        <td><span class="badge badge-low">已退房</span></td>
+                    </tr>
+            
+                    <tr>
+                        <td><code>STAY-20251101-001</code></td>
+                        <td>101 山景套房</td>
+                        <td>张三</td>
+                        <td>2</td>
+                        <td>2025-11-01</td>
+                        <td>2025-11-05</td>
+                        <td><span class="badge badge-low">已退房</span></td>
+                    </tr>
+            
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</body>
+</html>
+        
