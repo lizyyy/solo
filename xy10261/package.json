@@ -1,0 +1,57 @@
+{
+  "name": "shared-piano-room-settlement",
+  "version": "1.0.0",
+  "description": "共享琴房练习时长结算器",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-start\"",
+    "react-start": "react-scripts start",
+    "electron-start": "electron .",
+    "build": "react-scripts build",
+    "electron-pack": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "electron": "^31.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "electron-builder": "^24.13.0",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.pianoroom.settlement",
+    "productName": "共享琴房练习时长结算器",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "electron/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
