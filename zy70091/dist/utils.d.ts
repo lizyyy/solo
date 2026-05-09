@@ -1,0 +1,11 @@
+export declare function generateId(): string;
+export declare function normalizePlate(plate: string): string;
+export declare function dateToString(date: Date): string;
+export declare function stringToDate(str: string): Date;
+export declare function formatCurrency(amount: number): string;
+export declare function formatDateTime(date: Date): string;
+export declare function calculateDurationMinutes(entry: Date, exit: Date): number;
+export declare function formatDuration(minutes: number): string;
+export declare function translateStatus(status: string): string;
+export declare function translatePaymentChannel(channel: string): string;
+export declare function translateActionType(type: string): string;
