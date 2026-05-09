@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地下管线巡检路线模拟系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        #app {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #canvas-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #control-panel {
+            width: 380px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-left: 1px solid #3498db;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .panel-section {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            margin: 3px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+        
+        .info-label {
+            color: #a0a0a0;
+        }
+        
+        .info-value {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .status-ok {
+            color: #27ae60;
+        }
+        
+        .status-warning {
+            color: #f39c12;
+        }
+        
+        .status-error {
+            color: #e74c3c;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        
+        .checkbox-container input {
+            margin-right: 10px;
+        }
+        
+        #status-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #3498db;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 100;
+        }
+        
+        #status-message {
+            color: #3498db;
+            font-size: 14px;
+        }
+        
+        .list-container {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 4px;
+            padding: 5px;
+        }
+        
+        .list-item {
+            padding: 5px;
+            margin: 2px 0;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .list-item:hover {
+            background: rgba(52, 152, 219, 0.3);
+        }
+        
+        .list-item.active {
+            background: rgba(52, 152, 219, 0.5);
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-B1jiS7u4.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="canvas-container"></div>
+        
+        <div id="control-panel">
+            <div class="panel-section">
+                <div class="section-title">场景控制</div>
+                <button class="btn" id="btn-reset-view">重置视角</button>
+                <button class="btn" id="btn-toggle-wireframe">线框模式</button>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="show-labels" checked>
+                    <label for="show-labels">显示标签</label>
+                </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="show-boundary" checked>
+                    <label for="show-boundary">显示边界</label>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">管线点</div>
+                <button class="btn" id="btn-add-point">添加随机点</button>
+                <button class="btn btn-danger" id="btn-clear-points">清空点位</button>
+                <button class="btn btn-warning" id="btn-generate-demo">生成示例</button>
+                <div class="info-item">
+                    <span class="info-label">总点位:</span>
+                    <span class="info-value" id="total-points">0</span>
+                </div>
+                <div class="list-container" id="point-list"></div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">巡检路线</div>
+                <button class="btn btn-success" id="btn-auto-route">自动规划</button>
+                <button class="btn" id="btn-clear-route">清除路线</button>
+                <button class="btn" id="btn-play">播放</button>
+                <button class="btn" id="btn-pause">暂停</button>
+                <button class="btn" id="btn-stop">停止</button>
+                <div class="info-item">
+                    <span class="info-label">路线长度:</span>
+                    <span class="info-value" id="route-length">0 米</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">经过点位:</span>
+                    <span class="info-value" id="route-points">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">漏检点位:</span>
+                    <span class="info-value" id="missing-points">0</span>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">路径分析</div>
+                <button class="btn" id="btn-analyze">分析路线</button>
+                <div class="info-item">
+                    <span class="info-label">碰撞检测:</span>
+                    <span class="info-value" id="collision-status">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">边界校验:</span>
+                    <span class="info-value" id="boundary-status">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">覆盖率:</span>
+                    <span class="info-value" id="coverage-rate">0%</span>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">方案管理</div>
+                <button class="btn btn-success" id="btn-save">保存方案</button>
+                <button class="btn" id="btn-load">加载方案</button>
+                <button class="btn btn-warning" id="btn-export">导出报告</button>
+                <div class="list-container" id="saved-schemes"></div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="section-title">异常标记</div>
+                <button class="btn btn-danger" id="btn-mark-current">标记当前</button>
+                <button class="btn" id="btn-clear-marks">清除标记</button>
+                <div class="list-container" id="mark-list"></div>
+            </div>
+        </div>
+        
+        <div id="status-bar">
+            <div id="status-message">欢迎使用地下管线巡检路线模拟系统</div>
+        </div>
+    </div>
+    
+</body>
+</html>
