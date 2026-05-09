@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简历重复投递风险标注器</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">简历重复投递风险标注器</a>
+            <div class="navbar-nav">
+                <a class="nav-link active" href="#" data-tab="dashboard">仪表盘</a>
+                <a class="nav-link" href="#" data-tab="upload">数据导入</a>
+                <a class="nav-link" href="#" data-tab="resumes">简历列表</a>
+                <a class="nav-link" href="#" data-tab="detections">风险检测</a>
+                <a class="nav-link" href="#" data-tab="history">版本历史</a>
+                <a class="nav-link" href="#" data-tab="export">报告导出</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="dashboard-tab" class="tab-content active">
+            <h3 class="mb-4">数据概览</h3>
+            <div class="row mb-4" id="stats-cards"></div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">最近导入批次</div>
+                        <div class="card-body">
+                            <table class="table table-sm" id="recent-batches-table">
+                                <thead>
+                                    <tr><th>批次ID</th><th>文件名</th><th>成功/失败</th><th>导入时间</th></tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">快速操作</div>
+                        <div class="card-body">
+                            <button class="btn btn-primary w-100 mb-2" onclick="switchTab('upload')">
+                                导入新数据
+                            </button>
+                            <button class="btn btn-danger w-100 mb-2" onclick="runDetection()">
+                                运行重复检测
+                            </button>
+                            <button class="btn btn-warning w-100 mb-2" onclick="switchTab('detections')">
+                                查看待复核记录
+                            </button>
+                            <button class="btn btn-success w-100" onclick="switchTab('export')">
+                                导出报告
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="upload-tab" class="tab-content">
+            <h3 class="mb-4">数据导入</h3>
+            <div class="card mb-4">
+                <div class="card-header">上传简历数据</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">支持格式：CSV、Excel (.xlsx, .xls)</label>
+                        <input type="file" class="form-control" id="fileInput" accept=".csv,.xlsx,.xls">
+                    </div>
+                    <button class="btn btn-primary" onclick="uploadFile()">上传并导入</button>
+                    <div id="upload-result" class="mt-3"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">字段映射说明</div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>目标字段</th><th>支持的列名</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>姓名</td><td>姓名, 名字, Name</td></tr>
+                            <tr><td>手机号</td><td>手机, 手机号, 电话, Phone</td></tr>
+                            <tr><td>邮箱</td><td>邮箱, Email, E-mail</td></tr>
+                            <tr><td>身份证号</td><td>身份证, 身份证号, ID Number</td></tr>
+                            <tr><td>出生日期</td><td>生日, 出生日期, Birth Date</td></tr>
+                            <tr><td>其他字段</td><td>学历、学校、专业、公司、职位等</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="resumes-tab" class="tab-content">
+            <h3 class="mb-4">简历列表</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="resume-search" placeholder="搜索姓名/手机号/邮箱">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="resume-batch-filter">
+                                <option value="">所有批次</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" onclick="loadResumes()">搜索</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-hover" id="resumes-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>姓名</th><th>手机号</th><th>邮箱</th>
+                                <th>学历</th><th>学校</th><th>批次</th><th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <nav id="resumes-pagination"></nav>
+                </div>
+            </div>
+        </div>
+
+        <div id="detections-tab" class="tab-content">
+            <h3 class="mb-4">风险检测记录</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select class="form-control" id="det-risk-filter">
+                                <option value="">全部风险级别</option>
+                                <option value="high">高风险</option>
+                                <option value="medium">中风险</option>
+                                <option value="low">低风险</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="det-reviewed-filter">
+                                <option value="">全部状态</option>
+                                <option value="false">待复核</option>
+                                <option value="true">已复核</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="det-rollback-filter">
+                                <option value="">全部</option>
+                                <option value="false">正常</option>
+                                <option value="true">已回滚</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="loadDetections()">筛选</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-hover" id="detections-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>风险等级</th><th>分数</th>
+                                <th>候选人A</th><th>候选人B</th>
+                                <th>匹配原因</th><th>状态</th><th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <nav id="detections-pagination"></nav>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-tab" class="tab-content">
+            <h3 class="mb-4">版本历史</h3>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="number" class="form-control" id="history-detection-id" placeholder="输入检测记录ID查看详情">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="loadHistory()">查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-hover" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>检测ID</th><th>版本</th><th>操作</th><th>操作人</th>
+                                <th>变更内容</th><th>变更原因</th><th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="8" class="text-center">请输入检测记录ID查询历史</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="export-tab" class="tab-content">
+            <h3 class="mb-4">报告导出</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">风险检测报告</div>
+                        <div class="card-body">
+                            <p class="text-muted">导出所有风险检测记录，包含详细的匹配信息、复核状态和版本号。</p>
+                            <div class="mb-3">
+                                <select class="form-control" id="export-risk-level">
+                                    <option value="">全部风险级别</option>
+                                    <option value="high">高风险</option>
+                                    <option value="medium">中风险</option>
+                                    <option value="low">低风险</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" onclick="exportRiskReport()">导出Excel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">操作历史报告</div>
+                        <div class="card-body">
+                            <p class="text-muted">导出所有操作历史记录，可用于审计和追踪。</p>
+                            <div class="mb-3">
+                                <input type="number" class="form-control" id="export-history-id" placeholder="指定检测记录ID（可选）">
+                            </div>
+                            <button class="btn btn-success" onclick="exportHistoryReport()">导出Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">检测详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detailModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">人工复核</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="review-detection-id">
+                    <div class="mb-3">
+                        <label class="form-label">标注结果</label>
+                        <select class="form-control" id="review-label">
+                            <option value="confirmed_duplicate">确认重复投递</option>
+                            <option value="not_duplicate">非重复（误判）</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">复核备注</label>
+                        <textarea class="form-control" id="review-comment" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="submitReview()">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rollbackModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">误判回滚</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="rollback-detection-id">
+                    <div class="alert alert-warning">
+                        <strong>注意：</strong>回滚后该记录将被标记为已回滚，但不会物理删除。
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">回滚原因</label>
+                        <textarea class="form-control" id="rollback-reason" rows="3" placeholder="请输入回滚原因..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" onclick="submitRollback()">确认回滚</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

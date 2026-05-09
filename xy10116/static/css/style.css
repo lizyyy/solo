@@ -1,0 +1,57 @@
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+.risk-badge-high {
+    background-color: #dc3545;
+    color: white;
+}
+.risk-badge-medium {
+    background-color: #ffc107;
+    color: #212529;
+}
+.risk-badge-low {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-pending {
+    background-color: #6c757d;
+    color: white;
+}
+.status-confirmed {
+    background-color: #dc3545;
+    color: white;
+}
+.status-not-duplicate {
+    background-color: #28a745;
+    color: white;
+}
+
+.rollback-status {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+.version-tag {
+    font-size: 0.75em;
+    background: #007bff;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
