@@ -1,0 +1,18 @@
+{
+  "name": "sample-destruction-api",
+  "version": "1.0.0",
+  "description": "批次留样销毁 API 系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "test": "node tests/test-main.js && node tests/test-boundary.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^11.0.2",
+    "node-cron": "^3.0.3",
+    "multer": "^2.0.1"
+  },
+  "devDependencies": {}
+}
