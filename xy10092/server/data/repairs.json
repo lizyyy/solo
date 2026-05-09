@@ -1,0 +1,162 @@
+[
+  {
+    "id": "WX240001",
+    "studentId": "XS240001",
+    "studentName": "张三",
+    "studentPhone": "13800138001",
+    "dormBuilding": "1号楼",
+    "dormNumber": "301",
+    "repairType": "水暖维修",
+    "description": "水龙头漏水",
+    "repairDate": "2026-05-07",
+    "workerName": "李师傅",
+    "items": [
+      {
+        "id": "964ae789-0924-4390-a119-7f37b6ac2fea",
+        "materialId": "CL240001",
+        "type": "claim",
+        "quantity": 1,
+        "unitPrice": 25,
+        "createdAt": "2026-05-07T09:46:01.832Z",
+        "updatedAt": "2026-05-07T09:46:01.832Z"
+      },
+      {
+        "id": "d04bb221-9a46-462f-8942-4f51257dd6dc",
+        "materialId": "CL240005",
+        "type": "claim",
+        "quantity": 1,
+        "unitPrice": 3,
+        "createdAt": "2026-05-07T09:46:01.832Z",
+        "updatedAt": "2026-05-07T09:46:01.832Z"
+      }
+    ],
+    "status": "completed",
+    "confirmedByStudent": "张三",
+    "studentConfirmationDate": "2026-05-08T09:46:01.832Z",
+    "hasDiscrepancy": false,
+    "createdAt": "2026-05-07T09:46:01.832Z",
+    "updatedAt": "2026-05-08T09:46:01.832Z",
+    "history": [
+      {
+        "id": "ad8c9773-6c6b-4cdd-98f3-3351c6e3f2fb",
+        "action": "创建维修单",
+        "actor": "李师傅",
+        "timestamp": "2026-05-07T09:46:01.832Z",
+        "details": {
+          "repairType": "水暖维修",
+          "dorm": "1号楼-301"
+        }
+      },
+      {
+        "id": "8ec0d0fb-ce1e-4eb8-96b6-f2b02614f427",
+        "action": "学生确认",
+        "actor": "张三",
+        "timestamp": "2026-05-08T09:46:01.832Z",
+        "details": {
+          "hasDiscrepancy": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "WX240002",
+    "studentId": "XS240002",
+    "studentName": "李四",
+    "studentPhone": "13800138002",
+    "dormBuilding": "2号楼",
+    "dormNumber": "502",
+    "repairType": "电器维修",
+    "description": "房间灯不亮",
+    "repairDate": "2026-05-08",
+    "workerName": "王师傅",
+    "items": [
+      {
+        "id": "0f1ab944-70dd-4a85-82d5-d3fe139c0eb5",
+        "materialId": "CL240002",
+        "type": "claim",
+        "quantity": 2,
+        "unitPrice": 15,
+        "createdAt": "2026-05-08T09:46:01.832Z",
+        "updatedAt": "2026-05-08T09:46:01.832Z"
+      }
+    ],
+    "status": "pending_verification",
+    "confirmedByStudent": null,
+    "studentConfirmationDate": null,
+    "hasDiscrepancy": false,
+    "createdAt": "2026-05-08T09:46:01.832Z",
+    "updatedAt": "2026-05-08T09:46:01.832Z",
+    "history": [
+      {
+        "id": "9464784f-0b92-43f8-8d41-84fbaa9da1e4",
+        "action": "创建维修单",
+        "actor": "王师傅",
+        "timestamp": "2026-05-08T09:46:01.832Z",
+        "details": {
+          "repairType": "电器维修",
+          "dorm": "2号楼-502"
+        }
+      }
+    ]
+  },
+  {
+    "id": "WX240003",
+    "studentId": "XS240003",
+    "studentName": "王五",
+    "studentPhone": "13800138003",
+    "dormBuilding": "1号楼",
+    "dormNumber": "405",
+    "repairType": "五金维修",
+    "description": "门锁损坏",
+    "repairDate": "2026-05-08",
+    "workerName": "李师傅",
+    "items": [
+      {
+        "id": "21da433b-fcb3-4212-8a1b-75fda382bafb",
+        "materialId": "CL240003",
+        "type": "claim",
+        "quantity": 1,
+        "unitPrice": 45,
+        "createdAt": "2026-05-08T09:46:01.832Z",
+        "updatedAt": "2026-05-08T09:46:01.832Z"
+      },
+      {
+        "id": "ccb822b0-b642-48f4-b93a-b3b78c3ead42",
+        "materialId": "CL240003",
+        "type": "return",
+        "quantity": 2,
+        "unitPrice": 45,
+        "createdAt": "2026-05-09T09:46:01.832Z",
+        "updatedAt": "2026-05-09T09:46:01.832Z"
+      }
+    ],
+    "status": "discrepancy",
+    "confirmedByStudent": "王五",
+    "studentConfirmationDate": "2026-05-09T09:46:01.832Z",
+    "hasDiscrepancy": true,
+    "discrepancyNote": "退料数量不对",
+    "createdAt": "2026-05-08T09:46:01.832Z",
+    "updatedAt": "2026-05-09T09:46:01.832Z",
+    "history": [
+      {
+        "id": "8ebb0d89-7796-4b7d-aaa1-2c3a9d2852fc",
+        "action": "创建维修单",
+        "actor": "李师傅",
+        "timestamp": "2026-05-08T09:46:01.832Z",
+        "details": {
+          "repairType": "五金维修",
+          "dorm": "1号楼-405"
+        }
+      },
+      {
+        "id": "8995764d-07cc-4ffa-8553-179714bf2282",
+        "action": "学生确认",
+        "actor": "王五",
+        "timestamp": "2026-05-09T09:46:01.832Z",
+        "details": {
+          "hasDiscrepancy": true
+        }
+      }
+    ]
+  }
+]
