@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实验仪器校准提醒桌面台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>实验仪器校准提醒桌面台</h1>
+            <p class="subtitle">管理您的仪器校准证书，再也不会错过校准时间</p>
+        </header>
+
+        <nav class="app-nav">
+            <button class="nav-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="nav-btn" data-tab="instruments">仪器管理</button>
+            <button class="nav-btn" data-tab="import">数据导入</button>
+            <button class="nav-btn" data-tab="history">历史记录</button>
+            <button class="nav-btn" data-tab="export">导出清单</button>
+        </nav>
+
+        <main class="app-main">
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-cards">
+                    <div class="card">
+                        <div class="card-icon warning">⚠️</div>
+                        <div class="card-content">
+                            <div class="card-number" id="expiring-count">0</div>
+                            <div class="card-label">即将到期（30天内）</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon danger">🔴</div>
+                        <div class="card-content">
+                            <div class="card-number" id="expired-count">0</div>
+                            <div class="card-label">已过期</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon success">✅</div>
+                        <div class="card-content">
+                            <div class="card-number" id="valid-count">0</div>
+                            <div class="card-label">有效期内</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon info">📊</div>
+                        <div class="card-content">
+                            <div class="card-number" id="total-count">0</div>
+                            <div class="card-label">仪器总数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h2>需要关注的仪器</h2>
+                    <div id="attention-list" class="instrument-list">
+                        <p class="empty-state">暂无需要关注的仪器</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="instruments" class="tab-content">
+                <div class="section-header">
+                    <h2>仪器管理</h2>
+                    <div class="action-buttons">
+                        <input type="text" id="search-input" placeholder="搜索仪器编号或名称...">
+                        <select id="filter-status">
+                            <option value="all">全部状态</option>
+                            <option value="expired">已过期</option>
+                            <option value="expiring">即将到期</option>
+                            <option value="valid">有效期内</option>
+                        </select>
+                        <button class="btn-primary" id="add-instrument-btn">+ 新增仪器</button>
+                    </div>
+                </div>
+                <div id="instrument-list" class="instrument-list">
+                    <p class="empty-state">暂无仪器数据，请先导入或添加</p>
+                </div>
+            </div>
+
+            <div id="import" class="tab-content">
+                <div class="section-header">
+                    <h2>数据导入</h2>
+                </div>
+                <div class="import-section">
+                    <h3>文件导入</h3>
+                    <div class="file-upload-area" id="file-upload-area">
+                        <input type="file" id="file-input" accept=".json,.csv" hidden>
+                        <div class="upload-content">
+                            <div class="upload-icon">📁</div>
+                            <p>点击或拖拽文件到此处导入</p>
+                            <p class="upload-hint">支持 JSON 和 CSV 格式</p>
+                            <button class="btn-secondary" id="select-file-btn">选择文件</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="import-section">
+                    <h3>模板下载</h3>
+                    <p>下载导入模板，按格式填写后即可导入</p>
+                    <button class="btn-secondary" id="download-template-json">下载 JSON 模板</button>
+                    <button class="btn-secondary" id="download-template-csv">下载 CSV 模板</button>
+                </div>
+
+                <div id="preview-section" class="import-section" style="display: none;">
+                    <h3>导入预览（请人工复核）</h3>
+                    <div id="preview-messages"></div>
+                    <div class="preview-table-container">
+                        <table class="preview-table">
+                            <thead>
+                                <tr>
+                                    <th>仪器编号</th>
+                                    <th>仪器名称</th>
+                                    <th>型号</th>
+                                    <th>校准日期</th>
+                                    <th>到期日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="preview-actions">
+                        <button class="btn-secondary" id="cancel-import">取消</button>
+                        <button class="btn-primary" id="confirm-import">确认导入</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history" class="tab-content">
+                <div class="section-header">
+                    <h2>历史记录</h2>
+                    <div class="action-buttons">
+                        <button class="btn-secondary" id="clear-history">清空历史</button>
+                    </div>
+                </div>
+                <div id="history-list" class="history-list">
+                    <p class="empty-state">暂无历史记录</p>
+                </div>
+            </div>
+
+            <div id="export" class="tab-content">
+                <div class="section-header">
+                    <h2>导出清单</h2>
+                </div>
+                <div class="export-section">
+                    <h3>选择导出范围</h3>
+                    <div class="export-options">
+                        <label><input type="checkbox" id="export-all" checked> 全部仪器</label>
+                        <label><input type="checkbox" id="export-expired"> 已过期</label>
+                        <label><input type="checkbox" id="export-expiring"> 即将到期</label>
+                        <label><input type="checkbox" id="export-valid"> 有效期内</label>
+                    </div>
+                    <h3>选择导出格式</h3>
+                    <div class="export-actions">
+                        <button class="btn-primary" id="export-json-btn">导出为 JSON</button>
+                        <button class="btn-primary" id="export-csv-btn">导出为 CSV</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">仪器详情</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
