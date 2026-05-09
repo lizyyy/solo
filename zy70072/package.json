@@ -1,0 +1,19 @@
+{
+  "name": "meeting-todo-archive-api",
+  "version": "1.0.0",
+  "description": "会议待办归档 API - 解决会议待办状态同步和归档管理",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node scripts/test-flow.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
