@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冷链签收异常协同台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; color: #333; }
+        .header { background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .header .subtitle { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card .label { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; }
+        .stat-card.total .value { color: #1a5276; }
+        .stat-card.normal .value { color: #27ae60; }
+        .stat-card.abnormal .value { color: #e74c3c; }
+        .stat-card.pending .value { color: #f39c12; }
+        .stat-card.resolved .value { color: #3498db; }
+        .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 20px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; }
+        .card-header h2 { font-size: 16px; font-weight: 600; color: #333; }
+        .card-body { padding: 20px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .btn-primary { background: #2980b9; color: white; }
+        .btn-primary:hover { background: #1a5276; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #1e8449; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #d68910; }
+        .btn-default { background: #95a5a6; color: white; }
+        .btn-default:hover { background: #7f8c8d; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #2980b9; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fef3cd; color: #92400e; }
+        .status-normal { background: #dcfce7; color: #166534; }
+        .status-abnormal { background: #fee2e2; color: #991b1b; }
+        .status-resolved { background: #dbeafe; color: #1e40af; }
+        .record-list { list-style: none; max-height: 600px; overflow-y: auto; }
+        .record-item { padding: 14px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.2s; border-left: 3px solid transparent; }
+        .record-item:hover { background: #f8fafc; }
+        .record-item.active { background: #eff6ff; border-left-color: #2980b9; }
+        .record-item .batch { font-weight: 600; color: #1a5276; font-size: 14px; }
+        .record-item .product { font-size: 13px; color: #555; margin-top: 4px; }
+        .record-item .meta { font-size: 12px; color: #888; margin-top: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .alert-banner { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .alert-banner.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .alert-banner.success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+        .alert-banner.info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+        .tabs { display: flex; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab:hover { color: #2980b9; }
+        .tab.active { color: #2980b9; border-bottom-color: #2980b9; font-weight: 500; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h3 { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+        .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .detail-item { padding: 12px; background: #f8fafc; border-radius: 4px; }
+        .detail-item .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+        .detail-item .value { font-size: 14px; font-weight: 500; }
+        .evidence-list, .transfer-list, .review-list, .message-list, .log-list { list-style: none; }
+        .evidence-item, .transfer-item, .review-item, .message-item, .log-item { padding: 12px; border-bottom: 1px solid #eee; }
+        .evidence-item:last-child, .transfer-item:last-child, .review-item:last-child, .message-item:last-child, .log-item:last-child { border-bottom: none; }
+        .evidence-item .temp-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: 600; margin-right: 8px; }
+        .temp-normal { background: #dcfce7; color: #166534; }
+        .temp-abnormal { background: #fee2e2; color: #991b1b; }
+        .message-item { border-left: 3px solid #e5e7eb; padding-left: 12px; }
+        .message-item.driver { border-left-color: #f39c12; }
+        .message-item.warehouse { border-left-color: #9b59b6; }
+        .message-item.customer { border-left-color: #3498db; }
+        .message-item.admin { border-left-color: #27ae60; }
+        .message-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .message-sender { font-weight: 500; font-size: 13px; }
+        .message-time { font-size: 12px; color: #888; }
+        .message-content { font-size: 14px; color: #444; }
+        .role-tag { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-left: 6px; }
+        .role-driver { background: #fef3cd; color: #92400e; }
+        .role-warehouse { background: #f3e8ff; color: #6b21a8; }
+        .role-customer { background: #dbeafe; color: #1e40af; }
+        .role-admin { background: #dcfce7; color: #166534; }
+        .report-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; }
+        .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+        .report-no { font-weight: 600; color: #1a5276; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 16px; font-weight: 600; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .close-btn:hover { color: #333; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        .filter-row { display: flex; gap: 10px; margin-bottom: 12px; }
+        .filter-row select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+        .actions-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .temp-indicator { display: inline-flex; align-items: center; gap: 6px; }
+        .temp-range { font-size: 12px; color: #666; }
+        .temp-actual { font-weight: 600; }
+        .temp-actual.abnormal { color: #e74c3c; }
+        .validation-error { color: #e74c3c; font-size: 12px; margin-top: 4px; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 4px; color: white; font-size: 14px; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: #27ae60; }
+        .toast.error { background: #e74c3c; }
+        .toast.info { background: #3498db; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❄️ 冷链签收异常协同台</h1>
+        <div class="subtitle">签收温度异常协同处理 · 仓库 · 司机 · 客户三方协同</div>
+    </div>
+
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card total"><div class="label">总签收单</div><div class="value" id="stat-total">0</div></div>
+            <div class="stat-card normal"><div class="label">温度正常</div><div class="value" id="stat-normal">0</div></div>
+            <div class="stat-card abnormal"><div class="label">温度异常</div><div class="value" id="stat-abnormal">0</div></div>
+            <div class="stat-card pending"><div class="label">待处理</div><div class="value" id="stat-pending">0</div></div>
+            <div class="stat-card resolved"><div class="label">已解决</div><div class="value" id="stat-resolved">0</div></div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 签收记录列表</h2>
+                    <button class="btn btn-primary btn-sm" onclick="openModal('createModal')">+ 新建签收</button>
+                </div>
+                <div class="card-body">
+                    <div class="filter-row">
+                        <select id="statusFilter" onchange="loadRecords()">
+                            <option value="">全部状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="normal">正常</option>
+                            <option value="abnormal">异常</option>
+                            <option value="resolved">已解决</option>
+                        </select>
+                    </div>
+                    <ul class="record-list" id="recordList">
+                        <div class="empty-state"><div class="icon">📦</div><div>暂无签收记录</div></div>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card" id="detailCard" style="display: none;">
+                <div class="card-header">
+                    <h2 id="detailTitle">详情</h2>
+                    <span id="detailBadge"></span>
+                </div>
+                <div class="card-body" id="detailContent">
+                </div>
+            </div>
+
+            <div class="card" id="emptyDetailCard">
+                <div class="card-body">
+                    <div class="empty-state" style="padding: 80px 20px;">
+                        <div class="icon">👈</div>
+                        <div style="font-size: 16px;">请从左侧选择一条签收记录查看详情</div>
+                        <div style="font-size: 13px; margin-top: 8px;">或点击"新建签收"创建新记录</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <div class="modal-header"><h3>📝 新建签收记录</h3><button class="close-btn" onclick="closeModal('createModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="createForm">
+                    <div class="form-group"><label>产品名称 *</label><input type="text" name="product_name" required placeholder="如：冷冻牛肉"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>数量（件）*</label><input type="number" name="quantity" required min="1"></div>
+                        <div class="form-group"><label>签收时间</label><input type="datetime-local" name="sign_time"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>司机姓名 *</label><input type="text" name="driver_name" required placeholder="如：张师傅"></div>
+                        <div class="form-group"><label>仓库 *</label><input type="text" name="warehouse_name" required placeholder="如：华东冷链仓"></div>
+                        <div class="form-group"><label>客户 *</label><input type="text" name="customer_name" required placeholder="如：鲜丰超市"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>期望温度下限 (°C) *</label><input type="number" name="expected_temp_min" required step="0.1" placeholder="-18"></div>
+                        <div class="form-group"><label>期望温度上限 (°C) *</label><input type="number" name="expected_temp_max" required step="0.1" placeholder="-15"></div>
+                    </div>
+                    <div class="form-group"><label>实测温度 (°C)（可选，可稍后补录）</label><input type="number" name="actual_temp" step="0.1" placeholder="如：-12"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('createModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitCreate()">提交签收</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="tempModal">
+        <div class="modal">
+            <div class="modal-header"><h3>🌡️ 上传温度证据</h3><button class="close-btn" onclick="closeModal('tempModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="tempForm">
+                    <div class="form-row">
+                        <div class="form-group"><label>实测温度 (°C) *</label><input type="number" name="temp" required step="0.1"></div>
+                        <div class="form-group"><label>上传角色 *</label>
+                            <select name="source" required>
+                                <option value="driver">司机</option>
+                                <option value="warehouse">仓库</option>
+                                <option value="customer">客户</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>上传人 *</label><input type="text" name="uploader" required></div>
+                    <div class="form-group"><label>备注</label><textarea name="remark" rows="3" placeholder="温度测量说明..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('tempModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitTemp()">提交证据</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal">
+            <div class="modal-header"><h3>🔄 责任流转</h3><button class="close-btn" onclick="closeModal('transferModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="transferForm">
+                    <div class="form-row">
+                        <div class="form-group"><label>转出角色 *</label>
+                            <select name="from_role" required>
+                                <option value="customer">客户</option>
+                                <option value="warehouse">仓库</option>
+                                <option value="driver">司机</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>转出人 *</label><input type="text" name="from_user" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>转入角色 *</label>
+                            <select name="to_role" required>
+                                <option value="driver">司机</option>
+                                <option value="warehouse">仓库</option>
+                                <option value="customer">客户</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>转入人 *</label><input type="text" name="to_user" required></div>
+                    </div>
+                    <div class="form-group"><label>流转原因 *</label><textarea name="reason" rows="3" required placeholder="请说明责任流转的原因..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('transferModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitTransfer()">提交流转</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal">
+            <div class="modal-header"><h3>📋 补录审核申请</h3><button class="close-btn" onclick="closeModal('reviewModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    <div class="form-row">
+                        <div class="form-group"><label>申请人角色 *</label>
+                            <select name="submit_role" required>
+                                <option value="driver">司机</option>
+                                <option value="warehouse">仓库</option>
+                                <option value="customer">客户</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>申请人 *</label><input type="text" name="submitter" required></div>
+                    </div>
+                    <div class="form-group"><label>补录内容 *</label><textarea name="content" rows="5" required placeholder="请详细描述需要补录的内容..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('reviewModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">提交申请</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal">
+            <div class="modal-header"><h3>💬 发送消息</h3><button class="close-btn" onclick="closeModal('messageModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    <div class="form-row">
+                        <div class="form-group"><label>发送人角色 *</label>
+                            <select name="sender_role" required>
+                                <option value="driver">司机</option>
+                                <option value="warehouse">仓库</option>
+                                <option value="customer">客户</option>
+                                <option value="admin">管理员</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>发送人 *</label><input type="text" name="sender" required></div>
+                    </div>
+                    <div class="form-group"><label>消息内容 *</label><textarea name="content" rows="4" required placeholder="请输入消息内容..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('messageModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal">
+            <div class="modal-header"><h3>📊 生成追溯报告</h3><button class="close-btn" onclick="closeModal('reportModal')">&times;</button></div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="form-group"><label>生成人 *</label><input type="text" name="generated_by" required placeholder="管理员姓名"></div>
+                    <div class="form-group"><label>根本原因分析 *</label><textarea name="root_cause" rows="4" required placeholder="请详细分析温度异常的根本原因..."></textarea></div>
+                    <div class="form-group"><label>责任认定 *</label>
+                        <select name="responsibility" required>
+                            <option value="driver">司机责任（运输途中制冷故障）</option>
+                            <option value="warehouse">仓库责任（出库时温度超标）</option>
+                            <option value="customer">客户责任（签收延迟）</option>
+                            <option value="shared">多方共同责任</option>
+                            <option value="other">其他原因</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>改进措施 *</label><textarea name="action_plan" rows="4" required placeholder="请制定具体的改进和预防措施..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('reportModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReport()">生成报告</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reviewActionModal">
+        <div class="modal">
+            <div class="modal-header"><h3>✅ 审核补录申请</h3><button class="close-btn" onclick="closeModal('reviewActionModal')">&times;</button></div>
+            <div class="modal-body">
+                <div id="reviewActionContent"></div>
+                <form id="reviewActionForm">
+                    <div class="form-group"><label>审核人 *</label><input type="text" name="reviewer" required></div>
+                    <div class="form-group"><label>审核备注</label><textarea name="review_remark" rows="3" placeholder="请输入审核备注..."></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeModal('reviewActionModal')">取消</button>
+                <button class="btn btn-danger" onclick="processReview('rejected')">拒绝</button>
+                <button class="btn btn-success" onclick="processReview('approved')">通过</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRecordId = null;
+        let currentReviewId = null;
+
+        const roleLabels = { driver: '司机', warehouse: '仓库', customer: '客户', admin: '管理员' };
+        const statusLabels = { pending: '待处理', normal: '正常', abnormal: '异常', resolved: '已解决' };
+        const statusClasses = { pending: 'status-pending', normal: 'status-normal', abnormal: 'status-abnormal', resolved: 'status-resolved' };
+        const responsibilityLabels = { driver: '司机责任', warehouse: '仓库责任', customer: '客户责任', shared: '多方共同责任', other: '其他原因' };
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        async function api(endpoint, options = {}) {
+            const res = await fetch('/api' + endpoint, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
+        }
+
+        async function loadStats() {
+            const stats = await api('/stats');
+            document.getElementById('stat-total').textContent = stats.total;
+            document.getElementById('stat-normal').textContent = stats.normal;
+            document.getElementById('stat-abnormal').textContent = stats.abnormal;
+            document.getElementById('stat-pending').textContent = stats.pending;
+            document.getElementById('stat-resolved').textContent = stats.resolved;
+        }
+
+        async function loadRecords() {
+            const status = document.getElementById('statusFilter').value;
+            const url = status ? `/records?status=${status}` : '/records';
+            const records = await api(url);
+            const list = document.getElementById('recordList');
+            list.innerHTML = '';
+
+            if (!records.length) {
+                list.innerHTML = '<div class="empty-state"><div class="icon">📦</div><div>暂无签收记录</div></div>';
+                return;
+            }
+
+            records.forEach(r => {
+                const li = document.createElement('li');
+                li.className = 'record-item' + (currentRecordId === r.id ? ' active' : '');
+                li.onclick = () => selectRecord(r.id);
+                li.innerHTML = `
+                    <div class="batch">${r.batch_no}</div>
+                    <div class="product">${r.product_name} · ${r.quantity}件</div>
+                    <div class="meta">
+                        <span>仓库: ${r.warehouse_name}</span>
+                        <span class="status-badge ${statusClasses[r.status]}">${statusLabels[r.status]}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        async function selectRecord(id) {
+            currentRecordId = id;
+            loadRecords();
+            document.getElementById('emptyDetailCard').style.display = 'none';
+            document.getElementById('detailCard').style.display = 'block';
+            await loadDetail();
+        }
+
+        async function loadDetail() {
+            if (!currentRecordId) return;
+            const record = await api(`/records/${currentRecordId}`);
+            const [evidence, transfers, reviews, messages, report, logs] = await Promise.all([
+                api(`/records/${currentRecordId}/temp-evidence`),
+                api(`/records/${currentRecordId}/transfers`),
+                api(`/records/${currentRecordId}/reviews`),
+                api(`/records/${currentRecordId}/messages`),
+                api(`/records/${currentRecordId}/report`),
+                api(`/records/${currentRecordId}/audit-logs`)
+            ]);
+
+            document.getElementById('detailTitle').textContent = `📦 ${record.batch_no}`;
+            document.getElementById('detailBadge').innerHTML = `<span class="status-badge ${statusClasses[record.status]}">${statusLabels[record.status]}</span>`;
+
+            let alertHtml = '';
+            if (record.status === 'abnormal') {
+                alertHtml = `<div class="alert-banner">⚠️ <strong>温度异常！</strong> 请协同三方处理。期望温度: ${record.expected_temp_min}°C ~ ${record.expected_temp_max}°C，实测: ${record.actual_temp ?? '未录入'}°C</div>`;
+            } else if (record.status === 'pending') {
+                alertHtml = `<div class="alert-banner warning">⏳ <strong>待确认</strong> 请上传温度证据以确认状态。</div>`;
+            } else if (record.status === 'resolved') {
+                alertHtml = `<div class="alert-banner success">✅ <strong>已解决</strong> 该异常已完成追溯并生成报告。</div>`;
+            }
+
+            let tempDisplay = '';
+            if (record.actual_temp !== null) {
+                const isAbnormal = record.actual_temp < record.expected_temp_min || record.actual_temp > record.expected_temp_max;
+                tempDisplay = `<span class="temp-actual ${isAbnormal ? 'abnormal' : ''}">${record.actual_temp}°C</span>`;
+            } else {
+                tempDisplay = '<span style="color: #999;">未录入</span>';
+            }
+
+            const isResolved = record.status === 'resolved';
+
+            document.getElementById('detailContent').innerHTML = `
+                ${alertHtml}
+                <div class="detail-section">
+                    <h3>📋 签收基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">批次号</div><div class="value">${record.batch_no}</div></div>
+                        <div class="detail-item"><div class="label">产品名称</div><div class="value">${record.product_name}</div></div>
+                        <div class="detail-item"><div class="label">数量</div><div class="value">${record.quantity} 件</div></div>
+                        <div class="detail-item"><div class="label">司机</div><div class="value">${record.driver_name}</div></div>
+                        <div class="detail-item"><div class="label">仓库</div><div class="value">${record.warehouse_name}</div></div>
+                        <div class="detail-item"><div class="label">客户</div><div class="value">${record.customer_name}</div></div>
+                        <div class="detail-item"><div class="label">期望温度范围</div><div class="value temp-range">${record.expected_temp_min}°C ~ ${record.expected_temp_max}°C</div></div>
+                        <div class="detail-item"><div class="label">实测温度</div><div class="value">${tempDisplay}</div></div>
+                        <div class="detail-item"><div class="label">签收时间</div><div class="value">${record.sign_time}</div></div>
+                    </div>
+                    <div class="actions-row">
+                        <button class="btn btn-warning btn-sm" onclick="openModal('tempModal')" ${isResolved ? 'disabled' : ''}>🌡️ 上传温度证据</button>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('transferModal')" ${isResolved ? 'disabled' : ''}>🔄 责任流转</button>
+                        <button class="btn btn-default btn-sm" onclick="openModal('reviewModal')" ${isResolved ? 'disabled' : ''}>📋 补录审核</button>
+                        <button class="btn btn-default btn-sm" onclick="openModal('messageModal')">💬 发送消息</button>
+                        ${(record.status === 'abnormal' || record.status === 'pending') ? `<button class="btn btn-success btn-sm" onclick="openModal('reportModal')">📊 生成追溯报告</button>` : ''}
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('tabEvidence', this)">🌡️ 温度证据 (${evidence.length})</div>
+                    <div class="tab" onclick="switchTab('tabTransfer', this)">🔄 责任流转 (${transfers.length})</div>
+                    <div class="tab" onclick="switchTab('tabReview', this)">📋 补录审核 (${reviews.length})</div>
+                    <div class="tab" onclick="switchTab('tabMessage', this)">💬 消息记录 (${messages.length})</div>
+                    <div class="tab" onclick="switchTab('tabReport', this)">📊 追溯报告</div>
+                    <div class="tab" onclick="switchTab('tabLog', this)">📝 操作日志</div>
+                </div>
+
+                <div id="tabEvidence" class="tab-content active">
+                    ${evidence.length ? `
+                        <ul class="evidence-list">
+                            ${evidence.map(e => {
+                                const isAbnormal = e.temp < record.expected_temp_min || e.temp > record.expected_temp_max;
+                                return `
+                                    <li class="evidence-item">
+                                        <div style="margin-bottom: 6px;">
+                                            <span class="temp-badge ${isAbnormal ? 'temp-abnormal' : 'temp-normal'}">${e.temp}°C</span>
+                                            <span class="role-tag role-${e.source}">${roleLabels[e.source]}</span>
+                                            <span style="font-size: 13px; margin-left: 8px;">${e.uploader}</span>
+                                        </div>
+                                        <div style="font-size: 12px; color: #666;">📅 ${e.upload_time}</div>
+                                        ${e.remark ? `<div style="font-size: 13px; margin-top: 6px; color: #555;">💬 ${e.remark}</div>` : ''}
+                                    </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    ` : '<div class="empty-state"><div class="icon">🌡️</div><div>暂无温度证据</div></div>'}
+                </div>
+
+                <div id="tabTransfer" class="tab-content">
+                    ${transfers.length ? `
+                        <ul class="transfer-list">
+                            ${transfers.map(t => `
+                                <li class="transfer-item">
+                                    <div style="margin-bottom: 6px;">
+                                        <span class="role-tag role-${t.from_role}">${roleLabels[t.from_role]}</span>
+                                        <span style="margin: 0 8px;">${t.from_user}</span>
+                                        <span style="color: #999;">→</span>
+                                        <span style="margin: 0 8px;">${t.to_user}</span>
+                                        <span class="role-tag role-${t.to_role}">${roleLabels[t.to_role]}</span>
+                                        <span style="float: right;" class="status-badge ${t.status === 'accepted' ? 'status-normal' : t.status === 'rejected' ? 'status-abnormal' : 'status-pending'}">${t.status === 'accepted' ? '已接受' : t.status === 'rejected' ? '已拒绝' : '待确认'}</span>
+                                    </div>
+                                    <div style="font-size: 13px; color: #555; margin-bottom: 6px;">📝 ${t.reason}</div>
+                                    <div style="font-size: 12px; color: #666;">📅 ${t.transfer_time}</div>
+                                    ${t.status === 'pending' && !isResolved ? `
+                                        <div class="actions-row" style="margin-top: 10px;">
+                                            <button class="btn btn-success btn-sm" onclick="handleTransfer(${t.id}, 'accepted')">接受</button>
+                                            <button class="btn btn-danger btn-sm" onclick="handleTransfer(${t.id}, 'rejected')">拒绝</button>
+                                        </div>
+                                    ` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<div class="empty-state"><div class="icon">🔄</div><div>暂无责任流转记录</div></div>'}
+                </div>
+
+                <div id="tabReview" class="tab-content">
+                    ${reviews.length ? `
+                        <ul class="review-list">
+                            ${reviews.map(r => `
+                                <li class="review-item">
+                                    <div style="margin-bottom: 6px;">
+                                        <span class="role-tag role-${r.submit_role}">${roleLabels[r.submit_role]}</span>
+                                        <span style="margin-left: 8px; font-weight: 500;">${r.submitter}</span>
+                                        <span style="float: right;" class="status-badge ${r.review_status === 'approved' ? 'status-normal' : r.review_status === 'rejected' ? 'status-abnormal' : 'status-pending'}">${r.review_status === 'approved' ? '已通过' : r.review_status === 'rejected' ? '已拒绝' : '待审核'}</span>
+                                    </div>
+                                    <div style="font-size: 13px; color: #555; margin-bottom: 6px;">📝 ${r.content}</div>
+                                    <div style="font-size: 12px; color: #666;">📅 申请时间: ${r.submit_time}</div>
+                                    ${r.review_status !== 'pending' ? `
+                                        <div style="font-size: 12px; color: #666; margin-top: 4px;">✅ 审核人: ${r.reviewer} · ${r.review_time}${r.review_remark ? ` · 备注: ${r.review_remark}` : ''}</div>
+                                    ` : ''}
+                                    ${r.review_status === 'pending' && !isResolved ? `
+                                        <div class="actions-row" style="margin-top: 10px;">
+                                            <button class="btn btn-warning btn-sm" onclick="openReviewAction(${r.id}, '${r.submitter}', '${roleLabels[r.submit_role]}', '${r.content}')">审核</button>
+                                        </div>
+                                    ` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<div class="empty-state"><div class="icon">📋</div><div>暂无补录审核申请</div></div>'}
+                </div>
+
+                <div id="tabMessage" class="tab-content">
+                    ${messages.length ? `
+                        <ul class="message-list">
+                            ${messages.map(m => `
+                                <li class="message-item ${m.sender_role}">
+                                    <div class="message-header">
+                                        <span class="message-sender">${m.sender}<span class="role-tag role-${m.sender_role}">${roleLabels[m.sender_role]}</span></span>
+                                        <span class="message-time">${m.created_at}</span>
+                                    </div>
+                                    <div class="message-content">${m.content}</div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<div class="empty-state"><div class="icon">💬</div><div>暂无消息记录</div></div>'}
+                </div>
+
+                <div id="tabReport" class="tab-content">
+                    ${report ? `
+                        <div class="report-box">
+                            <div class="report-header">
+                                <div class="report-no">📊 追溯报告 · ${report.report_no}</div>
+                                <div style="font-size: 12px; color: #666;">生成时间: ${report.generated_at}</div>
+                            </div>
+                            <div class="detail-section" style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: #666; margin-bottom: 4px;">生成人</div>
+                                <div style="font-weight: 500; margin-bottom: 12px;">${report.generated_by}</div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 4px;">根本原因分析</div>
+                                <div style="background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #e2e8f0; margin-bottom: 12px; white-space: pre-wrap;">${report.root_cause}</div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 4px;">责任认定</div>
+                                <div style="font-weight: 500; margin-bottom: 12px;"><span class="status-badge status-abnormal">${responsibilityLabels[report.responsibility] || report.responsibility}</span></div>
+                                <div style="font-size: 13px; color: #666; margin-bottom: 4px;">改进措施</div>
+                                <div style="background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap;">${report.action_plan}</div>
+                            </div>
+                            <div class="alert-banner info" style="margin-top: 16px; margin-bottom: 0;">
+                                📋 报告明细与签收记录已关联，可在操作日志中追溯完整流程。
+                            </div>
+                        </div>
+                    ` : '<div class="empty-state"><div class="icon">📊</div><div>暂无追溯报告</div><div style="font-size: 13px; margin-top: 8px;">点击"生成追溯报告"按钮创建报告</div></div>'}
+                </div>
+
+                <div id="tabLog" class="tab-content">
+                    ${logs.length ? `
+                        <ul class="log-list">
+                            ${logs.map(l => `
+                                <li class="log-item">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span style="font-weight: 500;">${l.action}</span>
+                                        <span style="font-size: 12px; color: #666;">${l.created_at}</span>
+                                    </div>
+                                    <div style="font-size: 13px; color: #555;">
+                                        <span class="role-tag role-${l.operator_role}">${roleLabels[l.operator_role] || l.operator_role}</span>
+                                        <span style="margin-left: 6px;">${l.operator}</span>
+                                    </div>
+                                    ${l.detail ? `<div style="font-size: 12px; color: #888; margin-top: 4px;">${l.detail}</div>` : ''}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : '<div class="empty-state"><div class="icon">📝</div><div>暂无操作日志</div></div>'}
+                </div>
+            `;
+        }
+
+        function switchTab(tabId, tabEl) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            tabEl.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function getFormData(formId) {
+            const form = document.getElementById(formId);
+            const data = {};
+            new FormData(form).forEach((v, k) => data[k] = v);
+            return data;
+        }
+
+        async function submitCreate() {
+            const data = getFormData('createForm');
+            if (!data.product_name || !data.quantity || !data.driver_name || !data.warehouse_name || !data.customer_name || data.expected_temp_min === '' || data.expected_temp_max === '') {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            data.quantity = parseInt(data.quantity);
+            data.expected_temp_min = parseFloat(data.expected_temp_min);
+            data.expected_temp_max = parseFloat(data.expected_temp_max);
+            if (data.actual_temp) data.actual_temp = parseFloat(data.actual_temp);
+            else delete data.actual_temp;
+
+            try {
+                const record = await api('/records', { method: 'POST', body: JSON.stringify(data) });
+                closeModal('createModal');
+                document.getElementById('createForm').reset();
+                showToast('签收记录创建成功', 'success');
+                await loadStats();
+                await loadRecords();
+                await selectRecord(record.id);
+            } catch (e) {
+                showToast('创建失败: ' + e.message, 'error');
+            }
+        }
+
+        async function submitTemp() {
+            const data = getFormData('tempForm');
+            if (!data.temp || !data.source || !data.uploader) {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            data.temp = parseFloat(data.temp);
+            try {
+                await api(`/records/${currentRecordId}/temp-evidence`, { method: 'POST', body: JSON.stringify(data) });
+                closeModal('tempModal');
+                document.getElementById('tempForm').reset();
+                showToast('温度证据提交成功', 'success');
+                await loadStats();
+                await loadRecords();
+                await loadDetail();
+            } catch (e) {
+                showToast('提交失败: ' + e.message, 'error');
+            }
+        }
+
+        async function submitTransfer() {
+            const data = getFormData('transferForm');
+            if (!data.from_role || !data.from_user || !data.to_role || !data.to_user || !data.reason) {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            if (data.from_role === data.to_role) {
+                showToast('转出和转入角色不能相同', 'error');
+                return;
+            }
+            try {
+                await api(`/records/${currentRecordId}/transfers`, { method: 'POST', body: JSON.stringify(data) });
+                closeModal('transferModal');
+                document.getElementById('transferForm').reset();
+                showToast('责任流转提交成功', 'success');
+                await loadDetail();
+            } catch (e) {
+                showToast('提交失败: ' + e.message, 'error');
+            }
+        }
+
+        async function handleTransfer(id, status) {
+            try {
+                await api(`/transfers/${id}`, { method: 'PUT', body: JSON.stringify({ status }) });
+                showToast(status === 'accepted' ? '已接受流转' : '已拒绝流转', 'success');
+                await loadDetail();
+            } catch (e) {
+                showToast('操作失败: ' + e.message, 'error');
+            }
+        }
+
+        async function submitReview() {
+            const data = getFormData('reviewForm');
+            if (!data.submit_role || !data.submitter || !data.content) {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            try {
+                await api(`/records/${currentRecordId}/reviews`, { method: 'POST', body: JSON.stringify(data) });
+                closeModal('reviewModal');
+                document.getElementById('reviewForm').reset();
+                showToast('补录申请提交成功', 'success');
+                await loadDetail();
+            } catch (e) {
+                showToast('提交失败: ' + e.message, 'error');
+            }
+        }
+
+        function openReviewAction(id, submitter, role, content) {
+            currentReviewId = id;
+            document.getElementById('reviewActionContent').innerHTML = `
+                <div style="background: #f8fafc; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+                    <div style="font-weight: 500; margin-bottom: 6px;">${submitter} <span class="role-tag role-${role.toLowerCase()}">${role}</span> 申请补录：</div>
+                    <div style="font-size: 14px; color: #555;">${content}</div>
+                </div>
+            `;
+            openModal('reviewActionModal');
+        }
+
+        async function processReview(status) {
+            const data = getFormData('reviewActionForm');
+            if (!data.reviewer) {
+                showToast('请填写审核人', 'error');
+                return;
+            }
+            data.review_status = status;
+            try {
+                await api(`/reviews/${currentReviewId}`, { method: 'PUT', body: JSON.stringify(data) });
+                closeModal('reviewActionModal');
+                document.getElementById('reviewActionForm').reset();
+                showToast(status === 'approved' ? '审核通过' : '审核已拒绝', 'success');
+                await loadDetail();
+            } catch (e) {
+                showToast('操作失败: ' + e.message, 'error');
+            }
+        }
+
+        async function submitMessage() {
+            const data = getFormData('messageForm');
+            if (!data.sender_role || !data.sender || !data.content) {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            try {
+                await api(`/records/${currentRecordId}/messages`, { method: 'POST', body: JSON.stringify(data) });
+                closeModal('messageModal');
+                document.getElementById('messageForm').reset();
+                showToast('消息发送成功', 'success');
+                await loadDetail();
+            } catch (e) {
+                showToast('发送失败: ' + e.message, 'error');
+            }
+        }
+
+        async function submitReport() {
+            const data = getFormData('reportForm');
+            if (!data.generated_by || !data.root_cause || !data.responsibility || !data.action_plan) {
+                showToast('请填写所有必填项', 'error');
+                return;
+            }
+            try {
+                await api(`/records/${currentRecordId}/report`, { method: 'POST', body: JSON.stringify(data) });
+                closeModal('reportModal');
+                document.getElementById('reportForm').reset();
+                showToast('追溯报告生成成功，状态已更新为已解决', 'success');
+                await loadStats();
+                await loadRecords();
+                await loadDetail();
+            } catch (e) {
+                showToast('生成失败: ' + e.message, 'error');
+            }
+        }
+
+        (async () => {
+            await loadStats();
+            await loadRecords();
+        })();
+    </script>
+</body>
+</html>
