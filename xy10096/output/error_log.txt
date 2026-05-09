@@ -1,0 +1,16 @@
+错误时间: 2026-05-09 18:11:41.277962
+错误信息: index 98 is out of bounds for axis 0 with size 97
+Traceback (most recent call last):
+  File "/Users/mac/pro/solo/workspaces/xy10096/main.py", line 213, in main
+    result = run_fermentation_qc(
+  File "/Users/mac/pro/solo/workspaces/xy10096/main.py", line 73, in run_fermentation_qc
+    qc_results = qc_engine.analyze_batch(preprocessing_result['processed_samples'])
+  File "/Users/mac/pro/solo/workspaces/xy10096/fermentation_qc/quality_control.py", line 569, in analyze_batch
+    qc_result = self.analyze_sample(df, sample_id)
+  File "/Users/mac/pro/solo/workspaces/xy10096/fermentation_qc/quality_control.py", line 494, in analyze_sample
+    param_results["RANGE_CHECK"] = self.rule_range_check(
+  File "/Users/mac/pro/solo/workspaces/xy10096/fermentation_qc/quality_control.py", line 121, in rule_range_check
+    "time": series.index[idx] if hasattr(series, "index") else idx,
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/pandas/core/indexes/base.py", line 5366, in __getitem__
+    return getitem(key)
+IndexError: index 98 is out of bounds for axis 0 with size 97
