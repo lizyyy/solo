@@ -1,0 +1,102 @@
+route_id: ROUTE-2024-001
+vehicle_id: TRK-007
+compartments:
+  - A  # 冷冻车厢
+  - B  # 冷藏车厢
+
+orders:
+  - order_id: VAC-001
+    order_type: 疫苗
+    min_temp: -20.0
+    max_temp: -15.0
+    route_id: ROUTE-2024-001
+  - order_id: VAC-002
+    order_type: 疫苗
+    min_temp: -18.0
+    max_temp: -10.0
+    route_id: ROUTE-2024-001
+  - order_id: FRESH-001
+    order_type: 生鲜蔬菜
+    min_temp: 0.0
+    max_temp: 8.0
+    route_id: ROUTE-2024-001
+  - order_id: FRESH-002
+    order_type: 生鲜水果
+    min_temp: 2.0
+    max_temp: 10.0
+    route_id: ROUTE-2024-001
+  - order_id: FROZEN-001
+    order_type: 冷冻海鲜
+    min_temp: -25.0
+    max_temp: -18.0
+    route_id: ROUTE-2024-001
+
+stops:
+  - stop_id: S1
+    stop_name: 物流中心
+    arrival_time: "2024-06-15 08:00:00"
+    departure_time: "2024-06-15 08:30:00"
+    is_door_open: true
+    door_open_duration_min: 25
+  - stop_id: S2
+    stop_name: 第一医院
+    arrival_time: "2024-06-15 09:45:00"
+    departure_time: "2024-06-15 10:00:00"
+    is_door_open: true
+    door_open_duration_min: 12
+  - stop_id: S3
+    stop_name: 第二医院
+    arrival_time: "2024-06-15 10:45:00"
+    departure_time: "2024-06-15 11:00:00"
+    is_door_open: true
+    door_open_duration_min: 10
+  - stop_id: S4
+    stop_name: 生鲜超市
+    arrival_time: "2024-06-15 11:30:00"
+    departure_time: "2024-06-15 12:00:00"
+    is_door_open: true
+    door_open_duration_min: 28
+  - stop_id: S5
+    stop_name: 批发市场
+    arrival_time: "2024-06-15 13:00:00"
+    departure_time: "2024-06-15 13:45:00"
+    is_door_open: true
+    door_open_duration_min: 40
+
+segments:
+  - segment_id: SEG-001
+    from_stop: S1
+    to_stop: S2
+    compartment: A
+    start_time: "2024-06-15 08:30:00"
+    end_time: "2024-06-15 09:45:00"
+    orders:
+      - VAC-001
+      - VAC-002
+      - FROZEN-001
+  - segment_id: SEG-002
+    from_stop: S2
+    to_stop: S3
+    compartment: A
+    start_time: "2024-06-15 10:00:00"
+    end_time: "2024-06-15 10:45:00"
+    orders:
+      - VAC-002
+      - FROZEN-001
+  - segment_id: SEG-003
+    from_stop: S1
+    to_stop: S4
+    compartment: B
+    start_time: "2024-06-15 08:30:00"
+    end_time: "2024-06-15 11:30:00"
+    orders:
+      - FRESH-001
+      - FRESH-002
+  - segment_id: SEG-004
+    from_stop: S4
+    to_stop: S5
+    compartment: B
+    start_time: "2024-06-15 12:00:00"
+    end_time: "2024-06-15 13:00:00"
+    orders:
+      - FRESH-002
