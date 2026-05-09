@@ -1,0 +1,16 @@
+{
+  "name": "bus-lost-found-api",
+  "version": "1.0.0",
+  "description": "公交失物招领API服务",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1"
+  }
+}
