@@ -10,6 +10,7 @@ import {
   HealthCheckResult,
   PoolError
 } from '../types';
+import { validatePoolConfig } from '../config';
 import { PoolConnection, ConnectionClient, MockConnectionClient } from './connection';
 import { MetricsCollector } from '../utils/metrics';
 import { PoolLogger } from '../utils/logger';
@@ -42,6 +43,14 @@ export class PoolManager {
   private maxRecentErrors: number = 50;
 
   constructor(config: PoolConfig, clientFactory?: (config: PoolConfig) => ConnectionClient) {
+    const validationErrors = validatePoolConfig(config);
+    if (validationErrors.length > 0) {
+      throw new PoolException(
+        `Invalid pool configuration: ${validationErrors.join(', ')}`,
+        'INVALID_CONFIG'
+      );
+    }
+
     this.config = config;
     this.connections = new Map();
     this.idleQueue = [];

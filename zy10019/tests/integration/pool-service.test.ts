@@ -45,8 +45,7 @@ describe('PoolService Integration', () => {
     it('should execute operation with all features enabled', async () => {
       const result = await poolService.execute(
         async (conn) => {
-          const connection = await conn;
-          return await connection.query('SELECT 1');
+          return await conn.query('SELECT 1');
         },
         {
           requestId: 'test-001',
@@ -63,9 +62,8 @@ describe('PoolService Integration', () => {
       const operations = Array.from({ length: 10 }, (_, i) => 
         poolService.execute(
           async (conn) => {
-            const connection = await conn;
             await new Promise(resolve => setTimeout(resolve, 50));
-            return await connection.query(`SELECT ${i}`);
+            return await conn.query(`SELECT ${i}`);
           },
           { requestId: `concurrent-${i}` }
         )
@@ -100,34 +98,39 @@ describe('PoolService Integration', () => {
 
     it('should handle idempotency correctly', async () => {
       const idempotencyKey = 'idempotent-test-2';
-      let callCount = 0;
+      let innerOperationCount = 0;
 
-      const operation = async () => {
-        callCount++;
-        return await poolService.execute(
-          async (conn) => {
-            const connection = await conn;
-            return await connection.query('SELECT 1');
-          },
-          {
-            idempotencyKey,
-            requestId: `idempotent-${Date.now()}`
-          }
-        );
-      };
+      const result1 = await poolService.execute(
+        async (conn) => {
+          innerOperationCount++;
+          return await conn.query('SELECT 1');
+        },
+        {
+          idempotencyKey,
+          requestId: 'idempotent-request-1'
+        }
+      );
 
-      const result1 = await operation();
-      const result2 = await operation();
+      const result2 = await poolService.execute(
+        async (conn) => {
+          innerOperationCount++;
+          return await conn.query('SELECT 1');
+        },
+        {
+          idempotencyKey,
+          requestId: 'idempotent-request-2'
+        }
+      );
 
-      expect(callCount).toBe(1);
+      expect(result1).toEqual(result2);
+      expect(innerOperationCount).toBe(1);
     });
 
     it('should generate report', async () => {
       for (let i = 0; i < 5; i++) {
         await poolService.execute(
           async (conn) => {
-            const connection = await conn;
-            return await connection.query('SELECT 1');
+            return await conn.query('SELECT 1');
           },
           { requestId: `report-test-${i}` }
         );
@@ -166,7 +169,6 @@ describe('PoolService Integration', () => {
         try {
           await poolService.execute(
             async (conn) => {
-              const connection = await conn;
               throw new Error('Simulated failure');
             },
             { requestId: `failure-${i}` }
@@ -184,7 +186,6 @@ describe('PoolService Integration', () => {
         try {
           await poolService.execute(
             async (conn) => {
-              const connection = await conn;
               throw new Error('Simulated failure');
             },
             { requestId: `failure-${i}` }
@@ -241,8 +242,7 @@ describe('PoolService Integration', () => {
     it('should record events during operations', async () => {
       await poolService.execute(
         async (conn) => {
-          const connection = await conn;
-          return await connection.query('SELECT 1');
+          return await conn.query('SELECT 1');
         },
         { requestId: 'event-test' }
       );
@@ -254,8 +254,7 @@ describe('PoolService Integration', () => {
     it('should filter events by type', async () => {
       await poolService.execute(
         async (conn) => {
-          const connection = await conn;
-          return await connection.query('SELECT 1');
+          return await conn.query('SELECT 1');
         },
         { requestId: 'filter-test' }
       );
@@ -271,8 +270,7 @@ describe('PoolService Integration', () => {
     it('should replay events', async () => {
       await poolService.execute(
         async (conn) => {
-          const connection = await conn;
-          return await connection.query('SELECT 1');
+          return await conn.query('SELECT 1');
         },
         { requestId: 'replay-test' }
       );
