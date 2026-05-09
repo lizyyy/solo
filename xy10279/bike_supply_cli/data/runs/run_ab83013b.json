@@ -1,0 +1,145 @@
+{
+  "run_id": "run_ab83013b",
+  "timestamp": "2026-05-10T04:25:08.434035",
+  "route_name": "百公里爬坡挑战",
+  "route_hash": "8d0e7347b828fc65",
+  "settings": {
+    "weather": {
+      "temperature": 25.0,
+      "humidity": 60.0,
+      "wind_speed_kmh": 10.0,
+      "precipitation": 0.0,
+      "uv_index": 5.0
+    },
+    "participants": {
+      "level": "beginner",
+      "count": 20,
+      "avg_speed_kmh": 20.0
+    }
+  },
+  "profile": {
+    "total_distance_km": 48.24,
+    "total_elevation_gain": 765.0,
+    "total_elevation_loss": 765.0,
+    "max_elevation": 420.0,
+    "min_elevation": 10.0,
+    "climbs": [
+      {
+        "start_index": 3,
+        "end_index": 9,
+        "distance_km": 8.78,
+        "elevation_gain": 400.0,
+        "elevation_loss": 0.0,
+        "avg_gradient": 4.56,
+        "max_gradient": 6.84
+      },
+      {
+        "start_index": 20,
+        "end_index": 25,
+        "distance_km": 7.31,
+        "elevation_gain": 340.0,
+        "elevation_loss": 0.0,
+        "avg_gradient": 4.65,
+        "max_gradient": 5.47
+      }
+    ]
+  },
+  "stations": [
+    {
+      "id": "S01",
+      "name": "K4km爬坡补给",
+      "distance_km": 4.39,
+      "elevation": 20.0,
+      "type": "climb_start",
+      "materials": {
+        "water_liters": 23.4,
+        "food_kg": 6.3,
+        "electrolytes_packs": 10.0,
+        "energy_gels": 16
+      },
+      "reason": "爬坡前补给 (C1: +400m, 4.6%)"
+    },
+    {
+      "id": "S02",
+      "name": "K8km爬坡中续",
+      "distance_km": 8.78,
+      "elevation": 180.0,
+      "type": "climb_mid",
+      "materials": {
+        "water_liters": 23.4,
+        "food_kg": 6.3,
+        "electrolytes_packs": 10.0,
+        "energy_gels": 16
+      },
+      "reason": "爬坡中途补给 (C1: 高强度)"
+    },
+    {
+      "id": "S03",
+      "name": "K13km恢复补给",
+      "distance_km": 13.16,
+      "elevation": 420.0,
+      "type": "recovery",
+      "materials": {
+        "water_liters": 18.0,
+        "food_kg": 6.6,
+        "electrolytes_packs": 10.0,
+        "energy_gels": 16
+      },
+      "reason": "爬坡后恢复 (C1)"
+    },
+    {
+      "id": "S04",
+      "name": "K29km爬坡补给",
+      "distance_km": 29.25,
+      "elevation": 40.0,
+      "type": "climb_start",
+      "materials": {
+        "water_liters": 23.4,
+        "food_kg": 6.3,
+        "electrolytes_packs": 10.0,
+        "energy_gels": 16
+      },
+      "reason": "爬坡前补给 (C2: +340m, 4.7%)"
+    },
+    {
+      "id": "S05",
+      "name": "K32km爬坡中续",
+      "distance_km": 32.17,
+      "elevation": 160.0,
+      "type": "climb_mid",
+      "materials": {
+        "water_liters": 23.4,
+        "food_kg": 6.3,
+        "electrolytes_packs": 10.0,
+        "energy_gels": 16
+      },
+      "reason": "爬坡中途补给 (C2: 高强度)"
+    },
+    {
+      "id": "S06",
+      "name": "K35km综合补给",
+      "distance_km": 35.0,
+      "elevation": 320.0,
+      "type": "combined",
+      "materials": {
+        "electrolytes_packs": 10.0,
+        "food_kg": 6.6,
+        "energy_gels": 16,
+        "water_liters": 18.0
+      },
+      "reason": "定时补给 + 爬坡后恢复 (C2)"
+    }
+  ],
+  "totals": {
+    "total_water_liters": 129.6,
+    "total_food_kg": 38.4,
+    "total_electrolytes_packs": 60.0,
+    "total_energy_gels": 96,
+    "station_count": 6,
+    "participant_count": 20,
+    "participant_level": "beginner",
+    "weather_temperature": 25.0,
+    "weather_humidity": 60.0
+  },
+  "status": "completed"
+}
