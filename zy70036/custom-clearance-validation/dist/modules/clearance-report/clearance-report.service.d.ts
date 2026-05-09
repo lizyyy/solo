@@ -1,0 +1,31 @@
+import { Repository } from 'typeorm';
+import { ClearanceReport } from '../../entities/clearance-report.entity';
+import { ClearanceBatchService } from '../clearance-batch/clearance-batch.service';
+import { VersionManagementService } from '../version-management/version-management.service';
+import { HsCodeValidationService } from '../hs-code-validation/hs-code-validation.service';
+import { PackingListComparisonService } from '../packing-list-comparison/packing-list-comparison.service';
+import { MissingComponentService } from '../missing-component/missing-component.service';
+import { ComplianceTaskService } from '../compliance-task/compliance-task.service';
+import { InvoiceService } from '../version-management/invoice.service';
+import { PackingListService } from '../version-management/packing-list.service';
+import { HsCodeVersionService } from '../version-management/hs-code-version.service';
+export declare class ClearanceReportService {
+    private readonly reportRepository;
+    private readonly batchService;
+    private readonly versionService;
+    private readonly hsCodeValidationService;
+    private readonly packingListComparisonService;
+    private readonly missingComponentService;
+    private readonly complianceTaskService;
+    private readonly invoiceService;
+    private readonly packingListService;
+    private readonly hsCodeVersionService;
+    constructor(reportRepository: Repository<ClearanceReport>, batchService: ClearanceBatchService, versionService: VersionManagementService, hsCodeValidationService: HsCodeValidationService, packingListComparisonService: PackingListComparisonService, missingComponentService: MissingComponentService, complianceTaskService: ComplianceTaskService, invoiceService: InvoiceService, packingListService: PackingListService, hsCodeVersionService: HsCodeVersionService);
+    generateReport(batchId: string): Promise<ClearanceReport>;
+    private calculateOverallStatus;
+    private generateRecommendations;
+    findAll(batchId?: string): Promise<ClearanceReport[]>;
+    findOne(id: string): Promise<ClearanceReport>;
+    findLatestByBatch(batchId: string): Promise<ClearanceReport | null>;
+    findByBatch(batchId: string): Promise<ClearanceReport[]>;
+}
