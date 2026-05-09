@@ -1,0 +1,25 @@
+[
+  {
+    "id": "bad-001",
+    "name": "这个规则类型是错的",
+    "type": "unknown_type",
+    "status": "pending",
+    "priority": 10,
+    "discount_percent": 20.0
+  },
+  {
+    "id": "bad-002",
+    "name": "折扣超出范围",
+    "type": "direct_discount",
+    "status": "pending",
+    "discount_percent": 150.0
+  },
+  {
+    "id": "good-001",
+    "name": "这条是好的",
+    "type": "direct_discount",
+    "status": "pending",
+    "skus": ["SKU-TEST-001"],
+    "discount_value": 10.0
+  }
+]

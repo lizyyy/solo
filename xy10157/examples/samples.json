@@ -1,0 +1,54 @@
+[
+  {
+    "id": "sample-001",
+    "name": "iPhone 单购",
+    "description": "测试品类折扣 + SKU 特价叠加",
+    "items": [
+      {
+        "sku": "SKU-IPHONE-001",
+        "quantity": 1,
+        "original_price": 5000.0,
+        "applied_discounts": [],
+        "final_price": 0.0,
+        "total_final": 0.0
+      }
+    ],
+    "expected_total_original": 5000.0,
+    "expected_total_final": 4300.0
+  },
+  {
+    "id": "sample-002",
+    "name": "耳机买2送1",
+    "description": "测试买赠规则",
+    "items": [
+      {
+        "sku": "SKU-EARPODS-001",
+        "quantity": 3,
+        "original_price": 100.0,
+        "applied_discounts": [],
+        "final_price": 0.0,
+        "total_final": 0.0
+      }
+    ],
+    "expected_total_original": 300.0,
+    "expected_total_final": 200.0
+  },
+  {
+    "id": "sample-003",
+    "name": "使用品牌券",
+    "description": "测试优惠码叠加",
+    "items": [
+      {
+        "sku": "SKU-IPHONE-001",
+        "quantity": 1,
+        "original_price": 5000.0,
+        "applied_discounts": [],
+        "final_price": 0.0,
+        "total_final": 0.0
+      }
+    ],
+    "expected_total_original": 5000.0,
+    "expected_total_final": 4200.0,
+    "applied_coupons": ["APPLE100"]
+  }
+]

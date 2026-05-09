@@ -1,0 +1,45 @@
+[
+  {
+    "id": "rule-001",
+    "name": "618 品类直降 10%",
+    "type": "category",
+    "status": "pending",
+    "priority": 10,
+    "categories": ["手机", "数码"],
+    "discount_percent": 10.0,
+    "can_overlay": true
+  },
+  {
+    "id": "rule-002",
+    "name": "SKU 特价 iPhone",
+    "type": "direct_discount",
+    "status": "pending",
+    "priority": 20,
+    "skus": ["SKU-IPHONE-001"],
+    "discount_value": 200.0,
+    "can_overlay": true
+  },
+  {
+    "id": "rule-003",
+    "name": "买2送1 耳机促销",
+    "type": "multibuy",
+    "status": "pending",
+    "priority": 15,
+    "skus": ["SKU-EARPODS-001"],
+    "buy_count": 2,
+    "get_free": 1,
+    "can_overlay": false
+  },
+  {
+    "id": "rule-004",
+    "name": "品牌券满1000减100",
+    "type": "coupon",
+    "status": "pending",
+    "priority": 30,
+    "brands": ["Apple"],
+    "coupon_code": "APPLE100",
+    "min_amount": 1000.0,
+    "discount_value": 100.0,
+    "can_overlay": true
+  }
+]
