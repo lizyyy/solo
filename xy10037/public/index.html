@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客服跟进管理系统</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .app-header {
+      background: linear-gradient(135deg, #409EFF 0%, #66b1ff 100%);
+      color: white;
+      padding: 16px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .user-select {
+      width: 150px;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      background: #f5f7fa;
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card .number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #303133;
+    }
+    
+    .stat-card .label {
+      font-size: 13px;
+      color: #909399;
+      margin-top: 4px;
+    }
+    
+    .stat-card.pending .number { color: #E6A23C; }
+    .stat-card.in_progress .number { color: #409EFF; }
+    .stat-card.completed .number { color: #67C23A; }
+    .stat-card.failed .number { color: #F56C6C; }
+    .stat-card.overdue .number { color: #F56C6C; }
+    
+    .filters-bar {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .task-table {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      padding: 16px;
+    }
+    
+    .el-tag { margin-right: 4px; }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .dot.pending { background: #E6A23C; }
+    .dot.in_progress { background: #409EFF; animation: pulse 1.5s infinite; }
+    .dot.completed { background: #67C23A; }
+    .dot.failed { background: #F56C6C; }
+    .dot.cancelled { background: #909399; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .priority-tag {
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .priority-urgent { background: #FEF0F0; color: #F56C6C; border: 1px solid #FBC4C4; }
+    .priority-high { background: #FDF6EC; color: #E6A23C; border: 1px solid #F5DAB1; }
+    .priority-normal { background: #F4F4F5; color: #606266; border: 1px solid #D4D7DE; }
+    .priority-low { background: #F0F2F5; color: #909399; border: 1px solid #DCDFE6; }
+    
+    .timeline-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #EBEEF5;
+    }
+    
+    .timeline-item:last-child { border-bottom: none; }
+    
+    .timeline-meta {
+      color: #909399;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    
+    .tabs-container {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app-container">
+    <header class="app-header">
+      <h1>📋 客服跟进管理系统</h1>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="opacity: 0.9;">操作员:</span>
+        <el-select v-model="currentOperator" class="user-select" @change="onOperatorChange">
+          <el-option 
+            v-for="user in users" 
+            :key="user.id" 
+            :label="user.display_name" 
+            :value="user.display_name"
+          ></el-option>
+        </el-select>
+        <el-button type="primary" @click="refreshAll" icon="el-icon-refresh">刷新</el-button>
+      </div>
+    </header>
+    
+    <main class="main-content">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="number">{{ stats.total || 0 }}</div>
+          <div class="label">全部任务</div>
+        </div>
+        <div class="stat-card pending">
+          <div class="number">{{ stats.pending || 0 }}</div>
+          <div class="label">待处理</div>
+        </div>
+        <div class="stat-card in_progress">
+          <div class="number">{{ stats.in_progress || 0 }}</div>
+          <div class="label">处理中</div>
+        </div>
+        <div class="stat-card completed">
+          <div class="number">{{ stats.completed || 0 }}</div>
+          <div class="label">已完成</div>
+        </div>
+        <div class="stat-card failed">
+          <div class="number">{{ stats.failed || 0 }}</div>
+          <div class="label">失败</div>
+        </div>
+        <div class="stat-card overdue">
+          <div class="number">{{ stats.overdue || 0 }}</div>
+          <div class="label">已逾期</div>
+        </div>
+      </div>
+      
+      <el-tabs v-model="activeTab" @tab-click="onTabChange">
+        <el-tab-pane label="任务管理" name="tasks">
+          <div class="tabs-container">
+            <div class="filters-bar">
+              <div class="filter-row">
+                <el-input v-model="filters.keyword" placeholder="搜索客户姓名/任务编号/电话" 
+                  style="width: 250px;" @keyup.enter.native="loadTasks" clearable></el-input>
+                <el-select v-model="filters.status" placeholder="状态" clearable style="width: 120px;">
+                  <el-option label="待处理" value="pending"></el-option>
+                  <el-option label="处理中" value="in_progress"></el-option>
+                  <el-option label="已完成" value="completed"></el-option>
+                  <el-option label="失败" value="failed"></el-option>
+                  <el-option label="已取消" value="cancelled"></el-option>
+                </el-select>
+                <el-select v-model="filters.problem_type" placeholder="问题类型" clearable style="width: 140px;">
+                  <el-option label="补发商品" value="补发商品"></el-option>
+                  <el-option label="退款" value="退款"></el-option>
+                  <el-option label="换货" value="换货"></el-option>
+                  <el-option label="投诉处理" value="投诉处理"></el-option>
+                  <el-option label="其他" value="其他"></el-option>
+                </el-select>
+                <el-select v-model="filters.assignee" placeholder="指派人" clearable style="width: 120px;">
+                  <el-option v-for="user in users" :key="user.id" 
+                    :label="user.display_name" :value="user.display_name"></el-option>
+                </el-select>
+                <el-date-picker v-model="dateRange" type="daterange" range-separator="至"
+                  start-placeholder="开始日期" end-placeholder="结束日期"
+                  value-format="x" :default-time="['00:00:00', '23:59:59']">
+                </el-date-picker>
+                <el-button @click="loadTasks" type="primary" icon="el-icon-search">查询</el-button>
+                <el-button @click="resetFilters" icon="el-icon-refresh-left">重置</el-button>
+              </div>
+            </div>
+            
+            <div class="action-bar">
+              <div>
+                <el-button type="primary" @click="openCreateDialog" icon="el-icon-plus">新建任务</el-button>
+                <el-button @click="exportCSV" icon="el-icon-download" :disabled="tasks.length === 0">导出CSV</el-button>
+              </div>
+              <el-pagination 
+                v-if="pagination.total > 0"
+                background
+                :current-page="pagination.page"
+                :page-size="pagination.pageSize"
+                :total="pagination.total"
+                layout="total, prev, pager, next"
+                @current-change="onPageChange"
+              ></el-pagination>
+            </div>
+            
+            <div class="task-table">
+              <el-table :data="tasks" v-loading="loadingTasks" style="width: 100%" stripe>
+                <el-table-column label="任务编号" prop="task_no" width="160">
+                  <template slot-scope="scope">
+                    <a href="javascript:;" @click="openTaskDetail(scope.row)" 
+                       style="color: #409EFF; text-decoration: underline;">
+                      {{ scope.row.task_no }}
+                    </a>
+                  </template>
+                </el-table-column>
+                <el-table-column label="客户" width="120">
+                  <template slot-scope="scope">
+                    <div>{{ scope.row.customer_name }}</div>
+                    <div v-if="scope.row.customer_phone" style="font-size: 12px; color: #909399;">
+                      {{ scope.row.customer_phone }}
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="问题类型" prop="problem_type" width="100"></el-table-column>
+                <el-table-column label="承诺动作" prop="promised_action" show-overflow-tooltip></el-table-column>
+                <el-table-column label="状态" width="110">
+                  <template slot-scope="scope">
+                    <span class="status-badge">
+                      <span class="dot" :class="scope.row.status"></span>
+                      {{ getStatusText(scope.row.status) }}
+                    </span>
+                    <el-tag v-if="scope.row.retry_count > 0" type="warning" size="mini">
+                      重试{{ scope.row.retry_count }}次
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="优先级" width="80">
+                  <template slot-scope="scope">
+                    <span class="priority-tag" :class="'priority-' + scope.row.priority">
+                      {{ getPriorityText(scope.row.priority) }}
+                    </span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="指派人" prop="assignee" width="90"></el-table-column>
+                <el-table-column label="创建人" prop="created_by" width="90"></el-table-column>
+                <el-table-column label="创建时间" width="160">
+                  <template slot-scope="scope">
+                    {{ formatTime(scope.row.created_at) }}
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="280" fixed="right">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="openTaskDetail(scope.row)" icon="el-icon-view">详情</el-button>
+                    <el-button size="mini" type="primary" 
+                      v-if="scope.row.status === 'pending' || scope.row.status === 'in_progress'"
+                      @click="startTask(scope.row)" icon="el-icon-video-play">开始</el-button>
+                    <el-button size="mini" type="success" 
+                      v-if="scope.row.status === 'in_progress'"
+                      @click="openCompleteDialog(scope.row)" icon="el-icon-check">完成</el-button>
+                    <el-button size="mini" type="warning" 
+                      v-if="scope.row.status === 'failed'"
+                      @click="retryTask(scope.row)" icon="el-icon-refresh-right">重试</el-button>
+                    <el-button size="mini" type="danger" 
+                      v-if="scope.row.status !== 'completed' && scope.row.status !== 'cancelled'"
+                      @click="cancelTask(scope.row)" icon="el-icon-close">取消</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+              
+              <el-empty v-if="tasks.length === 0 && !loadingTasks" description="暂无任务"></el-empty>
+            </div>
+          </div>
+        </el-tab-pane>
+        
+        <el-tab-pane label="审计日志" name="audit">
+          <div class="tabs-container">
+            <div class="filters-bar">
+              <div class="filter-row">
+                <el-select v-model="auditFilters.module" placeholder="模块" clearable style="width: 120px;">
+                  <el-option label="任务" value="task"></el-option>
+                  <el-option label="报告" value="report"></el-option>
+                  <el-option label="用户" value="user"></el-option>
+                </el-select>
+                <el-select v-model="auditFilters.operator" placeholder="操作员" clearable style="width: 120px;">
+                  <el-option v-for="user in users" :key="user.id" 
+                    :label="user.display_name" :value="user.display_name"></el-option>
+                </el-select>
+                <el-button @click="loadAuditLogs" type="primary" icon="el-icon-search">查询</el-button>
+              </div>
+            </div>
+            
+            <el-pagination 
+              v-if="auditPagination.total > 0"
+              background
+              style="margin-bottom: 16px;"
+              :current-page="auditPagination.page"
+              :page-size="auditPagination.pageSize"
+              :total="auditPagination.total"
+              layout="total, prev, pager, next"
+              @current-change="onAuditPageChange"
+            ></el-pagination>
+            
+            <el-table :data="auditLogs" v-loading="loadingAudit" stripe>
+              <el-table-column label="时间" width="180">
+                <template slot-scope="scope">
+                  {{ formatTime(scope.row.created_at) }}
+                </template>
+              </el-table-column>
+              <el-table-column label="动作" prop="action" width="180"></el-table-column>
+              <el-table-column label="模块" prop="module" width="100"></el-table-column>
+              <el-table-column label="目标ID" prop="target_id" width="120"></el-table-column>
+              <el-table-column label="操作员" prop="operator" width="120"></el-table-column>
+              <el-table-column label="IP" prop="ip" width="140"></el-table-column>
+              <el-table-column label="请求内容">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.request_body" style="max-height: 80px; overflow: auto; font-size: 12px;">
+                    {{ scope.row.request_body }}
+                  </div>
+                  <span v-else style="color: #909399;">-</span>
+                </template>
+              </el-table-column>
+            </el-table>
+            
+            <el-empty v-if="auditLogs.length === 0 && !loadingAudit" description="暂无日志"></el-empty>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </main>
+    
+    <el-dialog :title="dialogTitle" :visible.sync="taskDialogVisible" width="700px" @close="closeTaskDialog">
+      <el-form :model="taskForm" :rules="taskFormRules" ref="taskForm" label-width="100px">
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="客户姓名" prop="customer_name">
+              <el-input v-model="taskForm.customer_name"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="联系电话">
+              <el-input v-model="taskForm.customer_phone"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="客户账号">
+              <el-input v-model="taskForm.customer_account"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="问题类型" prop="problem_type">
+              <el-select v-model="taskForm.problem_type" style="width: 100%;">
+                <el-option label="补发商品" value="补发商品"></el-option>
+                <el-option label="退款" value="退款"></el-option>
+                <el-option label="换货" value="换货"></el-option>
+                <el-option label="投诉处理" value="投诉处理"></el-option>
+                <el-option label="其他" value="其他"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="16">
+          <el-col :span="12">
+            <el-form-item label="优先级">
+              <el-select v-model="taskForm.priority" style="width: 100%;">
+                <el-option label="低" value="low"></el-option>
+                <el-option label="普通" value="normal"></el-option>
+                <el-option label="高" value="high"></el-option>
+                <el-option label="紧急" value="urgent"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="指派给">
+              <el-select v-model="taskForm.assignee" clearable style="width: 100%;">
+                <el-option v-for="user in users" :key="user.id" 
+                  :label="user.display_name" :value="user.display_name"></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="截止时间">
+          <el-date-picker v-model="taskForm.due_at" type="datetime" 
+            value-format="x" style="width: 100%;"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="问题描述">
+          <el-input v-model="taskForm.description" type="textarea" :rows="3"></el-input>
+        </el-form-item>
+        <el-form-item label="承诺动作" prop="promised_action">
+          <el-input v-model="taskForm.promised_action" type="textarea" :rows="3"
+            placeholder="明确说明答应给用户做什么，如：补发XX商品一件"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="taskDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="saveTask" :loading="savingTask">保存</el-button>
+      </span>
+    </el-dialog>
+    
+    <el-dialog title="任务详情" :visible.sync="detailDialogVisible" width="800px">
+      <el-descriptions v-if="selectedTask" :column="2" border>
+        <el-descriptions-item label="任务编号">{{ selectedTask.task_no }}</el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <span class="status-badge">
+            <span class="dot" :class="selectedTask.status"></span>
+            {{ getStatusText(selectedTask.status) }}
+          </span>
+        </el-descriptions-item>
+        <el-descriptions-item label="客户姓名">{{ selectedTask.customer_name }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ selectedTask.customer_phone || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="客户账号">{{ selectedTask.customer_account || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="问题类型">{{ selectedTask.problem_type }}</el-descriptions-item>
+        <el-descriptions-item label="优先级">
+          <span class="priority-tag" :class="'priority-' + selectedTask.priority">
+            {{ getPriorityText(selectedTask.priority) }}
+          </span>
+        </el-descriptions-item>
+        <el-descriptions-item label="指派人">{{ selectedTask.assignee || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="创建人">{{ selectedTask.created_by }}</el-descriptions-item>
+        <el-descriptions-item label="重试次数">{{ selectedTask.retry_count || 0 }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ formatTime(selectedTask.created_at) }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ formatTime(selectedTask.updated_at) }}</el-descriptions-item>
+        <el-descriptions-item label="问题描述" :span="2">
+          {{ selectedTask.description || '-' }}
+        </el-descriptions-item>
+        <el-descriptions-item label="承诺动作" :span="2">
+          {{ selectedTask.promised_action }}
+        </el-descriptions-item>
+        <el-descriptions-item label="最后错误" :span="2" v-if="selectedTask.last_error">
+          <span style="color: #F56C6C;">{{ selectedTask.last_error }}</span>
+        </el-descriptions-item>
+      </el-descriptions>
+      
+      <h4 style="margin: 20px 0 12px; color: #303133;">状态流转记录</h4>
+      <div v-if="taskTransitions.length > 0">
+        <div v-for="(transition, index) in taskTransitions" :key="transition.id" class="timeline-item">
+          <div>
+            <span v-if="transition.from_status" style="color: #909399;">
+              {{ getStatusText(transition.from_status) }} → 
+            </span>
+            <strong>{{ getStatusText(transition.to_status) }}</strong>
+            <span v-if="transition.remark" style="color: #606266; margin-left: 8px;">
+              ({{ transition.remark }})
+            </span>
+          </div>
+          <div class="timeline-meta">
+            操作人: {{ transition.operator }} | {{ formatTime(transition.created_at) }}
+          </div>
+        </div>
+      </div>
+      <el-empty v-else description="暂无流转记录"></el-empty>
+      
+      <span slot="footer">
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
+        <el-button type="primary" v-if="canEdit(selectedTask)" @click="openEditDialog">编辑</el-button>
+      </span>
+    </el-dialog>
+    
+    <el-dialog title="完成任务" :visible.sync="completeDialogVisible" width="500px">
+      <el-form>
+        <el-form-item label="完成说明">
+          <el-input v-model="completeRemark" type="textarea" :rows="3" 
+            placeholder="请输入完成情况说明（选填）"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer">
+        <el-button @click="completeDialogVisible = false">取消</el-button>
+        <el-button type="success" @click="confirmComplete" :loading="completingTask">确认完成</el-button>
+      </span>
+    </el-dialog>
+  </div>
+  
+  <script src="https://unpkg.com/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui@2.15.14/lib/index.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

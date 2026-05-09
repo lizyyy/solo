@@ -1,0 +1,23 @@
+{
+  "name": "customer-followup-system",
+  "version": "1.0.0",
+  "description": "客服跟进管理系统 - 稳定可靠的补发跟进管理",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-db": "node scripts/init-db.js"
+  },
+  "keywords": ["customer-service", "followup", "ticketing"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
