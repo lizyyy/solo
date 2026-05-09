@@ -1,0 +1,240 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.el-card {
+  margin-bottom: 20px;
+}
+
+.el-table {
+  margin-top: 15px;
+}
+
+.el-button + .el-button {
+  margin-left: 8px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #303133;
+  margin: 10px 0;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #909399;
+}
+
+.health-dashboard {
+  .el-progress {
+    margin: 20px auto;
+  }
+}
+
+.overview {
+  .el-card {
+    margin-bottom: 0;
+  }
+  
+  .el-descriptions {
+    margin-top: 10px;
+  }
+}
+
+.fault-form {
+  .el-slider {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  .slider-value {
+    min-width: 50px;
+    text-align: right;
+    color: #409eff;
+    font-weight: bold;
+  }
+  
+  .form-hint {
+    margin-left: 10px;
+    color: #909399;
+    font-size: 12px;
+  }
+}
+
+.problem-list {
+  .el-tag {
+    margin-right: 5px;
+  }
+  
+  pre {
+    margin: 0;
+    font-size: 12px;
+    background: #f5f7fa;
+    padding: 10px;
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 200px;
+  }
+}
+
+.rate-limit {
+  .algo-card {
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .algo-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #303133;
+    }
+    
+    .algo-desc {
+      font-size: 12px;
+      color: #909399;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+  }
+}
+
+.report-page {
+  .health-status {
+    text-align: center;
+    padding: 20px 0;
+    
+    .health-text {
+      margin-top: 20px;
+    }
+  }
+  
+  .stats {
+    padding: 15px 0;
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-big {
+      font-size: 36px;
+      font-weight: bold;
+      color: #409eff;
+    }
+    
+    .stat-label {
+      color: #909399;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    
+    .stat-types {
+      text-align: left;
+      padding-left: 20px;
+      
+      .type-name {
+        color: #606266;
+        margin-right: 5px;
+      }
+      
+      .type-count {
+        color: #f56c6c;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.simulation {
+  .demo-card {
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    
+    &:hover {
+      transform: translateY(-5px);
+    }
+    
+    .demo-icon {
+      font-size: 40px;
+      color: #409eff;
+      margin-bottom: 10px;
+    }
+    
+    .demo-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .demo-desc {
+      font-size: 12px;
+      color: #909399;
+      margin-bottom: 15px;
+    }
+  }
+  
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  pre {
+    margin: 0;
+    font-size: 12px;
+    background: #f5f7fa;
+    padding: 15px;
+    border-radius: 4px;
+    overflow: auto;
+    max-height: 400px;
+  }
+}
