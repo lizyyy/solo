@@ -1,0 +1,476 @@
+package com.grayscale.rollback.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.grayscale.rollback.config.RollbackSystemConfig;
+import com.grayscale.rollback.entity.Release;
+import com.grayscale.rollback.enums.OperationType;
+import com.grayscale.rollback.enums.ReleaseEvent;
+import com.grayscale.rollback.enums.ReleaseStatus;
+import com.grayscale.rollback.repository.ReleaseRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@Service
+@Slf4j
+public class ReleaseService {
+    
+    private final ReleaseRepository releaseRepository;
+    private final StateMachineFactory<ReleaseStatus, ReleaseEvent> stateMachineFactory;
+    private final DistributedLockService lockService;
+    private final IdempotentService idempotentService;
+    private final OperationLogService logService;
+    private final RollbackSystemConfig config;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
+    
+    private static final String RELEASE_CACHE_PREFIX = "rollback:release:";
+    private static final String OPERATOR = "system";
+    
+    public ReleaseService(ReleaseRepository releaseRepository,
+                          StateMachineFactory<ReleaseStatus, ReleaseEvent> stateMachineFactory,
+                          DistributedLockService lockService,
+                          IdempotentService idempotentService,
+                          OperationLogService logService,
+                          RollbackSystemConfig config,
+                          RedisTemplate<String, Object> redisTemplate,
+                          ObjectMapper objectMapper) {
+        this.releaseRepository = releaseRepository;
+        this.stateMachineFactory = stateMachineFactory;
+        this.lockService = lockService;
+        this.idempotentService = idempotentService;
+        this.logService = logService;
+        this.config = config;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+    }
+    
+    @Transactional
+    public Release createRelease(String serviceName, String currentVersion, 
+                                  String targetVersion, int totalInstances, String metadata) {
+        long startTime = System.currentTimeMillis();
+        Release release = Release.builder()
+                .id(UUID.randomUUID().toString())
+                .serviceName(serviceName)
+                .currentVersion(currentVersion)
+                .targetVersion(targetVersion)
+                .status(ReleaseStatus.PENDING)
+                .totalInstances(totalInstances)
+                .updatedInstances(0)
+                .metadata(metadata)
+                .build();
+        
+        Release savedRelease = releaseRepository.save(release);
+        cacheRelease(savedRelease);
+        
+        logService.logSuccess(savedRelease.getId(), OperationType.CREATE_RELEASE,
+                null, savedRelease, OPERATOR, 
+                String.format("Created release for %s from %s to %s", serviceName, currentVersion, targetVersion),
+                System.currentTimeMillis() - startTime);
+        
+        return savedRelease;
+    }
+    
+    @Transactional
+    public Release startRelease(String releaseId) {
+        return lockService.executeWithLock(
+            "release:" + releaseId,
+            5, config.getLockTimeoutSeconds(), TimeUnit.SECONDS,
+            () -> {
+                long startTime = System.currentTimeMillis();
+                Optional<Release> releaseOpt = releaseRepository.findByIdWithLock(releaseId);
+                if (releaseOpt.isEmpty()) {
+                    throw new IllegalArgumentException("Release not found: " + releaseId);
+                }
+                
+                Release release = releaseOpt.get();
+                Release beforeRelease = copyRelease(release);
+                
+                if (release.getStatus() != ReleaseStatus.PENDING) {
+                    throw new IllegalStateException("Release must be in PENDING state to start, current: " + release.getStatus());
+                }
+                
+                try {
+                    StateMachine<ReleaseStatus, ReleaseEvent> sm = buildStateMachine(release);
+                    if (!sendEvent(sm, ReleaseEvent.START_PREPARING, release)) {
+                        throw new IllegalStateException("Failed to transition to PREPARING state");
+                    }
+                    
+                    release.setStatus(ReleaseStatus.PREPARING);
+                    release.setStartedAt(LocalDateTime.now());
+                    release.setRollbackCheckpoint(createCheckpoint(release));
+                    
+                    Release savedRelease = releaseRepository.save(release);
+                    cacheRelease(savedRelease);
+                    
+                    logService.logSuccess(savedRelease.getId(), OperationType.START_PREPARING,
+                            beforeRelease, savedRelease, OPERATOR, null,
+                            System.currentTimeMillis() - startTime);
+                    
+                    return savedRelease;
+                } catch (Exception e) {
+                    logService.logFailure(releaseId, OperationType.START_PREPARING,
+                            beforeRelease, release, e.getMessage(), OPERATOR, null,
+                            System.currentTimeMillis() - startTime);
+                    throw e;
+                }
+            },
+            () -> {
+                throw new IllegalStateException("Failed to acquire lock for release: " + releaseId);
+            }
+        );
+    }
+    
+    @Transactional
+    public Release advanceCanary(String releaseId) {
+        return lockService.executeWithLock(
+            "release:" + releaseId,
+            5, config.getLockTimeoutSeconds(), TimeUnit.SECONDS,
+            () -> {
+                long startTime = System.currentTimeMillis();
+                Optional<Release> releaseOpt = releaseRepository.findByIdWithLock(releaseId);
+                if (releaseOpt.isEmpty()) {
+                    throw new IllegalArgumentException("Release not found: " + releaseId);
+                }
+                
+                Release release = releaseOpt.get();
+                Release beforeRelease = copyRelease(release);
+                
+                try {
+                    ReleaseStatus currentStatus = release.getStatus();
+                    ReleaseEvent event = getNextEvent(currentStatus);
+                    
+                    if (event == null) {
+                        throw new IllegalStateException("Cannot advance from state: " + currentStatus);
+                    }
+                    
+                    StateMachine<ReleaseStatus, ReleaseEvent> sm = buildStateMachine(release);
+                    if (!sendEvent(sm, event, release)) {
+                        throw new IllegalStateException("Failed to advance canary stage");
+                    }
+                    
+                    ReleaseStatus nextStatus = getNextStatus(currentStatus);
+                    int targetInstances = calculateTargetInstances(release.getTotalInstances(), nextStatus);
+                    
+                    release.setStatus(nextStatus);
+                    release.setUpdatedInstances(targetInstances);
+                    
+                    if (nextStatus == ReleaseStatus.COMPLETED) {
+                        release.setCompletedAt(LocalDateTime.now());
+                    }
+                    
+                    Release savedRelease = releaseRepository.save(release);
+                    cacheRelease(savedRelease);
+                    
+                    logService.logSuccess(savedRelease.getId(), OperationType.ADVANCE_CANARY,
+                            beforeRelease, savedRelease, OPERATOR,
+                            String.format("Advanced to %s with %d instances", nextStatus, targetInstances),
+                            System.currentTimeMillis() - startTime);
+                    
+                    return savedRelease;
+                } catch (Exception e) {
+                    logService.logFailure(releaseId, OperationType.ADVANCE_CANARY,
+                            beforeRelease, release, e.getMessage(), OPERATOR, null,
+                            System.currentTimeMillis() - startTime);
+                    throw e;
+                }
+            },
+            () -> {
+                throw new IllegalStateException("Failed to acquire lock for release: " + releaseId);
+            }
+        );
+    }
+    
+    @Transactional
+    public Release triggerRollback(String releaseId, String reason) {
+        return lockService.executeWithLock(
+            "release:" + releaseId,
+            5, config.getLockTimeoutSeconds(), TimeUnit.SECONDS,
+            () -> {
+                long startTime = System.currentTimeMillis();
+                Optional<Release> releaseOpt = releaseRepository.findByIdWithLock(releaseId);
+                if (releaseOpt.isEmpty()) {
+                    throw new IllegalArgumentException("Release not found: " + releaseId);
+                }
+                
+                Release release = releaseOpt.get();
+                Release beforeRelease = copyRelease(release);
+                
+                if (!isRollbackable(release.getStatus())) {
+                    throw new IllegalStateException("Cannot rollback from state: " + release.getStatus());
+                }
+                
+                try {
+                    StateMachine<ReleaseStatus, ReleaseEvent> sm = buildStateMachine(release);
+                    if (!sendEvent(sm, ReleaseEvent.TRIGGER_ROLLBACK, release)) {
+                        throw new IllegalStateException("Failed to transition to ROLLBACKING state");
+                    }
+                    
+                    release.setStatus(ReleaseStatus.ROLLBACKING);
+                    release.setErrorMessage(reason);
+                    
+                    Release savedRelease = releaseRepository.save(release);
+                    cacheRelease(savedRelease);
+                    
+                    logService.logSuccess(savedRelease.getId(), OperationType.TRIGGER_ROLLBACK,
+                            beforeRelease, savedRelease, OPERATOR, reason,
+                            System.currentTimeMillis() - startTime);
+                    
+                    return savedRelease;
+                } catch (Exception e) {
+                    logService.logFailure(releaseId, OperationType.TRIGGER_ROLLBACK,
+                            beforeRelease, release, e.getMessage(), OPERATOR, reason,
+                            System.currentTimeMillis() - startTime);
+                    throw e;
+                }
+            },
+            () -> {
+                throw new IllegalStateException("Failed to acquire lock for release: " + releaseId);
+            }
+        );
+    }
+    
+    @Transactional
+    public Release executeRollback(String releaseId) {
+        return lockService.executeWithLock(
+            "release:" + releaseId,
+            5, config.getLockTimeoutSeconds(), TimeUnit.SECONDS,
+            () -> {
+                long startTime = System.currentTimeMillis();
+                Optional<Release> releaseOpt = releaseRepository.findByIdWithLock(releaseId);
+                if (releaseOpt.isEmpty()) {
+                    throw new IllegalArgumentException("Release not found: " + releaseId);
+                }
+                
+                Release release = releaseOpt.get();
+                Release beforeRelease = copyRelease(release);
+                
+                if (release.getStatus() != ReleaseStatus.ROLLBACKING) {
+                    throw new IllegalStateException("Release must be in ROLLBACKING state, current: " + release.getStatus());
+                }
+                
+                try {
+                    ReleaseStatus originalStatus = restoreFromCheckpoint(release);
+                    
+                    StateMachine<ReleaseStatus, ReleaseEvent> sm = buildStateMachine(release);
+                    if (!sendEvent(sm, ReleaseEvent.ROLLBACK_COMPLETE, release)) {
+                        throw new IllegalStateException("Failed to complete rollback");
+                    }
+                    
+                    release.setStatus(ReleaseStatus.ROLLED_BACK);
+                    release.setUpdatedInstances(0);
+                    
+                    Release savedRelease = releaseRepository.save(release);
+                    cacheRelease(savedRelease);
+                    
+                    logService.logSuccess(savedRelease.getId(), OperationType.COMPLETE_ROLLBACK,
+                            beforeRelease, savedRelease, OPERATOR,
+                            "Rolled back from " + originalStatus,
+                            System.currentTimeMillis() - startTime);
+                    
+                    return savedRelease;
+                } catch (Exception e) {
+                    logService.logFailure(releaseId, OperationType.EXECUTE_ROLLBACK,
+                            beforeRelease, release, e.getMessage(), OPERATOR, null,
+                            System.currentTimeMillis() - startTime);
+                    
+                    release.setStatus(ReleaseStatus.FAILED);
+                    release.setFailedAt(LocalDateTime.now());
+                    release.setErrorMessage("Rollback failed: " + e.getMessage());
+                    releaseRepository.save(release);
+                    evictReleaseCache(releaseId);
+                    
+                    throw e;
+                }
+            },
+            () -> {
+                throw new IllegalStateException("Failed to acquire lock for release: " + releaseId);
+            }
+        );
+    }
+    
+    @Transactional
+    public Release failRelease(String releaseId, String reason) {
+        long startTime = System.currentTimeMillis();
+        Optional<Release> releaseOpt = releaseRepository.findById(releaseId);
+        if (releaseOpt.isEmpty()) {
+            throw new IllegalArgumentException("Release not found: " + releaseId);
+        }
+        
+        Release release = releaseOpt.get();
+        Release beforeRelease = copyRelease(release);
+        
+        try {
+            StateMachine<ReleaseStatus, ReleaseEvent> sm = buildStateMachine(release);
+            if (!sendEvent(sm, ReleaseEvent.FAIL, release)) {
+                throw new IllegalStateException("Failed to transition to FAILED state");
+            }
+            
+            release.setStatus(ReleaseStatus.FAILED);
+            release.setFailedAt(LocalDateTime.now());
+            release.setErrorMessage(reason);
+            
+            Release savedRelease = releaseRepository.save(release);
+            cacheRelease(savedRelease);
+            
+            logService.logSuccess(savedRelease.getId(), OperationType.FAIL_RELEASE,
+                    beforeRelease, savedRelease, OPERATOR, reason,
+                    System.currentTimeMillis() - startTime);
+            
+            return savedRelease;
+        } catch (Exception e) {
+            logService.logFailure(releaseId, OperationType.FAIL_RELEASE,
+                    beforeRelease, release, e.getMessage(), OPERATOR, reason,
+                    System.currentTimeMillis() - startTime);
+            throw e;
+        }
+    }
+    
+    @Cacheable(value = "releases", key = "#releaseId")
+    public Optional<Release> getRelease(String releaseId) {
+        return releaseRepository.findById(releaseId);
+    }
+    
+    public List<Release> getActiveReleases() {
+        List<ReleaseStatus> activeStatuses = List.of(
+            ReleaseStatus.PENDING,
+            ReleaseStatus.PREPARING,
+            ReleaseStatus.CANARY_10,
+            ReleaseStatus.CANARY_30,
+            ReleaseStatus.CANARY_50,
+            ReleaseStatus.CANARY_100,
+            ReleaseStatus.ROLLBACKING
+        );
+        return releaseRepository.findByStatusIn(activeStatuses);
+    }
+    
+    private StateMachine<ReleaseStatus, ReleaseEvent> buildStateMachine(Release release) {
+        StateMachine<ReleaseStatus, ReleaseEvent> sm = stateMachineFactory.getStateMachine(release.getId());
+        sm.stopReactively().block();
+        sm.getStateMachineAccessor()
+            .doWithAllRegions(accessor -> {
+                accessor.resetStateMachineReactively(new DefaultStateMachineContext<>(
+                    release.getStatus(), null, null, null
+                )).block();
+            });
+        sm.startReactively().block();
+        return sm;
+    }
+    
+    private boolean sendEvent(StateMachine<ReleaseStatus, ReleaseEvent> sm, 
+                              ReleaseEvent event, Release release) {
+        return sm.sendEvent(org.springframework.messaging.support.MessageBuilder
+                .withPayload(event)
+                .setHeader("releaseId", release.getId())
+                .build()).block();
+    }
+    
+    private ReleaseEvent getNextEvent(ReleaseStatus status) {
+        return switch (status) {
+            case PREPARING -> ReleaseEvent.ADVANCE_TO_CANARY_10;
+            case CANARY_10 -> ReleaseEvent.ADVANCE_TO_CANARY_30;
+            case CANARY_30 -> ReleaseEvent.ADVANCE_TO_CANARY_50;
+            case CANARY_50 -> ReleaseEvent.ADVANCE_TO_CANARY_100;
+            case CANARY_100 -> ReleaseEvent.COMPLETE;
+            default -> null;
+        };
+    }
+    
+    private ReleaseStatus getNextStatus(ReleaseStatus status) {
+        return switch (status) {
+            case PREPARING -> ReleaseStatus.CANARY_10;
+            case CANARY_10 -> ReleaseStatus.CANARY_30;
+            case CANARY_30 -> ReleaseStatus.CANARY_50;
+            case CANARY_50 -> ReleaseStatus.CANARY_100;
+            case CANARY_100 -> ReleaseStatus.COMPLETED;
+            default -> status;
+        };
+    }
+    
+    private int calculateTargetInstances(int totalInstances, ReleaseStatus status) {
+        int percentage = switch (status) {
+            case CANARY_10 -> 10;
+            case CANARY_30 -> 30;
+            case CANARY_50 -> 50;
+            case CANARY_100, COMPLETED -> 100;
+            default -> 0;
+        };
+        return (int) Math.ceil(totalInstances * percentage / 100.0);
+    }
+    
+    private boolean isRollbackable(ReleaseStatus status) {
+        return status == ReleaseStatus.PREPARING ||
+               status == ReleaseStatus.CANARY_10 ||
+               status == ReleaseStatus.CANARY_30 ||
+               status == ReleaseStatus.CANARY_50 ||
+               status == ReleaseStatus.CANARY_100;
+    }
+    
+    private String createCheckpoint(Release release) {
+        try {
+            return objectMapper.writeValueAsString(release);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to create checkpoint", e);
+            return null;
+        }
+    }
+    
+    private ReleaseStatus restoreFromCheckpoint(Release release) {
+        if (release.getRollbackCheckpoint() != null) {
+            try {
+                Release checkpoint = objectMapper.readValue(release.getRollbackCheckpoint(), Release.class);
+                return checkpoint.getStatus();
+            } catch (JsonProcessingException e) {
+                log.warn("Failed to restore from checkpoint", e);
+            }
+        }
+        return release.getStatus();
+    }
+    
+    private Release copyRelease(Release release) {
+        return Release.builder()
+                .id(release.getId())
+                .serviceName(release.getServiceName())
+                .currentVersion(release.getCurrentVersion())
+                .targetVersion(release.getTargetVersion())
+                .status(release.getStatus())
+                .totalInstances(release.getTotalInstances())
+                .updatedInstances(release.getUpdatedInstances())
+                .rollbackCheckpoint(release.getRollbackCheckpoint())
+                .errorMessage(release.getErrorMessage())
+                .metadata(release.getMetadata())
+                .createdAt(release.getCreatedAt())
+                .startedAt(release.getStartedAt())
+                .completedAt(release.getCompletedAt())
+                .failedAt(release.getFailedAt())
+                .version(release.getVersion())
+                .build();
+    }
+    
+    private void cacheRelease(Release release) {
+        redisTemplate.opsForValue().set(
+            RELEASE_CACHE_PREFIX + release.getId(),
+            release,
+            config.getCacheTtlSeconds(),
+            TimeUnit.SECONDS
+        );
+    }
+    
+    @CacheEvict(value = "releases", key = "#releaseId")
+    private void evictReleaseCache(String releaseId) {
+        redisTemplate.delete(RELEASE_CACHE_PREFIX + releaseId);
+    }
+}

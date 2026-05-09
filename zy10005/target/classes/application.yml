@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: rollback-system
+  datasource:
+    url: jdbc:mysql://localhost:3306/rollback_system?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 
+      database: 0
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+rollback:
+  system:
+    canary-stages: [10, 30, 50, 100]
+    stage-wait-seconds: 60
+    lock-timeout-seconds: 30
+    idempotent-ttl-seconds: 86400
+    cache-ttl-seconds: 300
