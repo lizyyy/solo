@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>消防值班派遣游戏</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="game-header">
+      <h1>🚒 消防值班派遣游戏</h1>
+      <div class="game-stats">
+        <div class="stat">
+          <span class="stat-label">得分</span>
+          <span id="score" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">剩余时间</span>
+          <span id="time" class="stat-value">03:00</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">游戏状态</span>
+          <span id="gameState" class="stat-value">准备开始</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="game-container">
+      <aside class="sidebar left-sidebar">
+        <section class="panel">
+          <h2>🏭 消防站</h2>
+          <div id="stationList" class="station-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>🚗 可用车辆</h2>
+          <div id="availableVehicles" class="vehicle-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>💧 消防栓</h2>
+          <div id="hydrantInfo" class="hydrant-info">
+            <p>消防栓在地图上显示为蓝色圆点</p>
+          </div>
+        </section>
+      </aside>
+
+      <section class="game-map-container">
+        <canvas id="gameMap" class="game-map"></canvas>
+        
+        <div id="overlay" class="overlay">
+          <div class="overlay-content">
+            <h2 id="overlayTitle">消防值班派遣游戏</h2>
+            <p id="overlayMessage">作为消防调度员，你需要同时处理多个警情。</p>
+            <div class="game-rules" id="gameRules">
+              <h3>游戏规则</h3>
+              <ul>
+                <li>📋 <strong>警情处理</strong>: 每个警情需要一定数量的人员和水量</li>
+                <li>🚒 <strong>车辆调度</strong>: 点击警情后选择可用车辆派遣</li>
+                <li>💧 <strong>水源利用</strong>: 利用附近消防栓增加有效水量</li>
+                <li>⏱️ <strong>时间压力</strong>: 警情会随时间恶化，超时即失败</li>
+                <li>❌ <strong>游戏结束</strong>: 失败3个警情或时间耗尽游戏结束</li>
+                <li>🏆 <strong>得分</strong>: 快速处置获得时间奖励</li>
+              </ul>
+            </div>
+            <div id="scoreBreakdown" class="score-breakdown" style="display: none;"></div>
+            <div id="actionButtons" class="action-buttons">
+              <button id="startBtn" class="btn btn-primary">开始游戏</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="dispatchPanel" class="dispatch-panel" style="display: none;">
+          <div class="dispatch-header">
+            <h3 id="dispatchEmergencyTitle">调度车辆</h3>
+            <button id="closeDispatchBtn" class="close-btn">&times;</button>
+          </div>
+          <div id="emergencyDetails" class="emergency-details"></div>
+          <div class="dispatch-vehicles">
+            <h4>选择车辆</h4>
+            <div id="dispatchVehicleList" class="dispatch-vehicle-list"></div>
+          </div>
+          <div class="dispatch-controls">
+            <label>
+              <input type="checkbox" id="useHydrant">
+              使用附近消防栓
+            </label>
+            <button id="confirmDispatchBtn" class="btn btn-primary" disabled>派遣</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar right-sidebar">
+        <section class="panel">
+          <h2>🚨 当前警情</h2>
+          <div id="activeEmergencies" class="emergency-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>✅ 已完成</h2>
+          <div id="completedEmergencies" class="completed-list"></div>
+        </section>
+
+        <section class="panel">
+          <h2>❌ 失败</h2>
+          <div id="failedEmergencies" class="failed-list"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="game-controls">
+      <button id="startBtn2" class="btn btn-primary">开始游戏</button>
+      <button id="pauseBtn" class="btn" disabled>暂停</button>
+      <button id="restartBtn" class="btn" disabled>重新开始</button>
+      <button id="replayBtn" class="btn" disabled>失败回放</button>
+    </footer>
+  </div>
+
+  <script src="js/gameConfig.js"></script>
+  <script src="js/gameEngine.js"></script>
+  <script src="js/gameUI.js"></script>
+</body>
+</html>

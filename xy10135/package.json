@@ -1,0 +1,13 @@
+{
+  "name": "fire-dispatch-game",
+  "version": "1.0.0",
+  "description": "Fire Dispatch Game - Manage emergency responses",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["game", "fire", "dispatch", "simulation"],
+  "author": "",
+  "license": "MIT"
+}
