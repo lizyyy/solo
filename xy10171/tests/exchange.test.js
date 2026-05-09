@@ -1,0 +1,233 @@
+const { v4: uuidv4 } = require('uuid');
+const { initDb, resetDb } = require('../src/db');
+const exchangeService = require('../src/services/exchangeService');
+const inventoryService = require('../src/services/inventory');
+const { EXCHANGE_STATUSES } = require('../src/constants/statuses');
+
+function getRandomSku() {
+  return `SKU-${uuidv4().substring(0, 8).toUpperCase()}`;
+}
+
+describe('Exchange Service', () => {
+  let targetSku;
+
+  beforeAll(async () => {
+    await initDb();
+  });
+
+  beforeEach(() => {
+    resetDb();
+    targetSku = getRandomSku();
+    inventoryService.upsertInventory(targetSku, 100, 100, 0);
+  });
+
+  test('createExchange: should create new exchange with correct initial state', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-001',
+      original_sku: 'SKU-OLD-001',
+      target_sku: targetSku,
+      original_qty: 1,
+      target_qty: 1,
+      reason: '尺码不对'
+    });
+
+    expect(exchange.id).toBeDefined();
+    expect(exchange.id).toMatch(/^EX-/);
+    expect(exchange.status).toBe(EXCHANGE_STATUSES.PENDING_APPLY);
+    expect(exchange.order_id).toBe('ORD-001');
+    expect(exchange.reason).toBe('尺码不对');
+  });
+
+  test('getExchangeWithLogs: should return exchange with status logs', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-001',
+      original_sku: 'SKU-OLD-001',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    const result = exchangeService.getExchangeWithLogs(exchange.id);
+    expect(result).not.toBeNull();
+    expect(result.status_logs).toBeDefined();
+    expect(result.status_logs.length).toBeGreaterThan(0);
+  });
+
+  test('full flow with positive price difference', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-001',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    expect(exchange.status).toBe(EXCHANGE_STATUSES.PENDING_APPLY);
+
+    let current = exchangeService.submitApply(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.APPLIED);
+
+    current = exchangeService.shipBack(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.SHIPPED_BACK);
+
+    current = exchangeService.passQC(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.QC_PASSED);
+
+    current = exchangeService.calculatePriceDiff(exchange.id, 5000);
+    expect(current.status).toBe(EXCHANGE_STATUSES.NEED_PAYMENT);
+    expect(current.price_diff).toBe(5000);
+
+    current = exchangeService.payDiff(exchange.id, 5000);
+    expect(current.status).toBe(EXCHANGE_STATUSES.PAID);
+    expect(current.paid_amount).toBe(5000);
+
+    current = exchangeService.startReshipping(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.RESHIPPING);
+
+    let inventory = inventoryService.getInventory(targetSku);
+    expect(inventory.reserved_qty).toBe(1);
+    expect(inventory.available_qty).toBe(99);
+
+    current = exchangeService.complete(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.COMPLETED);
+
+    inventory = inventoryService.getInventory(targetSku);
+    expect(inventory.total_qty).toBe(99);
+    expect(inventory.reserved_qty).toBe(0);
+  });
+
+  test('full flow with zero price difference', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-002',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    exchangeService.submitApply(exchange.id);
+    exchangeService.shipBack(exchange.id);
+    exchangeService.passQC(exchange.id);
+    
+    const current = exchangeService.calculatePriceDiff(exchange.id, 0);
+    expect(current.status).toBe(EXCHANGE_STATUSES.RESHIPPING);
+  });
+
+  test('cancel flow: should release reserved inventory on cancel', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-CANCEL',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    exchangeService.submitApply(exchange.id);
+    
+    const current = exchangeService.cancel(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.CANCELLED);
+  });
+
+  test('payDiff: should throw when payment amount mismatch', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-003',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    exchangeService.submitApply(exchange.id);
+    exchangeService.shipBack(exchange.id);
+    exchangeService.passQC(exchange.id);
+    exchangeService.calculatePriceDiff(exchange.id, 5000);
+
+    expect(() => {
+      exchangeService.payDiff(exchange.id, 3000);
+    }).toThrow('支付金额不匹配');
+  });
+
+  test('qc_fail flow: should allow cancellation after QC failure', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-QC-FAIL',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    exchangeService.submitApply(exchange.id);
+    exchangeService.shipBack(exchange.id);
+    
+    let current = exchangeService.failQC(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.QC_FAILED);
+
+    current = exchangeService.cancel(exchange.id);
+    expect(current.status).toBe(EXCHANGE_STATUSES.CANCELLED);
+  });
+
+  test('listExchanges: should list exchanges with filters', () => {
+    const ex1 = exchangeService.createExchange({
+      order_id: 'ORD-FILTER-1',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+    const ex2 = exchangeService.createExchange({
+      order_id: 'ORD-FILTER-2',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    exchangeService.submitApply(ex2.id);
+
+    const all = exchangeService.listExchanges({});
+    expect(all.length).toBe(2);
+
+    const applied = exchangeService.listExchanges({ status: EXCHANGE_STATUSES.APPLIED });
+    expect(applied.length).toBe(1);
+    expect(applied[0].id).toBe(ex2.id);
+
+    const byOrder = exchangeService.listExchanges({ order_id: 'ORD-FILTER-1' });
+    expect(byOrder.length).toBe(1);
+    expect(byOrder[0].id).toBe(ex1.id);
+  });
+
+  test('getExchangeStats: should return statistics', () => {
+    const ex1 = exchangeService.createExchange({
+      order_id: 'ORD-STATS-1',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+    const ex2 = exchangeService.createExchange({
+      order_id: 'ORD-STATS-2',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+    exchangeService.submitApply(ex2.id);
+
+    const stats = exchangeService.getExchangeStats();
+    expect(stats.totals.total).toBe(2);
+    expect(stats.by_status.length).toBe(2);
+  });
+
+  test('invalid state transitions should be rejected', () => {
+    const exchange = exchangeService.createExchange({
+      order_id: 'ORD-INVALID',
+      original_sku: 'SKU-OLD',
+      target_sku: targetSku,
+      reason: 'test'
+    });
+
+    expect(() => {
+      exchangeService.complete(exchange.id);
+    }).toThrow();
+
+    expect(() => {
+      exchangeService.shipBack(exchange.id);
+    }).toThrow();
+  });
+
+  test('non-existent exchange should throw', () => {
+    expect(() => {
+      exchangeService.submitApply('NON-EXISTENT-ID');
+    }).toThrow('换货单不存在');
+  });
+});

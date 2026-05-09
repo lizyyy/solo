@@ -1,0 +1,54 @@
+const EXCHANGE_STATUSES = {
+  PENDING_APPLY: 'pending_apply',
+  APPLIED: 'applied',
+  SHIPPED_BACK: 'shipped_back',
+  QC_PASSED: 'qc_passed',
+  QC_FAILED: 'qc_failed',
+  NEED_PAYMENT: 'need_payment',
+  PAID: 'paid',
+  RESHIPPING: 'reshipping',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled'
+};
+
+const STATUS_TRANSITIONS = {
+  [EXCHANGE_STATUSES.PENDING_APPLY]: {
+    [EXCHANGE_STATUSES.APPLIED]: '提交换货申请'
+  },
+  [EXCHANGE_STATUSES.APPLIED]: {
+    [EXCHANGE_STATUSES.SHIPPED_BACK]: '用户已寄回商品',
+    [EXCHANGE_STATUSES.CANCELLED]: '取消申请'
+  },
+  [EXCHANGE_STATUSES.SHIPPED_BACK]: {
+    [EXCHANGE_STATUSES.QC_PASSED]: '质检通过',
+    [EXCHANGE_STATUSES.QC_FAILED]: '质检不通过'
+  },
+  [EXCHANGE_STATUSES.QC_PASSED]: {
+    [EXCHANGE_STATUSES.NEED_PAYMENT]: '计算差价',
+    [EXCHANGE_STATUSES.RESHIPPING]: '无差价直接重发'
+  },
+  [EXCHANGE_STATUSES.NEED_PAYMENT]: {
+    [EXCHANGE_STATUSES.PAID]: '用户已支付差价'
+  },
+  [EXCHANGE_STATUSES.PAID]: {
+    [EXCHANGE_STATUSES.RESHIPPING]: '开始重发商品'
+  },
+  [EXCHANGE_STATUSES.RESHIPPING]: {
+    [EXCHANGE_STATUSES.COMPLETED]: '换货完成'
+  },
+  [EXCHANGE_STATUSES.QC_FAILED]: {
+    [EXCHANGE_STATUSES.CANCELLED]: '质检不通过，取消换货'
+  }
+};
+
+const RESERVATION_STATUSES = {
+  RESERVED: 'reserved',
+  RELEASED: 'released',
+  CONSUMED: 'consumed'
+};
+
+module.exports = {
+  EXCHANGE_STATUSES,
+  STATUS_TRANSITIONS,
+  RESERVATION_STATUSES
+};
