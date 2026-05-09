@@ -1,0 +1,42 @@
+[
+  {
+    "id": "P001",
+    "name": "iPhone 15 Pro",
+    "price": 8999,
+    "category": "手机"
+  },
+  {
+    "id": "P002",
+    "name": "MacBook Pro 14",
+    "price": 14999,
+    "category": "电脑",
+    "brand": "Apple",
+    "stock": 50
+  },
+  {
+    "id": "P003",
+    "name": "AirPods Pro 2",
+    "price": 1899,
+    "category": "耳机",
+    "brand": "Apple",
+    "description": "主动降噪耳机",
+    "stock": 200,
+    "isActive": true
+  },
+  {
+    "id": "P004",
+    "name": "iPad Air",
+    "price": 4799,
+    "category": "平板",
+    "description": "轻薄便携",
+    "isActive": true
+  },
+  {
+    "id": "P005",
+    "name": "Apple Watch Series 9",
+    "price": 2999,
+    "category": "手表",
+    "brand": "Apple",
+    "stock": 100
+  }
+]

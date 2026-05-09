@@ -1,0 +1,27 @@
+import { IndexSnapshot, SourceData, CheckResult, ReplayTask, CacheRefreshRecord, Report, HistoryEntry, Product } from '../types';
+export declare const isInitialized: () => boolean;
+export declare const initializeStore: () => boolean;
+export declare const addHistoryEntry: (type: HistoryEntry["type"], action: string, status: HistoryEntry["status"], details: string) => HistoryEntry;
+export declare const getHistory: (limit?: number, type?: HistoryEntry["type"]) => HistoryEntry[];
+export declare const saveSnapshot: (name: string, products: Product[], description?: string) => IndexSnapshot;
+export declare const getSnapshots: () => IndexSnapshot[];
+export declare const getSnapshotById: (id: string) => IndexSnapshot | null;
+export declare const getSnapshotProducts: (id: string) => Product[] | null;
+export declare const saveSourceData: (name: string, products: Product[], sourceType: SourceData["sourceType"], description?: string) => SourceData;
+export declare const getSources: () => SourceData[];
+export declare const getSourceById: (id: string) => SourceData | null;
+export declare const getSourceProducts: (id: string) => Product[] | null;
+export declare const saveCheckResult: (result: Omit<CheckResult, "id" | "timestamp" | "createdAt">) => CheckResult;
+export declare const getCheckResults: () => CheckResult[];
+export declare const getCheckResultById: (id: string) => CheckResult | null;
+export declare const saveReplayTask: (task: Omit<ReplayTask, "id" | "createdAt">) => ReplayTask;
+export declare const updateReplayTask: (taskId: string, updates: Partial<ReplayTask>) => ReplayTask | null;
+export declare const getReplayTasks: () => ReplayTask[];
+export declare const getReplayTaskById: (id: string) => ReplayTask | null;
+export declare const saveCacheRecord: (record: Omit<CacheRefreshRecord, "id" | "createdAt">) => CacheRefreshRecord;
+export declare const getCacheRecords: () => CacheRefreshRecord[];
+export declare const saveReport: (name: string, type: Report["type"], content: string, checkResultId?: string, replayTaskId?: string, cacheRecordId?: string) => Report;
+export declare const getReports: () => Report[];
+export declare const getReportById: (id: string) => Report | null;
+export declare const getDataDir: () => string;
+//# sourceMappingURL=store.d.ts.map

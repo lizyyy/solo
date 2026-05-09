@@ -1,0 +1,42 @@
+{
+  "name": "search-index-replay-cli",
+  "version": "1.0.0",
+  "description": "搜索索引重建回放 CLI 工具 - 用于商品搜索索引重建后的字段缺失检测与回放",
+  "main": "dist/index.js",
+  "bin": {
+    "sir": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "search",
+    "index",
+    "elasticsearch",
+    "cli",
+    "replay",
+    "reindex"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^8.2.6",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^8.2.10",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.10.5",
+    "@types/uuid": "^9.0.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

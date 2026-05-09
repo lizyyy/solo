@@ -1,0 +1,83 @@
+[
+  {
+    "id": "d95164ec-fa6f-4a3e-afea-06c3df66a599",
+    "timestamp": "2026-05-09T14:36:12.144Z",
+    "type": "report",
+    "action": "生成报告: 2024重建修复综合报告",
+    "status": "success",
+    "details": "类型: comprehensive, 路径: /Users/mac/pro/solo/workspaces/xy10160/.sir-data/reports/report-87047ce2-5597-4407-802f-c0729cb3c5b7.md",
+    "createdAt": "2026-05-09T14:36:12.144Z"
+  },
+  {
+    "id": "ede5d145-e227-4212-99e4-4e347a66778f",
+    "timestamp": "2026-05-09T14:36:01.031Z",
+    "type": "cache",
+    "action": "执行缓存刷新 (回放任务)",
+    "status": "success",
+    "details": "成功: 6, 失败: 0, 记录ID: 60a3b12b-c293-4b77-b7cd-36323c9b6d11",
+    "createdAt": "2026-05-09T14:36:01.031Z"
+  },
+  {
+    "id": "47cc1749-6746-4d15-bc38-98debf054d58",
+    "timestamp": "2026-05-09T14:35:56.780Z",
+    "type": "replay",
+    "action": "执行回放: 2024重建修复",
+    "status": "success",
+    "details": "成功: 6, 失败: 0, 任务ID: 79635943-cd92-43fb-85a7-2974e7ede51c",
+    "createdAt": "2026-05-09T14:35:56.780Z"
+  },
+  {
+    "id": "6e8f4aed-1cc8-44b5-9e89-83dfd02eec69",
+    "timestamp": "2026-05-09T14:35:36.139Z",
+    "type": "replay",
+    "action": "预演回放: 2024重建修复",
+    "status": "success",
+    "details": "商品数: 6",
+    "createdAt": "2026-05-09T14:35:36.139Z"
+  },
+  {
+    "id": "a75c29ae-fde9-4c85-8d48-9a90349e95e3",
+    "timestamp": "2026-05-09T14:35:27.576Z",
+    "type": "check",
+    "action": "执行检查: 重建后索引 vs 数据库源",
+    "status": "success",
+    "details": "问题商品: 6/6, 结果ID: 520e1b61-9ed4-49f8-8856-c9ebd53f752f",
+    "createdAt": "2026-05-09T14:35:27.576Z"
+  },
+  {
+    "id": "7c04573c-a79f-4081-b4bf-465d852b54f2",
+    "timestamp": "2026-05-09T14:35:15.802Z",
+    "type": "import",
+    "action": "导入源数据: 数据库源",
+    "status": "success",
+    "details": "商品数: 6, 类型: database, 文件: examples/source.json",
+    "createdAt": "2026-05-09T14:35:15.802Z"
+  },
+  {
+    "id": "2041de14-4980-4fa2-b56f-f72c467d26d0",
+    "timestamp": "2026-05-09T14:35:09.382Z",
+    "type": "import",
+    "action": "导入快照: 重建后索引",
+    "status": "success",
+    "details": "商品数: 5, 文件: examples/snapshot.json",
+    "createdAt": "2026-05-09T14:35:09.382Z"
+  },
+  {
+    "id": "5c656646-c98d-4d55-8e3f-b846bca6efdc",
+    "timestamp": "2026-05-09T14:35:03.595Z",
+    "type": "init",
+    "action": "检测到已初始化，跳过",
+    "status": "success",
+    "details": "项目已存在，使用 --force 可覆盖",
+    "createdAt": "2026-05-09T14:35:03.595Z"
+  },
+  {
+    "id": "468d4578-4c3a-4bfd-9777-ff3e95c9bcc0",
+    "timestamp": "2026-05-09T14:34:57.964Z",
+    "type": "init",
+    "action": "初始化完成",
+    "status": "success",
+    "details": "数据目录: /Users/mac/pro/solo/workspaces/xy10160/.sir-data",
+    "createdAt": "2026-05-09T14:34:57.964Z"
+  }
+]

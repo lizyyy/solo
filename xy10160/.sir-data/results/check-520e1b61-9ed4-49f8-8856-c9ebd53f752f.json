@@ -1,0 +1,134 @@
+{
+  "snapshotId": "ac75cf21-4601-4739-adf4-b9cdb4e12ecf",
+  "sourceId": "3af71302-2f41-450e-a4b1-b1632f2e9132",
+  "totalProducts": 6,
+  "missingFieldsCount": 26,
+  "mismatchedFieldsCount": 1,
+  "productDiffs": [
+    {
+      "productId": "P001",
+      "productName": "iPhone 15 Pro",
+      "missingFields": [
+        "brand",
+        "description",
+        "images",
+        "stock",
+        "isActive",
+        "createdAt",
+        "updatedAt"
+      ],
+      "mismatchedFields": [],
+      "extraFields": [],
+      "hasIssue": true
+    },
+    {
+      "productId": "P002",
+      "productName": "MacBook Pro 14",
+      "missingFields": [
+        "description",
+        "images",
+        "isActive",
+        "createdAt",
+        "updatedAt"
+      ],
+      "mismatchedFields": [],
+      "extraFields": [],
+      "hasIssue": true
+    },
+    {
+      "productId": "P003",
+      "productName": "AirPods Pro 2",
+      "missingFields": [
+        "createdAt"
+      ],
+      "mismatchedFields": [],
+      "extraFields": [],
+      "hasIssue": true
+    },
+    {
+      "productId": "P004",
+      "productName": "iPad Air",
+      "missingFields": [
+        "brand",
+        "images",
+        "stock",
+        "createdAt",
+        "updatedAt"
+      ],
+      "mismatchedFields": [
+        {
+          "productId": "P004",
+          "fieldName": "description",
+          "indexValue": "轻薄便携",
+          "sourceValue": "轻薄便携，M1芯片",
+          "diffType": "mismatch"
+        }
+      ],
+      "extraFields": [],
+      "hasIssue": true
+    },
+    {
+      "productId": "P005",
+      "productName": "Apple Watch Series 9",
+      "missingFields": [
+        "description",
+        "images",
+        "isActive",
+        "createdAt"
+      ],
+      "mismatchedFields": [],
+      "extraFields": [],
+      "hasIssue": true
+    },
+    {
+      "productId": "P006",
+      "productName": "Magic Keyboard",
+      "missingFields": [
+        "ENTIRE_PRODUCT"
+      ],
+      "mismatchedFields": [],
+      "extraFields": [],
+      "hasIssue": true
+    }
+  ],
+  "summary": {
+    "totalChecked": 6,
+    "withIssues": 6,
+    "withoutIssues": 0,
+    "missingFieldsTotal": 26,
+    "mismatchedFieldsTotal": 1,
+    "mostCommonMissingFields": [
+      {
+        "field": "createdAt",
+        "count": 5
+      },
+      {
+        "field": "images",
+        "count": 4
+      },
+      {
+        "field": "description",
+        "count": 3
+      },
+      {
+        "field": "isActive",
+        "count": 3
+      },
+      {
+        "field": "updatedAt",
+        "count": 3
+      },
+      {
+        "field": "brand",
+        "count": 2
+      },
+      {
+        "field": "stock",
+        "count": 2
+      }
+    ]
+  },
+  "id": "520e1b61-9ed4-49f8-8856-c9ebd53f752f",
+  "timestamp": "2026-05-09T14:35:27.573Z",
+  "createdAt": "2026-05-09T14:35:27.573Z"
+}

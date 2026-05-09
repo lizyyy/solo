@@ -1,0 +1,75 @@
+[
+  {
+    "id": "P001",
+    "name": "iPhone 15 Pro",
+    "price": 8999,
+    "category": "手机",
+    "brand": "Apple",
+    "description": "钛金属边框设计，A17 Pro芯片",
+    "images": ["img1.jpg", "img2.jpg"],
+    "stock": 100,
+    "isActive": true,
+    "createdAt": "2024-01-15T00:00:00Z",
+    "updatedAt": "2024-02-20T10:30:00Z"
+  },
+  {
+    "id": "P002",
+    "name": "MacBook Pro 14",
+    "price": 14999,
+    "category": "电脑",
+    "brand": "Apple",
+    "description": "M3 Pro芯片，Liquid Retina XDR显示屏",
+    "images": ["mbp1.jpg"],
+    "stock": 50,
+    "isActive": true,
+    "createdAt": "2024-01-10T00:00:00Z",
+    "updatedAt": "2024-02-18T15:45:00Z"
+  },
+  {
+    "id": "P003",
+    "name": "AirPods Pro 2",
+    "price": 1899,
+    "category": "耳机",
+    "brand": "Apple",
+    "description": "主动降噪耳机",
+    "stock": 200,
+    "isActive": true,
+    "createdAt": "2024-01-08T00:00:00Z"
+  },
+  {
+    "id": "P004",
+    "name": "iPad Air",
+    "price": 4799,
+    "category": "平板",
+    "brand": "Apple",
+    "description": "轻薄便携，M1芯片",
+    "images": ["ipadair1.jpg", "ipadair2.jpg", "ipadair3.jpg"],
+    "stock": 80,
+    "isActive": true,
+    "createdAt": "2024-01-12T00:00:00Z",
+    "updatedAt": "2024-02-22T09:00:00Z"
+  },
+  {
+    "id": "P005",
+    "name": "Apple Watch Series 9",
+    "price": 2999,
+    "category": "手表",
+    "brand": "Apple",
+    "description": "S9芯片，双指轻点交互",
+    "images": ["watch1.jpg"],
+    "stock": 100,
+    "isActive": true,
+    "createdAt": "2024-01-20T00:00:00Z"
+  },
+  {
+    "id": "P006",
+    "name": "Magic Keyboard",
+    "price": 899,
+    "category": "配件",
+    "brand": "Apple",
+    "description": "触控板内置，无线连接",
+    "stock": 150,
+    "isActive": true,
+    "createdAt": "2024-01-25T00:00:00Z"
+  }
+]
