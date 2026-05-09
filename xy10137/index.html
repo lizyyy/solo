@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>冷链配送限时游戏</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>❄️ 冷链配送限时游戏</h1>
+      <div class="game-info">
+        <div class="info-item">
+          <span class="label">游戏状态:</span>
+          <span id="game-state" class="value">待开始</span>
+        </div>
+        <div class="info-item">
+          <span class="label">时间:</span>
+          <span id="game-time" class="value">0.0s</span>
+        </div>
+        <div class="info-item">
+          <span class="label">得分:</span>
+          <span id="game-score" class="value score">0</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="game-area">
+        <div class="control-panel">
+          <button id="btn-start" class="btn btn-primary">开始游戏</button>
+          <button id="btn-pause" class="btn btn-secondary" disabled>暂停</button>
+          <button id="btn-resume" class="btn btn-success" disabled>继续</button>
+          <button id="btn-restart" class="btn btn-warning" disabled>重新开始</button>
+          <button id="btn-rules" class="btn btn-info">游戏规则</button>
+          <button id="btn-score-details" class="btn btn-info" disabled>计分明细</button>
+          <button id="btn-replay" class="btn btn-info" disabled>失败回放</button>
+        </div>
+
+        <div class="game-content">
+          <div class="section vehicles-section">
+            <h2>🚚 可用车辆</h2>
+            <div id="vehicles-list" class="vehicles-list"></div>
+          </div>
+
+          <div class="section crates-section">
+            <h2>📦 冷链箱</h2>
+            <div id="crates-list" class="crates-list"></div>
+          </div>
+        </div>
+
+        <div class="selection-info">
+          <h3>分配操作</h3>
+          <div class="selection-display">
+            <div class="selected-item">
+              <span class="label">已选车辆:</span>
+              <span id="selected-vehicle" class="value">无</span>
+            </div>
+            <div class="selected-item">
+              <span class="label">已选冷链箱:</span>
+              <span id="selected-crate" class="value">无</span>
+            </div>
+          </div>
+          <button id="btn-assign" class="btn btn-assign" disabled>分配车辆</button>
+          <button id="btn-clear-selection" class="btn btn-danger" disabled>清除选择</button>
+        </div>
+      </section>
+
+      <div id="rules-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>📜 游戏规则</h2>
+            <button id="btn-close-rules" class="btn-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <h3>🎯 目标</h3>
+            <p>在所有冷链箱的温度和时间同时超标之前，成功配送所有冷链箱到目的地。</p>
+
+            <h3>🎮 玩法</h3>
+            <ol>
+              <li>点击"开始游戏"按钮开始</li>
+              <li>选择一辆车和一个冷链箱</li>
+              <li>点击"分配车辆"将车辆分配给冷链箱</li>
+              <li>车辆会自动配送冷链箱到目的地</li>
+              <li>配送完成后，车辆可以再次分配给其他冷链箱</li>
+            </ol>
+
+            <h3>⚠️ 失败条件</h3>
+            <p>当<strong>任何一个</strong>冷链箱同时满足以下两个条件时，游戏失败：</p>
+            <ul>
+              <li>温度超过 10°C</li>
+              <li>配送时间超过该冷链箱的限制时间</li>
+            </ul>
+
+            <h3>✅ 胜利条件</h3>
+            <p>成功配送所有冷链箱到目的地。</p>
+
+            <h3>🏆 计分规则</h3>
+            <ul>
+              <li>每成功配送一个冷链箱：+100 分</li>
+              <li>快速配送（用时小于限制时间的60%）：+50 分</li>
+              <li>低温保存（配送完成时温度低于 4°C）：+50 分</li>
+            </ul>
+
+            <h3>💡 提示</h3>
+            <ul>
+              <li>不同车辆有不同的制冷能力和速度</li>
+              <li>优先配送时间限制较紧的冷链箱</li>
+              <li>合理分配车辆资源是获胜的关键</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="score-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>🏆 计分明细</h2>
+            <button id="btn-close-score" class="btn-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div id="score-details-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="replay-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>🎬 失败回放</h2>
+            <button id="btn-close-replay" class="btn-close">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="replay-controls">
+              <button id="btn-play-replay" class="btn btn-primary">播放</button>
+              <button id="btn-stop-replay" class="btn btn-danger" disabled>停止</button>
+              <div class="replay-time">
+                <span>时间: <span id="replay-time-display">0.0s</span></span>
+              </div>
+            </div>
+            <div id="replay-area" class="replay-area">
+              <p>游戏失败后可在此处查看失败回放</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="game-result-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 id="result-title">游戏结束</h2>
+          </div>
+          <div class="modal-body">
+            <div id="result-content"></div>
+            <div class="result-actions">
+              <button id="btn-restart-result" class="btn btn-primary">再玩一次</button>
+              <button id="btn-close-result" class="btn btn-secondary">关闭</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
