@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: paymentguard-postgres
+    environment:
+      POSTGRES_DB: paymentguard
+      POSTGRES_USER: paymentguard
+      POSTGRES_PASSWORD: paymentguard123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paymentguard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: paymentguard-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: paymentguard-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: paymentguard
+      RABBITMQ_DEFAULT_PASS: paymentguard123
+      RABBITMQ_DEFAULT_VHOST: /paymentguard
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  paymentguard-app:
+    build: .
+    container_name: paymentguard-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/paymentguard
+      SPRING_DATASOURCE_USERNAME: paymentguard
+      SPRING_DATASOURCE_PASSWORD: paymentguard123
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: paymentguard
+      SPRING_RABBITMQ_PASSWORD: paymentguard123
+      SPRING_RABBITMQ_VIRTUAL_HOST: /paymentguard
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
