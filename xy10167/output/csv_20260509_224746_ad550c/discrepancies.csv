@@ -1,0 +1,4 @@
+﻿批次号,类型,详情
+B20260501-002,pass_rate_mismatch,"{""type"": ""pass_rate_mismatch"", ""batch_id"": ""B20260501-002"", ""declared"": 0.95, ""calculated"": 0.8461538461538461, ""diff"": -0.10384615384615381}"
+B20260501-002,conclusion_mismatch,"{""type"": ""conclusion_mismatch"", ""batch_id"": ""B20260501-002"", ""declared"": ""PASS"", ""calculated"": ""FAIL""}"
+B20260501-002,validation_failed_below_pass_threshold,"{""type"": ""validation_failed_below_pass_threshold"", ""batch_id"": ""B20260501-002"", ""reason"": ""below_pass_threshold"", ""details"": {""valid"": false, ""reason"": ""below_pass_threshold"", ""rule"": ""RULE_MEDIUM"", ""required_size"": 13, ""actual_size"": 13, ""pass_rate"": 0.8461538461538461, ""pass_threshold"": 0.95}}"

@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "rule_id": "RULE_SMALL",
+      "name": "小批量抽检规则",
+      "description": "适用于批量 1-500 的产品，抽样 5 件，合格率需 >= 95%",
+      "min_batch_size": 1,
+      "max_batch_size": 500,
+      "sample_size": 5,
+      "pass_threshold": 0.95
+    },
+    {
+      "rule_id": "RULE_MEDIUM",
+      "name": "中批量抽检规则",
+      "description": "适用于批量 501-2000 的产品，抽样 13 件，合格率需 >= 95%",
+      "min_batch_size": 501,
+      "max_batch_size": 2000,
+      "sample_size": 13,
+      "pass_threshold": 0.95
+    },
+    {
+      "rule_id": "RULE_LARGE",
+      "name": "大批量抽检规则",
+      "description": "适用于批量 2001-10000 的产品，抽样 20 件，合格率需 >= 98%",
+      "min_batch_size": 2001,
+      "max_batch_size": 10000,
+      "sample_size": 20,
+      "pass_threshold": 0.98
+    }
+  ]
+}

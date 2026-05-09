@@ -1,0 +1,415 @@
+{
+  "report_id": "20260509_224746_ad550c",
+  "created_at": "2026-05-09T22:47:46.072575",
+  "summary": {
+    "run_id": "20260509_224746_ad550c",
+    "total_batches": 3,
+    "total_samples": 31,
+    "total_rechecks": 1,
+    "total_defective": 2,
+    "total_discrepancies": 3,
+    "total_warnings": 0,
+    "overall_pass_rate": 0.9354838709677419,
+    "failed_samples_count": 2
+  },
+  "rules": [
+    {
+      "rule_id": "RULE_SMALL",
+      "name": "小批量抽检规则",
+      "sample_size": 5,
+      "pass_threshold": 0.95,
+      "batch_size_range": [
+        1,
+        500
+      ]
+    },
+    {
+      "rule_id": "RULE_MEDIUM",
+      "name": "中批量抽检规则",
+      "sample_size": 13,
+      "pass_threshold": 0.95,
+      "batch_size_range": [
+        501,
+        2000
+      ]
+    },
+    {
+      "rule_id": "RULE_LARGE",
+      "name": "大批量抽检规则",
+      "sample_size": 20,
+      "pass_threshold": 0.98,
+      "batch_size_range": [
+        2001,
+        10000
+      ]
+    }
+  ],
+  "batches": [
+    {
+      "batch_id": "B20260501-001",
+      "product": "精密轴承-A型",
+      "total_quantity": 1500,
+      "sample_quantity": 13,
+      "production_date": "2026-05-01T00:00:00",
+      "line": "A线-03",
+      "pass_rate": 1.0,
+      "defective_count": 0,
+      "sample_count": 13,
+      "recheck_count": 1,
+      "merged_from": [],
+      "samples": [
+        {
+          "sample_id": "S001",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:15:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S002",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:18:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S003",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:20:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S004",
+          "is_defective": true,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:22:00",
+          "inspector": "张三",
+          "remark": "尺寸超差",
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S005",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:25:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S006",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:30:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S007",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:32:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S008",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:35:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S009",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:38:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S010",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T09:40:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S011",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T10:00:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S012",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T10:02:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S013",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T10:05:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        }
+      ],
+      "rechecks": [
+        {
+          "sample_id": "S004",
+          "original_result": true,
+          "recheck_result": false,
+          "recheck_time": "2026-05-01T14:00:00",
+          "rechecker": "质检主任",
+          "reason": "首次检测设备校准问题"
+        }
+      ]
+    },
+    {
+      "batch_id": "B20260501-002",
+      "product": "精密轴承-A型",
+      "total_quantity": 1200,
+      "sample_quantity": 13,
+      "production_date": "2026-05-01T00:00:00",
+      "line": "A线-03",
+      "pass_rate": 0.8461538461538461,
+      "defective_count": 2,
+      "sample_count": 13,
+      "recheck_count": 0,
+      "merged_from": [],
+      "samples": [
+        {
+          "sample_id": "S101",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:15:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S102",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:18:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S103",
+          "is_defective": true,
+          "effective_defective": true,
+          "inspection_time": "2026-05-01T14:20:00",
+          "inspector": "张三",
+          "remark": "表面划痕",
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S104",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:22:00",
+          "inspector": "张三",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S105",
+          "is_defective": true,
+          "effective_defective": true,
+          "inspection_time": "2026-05-01T14:25:00",
+          "inspector": "张三",
+          "remark": "硬度不够",
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S106",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:30:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S107",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:32:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S108",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:35:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S109",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:38:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S110",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T14:40:00",
+          "inspector": "李四",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S111",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T15:00:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S112",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T15:02:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S113",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-01T15:05:00",
+          "inspector": "王五",
+          "remark": null,
+          "rework_count": 0
+        }
+      ],
+      "rechecks": []
+    },
+    {
+      "batch_id": "B20260502-001",
+      "product": "精密轴承-B型",
+      "total_quantity": 300,
+      "sample_quantity": 5,
+      "production_date": "2026-05-02T00:00:00",
+      "line": "B线-01",
+      "pass_rate": 1.0,
+      "defective_count": 0,
+      "sample_count": 5,
+      "recheck_count": 0,
+      "merged_from": [],
+      "samples": [
+        {
+          "sample_id": "S201",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-02T09:00:00",
+          "inspector": "赵六",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S202",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-02T09:05:00",
+          "inspector": "赵六",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S203",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-02T09:10:00",
+          "inspector": "赵六",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S204",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-02T09:15:00",
+          "inspector": "赵六",
+          "remark": null,
+          "rework_count": 0
+        },
+        {
+          "sample_id": "S205",
+          "is_defective": false,
+          "effective_defective": false,
+          "inspection_time": "2026-05-02T09:20:00",
+          "inspector": "赵六",
+          "remark": null,
+          "rework_count": 0
+        }
+      ],
+      "rechecks": []
+    }
+  ],
+  "discrepancies": [
+    {
+      "type": "pass_rate_mismatch",
+      "batch_id": "B20260501-002",
+      "declared": 0.95,
+      "calculated": 0.8461538461538461,
+      "diff": -0.10384615384615381
+    },
+    {
+      "type": "conclusion_mismatch",
+      "batch_id": "B20260501-002",
+      "declared": "PASS",
+      "calculated": "FAIL"
+    },
+    {
+      "type": "validation_failed_below_pass_threshold",
+      "batch_id": "B20260501-002",
+      "reason": "below_pass_threshold",
+      "details": {
+        "valid": false,
+        "reason": "below_pass_threshold",
+        "rule": "RULE_MEDIUM",
+        "required_size": 13,
+        "actual_size": 13,
+        "pass_rate": 0.8461538461538461,
+        "pass_threshold": 0.95
+      }
+    }
+  ],
+  "dirty_data_warnings": []
+}

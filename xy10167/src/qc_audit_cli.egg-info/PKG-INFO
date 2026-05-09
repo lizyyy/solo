@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: qc-audit-cli
+Version: 0.1.0
+Summary: 质检抽样复核 CLI 工具 - 处理工厂抽检样本补录后的批次合格率和复检结论核对
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: pandas>=1.3
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jinja2>=3.0
+Provides-Extra: test
+Requires-Dist: pytest>=7.0; extra == "test"
+Requires-Dist: pytest-cov>=4.0; extra == "test"

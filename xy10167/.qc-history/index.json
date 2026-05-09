@@ -1,0 +1,34 @@
+{
+  "runs": [
+    {
+      "run_id": "20260509_224746_ad550c",
+      "timestamp": "2026-05-09T22:47:46.075810",
+      "command": "audit",
+      "input_files": [
+        "examples/rules.yaml",
+        "examples/batches.json",
+        "examples/declared.json"
+      ],
+      "output_files": [
+        "output/report_20260509_224746_ad550c.json",
+        "output/report_20260509_224746_ad550c.txt",
+        "output/csv_20260509_224746_ad550c/batches.csv",
+        "output/csv_20260509_224746_ad550c/samples.csv",
+        "output/csv_20260509_224746_ad550c/rechecks.csv",
+        "output/csv_20260509_224746_ad550c/discrepancies.csv",
+        "output/csv_20260509_224746_ad550c/warnings.csv"
+      ],
+      "summary": {
+        "run_id": "20260509_224746_ad550c",
+        "total_batches": 3,
+        "total_samples": 31,
+        "total_rechecks": 1,
+        "total_defective": 2,
+        "total_discrepancies": 3,
+        "total_warnings": 0,
+        "overall_pass_rate": 0.9354838709677419,
+        "failed_samples_count": 2
+      }
+    }
+  ]
+}
