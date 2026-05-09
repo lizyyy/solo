@@ -1,0 +1,81 @@
+{
+  "plan_id": "4ac428e7-c2e8-47df-8131-89c8f68c8780",
+  "generated_at": "2026-05-09T21:32:40.773009",
+  "target_date": "2026-05-08",
+  "missed_tasks": [
+    "extract_data",
+    "transform_data",
+    "load_data",
+    "generate_report",
+    "cleanup_temp"
+  ],
+  "steps": [
+    {
+      "step_id": 1,
+      "task_id": "extract_data",
+      "task_name": "数据抽取",
+      "execution_date": "2026-05-08",
+      "estimated_duration": 60.0,
+      "dependencies": [],
+      "action": "execute",
+      "reason": null,
+      "idempotency_check_needed": true
+    },
+    {
+      "step_id": 2,
+      "task_id": "transform_data",
+      "task_name": "数据转换",
+      "execution_date": "2026-05-08",
+      "estimated_duration": 45.0,
+      "dependencies": [
+        "extract_data"
+      ],
+      "action": "execute",
+      "reason": null,
+      "idempotency_check_needed": true
+    },
+    {
+      "step_id": 3,
+      "task_id": "load_data",
+      "task_name": "数据加载",
+      "execution_date": "2026-05-08",
+      "estimated_duration": 120.0,
+      "dependencies": [
+        "transform_data"
+      ],
+      "action": "execute",
+      "reason": null,
+      "idempotency_check_needed": true
+    },
+    {
+      "step_id": 4,
+      "task_id": "generate_report",
+      "task_name": "生成日报表",
+      "execution_date": "2026-05-08",
+      "estimated_duration": 30.0,
+      "dependencies": [
+        "load_data"
+      ],
+      "action": "execute",
+      "reason": null,
+      "idempotency_check_needed": true
+    },
+    {
+      "step_id": 5,
+      "task_id": "cleanup_temp",
+      "task_name": "清理临时文件",
+      "execution_date": "2026-05-08",
+      "estimated_duration": 20.0,
+      "dependencies": [
+        "load_data",
+        "generate_report"
+      ],
+      "action": "execute",
+      "reason": null,
+      "idempotency_check_needed": true
+    }
+  ],
+  "total_steps": 5,
+  "estimated_total_duration": 275.0,
+  "warnings": []
+}
