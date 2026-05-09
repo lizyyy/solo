@@ -1,0 +1,141 @@
+{
+  "audit_time": "2026-05-10T04:33:54.176611",
+  "version": "1.0.0",
+  "data_import": {
+    "total_lines": 13,
+    "valid_records": 10,
+    "invalid_records": 2,
+    "duplicate_records": 1,
+    "invalid_details": [
+      {
+        "line": 11,
+        "error": "缺少必填字段: record_id",
+        "data": {
+          "record_id": "",
+          "plate_number": "粤W99999",
+          "entry_station": "上海虹桥站",
+          "exit_station": "苏州新区站",
+          "entry_time": "2024-01-16T18:00:00",
+          "exit_time": "2024-01-16T19:00:00",
+          "vehicle_type": "1型客车",
+          "weight": 1.5,
+          "toll_amount": 35.0,
+          "is_etc": true
+        }
+      },
+      {
+        "line": 12,
+        "error": "缺少必填字段: entry_station",
+        "data": {
+          "record_id": "JSON012",
+          "plate_number": "云X88888",
+          "entry_station": "",
+          "exit_station": "深圳福田站",
+          "entry_time": "2024-01-16T19:00:00",
+          "exit_time": "2024-01-16T20:00:00",
+          "vehicle_type": "1型客车",
+          "weight": 1.5,
+          "toll_amount": 50.0,
+          "is_etc": true
+        }
+      }
+    ],
+    "duplicate_details": [
+      {
+        "line": 13,
+        "error": "重复的记录ID: JSON001",
+        "data": {
+          "record_id": "JSON001",
+          "plate_number": "沪Z66666",
+          "entry_station": "广州白云站",
+          "exit_station": "深圳福田站",
+          "entry_time": "2024-01-16T21:00:00",
+          "exit_time": "2024-01-16T22:15:00",
+          "vehicle_type": "1型客车",
+          "weight": 1.8,
+          "toll_amount": 120.0,
+          "is_etc": true
+        }
+      }
+    ]
+  },
+  "audit_results": {
+    "total": 10,
+    "passed": 5,
+    "suspicious": 5,
+    "needs_manual_review": 5,
+    "vehicle_type_only_issues": 2,
+    "route_only_issues": 1,
+    "both_issues": 2,
+    "pass_rate": 50.0
+  },
+  "review_items": [
+    {
+      "record_id": "JSON006",
+      "plate_number": "苏M88888",
+      "vehicle_type": "2型货车",
+      "vehicle_type_issue": true,
+      "vehicle_type_evidence": "实际载重 15.00吨 超过 2型货车 最大标准 12.0吨",
+      "route_issue": true,
+      "route_evidence": "行驶时间异常：实际用时 30.00小时，超过最长预期时间 2.0小时（路段：上海虹桥站→苏州新区站，预期距离：85.0公里）",
+      "final_status": "疑似异常",
+      "review_notes": [
+        "实际载重 15.00吨 超过 2型货车 最大标准 12.0吨",
+        "行驶时间异常：实际用时 30.00小时，超过最长预期时间 2.0小时（路段：上海虹桥站→苏州新区站，预期距离：85.0公里）"
+      ]
+    },
+    {
+      "record_id": "JSON007",
+      "plate_number": "鲁N77777",
+      "vehicle_type": "1型客车",
+      "vehicle_type_issue": false,
+      "vehicle_type_evidence": "",
+      "route_issue": true,
+      "route_evidence": "行驶时间异常：实际用时 0.50小时，低于最短预期时间 3.0小时（路段：武汉站→长沙南站，预期距离：350.0公里）",
+      "final_status": "疑似异常",
+      "review_notes": [
+        "行驶时间异常：实际用时 0.50小时，低于最短预期时间 3.0小时（路段：武汉站→长沙南站，预期距离：350.0公里）"
+      ]
+    },
+    {
+      "record_id": "JSON008",
+      "plate_number": "冀Q55555",
+      "vehicle_type": "1型客车",
+      "vehicle_type_issue": true,
+      "vehicle_type_evidence": "实际载重 3.00吨 超过 1型客车 最大标准 2.5吨",
+      "route_issue": false,
+      "route_evidence": "",
+      "final_status": "疑似异常",
+      "review_notes": [
+        "实际载重 3.00吨 超过 1型客车 最大标准 2.5吨"
+      ]
+    },
+    {
+      "record_id": "JSON009",
+      "plate_number": "闽R44444",
+      "vehicle_type": "1型客车",
+      "vehicle_type_issue": true,
+      "vehicle_type_evidence": "实际载重 0.20吨 低于 1型客车 最低标准 0.5吨",
+      "route_issue": false,
+      "route_evidence": "",
+      "final_status": "疑似异常",
+      "review_notes": [
+        "实际载重 0.20吨 低于 1型客车 最低标准 0.5吨"
+      ]
+    },
+    {
+      "record_id": "JSON010",
+      "plate_number": "琼A55555",
+      "vehicle_type": "5型货车",
+      "vehicle_type_issue": true,
+      "vehicle_type_evidence": "实际载重 25.00吨 低于 5型货车 最低标准 30.0吨",
+      "route_issue": true,
+      "route_evidence": "行驶时间异常：实际用时 1.00小时，低于最短预期时间 4.0小时（路段：西安北站→郑州东站，预期距离：480.0公里）",
+      "final_status": "疑似异常",
+      "review_notes": [
+        "实际载重 25.00吨 低于 5型货车 最低标准 30.0吨",
+        "行驶时间异常：实际用时 1.00小时，低于最短预期时间 4.0小时（路段：西安北站→郑州东站，预期距离：480.0公里）"
+      ]
+    }
+  ]
+}
