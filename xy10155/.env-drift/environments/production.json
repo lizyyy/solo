@@ -1,0 +1,15 @@
+{
+  "DB_HOST": "prod-db.example.com",
+  "DB_PORT": 5432,
+  "DB_NAME": "myapp_prod",
+  "DB_USER": "prod_user",
+  "DB_PASS": "prod_password_very_secure",
+  "API_BASE_URL": "https://api.example.com",
+  "AUTH_ENABLED": true,
+  "DEBUG": true,
+  "LOG_LEVEL": "error",
+  "REDIS_HOST": "prod-redis.example.com",
+  "REDIS_PORT": 6379,
+  "FEATURE_A_ENABLED": true,
+  "FEATURE_B_ENABLED": true
+}

@@ -1,0 +1,58 @@
+{
+  "initialized": true,
+  "initializedAt": "2026-05-09T13:54:10.253Z",
+  "environments": [
+    {
+      "name": "test",
+      "description": "测试环境",
+      "createdAt": "2026-05-09T13:54:22.532Z",
+      "updatedAt": "2026-05-09T13:54:22.532Z"
+    },
+    {
+      "name": "staging",
+      "description": "预发环境",
+      "createdAt": "2026-05-09T13:54:22.592Z",
+      "updatedAt": "2026-05-09T13:54:22.592Z"
+    },
+    {
+      "name": "production",
+      "description": "生产环境",
+      "createdAt": "2026-05-09T13:54:22.657Z",
+      "updatedAt": "2026-05-09T13:54:22.657Z"
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule-1",
+      "name": "生产环境不应有 DEBUG 模式",
+      "type": "value-mismatch",
+      "severity": "critical",
+      "description": "生产环境的 DEBUG 变量必须为 false",
+      "enabled": true,
+      "config": {
+        "keyPattern": "DEBUG",
+        "expectedValue": "false",
+        "environments": [
+          "production",
+          "prod"
+        ]
+      }
+    },
+    {
+      "id": "rule-2",
+      "name": "跨环境关键配置一致性",
+      "type": "missing-key",
+      "severity": "high",
+      "description": "关键配置必须在所有环境中存在",
+      "enabled": true,
+      "config": {
+        "mustExist": [
+          "DB_HOST",
+          "API_BASE_URL",
+          "AUTH_ENABLED"
+        ]
+      }
+    }
+  ],
+  "dataDir": "/Users/mac/pro/solo/workspaces/xy10155/.env-drift"
+}

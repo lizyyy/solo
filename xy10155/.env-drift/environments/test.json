@@ -1,0 +1,15 @@
+{
+  "DB_HOST": "localhost",
+  "DB_PORT": 5432,
+  "DB_NAME": "myapp_test",
+  "DB_USER": "test_user",
+  "DB_PASS": "test_password",
+  "API_BASE_URL": "http://test.api.example.com",
+  "AUTH_ENABLED": true,
+  "DEBUG": true,
+  "LOG_LEVEL": "debug",
+  "REDIS_HOST": "localhost",
+  "REDIS_PORT": 6379,
+  "FEATURE_A_ENABLED": true,
+  "FEATURE_B_ENABLED": false
+}

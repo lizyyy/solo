@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配置漂移巡检报告</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+    h2 { color: #444; margin: 30px 0 15px; padding-left: 10px; border-left: 4px solid #4a90d9; }
+    .summary { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+    .summary-card { padding: 20px; border-radius: 8px; min-width: 150px; text-align: center; }
+    .critical { background: #ffcccc; border: 1px solid #ff6666; }
+    .high { background: #ffe0b3; border: 1px solid #ff9933; }
+    .medium { background: #fff3cc; border: 1px solid #ffcc00; }
+    .low { background: #e6f7ff; border: 1px solid #66ccff; }
+    .count { font-size: 28px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f5f5f5; font-weight: 600; }
+    tr:hover { background: #fafafa; }
+    .badge { padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-critical { background: #ff4444; color: white; }
+    .badge-high { background: #ff8800; color: white; }
+    .badge-medium { background: #ffcc00; color: #333; }
+    .badge-low { background: #66ccff; color: #333; }
+    .diff-added { background: #e6ffed; color: #22863a; }
+    .diff-removed { background: #ffeef0; color: #d73a49; }
+    .diff-modified { background: #fff5b1; color: #b08800; }
+    .meta { color: #666; font-size: 14px; margin-bottom: 20px; }
+    .env-list { display: flex; gap: 10px; flex-wrap: wrap; }
+    .env-tag { padding: 8px 16px; background: #f0f0f0; border-radius: 20px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>🔍 多环境配置漂移巡检报告</h1>
+  <div class="meta">
+    <strong>生成时间:</strong> 2026/05/09 21:54:59<br>
+    <strong>环境数量:</strong> 3
+  </div>
+
+  <h2>📋 巡检环境</h2>
+  <div class="env-list">
+    <span class="env-tag">test - 测试环境</span><span class="env-tag">staging - 预发环境</span><span class="env-tag">production - 生产环境</span>
+  </div>
+
+  <h2>⚠️ 风险问题概览</h2>
+  <div class="summary">
+    <div class="summary-card critical">
+      <div class="count">1</div>
+      <div>Critical (严重)</div>
+    </div>
+    <div class="summary-card high">
+      <div class="count">0</div>
+      <div>High (高危)</div>
+    </div>
+    <div class="summary-card medium">
+      <div class="count">0</div>
+      <div>Medium (中等)</div>
+    </div>
+    <div class="summary-card low">
+      <div class="count">0</div>
+      <div>Low (低危)</div>
+    </div>
+  </div>
+
+  
+  <h2>🔴 风险问题详情</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>严重程度</th>
+        <th>规则</th>
+        <th>环境</th>
+        <th>配置项</th>
+        <th>问题描述</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><span class="badge badge-critical">CRITICAL</span></td>
+        <td>生产环境不应有 DEBUG 模式</td>
+        <td>production</td>
+        <td>DEBUG</td>
+        <td>环境 "production" 的配置项 "DEBUG" 值为 "true"，但期望为 "false"</td>
+      </tr>
+      
+    </tbody>
+  </table>
+  
+
+  
+  <h2>📊 环境差异对比</h2>
+  
+    <h3>test vs staging</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>状态</th>
+          <th>配置项</th>
+          <th>test</th>
+          <th>staging</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>API_BASE_URL</td>
+          <td>http://test.api.example.com</td>
+          <td>http://staging.api.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_HOST</td>
+          <td>localhost</td>
+          <td>staging-db.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_NAME</td>
+          <td>myapp_test</td>
+          <td>myapp_staging</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_PASS</td>
+          <td>test_password</td>
+          <td>staging_password_secure</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_USER</td>
+          <td>test_user</td>
+          <td>staging_user</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DEBUG</td>
+          <td>true</td>
+          <td>false</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>FEATURE_B_ENABLED</td>
+          <td>false</td>
+          <td>true</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>LOG_LEVEL</td>
+          <td>debug</td>
+          <td>info</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>REDIS_HOST</td>
+          <td>localhost</td>
+          <td>staging-redis.example.com</td>
+        </tr>
+        
+        <tr class="diff-added">
+          <td>➕ 新增</td>
+          <td>FEATURE_C_ENABLED</td>
+          <td>(未设置)</td>
+          <td>true</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  
+    <h3>test vs production</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>状态</th>
+          <th>配置项</th>
+          <th>test</th>
+          <th>production</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>API_BASE_URL</td>
+          <td>http://test.api.example.com</td>
+          <td>https://api.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_HOST</td>
+          <td>localhost</td>
+          <td>prod-db.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_NAME</td>
+          <td>myapp_test</td>
+          <td>myapp_prod</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_PASS</td>
+          <td>test_password</td>
+          <td>prod_password_very_secure</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_USER</td>
+          <td>test_user</td>
+          <td>prod_user</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>FEATURE_B_ENABLED</td>
+          <td>false</td>
+          <td>true</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>LOG_LEVEL</td>
+          <td>debug</td>
+          <td>error</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>REDIS_HOST</td>
+          <td>localhost</td>
+          <td>prod-redis.example.com</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  
+    <h3>staging vs production</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>状态</th>
+          <th>配置项</th>
+          <th>staging</th>
+          <th>production</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>API_BASE_URL</td>
+          <td>http://staging.api.example.com</td>
+          <td>https://api.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_HOST</td>
+          <td>staging-db.example.com</td>
+          <td>prod-db.example.com</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_NAME</td>
+          <td>myapp_staging</td>
+          <td>myapp_prod</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_PASS</td>
+          <td>staging_password_secure</td>
+          <td>prod_password_very_secure</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DB_USER</td>
+          <td>staging_user</td>
+          <td>prod_user</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>DEBUG</td>
+          <td>false</td>
+          <td>true</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>LOG_LEVEL</td>
+          <td>info</td>
+          <td>error</td>
+        </tr>
+        
+        <tr class="diff-modified">
+          <td>🔄 修改</td>
+          <td>REDIS_HOST</td>
+          <td>staging-redis.example.com</td>
+          <td>prod-redis.example.com</td>
+        </tr>
+        
+        <tr class="diff-removed">
+          <td>➖ 删除</td>
+          <td>FEATURE_C_ENABLED</td>
+          <td>true</td>
+          <td>(未设置)</td>
+        </tr>
+        
+      </tbody>
+    </table>
+  
+  
+
+  
+  <h2>📜 最近变更历史</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>时间</th>
+        <th>环境</th>
+        <th>操作</th>
+        <th>配置项</th>
+        <th>变更内容</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DB_HOST</td>
+        <td>值: prod-db.example.com</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DB_PORT</td>
+        <td>值: 5432</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DB_NAME</td>
+        <td>值: myapp_prod</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DB_USER</td>
+        <td>值: prod_user</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DB_PASS</td>
+        <td>值: prod_password_very_secure</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>API_BASE_URL</td>
+        <td>值: https://api.example.com</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>AUTH_ENABLED</td>
+        <td>值: true</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>DEBUG</td>
+        <td>值: true</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>LOG_LEVEL</td>
+        <td>值: error</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>REDIS_HOST</td>
+        <td>值: prod-redis.example.com</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>REDIS_PORT</td>
+        <td>值: 6379</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>FEATURE_A_ENABLED</td>
+        <td>值: true</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>production</td>
+        <td>➕ 新增</td>
+        <td>FEATURE_B_ENABLED</td>
+        <td>值: true</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>DB_HOST</td>
+        <td>值: staging-db.example.com</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>DB_PORT</td>
+        <td>值: 5432</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>DB_NAME</td>
+        <td>值: myapp_staging</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>DB_USER</td>
+        <td>值: staging_user</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>DB_PASS</td>
+        <td>值: staging_password_secure</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>API_BASE_URL</td>
+        <td>值: http://staging.api.example.com</td>
+      </tr>
+      
+      <tr>
+        <td>2026/05/09 21:54:34</td>
+        <td>staging</td>
+        <td>➕ 新增</td>
+        <td>AUTH_ENABLED</td>
+        <td>值: true</td>
+      </tr>
+      
+    </tbody>
+  </table>
+  
+</body>
+</html>

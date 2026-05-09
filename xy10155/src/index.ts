@@ -1,0 +1,555 @@
+#!/usr/bin/env node
+
+import { Command } from 'commander';
+import { Storage } from './storage';
+import { Checker } from './checker';
+import { Reporter, ReportContext } from './reporter';
+import {
+  generateId,
+  parseConfigFile,
+  compareConfigs,
+  computeChanges,
+  formatTimestamp,
+  formatValue
+} from './utils';
+import {
+  Environment,
+  Snapshot,
+  ChangeRecord,
+  EnvConfig,
+  RiskRule
+} from './types';
+import {
+  colors,
+  printTable,
+  printSuccess,
+  printError,
+  printWarning,
+  printInfo,
+  printHeader,
+  getSeverityColor,
+  getDiffTypeLabel
+} from './ui';
+
+const program = new Command();
+const storage = new Storage();
+const checker = new Checker(storage);
+const reporter = new Reporter();
+
+program
+  .name('env-drift')
+  .description('多环境配置漂移巡检 CLI - 检测测试、预发、生产环境配置差异')
+  .version('1.0.0');
+
+async function handleError(fn: () => Promise<void>): Promise<void> {
+  try {
+    await fn();
+  } catch (error: any) {
+    printError(error.message || '发生未知错误');
+    process.exit(1);
+  }
+}
+
+program
+  .command('init')
+  .description('初始化配置漂移巡检项目')
+  .option('-f, --force', '强制重新初始化（会清除现有数据）')
+  .action(async (options) => {
+    await handleError(async () => {
+      if (options.force) {
+        await storage.clear();
+        printInfo('已清除现有数据');
+      }
+
+      const config = await storage.initialize();
+      printSuccess(`项目初始化成功！`);
+      console.log(colors.gray(`  数据目录: ${config.dataDir}`));
+      console.log(colors.gray(`  初始化时间: ${formatTimestamp(config.initializedAt)}`));
+      console.log('');
+      console.log('接下来可以运行以下命令：');
+      console.log(colors.cyan('  env-drift env add <name>       '), colors.dim('添加环境'));
+      console.log(colors.cyan('  env-drift import <file> --env <name>  '), colors.dim('导入配置文件'));
+      console.log(colors.cyan('  env-drift diff <envA> <envB>  '), colors.dim('对比两个环境'));
+    });
+  });
+
+const envCmd = program.command('env').description('环境管理');
+
+envCmd
+  .command('list')
+  .description('列出所有环境')
+  .action(async () => {
+    await handleError(async () => {
+      const envs = await storage.listEnvironments();
+      if (envs.length === 0) {
+        printWarning('尚未添加任何环境');
+        console.log(colors.gray('使用 env-drift env add <name> 添加环境'));
+        return;
+      }
+
+      printHeader(`环境列表 (${envs.length} 个)`);
+      const rows = envs.map(env => [
+        env.name,
+        env.description || '-',
+        formatTimestamp(env.createdAt),
+        formatTimestamp(env.updatedAt)
+      ]);
+      printTable(rows, ['名称', '描述', '创建时间', '更新时间']);
+    });
+  });
+
+envCmd
+  .command('add')
+  .description('添加新环境')
+  .argument('<name>', '环境名称（如: test, staging, production）')
+  .option('-d, --description <desc>', '环境描述')
+  .action(async (name, options) => {
+    await handleError(async () => {
+      const now = new Date().toISOString();
+      const env: Environment = {
+        name,
+        description: options.description,
+        createdAt: now,
+        updatedAt: now
+      };
+
+      await storage.addEnvironment(env);
+      printSuccess(`环境 "${name}" 添加成功！`);
+      console.log(colors.gray(`使用 env-drift import <file> --env ${name} 导入配置文件`));
+    });
+  });
+
+envCmd
+  .command('show')
+  .description('显示环境当前配置')
+  .argument('<name>', '环境名称')
+  .action(async (name) => {
+    await handleError(async () => {
+      const env = await storage.getEnvironment(name);
+      if (!env) {
+        printError(`环境 "${name}" 不存在`);
+        return;
+      }
+
+      const data = await storage.getEnvData(name);
+      printHeader(`环境: ${name}`);
+      console.log(colors.gray(`描述: ${env.description || '无'}`));
+      console.log(colors.gray(`更新时间: ${formatTimestamp(env.updatedAt)}`));
+
+      const keys = Object.keys(data).sort();
+      if (keys.length === 0) {
+        printWarning('该环境暂无配置数据');
+        return;
+      }
+
+      const rows = keys.map(key => [key, formatValue(data[key])]);
+      printTable(rows, ['配置项', '值']);
+    });
+  });
+
+program
+  .command('import')
+  .description('从文件导入环境配置')
+  .argument('<file>', '配置文件路径（支持 .env, .json, .yaml/.yml）')
+  .requiredOption('-e, --env <name>', '目标环境名称')
+  .option('-c, --comment <text>', '快照备注')
+  .action(async (file, options) => {
+    await handleError(async () => {
+      const envName = options.env;
+      const env = await storage.getEnvironment(envName);
+      if (!env) {
+        printError(`环境 "${envName}" 不存在，请先使用 env-drift env add ${envName} 创建`);
+        return;
+      }
+
+      const newData = await parseConfigFile(file);
+      const oldData = await storage.getEnvData(envName);
+
+      const changes = computeChanges(oldData, newData);
+
+      if (changes.length === 0) {
+        printInfo('配置无变化，跳过导入');
+        return;
+      }
+
+      await storage.saveEnvData(envName, newData);
+
+      const snapshot: Snapshot = {
+        id: generateId(),
+        environment: envName,
+        data: newData,
+        createdAt: new Date().toISOString(),
+        comment: options.comment
+      };
+      await storage.createSnapshot(snapshot);
+
+      const timestamp = new Date().toISOString();
+      for (const change of changes) {
+        const record: ChangeRecord = {
+          id: generateId(),
+          environment: envName,
+          action: change.action,
+          key: change.key,
+          oldValue: change.oldValue,
+          newValue: change.newValue,
+          timestamp,
+          snapshotId: snapshot.id
+        };
+        await storage.addChangeRecord(record);
+      }
+
+      printSuccess(`已导入 ${file} 到环境 "${envName}"`);
+      console.log(colors.cyan(`检测到 ${changes.length} 项变更:`));
+
+      const rows = changes.map(c => {
+        const actionLabel = c.action === 'add' ? colors.green('新增') :
+                           c.action === 'delete' ? colors.red('删除') :
+                           colors.yellow('修改');
+        return [
+          actionLabel,
+          c.key,
+          c.oldValue ? formatValue(c.oldValue) : '-',
+          c.newValue ? formatValue(c.newValue) : '-'
+        ];
+      });
+      printTable(rows, ['操作', '配置项', '原值', '新值']);
+    });
+  });
+
+program
+  .command('snapshot')
+  .description('创建或查看环境快照')
+  .argument('[envName]', '环境名称（可选，不传则查看所有快照）')
+  .option('-c, --comment <text>', '快照备注')
+  .option('-s, --show <snapshotId>', '查看指定快照详情')
+  .action(async (envName, options) => {
+    await handleError(async () => {
+      if (options.show && envName) {
+        const snapshot = await storage.getSnapshot(envName, options.show);
+        if (!snapshot) {
+          printError(`快照 ${options.show} 在环境 ${envName} 中不存在`);
+          return;
+        }
+
+        printHeader(`快照详情`);
+        console.log(colors.gray(`快照 ID: ${snapshot.id}`));
+        console.log(colors.gray(`环境: ${snapshot.environment}`));
+        console.log(colors.gray(`创建时间: ${formatTimestamp(snapshot.createdAt)}`));
+        if (snapshot.comment) {
+          console.log(colors.gray(`备注: ${snapshot.comment}`));
+        }
+
+        const rows = Object.keys(snapshot.data)
+          .sort()
+          .map(key => [key, formatValue(snapshot.data[key])]);
+        printTable(rows, ['配置项', '值']);
+        return;
+      }
+
+      if (!envName) {
+        const envs = await storage.listEnvironments();
+        printHeader('所有快照');
+
+        for (const env of envs) {
+          const snapshots = await storage.listSnapshots(env.name);
+          if (snapshots.length > 0) {
+            console.log(`\n${colors.bold(env.name)} (${snapshots.length} 个快照)`);
+            const rows = snapshots.map(s => [
+              s.id.substring(0, 16) + '...',
+              formatTimestamp(s.createdAt),
+              s.comment || '-'
+            ]);
+            printTable(rows, ['快照 ID', '创建时间', '备注']);
+          }
+        }
+        return;
+      }
+
+      const env = await storage.getEnvironment(envName);
+      if (!env) {
+        printError(`环境 "${envName}" 不存在`);
+        return;
+      }
+
+      const currentData = await storage.getEnvData(envName);
+      const snapshot: Snapshot = {
+        id: generateId(),
+        environment: envName,
+        data: currentData,
+        createdAt: new Date().toISOString(),
+        comment: options.comment
+      };
+
+      await storage.createSnapshot(snapshot);
+      printSuccess(`已为环境 "${envName}" 创建快照`);
+      console.log(colors.gray(`快照 ID: ${snapshot.id}`));
+    });
+  });
+
+program
+  .command('diff')
+  .description('对比两个环境的配置差异')
+  .argument('<envA>', '第一个环境名称')
+  .argument('<envB>', '第二个环境名称')
+  .option('-a, --all', '显示所有配置项（包括未变更的）')
+  .action(async (envA, envB, options) => {
+    await handleError(async () => {
+      const [dataA, dataB] = await Promise.all([
+        storage.getEnvData(envA),
+        storage.getEnvData(envB)
+      ]);
+
+      const diffs = compareConfigs(dataA, dataB, envA, envB);
+      const changedDiffs = diffs.filter(d => d.type !== 'unchanged');
+
+      printHeader(`${envA} vs ${envB}`);
+
+      if (changedDiffs.length === 0) {
+        printSuccess('两个环境配置完全一致！✅');
+        return;
+      }
+
+      console.log(colors.yellow(`发现 ${changedDiffs.length} 项差异`));
+
+      const displayDiffs = options.all ? diffs : changedDiffs;
+      const rows = displayDiffs.map(d => [
+        getDiffTypeLabel(d.type),
+        d.key,
+        formatValue(d.envA),
+        formatValue(d.envB)
+      ]);
+
+      printTable(rows, ['状态', '配置项', envA, envB]);
+    });
+  });
+
+program
+  .command('check')
+  .description('运行风险规则检查')
+  .option('-s, --strict', '遇到 Critical 级别问题时退出码为 1')
+  .action(async (options) => {
+    await handleError(async () => {
+      const envs = await storage.listEnvironments();
+      if (envs.length < 2) {
+        printWarning('至少需要 2 个环境才能进行有效检查');
+      }
+
+      printHeader('风险规则检查');
+      const issues = await checker.runChecks();
+
+      if (issues.length === 0) {
+        printSuccess('未发现风险问题 ✅');
+        return;
+      }
+
+      const criticalCount = issues.filter(i => i.severity === 'critical').length;
+      const highCount = issues.filter(i => i.severity === 'high').length;
+      const mediumCount = issues.filter(i => i.severity === 'medium').length;
+      const lowCount = issues.filter(i => i.severity === 'low').length;
+
+      console.log(`\n${colors.bold('问题统计:')}`);
+      if (criticalCount > 0) console.log(`  ${colors.red(`Critical: ${criticalCount}`)}`);
+      if (highCount > 0) console.log(`  ${colors.yellow(`High: ${highCount}`)}`);
+      if (mediumCount > 0) console.log(`  ${colors.magenta(`Medium: ${mediumCount}`)}`);
+      if (lowCount > 0) console.log(`  ${colors.blue(`Low: ${lowCount}`)}`);
+
+      console.log('');
+      const rows = issues.map(i => {
+        const colorFn = getSeverityColor(i.severity);
+        return [
+          colorFn(i.severity.toUpperCase()),
+          i.ruleName,
+          i.environment || (i.affectedEnvironments?.join(', ') || '-'),
+          i.key || '-',
+          i.message
+        ];
+      });
+
+      printTable(rows, ['级别', '规则', '环境', '配置项', '问题描述']);
+
+      if (options.strict && criticalCount > 0) {
+        process.exit(1);
+      }
+    });
+  });
+
+const rulesCmd = program.command('rules').description('风险规则管理');
+
+rulesCmd
+  .command('list')
+  .description('列出所有风险规则')
+  .action(async () => {
+    await handleError(async () => {
+      const config = await storage.getConfig();
+      printHeader(`风险规则列表 (${config.rules.length} 条)`);
+
+      const rows = config.rules.map(r => [
+        r.id,
+        r.enabled ? colors.green('启用') : colors.gray('禁用'),
+        r.type,
+        getSeverityColor(r.severity)(r.severity),
+        r.name
+      ]);
+
+      printTable(rows, ['ID', '状态', '类型', '级别', '名称']);
+    });
+  });
+
+rulesCmd
+  .command('toggle')
+  .description('启用/禁用规则')
+  .argument('<ruleId>', '规则 ID')
+  .action(async (ruleId) => {
+    await handleError(async () => {
+      const config = await storage.getConfig();
+      const rule = config.rules.find(r => r.id === ruleId);
+      if (!rule) {
+        printError(`规则 "${ruleId}" 不存在`);
+        return;
+      }
+
+      rule.enabled = !rule.enabled;
+      await storage.saveRules(config.rules);
+
+      printSuccess(`规则 "${rule.name}" 已${rule.enabled ? '启用' : '禁用'}`);
+    });
+  });
+
+rulesCmd
+  .command('add')
+  .description('添加自定义规则')
+  .requiredOption('-n, --name <name>', '规则名称')
+  .requiredOption('-t, --type <type>', '规则类型: value-mismatch|missing-key|extra-key|critical-key')
+  .requiredOption('-s, --severity <level>', '严重级别: critical|high|medium|low')
+  .option('-k, --key-pattern <pattern>', '键名正则模式（用于 value-mismatch）')
+  .option('-v, --expected-value <value>', '期望值（用于 value-mismatch）')
+  .option('-m, --must-exist <keys>', '必须存在的键（逗号分隔，用于 missing-key/critical-key）')
+  .option('-e, --environments <envs>', '适用环境（逗号分隔）')
+  .option('-d, --description <desc>', '规则描述')
+  .action(async (options) => {
+    await handleError(async () => {
+      const config = await storage.getConfig();
+      const newRule: RiskRule = {
+        id: `rule-${Date.now()}`,
+        name: options.name,
+        type: options.type,
+        severity: options.severity,
+        description: options.description || options.name,
+        enabled: true,
+        config: {
+          keyPattern: options.keyPattern,
+          expectedValue: options.expectedValue,
+          mustExist: options.mustExist ? options.mustExist.split(',') : undefined,
+          environments: options.environments ? options.environments.split(',') : undefined
+        }
+      };
+
+      config.rules.push(newRule);
+      await storage.saveRules(config.rules);
+
+      printSuccess(`规则 "${newRule.name}" 已添加`);
+    });
+  });
+
+program
+  .command('history')
+  .description('查看变更历史')
+  .option('-e, --env <name>', '指定环境')
+  .option('--start <date>', '开始日期 (YYYY-MM-DD)')
+  .option('--end <date>', '结束日期 (YYYY-MM-DD)')
+  .option('-l, --limit <number>', '显示条数限制', '50')
+  .action(async (options) => {
+    await handleError(async () => {
+      const records = await storage.getHistory(options.start, options.end, options.env);
+      const limit = parseInt(options.limit, 10);
+      const displayRecords = records.slice(0, limit);
+
+      printHeader(`变更历史 (${displayRecords.length}/${records.length} 条)`);
+
+      if (records.length === 0) {
+        printInfo('暂无变更记录');
+        return;
+      }
+
+      const rows = displayRecords.map(r => {
+        const actionLabel = r.action === 'add' ? colors.green('新增') :
+                           r.action === 'delete' ? colors.red('删除') :
+                           colors.yellow('修改');
+        let changeStr = '';
+        if (r.action === 'add') changeStr = `→ ${formatValue(r.newValue)}`;
+        else if (r.action === 'delete') changeStr = `${formatValue(r.oldValue)} →`;
+        else changeStr = `${formatValue(r.oldValue)} → ${formatValue(r.newValue)}`;
+
+        return [
+          formatTimestamp(r.timestamp),
+          r.environment,
+          actionLabel,
+          r.key,
+          changeStr
+        ];
+      });
+
+      printTable(rows, ['时间', '环境', '操作', '配置项', '变更']);
+    });
+  });
+
+program
+  .command('report')
+  .description('生成巡检报告')
+  .option('-f, --format <format>', '报告格式: html|markdown|both', 'both')
+  .option('-o, --output <dir>', '输出目录', '.')
+  .option('--diff-all', '包含所有环境两两对比')
+  .action(async (options) => {
+    await handleError(async () => {
+      const environments = await storage.listEnvironments();
+      const issues = await checker.runChecks();
+      const history = await storage.getHistory();
+
+      const latestSnapshots: Record<string, any> = {};
+      for (const env of environments) {
+        const snapshots = await storage.listSnapshots(env.name);
+        latestSnapshots[env.name] = snapshots[0];
+      }
+
+      const diffs: Array<{ envA: string; envB: string; items: any[] }> = [];
+      if (options.diffAll && environments.length >= 2) {
+        for (let i = 0; i < environments.length; i++) {
+          for (let j = i + 1; j < environments.length; j++) {
+            const dataA = await storage.getEnvData(environments[i].name);
+            const dataB = await storage.getEnvData(environments[j].name);
+            diffs.push({
+              envA: environments[i].name,
+              envB: environments[j].name,
+              items: compareConfigs(dataA, dataB, environments[i].name, environments[j].name)
+            });
+          }
+        }
+      }
+
+      const context: ReportContext = {
+        generatedAt: new Date().toISOString(),
+        environments,
+        latestSnapshots,
+        issues,
+        diffs,
+        recentHistory: history.slice(0, 50)
+      };
+
+      const customReporter = new Reporter(options.output);
+
+      if (options.format === 'html' || options.format === 'both') {
+        const htmlPath = await customReporter.generateHTML(context);
+        printSuccess(`HTML 报告已生成: ${htmlPath}`);
+      }
+
+      if (options.format === 'markdown' || options.format === 'both') {
+        const mdPath = await customReporter.generateMarkdown(context);
+        printSuccess(`Markdown 报告已生成: ${mdPath}`);
+      }
+    });
+  });
+
+program.parseAsync(process.argv).catch((err) => {
+  printError(err.message);
+  process.exit(1);
+});

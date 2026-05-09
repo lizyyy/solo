@@ -1,0 +1,33 @@
+{
+  "name": "env-drift-checker",
+  "version": "1.0.0",
+  "description": "多环境配置漂移巡检 CLI - 检测测试、预发、生产环境配置差异",
+  "main": "dist/index.js",
+  "bin": {
+    "env-drift": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "fs-extra": "^11.3.5",
+    "nunjucks": "^3.2.4",
+    "table": "^6.9.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.6.2",
+    "@types/nunjucks": "^3.2.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
