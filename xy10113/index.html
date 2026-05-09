@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产线标签打印复核工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🏷️ 产线标签打印复核工具</h1>
+            <p class="subtitle">确保标签模板与实际物料批号一致</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="import">📥 数据导入</button>
+            <button class="tab-btn" data-tab="review">🔍 复核操作</button>
+            <button class="tab-btn" data-tab="history">📋 历史记录</button>
+            <button class="tab-btn" data-tab="export">📤 导出清单</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="import" class="tab-content active">
+                <div class="import-section">
+                    <h2>数据导入</h2>
+                    <p class="section-desc">导入标签模板数据和物料批次数据进行比对</p>
+                    
+                    <div class="import-areas">
+                        <div class="import-card">
+                            <h3>📄 标签数据</h3>
+                            <p class="card-desc">支持 CSV, JSON, Excel 格式</p>
+                            <input type="file" id="labelFile" accept=".csv,.json,.xlsx,.xls" class="file-input">
+                            <button class="btn btn-primary" id="importLabelBtn">导入标签数据</button>
+                            <div class="file-info" id="labelFileInfo">未选择文件</div>
+                        </div>
+
+                        <div class="import-card">
+                            <h3>📦 物料数据</h3>
+                            <p class="card-desc">支持 CSV, JSON, Excel 格式</p>
+                            <input type="file" id="materialFile" accept=".csv,.json,.xlsx,.xls" class="file-input">
+                            <button class="btn btn-primary" id="importMaterialBtn">导入物料数据</button>
+                            <div class="file-info" id="materialFileInfo">未选择文件</div>
+                        </div>
+                    </div>
+
+                    <div class="field-mapping" id="fieldMapping" style="display: none;">
+                        <h3>字段映射</h3>
+                        <p class="section-desc">匹配标签数据和物料数据的关键字段</p>
+                        
+                        <div class="mapping-grid">
+                            <div class="mapping-item">
+                                <label>标签批次号字段：</label>
+                                <select id="labelBatchField"></select>
+                            </div>
+                            <div class="mapping-item">
+                                <label>物料批次号字段：</label>
+                                <select id="materialBatchField"></select>
+                            </div>
+                            <div class="mapping-item">
+                                <label>标签物料号字段：</label>
+                                <select id="labelMaterialField"></select>
+                            </div>
+                            <div class="mapping-item">
+                                <label>物料物料号字段：</label>
+                                <select id="materialMaterialField"></select>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success" id="confirmMappingBtn">确认映射并开始比对</button>
+                    </div>
+
+                    <div class="data-preview" id="dataPreview" style="display: none;">
+                        <h3>数据预览</h3>
+                        <div class="preview-container">
+                            <div class="preview-section">
+                                <h4>标签数据预览</h4>
+                                <div class="data-table-container" id="labelPreview"></div>
+                                <p class="record-count" id="labelCount">共 0 条记录</p>
+                            </div>
+                            <div class="preview-section">
+                                <h4>物料数据预览</h4>
+                                <div class="data-table-container" id="materialPreview"></div>
+                                <p class="record-count" id="materialCount">共 0 条记录</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="review" class="tab-content">
+                <div class="review-section">
+                    <h2>复核操作</h2>
+                    <p class="section-desc">逐条核对标签与物料信息，确认一致性</p>
+
+                    <div class="review-stats" id="reviewStats">
+                        <div class="stat-card">
+                            <span class="stat-label">待复核</span>
+                            <span class="stat-value" id="pendingCount">0</span>
+                        </div>
+                        <div class="stat-card stat-pass">
+                            <span class="stat-label">已通过</span>
+                            <span class="stat-value" id="passedCount">0</span>
+                        </div>
+                        <div class="stat-card stat-fail">
+                            <span class="stat-label">有问题</span>
+                            <span class="stat-value" id="failedCount">0</span>
+                        </div>
+                        <div class="stat-card stat-progress">
+                            <span class="stat-label">进度</span>
+                            <span class="stat-value" id="progressPercent">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="review-controls">
+                        <button class="btn btn-primary" id="batchPassBtn">批量通过当前页</button>
+                        <button class="btn btn-danger" id="batchFailBtn">批量标记问题</button>
+                        <label class="filter-label">
+                            筛选：
+                            <select id="reviewFilter">
+                                <option value="all">全部</option>
+                                <option value="pending">待复核</option>
+                                <option value="passed">已通过</option>
+                                <option value="failed">有问题</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="review-list" id="reviewList">
+                        <p class="empty-tip">请先导入数据并完成字段映射</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history" class="tab-content">
+                <div class="history-section">
+                    <h2>历史记录</h2>
+                    <p class="section-desc">查看和管理历史复核任务</p>
+
+                    <div class="history-controls">
+                        <button class="btn btn-danger" id="clearHistoryBtn">清空历史记录</button>
+                        <button class="btn btn-primary" id="importHistoryBtn">导入历史数据</button>
+                        <input type="file" id="historyFile" accept=".json" style="display: none;">
+                    </div>
+
+                    <div class="history-list" id="historyList">
+                        <p class="empty-tip">暂无历史记录</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="export" class="tab-content">
+                <div class="export-section">
+                    <h2>导出清单</h2>
+                    <p class="section-desc">导出当前复核结果或历史记录</p>
+
+                    <div class="export-options">
+                        <div class="export-option">
+                            <h3>📊 当前复核结果</h3>
+                            <p class="card-desc">导出本次复核的所有记录</p>
+                            <div class="export-buttons">
+                                <button class="btn btn-primary" id="exportCurrentCsv">导出 CSV</button>
+                                <button class="btn btn-primary" id="exportCurrentJson">导出 JSON</button>
+                                <button class="btn btn-primary" id="exportCurrentExcel">导出 Excel</button>
+                            </div>
+                        </div>
+
+                        <div class="export-option">
+                            <h3>📋 汇总报表</h3>
+                            <p class="card-desc">导出包含统计信息的汇总报告</p>
+                            <div class="export-buttons">
+                                <button class="btn btn-success" id="exportSummaryCsv">导出 CSV</button>
+                                <button class="btn btn-success" id="exportSummaryJson">导出 JSON</button>
+                            </div>
+                        </div>
+
+                        <div class="export-option">
+                            <h3>💾 完整数据备份</h3>
+                            <p class="card-desc">导出所有历史数据（可用于恢复）</p>
+                            <div class="export-buttons">
+                                <button class="btn btn-warning" id="exportFullBackup">导出备份</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="toastContainer" class="toast-container"></div>
+
+        <div id="modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">提示</h3>
+                    <span class="modal-close" id="modalClose">&times;</span>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="modalCancel">取消</button>
+                    <button class="btn btn-primary" id="modalConfirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
