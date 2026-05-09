@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钢琴调律师路线排程器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        header p {
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-group .error {
+            border-color: #e74c3c;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #219a52;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .appointment-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .appointment-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .appointment-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .appointment-item.conflict {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        .appointment-item.cancelled {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .appointment-time {
+            font-weight: 600;
+            color: #667eea;
+        }
+        .appointment-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .appointment-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .badge-info {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .badge-danger {
+            background: #ffebee;
+            color: #e53935;
+        }
+        .badge-success {
+            background: #e8f5e9;
+            color: #43a047;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .history-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .history-item {
+            border-left: 3px solid #667eea;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 0 6px 6px 0;
+        }
+        .history-item.create { border-left-color: #27ae60; }
+        .history-item.update { border-left-color: #f39c12; }
+        .history-item.delete { border-left-color: #e74c3c; }
+        .history-item.restore { border-left-color: #3498db; }
+        .history-time {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .history-action {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .history-diff {
+            font-size: 12px;
+            color: #666;
+        }
+        .history-diff .old {
+            color: #e74c3c;
+            text-decoration: line-through;
+        }
+        .history-diff .new {
+            color: #27ae60;
+        }
+        .route-section {
+            margin-top: 20px;
+        }
+        .route-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .route-number {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .route-info {
+            flex: 1;
+        }
+        .route-arrow {
+            text-align: center;
+            color: #999;
+            margin: 5px 0;
+        }
+        .total-distance {
+            text-align: right;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 10px;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.warning { background: #f39c12; }
+        .notification.info { background: #3498db; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .duration-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            margin: 0;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎹 钢琴调律师路线排程器</h1>
+            <p>智能排程 · 琴龄优化 · 路线规划</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-total">0</div>
+                <div class="stat-label">今日预约</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-duration">0</div>
+                <div class="stat-label">总服务时长(分钟)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-distance">0</div>
+                <div class="stat-label">总路程(公里)</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- 左侧：预约管理 -->
+            <div class="card">
+                <h2>📋 客户预约管理</h2>
+                
+                <form id="appointment-form">
+                    <div class="form-group">
+                        <label>客户姓名 *</label>
+                        <input type="text" id="customer-name" placeholder="请输入客户姓名">
+                        <div class="error-msg" id="error-name"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>联系电话 *</label>
+                        <input type="tel" id="customer-phone" placeholder="请输入联系电话">
+                        <div class="error-msg" id="error-phone"></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>预约日期 *</label>
+                            <input type="date" id="appointment-date">
+                            <div class="error-msg" id="error-date"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>开始时间 *</label>
+                            <input type="time" id="start-time">
+                            <div class="error-msg" id="error-time"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>所在城区 *</label>
+                        <select id="district">
+                            <option value="">请选择城区</option>
+                            <option value="东城">东城区 (0km)</option>
+                            <option value="西城">西城区 (5km)</option>
+                            <option value="朝阳">朝阳区 (10km)</option>
+                            <option value="海淀">海淀区 (15km)</option>
+                            <option value="丰台">丰台区 (20km)</option>
+                            <option value="石景山">石景山区 (25km)</option>
+                            <option value="通州">通州区 (35km)</option>
+                            <option value="昌平">昌平区 (40km)</option>
+                        </select>
+                        <div class="error-msg" id="error-district"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>详细地址 *</label>
+                        <input type="text" id="address" placeholder="请输入详细地址">
+                        <div class="error-msg" id="error-address"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>琴龄（年） *</label>
+                        <input type="number" id="piano-age" min="0" max="100" placeholder="请输入钢琴使用年数">
+                        <div class="error-msg" id="error-piano-age"></div>
+                        <div class="duration-hint" id="duration-hint">💡 服务时长将根据琴龄自动计算</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>服务类型</label>
+                        <select id="service-type">
+                            <option value="tuning">标准调律</option>
+                            <option value="repair">调律+维修</option>
+                            <option value="deep">深度调律+保养</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>备注</label>
+                        <input type="text" id="notes" placeholder="特殊要求等">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="submit-btn">➕ 添加预约</button>
+                    <button type="button" class="btn btn-secondary" id="clear-form-btn" style="margin-left: 10px;">清空表单</button>
+                </form>
+                
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e0e0e0;">
+                
+                <h3 style="margin-bottom: 15px;">今日预约列表</h3>
+                <div class="appointment-list" id="appointment-list">
+                    <div class="empty-state">暂无预约记录</div>
+                </div>
+            </div>
+
+            <!-- 右侧：排程与历史 -->
+            <div class="card">
+                <h2>🗺️ 路线排程</h2>
+                
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-success" id="optimize-btn">🔄 智能优化路线</button>
+                    <button class="btn btn-warning" id="sort-time-btn" style="margin-left: 10px;">⏰ 按时间排序</button>
+                    <button class="btn btn-info" id="sort-distance-btn" style="margin-left: 10px;">🚗 按距离排序</button>
+                </div>
+                
+                <div class="route-section" id="route-section">
+                    <div class="empty-state">暂无排程，请先添加预约</div>
+                </div>
+                
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e0e0e0;">
+                
+                <h2>📝 操作历史</h2>
+                <div style="margin-bottom: 10px;">
+                    <button class="btn btn-secondary btn-sm" id="clear-history-btn">清空历史</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <div class="empty-state">暂无操作记录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑预约</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-id">
+                
+                <div class="form-group">
+                    <label>客户姓名</label>
+                    <input type="text" id="edit-customer-name">
+                </div>
+                
+                <div class="form-group">
+                    <label>联系电话</label>
+                    <input type="tel" id="edit-customer-phone">
+                </div>
+                
+                <div class="row">
+                    <div class="form-group">
+                        <label>预约日期</label>
+                        <input type="date" id="edit-appointment-date">
+                    </div>
+                    <div class="form-group">
+                        <label>开始时间</label>
+                        <input type="time" id="edit-start-time">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>所在城区</label>
+                    <select id="edit-district">
+                        <option value="东城">东城区 (0km)</option>
+                        <option value="西城">西城区 (5km)</option>
+                        <option value="朝阳">朝阳区 (10km)</option>
+                        <option value="海淀">海淀区 (15km)</option>
+                        <option value="丰台">丰台区 (20km)</option>
+                        <option value="石景山">石景山区 (25km)</option>
+                        <option value="通州">通州区 (35km)</option>
+                        <option value="昌平">昌平区 (40km)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>详细地址</label>
+                    <input type="text" id="edit-address">
+                </div>
+                
+                <div class="form-group">
+                    <label>琴龄（年）</label>
+                    <input type="number" id="edit-piano-age" min="0" max="100">
+                </div>
+                
+                <div class="form-group">
+                    <label>服务类型</label>
+                    <select id="edit-service-type">
+                        <option value="tuning">标准调律</option>
+                        <option value="repair">调律+维修</option>
+                        <option value="deep">深度调律+保养</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" id="edit-notes">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">保存修改</button>
+                <button type="button" class="btn btn-secondary" style="margin-left: 10px;" onclick="closeEditModal()">取消</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'piano_tuner_scheduler';
+        const HISTORY_KEY = 'piano_tuner_history';
+
+        const DISTANCE_MAP = {
+            '东城': 0,
+            '西城': 5,
+            '朝阳': 10,
+            '海淀': 15,
+            '丰台': 20,
+            '石景山': 25,
+            '通州': 35,
+            '昌平': 40
+        };
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function saveData(appointments) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+        }
+
+        function loadData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveHistory(history) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+
+        function loadHistory() {
+            const data = localStorage.getItem(HISTORY_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function calculateDuration(pianoAge, serviceType) {
+            let baseDuration = 60;
+            if (pianoAge < 2) {
+                baseDuration = 60;
+            } else if (pianoAge < 5) {
+                baseDuration = 75;
+            } else if (pianoAge < 10) {
+                baseDuration = 90;
+            } else {
+                baseDuration = 120;
+            }
+            
+            if (serviceType === 'repair') {
+                baseDuration += 30;
+            } else if (serviceType === 'deep') {
+                baseDuration += 45;
+            }
+            
+            return baseDuration;
+        }
+
+        function addMinutes(time, minutes) {
+            const [hours, mins] = time.split(':').map(Number);
+            const totalMins = hours * 60 + mins + minutes;
+            const newHours = Math.floor(totalMins / 60);
+            const newMins = totalMins % 60;
+            return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
+        }
+
+        function timeToMinutes(time) {
+            const [hours, mins] = time.split(':').map(Number);
+            return hours * 60 + mins;
+        }
+
+        function checkConflicts(appointments) {
+            const conflicts = [];
+            const activeAppointments = appointments.filter(a => a.status !== 'cancelled');
+            
+            for (let i = 0; i < activeAppointments.length; i++) {
+                for (let j = i + 1; j < activeAppointments.length; j++) {
+                    const a = activeAppointments[i];
+                    const b = activeAppointments[j];
+                    
+                    if (a.date !== b.date) continue;
+                    
+                    const aStart = timeToMinutes(a.startTime);
+                    const aEnd = aStart + a.duration;
+                    const bStart = timeToMinutes(b.startTime);
+                    const bEnd = bStart + b.duration;
+                    
+                    if ((aStart < bEnd && aEnd > bStart) || (bStart < aEnd && bEnd > aStart)) {
+                        conflicts.push({ id1: a.id, id2: b.id, message: '时间冲突' });
+                    }
+                }
+            }
+            
+            return conflicts;
+        }
+
+        function hasConflict(id, appointments) {
+            const conflicts = checkConflicts(appointments);
+            return conflicts.some(c => c.id1 === id || c.id2 === id);
+        }
+
+        function formatDateTime(date, time) {
+            return `${date} ${time}`;
+        }
+
+        function addHistoryRecord(action, appointment, before = null) {
+            const history = loadHistory();
+            const record = {
+                id: generateId(),
+                timestamp: new Date().toISOString(),
+                action,
+                appointmentId: appointment.id,
+                before,
+                after: appointment
+            };
+            history.unshift(record);
+            if (history.length > 100) {
+                history.pop();
+            }
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function calculateTotalStats(appointments) {
+            const active = appointments.filter(a => a.status !== 'cancelled');
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = active.filter(a => a.date === today);
+            
+            const totalDuration = todayAppointments.reduce((sum, a) => sum + a.duration, 0);
+            const totalDistance = todayAppointments.reduce((sum, a) => sum + (DISTANCE_MAP[a.district] || 0), 0);
+            
+            return {
+                total: todayAppointments.length,
+                duration: totalDuration,
+                distance: totalDistance
+            };
+        }
+
+        function updateStats() {
+            const appointments = loadData();
+            const stats = calculateTotalStats(appointments);
+            document.getElementById('stat-total').textContent = stats.total;
+            document.getElementById('stat-duration').textContent = stats.duration;
+            document.getElementById('stat-distance').textContent = stats.distance;
+        }
+
+        function renderAppointments() {
+            const appointments = loadData();
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = appointments.filter(a => a.date === today);
+            
+            const listEl = document.getElementById('appointment-list');
+            
+            if (todayAppointments.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">暂无预约记录</div>';
+                updateStats();
+                renderRoute();
+                return;
+            }
+            
+            todayAppointments.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+            
+            const conflicts = checkConflicts(appointments);
+            const conflictIds = new Set();
+            conflicts.forEach(c => {
+                conflictIds.add(c.id1);
+                conflictIds.add(c.id2);
+            });
+            
+            listEl.innerHTML = todayAppointments.map(appt => {
+                const endTime = addMinutes(appt.startTime, appt.duration);
+                const isConflict = conflictIds.has(appt.id);
+                const isCancelled = appt.status === 'cancelled';
+                
+                let badges = `<span class="badge badge-info">${appt.district}</span>`;
+                if (appt.pianoAge >= 10) {
+                    badges += ` <span class="badge badge-warning">老琴(${appt.pianoAge}年)</span>`;
+                }
+                if (isConflict) {
+                    badges += ` <span class="badge badge-danger">⚠️ 时间冲突</span>`;
+                }
+                
+                return `
+                    <div class="appointment-item ${isConflict ? 'conflict' : ''} ${isCancelled ? 'cancelled' : ''}" data-id="${appt.id}">
+                        <div class="appointment-header">
+                            <span class="appointment-time">⏰ ${appt.startTime} - ${endTime}</span>
+                            <div>${badges}</div>
+                        </div>
+                        <div class="appointment-info"><strong>${appt.customerName}</strong> | ${appt.phone}</div>
+                        <div class="appointment-info">📍 ${appt.address}</div>
+                        <div class="appointment-info">🎹 琴龄: ${appt.pianoAge}年 | 服务: ${getServiceTypeLabel(appt.serviceType)} | 时长: ${appt.duration}分钟</div>
+                        ${appt.notes ? `<div class="appointment-info">📝 ${appt.notes}</div>` : ''}
+                        ${appt.status === 'cancelled' ? '<div class="appointment-info" style="color: #e74c3c;">❌ 已取消</div>' : ''}
+                        <div class="appointment-actions">
+                            ${!isCancelled ? `
+                                <button class="btn btn-warning btn-sm" onclick="editAppointment('${appt.id}')">编辑</button>
+                                <button class="btn btn-danger btn-sm" onclick="cancelAppointment('${appt.id}')">取消</button>
+                            ` : `
+                                <button class="btn btn-success btn-sm" onclick="restoreAppointment('${appt.id}')">恢复</button>
+                            `}
+                            <button class="btn btn-secondary btn-sm" onclick="deleteAppointment('${appt.id}')">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateStats();
+            renderRoute();
+            
+            if (conflicts.length > 0) {
+                showNotification(`⚠️ 检测到 ${conflicts.length} 个时间冲突！`, 'warning');
+            }
+        }
+
+        function getServiceTypeLabel(type) {
+            const labels = {
+                'tuning': '标准调律',
+                'repair': '调律+维修',
+                'deep': '深度调律+保养'
+            };
+            return labels[type] || type;
+        }
+
+        function renderRoute() {
+            const appointments = loadData();
+            const today = new Date().toISOString().split('T')[0];
+            const activeAppointments = appointments.filter(a => a.status !== 'cancelled' && a.date === today);
+            
+            const routeSection = document.getElementById('route-section');
+            
+            if (activeAppointments.length === 0) {
+                routeSection.innerHTML = '<div class="empty-state">暂无排程，请先添加预约</div>';
+                return;
+            }
+            
+            activeAppointments.sort((a, b) => {
+                const aStart = timeToMinutes(a.startTime);
+                const bStart = timeToMinutes(b.startTime);
+                if (aStart !== bStart) return aStart - bStart;
+                return (DISTANCE_MAP[a.district] || 0) - (DISTANCE_MAP[b.district] || 0);
+            });
+            
+            let totalDistance = 0;
+            let prevDistance = 0;
+            
+            const routeHTML = activeAppointments.map((appt, index) => {
+                const distance = DISTANCE_MAP[appt.district] || 0;
+                const legDistance = index === 0 ? distance : Math.abs(distance - prevDistance);
+                totalDistance += legDistance;
+                prevDistance = distance;
+                
+                const endTime = addMinutes(appt.startTime, appt.duration);
+                
+                return `
+                    ${index > 0 ? `<div class="route-arrow">↓ 路程约 ${legDistance} 公里</div>` : '<div class="route-arrow">🚗 从工作室出发</div>'}
+                    <div class="route-item">
+                        <div class="route-number">${index + 1}</div>
+                        <div class="route-info">
+                            <div style="font-weight: 600;">${appt.customerName} - ${appt.district}</div>
+                            <div style="font-size: 13px; color: #666;">
+                                ⏰ ${appt.startTime} - ${endTime} (${appt.duration}分钟)
+                            </div>
+                            <div style="font-size: 13px; color: #666;">
+                                📍 ${appt.address} | 🎹 琴龄${appt.pianoAge}年 | ${getServiceTypeLabel(appt.serviceType)}
+                            </div>
+                        </div>
+                        <div style="text-align: right; color: #667eea; font-weight: 500;">
+                            ${distance} km
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            routeSection.innerHTML = routeHTML + `
+                <div class="total-distance">
+                    📊 今日预计总路程：<strong>${totalDistance}</strong> 公里
+                </div>
+            `;
+        }
+
+        function renderHistory() {
+            const history = loadHistory();
+            const listEl = document.getElementById('history-list');
+            
+            if (history.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">暂无操作记录</div>';
+                return;
+            }
+            
+            const actionLabels = {
+                'create': '新增预约',
+                'update': '修改预约',
+                'delete': '删除预约',
+                'cancel': '取消预约',
+                'restore': '恢复预约'
+            };
+            
+            listEl.innerHTML = history.slice(0, 20).map(record => {
+                const time = new Date(record.timestamp).toLocaleString('zh-CN');
+                const label = actionLabels[record.action] || record.action;
+                let diff = '';
+                
+                if (record.action === 'update' && record.before && record.after) {
+                    const changes = [];
+                    const fields = ['customerName', 'date', 'startTime', 'district', 'pianoAge', 'serviceType'];
+                    fields.forEach(field => {
+                        const before = record.before[field];
+                        const after = record.after[field];
+                        if (before !== after) {
+                            const fieldLabels = {
+                                'customerName': '客户',
+                                'date': '日期',
+                                'startTime': '时间',
+                                'district': '城区',
+                                'pianoAge': '琴龄',
+                                'serviceType': '服务'
+                            };
+                            changes.push(`${fieldLabels[field]}: <span class="old">${before}</span> → <span class="new">${after}</span>`);
+                        }
+                    });
+                    diff = changes.join(' | ');
+                } else if (record.after) {
+                    diff = `${record.after.customerName} - ${record.after.date} ${record.after.startTime}`;
+                }
+                
+                return `
+                    <div class="history-item ${record.action}">
+                        <div class="history-time">${time}</div>
+                        <div class="history-action">${label}</div>
+                        <div class="history-diff">${diff}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function validateForm() {
+            let isValid = true;
+            const errors = {};
+            
+            const name = document.getElementById('customer-name').value.trim();
+            const phone = document.getElementById('customer-phone').value.trim();
+            const date = document.getElementById('appointment-date').value;
+            const time = document.getElementById('start-time').value;
+            const district = document.getElementById('district').value;
+            const address = document.getElementById('address').value.trim();
+            const pianoAge = document.getElementById('piano-age').value;
+            
+            if (!name) {
+                errors.name = '请输入客户姓名';
+                isValid = false;
+            }
+            
+            if (!phone) {
+                errors.phone = '请输入联系电话';
+                isValid = false;
+            } else if (!/^1[3-9]\d{9}$/.test(phone)) {
+                errors.phone = '请输入有效的手机号码';
+                isValid = false;
+            }
+            
+            if (!date) {
+                errors.date = '请选择预约日期';
+                isValid = false;
+            }
+            
+            if (!time) {
+                errors.time = '请选择开始时间';
+                isValid = false;
+            }
+            
+            if (!district) {
+                errors.district = '请选择所在城区';
+                isValid = false;
+            }
+            
+            if (!address) {
+                errors.address = '请输入详细地址';
+                isValid = false;
+            }
+            
+            if (!pianoAge || pianoAge < 0) {
+                errors.pianoAge = '请输入有效的琴龄';
+                isValid = false;
+            }
+            
+            ['name', 'phone', 'date', 'time', 'district', 'address', 'piano-age'].forEach(field => {
+                const errorKey = field.replace('-', '');
+                const inputEl = document.getElementById(field === 'piano-age' ? 'piano-age' : field);
+                const errorEl = document.getElementById(`error-${errorKey}`);
+                
+                if (errors[errorKey]) {
+                    inputEl.classList.add('error');
+                    errorEl.textContent = errors[errorKey];
+                } else {
+                    inputEl.classList.remove('error');
+                    errorEl.textContent = '';
+                }
+            });
+            
+            return isValid;
+        }
+
+        document.getElementById('appointment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                showNotification('请填写所有必填字段', 'error');
+                return;
+            }
+            
+            const pianoAge = parseInt(document.getElementById('piano-age').value);
+            const serviceType = document.getElementById('service-type').value;
+            const duration = calculateDuration(pianoAge, serviceType);
+            
+            const appointment = {
+                id: generateId(),
+                customerName: document.getElementById('customer-name').value.trim(),
+                phone: document.getElementById('customer-phone').value.trim(),
+                date: document.getElementById('appointment-date').value,
+                startTime: document.getElementById('start-time').value,
+                district: document.getElementById('district').value,
+                address: document.getElementById('address').value.trim(),
+                pianoAge: pianoAge,
+                serviceType: serviceType,
+                duration: duration,
+                notes: document.getElementById('notes').value.trim(),
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+            
+            const appointments = loadData();
+            appointments.push(appointment);
+            saveData(appointments);
+            
+            addHistoryRecord('create', appointment);
+            
+            showNotification('✅ 预约添加成功！', 'success');
+            document.getElementById('appointment-form').reset();
+            document.getElementById('duration-hint').textContent = '💡 服务时长将根据琴龄自动计算';
+            
+            renderAppointments();
+        });
+
+        document.getElementById('piano-age').addEventListener('input', function() {
+            const pianoAge = parseInt(this.value) || 0;
+            const serviceType = document.getElementById('service-type').value;
+            const duration = calculateDuration(pianoAge, serviceType);
+            document.getElementById('duration-hint').textContent = `🎹 琴龄${pianoAge}年，预计服务时长：${duration}分钟`;
+        });
+
+        document.getElementById('service-type').addEventListener('change', function() {
+            const pianoAgeInput = document.getElementById('piano-age');
+            const pianoAge = parseInt(pianoAgeInput.value) || 0;
+            const duration = calculateDuration(pianoAge, this.value);
+            document.getElementById('duration-hint').textContent = `🎹 琴龄${pianoAge}年，预计服务时长：${duration}分钟`;
+        });
+
+        document.getElementById('clear-form-btn').addEventListener('click', function() {
+            document.getElementById('appointment-form').reset();
+            ['name', 'phone', 'date', 'time', 'district', 'address', 'piano-age'].forEach(field => {
+                const errorKey = field.replace('-', '');
+                const inputEl = document.getElementById(field === 'piano-age' ? 'piano-age' : field);
+                const errorEl = document.getElementById(`error-${errorKey}`);
+                inputEl.classList.remove('error');
+                errorEl.textContent = '';
+            });
+            document.getElementById('duration-hint').textContent = '💡 服务时长将根据琴龄自动计算';
+        });
+
+        document.getElementById('optimize-btn').addEventListener('click', function() {
+            const appointments = loadData();
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = appointments.filter(a => a.date === today);
+            
+            if (todayAppointments.length < 2) {
+                showNotification('至少需要2个预约才能优化路线', 'warning');
+                return;
+            }
+            
+            todayAppointments.sort((a, b) => {
+                const aDistance = DISTANCE_MAP[a.district] || 0;
+                const bDistance = DISTANCE_MAP[b.district] || 0;
+                const aStart = timeToMinutes(a.startTime);
+                const bStart = timeToMinutes(b.startTime);
+                
+                if (Math.abs(aStart - bStart) > 60) {
+                    return aStart - bStart;
+                }
+                
+                return aDistance - bDistance;
+            });
+            
+            showNotification('🔄 路线已优化：优先考虑时间相近+距离最短', 'success');
+            renderAppointments();
+        });
+
+        document.getElementById('sort-time-btn').addEventListener('click', function() {
+            const appointments = loadData();
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = appointments.filter(a => a.date === today);
+            
+            if (todayAppointments.length < 2) {
+                showNotification('至少需要2个预约才能排序', 'warning');
+                return;
+            }
+            
+            todayAppointments.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+            
+            showNotification('⏰ 已按时间排序', 'info');
+            renderAppointments();
+        });
+
+        document.getElementById('sort-distance-btn').addEventListener('click', function() {
+            const appointments = loadData();
+            const today = new Date().toISOString().split('T')[0];
+            const todayAppointments = appointments.filter(a => a.date === today);
+            
+            if (todayAppointments.length < 2) {
+                showNotification('至少需要2个预约才能排序', 'warning');
+                return;
+            }
+            
+            todayAppointments.sort((a, b) => {
+                const aDistance = DISTANCE_MAP[a.district] || 0;
+                const bDistance = DISTANCE_MAP[b.district] || 0;
+                return aDistance - bDistance;
+            });
+            
+            showNotification('🚗 已按距离排序', 'info');
+            renderAppointments();
+        });
+
+        document.getElementById('clear-history-btn').addEventListener('click', function() {
+            if (confirm('确定要清空所有操作历史吗？此操作不可恢复。')) {
+                saveHistory([]);
+                renderHistory();
+                showNotification('历史记录已清空', 'info');
+            }
+        });
+
+        function editAppointment(id) {
+            const appointments = loadData();
+            const appointment = appointments.find(a => a.id === id);
+            
+            if (!appointment) {
+                showNotification('预约不存在', 'error');
+                return;
+            }
+            
+            document.getElementById('edit-id').value = appointment.id;
+            document.getElementById('edit-customer-name').value = appointment.customerName;
+            document.getElementById('edit-customer-phone').value = appointment.phone;
+            document.getElementById('edit-appointment-date').value = appointment.date;
+            document.getElementById('edit-start-time').value = appointment.startTime;
+            document.getElementById('edit-district').value = appointment.district;
+            document.getElementById('edit-address').value = appointment.address;
+            document.getElementById('edit-piano-age').value = appointment.pianoAge;
+            document.getElementById('edit-service-type').value = appointment.serviceType;
+            document.getElementById('edit-notes').value = appointment.notes || '';
+            
+            document.getElementById('edit-modal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('show');
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('edit-id').value;
+            const appointments = loadData();
+            const index = appointments.findIndex(a => a.id === id);
+            
+            if (index === -1) {
+                showNotification('预约不存在', 'error');
+                return;
+            }
+            
+            const before = { ...appointments[index] };
+            
+            const pianoAge = parseInt(document.getElementById('edit-piano-age').value);
+            const serviceType = document.getElementById('edit-service-type').value;
+            const duration = calculateDuration(pianoAge, serviceType);
+            
+            appointments[index] = {
+                ...appointments[index],
+                customerName: document.getElementById('edit-customer-name').value.trim(),
+                phone: document.getElementById('edit-customer-phone').value.trim(),
+                date: document.getElementById('edit-appointment-date').value,
+                startTime: document.getElementById('edit-start-time').value,
+                district: document.getElementById('edit-district').value,
+                address: document.getElementById('edit-address').value.trim(),
+                pianoAge: pianoAge,
+                serviceType: serviceType,
+                duration: duration,
+                notes: document.getElementById('edit-notes').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            saveData(appointments);
+            addHistoryRecord('update', appointments[index], before);
+            
+            closeEditModal();
+            showNotification('✅ 预约已更新！', 'success');
+            renderAppointments();
+        });
+
+        function cancelAppointment(id) {
+            if (!confirm('确定要取消这个预约吗？')) return;
+            
+            const appointments = loadData();
+            const index = appointments.findIndex(a => a.id === id);
+            
+            if (index === -1) {
+                showNotification('预约不存在', 'error');
+                return;
+            }
+            
+            const before = { ...appointments[index] };
+            appointments[index].status = 'cancelled';
+            appointments[index].cancelledAt = new Date().toISOString();
+            
+            saveData(appointments);
+            addHistoryRecord('cancel', appointments[index], before);
+            
+            showNotification('❌ 预约已取消', 'warning');
+            renderAppointments();
+        }
+
+        function restoreAppointment(id) {
+            const appointments = loadData();
+            const index = appointments.findIndex(a => a.id === id);
+            
+            if (index === -1) {
+                showNotification('预约不存在', 'error');
+                return;
+            }
+            
+            const before = { ...appointments[index] };
+            appointments[index].status = 'active';
+            delete appointments[index].cancelledAt;
+            appointments[index].restoredAt = new Date().toISOString();
+            
+            saveData(appointments);
+            addHistoryRecord('restore', appointments[index], before);
+            
+            showNotification('✅ 预约已恢复', 'success');
+            renderAppointments();
+        }
+
+        function deleteAppointment(id) {
+            if (!confirm('确定要永久删除这个预约吗？此操作不可恢复。')) return;
+            
+            const appointments = loadData();
+            const index = appointments.findIndex(a => a.id === id);
+            
+            if (index === -1) {
+                showNotification('预约不存在', 'error');
+                return;
+            }
+            
+            const deleted = appointments[index];
+            appointments.splice(index, 1);
+            
+            saveData(appointments);
+            addHistoryRecord('delete', deleted);
+            
+            showNotification('🗑️ 预约已删除', 'info');
+            renderAppointments();
+        }
+
+        function init() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointment-date').value = today;
+            
+            renderAppointments();
+            renderHistory();
+            
+            showNotification('欢迎使用钢琴调律师路线排程器！数据自动保存到本地。', 'info');
+        }
+
+        init();
+    </script>
+</body>
+</html>
