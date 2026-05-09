@@ -1,0 +1,60 @@
+[
+  {
+    "id": "FLIGHT-001",
+    "flightNumber": "CA1234",
+    "scheduledDeparture": "2026-05-09T20:45:25.270Z",
+    "actualDeparture": "2026-05-09T22:15:25.270Z",
+    "status": "delayed",
+    "gate": "T3-A01",
+    "destination": "北京",
+    "airline": "国航",
+    "passengerName": "张三",
+    "passengerLevel": "platinum",
+    "vehiclePreference": "limousine",
+    "delayMinutes": 90,
+    "gateChangeHistory": [],
+    "vipRequests": [
+      "需要轮椅"
+    ],
+    "createdAt": "2026-05-09T18:45:25.270Z",
+    "updatedAt": "2026-05-09T18:45:30.954Z"
+  },
+  {
+    "id": "FLIGHT-002",
+    "flightNumber": "MU5678",
+    "scheduledDeparture": "2026-05-09T21:45:25.270Z",
+    "actualDeparture": null,
+    "status": "delayed",
+    "gate": "T1-B02",
+    "destination": "上海",
+    "airline": "东航",
+    "passengerName": "李四",
+    "passengerLevel": "gold",
+    "vehiclePreference": "suv",
+    "delayMinutes": 45,
+    "gateChangeHistory": [],
+    "vipRequests": [],
+    "createdAt": "2026-05-09T18:45:25.270Z",
+    "updatedAt": "2026-05-09T18:45:25.270Z"
+  },
+  {
+    "id": "FLIGHT-003",
+    "flightNumber": "CZ9012",
+    "scheduledDeparture": "2026-05-09T22:45:25.270Z",
+    "actualDeparture": null,
+    "status": "scheduled",
+    "gate": "T2-A02",
+    "destination": "广州",
+    "airline": "南航",
+    "passengerName": "王五",
+    "passengerLevel": "silver",
+    "vehiclePreference": "sedan",
+    "delayMinutes": 0,
+    "gateChangeHistory": [],
+    "vipRequests": [
+      "额外行李空间"
+    ],
+    "createdAt": "2026-05-09T18:45:25.270Z",
+    "updatedAt": "2026-05-09T18:45:25.270Z"
+  }
+]

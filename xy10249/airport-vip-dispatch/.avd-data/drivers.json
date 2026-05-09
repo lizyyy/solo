@@ -1,0 +1,54 @@
+[
+  {
+    "id": "DRV-001",
+    "name": "王师傅",
+    "phone": "13800138001",
+    "status": "available",
+    "vehicleId": "VEH-001",
+    "rating": 4.9,
+    "experienceYears": 10,
+    "currentDispatchId": null,
+    "notificationHistory": [],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  },
+  {
+    "id": "DRV-002",
+    "name": "李师傅",
+    "phone": "13800138002",
+    "status": "available",
+    "vehicleId": "VEH-002",
+    "rating": 4.7,
+    "experienceYears": 5,
+    "currentDispatchId": null,
+    "notificationHistory": [],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  },
+  {
+    "id": "DRV-003",
+    "name": "张师傅",
+    "phone": "13800138003",
+    "status": "on_duty",
+    "vehicleId": "VEH-003",
+    "rating": 4.8,
+    "experienceYears": 7,
+    "currentDispatchId": null,
+    "notificationHistory": [],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  },
+  {
+    "id": "DRV-004",
+    "name": "赵师傅",
+    "phone": "13800138004",
+    "status": "available",
+    "vehicleId": "VEH-004",
+    "rating": 4.6,
+    "experienceYears": 3,
+    "currentDispatchId": null,
+    "notificationHistory": [],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  }
+]

@@ -1,0 +1,69 @@
+[
+  {
+    "id": "VEH-001",
+    "plateNumber": "京A·88888",
+    "type": "limousine",
+    "capacity": 4,
+    "status": "available",
+    "baseLocation": "BASE-T3",
+    "driverId": null,
+    "lastMaintenance": null,
+    "features": [
+      "商务座",
+      "WiFi",
+      "充电口"
+    ],
+    "createdAt": "2026-05-09T18:45:25.270Z",
+    "updatedAt": "2026-05-09T18:45:25.270Z"
+  },
+  {
+    "id": "VEH-002",
+    "plateNumber": "京B·66666",
+    "type": "suv",
+    "capacity": 6,
+    "status": "available",
+    "baseLocation": "BASE-T1",
+    "driverId": null,
+    "lastMaintenance": null,
+    "features": [
+      "大空间",
+      "四驱",
+      "儿童座椅"
+    ],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  },
+  {
+    "id": "VEH-003",
+    "plateNumber": "京C·22222",
+    "type": "sedan",
+    "capacity": 4,
+    "status": "available",
+    "baseLocation": "BASE-MAIN",
+    "driverId": null,
+    "lastMaintenance": null,
+    "features": [
+      "豪华内饰",
+      "真皮座椅"
+    ],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  },
+  {
+    "id": "VEH-004",
+    "plateNumber": "京D·55555",
+    "type": "van",
+    "capacity": 8,
+    "status": "available",
+    "baseLocation": "BASE-MAIN",
+    "driverId": null,
+    "lastMaintenance": null,
+    "features": [
+      "商务车",
+      "多人乘坐",
+      "会议设备"
+    ],
+    "createdAt": "2026-05-09T18:45:25.271Z",
+    "updatedAt": "2026-05-09T18:45:25.271Z"
+  }
+]

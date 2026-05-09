@@ -1,0 +1,53 @@
+[
+  {
+    "id": "DISP-1778352325308-2w5b",
+    "flightId": "FLIGHT-001",
+    "vehicleId": "VEH-001",
+    "driverId": "DRV-001",
+    "status": "pending",
+    "pickupTime": "2026-05-09T21:58:25.270Z",
+    "actualPickupTime": null,
+    "dropoffTime": null,
+    "notes": "评分: 256",
+    "reason": "",
+    "conflicts": [],
+    "history": [],
+    "notifications": [
+      {
+        "id": "NOTIF-1778352330966-t9cb",
+        "type": "delay_notice",
+        "recipient": "王师傅",
+        "message": "航班 CA1234 延误 90 分钟，接驾时间调整为 2026/5/10 05:58:25",
+        "delayInfo": {
+          "flightId": "FLIGHT-001",
+          "flightNumber": "CA1234",
+          "oldDelayMinutes": 0,
+          "newDelayMinutes": 90,
+          "delayChange": 90,
+          "reason": "空中管制原因",
+          "updatedAt": "2026-05-09T18:45:30.954Z"
+        },
+        "sentAt": "2026-05-09T18:45:30.966Z"
+      }
+    ],
+    "createdAt": "2026-05-09T18:45:25.308Z",
+    "updatedAt": "2026-05-09T18:45:30.966Z"
+  },
+  {
+    "id": "DISP-1778352330922-0dz7",
+    "flightId": "FLIGHT-002",
+    "vehicleId": "VEH-002",
+    "driverId": "DRV-002",
+    "status": "pending",
+    "pickupTime": "2026-05-09T21:24:25.270Z",
+    "actualPickupTime": null,
+    "dropoffTime": null,
+    "notes": "评分: 250",
+    "reason": "",
+    "conflicts": [],
+    "history": [],
+    "notifications": [],
+    "createdAt": "2026-05-09T18:45:30.922Z",
+    "updatedAt": "2026-05-09T18:45:30.922Z"
+  }
+]
