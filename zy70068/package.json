@@ -1,0 +1,22 @@
+{
+  "name": "school-bus-notification",
+  "version": "1.0.0",
+  "description": "校车绕行通知服务",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts",
+    "demo": "ts-node src/demo.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
+  }
+}
