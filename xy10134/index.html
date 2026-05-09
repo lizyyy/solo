@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产线瓶颈调度游戏</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏭 产线瓶颈调度游戏</h1>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">分数:</span>
+                    <span id="score" class="value">1000</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">剩余时间:</span>
+                    <span id="time" class="value">120秒</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">完成产品:</span>
+                    <span id="products" class="value">0/20</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <button id="btn-start" class="btn btn-primary">开始游戏</button>
+            <button id="btn-pause" class="btn btn-warning" disabled>暂停</button>
+            <button id="btn-restart" class="btn btn-danger" disabled>重新开始</button>
+            <button id="btn-replay" class="btn btn-info" disabled>失败回放</button>
+        </div>
+
+        <div class="status-bar">
+            <span id="status-text">点击「开始游戏」按钮开始</span>
+        </div>
+
+        <div class="game-area">
+            <div class="production-line">
+                <div class="source">
+                    <div class="buffer-icon">📦</div>
+                    <div class="label">原料</div>
+                </div>
+                
+                <div id="workstations-container">
+                </div>
+                
+                <div class="destination">
+                    <div class="buffer-icon">✅</div>
+                    <div class="label">成品</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-details">
+            <h3>📊 计分明细</h3>
+            <div id="score-log" class="score-log">
+                <div class="empty-log">暂无记录</div>
+            </div>
+        </div>
+
+        <div class="rules-panel">
+            <h3>📖 游戏规则</h3>
+            <ul>
+                <li><strong>目标:</strong> 在 120 秒内完成 20 个产品</li>
+                <li><strong>工位节拍:</strong> 点击 + / - 调整每个工位的处理时间（2-8秒）</li>
+                <li><strong>缓冲区:</strong> 工位之间的缓冲区容量为 8 个</li>
+                <li><strong>扣分:</strong> 缓冲区爆满或断料，每秒钟各扣 10 分</li>
+                <li><strong>加分:</strong> 每完成一个产品，加 50 分</li>
+                <li><strong>失败条件:</strong> 分数低于 -500 或时间耗尽</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="game-over-title">游戏结束</h2>
+            <p id="game-over-message"></p>
+            <div class="final-stats">
+                <div class="stat-item">
+                    <span class="stat-label">最终分数:</span>
+                    <span id="final-score" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">完成产品:</span>
+                    <span id="final-products" class="stat-value">0</span>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="btn-modal-restart" class="btn btn-primary">重新开始</button>
+                <button id="btn-modal-replay" class="btn btn-info">查看回放</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="replay-modal" class="modal hidden">
+        <div class="modal-content wide">
+            <h2>🎬 失败回放</h2>
+            <div class="replay-controls">
+                <button id="btn-replay-prev" class="btn btn-secondary">⏮ 上一帧</button>
+                <span id="replay-progress">0 / 0</span>
+                <button id="btn-replay-next" class="btn btn-secondary">下一帧 ⏭</button>
+                <button id="btn-replay-close" class="btn btn-danger">关闭</button>
+            </div>
+            <div id="replay-container" class="replay-container">
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="src/app.js"></script>
+</body>
+</html>

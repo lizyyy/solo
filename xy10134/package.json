@@ -1,0 +1,10 @@
+{
+  "name": "production-line-game",
+  "version": "1.0.0",
+  "description": "产线瓶颈调度游戏",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/game.test.js",
+    "start": "python3 -m http.server 8080"
+  }
+}
