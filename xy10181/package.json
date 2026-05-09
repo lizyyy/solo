@@ -1,0 +1,32 @@
+{
+  "name": "quota-approval-service",
+  "version": "1.0.0",
+  "description": "限额审批占用释放 API 后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/",
+    "db:init": "node src/scripts/init-db.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "joi": "^17.13.1",
+    "node-cron": "^3.0.3",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "nodemon": "^3.1.3",
+    "eslint": "^9.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
