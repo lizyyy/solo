@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乡镇集市摊位抽签器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 乡镇集市摊位抽签器</h1>
+            <p class="subtitle">摊主名单管理 · 品类约束 · 公平抽签</p>
+            <div class="header-actions">
+                <button id="loadSampleSuccess" class="btn btn-secondary">📋 加载顺利样例</button>
+                <button id="loadSampleConflict" class="btn btn-warning">⚠️ 加载冲突样例</button>
+                <button id="clearAll" class="btn btn-danger">🗑️ 清空全部</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="vendors">👥 摊主名单</button>
+            <button class="tab-btn" data-tab="stalls">🏠 摊位管理</button>
+            <button class="tab-btn" data-tab="categories">📦 品类约束</button>
+            <button class="tab-btn" data-tab="lottery">🎲 抽签</button>
+            <button class="tab-btn" data-tab="results">📋 结果</button>
+            <button class="tab-btn" data-tab="export">📤 导出</button>
+        </div>
+
+        <div class="tab-content active" id="vendors-tab">
+            <div class="section-header">
+                <h2>摊主名单管理</h2>
+                <button id="addVendorBtn" class="btn btn-primary">➕ 添加摊主</button>
+            </div>
+            
+            <div class="statistics-card" id="vendorStats">
+                <div class="stat-item">
+                    <span class="stat-label">总摊主数</span>
+                    <span class="stat-value" id="totalVendors">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">老摊主数</span>
+                    <span class="stat-value" id="oldVendors">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">新摊主数</span>
+                    <span class="stat-value" id="newVendors">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">品类数</span>
+                    <span class="stat-value" id="totalCategories">0</span>
+                </div>
+            </div>
+
+            <div class="vendor-form hidden" id="vendorForm">
+                <h3>添加摊主</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>姓名 *</label>
+                        <input type="text" id="vendorName" placeholder="请输入摊主姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="tel" id="vendorPhone" placeholder="请输入联系电话">
+                    </div>
+                    <div class="form-group">
+                        <label>经营品类 *</label>
+                        <select id="vendorCategory">
+                            <option value="">请选择品类</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>摊主类型</label>
+                        <select id="vendorType">
+                            <option value="new">新摊主</option>
+                            <option value="old">老摊主</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button id="saveVendorBtn" class="btn btn-primary">保存</button>
+                    <button id="cancelVendorBtn" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="vendorTable">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>姓名</th>
+                            <th>联系电话</th>
+                            <th>经营品类</th>
+                            <th>摊主类型</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="stalls-tab">
+            <div class="section-header">
+                <h2>摊位管理</h2>
+                <button id="addStallBtn" class="btn btn-primary">➕ 添加摊位</button>
+            </div>
+            
+            <div class="statistics-card" id="stallStats">
+                <div class="stat-item">
+                    <span class="stat-label">总摊位数量</span>
+                    <span class="stat-value" id="totalStalls">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">可用摊位</span>
+                    <span class="stat-value" id="availableStalls">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">已分配摊位</span>
+                    <span class="stat-value" id="assignedStalls">0</span>
+                </div>
+            </div>
+
+            <div class="stall-form hidden" id="stallForm">
+                <h3>添加摊位</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>摊位编号 *</label>
+                        <input type="text" id="stallNumber" placeholder="如：A1、B2">
+                    </div>
+                    <div class="form-group">
+                        <label>摊位区域</label>
+                        <input type="text" id="stallZone" placeholder="如：东区、西区">
+                    </div>
+                    <div class="form-group">
+                        <label>摊位位置</label>
+                        <input type="number" id="stallPosition" placeholder="顺序位置，用于相邻判断">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button id="saveStallBtn" class="btn btn-primary">保存</button>
+                    <button id="cancelStallBtn" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="stallTable">
+                    <thead>
+                        <tr>
+                            <th>摊位编号</th>
+                            <th>区域</th>
+                            <th>位置</th>
+                            <th>状态</th>
+                            <th>分配摊主</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="categories-tab">
+            <div class="section-header">
+                <h2>品类约束管理</h2>
+                <button id="addCategoryBtn" class="btn btn-primary">➕ 添加品类</button>
+                <button id="addConstraintBtn" class="btn btn-info">🔗 添加约束</button>
+            </div>
+
+            <div class="two-column">
+                <div class="column">
+                    <h3>品类列表</h3>
+                    <div class="category-form hidden" id="categoryForm">
+                        <div class="form-group">
+                            <label>品类名称 *</label>
+                            <input type="text" id="categoryName" placeholder="如：蔬菜、水果、服装">
+                        </div>
+                        <div class="form-actions">
+                            <button id="saveCategoryBtn" class="btn btn-primary">保存</button>
+                            <button id="cancelCategoryBtn" class="btn btn-secondary">取消</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="categoryTable">
+                            <thead>
+                                <tr>
+                                    <th>品类名称</th>
+                                    <th>摊主数量</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <h3>相邻约束（禁止相邻的品类）</h3>
+                    <div class="constraint-form hidden" id="constraintForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>品类A</label>
+                                <select id="constraintCategoryA">
+                                    <option value="">请选择</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>品类B</label>
+                                <select id="constraintCategoryB">
+                                    <option value="">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button id="saveConstraintBtn" class="btn btn-primary">保存</button>
+                            <button id="cancelConstraintBtn" class="btn btn-secondary">取消</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="constraintTable">
+                            <thead>
+                                <tr>
+                                    <th>禁止相邻组合</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="lottery-tab">
+            <div class="section-header">
+                <h2>抽签规则与执行</h2>
+            </div>
+
+            <div class="lottery-rules">
+                <h3>抽签规则配置</h3>
+                <div class="rule-item">
+                    <label>
+                        <input type="checkbox" id="ruleOldVendorPriority" checked>
+                        老摊主优先抽签（先分配，保持相对位置）
+                    </label>
+                </div>
+                <div class="rule-item">
+                    <label>
+                        <input type="checkbox" id="ruleCategoryConstraint" checked>
+                        执行品类相邻约束
+                    </label>
+                </div>
+                <div class="rule-item">
+                    <label>
+                        <input type="checkbox" id="ruleRandomize" checked>
+                        随机打乱顺序（公平抽签）
+                    </label>
+                </div>
+            </div>
+
+            <div class="precheck-section">
+                <h3>抽签前检查</h3>
+                <div id="precheckResult" class="precheck-result">
+                    <p class="precheck-info">点击"开始检查"按钮进行抽签前验证</p>
+                </div>
+                <button id="runPrecheckBtn" class="btn btn-info">🔍 开始检查</button>
+            </div>
+
+            <div class="lottery-actions">
+                <button id="startLotteryBtn" class="btn btn-primary btn-lg">🎲 开始抽签</button>
+                <button id="resetLotteryBtn" class="btn btn-secondary">🔄 重置抽签</button>
+            </div>
+
+            <div id="lotteryProcess" class="hidden">
+                <h3>抽签过程记录</h3>
+                <div class="lottery-log" id="lotteryLog"></div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="results-tab">
+            <div class="section-header">
+                <h2>抽签结果</h2>
+                <div class="result-actions">
+                    <button id="freezeResultsBtn" class="btn btn-success">🔒 冻结结果</button>
+                    <button id="unfreezeResultsBtn" class="btn btn-warning hidden">🔓 解冻结果</button>
+                </div>
+            </div>
+
+            <div class="frozen-banner hidden" id="frozenBanner">
+                ⚠️ 结果已冻结，不能修改。如需修改请先解冻。
+            </div>
+
+            <div class="result-stats" id="resultStats">
+                <div class="stat-item">
+                    <span class="stat-label">分配总数</span>
+                    <span class="stat-value" id="resultTotal">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">老摊主</span>
+                    <span class="stat-value" id="resultOld">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">新摊主</span>
+                    <span class="stat-value" id="resultNew">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">待申诉</span>
+                    <span class="stat-value" id="resultPending">0</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>摊位编号</th>
+                            <th>区域</th>
+                            <th>摊主姓名</th>
+                            <th>经营品类</th>
+                            <th>摊主类型</th>
+                            <th>相邻品类</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="appeal-form hidden" id="appealForm">
+                <h3>申诉处理</h3>
+                <div class="form-group">
+                    <label>申诉原因</label>
+                    <textarea id="appealReason" rows="3" placeholder="请输入申诉原因"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button id="saveAppealBtn" class="btn btn-warning">标记为待复核</button>
+                    <button id="cancelAppealBtn" class="btn btn-secondary">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="export-tab">
+            <div class="section-header">
+                <h2>数据导出</h2>
+            </div>
+
+            <div class="export-options">
+                <div class="export-card">
+                    <h3>📋 摊主名单</h3>
+                    <p>导出所有摊主的详细信息</p>
+                    <button id="exportVendorsBtn" class="btn btn-primary">导出 CSV</button>
+                </div>
+                <div class="export-card">
+                    <h3>🏠 摊位信息</h3>
+                    <p>导出所有摊位的配置信息</p>
+                    <button id="exportStallsBtn" class="btn btn-primary">导出 CSV</button>
+                </div>
+                <div class="export-card">
+                    <h3>🎲 抽签结果</h3>
+                    <p>导出抽签分配结果</p>
+                    <button id="exportResultsBtn" class="btn btn-primary">导出 CSV</button>
+                </div>
+                <div class="export-card">
+                    <h3>📦 完整工作区</h3>
+                    <p>导出所有数据（JSON格式）</p>
+                    <button id="exportWorkspaceBtn" class="btn btn-primary">导出 JSON</button>
+                </div>
+            </div>
+
+            <div class="import-section">
+                <h3>📥 导入工作区</h3>
+                <p>导入之前导出的工作区JSON文件</p>
+                <input type="file" id="importFile" accept=".json" class="file-input">
+                <button id="importWorkspaceBtn" class="btn btn-info">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="data/samples.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
