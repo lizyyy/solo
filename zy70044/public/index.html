@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>返修责任冻结服务</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { color: #333; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: #e0e0e0; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .tab.active { background: #2196f3; color: white; }
+    .tab:hover:not(.active) { background: #d0d0d0; }
+    
+    .panel { background: white; border-radius: 8px; padding: 20px; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .panel.active { display: block; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    
+    .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; margin-bottom: 10px; }
+    .btn-primary { background: #2196f3; color: white; }
+    .btn-success { background: #4caf50; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-secondary { background: #9e9e9e; color: white; }
+    .btn:hover { opacity: 0.9; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f5f5f5; font-weight: 600; }
+    tr:hover { background: #fafafa; }
+    
+    .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; display: inline-block; }
+    .status-PENDING { background: #fff3e0; color: #e65100; }
+    .status-PROCESSING { background: #e3f2fd; color: #1565c0; }
+    .status-FREEZED { background: #e8f5e9; color: #2e7d32; }
+    .status-REJUDGING { background: #fce4ec; color: #880e4f; }
+    .status-SETTLED { background: #e0e0e0; color: #424242; }
+    
+    .section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .section:last-child { border-bottom: none; }
+    .section-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #333; }
+    
+    .summary-card { display: inline-block; background: #f5f5f5; padding: 15px 25px; border-radius: 8px; margin-right: 15px; margin-bottom: 15px; }
+    .summary-card .label { font-size: 12px; color: #666; }
+    .summary-card .value { font-size: 24px; font-weight: bold; color: #333; margin-top: 5px; }
+    
+    .message { padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; }
+    .message-success { background: #e8f5e9; color: #2e7d32; }
+    .message-error { background: #ffebee; color: #c62828; }
+    
+    .row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 300px; }
+    
+    .inline-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+    .inline-form .form-group { margin-bottom: 0; }
+    
+    .details { background: #fafafa; padding: 15px; border-radius: 4px; margin-top: 10px; }
+    .details pre { margin: 0; white-space: pre-wrap; font-size: 12px; }
+    
+    .hidden { display: none !important; }
+    
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .card { background: #fafafa; padding: 15px; border-radius: 8px; }
+    .card-title { font-weight: 600; margin-bottom: 10px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>返修责任冻结服务</h1>
+    
+    <div class="tabs">
+      <button class="tab active" data-panel="orders">返修单管理</button>
+      <button class="tab" data-panel="liability">责任冻结</button>
+      <button class="tab" data-panel="evidence">证据附件</button>
+      <button class="tab" data-panel="rejudge">复判流转</button>
+      <button class="tab" data-panel="costs">费用归集</button>
+      <button class="tab" data-panel="reports">责任报表</button>
+      <button class="tab" data-panel="logs">操作日志</button>
+      <button class="tab" data-panel="test">功能验证</button>
+    </div>
+
+    <div id="message" class="message hidden"></div>
+
+    <!-- 返修单管理 -->
+    <div class="panel active" id="panel-orders">
+      <div class="section">
+        <div class="section-title">新建返修单</div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>产品序列号 *</label>
+              <input type="text" id="order-product-sn" placeholder="如: SN-2024-001">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>产品名称 *</label>
+              <input type="text" id="order-product-name" placeholder="如: 智能手表A1">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>返修类型 *</label>
+              <input type="text" id="order-repair-type" placeholder="如: 功能故障、外观破损">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>问题描述</label>
+          <textarea id="order-description" placeholder="详细描述返修问题..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="createOrder()">创建返修单</button>
+        <button class="btn btn-secondary" onclick="refreshOrders()">刷新列表</button>
+        <a href="/api/orders/export" target="_blank" class="btn btn-secondary">导出CSV</a>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">返修单列表</div>
+        <div class="inline-form">
+          <div class="form-group">
+            <label>状态筛选</label>
+            <select id="filter-status">
+              <option value="">全部</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>产品序列号</label>
+            <input type="text" id="filter-product-sn" placeholder="搜索序列号">
+          </div>
+          <button class="btn btn-secondary" onclick="refreshOrders()">查询</button>
+        </div>
+        <table id="orders-table">
+          <thead>
+            <tr>
+              <th>返修单ID</th>
+              <th>产品序列号</th>
+              <th>产品名称</th>
+              <th>返修类型</th>
+              <th>状态</th>
+              <th>当前责任方</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 责任冻结 -->
+    <div class="panel" id="panel-liability">
+      <div class="section">
+        <div class="section-title">责任冻结/切换</div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>返修单ID *</label>
+              <input type="text" id="freeze-order-id" placeholder="从返修单列表复制ID">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>责任方 *</label>
+              <select id="freeze-responsibility"></select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>冻结原因</label>
+          <textarea id="freeze-reason" placeholder="说明冻结责任的原因..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="freezeLiability()">冻结/切换责任</button>
+        <button class="btn btn-danger" onclick="unfreezeLiability()">解除责任冻结</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">查询冻结状态</div>
+        <div class="inline-form">
+          <div class="form-group">
+            <label>返修单ID</label>
+            <input type="text" id="query-freeze-order-id">
+          </div>
+          <button class="btn btn-secondary" onclick="queryFreeze()">查询</button>
+        </div>
+        <div id="freeze-result" class="details hidden"></div>
+      </div>
+    </div>
+
+    <!-- 证据附件 -->
+    <div class="panel" id="panel-evidence">
+      <div class="section">
+        <div class="section-title">上传证据</div>
+        <div class="form-group">
+          <label>返修单ID *</label>
+          <input type="text" id="evidence-order-id" placeholder="返修单ID">
+        </div>
+        <div class="form-group">
+          <label>选择文件 * (最大10MB)</label>
+          <input type="file" id="evidence-file">
+        </div>
+        <div class="form-group">
+          <label>证据说明</label>
+          <input type="text" id="evidence-description" placeholder="简要说明此证据">
+        </div>
+        <button class="btn btn-primary" onclick="uploadEvidence()">上传</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">证据列表</div>
+        <div class="inline-form">
+          <div class="form-group">
+            <label>返修单ID</label>
+            <input type="text" id="query-evidence-order-id">
+          </div>
+          <button class="btn btn-secondary" onclick="listEvidence()">查询</button>
+        </div>
+        <table id="evidence-table">
+          <thead>
+            <tr>
+              <th>证据ID</th>
+              <th>文件名</th>
+              <th>类型</th>
+              <th>大小</th>
+              <th>说明</th>
+              <th>上传时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 复判流转 -->
+    <div class="panel" id="panel-rejudge">
+      <div class="section">
+        <div class="section-title">提交复判申请</div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>返修单ID *</label>
+              <input type="text" id="rejudge-order-id" placeholder="返修单ID">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>新责任方 *</label>
+              <select id="rejudge-responsibility"></select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>复判原因 *</label>
+          <textarea id="rejudge-reason" placeholder="说明为什么要切换责任..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitRejudge()">提交复判</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">复判审批</div>
+        <div class="inline-form">
+          <div class="form-group">
+            <label>复判记录ID</label>
+            <input type="text" id="approve-rejudge-id">
+          </div>
+          <div class="form-group">
+            <label>审批意见</label>
+            <input type="text" id="approve-comment">
+          </div>
+          <button class="btn btn-success" onclick="approveRejudge()">通过</button>
+          <button class="btn btn-danger" onclick="rejectRejudge()">驳回</button>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">复判记录</div>
+        <button class="btn btn-secondary" onclick="listRejudges()">刷新</button>
+        <a href="/api/rejudge/export" target="_blank" class="btn btn-secondary">导出CSV</a>
+        <table id="rejudge-table">
+          <thead>
+            <tr>
+              <th>复判ID</th>
+              <th>返修单ID</th>
+              <th>原责任方</th>
+              <th>新责任方</th>
+              <th>原因</th>
+              <th>状态</th>
+              <th>申请时间</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 费用归集 -->
+    <div class="panel" id="panel-costs">
+      <div class="section">
+        <div class="section-title">登记费用</div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>返修单ID *</label>
+              <input type="text" id="cost-order-id" placeholder="返修单ID">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>责任方 *</label>
+              <select id="cost-responsibility"></select>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>金额 *</label>
+              <input type="number" id="cost-amount" step="0.01" min="0.01" placeholder="如: 150.50">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>费用类型 *</label>
+              <input type="text" id="cost-type" placeholder="如: 人工费、材料费、运输费">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>币种</label>
+              <input type="text" id="cost-currency" value="CNY">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>费用描述</label>
+          <textarea id="cost-description"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="addCost()">登记费用</button>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">待结算费用</div>
+        <button class="btn btn-secondary" onclick="listUnsettled()">查看待结算</button>
+        <div id="unsettled-result"></div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">批量结算</div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>选择责任方 *</label>
+              <select id="settlement-responsibility"></select>
+            </div>
+          </div>
+          <div class="col">
+            <div style="margin-top: 22px;">
+              <button class="btn btn-success" onclick="createSettlement()">创建结算批次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">结算批次</div>
+        <button class="btn btn-secondary" onclick="listSettlements()">刷新</button>
+        <table id="settlements-table">
+          <thead>
+            <tr>
+              <th>批次ID</th>
+              <th>责任方</th>
+              <th>费用数量</th>
+              <th>总金额</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <a href="/api/costs/export" target="_blank" class="btn btn-secondary">导出所有费用CSV</a>
+      </div>
+    </div>
+
+    <!-- 责任报表 -->
+    <div class="panel" id="panel-reports">
+      <div class="section">
+        <div class="section-title">综合统计</div>
+        <button class="btn btn-primary" onclick="loadSummary()">刷新报表</button>
+        <div id="summary-container" class="grid-3"></div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">详细报表导出</div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">返修单报表</div>
+            <a href="/api/orders/export" target="_blank" class="btn btn-secondary">下载返修单列表</a>
+          </div>
+          <div class="card">
+            <div class="card-title">费用报表</div>
+            <a href="/api/costs/export" target="_blank" class="btn btn-secondary">下载费用明细</a>
+          </div>
+          <div class="card">
+            <div class="card-title">复判报表</div>
+            <a href="/api/rejudge/export" target="_blank" class="btn btn-secondary">下载复判记录</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 操作日志 -->
+    <div class="panel" id="panel-logs">
+      <div class="section">
+        <div class="section-title">操作日志</div>
+        <div class="inline-form">
+          <div class="form-group">
+            <label>模块筛选</label>
+            <select id="log-module">
+              <option value="">全部</option>
+              <option value="REPAIR_ORDER">返修单</option>
+              <option value="LIABILITY">责任冻结</option>
+              <option value="EVIDENCE">证据</option>
+              <option value="REJUDGE">复判</option>
+              <option value="COST">费用</option>
+              <option value="SETTLEMENT">结算</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" onclick="loadLogs()">查询</button>
+          <a href="/api/reports/logs/export" target="_blank" class="btn btn-secondary">导出全部日志</a>
+        </div>
+        <table id="logs-table">
+          <thead>
+            <tr>
+              <th>模块</th>
+              <th>操作</th>
+              <th>目标ID</th>
+              <th>操作人</th>
+              <th>时间</th>
+              <th>详情</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 功能验证 -->
+    <div class="panel" id="panel-test">
+      <div class="section">
+        <div class="section-title">一键完整流程测试</div>
+        <p style="margin-bottom: 15px; color: #666;">点击按钮自动执行完整业务流程，测试各个功能是否正常工作。</p>
+        <button class="btn btn-primary" onclick="runFullTest()">执行完整测试</button>
+        <button class="btn btn-secondary" onclick="runConcurrentTest()">并发场景测试</button>
+        <div id="test-result" class="details hidden"></div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">测试说明</div>
+        <ul style="margin-left: 20px; line-height: 1.8;">
+          <li><strong>完整测试</strong>：创建返修单 → 冻结责任 → 上传证据 → 登记费用 → 提交复判 → 审批复判 → 批量结算</li>
+          <li><strong>并发测试</strong>：同时发起多个责任冻结请求，验证互斥锁是否生效（同一时间只能有一个成功）</li>
+          <li>所有操作都会记录在操作日志中，可在「操作日志」页签查看</li>
+          <li>导出的CSV文件包含完整业务字段，可直接用于业务复核</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let constants = {};
+    
+    async function init() {
+      const res = await fetch('/api/constants');
+      constants = await res.json();
+      populateSelects();
+      refreshOrders();
+      listRejudges();
+      listSettlements();
+      loadSummary();
+      loadLogs();
+    }
+    
+    function populateSelects() {
+      const selects = ['freeze-responsibility', 'rejudge-responsibility', 'cost-responsibility', 'settlement-responsibility'];
+      selects.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerHTML = constants.responsibilities.map(r => 
+            `<option value="${r.code}">${r.name}</option>`
+          ).join('');
+        }
+      });
+      
+      const statusSelect = document.getElementById('filter-status');
+      statusSelect.innerHTML = '<option value="">全部</option>' + 
+        Object.entries(constants.order_statuses).map(([k, v]) => 
+          `<option value="${k}">${v}</option>`
+        ).join('');
+    }
+    
+    function showMessage(type, text) {
+      const msg = document.getElementById('message');
+      msg.className = `message message-${type}`;
+      msg.textContent = text;
+      setTimeout(() => msg.classList.add('hidden'), 5000);
+    }
+    
+    function formatDate(ts) {
+      if (!ts) return '-';
+      const d = new Date(ts);
+      return d.toLocaleString('zh-CN');
+    }
+    
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+      });
+    });
+    
+    // API helpers
+    async function apiCall(url, options = {}) {
+      try {
+        const res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json', 'X-Operator': 'web_user' },
+          ...options
+        });
+        return await res.json();
+      } catch (e) {
+        return { success: false, error: e.message };
+      }
+    }
+
+    // Orders
+    async function createOrder() {
+      const data = {
+        product_sn: document.getElementById('order-product-sn').value.trim(),
+        product_name: document.getElementById('order-product-name').value.trim(),
+        repair_type: document.getElementById('order-repair-type').value.trim(),
+        description: document.getElementById('order-description').value.trim()
+      };
+      
+      const result = await apiCall('/api/orders', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        showMessage('success', '返修单创建成功！ID: ' + result.data.id);
+        document.getElementById('order-product-sn').value = '';
+        document.getElementById('order-product-name').value = '';
+        document.getElementById('order-repair-type').value = '';
+        document.getElementById('order-description').value = '';
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function refreshOrders() {
+      const status = document.getElementById('filter-status').value;
+      const sn = document.getElementById('filter-product-sn').value;
+      
+      let url = '/api/orders?limit=50';
+      if (status) url += '&status=' + status;
+      if (sn) url += '&product_sn=' + encodeURIComponent(sn);
+      
+      const result = await apiCall(url);
+      
+      if (result.success) {
+        const tbody = document.querySelector('#orders-table tbody');
+        tbody.innerHTML = result.data.map(o => `
+          <tr>
+            <td style="font-family: monospace; font-size: 12px;" title="${o.id}">${o.id.substring(0, 12)}...</td>
+            <td>${o.product_sn}</td>
+            <td>${o.product_name}</td>
+            <td>${o.repair_type}</td>
+            <td><span class="status-badge status-${o.status}">${constants.order_statuses[o.status] || o.status}</span></td>
+            <td>${o.current_responsibility ? (constants.responsibilities.find(r => r.code === o.current_responsibility)?.name || o.current_responsibility) : '-'}</td>
+            <td>${formatDate(o.created_at)}</td>
+            <td>
+              <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="copyText('${o.id}')">复制ID</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => showMessage('success', '已复制: ' + text.substring(0, 20) + '...'));
+    }
+    
+    // Liability
+    async function freezeLiability() {
+      const data = {
+        repair_order_id: document.getElementById('freeze-order-id').value.trim(),
+        responsibility: document.getElementById('freeze-responsibility').value,
+        reason: document.getElementById('freeze-reason').value.trim()
+      };
+      
+      if (!data.repair_order_id) {
+        showMessage('error', '请输入返修单ID');
+        return;
+      }
+      
+      const result = await apiCall('/api/liability/freeze', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        const respName = constants.responsibilities.find(r => r.code === result.data.responsibility)?.name;
+        showMessage('success', `责任已冻结到: ${respName}`);
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function unfreezeLiability() {
+      const data = { repair_order_id: document.getElementById('freeze-order-id').value.trim() };
+      
+      if (!data.repair_order_id) {
+        showMessage('error', '请输入返修单ID');
+        return;
+      }
+      
+      const result = await apiCall('/api/liability/unfreeze', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        showMessage('success', result.data.message);
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function queryFreeze() {
+      const orderId = document.getElementById('query-freeze-order-id').value.trim();
+      if (!orderId) {
+        showMessage('error', '请输入返修单ID');
+        return;
+      }
+      
+      const history = await apiCall(`/api/liability/history/${encodeURIComponent(orderId)}`);
+      const active = await apiCall(`/api/liability/active/${encodeURIComponent(orderId)}`);
+      
+      const div = document.getElementById('freeze-result');
+      div.classList.remove('hidden');
+      
+      let html = '<h4>当前活动冻结:</h4>';
+      html += active.data ? `<pre>${JSON.stringify(active.data, null, 2)}</pre>` : '<p>无</p>';
+      html += '<h4 style="margin-top: 15px;">历史冻结记录:</h4>';
+      if (history.success && history.data.length > 0) {
+        html += `<pre>${JSON.stringify(history.data, null, 2)}</pre>`;
+        html += `<p style="margin-top: 10px;"><a href="/api/liability/history/${encodeURIComponent(orderId)}/export" target="_blank" class="btn btn-secondary">导出历史CSV</a></p>`;
+      } else {
+        html += '<p>无历史记录</p>';
+      }
+      div.innerHTML = html;
+    }
+    
+    // Evidence
+    async function uploadEvidence() {
+      const orderId = document.getElementById('evidence-order-id').value.trim();
+      const file = document.getElementById('evidence-file').files[0];
+      const desc = document.getElementById('evidence-description').value;
+      
+      if (!orderId || !file) {
+        showMessage('error', '请输入返修单ID并选择文件');
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      if (desc) formData.append('description', desc);
+      
+      try {
+        const res = await fetch(`/api/evidence/upload/${encodeURIComponent(orderId)}`, {
+          method: 'POST',
+          headers: { 'X-Operator': 'web_user' },
+          body: formData
+        });
+        const result = await res.json();
+        
+        if (result.success) {
+          showMessage('success', '证据上传成功！');
+          document.getElementById('evidence-file').value = '';
+          document.getElementById('evidence-description').value = '';
+          listEvidence();
+        } else {
+          showMessage('error', result.error);
+        }
+      } catch (e) {
+        showMessage('error', e.message);
+      }
+    }
+    
+    async function listEvidence() {
+      const orderId = document.getElementById('query-evidence-order-id').value.trim();
+      if (!orderId) {
+        showMessage('error', '请输入返修单ID');
+        return;
+      }
+      
+      const result = await apiCall(`/api/evidence/${encodeURIComponent(orderId)}`);
+      
+      if (result.success) {
+        const tbody = document.querySelector('#evidence-table tbody');
+        tbody.innerHTML = result.data.map(e => `
+          <tr>
+            <td style="font-family: monospace; font-size: 12px;">${e.id.substring(0, 12)}...</td>
+            <td>${e.file_name}</td>
+            <td>${e.file_type || '-'}</td>
+            <td>${formatBytes(e.file_size)}</td>
+            <td>${e.description || '-'}</td>
+            <td>${formatDate(e.uploaded_at)}</td>
+            <td>
+              <a href="/api/evidence/file/${e.id}" target="_blank" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">下载</a>
+              <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="deleteEvidence('${e.id}')">删除</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    async function deleteEvidence(id) {
+      if (!confirm('确定删除此证据？')) return;
+      const result = await apiCall(`/api/evidence/${id}`, { method: 'DELETE' });
+      if (result.success) {
+        showMessage('success', '证据已删除');
+        listEvidence();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    // Rejudge
+    async function submitRejudge() {
+      const data = {
+        repair_order_id: document.getElementById('rejudge-order-id').value.trim(),
+        new_responsibility: document.getElementById('rejudge-responsibility').value,
+        reason: document.getElementById('rejudge-reason').value.trim()
+      };
+      
+      if (!data.repair_order_id || !data.reason) {
+        showMessage('error', '请填写完整信息');
+        return;
+      }
+      
+      const result = await apiCall('/api/rejudge/submit', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        showMessage('success', '复判申请已提交');
+        listRejudges();
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function approveRejudge() {
+      const id = document.getElementById('approve-rejudge-id').value.trim();
+      const comment = document.getElementById('approve-comment').value;
+      
+      if (!id) {
+        showMessage('error', '请输入复判记录ID');
+        return;
+      }
+      
+      const result = await apiCall(`/api/rejudge/${id}/approve`, { method: 'POST', body: JSON.stringify({ comment }) });
+      
+      if (result.success) {
+        showMessage('success', '复判已通过，责任已切换');
+        listRejudges();
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function rejectRejudge() {
+      const id = document.getElementById('approve-rejudge-id').value.trim();
+      const comment = document.getElementById('approve-comment').value;
+      
+      if (!id) {
+        showMessage('error', '请输入复判记录ID');
+        return;
+      }
+      
+      const result = await apiCall(`/api/rejudge/${id}/reject`, { method: 'POST', body: JSON.stringify({ comment }) });
+      
+      if (result.success) {
+        showMessage('success', '复判已驳回');
+        listRejudges();
+        refreshOrders();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function listRejudges() {
+      const result = await apiCall('/api/rejudge?limit=50');
+      
+      if (result.success) {
+        const tbody = document.querySelector('#rejudge-table tbody');
+        tbody.innerHTML = result.data.map(r => `
+          <tr>
+            <td style="font-family: monospace; font-size: 12px;" title="${r.id}">${r.id.substring(0, 12)}...</td>
+            <td style="font-family: monospace; font-size: 11px;">${r.repair_order_id.substring(0, 10)}...</td>
+            <td>${r.previous_responsibility ? (constants.responsibilities.find(x => x.code === r.previous_responsibility)?.name) : '-'}</td>
+            <td>${constants.responsibilities.find(x => x.code === r.new_responsibility)?.name}</td>
+            <td>${r.reason}</td>
+            <td><span class="status-badge status-${r.status}">${constants.rejudge_statuses[r.status] || r.status}</span></td>
+            <td>${formatDate(r.operated_at)}</td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    // Costs
+    async function addCost() {
+      const data = {
+        repair_order_id: document.getElementById('cost-order-id').value.trim(),
+        responsibility: document.getElementById('cost-responsibility').value,
+        cost_type: document.getElementById('cost-type').value.trim(),
+        amount: parseFloat(document.getElementById('cost-amount').value),
+        currency: document.getElementById('cost-currency').value,
+        description: document.getElementById('cost-description').value.trim()
+      };
+      
+      if (!data.repair_order_id || !data.cost_type || !data.amount) {
+        showMessage('error', '请填写必要信息');
+        return;
+      }
+      
+      const result = await apiCall('/api/costs/add', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        showMessage('success', '费用登记成功');
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function listUnsettled() {
+      const result = await apiCall('/api/costs/unsettled');
+      const div = document.getElementById('unsettled-result');
+      
+      if (result.success && result.data.length > 0) {
+        let html = '<div class="grid-3">';
+        result.data.forEach(group => {
+          const respName = constants.responsibilities.find(r => r.code === group.responsibility)?.name || group.responsibility;
+          html += `
+            <div class="card">
+              <div class="card-title">${respName}</div>
+              <p><strong>待结算数量:</strong> ${group.cost_count}</p>
+              <p><strong>总金额:</strong> ${group.total_amount.toFixed(2)} ${group.costs[0]?.currency || 'CNY'}</p>
+              <p style="margin-top: 10px;"><small>前5条费用:</small></p>
+              <ul style="margin-left: 20px; font-size: 12px;">
+                ${group.costs.slice(0, 5).map(c => `<li>${c.cost_type}: ${c.amount}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        });
+        html += '</div>';
+        div.innerHTML = html;
+      } else {
+        div.innerHTML = '<p>暂无待结算费用</p>';
+      }
+    }
+    
+    async function createSettlement() {
+      const data = { responsibility: document.getElementById('settlement-responsibility').value };
+      const result = await apiCall('/api/costs/settlement/batch', { method: 'POST', body: JSON.stringify(data) });
+      
+      if (result.success) {
+        showMessage('success', `结算批次已创建，批次ID: ${result.data.batch_id.substring(0, 12)}...`);
+        listSettlements();
+        listUnsettled();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    async function listSettlements() {
+      const result = await apiCall('/api/costs/settlement/batches?limit=50');
+      
+      if (result.success) {
+        const tbody = document.querySelector('#settlements-table tbody');
+        tbody.innerHTML = result.data.map(s => `
+          <tr>
+            <td style="font-family: monospace; font-size: 12px;" title="${s.id}">${s.id.substring(0, 12)}...</td>
+            <td>${constants.responsibilities.find(r => r.code === s.responsibility)?.name}</td>
+            <td>${s.cost_count}</td>
+            <td>${s.total_amount.toFixed(2)} ${s.currency}</td>
+            <td>${s.status}</td>
+            <td>${formatDate(s.created_at)}</td>
+            <td>
+              <a href="/api/costs/settlement/batches/${s.id}/export" target="_blank" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">导出</a>
+              ${s.status === 'PENDING' ? `<button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="confirmSettlement('${s.id}')">确认</button>` : ''}
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    async function confirmSettlement(id) {
+      const result = await apiCall(`/api/costs/settlement/batches/${id}/confirm`, { method: 'POST' });
+      if (result.success) {
+        showMessage('success', '结算批次已确认');
+        listSettlements();
+      } else {
+        showMessage('error', result.error);
+      }
+    }
+    
+    // Reports
+    async function loadSummary() {
+      const result = await apiCall('/api/reports/summary');
+      const container = document.getElementById('summary-container');
+      
+      if (result.success) {
+        const d = result.data;
+        container.innerHTML = `
+          <div class="card">
+            <div class="card-title">返修单统计</div>
+            <p><strong>总返修单数:</strong> ${d.order_status.total_orders}</p>
+            ${Object.entries(d.order_status.by_status).map(([k, v]) => 
+              `<p>${constants.order_statuses[k] || k}: ${v}</p>`
+            ).join('')}
+          </div>
+          <div class="card">
+            <div class="card-title">责任冻结统计</div>
+            <p><strong>总冻结次数:</strong> ${d.liability.total_freezes}</p>
+            ${Object.entries(d.liability.by_responsibility).map(([k, v]) => 
+              `<p>${v.name}: ${v.freeze_count} 次</p>`
+            ).join('')}
+          </div>
+          <div class="card">
+            <div class="card-title">复判统计</div>
+            <p><strong>总复判数:</strong> ${d.rejudge.total_rejudges}</p>
+            <p>待审批: ${d.rejudge.pending}</p>
+            <p>已通过: ${d.rejudge.approved}</p>
+            <p>已驳回: ${d.rejudge.rejected}</p>
+          </div>
+          <div class="card">
+            <div class="card-title">费用统计 (按责任方)</div>
+            ${Object.entries(d.cost.by_responsibility).map(([k, v]) => `
+              <p><strong>${v.name}:</strong> ${v.cost_count} 笔, ${v.total_amount.toFixed(2)} ${v.currency}</p>
+            `).join('') || '<p>暂无费用数据</p>'}
+          </div>
+        `;
+      }
+    }
+    
+    // Logs
+    async function loadLogs() {
+      const module = document.getElementById('log-module').value;
+      let url = '/api/reports/logs?limit=100';
+      if (module) url += '&module=' + module;
+      
+      const result = await apiCall(url);
+      
+      if (result.success) {
+        const tbody = document.querySelector('#logs-table tbody');
+        tbody.innerHTML = result.data.map(l => `
+          <tr>
+            <td>${l.module}</td>
+            <td>${l.action}</td>
+            <td style="font-family: monospace; font-size: 11px;">${l.target_id ? l.target_id.substring(0, 12) + '...' : '-'}</td>
+            <td>${l.operator || '-'}</td>
+            <td>${formatDate(l.operated_at)}</td>
+            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${l.details || ''}">${l.details || '-'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+    
+    // Test
+    async function runFullTest() {
+      const div = document.getElementById('test-result');
+      div.classList.remove('hidden');
+      div.innerHTML = '<p>开始执行完整测试...</p><p>==============</p>';
+      
+      const append = (text) => { div.innerHTML += `<p>${text}</p>`; };
+      
+      try {
+        let orderId, rejudgeId;
+        
+        append('1. 创建返修单...');
+        const orderRes = await apiCall('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify({
+            product_sn: 'TEST-' + Date.now(),
+            product_name: '测试产品-A',
+            repair_type: '功能故障',
+            description: '测试用返修单，自动生成'
+          })
+        });
+        if (!orderRes.success) throw new Error('创建返修单失败: ' + orderRes.error);
+        orderId = orderRes.data.id;
+        append('   ✓ 返修单创建成功: ' + orderId.substring(0, 12) + '...');
+        
+        append('2. 冻结责任到 装配...');
+        const freeze1 = await apiCall('/api/liability/freeze', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, responsibility: 'ASSEMBLY', reason: '初始判定' })
+        });
+        if (!freeze1.success) throw new Error('冻结失败: ' + freeze1.error);
+        append('   ✓ 责任已冻结: 装配');
+        
+        append('3. 切换责任到 测试...');
+        const freeze2 = await apiCall('/api/liability/freeze', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, responsibility: 'TESTING', reason: '发现测试环节问题' })
+        });
+        if (!freeze2.success) throw new Error('切换失败: ' + freeze2.error);
+        append('   ✓ 责任已切换: 测试');
+        
+        append('4. 登记两笔费用...');
+        const cost1 = await apiCall('/api/costs/add', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, responsibility: 'TESTING', cost_type: '返工人工费', amount: 200, description: '测试返工' })
+        });
+        if (!cost1.success) throw new Error('登记费用失败: ' + cost1.error);
+        
+        const cost2 = await apiCall('/api/costs/add', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, responsibility: 'TESTING', cost_type: '材料费', amount: 50.5, description: '更换零件' })
+        });
+        if (!cost2.success) throw new Error('登记费用失败: ' + cost2.error);
+        append('   ✓ 已登记2笔费用，合计 250.50');
+        
+        append('5. 提交复判申请(转包装)...');
+        const rejudge = await apiCall('/api/rejudge/submit', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, new_responsibility: 'PACKAGING', reason: '经核查实际是包装环节问题' })
+        });
+        if (!rejudge.success) throw new Error('提交复判失败: ' + rejudge.error);
+        rejudgeId = rejudge.data.id;
+        append('   ✓ 复判申请已提交，状态: 待审批');
+        
+        append('6. 审批通过复判...');
+        const approve = await apiCall(`/api/rejudge/${rejudgeId}/approve`, {
+          method: 'POST',
+          body: JSON.stringify({ comment: '情况属实，同意转包装责任' })
+        });
+        if (!approve.success) throw new Error('审批失败: ' + approve.error);
+        append('   ✓ 复判已通过，责任已切换到: 包装');
+        
+        append('7. 再登记一笔包装责任的费用...');
+        const cost3 = await apiCall('/api/costs/add', {
+          method: 'POST',
+          body: JSON.stringify({ repair_order_id: orderId, responsibility: 'PACKAGING', cost_type: '重新包装费', amount: 30, description: '重新包装' })
+        });
+        if (!cost3.success) throw new Error('登记费用失败: ' + cost3.error);
+        append('   ✓ 已登记包装费用: 30.00');
+        
+        append('8. 批量结算 测试 责任方费用...');
+        const settlement = await apiCall('/api/costs/settlement/batch', {
+          method: 'POST',
+          body: JSON.stringify({ responsibility: 'TESTING' })
+        });
+        if (!settlement.success) throw new Error('创建结算批次失败: ' + settlement.error);
+        append('   ✓ 结算批次已创建: ' + settlement.data.batch_id.substring(0, 12) + '...');
+        append('     费用数量: ' + settlement.data.cost_count + ', 总金额: ' + settlement.data.total_amount);
+        
+        append('');
+        append('==============');
+        append('✓ 完整测试全部通过！');
+        append('');
+        append('验证方法:');
+        append('  - 到「返修单管理」查看状态是否为「责任冻结」，责任方为「包装」');
+        append('  - 到「复判流转」查看复判记录状态为「已通过」');
+        append('  - 到「费用归集」查看结算批次已创建');
+        append('  - 到「责任报表」查看统计数据已更新');
+        append('  - 到「操作日志」查看完整操作历史');
+        
+      } catch (e) {
+        append('');
+        append('✗ 测试失败: ' + e.message);
+      }
+    }
+    
+    async function runConcurrentTest() {
+      const div = document.getElementById('test-result');
+      div.classList.remove('hidden');
+      div.innerHTML = '<p>开始执行并发测试...</p><p>==============</p><p>先创建一个返修单，然后同时发起5个冻结请求</p>';
+      
+      const append = (text) => { div.innerHTML += `<p>${text}</p>`; };
+      
+      try {
+        append('1. 创建测试返修单...');
+        const orderRes = await apiCall('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify({
+            product_sn: 'CONC-' + Date.now(),
+            product_name: '并发测试产品',
+            repair_type: '并发测试'
+          })
+        });
+        if (!orderRes.success) throw new Error('创建失败: ' + orderRes.error);
+        const orderId = orderRes.data.id;
+        append('   ✓ 返修单ID: ' + orderId.substring(0, 12) + '...');
+        
+        append('');
+        append('2. 同时发起5个冻结请求 (并发)...');
+        
+        const promises = [];
+        const responsibilities = ['ASSEMBLY', 'TESTING', 'PACKAGING', 'ASSEMBLY', 'TESTING'];
+        
+        for (let i = 0; i < 5; i++) {
+          promises.push(
+            apiCall('/api/liability/freeze', {
+              method: 'POST',
+              body: JSON.stringify({
+                repair_order_id: orderId,
+                responsibility: responsibilities[i],
+                reason: `并发请求 #${i + 1}`
+              })
+            })
+          );
+        }
+        
+        const results = await Promise.all(promises);
+        
+        let successCount = 0;
+        let failCount = 0;
+        
+        results.forEach((r, i) => {
+          const respName = constants.responsibilities.find(x => x.code === responsibilities[i])?.name;
+          if (r.success) {
+            successCount++;
+            append(`   请求 #${i + 1} (冻结到${respName}): ✓ 成功`);
+          } else {
+            failCount++;
+            append(`   请求 #${i + 1} (冻结到${respName}): ✗ 失败 - ${r.error}`);
+          }
+        });
+        
+        append('');
+        append('==============');
+        append(`并发测试结果:`);
+        append(`  成功: ${successCount} 个`);
+        append(`  失败: ${failCount} 个`);
+        append('');
+        
+        if (successCount === 1 && failCount === 4) {
+          append('✓ 并发测试通过！互斥锁机制正常工作。');
+          append('  (只有一个请求能成功获取锁，其余被正确拒绝)');
+        } else if (successCount > 1) {
+          append('⚠ 注意: 有多个请求成功，可能存在并发问题');
+        }
+        
+        append('');
+        append('验证方法:');
+        append('  - 查看该返修单的责任冻结历史，应该只有最后一次是有效的');
+        append('  - 但在并发场景下，互斥锁应该保证同一时间只有一个操作能执行');
+        
+      } catch (e) {
+        append('');
+        append('✗ 测试异常: ' + e.message);
+      }
+    }
+    
+    init();
+  </script>
+</body>
+</html>

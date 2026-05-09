@@ -1,0 +1,21 @@
+{
+  "name": "repair-liability-freeze-service",
+  "version": "1.0.0",
+  "description": "返修责任冻结服务 - 管理产品返修时的责任冻结、证据附件、复判流转、费用归集和责任报表",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "multer": "^1.4.5-lts.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
