@@ -1,0 +1,42 @@
+{
+  "name": "screen-recorder-delivery-archiver",
+  "version": "1.0.0",
+  "description": "本地屏幕录制素材交付归档器",
+  "main": "dist/server/server.js",
+  "scripts": {
+    "start": "npm run build && node dist/server/server.js",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:client": "webpack --mode production",
+    "dev:server": "tsc -p tsconfig.server.json -w",
+    "dev:client": "webpack --mode development -w",
+    "server": "node dist/server/server.js"
+  },
+  "keywords": ["archive", "screen-recorder", "delivery"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "concurrently": "^8.0.0",
+    "css-loader": "^6.0.0",
+    "html-webpack-plugin": "^5.0.0",
+    "style-loader": "^3.0.0",
+    "ts-loader": "^9.0.0",
+    "typescript": "^5.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
