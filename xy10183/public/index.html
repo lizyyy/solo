@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区共享车位结算台</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .app { min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { opacity: 0.9; margin-top: 5px; }
+        
+        .nav { display: flex; gap: 5px; background: white; padding: 0 20px; border-bottom: 1px solid #e5e7eb; overflow-x: auto; }
+        .nav button { padding: 15px 20px; border: none; background: none; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; white-space: nowrap; }
+        .nav button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+        .nav button:hover { color: #667eea; }
+        
+        .container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card .label { color: #666; font-size: 14px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #1f2937; }
+        .stat-card .trend { font-size: 12px; margin-top: 5px; }
+        .stat-card .trend.up { color: #10b981; }
+        .stat-card .trend.down { color: #ef4444; }
+        
+        .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card-header { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 16px; font-weight: 600; color: #1f2937; }
+        .card-body { padding: 20px; }
+        
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-secondary { background: #f3f4f6; color: #4b5563; }
+        .btn-secondary:hover { background: #e5e7eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-confirmed { background: #dbeafe; color: #2563eb; }
+        .status-paid { background: #d1fae5; color: #059669; }
+        .status-in_progress { background: #cffafe; color: #0891b2; }
+        .status-completed { background: #e5e7eb; color: #4b5563; }
+        .status-cancelled { background: #fee2e2; color: #dc2626; }
+        .status-refunded { background: #fecaca; color: #b91c1c; }
+        .status-exception { background: #fecdd3; color: #be123c; }
+        
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f9fafb; font-weight: 600; color: #4b5563; font-size: 13px; }
+        .table td { font-size: 14px; }
+        .table tr:hover { background: #f9fafb; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        
+        .calendar { background: white; border-radius: 12px; padding: 20px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-header h4 { font-size: 18px; font-weight: 600; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .calendar-day:hover { background: #f3f4f6; }
+        .calendar-day.selected { background: #667eea; color: white; }
+        .calendar-day.today { border: 2px solid #667eea; }
+        .calendar-day.disabled { color: #d1d5db; cursor: not-allowed; }
+        .calendar-weekday { text-align: center; font-size: 12px; color: #6b7280; padding: 10px 0; }
+        
+        .time-slots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 15px; }
+        .time-slot { padding: 10px; text-align: center; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid #e5e7eb; }
+        .time-slot.available { background: #ecfdf5; color: #059669; }
+        .time-slot.unavailable { background: #fef2f2; color: #dc2626; cursor: not-allowed; }
+        .time-slot.selected { background: #667eea; color: white; border-color: #667eea; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 16px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; }
+        
+        .price-breakdown { background: #f9fafb; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .price-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+        .price-row:last-child { border-bottom: none; }
+        .price-row.total { font-weight: 600; font-size: 16px; }
+        
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; }
+        .alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+        
+        .search-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .search-bar input, .search-bar select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        
+        .pagination { display: flex; gap: 5px; justify-content: center; margin-top: 20px; }
+        .pagination button { padding: 8px 12px; border: 1px solid #d1d5db; background: white; border-radius: 6px; cursor: pointer; }
+        .pagination button.active { background: #667eea; color: white; border-color: #667eea; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .spot-card { border: 1px solid #e5e7eb; border-radius: 12px; padding: 15px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+        .spot-card:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15); }
+        .spot-card.selected { border-color: #667eea; background: #f5f3ff; }
+        .spot-card .spot-header { display: flex; justify-content: space-between; align-items: center; }
+        .spot-card .spot-id { font-size: 16px; font-weight: 600; color: #1f2937; }
+        .spot-card .spot-owner { font-size: 13px; color: #6b7280; }
+        .spot-card .spot-prices { display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #4b5563; }
+        
+        .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .detail-row .label { width: 120px; color: #6b7280; font-size: 14px; }
+        .detail-row .value { flex: 1; font-size: 14px; color: #1f2937; }
+        
+        .tabs { display: flex; gap: 10px; border-bottom: 1px solid #e5e7eb; margin-bottom: 20px; }
+        .tabs button { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 14px; color: #6b7280; border-bottom: 2px solid transparent; }
+        .tabs button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+        
+        .report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .report-item { background: #f9fafb; padding: 15px; border-radius: 8px; }
+        .report-item .label { font-size: 13px; color: #6b7280; margin-bottom: 5px; }
+        .report-item .value { font-size: 20px; font-weight: 700; color: #1f2937; }
+        
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) {
+            .chart-container { grid-template-columns: 1fr; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .time-slots { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🅿️ 社区共享车位结算台</h1>
+            <p>智能计费 · 实时监控 · 数据报表</p>
+        </div>
+        
+        <div class="nav">
+            <button :class="{ active: currentView === 'dashboard' }" @click="currentView = 'dashboard'">📊 工作台</button>
+            <button :class="{ active: currentView === 'booking' }" @click="currentView = 'booking'">📅 预约日历</button>
+            <button :class="{ active: currentView === 'orders' }" @click="currentView = 'orders'">📋 订单管理</button>
+            <button :class="{ active: currentView === 'reports' }" @click="currentView = 'reports'">📈 报表中心</button>
+        </div>
+        
+        <div class="container">
+            <div v-if="currentView === 'dashboard'">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">今日订单</div>
+                        <div class="value">{{ dashboardStats.today?.orders || 0 }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">今日收入</div>
+                        <div class="value">¥{{ dashboardStats.today?.revenue || 0 }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">今日退款</div>
+                        <div class="value">¥{{ dashboardStats.today?.refunds || 0 }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待处理订单</div>
+                        <div class="value">{{ dashboardStats.pendingOrders || 0 }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">进行中</div>
+                        <div class="value">{{ dashboardStats.activeOrders || 0 }}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">总订单数</div>
+                        <div class="value">{{ dashboardStats.totalOrders || 0 }}</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>订单状态分布</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid-6" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            <div v-for="(count, status) in dashboardStats.statusDistribution" :key="status" class="status-card" style="padding: 15px; background: #f9fafb; border-radius: 8px; text-align: center;">
+                                <span class="status-badge" :class="'status-' + status">{{ getStatusLabel(status) }}</span>
+                                <div style="font-size: 24px; font-weight: 700; margin-top: 10px;">{{ count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>快捷操作</h3>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" @click="currentView = 'booking'">➕ 新建预约</button>
+                            <button class="btn btn-secondary" @click="currentView = 'orders'">📋 查看订单</button>
+                            <button class="btn btn-secondary" @click="currentView = 'reports'">📊 查看报表</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div v-if="currentView === 'booking'">
+                <div class="grid-2">
+                    <div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>选择车位</h3>
+                            </div>
+                            <div class="card-body">
+                                <div v-for="spot in spots" :key="spot.id" 
+                                     class="spot-card" 
+                                     :class="{ selected: selectedSpot?.id === spot.id }"
+                                     @click="selectSpot(spot)">
+                                    <div class="spot-header">
+                                        <span class="spot-id">{{ spot.id }}</span>
+                                        <span class="spot-owner">{{ spot.area }} · {{ spot.owner }}</span>
+                                    </div>
+                                    <div class="spot-prices">
+                                        <span>¥{{ spot.pricePerHour }}/小时</span>
+                                        <span>¥{{ spot.overnightPrice }}/过夜 (0-6点)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-if="selectedSpot" class="card">
+                            <div class="card-header">
+                                <h3>预约信息</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>姓名</label>
+                                    <input type="text" v-model="bookingForm.customerName" placeholder="请输入姓名">
+                                </div>
+                                <div class="form-group">
+                                    <label>电话</label>
+                                    <input type="tel" v-model="bookingForm.phone" placeholder="请输入电话">
+                                </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>开始时间</label>
+                                        <input type="datetime-local" v-model="bookingForm.startTime" @change="calculateBookingPrice">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>结束时间</label>
+                                        <input type="datetime-local" v-model="bookingForm.endTime" @change="calculateBookingPrice">
+                                    </div>
+                                </div>
+                                
+                                <div v-if="pricePreview" class="price-breakdown">
+                                    <div class="price-row">
+                                        <span>普通时长 ({{ pricePreview.regularHours }}小时 × ¥{{ selectedSpot.pricePerHour }})</span>
+                                        <span>¥{{ pricePreview.regularPrice }}</span>
+                                    </div>
+                                    <div class="price-row">
+                                        <span>过夜次数 ({{ pricePreview.overnightPeriods }}次 × ¥{{ selectedSpot.overnightPrice }})</span>
+                                        <span>¥{{ pricePreview.overnightPrice }}</span>
+                                    </div>
+                                    <div class="price-row total">
+                                        <span>合计</span>
+                                        <span>¥{{ pricePreview.total }}</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" style="width: 100%;" @click="createOrder" :disabled="!canCreateOrder">
+                                    创建订单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="calendar">
+                            <div class="calendar-header">
+                                <button class="btn btn-secondary" @click="prevMonth">◀</button>
+                                <h4>{{ currentYear }}年{{ currentMonth + 1 }}月</h4>
+                                <button class="btn btn-secondary" @click="nextMonth">▶</button>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-weekday">日</div>
+                                <div class="calendar-weekday">一</div>
+                                <div class="calendar-weekday">二</div>
+                                <div class="calendar-weekday">三</div>
+                                <div class="calendar-weekday">四</div>
+                                <div class="calendar-weekday">五</div>
+                                <div class="calendar-weekday">六</div>
+                                <div v-for="(day, index) in calendarDays" :key="index"
+                                     class="calendar-day"
+                                     :class="{ 
+                                         selected: isSelectedDate(day), 
+                                         today: isToday(day),
+                                         disabled: !day 
+                                     }"
+                                     @click="day && selectDate(day)">
+                                    {{ day ? day.date : '' }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-if="selectedSpot" class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3>{{ selectedSpot.id }} 当日可用时段</h3>
+                            </div>
+                            <div class="card-body">
+                                <div v-if="availabilitySlots" class="time-slots">
+                                    <div v-for="slot in availabilitySlots" :key="slot.hour"
+                                         class="time-slot"
+                                         :class="{ 
+                                             available: slot.available, 
+                                             unavailable: !slot.available 
+                                         }">
+                                        {{ slot.hour }}:00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div v-if="currentView === 'orders'">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>订单管理</h3>
+                        <button class="btn btn-primary" @click="refreshOrders">🔄 刷新</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-bar">
+                            <input type="text" v-model="orderFilters.customerName" placeholder="搜索姓名" style="width: 150px;">
+                            <select v-model="orderFilters.status" style="width: 120px;">
+                                <option value="">全部状态</option>
+                                <option value="pending">待确认</option>
+                                <option value="confirmed">已确认</option>
+                                <option value="paid">已支付</option>
+                                <option value="in_progress">进行中</option>
+                                <option value="completed">已完成</option>
+                                <option value="cancelled">已取消</option>
+                                <option value="refunded">已退款</option>
+                            </select>
+                            <select v-model="orderFilters.spotId" style="width: 120px;">
+                                <option value="">全部车位</option>
+                                <option v-for="spot in spots" :key="spot.id" :value="spot.id">{{ spot.id }}</option>
+                            </select>
+                            <button class="btn btn-secondary" @click="loadOrders">查询</button>
+                        </div>
+                        
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>订单号</th>
+                                    <th>车位</th>
+                                    <th>客户</th>
+                                    <th>预约时间</th>
+                                    <th>金额</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="order in orders" :key="order.id">
+                                    <td style="font-family: monospace; font-size: 12px;">{{ order.id }}</td>
+                                    <td>
+                                        <div>{{ order.spotId }}</div>
+                                        <div style="font-size: 12px; color: #666;">{{ order.spotInfo?.area }} · {{ order.spotInfo?.owner }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ order.customerName }}</div>
+                                        <div style="font-size: 12px; color: #666;">{{ order.phone }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ formatDateTime(order.startTime) }}</div>
+                                        <div style="font-size: 12px; color: #666;">至 {{ formatDateTime(order.endTime) }}</div>
+                                    </td>
+                                    <td style="font-weight: 600;">¥{{ order.totalPrice }}</td>
+                                    <td><span class="status-badge" :class="'status-' + order.status">{{ getStatusLabel(order.status) }}</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" @click="viewOrderDetail(order.id)">详情</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="pagination">
+                            <button @click="goToPage(1)" :disabled="orderPagination.page === 1">首页</button>
+                            <button @click="goToPage(orderPagination.page - 1)" :disabled="orderPagination.page === 1">上一页</button>
+                            <span style="padding: 8px 12px;">第 {{ orderPagination.page }} / {{ orderPagination.totalPages }} 页</span>
+                            <button @click="goToPage(orderPagination.page + 1)" :disabled="orderPagination.page >= orderPagination.totalPages">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div v-if="currentView === 'reports'">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>报表中心</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="date" v-model="reportDateRange.start">
+                            <span style="line-height: 38px;">至</span>
+                            <input type="date" v-model="reportDateRange.end">
+                            <button class="btn btn-secondary" @click="loadReports">查询</button>
+                            <button class="btn btn-primary" @click="exportReport">📥 导出报表</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="tabs">
+                            <button :class="{ active: reportTab === 'summary' }" @click="reportTab = 'summary'">汇总报表</button>
+                            <button :class="{ active: reportTab === 'details' }" @click="reportTab = 'details'">订单明细</button>
+                        </div>
+                        
+                        <div v-if="reportTab === 'summary'">
+                            <div class="report-summary">
+                                <div class="report-item">
+                                    <div class="label">总订单数</div>
+                                    <div class="value">{{ reportSummary?.summary?.totalOrders || 0 }}</div>
+                                </div>
+                                <div class="report-item">
+                                    <div class="label">已完成</div>
+                                    <div class="value">{{ reportSummary?.summary?.completedOrders || 0 }}</div>
+                                </div>
+                                <div class="report-item">
+                                    <div class="label">已取消/退款</div>
+                                    <div class="value">{{ reportSummary?.summary?.cancelledOrders || 0 }}</div>
+                                </div>
+                                <div class="report-item">
+                                    <div class="label">总收入</div>
+                                    <div class="value">¥{{ reportSummary?.summary?.totalRevenue || 0 }}</div>
+                                </div>
+                                <div class="report-item">
+                                    <div class="label">总退款</div>
+                                    <div class="value">¥{{ reportSummary?.summary?.totalRefunds || 0 }}</div>
+                                </div>
+                                <div class="report-item">
+                                    <div class="label">净收入</div>
+                                    <div class="value" style="color: #667eea;">¥{{ reportSummary?.summary?.netRevenue || 0 }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="card" style="margin-top: 20px;">
+                                <div class="card-header">
+                                    <h3>车位营收排行</h3>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>车位号</th>
+                                                <th>业主</th>
+                                                <th>区域</th>
+                                                <th>订单数</th>
+                                                <th>营收</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="stat in sortedSpotStats" :key="stat.spotId">
+                                                <td style="font-weight: 600;">{{ stat.spotId }}</td>
+                                                <td>{{ stat.owner }}</td>
+                                                <td>{{ stat.area }}</td>
+                                                <td>{{ stat.orderCount }}</td>
+                                                <td style="font-weight: 600; color: #667eea;">¥{{ stat.revenue }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-if="reportTab === 'details'">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>订单号</th>
+                                        <th>车位</th>
+                                        <th>客户</th>
+                                        <th>开始时间</th>
+                                        <th>结束时间</th>
+                                        <th>状态</th>
+                                        <th>应收</th>
+                                        <th>实收</th>
+                                        <th>退款</th>
+                                        <th>净额</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="detail in reportDetails?.details" :key="detail.orderId">
+                                        <td style="font-family: monospace; font-size: 11px;">{{ detail.orderId }}</td>
+                                        <td>{{ detail.spotId }}</td>
+                                        <td>{{ detail.customerName }}</td>
+                                        <td>{{ formatDateTime(detail.startTime) }}</td>
+                                        <td>{{ formatDateTime(detail.endTime) }}</td>
+                                        <td><span class="status-badge" :class="'status-' + detail.status">{{ getStatusLabel(detail.status) }}</span></td>
+                                        <td>¥{{ detail.totalPrice }}</td>
+                                        <td>¥{{ detail.totalPaid }}</td>
+                                        <td>¥{{ detail.totalRefunded }}</td>
+                                        <td style="font-weight: 600;">¥{{ detail.netAmount }}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background: #f9fafb; font-weight: 600;">
+                                        <td colspan="6">合计</td>
+                                        <td>¥{{ reportDetails?.summary?.totalRevenue }}</td>
+                                        <td>¥{{ reportDetails?.summary?.totalRevenue }}</td>
+                                        <td>¥{{ reportDetails?.summary?.totalRefunds }}</td>
+                                        <td>¥{{ reportDetails?.summary?.netRevenue }}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div v-if="alert" class="alert" :class="'alert-' + alert.type" style="position: fixed; top: 20px; right: 20px; max-width: 400px; z-index: 2000;">
+            {{ alert.message }}
+        </div>
+        
+        <div v-if="showOrderDetail" class="modal" @click.self="showOrderDetail = false">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>订单详情</h3>
+                    <button class="btn btn-secondary" @click="showOrderDetail = false">✕</button>
+                </div>
+                <div class="modal-body" v-if="currentOrderDetail">
+                    <div class="detail-row">
+                        <span class="label">订单号</span>
+                        <span class="value" style="font-family: monospace;">{{ currentOrderDetail.order.id }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">车位</span>
+                        <span class="value">{{ currentOrderDetail.order.spotId }} ({{ currentOrderDetail.order.spotInfo?.area }} · {{ currentOrderDetail.order.spotInfo?.owner }})</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">客户</span>
+                        <span class="value">{{ currentOrderDetail.order.customerName }} ({{ currentOrderDetail.order.phone }})</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">预约时间</span>
+                        <span class="value">{{ formatDateTime(currentOrderDetail.order.startTime) }} 至 {{ formatDateTime(currentOrderDetail.order.endTime) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">状态</span>
+                        <span class="value"><span class="status-badge" :class="'status-' + currentOrderDetail.order.status">{{ getStatusLabel(currentOrderDetail.order.status) }}</span></span>
+                    </div>
+                    
+                    <div class="price-breakdown" style="margin-top: 15px;">
+                        <div class="price-row">
+                            <span>普通时长 ({{ currentOrderDetail.order.priceInfo?.regularHours }}小时)</span>
+                            <span>¥{{ currentOrderDetail.order.priceInfo?.regularPrice }}</span>
+                        </div>
+                        <div class="price-row">
+                            <span>过夜次数 ({{ currentOrderDetail.order.priceInfo?.overnightPeriods }}次)</span>
+                            <span>¥{{ currentOrderDetail.order.priceInfo?.overnightPrice }}</span>
+                        </div>
+                        <div class="price-row total">
+                            <span>订单金额</span>
+                            <span>¥{{ currentOrderDetail.order.totalPrice }}</span>
+                        </div>
+                    </div>
+                    
+                    <div v-if="currentOrderDetail.payments?.length" style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; font-size: 14px;">支付记录</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>支付号</th>
+                                    <th>金额</th>
+                                    <th>方式</th>
+                                    <th>时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="p in currentOrderDetail.payments" :key="p.id">
+                                    <td style="font-family: monospace; font-size: 11px;">{{ p.id }}</td>
+                                    <td>¥{{ p.amount }}</td>
+                                    <td>{{ p.method }}</td>
+                                    <td>{{ formatDateTime(p.createTime) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div v-if="currentOrderDetail.refunds?.length" style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 10px; font-size: 14px;">退款记录</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>退款号</th>
+                                    <th>退款金额</th>
+                                    <th>手续费</th>
+                                    <th>原因</th>
+                                    <th>时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="r in currentOrderDetail.refunds" :key="r.id">
+                                    <td style="font-family: monospace; font-size: 11px;">{{ r.id }}</td>
+                                    <td>¥{{ r.amount }}</td>
+                                    <td>¥{{ r.fee }}</td>
+                                    <td>{{ r.reason }}</td>
+                                    <td>{{ formatDateTime(r.createTime) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button v-if="canConfirmOrder(currentOrderDetail?.order)" class="btn btn-warning" @click="confirmOrder">确认订单</button>
+                    <button v-if="canPayOrder(currentOrderDetail?.order)" class="btn btn-success" @click="payOrder">模拟支付</button>
+                    <button v-if="canStartOrder(currentOrderDetail?.order)" class="btn btn-primary" @click="startOrder">开始停车</button>
+                    <button v-if="canCompleteOrder(currentOrderDetail?.order)" class="btn btn-success" @click="completeOrder">结束停车</button>
+                    <button v-if="canCancelOrder(currentOrderDetail?.order)" class="btn btn-danger" @click="showCancelConfirm = true">取消订单</button>
+                </div>
+            </div>
+        </div>
+        
+        <div v-if="showCancelConfirm" class="modal" @click.self="showCancelConfirm = false">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3>确认取消</h3>
+                    <button class="btn btn-secondary" @click="showCancelConfirm = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要取消这个订单吗？</p>
+                    <div v-if="currentOrderDetail?.order?.status === 'paid'" class="alert alert-info" style="margin-top: 15px;">
+                        已支付订单将根据取消时间计算退款金额。
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>取消原因</label>
+                        <textarea v-model="cancelReason" rows="2" placeholder="请输入取消原因（可选）"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="showCancelConfirm = false">返回</button>
+                    <button class="btn btn-danger" @click="cancelOrder">确认取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+        
+        const API_BASE = '/api';
+        
+        createApp({
+            setup() {
+                const currentView = ref('dashboard');
+                const spots = ref([]);
+                const dashboardStats = ref({});
+                
+                const selectedSpot = ref(null);
+                const availabilitySlots = ref(null);
+                const pricePreview = ref(null);
+                
+                const currentYear = ref(new Date().getFullYear());
+                const currentMonth = ref(new Date().getMonth());
+                const selectedDate = ref(null);
+                
+                const bookingForm = ref({
+                    customerName: '',
+                    phone: '',
+                    startTime: '',
+                    endTime: ''
+                });
+                
+                const orders = ref([]);
+                const orderFilters = ref({
+                    customerName: '',
+                    status: '',
+                    spotId: ''
+                });
+                const orderPagination = ref({
+                    page: 1,
+                    pageSize: 20,
+                    totalPages: 1
+                });
+                
+                const showOrderDetail = ref(false);
+                const currentOrderDetail = ref(null);
+                const showCancelConfirm = ref(false);
+                const cancelReason = ref('');
+                
+                const reportTab = ref('summary');
+                const reportDateRange = ref({
+                    start: '',
+                    end: ''
+                });
+                const reportSummary = ref(null);
+                const reportDetails = ref(null);
+                
+                const alert = ref(null);
+                
+                const calendarDays = computed(() => {
+                    const year = currentYear.value;
+                    const month = currentMonth.value;
+                    const firstDay = new Date(year, month, 1).getDay();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    
+                    const days = [];
+                    for (let i = 0; i < firstDay; i++) {
+                        days.push(null);
+                    }
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        days.push({ date: d, year, month });
+                    }
+                    return days;
+                });
+                
+                const sortedSpotStats = computed(() => {
+                    if (!reportSummary.value?.spotStats) return [];
+                    return [...reportSummary.value.spotStats].sort((a, b) => b.revenue - a.revenue);
+                });
+                
+                const canCreateOrder = computed(() => {
+                    return selectedSpot.value && 
+                           bookingForm.value.customerName && 
+                           bookingForm.value.phone && 
+                           bookingForm.value.startTime && 
+                           bookingForm.value.endTime &&
+                           pricePreview.value;
+                });
+                
+                function showAlert(message, type = 'info') {
+                    alert.value = { message, type };
+                    setTimeout(() => { alert.value = null; }, 3000);
+                }
+                
+                async function fetchAPI(url, options = {}) {
+                    try {
+                        const res = await fetch(API_BASE + url, {
+                            headers: { 'Content-Type': 'application/json' },
+                            ...options
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                            throw new Error(data.error || data.message || '请求失败');
+                        }
+                        return data;
+                    } catch (error) {
+                        showAlert(error.message, 'error');
+                        throw error;
+                    }
+                }
+                
+                async function loadSpots() {
+                    spots.value = await fetchAPI('/spots');
+                }
+                
+                async function loadDashboardStats() {
+                    dashboardStats.value = await fetchAPI('/dashboard/stats');
+                }
+                
+                async function selectSpot(spot) {
+                    selectedSpot.value = spot;
+                    pricePreview.value = null;
+                    if (selectedDate.value) {
+                        await loadAvailability();
+                    }
+                }
+                
+                function selectDate(day) {
+                    selectedDate.value = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`;
+                    if (selectedSpot.value) {
+                        loadAvailability();
+                    }
+                }
+                
+                function isSelectedDate(day) {
+                    if (!day || !selectedDate.value) return false;
+                    const dateStr = `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.date).padStart(2, '0')}`;
+                    return dateStr === selectedDate.value;
+                }
+                
+                function isToday(day) {
+                    if (!day) return false;
+                    const today = new Date();
+                    return day.year === today.getFullYear() && 
+                           day.month === today.getMonth() && 
+                           day.date === today.getDate();
+                }
+                
+                function prevMonth() {
+                    if (currentMonth.value === 0) {
+                        currentMonth.value = 11;
+                        currentYear.value--;
+                    } else {
+                        currentMonth.value--;
+                    }
+                }
+                
+                function nextMonth() {
+                    if (currentMonth.value === 11) {
+                        currentMonth.value = 0;
+                        currentYear.value++;
+                    } else {
+                        currentMonth.value++;
+                    }
+                }
+                
+                async function loadAvailability() {
+                    if (!selectedSpot.value || !selectedDate.value) return;
+                    const data = await fetchAPI(`/spots/${selectedSpot.value.id}/availability?date=${selectedDate.value}`);
+                    availabilitySlots.value = data.slots;
+                }
+                
+                async function calculateBookingPrice() {
+                    if (!selectedSpot.value || !bookingForm.value.startTime || !bookingForm.value.endTime) {
+                        pricePreview.value = null;
+                        return;
+                    }
+                    try {
+                        const data = await fetchAPI(`/spots/${selectedSpot.value.id}/calculate-price?startTime=${bookingForm.value.startTime}&endTime=${bookingForm.value.endTime}`);
+                        pricePreview.value = data;
+                    } catch (e) {
+                        pricePreview.value = null;
+                    }
+                }
+                
+                async function createOrder() {
+                    try {
+                        const order = await fetchAPI('/orders', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                spotId: selectedSpot.value.id,
+                                customerName: bookingForm.value.customerName,
+                                phone: bookingForm.value.phone,
+                                startTime: bookingForm.value.startTime,
+                                endTime: bookingForm.value.endTime
+                            })
+                        });
+                        showAlert('订单创建成功！订单号：' + order.id, 'success');
+                        resetBookingForm();
+                        currentView.value = 'orders';
+                        loadOrders();
+                    } catch (e) {}
+                }
+                
+                function resetBookingForm() {
+                    bookingForm.value = {
+                        customerName: '',
+                        phone: '',
+                        startTime: '',
+                        endTime: ''
+                    };
+                    pricePreview.value = null;
+                }
+                
+                async function loadOrders() {
+                    const params = new URLSearchParams({
+                        page: orderPagination.value.page,
+                        pageSize: orderPagination.value.pageSize,
+                        ...orderFilters.value
+                    });
+                    const data = await fetchAPI('/orders?' + params.toString());
+                    orders.value = data.orders;
+                    orderPagination.value.totalPages = data.totalPages;
+                    orderPagination.value.page = data.page;
+                }
+                
+                function refreshOrders() {
+                    loadOrders();
+                    loadDashboardStats();
+                    showAlert('数据已刷新', 'info');
+                }
+                
+                function goToPage(page) {
+                    orderPagination.value.page = page;
+                    loadOrders();
+                }
+                
+                async function viewOrderDetail(orderId) {
+                    currentOrderDetail.value = await fetchAPI(`/orders/${orderId}`);
+                    showOrderDetail.value = true;
+                }
+                
+                function canConfirmOrder(order) {
+                    return order?.status === 'pending';
+                }
+                
+                function canPayOrder(order) {
+                    return order?.status === 'confirmed';
+                }
+                
+                function canStartOrder(order) {
+                    return order?.status === 'paid';
+                }
+                
+                function canCompleteOrder(order) {
+                    return order?.status === 'in_progress';
+                }
+                
+                function canCancelOrder(order) {
+                    return ['pending', 'confirmed', 'paid'].includes(order?.status);
+                }
+                
+                async function confirmOrder() {
+                    const order = await fetchAPI(`/orders/${currentOrderDetail.value.order.id}/confirm`, { method: 'POST' });
+                    currentOrderDetail.value.order = order;
+                    showAlert('订单已确认', 'success');
+                    loadOrders();
+                    loadDashboardStats();
+                }
+                
+                async function payOrder() {
+                    const data = await fetchAPI(`/orders/${currentOrderDetail.value.order.id}/pay`, { 
+                        method: 'POST',
+                        body: JSON.stringify({ method: 'wechat' })
+                    });
+                    currentOrderDetail.value.order = data.order;
+                    currentOrderDetail.value.payments = [data.payment];
+                    showAlert('支付成功！金额：¥' + data.payment.amount, 'success');
+                    loadOrders();
+                    loadDashboardStats();
+                }
+                
+                async function startOrder() {
+                    const order = await fetchAPI(`/orders/${currentOrderDetail.value.order.id}/start`, { method: 'POST' });
+                    currentOrderDetail.value.order = order;
+                    showAlert('已开始停车', 'success');
+                    loadOrders();
+                    loadDashboardStats();
+                }
+                
+                async function completeOrder() {
+                    const order = await fetchAPI(`/orders/${currentOrderDetail.value.order.id}/complete`, { method: 'POST' });
+                    currentOrderDetail.value.order = order;
+                    showAlert('订单已完成', 'success');
+                    loadOrders();
+                    loadDashboardStats();
+                }
+                
+                async function cancelOrder() {
+                    try {
+                        const data = await fetchAPI(`/orders/${currentOrderDetail.value.order.id}/cancel`, { 
+                            method: 'POST',
+                            body: JSON.stringify({ reason: cancelReason.value })
+                        });
+                        currentOrderDetail.value.order = data.order;
+                        if (data.refund) {
+                            currentOrderDetail.value.refunds = [data.refund];
+                            showAlert('订单已取消，退款金额：¥' + data.refund.amount, 'success');
+                        } else {
+                            showAlert('订单已取消', 'success');
+                        }
+                        showCancelConfirm.value = false;
+                        cancelReason.value = '';
+                        loadOrders();
+                        loadDashboardStats();
+                    } catch (e) {}
+                }
+                
+                async function loadReports() {
+                    const params = new URLSearchParams();
+                    if (reportDateRange.value.start) params.append('startDate', reportDateRange.value.start);
+                    if (reportDateRange.value.end) params.append('endDate', reportDateRange.value.end);
+                    
+                    reportSummary.value = await fetchAPI('/reports/summary?' + params.toString());
+                    reportDetails.value = await fetchAPI('/reports/details?' + params.toString());
+                }
+                
+                function exportReport() {
+                    if (!reportDetails.value?.details?.length) {
+                        showAlert('没有可导出的数据', 'error');
+                        return;
+                    }
+                    
+                    let csv = '订单号,车位,客户,开始时间,结束时间,状态,应收,实收,退款,净额\n';
+                    reportDetails.value.details.forEach(d => {
+                        csv += `${d.orderId},${d.spotId},${d.customerName},${d.startTime},${d.endTime},${getStatusLabel(d.status)},${d.totalPrice},${d.totalPaid},${d.totalRefunded},${d.netAmount}\n`;
+                    });
+                    csv += `\n合计,,,,,${reportDetails.value.details.length},${reportDetails.value.summary.totalRevenue},${reportDetails.value.summary.totalRevenue},${reportDetails.value.summary.totalRefunds},${reportDetails.value.summary.netRevenue}`;
+                    
+                    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `停车报表_${new Date().toISOString().slice(0, 10)}.csv`;
+                    link.click();
+                    
+                    showAlert('报表已导出', 'success');
+                }
+                
+                function getStatusLabel(status) {
+                    const labels = {
+                        pending: '待确认',
+                        confirmed: '已确认',
+                        paid: '已支付',
+                        in_progress: '进行中',
+                        completed: '已完成',
+                        cancelled: '已取消',
+                        refunded: '已退款',
+                        exception: '异常'
+                    };
+                    return labels[status] || status;
+                }
+                
+                function formatDateTime(iso) {
+                    if (!iso) return '-';
+                    const d = new Date(iso);
+                    return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                }
+                
+                onMounted(async () => {
+                    await loadSpots();
+                    await loadDashboardStats();
+                });
+                
+                watch([reportTab], () => {
+                    if (reportSummary.value === null || reportDetails.value === null) {
+                        loadReports();
+                    }
+                });
+                
+                watch(currentView, (newView) => {
+                    if (newView === 'orders') loadOrders();
+                    if (newView === 'reports') loadReports();
+                    if (newView === 'dashboard') loadDashboardStats();
+                });
+                
+                return {
+                    currentView,
+                    spots,
+                    dashboardStats,
+                    selectedSpot,
+                    availabilitySlots,
+                    pricePreview,
+                    currentYear,
+                    currentMonth,
+                    selectedDate,
+                    calendarDays,
+                    bookingForm,
+                    orders,
+                    orderFilters,
+                    orderPagination,
+                    showOrderDetail,
+                    currentOrderDetail,
+                    showCancelConfirm,
+                    cancelReason,
+                    reportTab,
+                    reportDateRange,
+                    reportSummary,
+                    reportDetails,
+                    sortedSpotStats,
+                    canCreateOrder,
+                    alert,
+                    loadSpots,
+                    selectSpot,
+                    selectDate,
+                    isSelectedDate,
+                    isToday,
+                    prevMonth,
+                    nextMonth,
+                    calculateBookingPrice,
+                    createOrder,
+                    loadOrders,
+                    refreshOrders,
+                    goToPage,
+                    viewOrderDetail,
+                    canConfirmOrder,
+                    canPayOrder,
+                    canStartOrder,
+                    canCompleteOrder,
+                    canCancelOrder,
+                    confirmOrder,
+                    payOrder,
+                    startOrder,
+                    completeOrder,
+                    cancelOrder,
+                    loadReports,
+                    exportReport,
+                    getStatusLabel,
+                    formatDateTime
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
