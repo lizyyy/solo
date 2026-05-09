@@ -1,0 +1,77 @@
+2026-05-09 18:22:04,934 - FoodNutritionOptimizer - INFO - ============================================================
+2026-05-09 18:22:04,935 - FoodNutritionOptimizer - INFO - 开始执行食品营养配方优化流程
+2026-05-09 18:22:04,935 - FoodNutritionOptimizer - INFO - 开始时间: 2026-05-09 18:22:04
+2026-05-09 18:22:04,935 - FoodNutritionOptimizer - INFO - ============================================================
+2026-05-09 18:22:04,935 - FoodNutritionOptimizer - INFO - 读取数据文件: /Users/mac/pro/solo/workspaces/xy10103/food_nutrition_optimizer/data/raw/ingredients.csv
+2026-05-09 18:22:04,941 - FoodNutritionOptimizer - INFO - 成功加载数据，共 40 行 13 列
+2026-05-09 18:22:04,941 - FoodNutritionOptimizer - INFO - 原始数据: 40 条记录
+2026-05-09 18:22:04,941 - FoodNutritionOptimizer - INFO - 开始执行质控规则检查...
+2026-05-09 18:22:04,941 - FoodNutritionOptimizer - INFO - 执行 RULE_001: 数据完整性检查
+2026-05-09 18:22:04,946 - FoodNutritionOptimizer - WARNING -   - 发现 3 个问题 (严重度: high)
+2026-05-09 18:22:04,946 - FoodNutritionOptimizer - INFO - 执行 RULE_002: 数值有效性检查
+2026-05-09 18:22:04,958 - FoodNutritionOptimizer - INFO -   - 通过检查
+2026-05-09 18:22:04,958 - FoodNutritionOptimizer - INFO - 执行 RULE_003: 单位一致性检查
+2026-05-09 18:22:04,966 - FoodNutritionOptimizer - INFO -   - 通过检查
+2026-05-09 18:22:04,966 - FoodNutritionOptimizer - INFO - 执行 RULE_004: 重复记录检查
+2026-05-09 18:22:05,046 - FoodNutritionOptimizer - WARNING -   - 发现 1 个问题 (严重度: medium)
+2026-05-09 18:22:05,046 - FoodNutritionOptimizer - INFO - 执行 RULE_005: 异常值检测
+2026-05-09 18:22:05,053 - FoodNutritionOptimizer - WARNING -   - 发现 3 个问题 (严重度: medium)
+2026-05-09 18:22:05,054 - FoodNutritionOptimizer - INFO - 执行 RULE_006: 过敏原合规检查
+2026-05-09 18:22:05,058 - FoodNutritionOptimizer - WARNING -   - 发现 9 个问题 (严重度: high)
+2026-05-09 18:22:05,058 - FoodNutritionOptimizer - INFO - 质控检查完成，共发现 16 个问题
+2026-05-09 18:22:05,058 - FoodNutritionOptimizer - INFO - 质控检查完成，发现 16 个质量问题
+2026-05-09 18:22:05,059 - FoodNutritionOptimizer - INFO - 
+------------------------------------------------------------
+2026-05-09 18:22:05,059 - FoodNutritionOptimizer - INFO - 步骤 1: 数据预处理
+2026-05-09 18:22:05,059 - FoodNutritionOptimizer - INFO - ------------------------------------------------------------
+2026-05-09 18:22:05,059 - FoodNutritionOptimizer - INFO - 开始数据预处理...
+2026-05-09 18:22:05,059 - FoodNutritionOptimizer - INFO - 检查重复数据...
+2026-05-09 18:22:05,141 - FoodNutritionOptimizer - WARNING - 删除重复数据: 鸡胸肉 (行 13)
+2026-05-09 18:22:05,143 - FoodNutritionOptimizer - INFO - 删除了 1 条重复数据
+2026-05-09 18:22:05,143 - FoodNutritionOptimizer - INFO - 处理缺失值...
+2026-05-09 18:22:05,147 - FoodNutritionOptimizer - INFO - 填充缺失值: 黄瓜 的 protein = 2.34
+2026-05-09 18:22:05,150 - FoodNutritionOptimizer - INFO - 填充缺失值: 生菜 的 sodium = 28.43
+2026-05-09 18:22:05,162 - FoodNutritionOptimizer - INFO - 填充缺失值: 西红柿 的 cost = 0.51
+2026-05-09 18:22:05,162 - FoodNutritionOptimizer - INFO - 统一单位...
+2026-05-09 18:22:05,166 - FoodNutritionOptimizer - INFO - 检测异常值...
+2026-05-09 18:22:05,169 - FoodNutritionOptimizer - WARNING - 检测到异常值: 高蛋白粉 的 protein=80.00
+2026-05-09 18:22:05,172 - FoodNutritionOptimizer - WARNING - 检测到异常值: 超咸食品 的 sodium=5000.00
+2026-05-09 18:22:05,175 - FoodNutritionOptimizer - WARNING - 检测到异常值: 三文鱼 的 cost=5.50
+2026-05-09 18:22:05,176 - FoodNutritionOptimizer - INFO - 移除了 3 条包含异常值的记录
+2026-05-09 18:22:05,176 - FoodNutritionOptimizer - INFO - 过敏原过滤...
+2026-05-09 18:22:05,177 - FoodNutritionOptimizer - INFO - 过滤过敏原: 杏仁 包含 坚果
+2026-05-09 18:22:05,177 - FoodNutritionOptimizer - INFO - 过滤过敏原: 牛奶 包含 牛奶
+2026-05-09 18:22:05,177 - FoodNutritionOptimizer - INFO - 过滤过敏原: 奶酪 包含 牛奶
+2026-05-09 18:22:05,177 - FoodNutritionOptimizer - INFO - 过滤过敏原: 豆腐 包含 大豆
+2026-05-09 18:22:05,177 - FoodNutritionOptimizer - INFO - 过滤过敏原: 白面包 包含 小麦
+2026-05-09 18:22:05,178 - FoodNutritionOptimizer - INFO - 过滤过敏原: 面条 包含 小麦
+2026-05-09 18:22:05,178 - FoodNutritionOptimizer - INFO - 过滤过敏原: 酸奶 包含 牛奶
+2026-05-09 18:22:05,178 - FoodNutritionOptimizer - INFO - 过滤过敏原: 豆浆 包含 大豆
+2026-05-09 18:22:05,179 - FoodNutritionOptimizer - INFO - 过滤过敏原: 花生酱 包含 坚果
+2026-05-09 18:22:05,179 - FoodNutritionOptimizer - INFO - 过滤了 9 条含过敏原的记录
+2026-05-09 18:22:05,179 - FoodNutritionOptimizer - INFO - 最终数据验证...
+2026-05-09 18:22:05,185 - FoodNutritionOptimizer - INFO - 数据预处理完成: 27/40 条有效记录
+2026-05-09 18:22:05,185 - FoodNutritionOptimizer - INFO - 
+------------------------------------------------------------
+2026-05-09 18:22:05,185 - FoodNutritionOptimizer - INFO - 步骤 2: 配方优化求解
+2026-05-09 18:22:05,185 - FoodNutritionOptimizer - INFO - ------------------------------------------------------------
+2026-05-09 18:22:05,188 - FoodNutritionOptimizer - INFO - 可用于优化的食材: 27 种
+2026-05-09 18:22:05,188 - FoodNutritionOptimizer - INFO - 开始配方优化求解...
+2026-05-09 18:22:05,190 - FoodNutritionOptimizer - INFO - 正在求解线性规划问题，包含 27 个食材变量...
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 配方优化成功！耗时: 2.66秒
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 最优配方: ['鸡胸肉', '鸡蛋', '黄瓜', '鲈鱼', '燕麦粥', '黑豆', '香蕉', '橄榄油']
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 蛋白: 15.00g, 钠: 100.00mg, 成本: $0.93
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 优化成功！找到最优配方
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 
+------------------------------------------------------------
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 步骤 3: 生成报告
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - ------------------------------------------------------------
+2026-05-09 18:22:07,844 - FoodNutritionOptimizer - INFO - 开始生成完整报告...
+2026-05-09 18:22:07,845 - FoodNutritionOptimizer - INFO - HTML报告已生成: /Users/mac/pro/solo/workspaces/xy10103/food_nutrition_optimizer/reports/nutrition_recipe_report_20260509_182207.html
+2026-05-09 18:22:07,969 - FoodNutritionOptimizer - INFO - Excel报告已生成: /Users/mac/pro/solo/workspaces/xy10103/food_nutrition_optimizer/reports/nutrition_recipe_report_20260509_182207.xlsx
+2026-05-09 18:22:11,539 - FoodNutritionOptimizer - INFO - 图表已生成: /Users/mac/pro/solo/workspaces/xy10103/food_nutrition_optimizer/reports/charts_20260509_182207
+2026-05-09 18:22:11,542 - FoodNutritionOptimizer - INFO - 处理后的数据已保存到: /Users/mac/pro/solo/workspaces/xy10103/food_nutrition_optimizer/data/processed/processed_ingredients_20260509_182211.csv
+2026-05-09 18:22:11,543 - FoodNutritionOptimizer - INFO - ============================================================
+2026-05-09 18:22:11,543 - FoodNutritionOptimizer - INFO - 流程执行完成
+2026-05-09 18:22:11,543 - FoodNutritionOptimizer - INFO - 结束时间: 2026-05-09 18:22:11
+2026-05-09 18:22:11,543 - FoodNutritionOptimizer - INFO - ============================================================

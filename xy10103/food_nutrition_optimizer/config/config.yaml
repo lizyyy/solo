@@ -1,0 +1,49 @@
+data:
+  input_file: "data/raw/ingredients.csv"
+  output_dir: "data/processed"
+  
+constraints:
+  target_protein:
+    min: 15.0  
+    max: 20.0  
+    unit: "g"
+  target_sodium:
+    min: 100.0
+    max: 600.0
+    unit: "mg"
+  target_cost:
+    min: 0.0
+    max: 5.0
+    unit: "USD"
+  total_weight:
+    min: 80.0
+    max: 120.0
+    unit: "g"
+  
+allergens:
+  forbidden: ["牛奶", "坚果", "小麦", "大豆"]
+  
+quality_control:
+  max_missing_rate: 0.1  
+  allowed_units:
+    protein: ["g", "mg", "kg"]
+    sodium: ["mg", "g", "kg"]
+    cost: ["USD", "CNY"]
+  z_score_threshold: 3.0  
+  min_valid_records: 5
+
+report:
+  format: ["html", "excel", "pdf"]
+  include_charts: true
+  
+units:
+  protein_base: "g"
+  sodium_base: "mg"
+  cost_base: "USD"
+  weight_base: "g"
+  conversions:
+    g_to_mg: 1000.0
+    mg_to_g: 0.001
+    kg_to_g: 1000.0
+    kg_to_mg: 1000000.0
+    CNY_to_USD: 0.14
