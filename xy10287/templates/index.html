@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物业水泵房巡检声纹记录台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { padding-top: 60px; background-color: #f8f9fa; }
+        .navbar-brand { font-weight: bold; }
+        .card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .stat-card { text-align: center; padding: 15px; }
+        .stat-number { font-size: 2rem; font-weight: bold; }
+        .stat-label { color: #6c757d; font-size: 0.9rem; }
+        .badge-level-normal { background-color: #28a745; }
+        .badge-level-warning { background-color: #ffc107; color: #000; }
+        .badge-level-alert { background-color: #fd7e14; }
+        .badge-level-critical { background-color: #dc3545; }
+        .table-sm th, .table-sm td { padding: 0.5rem; }
+        .modal-xl { --bs-modal-width: 900px; }
+        .feature-bar { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #007bff, #28a745); }
+        .feature-container { margin-bottom: 10px; }
+        .rule-card { border-left: 4px solid #007bff; margin-bottom: 10px; padding: 10px; background: #f8f9fa; }
+        .rule-card.matched { border-left-color: #dc3545; background: #fff5f5; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <span class="navbar-brand"><i class="bi bi-soundwave"></i> 物业水泵房巡检声纹记录台</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row" id="stats-section"></div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-upload"></i> 数据导入</h5>
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#rulesModal">
+                            <i class="bi bi-list-ul"></i> 查看规则
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="flex-grow-1">
+                                <input type="file" id="importFile" class="form-control" accept=".xlsx,.xls,.csv">
+                                <small class="text-muted">支持格式: .xlsx, .xls, .csv | 必需列: pump_room, pump_name, inspection_date, inspector, noise_description</small>
+                            </div>
+                            <button id="importBtn" class="btn btn-primary"><i class="bi bi-cloud-upload"></i> 导入处理</button>
+                            <button id="exportBtn" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> 导出全部</button>
+                        </div>
+                        <div id="importResult" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-table"></i> 巡检记录列表</h5>
+                        <div class="d-flex gap-2">
+                            <select id="filterLevel" class="form-select form-select-sm" style="width: 120px;">
+                                <option value="">全部级别</option>
+                                <option value="normal">正常</option>
+                                <option value="warning">预警</option>
+                                <option value="alert">告警</option>
+                                <option value="critical">严重</option>
+                            </select>
+                            <select id="filterStatus" class="form-select form-select-sm" style="width: 120px;">
+                                <option value="">全部状态</option>
+                                <option value="pending">待复核</option>
+                                <option value="reviewed">已复核</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>记录ID</th>
+                                        <th>泵房</th>
+                                        <th>水泵</th>
+                                        <th>巡检日期</th>
+                                        <th>巡检人</th>
+                                        <th>异响描述</th>
+                                        <th>RMS</th>
+                                        <th>峰值频率</th>
+                                        <th>异常类型</th>
+                                        <th>级别</th>
+                                        <th>置信度</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-xl" id="detailModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">记录详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detailContent"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">人工复核</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reviewForm">
+                        <input type="hidden" id="reviewRecordId">
+                        <div class="mb-3">
+                            <label class="form-label">复核人</label>
+                            <input type="text" class="form-control" id="reviewer" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">最终异常类型</label>
+                            <input type="text" class="form-control" id="finalType" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">最终异常级别</label>
+                            <select class="form-select" id="finalLevel">
+                                <option value="normal">正常</option>
+                                <option value="warning">预警</option>
+                                <option value="alert">告警</option>
+                                <option value="critical">严重</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">复核意见</label>
+                            <textarea class="form-control" id="reviewComment" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="submitReview">提交复核</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rulesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-lightbulb"></i> 异常分类规则（可解释）</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="rulesContent">
+                    <div class="text-center"><i class="bi bi-hourglass-split"></i> 加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPage = 1;
+        let perPage = 10;
+
+        function getLevelBadge(level) {
+            const map = {
+                'normal': '<span class="badge badge-level-normal">正常</span>',
+                'warning': '<span class="badge badge-level-warning">预警</span>',
+                'alert': '<span class="badge badge-level-alert">告警</span>',
+                'critical': '<span class="badge badge-level-critical">严重</span>'
+            };
+            return map[level] || '<span class="badge bg-secondary">' + level + '</span>';
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'reviewed') {
+                return '<span class="badge bg-success">已复核</span>';
+            }
+            return '<span class="badge bg-warning text-dark">待复核</span>';
+        }
+
+        function loadStats() {
+            $.get('/api/stats', function(res) {
+                if (res.success) {
+                    const s = res.data;
+                    $('#stats-section').html(`
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="stat-number text-primary">${s.total_records}</div>
+                                <div class="stat-label">总记录数</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="stat-number text-success">${s.normal_count}</div>
+                                <div class="stat-label">正常</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="stat-number text-warning">${s.warning_count + s.alert_count}</div>
+                                <div class="stat-label">异常(预警/告警)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card">
+                                <div class="stat-number text-danger">${s.critical_count}</div>
+                                <div class="stat-label">严重异常</div>
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function loadRecords() {
+            const level = $('#filterLevel').val();
+            const status = $('#filterStatus').val();
+            let url = `/api/records?page=${currentPage}&per_page=${perPage}`;
+            if (level) url += `&level=${level}`;
+            if (status) url += `&status=${status}`;
+
+            $.get(url, function(res) {
+                if (res.success) {
+                    const data = res.data;
+                    let html = '';
+                    
+                    if (data.records.length === 0) {
+                        html = '<tr><td colspan="13" class="text-center py-4">暂无数据，请先导入巡检记录</td></tr>';
+                    } else {
+                        data.records.forEach(r => {
+                            html += `
+                                <tr>
+                                    <td><small>${r.record_id}</small></td>
+                                    <td>${r.pump_room}</td>
+                                    <td>${r.pump_name}</td>
+                                    <td><small>${r.inspection_date}</small></td>
+                                    <td>${r.inspector}</td>
+                                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${r.noise_description}">${r.noise_description}</td>
+                                    <td>${r.rms_level ? r.rms_level.toFixed(3) : '-'}</td>
+                                    <td>${r.peak_frequency ? r.peak_frequency.toFixed(0) + 'Hz' : '-'}</td>
+                                    <td><small>${r.anomaly_type}</small></td>
+                                    <td>${getLevelBadge(r.anomaly_level)}</td>
+                                    <td>${r.confidence_score ? (r.confidence_score * 100).toFixed(0) + '%' : '-'}</td>
+                                    <td>${getStatusBadge(r.status)}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewDetail('${r.record_id}')"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success" onclick="openReview('${r.record_id}')"><i class="bi bi-check2-square"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    $('#recordsTable').html(html);
+
+                    let pager = '';
+                    if (data.total_pages > 1) {
+                        for (let i = 1; i <= data.total_pages; i++) {
+                            const active = i === currentPage ? 'active' : '';
+                            pager += `<li class="page-item ${active}"><a class="page-link" href="#" onclick="goToPage(${i})">${i}</a></li>`;
+                        }
+                    }
+                    $('#pagination').html(pager);
+                }
+            });
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadRecords();
+            return false;
+        }
+
+        function viewDetail(recordId) {
+            $.get('/api/records/' + recordId, function(res) {
+                if (res.success) {
+                    const d = res.data;
+                    let rulesHtml = '';
+                    
+                    if (d.anomaly_result && d.anomaly_result.rule_matched && d.anomaly_result.rule_matched.length > 0) {
+                        d.anomaly_result.rule_matched.forEach(r => {
+                            rulesHtml += `
+                                <div class="rule-card matched">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>${r.rule_id} - ${r.rule_name}</strong>
+                                        <span class="badge bg-danger">已匹配</span>
+                                    </div>
+                                    <small class="text-muted">异常类型: ${r.anomaly_type} | 置信度: ${(r.confidence * 100).toFixed(0)}%</small>
+                                    <div class="mt-1"><small>${r.explanation}</small></div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        rulesHtml = '<div class="rule-card"><small>未触发异常规则</small></div>';
+                    }
+
+                    const f = d.acoustic_feature;
+                    const rmsPercent = Math.min(100, (f.rms_level / 0.5) * 100);
+                    const harmPercent = (f.harmonic_ratio || 0) * 100;
+
+                    $('#detailContent').html(`
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary"><i class="bi bi-file-text"></i> 巡检基本信息</h6>
+                                <table class="table table-sm">
+                                    <tr><th width="100">记录ID</th><td>${d.inspection.record_id}</td></tr>
+                                    <tr><th>泵房</th><td>${d.inspection.pump_room}</td></tr>
+                                    <tr><th>水泵名称</th><td>${d.inspection.pump_name}</td></tr>
+                                    <tr><th>巡检日期</th><td>${d.inspection.inspection_date}</td></tr>
+                                    <tr><th>巡检人</th><td>${d.inspection.inspector}</td></tr>
+                                    <tr><th>批次ID</th><td>${d.inspection.batch_id}</td></tr>
+                                </table>
+                                <div class="alert alert-info">
+                                    <strong>异响描述:</strong> ${d.inspection.noise_description}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success"><i class="bi bi-graph-up"></i> 声纹特征（占位提取）</h6>
+                                <div class="feature-container">
+                                    <div class="d-flex justify-content-between"><small>RMS能量值</small><small>${f.rms_level.toFixed(4)}</small></div>
+                                    <div class="feature-bar" style="width: ${rmsPercent}%"></div>
+                                    <small class="text-muted">正常阈值: &le; 0.12</small>
+                                </div>
+                                <div class="feature-container">
+                                    <div class="d-flex justify-content-between"><small>峰值频率</small><small>${f.peak_frequency.toFixed(0)} Hz</small></div>
+                                    <small class="text-muted">高频异常阈值: &gt; 3000Hz</small>
+                                </div>
+                                <div class="feature-container">
+                                    <div class="d-flex justify-content-between"><small>频谱质心</small><small>${f.spectral_centroid.toFixed(0)}</small></div>
+                                </div>
+                                <div class="feature-container">
+                                    <div class="d-flex justify-content-between"><small>谐波比</small><small>${f.harmonic_ratio.toFixed(4)}</small></div>
+                                    <div class="feature-bar" style="width: ${harmPercent}%; background: linear-gradient(90deg, #dc3545, #28a745)"></div>
+                                    <small class="text-muted">低谐波异常阈值: &lt; 0.5</small>
+                                </div>
+                                <div class="feature-container">
+                                    <small class="text-muted">匹配的噪声关键词:</small>
+                                    <div>
+                                        ${f.noise_type_keywords.map(k => `<span class="badge bg-secondary me-1">${k}</span>`).join('')}
+                                    </div>
+                                </div>
+                                <small class="text-muted">提取方法: ${f.extraction_method}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> 异常分类结果</h6>
+                            <div class="d-flex gap-3 mb-2">
+                                <span><strong>类型:</strong> ${d.anomaly_result.anomaly_type}</span>
+                                <span><strong>级别:</strong> ${getLevelBadge(d.anomaly_result.anomaly_level)}</span>
+                                <span><strong>置信度:</strong> ${(d.anomaly_result.confidence_score * 100).toFixed(0)}%</span>
+                            </div>
+                            <h6 class="text-muted mt-3"><small><i class="bi bi-lightbulb"></i> 匹配规则（可解释）:</small></h6>
+                            ${rulesHtml}
+                        </div>
+
+                        ${d.review ? `
+                            <div class="mt-4 border-top pt-3">
+                                <h6><i class="bi bi-check-circle-fill text-success"></i> 复核信息</h6>
+                                <table class="table table-sm">
+                                    <tr><th width="100">复核人</th><td>${d.review.reviewer}</td></tr>
+                                    <tr><th>最终类型</th><td>${d.review.final_anomaly_type}</td></tr>
+                                    <tr><th>最终级别</th><td>${getLevelBadge(d.review.final_anomaly_level)}</td></tr>
+                                    <tr><th>复核意见</th><td>${d.review.review_comment || '-'}</td></tr>
+                                    <tr><th>复核时间</th><td>${d.review.reviewed_at}</td></tr>
+                                </table>
+                            </div>
+                        ` : ''}
+                    `);
+                    
+                    new bootstrap.Modal(document.getElementById('detailModal')).show();
+                }
+            });
+        }
+
+        function openReview(recordId) {
+            $('#reviewRecordId').val(recordId);
+            $('#reviewer').val('');
+            $('#finalType').val('');
+            $('#finalLevel').val('normal');
+            $('#reviewComment').val('');
+            new bootstrap.Modal(document.getElementById('reviewModal')).show();
+        }
+
+        $('#submitReview').click(function() {
+            const data = {
+                reviewer: $('#reviewer').val(),
+                final_type: $('#finalType').val(),
+                final_level: $('#finalLevel').val(),
+                comment: $('#reviewComment').val()
+            };
+            
+            if (!data.reviewer || !data.final_type) {
+                alert('请填写复核人和最终异常类型');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/records/' + $('#reviewRecordId').val() + '/review',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(res) {
+                    if (res.success) {
+                        alert('复核完成');
+                        bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+                        loadRecords();
+                        loadStats();
+                    } else {
+                        alert('复核失败: ' + res.message);
+                    }
+                }
+            });
+        });
+
+        $('#importBtn').click(function() {
+            const file = $('#importFile')[0].files[0];
+            if (!file) {
+                alert('请选择文件');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            $('#importBtn').prop('disabled', true).text('处理中...');
+
+            $.ajax({
+                url: '/api/import',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    $('#importBtn').prop('disabled', false).html('<i class="bi bi-cloud-upload"></i> 导入处理');
+                    
+                    if (res.success) {
+                        let msg = `<div class="alert alert-success">
+                            <strong>处理完成!</strong> 批次ID: ${res.batch_id}<br>
+                            原始记录: ${res.total_records} | 清洗后: ${res.cleaned_records} | 新增: ${res.new_records}<br>
+                            正常: ${res.normal_count} | 异常: ${res.anomaly_count}<br>
+                            ${res.duplicate ? '<em class="text-warning">该批次已存在，跳过重复处理</em>' : ''}
+                        </div>`;
+                        $('#importResult').html(msg);
+                        loadRecords();
+                        loadStats();
+                    } else {
+                        $('#importResult').html('<div class="alert alert-danger">' + res.message + '</div>');
+                    }
+                },
+                error: function() {
+                    $('#importBtn').prop('disabled', false).html('<i class="bi bi-cloud-upload"></i> 导入处理');
+                    $('#importResult').html('<div class="alert alert-danger">上传失败</div>');
+                }
+            });
+        });
+
+        $('#exportBtn').click(function() {
+            window.location.href = '/api/export';
+        });
+
+        $('#filterLevel, #filterStatus').change(function() {
+            currentPage = 1;
+            loadRecords();
+        });
+
+        $('#rulesModal').on('show.bs.modal', function() {
+            $.get('/api/rules', function(res) {
+                if (res.success) {
+                    let html = '';
+                    res.data.forEach(r => {
+                        html += `
+                            <div class="rule-card">
+                                <div class="d-flex justify-content-between">
+                                    <strong>${r.id} - ${r.name}</strong>
+                                    ${getLevelBadge(r.anomaly_level)}
+                                </div>
+                                <small class="text-muted">置信度基础值: ${(r.confidence_base * 100).toFixed(0)}%</small>
+                                <div class="mt-1">
+                                    <strong>触发条件:</strong> <code>${r.condition}</code>
+                                </div>
+                                <div class="mt-1 text-muted">
+                                    <i class="bi bi-info-circle"></i> ${r.explanation}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    $('#rulesContent').html(html);
+                }
+            });
+        });
+
+        loadStats();
+        loadRecords();
+    </script>
+</body>
+</html>
