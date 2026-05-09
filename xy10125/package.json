@@ -1,0 +1,14 @@
+{
+  "name": "parking-planner",
+  "version": "1.0.0",
+  "description": "停车场泊位拖拽规划器",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

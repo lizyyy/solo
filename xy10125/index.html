@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>停车场泊位拖拽规划器</title>
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>停车场泊位拖拽规划器</h1>
+      <div class="header-actions">
+        <button id="btn-save">保存方案</button>
+        <button id="btn-load">加载方案</button>
+        <button id="btn-export">导出报告</button>
+        <button id="btn-clear">清空</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>工具栏</h3>
+          <div class="tool-buttons">
+            <button class="tool-btn active" data-tool="select">选择</button>
+            <button class="tool-btn" data-tool="parking">添加泊位</button>
+            <button class="tool-btn" data-tool="fireLane">添加消防通道</button>
+            <button class="tool-btn" data-tool="turningRadius">添加转弯区域</button>
+            <button class="tool-btn" data-tool="obstacle">添加障碍物</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>泊位设置</h3>
+          <div class="form-group">
+            <label>宽度 (米)</label>
+            <input type="number" id="spot-width" value="2.5" min="1" max="5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>长度 (米)</label>
+            <input type="number" id="spot-length" value="5.0" min="3" max="8" step="0.1">
+          </div>
+          <div class="form-group">
+            <label>角度 (°)</label>
+            <input type="number" id="spot-angle" value="0" min="0" max="360" step="1">
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>回放控制</h3>
+          <div class="playback-controls">
+            <button id="btn-play">播放</button>
+            <button id="btn-pause">暂停</button>
+            <button id="btn-reset">重置</button>
+          </div>
+          <div class="form-group">
+            <label>回放速度</label>
+            <input type="range" id="playback-speed" min="0.5" max="3" step="0.1" value="1">
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>统计信息</h3>
+          <div class="stats" id="stats">
+            <p>泊位数量: <span id="stat-spots">0</span></p>
+            <p>消防通道: <span id="stat-fire-lanes">0</span></p>
+            <p>转弯区域: <span id="stat-turning">0</span></p>
+            <p>异常数量: <span id="stat-anomalies">0</span></p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="canvas-container">
+        <canvas id="parking-canvas"></canvas>
+        <div class="canvas-info">
+          <span id="coord-info">坐标: (0, 0) 米</span>
+          <span id="scale-info">比例: 1:50</span>
+        </div>
+      </main>
+
+      <aside class="anomaly-panel">
+        <h3>异常检测</h3>
+        <div id="anomaly-list">
+          <p class="no-anomalies">暂无异常</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept=".json" style="display: none;">
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
