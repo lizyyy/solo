@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: outsourcing-inspection
+  datasource:
+    url: jdbc:mysql://localhost:3306/outsourcing_inspection?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+app:
+  jwt:
+    secret: outsourcing-inspection-service-jwt-secret-key-2024-for-production-use-please-change
+    expiration-ms: 86400000
+
+logging:
+  level:
+    com.manufacture.outsourcing: DEBUG
+    org.springframework.security: INFO
