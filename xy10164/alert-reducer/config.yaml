@@ -1,0 +1,107 @@
+# Alert Reducer Configuration
+
+# 告警合并配置
+merge:
+  # 合并窗口（分钟）
+  window_minutes: 15
+  # 合并规则：根据这些字段相同的告警会被合并
+  merge_by:
+    - alertname
+    - severity
+    - job
+    - instance
+  # 合并后的告警数量阈值：超过此数量时升级
+  count_threshold: 5
+
+# 告警抑制规则
+suppression_rules:
+  # 规则ID
+  - id: "suppress_low_priority_night"
+    name: "夜间抑制低优先级告警"
+    description: "在夜间（22:00-06:00）抑制所有P3及以下优先级告警"
+    # 时间范围
+    time_range:
+      start: "22:00"
+      end: "06:00"
+    # 优先级条件
+    severity:
+      - "P3"
+      - "P4"
+      - "P5"
+    # 状态：active 或 inactive
+    status: "active"
+  
+  - id: "suppress_info_alerts"
+    name: "抑制信息级别告警"
+    description: "始终抑制所有信息级别告警"
+    severity:
+      - "info"
+      - "debug"
+    status: "active"
+  
+  - id: "suppress_maintenance"
+    name: "抑制维护期间告警"
+    description: "在维护期间抑制特定服务的告警"
+    # 标签条件
+    labels:
+      environment: "maintenance"
+    status: "inactive"
+
+# 告警升级策略
+escalation_strategies:
+  # 策略ID
+  - id: "critical_alert_immediate"
+    name: "严重告警立即升级"
+    description: "P1级告警立即升级"
+    conditions:
+      severity: "P1"
+      # 告警持续时间（秒）
+      duration: 0
+    actions:
+      - type: "escalate"
+        level: "critical"
+        notify:
+          - "oncall"
+          - "team_lead"
+  
+  - id: "high_alert_10min"
+    name: "高优先级告警10分钟升级"
+    description: "P2级告警持续10分钟未解决升级"
+    conditions:
+      severity: "P2"
+      duration: 600
+    actions:
+      - type: "escalate"
+        level: "high"
+        notify:
+          - "oncall"
+  
+  - id: "merged_alert_high_count"
+    name: "合并告警数量过多升级"
+    description: "合并的告警数量超过阈值时升级"
+    conditions:
+      merged_count_gt: 10
+    actions:
+      - type: "escalate"
+        level: "high"
+        notify:
+          - "oncall"
+
+# 夜间时段定义（用于特殊处理）
+night_hours:
+  start: "22:00"
+  end: "06:00"
+
+# 数据库配置
+database:
+  # SQLite数据库路径
+  path: "alerts.db"
+
+# 日志配置
+logging:
+  # 日志级别
+  level: "INFO"
+  # 日志文件路径
+  file: "alert_reducer.log"
+  # 是否记录到文件
+  log_to_file: true

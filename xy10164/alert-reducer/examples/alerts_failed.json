@@ -1,0 +1,46 @@
+[
+  {
+    "labels": {
+      "alertname": "NetworkError",
+      "severity": "P2",
+      "job": "network",
+      "instance": "switch-01"
+    },
+    "annotations": {
+      "summary": "网络连接错误",
+      "description": "交换机 switch-01 出现网络连接错误"
+    },
+    "startsAt": "invalid_date_format",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "MissingRequiredField",
+      "severity": "P3",
+      "job": "test"
+    },
+    "annotations": {
+      "summary": "缺少必要字段"
+    },
+    "startsAt": "2026-05-09T04:00:00+08:00",
+    "endsAt": null
+  },
+  {
+    "this_is": "invalid_format",
+    "no_labels": true
+  },
+  {
+    "labels": {
+      "alertname": "ValidAlertAfterErrors",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "有效的告警",
+      "description": "这是一个有效的告警，应该能正常导入"
+    },
+    "startsAt": "2026-05-09T04:10:00+08:00",
+    "endsAt": null
+  }
+]

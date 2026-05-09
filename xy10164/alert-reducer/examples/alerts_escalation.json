@@ -1,0 +1,100 @@
+[
+  {
+    "labels": {
+      "alertname": "DatabaseDown",
+      "severity": "P1",
+      "job": "database",
+      "instance": "db-primary:5432"
+    },
+    "annotations": {
+      "summary": "主数据库宕机",
+      "description": "主数据库 db-primary 无法连接，所有数据库操作已失败"
+    },
+    "startsAt": "2026-05-09T03:45:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "ServiceUnavailable",
+      "severity": "P1",
+      "job": "api-gateway",
+      "instance": "gateway-01:80"
+    },
+    "annotations": {
+      "summary": "API网关不可用",
+      "description": "API网关 gateway-01 返回503错误，服务已中断"
+    },
+    "startsAt": "2026-05-09T03:46:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighLatency",
+      "severity": "P2",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "响应延迟过高",
+      "description": "服务器 server-01 响应延迟超过5秒，影响用户体验"
+    },
+    "startsAt": "2026-05-09T03:40:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighLatency",
+      "severity": "P2",
+      "job": "api-server",
+      "instance": "server-02:8080"
+    },
+    "annotations": {
+      "summary": "响应延迟过高",
+      "description": "服务器 server-02 响应延迟超过5秒，影响用户体验"
+    },
+    "startsAt": "2026-05-09T03:41:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighLatency",
+      "severity": "P2",
+      "job": "api-server",
+      "instance": "server-03:8080"
+    },
+    "annotations": {
+      "summary": "响应延迟过高",
+      "description": "服务器 server-03 响应延迟超过5秒，影响用户体验"
+    },
+    "startsAt": "2026-05-09T03:42:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighLatency",
+      "severity": "P2",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "响应延迟过高",
+      "description": "服务器 server-01 响应延迟超过8秒，严重影响用户体验"
+    },
+    "startsAt": "2026-05-09T03:50:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighLatency",
+      "severity": "P2",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "响应延迟过高",
+      "description": "服务器 server-01 响应延迟超过10秒，严重影响用户体验"
+    },
+    "startsAt": "2026-05-09T03:52:00+08:00",
+    "endsAt": null
+  }
+]

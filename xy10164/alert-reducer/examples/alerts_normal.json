@@ -1,0 +1,100 @@
+[
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%",
+      "description": "服务器 server-01 的CPU使用率已超过80%，当前值为85%"
+    },
+    "startsAt": "2026-05-09T03:15:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%",
+      "description": "服务器 server-01 的CPU使用率已超过80%，当前值为88%"
+    },
+    "startsAt": "2026-05-09T03:18:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighMemoryUsage",
+      "severity": "P4",
+      "job": "database",
+      "instance": "db-01:5432"
+    },
+    "annotations": {
+      "summary": "内存使用率超过70%",
+      "description": "数据库 db-01 的内存使用率已超过70%"
+    },
+    "startsAt": "2026-05-09T03:20:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "DiskSpaceLow",
+      "severity": "P3",
+      "job": "storage",
+      "instance": "storage-01:9000"
+    },
+    "annotations": {
+      "summary": "磁盘空间不足",
+      "description": "存储节点 storage-01 磁盘空间剩余不足10%"
+    },
+    "startsAt": "2026-05-09T03:22:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率超过80%",
+      "description": "服务器 server-01 的CPU使用率已超过80%，当前值为90%"
+    },
+    "startsAt": "2026-05-09T03:25:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "InfoLogWarning",
+      "severity": "info",
+      "job": "application",
+      "instance": "app-01:80"
+    },
+    "annotations": {
+      "summary": "应用日志警告",
+      "description": "应用 app-01 产生了警告级别日志"
+    },
+    "startsAt": "2026-05-09T03:30:00+08:00",
+    "endsAt": "2026-05-09T03:31:00+08:00"
+  },
+  {
+    "labels": {
+      "alertname": "DebugTrace",
+      "severity": "debug",
+      "job": "application",
+      "instance": "app-02:80"
+    },
+    "annotations": {
+      "summary": "调试追踪信息",
+      "description": "应用 app-02 产生了调试级别的追踪信息"
+    },
+    "startsAt": "2026-05-09T03:35:00+08:00",
+    "endsAt": "2026-05-09T03:35:30+08:00"
+  }
+]
