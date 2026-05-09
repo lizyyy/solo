@@ -1,0 +1,14 @@
+{
+  "name": "b2b-credit-management",
+  "version": "1.0.0",
+  "description": "B2B 赊销额度管理系统 - 完整前后端项目",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "start": "npm run start:backend & npm run start:frontend"
+  },
+  "keywords": ["B2B", "credit", "management", "erp"],
+  "author": "",
+  "license": "MIT"
+}
