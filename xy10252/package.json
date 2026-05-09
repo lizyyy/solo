@@ -1,0 +1,23 @@
+{
+  "name": "short-term-rental-lock-battery-api",
+  "version": "1.0.0",
+  "description": "短租门锁电量巡检 API - 小而完整的业务工具",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "demo": "node scripts/demo.js",
+    "demo-error": "node scripts/demo-error.js",
+    "test": "node scripts/test.js"
+  },
+  "keywords": ["short-term-rental", "smart-lock", "battery-monitoring", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
