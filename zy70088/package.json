@@ -1,0 +1,22 @@
+{
+  "name": "government-hotline-ticket-merge-service",
+  "version": "1.0.0",
+  "description": "政务热线工单合并服务 - 解决同一事件被多个市民重复投诉的问题",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node tests/run-test.js",
+    "init-data": "node scripts/init-test-data.js",
+    "reset": "node scripts/reset-db.js"
+  },
+  "keywords": ["government", "hotline", "ticket", "merge", "clustering"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "express": "^4.19.0",
+    "csv-writer": "^1.6.0",
+    "date-fns": "^3.6.0"
+  }
+}
