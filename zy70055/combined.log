@@ -1,0 +1,12 @@
+{"level":"info","message":"数据库连接成功","timestamp":"2026-05-09T15:08:44.317Z"}
+{"level":"info","message":"服务器启动成功: http://localhost:3000","timestamp":"2026-05-09T15:08:44.320Z"}
+{"level":"info","message":"GET /","timestamp":"2026-05-09T15:09:07.153Z"}
+{"level":"info","message":"GET /api/reports/dashboard","timestamp":"2026-05-09T15:09:11.621Z"}
+{"level":"info","message":"GET /api/exceptions/pending","timestamp":"2026-05-09T15:09:13.961Z"}
+{"level":"info","message":"GET /api/batches","timestamp":"2026-05-09T15:09:23.527Z"}
+{"level":"info","message":"POST /api/reports/batches/cmoyhb0wq000aa3693qm6kwd8/generate","timestamp":"2026-05-09T15:09:28.784Z"}
+{"level":"info","message":"[finance_user] 生成出款报表: RPT-20260509-D899A98F","timestamp":"2026-05-09T15:09:28.791Z"}
+{"level":"info","message":"POST /api/reports/batches/cmoyhb0wq000aa3693qm6kwd8/mark-paid","timestamp":"2026-05-09T15:09:35.051Z"}
+{"level":"info","message":"[finance_user] 标记已出款: 批次 BATCH-NORMAL-1778339304025","timestamp":"2026-05-09T15:09:35.058Z"}
+{"level":"info","message":"POST /api/batches/cmoyhb0wq000aa3693qm6kwd8/mark-paid","timestamp":"2026-05-09T15:09:40.124Z"}
+{"level":"info","message":"POST /api/reports/batches/cmoyhb0wq000aa3693qm6kwd8/mark-paid","timestamp":"2026-05-09T15:09:46.243Z"}
