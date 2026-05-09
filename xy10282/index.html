@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口译设备借还电量台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>口译设备借还电量台</h1>
+            <div class="timestamp">当前时间：<span id="currentTime"></span></div>
+        </header>
+        
+        <nav>
+            <button class="nav-btn active" data-tab="dashboard">工作台</button>
+            <button class="nav-btn" data-tab="devices">设备档案</button>
+            <button class="nav-btn" data-tab="borrow">借还登记</button>
+            <button class="nav-btn" data-tab="check">电量检查</button>
+            <button class="nav-btn" data-tab="problems">问题列表</button>
+            <button class="nav-btn" data-tab="audit">操作记录</button>
+        </nav>
+        
+        <main>
+            <section id="dashboard" class="tab-content active">
+                <h2>工作台</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>设备总数</h3>
+                        <p id="stat-total">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>可用设备</h3>
+                        <p id="stat-available">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>借出中</h3>
+                        <p id="stat-borrowed">0</p>
+                    </div>
+                    <div class="stat-card warning">
+                        <h3>待处理问题</h3>
+                        <p id="stat-problems">0</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h3>快捷操作</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="app.switchTab('borrow')">📥 借出登记</button>
+                        <button class="action-btn" onclick="app.switchTab('borrow')">📤 归还登记</button>
+                        <button class="action-btn" onclick="app.switchTab('check')">🔋 电量检查</button>
+                        <button class="action-btn" onclick="app.switchTab('devices')">➕ 新增设备</button>
+                    </div>
+                </div>
+                
+                <div class="recent-activity">
+                    <h3>最近操作</h3>
+                    <div id="recent-activity-list" class="activity-list"></div>
+                </div>
+            </section>
+            
+            <section id="devices" class="tab-content">
+                <h2>设备档案</h2>
+                <div class="card">
+                    <h3>新增设备</h3>
+                    <form id="deviceForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>设备编号 *</label>
+                                <input type="text" id="deviceId" placeholder="如：INT-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>设备名称 *</label>
+                                <input type="text" id="deviceName" placeholder="如：博世接收机" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>频道范围 *</label>
+                                <input type="text" id="channelRange" placeholder="如：1-16" required>
+                            </div>
+                            <div class="form-group">
+                                <label>标准配件</label>
+                                <input type="text" id="accessories" placeholder="如：耳机,电池盒,挂绳">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>初始电量 (%)</label>
+                                <input type="number" id="initialBattery" min="0" max="100" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>备注</label>
+                                <input type="text" id="deviceNotes" placeholder="可选">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">保存设备</button>
+                    </form>
+                    <div id="deviceFormFeedback" class="feedback"></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>设备列表</h3>
+                        <div class="search-box">
+                            <input type="text" id="deviceSearch" placeholder="搜索设备编号或名称...">
+                            <select id="deviceStatusFilter">
+                                <option value="all">全部状态</option>
+                                <option value="available">可用</option>
+                                <option value="borrowed">借出中</option>
+                                <option value="maintenance">维护中</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="deviceList" class="data-table"></div>
+                </div>
+            </section>
+            
+            <section id="borrow" class="tab-content">
+                <h2>借还登记</h2>
+                <div class="tabs-sub">
+                    <button class="tab-sub-btn active" data-subtab="borrow-out">借出登记</button>
+                    <button class="tab-sub-btn" data-subtab="borrow-in">归还登记</button>
+                </div>
+                
+                <div id="borrow-out" class="subtab-content active">
+                    <div class="card">
+                        <h3>借出设备</h3>
+                        <form id="borrowOutForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>设备编号 *</label>
+                                    <select id="borrowDeviceId" required>
+                                        <option value="">请选择可用设备</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>借用人 *</label>
+                                    <input type="text" id="borrowerName" placeholder="借用人姓名" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>借出频道 *</label>
+                                    <input type="number" id="borrowChannel" placeholder="如：5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>会议场次</label>
+                                    <input type="text" id="meetingSession" placeholder="如：主会场上午">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>借出时电量检查 (%)</label>
+                                    <input type="number" id="borrowBattery" min="0" max="100" value="80">
+                                </div>
+                                <div class="form-group">
+                                    <label>借出配件检查</label>
+                                    <input type="text" id="borrowAccessories" placeholder="如：耳机,挂绳">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>备注</label>
+                                <textarea id="borrowNotes" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">确认借出</button>
+                        </form>
+                        <div id="borrowOutFeedback" class="feedback"></div>
+                    </div>
+                </div>
+                
+                <div id="borrow-in" class="subtab-content">
+                    <div class="card">
+                        <h3>归还设备</h3>
+                        <form id="borrowInForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>设备编号 *</label>
+                                    <select id="returnDeviceId" required>
+                                        <option value="">请选择借出设备</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>归还人</label>
+                                    <input type="text" id="returnerName" placeholder="归还人姓名">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>归还时电量 (%) *</label>
+                                    <input type="number" id="returnBattery" min="0" max="100" placeholder="如：30" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>归还频道</label>
+                                    <input type="number" id="returnChannel" placeholder="如：5">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>配件归还情况</label>
+                                <input type="text" id="returnAccessories" placeholder="如：耳机,挂绳（缺电池盒）">
+                            </div>
+                            <div class="form-group">
+                                <label>备注</label>
+                                <textarea id="returnNotes" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">确认归还</button>
+                        </form>
+                        <div id="borrowInFeedback" class="feedback"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>借还记录</h3>
+                    <div id="borrowHistory" class="data-table"></div>
+                </div>
+            </section>
+            
+            <section id="check" class="tab-content">
+                <h2>电量检查</h2>
+                <div class="card">
+                    <h3>批量检查设备</h3>
+                    <div class="check-options">
+                        <div class="form-group">
+                            <label>检查模式</label>
+                            <select id="checkMode">
+                                <option value="single">单设备检查</option>
+                                <option value="batch">批量检查</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="singleCheckPanel">
+                        <form id="singleCheckForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>设备编号 *</label>
+                                    <select id="checkDeviceId" required>
+                                        <option value="">请选择设备</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>当前电量 (%) *</label>
+                                    <input type="number" id="checkBattery" min="0" max="100" placeholder="如：85" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>当前频道</label>
+                                    <input type="number" id="checkChannel" placeholder="如：5">
+                                </div>
+                                <div class="form-group">
+                                    <label>配件检查</label>
+                                    <input type="text" id="checkAccessories" placeholder="如：耳机,挂绳">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>备注</label>
+                                <textarea id="checkNotes" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">提交检查</button>
+                        </form>
+                        <div id="singleCheckFeedback" class="feedback"></div>
+                    </div>
+                    
+                    <div id="batchCheckPanel" style="display:none">
+                        <div class="form-group">
+                            <label>批量输入 (每行一条：设备编号,电量,频道,配件)</label>
+                            <textarea id="batchInput" rows="6" placeholder="INT-001,85,5,耳机,挂绳&#10;INT-002,30,3,耳机&#10;INT-003,95,,"></textarea>
+                        </div>
+                        <button id="batchCheckBtn" class="btn-primary">批量检查</button>
+                        <div id="batchCheckFeedback" class="feedback"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>检查记录</h3>
+                        <div class="search-box">
+                            <select id="checkResultFilter">
+                                <option value="all">全部结果</option>
+                                <option value="pass">通过</option>
+                                <option value="warning">警告</option>
+                                <option value="fail">不通过</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="checkHistory" class="data-table"></div>
+                </div>
+            </section>
+            
+            <section id="problems" class="tab-content">
+                <h2>问题列表</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>异常/脏数据记录</h3>
+                        <div class="search-box">
+                            <select id="problemTypeFilter">
+                                <option value="all">全部类型</option>
+                                <option value="battery">电量问题</option>
+                                <option value="channel">频道问题</option>
+                                <option value="accessory">配件问题</option>
+                                <option value="data">数据异常</option>
+                            </select>
+                            <select id="problemStatusFilter">
+                                <option value="all">全部状态</option>
+                                <option value="open">待处理</option>
+                                <option value="resolved">已解决</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="problemList" class="data-table"></div>
+                </div>
+            </section>
+            
+            <section id="audit" class="tab-content">
+                <h2>操作记录</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>完整操作审计</h3>
+                        <div class="search-box">
+                            <select id="auditTypeFilter">
+                                <option value="all">全部类型</option>
+                                <option value="device">设备操作</option>
+                                <option value="borrow">借还操作</option>
+                                <option value="check">检查操作</option>
+                                <option value="problem">问题操作</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="auditLog" class="data-table"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <div id="toast-container"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
