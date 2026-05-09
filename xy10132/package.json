@@ -1,0 +1,13 @@
+{
+  "name": "port-crane-game",
+  "version": "1.0.0",
+  "description": "港口吊机装箱节奏游戏",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/game.test.js"
+  },
+  "keywords": ["game", "rhythm", "port", "crane"],
+  "author": "",
+  "license": "MIT"
+}
