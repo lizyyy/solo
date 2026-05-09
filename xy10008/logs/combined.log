@@ -1,0 +1,35 @@
+{"intervalMs":3000,"level":"info","message":"Task processor started","service":"bill-splitting-system","timestamp":"2026-05-09 14:15:42"}
+{"level":"info","message":"Bill splitting system server running on port 3000","service":"bill-splitting-system","timestamp":"2026-05-09 14:15:42"}
+{"level":"info","message":"Environment: development","service":"bill-splitting-system","timestamp":"2026-05-09 14:15:42"}
+{"level":"info","message":"Received SIGTERM, starting graceful shutdown...","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:10"}
+{"intervalMs":3000,"level":"info","message":"Task processor started","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:19"}
+{"level":"info","message":"Bill splitting system server running on port 3001","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:19"}
+{"level":"info","message":"Environment: development","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:19"}
+{"ip":"::1","level":"info","message":"GET /health","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:30","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"POST /api/users","requestId":"test-user-1","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:40","userAgent":"curl/8.7.1"}
+{"entityId":"5661ecd1-2efc-41e0-816e-f04f8f7fbad5","entityType":"USER","level":"info","logId":1,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:40"}
+{"ip":"::1","level":"info","message":"POST /api/users","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:47","userAgent":"curl/8.7.1"}
+{"entityId":"5c884243-8e2d-4eab-9d85-7740d8ce1920","entityType":"USER","level":"info","logId":2,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:47"}
+{"ip":"::1","level":"info","message":"POST /api/users","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:47","userAgent":"curl/8.7.1"}
+{"entityId":"ffa8bc90-f3b0-4531-ab50-8feaf90475c7","entityType":"USER","level":"info","logId":3,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:47"}
+{"ip":"::1","level":"info","message":"GET /api/users","service":"bill-splitting-system","timestamp":"2026-05-09 14:16:47","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"GET /api/bills","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:20","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"GET /api/bills/balance","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:20","userAgent":"curl/8.7.1"}
+{"ip":"::1","level":"info","message":"GET /api/audit","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:20","userAgent":"curl/8.7.1"}
+{"level":"info","message":"Received SIGTERM, starting graceful shutdown...","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:36"}
+{"intervalMs":3000,"level":"info","message":"Task processor started","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:46"}
+{"level":"info","message":"Bill splitting system server running on port 3001","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:46"}
+{"level":"info","message":"Environment: development","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:46"}
+{"ip":"::1","level":"info","message":"GET /api/bills/balance","service":"bill-splitting-system","timestamp":"2026-05-09 14:17:57","userAgent":"curl/8.7.1"}
+{"entityId":"8d189a03-e517-4b77-9a00-825998fdb477","entityType":"USER","level":"info","logId":4,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"entityId":"267c9826-bf3d-45bc-b932-39bcff84b91c","entityType":"USER","level":"info","logId":5,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"entityId":"cf6467bf-0a8f-4b4c-b2a5-abea05c73d66","entityType":"USER","level":"info","logId":6,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"entityId":"4f4fb579-ec19-49e5-b8f6-68bfdb1ce161","entityType":"BILL","level":"info","logId":7,"message":"Audit log created","operation":"CREATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"entityId":"4f4fb579-ec19-49e5-b8f6-68bfdb1ce161","entityType":"BILL","level":"info","logId":8,"message":"Audit log created","operation":"UPDATE","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"billId":"4f4fb579-ec19-49e5-b8f6-68bfdb1ce161","error":"Bill has been modified by another user. Please refresh and try again.","level":"error","message":"Failed to update bill","service":"bill-splitting-system","timestamp":"2026-05-09 14:19:49"}
+{"ip":"::1","level":"info","message":"GET /","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
+{"ip":"::1","level":"info","message":"GET /app.js","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
+{"ip":"::1","level":"info","message":"GET /api/users","requestId":"req_1778307612858_nq0vy608t","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
+{"ip":"::1","level":"info","message":"GET /api/bills","requestId":"req_1778307612859_tfizk295y","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
+{"ip":"::1","level":"info","message":"GET /api/users","requestId":"req_1778307612859_b3kiwm938","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
+{"ip":"::1","level":"info","message":"GET /@vite/client","service":"bill-splitting-system","timestamp":"2026-05-09 14:20:12","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) TraeCN/1.107.1 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36"}
