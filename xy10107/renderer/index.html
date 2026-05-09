@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>票据扫描归档桌面台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-left">
+        <h1>📄 票据扫描归档桌面台</h1>
+      </div>
+      <div class="header-right">
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-label">总计</span>
+            <span class="stat-value" id="stat-total">0</span>
+          </div>
+          <div class="stat-item warning">
+            <span class="stat-label">待复核</span>
+            <span class="stat-value" id="stat-pending">0</span>
+          </div>
+          <div class="stat-item success">
+            <span class="stat-label">已复核</span>
+            <span class="stat-value" id="stat-reviewed">0</span>
+          </div>
+          <div class="stat-item info">
+            <span class="stat-label">总金额</span>
+            <span class="stat-value" id="stat-amount">¥0.00</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <aside class="sidebar">
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tab="invoices">
+            <span class="nav-icon">📋</span>
+            <span class="nav-text">票据列表</span>
+          </button>
+          <button class="nav-item" data-tab="history">
+            <span class="nav-icon">📜</span>
+            <span class="nav-text">操作历史</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-actions">
+          <button class="btn btn-primary btn-block" id="btn-import">
+            <span>📥</span> 导入票据文件
+          </button>
+          <button class="btn btn-secondary btn-block" id="btn-export">
+            <span>📤</span> 导出清单
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <section class="tab-content active" id="tab-invoices">
+          <div class="toolbar">
+            <div class="filter-group">
+              <select id="filter-status" class="form-control">
+                <option value="">全部状态</option>
+                <option value="pending">待复核</option>
+                <option value="reviewed">已复核</option>
+              </select>
+              <input type="text" id="search-input" class="form-control" placeholder="搜索文件名、项目号、审批单...">
+              <button class="btn btn-outline" id="btn-refresh">
+                🔄 刷新
+              </button>
+            </div>
+          </div>
+
+          <div class="content-area">
+            <div class="invoice-panel">
+              <div class="invoice-list-container">
+                <table class="invoice-table" id="invoice-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px;">选中</th>
+                      <th>文件名</th>
+                      <th style="width: 120px;">项目号</th>
+                      <th style="width: 120px;">审批单号</th>
+                      <th style="width: 100px;">金额</th>
+                      <th style="width: 90px;">状态</th>
+                      <th style="width: 150px;">创建时间</th>
+                      <th style="width: 180px;">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="invoice-list-body">
+                    <tr class="empty-row">
+                      <td colspan="8">
+                        <div class="empty-state">
+                          <p>暂无票据数据</p>
+                          <p class="hint">点击"导入票据文件"开始使用</p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="detail-panel" id="detail-panel">
+              <div class="detail-empty" id="detail-empty">
+                <div class="empty-icon">👈</div>
+                <p>请从左侧列表选择一张票据</p>
+              </div>
+
+              <div class="detail-content" id="detail-content" style="display: none;">
+                <div class="detail-header">
+                  <h3 id="detail-filename">文件名</h3>
+                  <div class="status-badge" id="detail-status">待复核</div>
+                </div>
+
+                <div class="detail-body">
+                  <div class="preview-section">
+                    <h4>文件预览</h4>
+                    <div class="preview-container" id="preview-container">
+                      <div class="preview-placeholder" id="preview-placeholder">
+                        <div class="preview-icon">📁</div>
+                        <p>加载预览中...</p>
+                      </div>
+                    </div>
+                    <div class="preview-actions">
+                      <button class="btn btn-sm btn-outline" id="btn-open-file">打开文件</button>
+                      <button class="btn btn-sm btn-outline" id="btn-show-in-folder">在文件夹中显示</button>
+                    </div>
+                  </div>
+
+                  <div class="form-section">
+                    <h4>票据信息</h4>
+                    <form id="invoice-form">
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="form-project-no">项目号 <span class="required">*</span></label>
+                          <input type="text" id="form-project-no" class="form-control" placeholder="输入项目号">
+                        </div>
+                        <div class="form-group">
+                          <label for="form-approval-no">审批单号</label>
+                          <input type="text" id="form-approval-no" class="form-control" placeholder="输入审批单号">
+                        </div>
+                      </div>
+
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="form-amount">金额</label>
+                          <input type="number" id="form-amount" class="form-control" placeholder="0.00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                          <label for="form-invoice-date">开票日期</label>
+                          <input type="date" id="form-invoice-date" class="form-control">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="form-notes">备注</label>
+                        <textarea id="form-notes" class="form-control" rows="3" placeholder="添加备注..."></textarea>
+                      </div>
+
+                      <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="btn-save">💾 保存</button>
+                        <button type="button" class="btn btn-success" id="btn-review" style="display: none;">✅ 复核通过</button>
+                        <button type="button" class="btn btn-warning" id="btn-unreview" style="display: none;">↩️ 取消复核</button>
+                        <button type="button" class="btn btn-danger" id="btn-delete">🗑️ 删除</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
+                <div class="info-panel">
+                  <h4>系统信息</h4>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="info-label">ID:</span>
+                      <span class="info-value" id="info-id">-</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">原路径:</span>
+                      <span class="info-value truncate" id="info-path">-</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">创建时间:</span>
+                      <span class="info-value" id="info-created">-</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">更新时间:</span>
+                      <span class="info-value" id="info-updated">-</span>
+                    </div>
+                    <div class="info-item" id="info-reviewed-row" style="display: none;">
+                      <span class="info-label">复核时间:</span>
+                      <span class="info-value" id="info-reviewed">-</span>
+                    </div>
+                    <div class="info-item" id="info-reviewer-row" style="display: none;">
+                      <span class="info-label">复核人:</span>
+                      <span class="info-value" id="info-reviewer">-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-content" id="tab-history">
+          <div class="history-header">
+            <h3>操作历史记录</h3>
+            <button class="btn btn-outline btn-sm" id="btn-refresh-history">🔄 刷新</button>
+          </div>
+          <div class="history-list" id="history-list">
+            <div class="empty-state">
+              <p>暂无操作记录</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal" id="modal">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content" id="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">提示</h3>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
