@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健身房团课替补排队器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: white;
+        }
+        
+        .panel {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .panel.active {
+            display: block;
+        }
+        
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 2px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-full {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-confirmed {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-cancelled {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-late {
+            background: #ffe5d0;
+            color: #c46210;
+        }
+        
+        .status-no-show {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .log-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .log-time {
+            color: #666;
+            margin-right: 10px;
+        }
+        
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .validation-result {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .validation-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .validation-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .validation-item {
+            margin-bottom: 8px;
+        }
+        
+        .problem-item {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .problem-type {
+            font-weight: bold;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ 健身房团课替补排队器</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="classes">团课列表</button>
+            <button class="tab-btn" data-tab="details">团课详情</button>
+            <button class="tab-btn" data-tab="create">创建/导入</button>
+            <button class="tab-btn" data-tab="queue">候补队列</button>
+            <button class="tab-btn" data-tab="statistics">筛选统计</button>
+            <button class="tab-btn" data-tab="problems">问题列表</button>
+            <button class="tab-btn" data-tab="verify">规则验证</button>
+        </div>
+        
+        <div id="classes" class="panel active">
+            <h2>团课列表</h2>
+            <div class="filter-section">
+                <div class="form-group">
+                    <label>课程状态</label>
+                    <select id="filterStatus">
+                        <option value="">全部</option>
+                        <option value="available">有名额</option>
+                        <option value="full">已满员</option>
+                        <option value="waiting">有候补</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>教练</label>
+                    <input type="text" id="filterCoach" placeholder="输入教练名字">
+                </div>
+                <div class="form-group">
+                    <label>日期范围</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+                <div class="form-group">
+                    <label>到</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="showCreateClassModal()">+ 新建团课</button>
+            <button class="btn btn-secondary" onclick="exportClasses()">导出团课数据</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>课程名称</th>
+                        <th>教练</th>
+                        <th>时间</th>
+                        <th>容量</th>
+                        <th>已报名</th>
+                        <th>候补</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="classesTableBody"></tbody>
+            </table>
+        </div>
+        
+        <div id="details" class="panel">
+            <h2>团课详情</h2>
+            <div class="form-group">
+                <label>选择团课</label>
+                <select id="detailClassSelect" onchange="loadClassDetails()">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            <div id="classDetailsContent"></div>
+        </div>
+        
+        <div id="create" class="panel">
+            <h2>创建/导入</h2>
+            <h3 style="margin-top: 20px;">新建团课</h3>
+            <div class="form-group">
+                <label>课程名称 *</label>
+                <input type="text" id="newClassName" placeholder="例如：动感单车">
+            </div>
+            <div class="form-group">
+                <label>教练 *</label>
+                <input type="text" id="newClassCoach" placeholder="例如：王教练">
+            </div>
+            <div class="form-group">
+                <label>时间 *</label>
+                <input type="datetime-local" id="newClassTime">
+            </div>
+            <div class="form-group">
+                <label>容量 *</label>
+                <input type="number" id="newClassCapacity" min="1" value="10">
+            </div>
+            <button class="btn btn-primary" onclick="createClass()">创建团课</button>
+            
+            <h3 style="margin-top: 40px;">批量导入团课</h3>
+            <div class="form-group">
+                <label>导入格式说明：每行一条记录，格式为：课程名称,教练,时间(YYYY-MM-DD HH:mm),容量</label>
+                <textarea id="importClasses" rows="6" placeholder="例如：&#10;动感单车,王教练,2024-01-15 18:00,10&#10;瑜伽,李教练,2024-01-15 19:00,15"></textarea>
+            </div>
+            <button class="btn btn-secondary" onclick="importClasses()">导入团课</button>
+            
+            <h3 style="margin-top: 40px;">新建报名</h3>
+            <div class="form-group">
+                <label>选择团课</label>
+                <select id="newEnrollmentClass">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>会员姓名 *</label>
+                <input type="text" id="newEnrollmentMember" placeholder="例如：张三">
+            </div>
+            <button class="btn btn-primary" onclick="createEnrollment()">创建报名</button>
+            
+            <h3 style="margin-top: 40px;">批量导入报名</h3>
+            <div class="form-group">
+                <label>导入格式说明：每行一条记录，格式为：课程名称,会员姓名</label>
+                <textarea id="importEnrollments" rows="6" placeholder="例如：&#10;动感单车,张三&#10;动感单车,李四"></textarea>
+            </div>
+            <button class="btn btn-secondary" onclick="importEnrollments()">导入报名</button>
+        </div>
+        
+        <div id="queue" class="panel">
+            <h2>候补队列管理</h2>
+            <div class="filter-section">
+                <div class="form-group">
+                    <label>选择团课</label>
+                    <select id="queueClassSelect" onchange="loadQueue()">
+                        <option value="">全部团课</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>团课</th>
+                        <th>会员</th>
+                        <th>排队时间</th>
+                        <th>队列位置</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="queueTableBody"></tbody>
+            </table>
+        </div>
+        
+        <div id="statistics" class="panel">
+            <h2>筛选统计</h2>
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <h3>总团课数</h3>
+                    <div class="value" id="statTotalClasses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已满员课程</h3>
+                    <div class="value" id="statFullClasses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>有候补课程</h3>
+                    <div class="value" id="statWaitingClasses">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>待替补人数</h3>
+                    <div class="value" id="statWaitingMembers">0</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px;">报名状态统计</h3>
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <h3>已确认</h3>
+                    <div class="value" id="statConfirmed">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>候补中</h3>
+                    <div class="value" id="statWaiting">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已取消</h3>
+                    <div class="value" id="statCancelled">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>已迟到</h3>
+                    <div class="value" id="statLate">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>爽约</h3>
+                    <div class="value" id="statNoShow">0</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px;">导出功能</h3>
+            <button class="btn btn-success" onclick="exportAllData()">导出所有数据</button>
+            <button class="btn btn-secondary" onclick="exportWaitingList()">导出候补列表</button>
+            <button class="btn btn-primary" onclick="exportEnrollmentReport()">导出报名报告</button>
+        </div>
+        
+        <div id="problems" class="panel">
+            <h2>问题列表</h2>
+            <div class="filter-section">
+                <div class="form-group">
+                    <label>问题类型</label>
+                    <select id="filterProblemType">
+                        <option value="">全部</option>
+                        <option value="import">导入错误</option>
+                        <option value="data">数据异常</option>
+                        <option value="business">业务规则冲突</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>来源</label>
+                    <input type="text" id="filterProblemSource" placeholder="输入来源">
+                </div>
+            </div>
+            <div id="problemsList"></div>
+        </div>
+        
+        <div id="verify" class="panel">
+            <h2>规则验证</h2>
+            <p>点击下方按钮验证所有核心业务规则是否正确实现：</p>
+            <button class="btn btn-primary" onclick="runAllRulesVerification()">运行验证</button>
+            <div id="verificationResults"></div>
+            
+            <h3 style="margin-top: 30px;">操作日志</h3>
+            <div class="log-container" id="actionLog"></div>
+        </div>
+    </div>
+    
+    <div id="classModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新建团课</h2>
+                <button class="close-btn" onclick="closeModal('classModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>课程名称 *</label>
+                <input type="text" id="modalClassName">
+            </div>
+            <div class="form-group">
+                <label>教练 *</label>
+                <input type="text" id="modalClassCoach">
+            </div>
+            <div class="form-group">
+                <label>时间 *</label>
+                <input type="datetime-local" id="modalClassTime">
+            </div>
+            <div class="form-group">
+                <label>容量 *</label>
+                <input type="number" id="modalClassCapacity" min="1">
+            </div>
+            <button class="btn btn-primary" onclick="saveClass()">保存</button>
+            <button class="btn btn-secondary" onclick="closeModal('classModal')">取消</button>
+        </div>
+    </div>
+    
+    <div id="enrollmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>报名详情</h2>
+                <button class="close-btn" onclick="closeModal('enrollmentModal')">&times;</button>
+            </div>
+            <div id="enrollmentDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            CLASSES: 'gym_classes',
+            ENROLLMENTS: 'gym_enrollments',
+            PROBLEMS: 'gym_problems',
+            LOGS: 'gym_logs'
+        };
+
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatDateForInput(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                addProblem({
+                    type: 'data',
+                    message: '数据保存失败',
+                    source: 'storage',
+                    details: e.message,
+                    originalData: JSON.stringify(data).substring(0, 200)
+                });
+                return false;
+            }
+        }
+
+        function loadFromStorage(key, defaultValue = []) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                addProblem({
+                    type: 'data',
+                    message: '数据读取失败',
+                    source: 'storage',
+                    details: e.message
+                });
+                return defaultValue;
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const logs = loadFromStorage(STORAGE_KEYS.LOGS, []);
+            logs.unshift({
+                id: generateId(),
+                timestamp: new Date().toISOString(),
+                type: type,
+                message: message
+            });
+            saveToStorage(STORAGE_KEYS.LOGS, logs.slice(0, 100));
+            renderLogs();
+        }
+
+        function addProblem(problem) {
+            const problems = loadFromStorage(STORAGE_KEYS.PROBLEMS, []);
+            problems.unshift({
+                id: generateId(),
+                timestamp: new Date().toISOString(),
+                ...problem
+            });
+            saveToStorage(STORAGE_KEYS.PROBLEMS, problems);
+        }
+
+        function getAllClasses() {
+            return loadFromStorage(STORAGE_KEYS.CLASSES, []);
+        }
+
+        function getAllEnrollments() {
+            return loadFromStorage(STORAGE_KEYS.ENROLLMENTS, []);
+        }
+
+        function getClassById(id) {
+            const classes = getAllClasses();
+            return classes.find(c => c.id === id);
+        }
+
+        function getEnrollmentById(id) {
+            const enrollments = getAllEnrollments();
+            return enrollments.find(e => e.id === id);
+        }
+
+        function getEnrollmentsForClass(classId) {
+            const enrollments = getAllEnrollments();
+            return enrollments.filter(e => e.classId === classId);
+        }
+
+        function getConfirmedEnrollments(classId) {
+            return getEnrollmentsForClass(classId).filter(e => 
+                e.status === 'confirmed' || e.status === 'late'
+            );
+        }
+
+        function getWaitingEnrollments(classId) {
+            return getEnrollmentsForClass(classId)
+                .filter(e => e.status === 'waiting')
+                .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        }
+
+        function getClassStatus(gymClass) {
+            const confirmed = getConfirmedEnrollments(gymClass.id).length;
+            const waiting = getWaitingEnrollments(gymClass.id).length;
+            
+            if (confirmed < gymClass.capacity) {
+                return 'available';
+            } else if (waiting > 0) {
+                return 'waiting';
+            } else {
+                return 'full';
+            }
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                available: '<span class="status-badge status-available">有名额</span>',
+                full: '<span class="status-badge status-full">已满员</span>',
+                waiting: '<span class="status-badge status-waiting">有候补</span>',
+                confirmed: '<span class="status-badge status-confirmed">已确认</span>',
+                waiting: '<span class="status-badge status-waiting">候补中</span>',
+                cancelled: '<span class="status-badge status-cancelled">已取消</span>',
+                late: '<span class="status-badge status-late">已迟到</span>',
+                no_show: '<span class="status-badge status-no-show">爽约</span>'
+            };
+            return statusMap[status] || status;
+        }
+
+        function createGymClass(name, coach, time, capacity) {
+            const errors = [];
+            
+            if (!name || name.trim() === '') {
+                errors.push('课程名称不能为空');
+            }
+            if (!coach || coach.trim() === '') {
+                errors.push('教练不能为空');
+            }
+            if (!time) {
+                errors.push('时间不能为空');
+            }
+            if (!capacity || capacity < 1) {
+                errors.push('容量必须大于0');
+            }
+            
+            if (errors.length > 0) {
+                addLog('创建团课失败: ' + errors.join(', '), 'error');
+                return { success: false, errors: errors };
+            }
+            
+            const newClass = {
+                id: generateId(),
+                name: name.trim(),
+                coach: coach.trim(),
+                time: time,
+                capacity: parseInt(capacity),
+                createdAt: new Date().toISOString()
+            };
+            
+            const classes = getAllClasses();
+            classes.push(newClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            addLog('创建团课成功: ' + name, 'success');
+            return { success: true, class: newClass };
+        }
+
+        function updateGymClass(id, updates) {
+            const classes = getAllClasses();
+            const index = classes.findIndex(c => c.id === id);
+            
+            if (index === -1) {
+                addLog('更新团课失败: 未找到课程', 'error');
+                return { success: false, errors: ['未找到课程'] };
+            }
+            
+            const confirmedCount = getConfirmedEnrollments(id).length;
+            if (updates.capacity !== undefined && parseInt(updates.capacity) < confirmedCount) {
+                const error = `容量不能小于当前已报名人数(${confirmedCount})`;
+                addLog('更新团课失败: ' + error, 'error');
+                return { success: false, errors: [error] };
+            }
+            
+            classes[index] = { ...classes[index], ...updates };
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            if (updates.capacity !== undefined && parseInt(updates.capacity) > confirmedCount) {
+                processWaitingList(id);
+            }
+            
+            addLog('更新团课成功: ' + classes[index].name, 'success');
+            return { success: true, class: classes[index] };
+        }
+
+        function createEnrollment(classId, memberName) {
+            const errors = [];
+            
+            if (!classId || classId.trim() === '') {
+                errors.push('必须选择团课');
+            }
+            if (!memberName || memberName.trim() === '') {
+                errors.push('会员姓名不能为空');
+            }
+            
+            if (errors.length > 0) {
+                addLog('创建报名失败: ' + errors.join(', '), 'error');
+                return { success: false, errors: errors };
+            }
+            
+            const gymClass = getClassById(classId);
+            if (!gymClass) {
+                addLog('创建报名失败: 未找到课程', 'error');
+                return { success: false, errors: ['未找到课程'] };
+            }
+            
+            const existingEnrollments = getEnrollmentsForClass(classId);
+            const existingMember = existingEnrollments.find(e => 
+                e.memberName.trim().toLowerCase() === memberName.trim().toLowerCase() &&
+                e.status !== 'cancelled'
+            );
+            
+            if (existingMember) {
+                const error = `会员 ${memberName} 已报名该课程`;
+                addLog('创建报名失败: ' + error, 'error');
+                return { success: false, errors: [error] };
+            }
+            
+            const confirmedCount = getConfirmedEnrollments(classId).length;
+            const waitingCount = getWaitingEnrollments(classId).length;
+            const queuePosition = confirmedCount >= gymClass.capacity ? waitingCount + 1 : null;
+            const status = confirmedCount >= gymClass.capacity ? 'waiting' : 'confirmed';
+            
+            const newEnrollment = {
+                id: generateId(),
+                classId: classId,
+                memberName: memberName.trim(),
+                status: status,
+                queuePosition: queuePosition,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                history: [
+                    {
+                        status: status,
+                        timestamp: new Date().toISOString(),
+                        reason: status === 'waiting' ? '课程已满，进入候补队列' : '直接报名成功'
+                    }
+                ]
+            };
+            
+            const enrollments = getAllEnrollments();
+            enrollments.push(newEnrollment);
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            if (status === 'confirmed') {
+                addLog(`报名成功: ${memberName} 报名 ${gymClass.name}`, 'success');
+            } else {
+                addLog(`候补成功: ${memberName} 进入 ${gymClass.name} 候补队列，位置: ${queuePosition}`, 'info');
+            }
+            
+            return { success: true, enrollment: newEnrollment };
+        }
+
+        function cancelEnrollment(enrollmentId, reason = '会员主动取消') {
+            const enrollment = getEnrollmentById(enrollmentId);
+            
+            if (!enrollment) {
+                addLog('取消报名失败: 未找到报名记录', 'error');
+                return { success: false, errors: ['未找到报名记录'] };
+            }
+            
+            if (enrollment.status === 'cancelled') {
+                addLog('取消报名失败: 已取消', 'error');
+                return { success: false, errors: ['已取消'] };
+            }
+            
+            if (enrollment.status === 'no_show') {
+                addLog('取消报名失败: 已爽约', 'error');
+                return { success: false, errors: ['已爽约，无法取消'] };
+            }
+            
+            const wasConfirmed = enrollment.status === 'confirmed' || enrollment.status === 'late';
+            const gymClass = getClassById(enrollment.classId);
+            
+            const enrollments = getAllEnrollments();
+            const index = enrollments.findIndex(e => e.id === enrollmentId);
+            
+            enrollments[index] = {
+                ...enrollments[index],
+                status: 'cancelled',
+                updatedAt: new Date().toISOString(),
+                queuePosition: null,
+                history: [...(enrollment.history || []), {
+                    status: 'cancelled',
+                    timestamp: new Date().toISOString(),
+                    reason: reason
+                }]
+            };
+            
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            addLog(`取消报名: ${enrollment.memberName} 取消了 ${gymClass.name} 的报名`, 'info');
+            
+            if (wasConfirmed) {
+                processWaitingList(enrollment.classId, '名额释放: ' + reason);
+            }
+            
+            return { success: true, enrollment: enrollments[index] };
+        }
+
+        function markLate(enrollmentId) {
+            const enrollment = getEnrollmentById(enrollmentId);
+            
+            if (!enrollment) {
+                addLog('标记迟到失败: 未找到报名记录', 'error');
+                return { success: false, errors: ['未找到报名记录'] };
+            }
+            
+            if (enrollment.status !== 'confirmed') {
+                addLog('标记迟到失败: 只有已确认的报名才能标记迟到', 'error');
+                return { success: false, errors: ['只有已确认的报名才能标记迟到'] };
+            }
+            
+            const enrollments = getAllEnrollments();
+            const index = enrollments.findIndex(e => e.id === enrollmentId);
+            
+            enrollments[index] = {
+                ...enrollments[index],
+                status: 'late',
+                updatedAt: new Date().toISOString(),
+                history: [...(enrollment.history || []), {
+                    status: 'late',
+                    timestamp: new Date().toISOString(),
+                    reason: '标记迟到'
+                }]
+            };
+            
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            const gymClass = getClassById(enrollment.classId);
+            addLog(`标记迟到: ${enrollment.memberName} 在 ${gymClass.name} 迟到`, 'warning');
+            
+            return { success: true, enrollment: enrollments[index] };
+        }
+
+        function markNoShow(enrollmentId) {
+            const enrollment = getEnrollmentById(enrollmentId);
+            
+            if (!enrollment) {
+                addLog('标记爽约失败: 未找到报名记录', 'error');
+                return { success: false, errors: ['未找到报名记录'] };
+            }
+            
+            if (enrollment.status !== 'confirmed' && enrollment.status !== 'late') {
+                addLog('标记爽约失败: 只有已确认或迟到的报名才能标记爽约', 'error');
+                return { success: false, errors: ['只有已确认或迟到的报名才能标记爽约'] };
+            }
+            
+            const wasConfirmed = enrollment.status === 'confirmed' || enrollment.status === 'late';
+            
+            const enrollments = getAllEnrollments();
+            const index = enrollments.findIndex(e => e.id === enrollmentId);
+            
+            enrollments[index] = {
+                ...enrollments[index],
+                status: 'no_show',
+                updatedAt: new Date().toISOString(),
+                history: [...(enrollment.history || []), {
+                    status: 'no_show',
+                    timestamp: new Date().toISOString(),
+                    reason: '标记爽约'
+                }]
+            };
+            
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            const gymClass = getClassById(enrollment.classId);
+            addLog(`标记爽约: ${enrollment.memberName} 在 ${gymClass.name} 爽约`, 'error');
+            
+            if (wasConfirmed) {
+                processWaitingList(enrollment.classId, '名额释放: 爽约');
+            }
+            
+            return { success: true, enrollment: enrollments[index] };
+        }
+
+        function processWaitingList(classId, reason = '名额释放') {
+            const gymClass = getClassById(classId);
+            if (!gymClass) {
+                return { success: false, promoted: [], errors: ['未找到课程'] };
+            }
+            
+            const confirmedCount = getConfirmedEnrollments(classId).length;
+            const waitingList = getWaitingEnrollments(classId);
+            const availableSlots = gymClass.capacity - confirmedCount;
+            const promoted = [];
+            
+            if (availableSlots <= 0 || waitingList.length === 0) {
+                return { success: true, promoted: [] };
+            }
+            
+            const toPromote = waitingList.slice(0, availableSlots);
+            const enrollments = getAllEnrollments();
+            
+            toPromote.forEach(waiting => {
+                const index = enrollments.findIndex(e => e.id === waiting.id);
+                if (index !== -1) {
+                    enrollments[index] = {
+                        ...enrollments[index],
+                        status: 'confirmed',
+                        queuePosition: null,
+                        updatedAt: new Date().toISOString(),
+                        history: [...(waiting.history || []), {
+                            status: 'confirmed',
+                            timestamp: new Date().toISOString(),
+                            reason: reason
+                        }]
+                    };
+                    promoted.push(enrollments[index]);
+                    addLog(`候补晋升: ${waiting.memberName} 从 ${gymClass.name} 候补队列晋升`, 'success');
+                }
+            });
+            
+            const remainingWaiting = waitingList.slice(availableSlots);
+            remainingWaiting.forEach((waiting, idx) => {
+                const index = enrollments.findIndex(e => e.id === waiting.id);
+                if (index !== -1) {
+                    enrollments[index] = {
+                        ...enrollments[index],
+                        queuePosition: idx + 1,
+                        updatedAt: new Date().toISOString()
+                    };
+                }
+            });
+            
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            return { success: true, promoted: promoted };
+        }
+
+        function importClassesFromText(text) {
+            const lines = text.trim().split('\n');
+            const results = { success: [], failed: [], problems: [] };
+            
+            lines.forEach((line, idx) => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return;
+                
+                const parts = trimmedLine.split(',').map(p => p.trim());
+                if (parts.length < 4) {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: 格式错误`,
+                        source: 'import_classes',
+                        details: `行 ${idx + 1}: 需要4个字段，实际${parts.length}个`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: '格式错误' });
+                    return;
+                }
+                
+                const [name, coach, timeStr, capacityStr] = parts;
+                let time;
+                try {
+                    time = new Date(timeStr).toISOString();
+                } catch (e) {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: 时间格式错误`,
+                        source: 'import_classes',
+                        details: `行 ${idx + 1}: 无法解析时间 ${timeStr}`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: '时间格式错误' });
+                    return;
+                }
+                
+                const capacity = parseInt(capacityStr);
+                if (isNaN(capacity) || capacity < 1) {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: 容量格式错误`,
+                        source: 'import_classes',
+                        details: `行 ${idx + 1}: 容量必须是正整数`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: '容量格式错误' });
+                    return;
+                }
+                
+                const result = createGymClass(name, coach, time, capacity);
+                if (result.success) {
+                    results.success.push({ line: idx + 1, class: result.class });
+                } else {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: ${result.errors.join(', ')}`,
+                        source: 'import_classes',
+                        details: `行 ${idx + 1}`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: result.errors.join(', ') });
+                }
+            });
+            
+            return results;
+        }
+
+        function importEnrollmentsFromText(text) {
+            const classes = getAllClasses();
+            const lines = text.trim().split('\n');
+            const results = { success: [], failed: [], problems: [] };
+            
+            lines.forEach((line, idx) => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return;
+                
+                const parts = trimmedLine.split(',').map(p => p.trim());
+                if (parts.length < 2) {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: 格式错误`,
+                        source: 'import_enrollments',
+                        details: `行 ${idx + 1}: 需要2个字段，实际${parts.length}个`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: '格式错误' });
+                    return;
+                }
+                
+                const [className, memberName] = parts;
+                const gymClass = classes.find(c => 
+                    c.name.trim().toLowerCase() === className.trim().toLowerCase()
+                );
+                
+                if (!gymClass) {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: 未找到课程`,
+                        source: 'import_enrollments',
+                        details: `行 ${idx + 1}: 课程 "${className}" 不存在`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: '未找到课程' });
+                    return;
+                }
+                
+                const result = createEnrollment(gymClass.id, memberName);
+                if (result.success) {
+                    results.success.push({ line: idx + 1, enrollment: result.enrollment });
+                } else {
+                    addProblem({
+                        type: 'import',
+                        message: `导入失败: ${result.errors.join(', ')}`,
+                        source: 'import_enrollments',
+                        details: `行 ${idx + 1}`,
+                        originalData: trimmedLine
+                    });
+                    results.failed.push({ line: idx + 1, error: result.errors.join(', ') });
+                }
+            });
+            
+            return results;
+        }
+
+        function exportToCSV(filename, headers, rows) {
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => 
+                    row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+                )
+            ].join('\n');
+            
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function renderClasses() {
+            const classes = getAllClasses();
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterCoach = document.getElementById('filterCoach').value.toLowerCase();
+            const filterStartDate = document.getElementById('filterStartDate').value;
+            const filterEndDate = document.getElementById('filterEndDate').value;
+            
+            const filteredClasses = classes.filter(gymClass => {
+                if (filterStatus) {
+                    const status = getClassStatus(gymClass);
+                    if (status !== filterStatus) return false;
+                }
+                if (filterCoach && !gymClass.coach.toLowerCase().includes(filterCoach)) {
+                    return false;
+                }
+                if (filterStartDate) {
+                    const classDate = new Date(gymClass.time);
+                    if (classDate < new Date(filterStartDate)) return false;
+                }
+                if (filterEndDate) {
+                    const classDate = new Date(gymClass.time);
+                    if (classDate > new Date(filterEndDate + ' 23:59:59')) return false;
+                }
+                return true;
+            });
+            
+            const tbody = document.getElementById('classesTableBody');
+            tbody.innerHTML = filteredClasses.map(gymClass => {
+                const confirmed = getConfirmedEnrollments(gymClass.id).length;
+                const waiting = getWaitingEnrollments(gymClass.id).length;
+                const status = getClassStatus(gymClass);
+                
+                return `
+                    <tr>
+                        <td>${gymClass.name}</td>
+                        <td>${gymClass.coach}</td>
+                        <td>${formatDate(gymClass.time)}</td>
+                        <td>${gymClass.capacity}</td>
+                        <td>${confirmed}</td>
+                        <td>${waiting}</td>
+                        <td>${getStatusBadge(status)}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="showClassDetails('${gymClass.id}')">详情</button>
+                            <button class="btn btn-success" onclick="showEnrollModal('${gymClass.id}')">报名</button>
+                            <button class="btn btn-warning" onclick="editClass('${gymClass.id}')">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteClass('${gymClass.id}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function showClassDetails(classId) {
+            document.getElementById('detailClassSelect').value = classId;
+            loadClassDetails();
+            switchTab('details');
+        }
+
+        function loadClassDetails() {
+            const classId = document.getElementById('detailClassSelect').value;
+            const content = document.getElementById('classDetailsContent');
+            
+            if (!classId) {
+                content.innerHTML = '<p>请选择团课查看详情</p>';
+                return;
+            }
+            
+            const gymClass = getClassById(classId);
+            if (!gymClass) {
+                content.innerHTML = '<p>未找到课程</p>';
+                return;
+            }
+            
+            const confirmed = getConfirmedEnrollments(classId);
+            const waiting = getWaitingEnrollments(classId);
+            const cancelled = getEnrollmentsForClass(classId).filter(e => e.status === 'cancelled');
+            const noShow = getEnrollmentsForClass(classId).filter(e => e.status === 'no_show');
+            
+            content.innerHTML = `
+                <div class="stats-bar">
+                    <div class="stat-card">
+                        <h3>课程名称</h3>
+                        <div class="value" style="font-size: 18px;">${gymClass.name}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>教练</h3>
+                        <div class="value" style="font-size: 18px;">${gymClass.coach}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>时间</h3>
+                        <div class="value" style="font-size: 18px;">${formatDate(gymClass.time)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>容量</h3>
+                        <div class="value">${gymClass.capacity}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>已确认</h3>
+                        <div class="value">${confirmed.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>候补</h3>
+                        <div class="value">${waiting.length}</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">已确认报名</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>会员</th>
+                            <th>状态</th>
+                            <th>报名时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${confirmed.map(e => `
+                            <tr>
+                                <td>${e.memberName}</td>
+                                <td>${getStatusBadge(e.status)}</td>
+                                <td>${formatDate(e.createdAt)}</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="showEnrollmentDetail('${e.id}')">详情</button>
+                                    ${e.status === 'confirmed' ? `
+                                        <button class="btn btn-warning" onclick="markLate('${e.id}'); loadClassDetails();">迟到</button>
+                                        <button class="btn btn-danger" onclick="markNoShow('${e.id}'); loadClassDetails();">爽约</button>
+                                    ` : ''}
+                                    <button class="btn btn-secondary" onclick="cancelEnrollment('${e.id}'); loadClassDetails();">取消</button>
+                                </td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="4" style="text-align:center;">暂无数据</td></tr>'}
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 30px;">候补队列</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>队列位置</th>
+                            <th>会员</th>
+                            <th>排队时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${waiting.map(e => `
+                            <tr>
+                                <td>#${e.queuePosition}</td>
+                                <td>${e.memberName}</td>
+                                <td>${formatDate(e.createdAt)}</td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="showEnrollmentDetail('${e.id}')">详情</button>
+                                    <button class="btn btn-secondary" onclick="cancelEnrollment('${e.id}'); loadClassDetails();">取消</button>
+                                </td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="4" style="text-align:center;">暂无候补</td></tr>'}
+                    </tbody>
+                </table>
+                
+                <h3 style="margin-top: 30px;">取消/爽约记录</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>会员</th>
+                            <th>状态</th>
+                            <th>更新时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${[...cancelled, ...noShow].map(e => `
+                            <tr>
+                                <td>${e.memberName}</td>
+                                <td>${getStatusBadge(e.status)}</td>
+                                <td>${formatDate(e.updatedAt)}</td>
+                            </tr>
+                        `).join('') || '<tr><td colspan="3" style="text-align:center;">暂无记录</td></tr>'}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function loadQueue() {
+            const classId = document.getElementById('queueClassSelect').value;
+            const enrollments = getAllEnrollments();
+            
+            let waitingEnrollments = enrollments.filter(e => e.status === 'waiting');
+            if (classId) {
+                waitingEnrollments = waitingEnrollments.filter(e => e.classId === classId);
+            }
+            
+            waitingEnrollments.sort((a, b) => {
+                if (a.classId === b.classId) {
+                    return (a.queuePosition || 0) - (b.queuePosition || 0);
+                }
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            });
+            
+            const tbody = document.getElementById('queueTableBody');
+            tbody.innerHTML = waitingEnrollments.map(e => {
+                const gymClass = getClassById(e.classId);
+                return `
+                    <tr>
+                        <td>${gymClass ? gymClass.name : '未知课程'}</td>
+                        <td>${e.memberName}</td>
+                        <td>${formatDate(e.createdAt)}</td>
+                        <td>#${e.queuePosition}</td>
+                        <td>
+                            <button class="btn btn-secondary" onclick="cancelEnrollment('${e.id}'); loadQueue();">取消</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5" style="text-align:center;">暂无候补数据</td></tr>';
+        }
+
+        function loadStatistics() {
+            const classes = getAllClasses();
+            const enrollments = getAllEnrollments();
+            
+            let fullClasses = 0;
+            let waitingClasses = 0;
+            let waitingMembers = 0;
+            
+            classes.forEach(gymClass => {
+                const confirmed = getConfirmedEnrollments(gymClass.id).length;
+                const waiting = getWaitingEnrollments(gymClass.id).length;
+                
+                if (confirmed >= gymClass.capacity) fullClasses++;
+                if (waiting > 0) waitingClasses++;
+                waitingMembers += waiting;
+            });
+            
+            document.getElementById('statTotalClasses').textContent = classes.length;
+            document.getElementById('statFullClasses').textContent = fullClasses;
+            document.getElementById('statWaitingClasses').textContent = waitingClasses;
+            document.getElementById('statWaitingMembers').textContent = waitingMembers;
+            
+            const statusCounts = {
+                confirmed: 0,
+                waiting: 0,
+                cancelled: 0,
+                late: 0,
+                no_show: 0
+            };
+            
+            enrollments.forEach(e => {
+                if (statusCounts.hasOwnProperty(e.status)) {
+                    statusCounts[e.status]++;
+                }
+            });
+            
+            document.getElementById('statConfirmed').textContent = statusCounts.confirmed;
+            document.getElementById('statWaiting').textContent = statusCounts.waiting;
+            document.getElementById('statCancelled').textContent = statusCounts.cancelled;
+            document.getElementById('statLate').textContent = statusCounts.late;
+            document.getElementById('statNoShow').textContent = statusCounts.no_show;
+        }
+
+        function loadProblems() {
+            const problems = loadFromStorage(STORAGE_KEYS.PROBLEMS, []);
+            const filterType = document.getElementById('filterProblemType').value;
+            const filterSource = document.getElementById('filterProblemSource').value.toLowerCase();
+            
+            const filteredProblems = problems.filter(p => {
+                if (filterType && p.type !== filterType) return false;
+                if (filterSource && !p.source.toLowerCase().includes(filterSource)) return false;
+                return true;
+            });
+            
+            const list = document.getElementById('problemsList');
+            list.innerHTML = filteredProblems.map(p => `
+                <div class="problem-item">
+                    <div class="problem-header">
+                        <span class="problem-type">[${p.type.toUpperCase()}]</span>
+                        <span>${formatDate(p.timestamp)}</span>
+                    </div>
+                    <strong>${p.message}</strong>
+                    ${p.details ? `<p style="margin-top: 8px; color: #666;">详情: ${p.details}</p>` : ''}
+                    ${p.source ? `<p style="margin-top: 4px; color: #999; font-size: 12px;">来源: ${p.source}</p>` : ''}
+                    ${p.originalData ? `<p style="margin-top: 4px; color: #999; font-size: 12px; font-family: monospace;">原始数据: ${p.originalData}</p>` : ''}
+                    <button class="btn btn-danger" style="margin-top: 12px;" onclick="dismissProblem('${p.id}')">标记已处理</button>
+                </div>
+            `).join('') || '<p>暂无问题记录</p>';
+        }
+
+        function dismissProblem(id) {
+            const problems = loadFromStorage(STORAGE_KEYS.PROBLEMS, []);
+            const filtered = problems.filter(p => p.id !== id);
+            saveToStorage(STORAGE_KEYS.PROBLEMS, filtered);
+            loadProblems();
+            addLog('问题已标记处理', 'info');
+        }
+
+        function renderLogs() {
+            const logs = loadFromStorage(STORAGE_KEYS.LOGS, []);
+            const container = document.getElementById('actionLog');
+            
+            container.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <span class="log-time">${formatDate(log.timestamp)}</span>
+                    <span>[${log.type.toUpperCase()}]</span>
+                    <span>${log.message}</span>
+                </div>
+            `).join('') || '<p>暂无日志记录</p>';
+        }
+
+        function populateClassSelects() {
+            const classes = getAllClasses();
+            const options = classes.map(c => `<option value="${c.id}">${c.name} - ${formatDate(c.time)}</option>`).join('');
+            
+            document.getElementById('detailClassSelect').innerHTML = '<option value="">请选择</option>' + options;
+            document.getElementById('queueClassSelect').innerHTML = '<option value="">全部团课</option>' + options;
+            document.getElementById('newEnrollmentClass').innerHTML = '<option value="">请选择</option>' + options;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'classes') renderClasses();
+            if (tabId === 'queue') loadQueue();
+            if (tabId === 'statistics') loadStatistics();
+            if (tabId === 'problems') loadProblems();
+            if (tabId === 'verify') renderLogs();
+        }
+
+        function showCreateClassModal() {
+            document.getElementById('modalTitle').textContent = '新建团课';
+            document.getElementById('modalClassName').value = '';
+            document.getElementById('modalClassCoach').value = '';
+            document.getElementById('modalClassTime').value = '';
+            document.getElementById('modalClassCapacity').value = '10';
+            document.getElementById('classModal').dataset.mode = 'create';
+            document.getElementById('classModal').classList.add('active');
+        }
+
+        function editClass(classId) {
+            const gymClass = getClassById(classId);
+            if (!gymClass) return;
+            
+            document.getElementById('modalTitle').textContent = '编辑团课';
+            document.getElementById('modalClassName').value = gymClass.name;
+            document.getElementById('modalClassCoach').value = gymClass.coach;
+            document.getElementById('modalClassTime').value = formatDateForInput(gymClass.time);
+            document.getElementById('modalClassCapacity').value = gymClass.capacity;
+            document.getElementById('classModal').dataset.mode = 'edit';
+            document.getElementById('classModal').dataset.id = classId;
+            document.getElementById('classModal').classList.add('active');
+        }
+
+        function saveClass() {
+            const mode = document.getElementById('classModal').dataset.mode;
+            const name = document.getElementById('modalClassName').value;
+            const coach = document.getElementById('modalClassCoach').value;
+            const timeStr = document.getElementById('modalClassTime').value;
+            const capacity = document.getElementById('modalClassCapacity').value;
+            
+            if (!name || !coach || !timeStr || !capacity) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            const time = new Date(timeStr).toISOString();
+            
+            let result;
+            if (mode === 'create') {
+                result = createGymClass(name, coach, time, capacity);
+            } else {
+                const id = document.getElementById('classModal').dataset.id;
+                result = updateGymClass(id, { name, coach, time, capacity: parseInt(capacity) });
+            }
+            
+            if (result.success) {
+                closeModal('classModal');
+                populateClassSelects();
+                renderClasses();
+            } else {
+                alert('操作失败: ' + result.errors.join(', '));
+            }
+        }
+
+        function deleteClass(classId) {
+            if (!confirm('确定要删除这个团课吗？相关报名记录也会被删除。')) return;
+            
+            const classes = getAllClasses().filter(c => c.id !== classId);
+            const enrollments = getAllEnrollments().filter(e => e.classId !== classId);
+            
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, enrollments);
+            
+            addLog('删除团课: ID=' + classId, 'info');
+            populateClassSelects();
+            renderClasses();
+        }
+
+        function showEnrollModal(classId) {
+            const gymClass = getClassById(classId);
+            const memberName = prompt(`请输入会员姓名\n\n课程: ${gymClass.name}\n教练: ${gymClass.coach}\n时间: ${formatDate(gymClass.time)}`);
+            
+            if (memberName && memberName.trim()) {
+                const result = createEnrollment(classId, memberName.trim());
+                if (result.success) {
+                    renderClasses();
+                } else {
+                    alert('报名失败: ' + result.errors.join(', '));
+                }
+            }
+        }
+
+        function createClass() {
+            const name = document.getElementById('newClassName').value;
+            const coach = document.getElementById('newClassCoach').value;
+            const timeStr = document.getElementById('newClassTime').value;
+            const capacity = document.getElementById('newClassCapacity').value;
+            
+            if (!name || !coach || !timeStr || !capacity) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            const time = new Date(timeStr).toISOString();
+            const result = createGymClass(name, coach, time, capacity);
+            
+            if (result.success) {
+                document.getElementById('newClassName').value = '';
+                document.getElementById('newClassCoach').value = '';
+                document.getElementById('newClassTime').value = '';
+                document.getElementById('newClassCapacity').value = '10';
+                populateClassSelects();
+                renderClasses();
+                alert('创建成功！');
+            } else {
+                alert('创建失败: ' + result.errors.join(', '));
+            }
+        }
+
+        function createEnrollment() {
+            const classId = document.getElementById('newEnrollmentClass').value;
+            const memberName = document.getElementById('newEnrollmentMember').value;
+            
+            if (!classId || !memberName) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            const result = createEnrollment(classId, memberName.trim());
+            
+            if (result.success) {
+                document.getElementById('newEnrollmentMember').value = '';
+                renderClasses();
+                alert('报名成功！');
+            } else {
+                alert('报名失败: ' + result.errors.join(', '));
+            }
+        }
+
+        function importClasses() {
+            const text = document.getElementById('importClasses').value;
+            if (!text.trim()) {
+                alert('请输入要导入的内容');
+                return;
+            }
+            
+            const result = importClassesFromText(text);
+            document.getElementById('importClasses').value = '';
+            populateClassSelects();
+            renderClasses();
+            
+            alert(`导入完成!\n成功: ${result.success.length} 条\n失败: ${result.failed.length} 条`);
+        }
+
+        function importEnrollments() {
+            const text = document.getElementById('importEnrollments').value;
+            if (!text.trim()) {
+                alert('请输入要导入的内容');
+                return;
+            }
+            
+            const result = importEnrollmentsFromText(text);
+            document.getElementById('importEnrollments').value = '';
+            renderClasses();
+            
+            alert(`导入完成!\n成功: ${result.success.length} 条\n失败: ${result.failed.length} 条`);
+        }
+
+        function exportClasses() {
+            const classes = getAllClasses();
+            const headers = ['课程名称', '教练', '时间', '容量', '已确认', '候补', '状态'];
+            const rows = classes.map(c => [
+                c.name,
+                c.coach,
+                formatDate(c.time),
+                c.capacity,
+                getConfirmedEnrollments(c.id).length,
+                getWaitingEnrollments(c.id).length,
+                getClassStatus(c)
+            ]);
+            
+            exportToCSV('团课数据.csv', headers, rows);
+            addLog('导出团课数据', 'info');
+        }
+
+        function exportAllData() {
+            const classes = getAllClasses();
+            const enrollments = getAllEnrollments();
+            
+            const headers = ['课程名称', '教练', '时间', '容量', '会员', '状态', '队列位置', '报名时间', '更新时间'];
+            const rows = enrollments.map(e => {
+                const gymClass = classes.find(c => c.id === e.classId);
+                return [
+                    gymClass ? gymClass.name : '未知',
+                    gymClass ? gymClass.coach : '未知',
+                    gymClass ? formatDate(gymClass.time) : '未知',
+                    gymClass ? gymClass.capacity : '未知',
+                    e.memberName,
+                    e.status,
+                    e.queuePosition || '',
+                    formatDate(e.createdAt),
+                    formatDate(e.updatedAt)
+                ];
+            });
+            
+            exportToCSV('全部数据.csv', headers, rows);
+            addLog('导出全部数据', 'info');
+        }
+
+        function exportWaitingList() {
+            const enrollments = getAllEnrollments();
+            const classes = getAllClasses();
+            
+            const waiting = enrollments.filter(e => e.status === 'waiting');
+            const headers = ['课程名称', '会员', '队列位置', '排队时间'];
+            const rows = waiting.map(e => {
+                const gymClass = classes.find(c => c.id === e.classId);
+                return [
+                    gymClass ? gymClass.name : '未知',
+                    e.memberName,
+                    e.queuePosition || '',
+                    formatDate(e.createdAt)
+                ];
+            });
+            
+            exportToCSV('候补列表.csv', headers, rows);
+            addLog('导出候补列表', 'info');
+        }
+
+        function exportEnrollmentReport() {
+            const classes = getAllClasses();
+            const headers = ['课程名称', '教练', '时间', '容量', '已确认', '候补', '取消', '迟到', '爽约'];
+            const rows = classes.map(c => {
+                const all = getEnrollmentsForClass(c.id);
+                return [
+                    c.name,
+                    c.coach,
+                    formatDate(c.time),
+                    c.capacity,
+                    all.filter(e => e.status === 'confirmed').length,
+                    all.filter(e => e.status === 'waiting').length,
+                    all.filter(e => e.status === 'cancelled').length,
+                    all.filter(e => e.status === 'late').length,
+                    all.filter(e => e.status === 'no_show').length
+                ];
+            });
+            
+            exportToCSV('报名报告.csv', headers, rows);
+            addLog('导出报名报告', 'info');
+        }
+
+        function showEnrollmentDetail(enrollmentId) {
+            const enrollment = getEnrollmentById(enrollmentId);
+            if (!enrollment) return;
+            
+            const gymClass = getClassById(enrollment.classId);
+            
+            document.getElementById('enrollmentDetailContent').innerHTML = `
+                <div class="form-group">
+                    <label>课程</label>
+                    <input type="text" value="${gymClass ? gymClass.name : '未知'}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>会员</label>
+                    <input type="text" value="${enrollment.memberName}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>当前状态</label>
+                    ${getStatusBadge(enrollment.status)}
+                </div>
+                <div class="form-group">
+                    <label>队列位置</label>
+                    <input type="text" value="${enrollment.queuePosition || '-'}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>报名时间</label>
+                    <input type="text" value="${formatDate(enrollment.createdAt)}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>更新时间</label>
+                    <input type="text" value="${formatDate(enrollment.updatedAt)}" disabled>
+                </div>
+                
+                <h3 style="margin-top: 20px;">状态变更历史</h3>
+                <div class="log-container">
+                    ${(enrollment.history || []).map(h => `
+                        <div class="log-item">
+                            <span class="log-time">${formatDate(h.timestamp)}</span>
+                            ${getStatusBadge(h.status)}
+                            <span>${h.reason || ''}</span>
+                        </div>
+                    `).join('') || '<p>暂无历史记录</p>'}
+                </div>
+            `;
+            
+            document.getElementById('enrollmentModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function runAllRulesVerification() {
+            const results = [];
+            
+            addLog('开始规则验证...', 'info');
+            
+            results.push(verifyRuleCapacity());
+            results.push(verifyRuleWaitingQueue());
+            results.push(verifyRuleCancelRelease());
+            results.push(verifyRuleLateNoShow());
+            results.push(verifyRuleDuplicateEnrollment());
+            results.push(verifyRuleCapacityReduction());
+            
+            const successCount = results.filter(r => r.success).length;
+            const totalCount = results.length;
+            
+            document.getElementById('verificationResults').innerHTML = `
+                <div class="validation-result ${successCount === totalCount ? 'validation-success' : 'validation-error'}">
+                    <strong>验证结果: ${successCount}/${totalCount} 条规则通过</strong>
+                </div>
+                ${results.map(r => `
+                    <div class="validation-item" style="margin-top: 16px; padding: 12px; border-radius: 6px; background: ${r.success ? '#f8f9fa' : '#fff3cd'}">
+                        <strong>${r.success ? '✅' : '❌'} ${r.rule}</strong><br>
+                        <span style="color: #666;">${r.description}</span>
+                        ${r.details ? `<p style="margin-top: 8px; font-family: monospace; font-size: 12px;">${r.details}</p>` : ''}
+                    </div>
+                `).join('')}
+            `;
+            
+            addLog(`规则验证完成: ${successCount}/${totalCount} 条通过`, successCount === totalCount ? 'success' : 'error');
+        }
+
+        function verifyRuleCapacity() {
+            const testClass = {
+                id: 'test_capacity_' + generateId(),
+                name: '验证课程-容量',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 2
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            const e1 = createEnrollment(testClass.id, '会员A');
+            const e2 = createEnrollment(testClass.id, '会员B');
+            const e3 = createEnrollment(testClass.id, '会员C');
+            
+            const success = e1.success && e2.success && e3.success &&
+                e1.enrollment?.status === 'confirmed' &&
+                e2.enrollment?.status === 'confirmed' &&
+                e3.enrollment?.status === 'waiting' &&
+                e3.enrollment?.queuePosition === 1;
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => ![e1.enrollment?.id, e2.enrollment?.id, e3.enrollment?.id].includes(e.id));
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '团课容量规则',
+                description: '当报名人数超过容量时，新报名会员应进入候补队列',
+                details: success ? 
+                    '容量为2时，第3位会员C正确进入候补队列，队列位置#1' : 
+                    `预期: 会员C状态=waiting, queuePosition=1; 实际: 状态=${e3.enrollment?.status}, 位置=${e3.enrollment?.queuePosition}`
+            };
+        }
+
+        function verifyRuleWaitingQueue() {
+            const testClass = {
+                id: 'test_queue_' + generateId(),
+                name: '验证课程-队列',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 1
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            const e1 = createEnrollment(testClass.id, '会员A');
+            const e2 = createEnrollment(testClass.id, '会员B');
+            const e3 = createEnrollment(testClass.id, '会员C');
+            
+            const initialCheck = e2.enrollment?.queuePosition === 1 && e3.enrollment?.queuePosition === 2;
+            
+            if (e1.enrollment?.id) {
+                cancelEnrollment(e1.enrollment.id, '测试取消');
+            }
+            
+            const updatedEnrollments = getAllEnrollments();
+            const e2Updated = e2.enrollment?.id ? updatedEnrollments.find(e => e.id === e2.enrollment.id) : null;
+            const e3Updated = e3.enrollment?.id ? updatedEnrollments.find(e => e.id === e3.enrollment.id) : null;
+            
+            const success = initialCheck && 
+                e2Updated?.status === 'confirmed' && 
+                e3Updated?.queuePosition === 1;
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => ![e1.enrollment?.id, e2.enrollment?.id, e3.enrollment?.id].includes(e.id));
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '候补队列优先级规则',
+                description: '候补会员应按排队顺序排列，名额释放时按顺序晋升',
+                details: success ?
+                    '会员B(位置#1)在会员A取消后成功晋升为已确认，会员C位置更新为#1' :
+                    `初始队列: B=#${e2.enrollment?.queuePosition}, C=#${e3.enrollment?.queuePosition}; 晋升后: B状态=${e2Updated?.status}, C位置=${e3Updated?.queuePosition}`
+            };
+        }
+
+        function verifyRuleCancelRelease() {
+            const testClass = {
+                id: 'test_cancel_' + generateId(),
+                name: '验证课程-取消',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 1
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            const e1 = createEnrollment(testClass.id, '会员A');
+            const e2 = createEnrollment(testClass.id, '会员B');
+            
+            const before = getConfirmedEnrollments(testClass.id).length;
+            
+            if (e1.enrollment?.id) {
+                cancelEnrollment(e1.enrollment.id, '测试取消');
+            }
+            
+            const after = getConfirmedEnrollments(testClass.id).length;
+            
+            const success = before === 1 && after === 1;
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => ![e1.enrollment?.id, e2.enrollment?.id].includes(e.id));
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '取消释放名额规则',
+                description: '已确认会员取消后，名额应释放给候补队列首位会员',
+                details: success ?
+                    '会员A取消后，会员B从候补晋升，已确认人数保持为1（而非变为0）' :
+                    `取消前已确认数=${before}, 取消后=${after} (预期应保持1)`
+            };
+        }
+
+        function verifyRuleLateNoShow() {
+            const testClass = {
+                id: 'test_late_' + generateId(),
+                name: '验证课程-迟到爽约',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 1
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            const e1 = createEnrollment(testClass.id, '会员A');
+            const e2 = createEnrollment(testClass.id, '会员B');
+            
+            if (e1.enrollment?.id) {
+                markLate(e1.enrollment.id);
+            }
+            
+            const afterLate = e1.enrollment?.id ? getAllEnrollments().find(e => e.id === e1.enrollment.id) : null;
+            const confirmedAfterLate = getConfirmedEnrollments(testClass.id).length;
+            
+            if (e1.enrollment?.id) {
+                markNoShow(e1.enrollment.id);
+            }
+            
+            const afterNoShow = e1.enrollment?.id ? getAllEnrollments().find(e => e.id === e1.enrollment.id) : null;
+            const e2Updated = e2.enrollment?.id ? getAllEnrollments().find(e => e.id === e2.enrollment.id) : null;
+            
+            const success = afterLate?.status === 'late' && 
+                confirmedAfterLate === 1 && 
+                afterNoShow?.status === 'no_show' &&
+                e2Updated?.status === 'confirmed';
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => ![e1.enrollment?.id, e2.enrollment?.id].includes(e.id));
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '迟到/爽约规则',
+                description: '迟到不释放名额，爽约释放名额给候补会员',
+                details: success ?
+                    '迟到后状态=late，已确认数仍为1；爽约后状态=no_show，会员B晋升为已确认' :
+                    `迟到后状态=${afterLate?.status}, 确认数=${confirmedAfterLate}; 爽约后状态=${afterNoShow?.status}, B状态=${e2Updated?.status}`
+            };
+        }
+
+        function verifyRuleDuplicateEnrollment() {
+            const testClass = {
+                id: 'test_dup_' + generateId(),
+                name: '验证课程-重复',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 10
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            const e1 = createEnrollment(testClass.id, '会员A');
+            const e2 = createEnrollment(testClass.id, '会员A');
+            
+            const success = e1.success && !e2.success && 
+                e2.errors?.some(err => err.includes('已报名'));
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => e.id !== e1.enrollment?.id);
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '重复报名阻止规则',
+                description: '同一会员不能重复报名同一课程',
+                details: success ?
+                    '会员A第一次报名成功，第二次尝试报名被拒绝，错误信息包含"已报名"' :
+                    `第一次成功=${e1.success}, 第二次成功=${e2.success}, 错误=${e2.errors?.join(', ')}`
+            };
+        }
+
+        function verifyRuleCapacityReduction() {
+            const testClass = {
+                id: 'test_reduce_' + generateId(),
+                name: '验证课程-缩减',
+                coach: '测试教练',
+                time: new Date().toISOString(),
+                capacity: 5
+            };
+            
+            const classes = getAllClasses();
+            classes.push(testClass);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes);
+            
+            createEnrollment(testClass.id, '会员A');
+            createEnrollment(testClass.id, '会员B');
+            
+            const reduceTo1 = updateGymClass(testClass.id, { capacity: 1 });
+            const reduceTo0 = updateGymClass(testClass.id, { capacity: 0 });
+            
+            const success = !reduceTo1.success && 
+                reduceTo1.errors?.some(err => err.includes('不能小于')) &&
+                !reduceTo0.success &&
+                reduceTo0.errors?.some(err => err.includes('不能小于'));
+            
+            const enrollments = getAllEnrollments();
+            const filtered = enrollments.filter(e => e.classId !== testClass.id);
+            saveToStorage(STORAGE_KEYS.ENROLLMENTS, filtered);
+            saveToStorage(STORAGE_KEYS.CLASSES, classes.filter(c => c.id !== testClass.id));
+            
+            return {
+                success: success,
+                rule: '容量缩减限制规则',
+                description: '课程容量不能缩减到小于当前已报名人数',
+                details: success ?
+                    '已报名2人时，尝试缩减到1和0都被拒绝，错误信息包含"不能小于"' :
+                    `缩减到1: ${reduceTo1.success ? '成功(错误)' : '正确拒绝'}, 缩减到0: ${reduceTo0.success ? '成功(错误)' : '正确拒绝'}`
+            };
+        }
+
+        function initDemoData() {
+            if (getAllClasses().length > 0) return;
+            
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const dayAfter = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+            
+            const classes = [
+                { name: '动感单车', coach: '王教练', time: tomorrow, capacity: 2 },
+                { name: '瑜伽', coach: '李教练', time: dayAfter, capacity: 3 }
+            ];
+            
+            classes.forEach(c => createGymClass(c.name, c.coach, c.time.toISOString(), c.capacity));
+            
+            const allClasses = getAllClasses();
+            const spinning = allClasses.find(c => c.name === '动感单车');
+            const yoga = allClasses.find(c => c.name === '瑜伽');
+            
+            if (spinning) {
+                createEnrollment(spinning.id, '张三');
+                createEnrollment(spinning.id, '李四');
+                createEnrollment(spinning.id, '王五');
+            }
+            
+            if (yoga) {
+                createEnrollment(yoga.id, '赵六');
+                createEnrollment(yoga.id, '钱七');
+            }
+            
+            addLog('初始化演示数据', 'info');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDemoData();
+            populateClassSelects();
+            renderClasses();
+            renderLogs();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+            
+            document.getElementById('filterStatus').addEventListener('change', renderClasses);
+            document.getElementById('filterCoach').addEventListener('input', renderClasses);
+            document.getElementById('filterStartDate').addEventListener('change', renderClasses);
+            document.getElementById('filterEndDate').addEventListener('change', renderClasses);
+            document.getElementById('filterProblemType').addEventListener('change', loadProblems);
+            document.getElementById('filterProblemSource').addEventListener('input', loadProblems);
+            
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
