@@ -1,0 +1,30 @@
+{
+  "name": "aquarium-isolation-api",
+  "version": "1.0.0",
+  "description": "水族馆鱼病隔离调度 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "jest",
+    "demo": "node demo/main-demo.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": ["aquarium", "fish-disease", "isolation", "scheduler"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.js"],
+    "setupFilesAfterEnv": ["./tests/setup.js"]
+  }
+}
