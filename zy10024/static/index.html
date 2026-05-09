@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Simulator - 混沌工程模拟平台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #334155; margin-bottom: 24px; }
+        h1 { font-size: 28px; color: #f8fafc; }
+        h2 { font-size: 18px; margin-bottom: 16px; color: #94a3b8; font-weight: 600; }
+        .badge { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+        .metric-label { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+        .metric-value { font-size: 32px; font-weight: bold; color: #f8fafc; }
+        .main-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
+        .scenarios-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .scenario-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; transition: border-color 0.3s; }
+        .scenario-card.running { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.1); }
+        .scenario-card.error { border-color: #ef4444; }
+        .scenario-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .scenario-status { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
+        .status-ready { background: #065f46; color: #a7f3d0; }
+        .status-running { background: #78350f; color: #fcd34d; }
+        .status-recovered { background: #1e40af; color: #93c5fd; }
+        .status-error { background: #7f1d1d; color: #fca5a5; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; margin-right: 8px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-start { background: #22c55e; color: white; }
+        .btn-stop { background: #ef4444; color: white; }
+        .btn-recover { background: #3b82f6; color: white; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .config-preview { font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace; }
+        .timeline-panel { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; max-height: 600px; overflow-y: auto; }
+        .event-item { padding: 12px; border-left: 3px solid #475569; margin-bottom: 8px; background: #0f172a; border-radius: 0 6px 6px 0; }
+        .event-item.error { border-left-color: #ef4444; }
+        .event-item.warn { border-left-color: #f59e0b; }
+        .event-item.info { border-left-color: #3b82f6; }
+        .event-time { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+        .event-scenario { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+        .event-message { font-size: 13px; color: #e2e8f0; }
+        .event-data { font-size: 11px; color: #64748b; margin-top: 4px; font-family: monospace; }
+        .state-panel { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 24px; }
+        .state-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; }
+        .state-item:last-child { border-bottom: none; }
+        .state-label { color: #94a3b8; }
+        .state-value { font-weight: 600; }
+        @media (max-width: 1200px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .main-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: 1fr; }
+            .scenarios-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌀 Chaos Simulator</h1>
+            <span class="badge">v1.0</span>
+        </header>
+
+        <div class="dashboard">
+            <div class="metric-card">
+                <div class="metric-label">Goroutines</div>
+                <div class="metric-value" id="goroutines">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">DB Connections</div>
+                <div class="metric-value" id="db-conns">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Redis Connections</div>
+                <div class="metric-value" id="redis-conns">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Queue Length</div>
+                <div class="metric-value" id="queue">-</div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <div>
+                <h2>问题场景 (点击开始模拟)</h2>
+                <div class="scenarios-grid" id="scenarios">
+                </div>
+            </div>
+            <div>
+                <h2>事件时间线</h2>
+                <div class="timeline-panel" id="timeline">
+                    <div style="text-align: center; color: #64748b; padding: 40px;">暂无事件</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scenarioInfo = {
+            'connection_pool_exhaustion': {
+                name: '连接池耗尽',
+                desc: '模拟数据库连接池耗尽的情况。持续创建连接但不释放，观察连接耗尽后的请求阻塞。'
+            },
+            'message_queue_backlog': {
+                name: '消息队列积压',
+                desc: '生产速度远大于消费速度，观察队列积压增长、消息丢弃等情况。'
+            },
+            'goroutine_leak': {
+                name: 'Goroutine泄漏',
+                desc: '创建goroutine但不释放，观察Go协程数量持续增长的情况。'
+            },
+            'db_lock_wait': {
+                name: '数据库锁等待',
+                desc: '多线程竞争同一行数据，模拟行锁等待和超时问题。'
+            },
+            'cache_dirty_data': {
+                name: '缓存脏数据',
+                desc: '更新数据库后不更新缓存，模拟缓存与DB数据不一致问题。'
+            },
+            'config_drift': {
+                name: '配置漂移',
+                desc: '模拟配置在运行时偏离基线的情况，观察配置一致性丢失过程。'
+            }
+        };
+
+        let ws = null;
+
+        function connectWebSocket() {
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${proto}//${window.location.host}/ws`);
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                updateMetrics(data.state);
+                updateTimeline(data.events);
+                updateScenarioStatus(data.scenario_status);
+            };
+
+            ws.onclose = function() {
+                setTimeout(connectWebSocket, 1000);
+            };
+        }
+
+        function updateMetrics(state) {
+            document.getElementById('goroutines').textContent = state.active_goroutines || 0;
+            document.getElementById('db-conns').textContent = state.db_connections || 0;
+            document.getElementById('redis-conns').textContent = state.redis_connections || 0;
+            document.getElementById('queue').textContent = state.queue_length || 0;
+        }
+
+        function updateScenarioStatus(statuses) {
+            for (const [name, status] of Object.entries(statuses)) {
+                const card = document.getElementById(`scenario-${name}`);
+                if (!card) continue;
+
+                card.className = `scenario-card ${status}`;
+                const statusBadge = card.querySelector('.scenario-status');
+                statusBadge.textContent = status;
+                statusBadge.className = `scenario-status status-${status}`;
+
+                const startBtn = card.querySelector('.btn-start');
+                const stopBtn = card.querySelector('.btn-stop');
+                const recoverBtn = card.querySelector('.btn-recover');
+
+                if (status === 'running') {
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    recoverBtn.disabled = false;
+                } else {
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                }
+            }
+        }
+
+        function updateTimeline(events) {
+            const container = document.getElementById('timeline');
+            if (!events || events.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">暂无事件</div>';
+                return;
+            }
+
+            const html = events.slice().reverse().map(event => {
+                let dataStr = '';
+                if (event.data) {
+                    dataStr = `<div class="event-data">${JSON.stringify(event.data, null, 2)}</div>`;
+                }
+                const time = new Date(event.timestamp).toLocaleTimeString();
+                return `
+                    <div class="event-item ${event.level}">
+                        <div class="event-time">${time}</div>
+                        <div class="event-scenario">[${event.scenario}]</div>
+                        <div class="event-message">${event.message}</div>
+                        ${dataStr}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+        }
+
+        async function loadScenarios() {
+            const res = await fetch('/api/scenarios');
+            const scenarios = await res.json();
+            const container = document.getElementById('scenarios');
+
+            container.innerHTML = scenarios.map(s => {
+                const info = scenarioInfo[s.name] || { name: s.name, desc: '' };
+                return `
+                    <div class="scenario-card ${s.status}" id="scenario-${s.name}">
+                        <div class="scenario-name">${info.name}</div>
+                        <span class="scenario-status status-${s.status}">${s.status}</span>
+                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">${info.desc}</div>
+                        <div>
+                            <button class="btn btn-start" onclick="controlScenario('${s.name}', 'start')" ${s.status === 'running' ? 'disabled' : ''}>▶ 开始</button>
+                            <button class="btn btn-stop" onclick="controlScenario('${s.name}', 'stop')" ${s.status !== 'running' ? 'disabled' : ''}>⏹ 停止</button>
+                            <button class="btn btn-recover" onclick="controlScenario('${s.name}', 'recover')">↺ 恢复</button>
+                        </div>
+                        <div class="config-preview">Config: ${JSON.stringify(s.config)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function controlScenario(name, action) {
+            await fetch(`/api/scenarios/${name}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action })
+            });
+        }
+
+        loadScenarios();
+        connectWebSocket();
+    </script>
+</body>
+</html>

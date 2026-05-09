@@ -1,0 +1,50 @@
+{
+  "DB": {
+    "Host": "127.0.0.1",
+    "Port": 3306,
+    "User": "root",
+    "Password": "root",
+    "DBName": "chaos_db",
+    "MaxOpenConns": 20,
+    "MaxIdleConns": 10,
+    "ConnMaxLifetime": 3600000000000
+  },
+  "Redis": {
+    "Host": "127.0.0.1",
+    "Port": 6379,
+    "Password": "",
+    "DB": 0,
+    "PoolSize": 50,
+    "MinIdleConns": 10
+  },
+  "Web": {
+    "Port": 8080
+  },
+  "Scenarios": {
+    "ConnectionPool": {
+      "LeakRate": 2,
+      "IntervalMs": 500,
+      "MaxLeakedConns": 50
+    },
+    "MessageQueue": {
+      "ProducerRate": 100,
+      "ConsumerRate": 10,
+      "QueueCapacity": 1000
+    },
+    "GoroutineLeak": {
+      "LeakRate": 5,
+      "IntervalMs": 200,
+      "MaxLeakedGoroutines": 1000
+    },
+    "DBLockWait": {
+      "NumWorkers": 50,
+      "HoldTimeMs": 5000
+    },
+    "CacheDirty": {
+      "UpdateIntervalMs": 1000
+    },
+    "ConfigDrift": {
+      "DriftIntervalMs": 3000
+    }
+  }
+}
