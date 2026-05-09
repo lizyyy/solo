@@ -1,0 +1,27 @@
+{
+  "name": "points-freeze-api",
+  "version": "1.0.0",
+  "description": "会员积分冻结 API - 解决风控冻结后消费、退款、解冻余额算错问题",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/seeders/seed.js",
+    "test": "jest"
+  },
+  "keywords": ["points", "freeze", "risk", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.4.3",
+    "uuid": "^9.0.1",
+    "joi": "^17.12.2",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
+  }
+}
