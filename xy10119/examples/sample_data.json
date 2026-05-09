@@ -1,0 +1,92 @@
+[
+  {
+    "id": "review_001",
+    "content": "这家餐厅的菜品味道很不错，服务也很周到，下次还会再来。",
+    "annotations": [
+      { "annotator": "张三", "label": "正面", "confidence": 0.92, "reasoning": "使用了'很不错'、'周到'等正面词汇" },
+      { "annotator": "李四", "label": "正面", "confidence": 0.88, "reasoning": "整体评价积极" },
+      { "annotator": "王五", "label": "负面", "confidence": 0.65, "reasoning": "可能需要更多正面词验证" }
+    ]
+  },
+  {
+    "id": "review_002",
+    "content": "等了一个小时才上菜，菜品一般，价格还贵。",
+    "annotations": [
+      { "annotator": "张三", "label": "负面", "confidence": 0.95, "reasoning": "有'才上菜'、'一般'、'还贵'等负面描述" },
+      { "annotator": "李四", "label": "负面", "confidence": 0.90, "reasoning": "明确的负面评价" },
+      { "annotator": "王五", "label": "负面", "confidence": 0.85, "reasoning": "等待时间长，价格贵" }
+    ]
+  },
+  {
+    "id": "review_003",
+    "content": "环境还可以，但是价格不太合理，性价比一般。",
+    "annotations": [
+      { "annotator": "张三", "label": "中立", "confidence": 0.80, "reasoning": "有正面也有负面，整体中立" },
+      { "annotator": "李四", "label": "负面", "confidence": 0.70, "reasoning": "价格不合理是主要问题" },
+      { "annotator": "王五", "label": "中立", "confidence": 0.75, "reasoning": "褒贬各半" }
+    ]
+  },
+  {
+    "id": "review_004",
+    "content": "今天天气很好，阳光明媚。",
+    "annotations": [
+      { "annotator": "张三", "label": "正面", "confidence": 0.75, "reasoning": "'很好'、'明媚'是正面词" },
+      { "annotator": "李四", "label": "中立", "confidence": 0.85, "reasoning": "只是描述天气，没有情感倾向" },
+      { "annotator": "王五", "label": "中立", "confidence": 0.90, "reasoning": "客观描述，无情感" }
+    ]
+  },
+  {
+    "id": "review_005",
+    "content": "这个产品的质量确实超出预期，推荐购买。",
+    "annotations": [
+      { "annotator": "张三", "label": "正面", "confidence": 0.98, "reasoning": "'超出预期'、'推荐购买'非常正面" },
+      { "annotator": "李四", "label": "正面", "confidence": 0.95, "reasoning": "强烈推荐" },
+      { "annotator": "王五", "label": "正面", "confidence": 0.92, "reasoning": "明确的正面评价" }
+    ]
+  },
+  {
+    "id": "review_006",
+    "content": "客服态度很差，一直不回消息，体验糟糕。",
+    "annotations": [
+      { "annotator": "张三", "label": "负面", "confidence": 0.99, "reasoning": "'很差'、'不回'、'糟糕'都是负面词" },
+      { "annotator": "李四", "label": "负面", "confidence": 0.97, "reasoning": "非常负面的体验描述" },
+      { "annotator": "王五", "label": "中立", "confidence": 0.55, "reasoning": "可能只是客观描述" }
+    ]
+  },
+  {
+    "id": "review_007",
+    "content": "这本书的内容丰富，但排版需要改进。",
+    "annotations": [
+      { "annotator": "张三", "label": "正面", "confidence": 0.60, "reasoning": "内容丰富是优点" },
+      { "annotator": "李四", "label": "中立", "confidence": 0.85, "reasoning": "有好有坏，整体中立" },
+      { "annotator": "王五", "label": "负面", "confidence": 0.65, "reasoning": "排版问题是硬伤" }
+    ]
+  },
+  {
+    "id": "review_008",
+    "content": "配送速度很快，包装也很完好。",
+    "annotations": [
+      { "annotator": "张三", "label": "正面", "confidence": 0.88, "reasoning": "'很快'、'完好'都是正面评价" },
+      { "annotator": "李四", "label": "正面", "confidence": 0.85, "reasoning": "物流体验好" },
+      { "annotator": "王五", "label": "正面", "confidence": 0.80, "reasoning": "配送和包装都不错" }
+    ]
+  },
+  {
+    "id": "review_009",
+    "content": "功能一般，界面也不好看，不太推荐。",
+    "annotations": [
+      { "annotator": "张三", "label": "负面", "confidence": 0.92, "reasoning": "'一般'、'不好看'、'不太推荐'" },
+      { "annotator": "李四", "label": "负面", "confidence": 0.88, "reasoning": "整体评价偏负面" },
+      { "annotator": "王五", "label": "负面", "confidence": 0.90, "reasoning": "明确不推荐" }
+    ]
+  },
+  {
+    "id": "review_010",
+    "content": "可能还行吧，说不上好也说不上坏。",
+    "annotations": [
+      { "annotator": "张三", "label": "中立", "confidence": 0.90, "reasoning": "非常典型的中立描述" },
+      { "annotator": "李四", "label": "中立", "confidence": 0.85, "reasoning": "没有明确倾向" },
+      { "annotator": "王五", "label": "正面", "confidence": 0.50, "reasoning": "'还行'略带正面" }
+    ]
+  }
+]

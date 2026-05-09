@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标注样本一致性审计器</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .app { min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 260px; background: #1a1f36; color: #fff; padding: 24px; }
+        .sidebar h1 { font-size: 18px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+        .sidebar h1 i { color: #6366f1; }
+        .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #94a3b8; transition: all 0.2s; margin-bottom: 4px; }
+        .nav-item:hover { background: #242b45; color: #fff; }
+        .nav-item.active { background: #6366f1; color: #fff; }
+        .nav-item i { width: 20px; }
+        
+        /* Main content */
+        .main { margin-left: 260px; padding: 24px; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h2 { font-size: 24px; font-weight: 600; }
+        .breadcrumb { font-size: 14px; color: #64748b; margin-top: 4px; }
+        
+        /* Stats cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card .icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 20px; }
+        .stat-card.purple .icon { background: #ede9fe; color: #7c3aed; }
+        .stat-card.blue .icon { background: #dbeafe; color: #3b82f6; }
+        .stat-card.green .icon { background: #d1fae5; color: #10b981; }
+        .stat-card.red .icon { background: #fee2e2; color: #ef4444; }
+        .stat-card .value { font-size: 28px; font-weight: 700; }
+        .stat-card .label { font-size: 14px; color: #64748b; margin-top: 4px; }
+        
+        /* Cards */
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-header { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 16px; font-weight: 600; }
+        .card-body { padding: 20px; }
+        
+        /* Buttons */
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-primary:hover { background: #4f46e5; }
+        .btn-secondary { background: #f1f5f9; color: #334155; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-success { background: #10b981; color: #fff; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; }
+        
+        /* Tables */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { text-align: left; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; }
+        .table td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .table tr:hover { background: #f8fafc; }
+        
+        /* Badges */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-high { background: #fee2e2; color: #991b1b; }
+        .badge-medium { background: #fef3c7; color: #92400e; }
+        .badge-low { background: #dbeafe; color: #1e40af; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #334155; }
+        .form-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: all 0.2s; }
+        .form-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal { background: #fff; border-radius: 16px; max-width: 700px; width: 100%; max-height: 90vh; overflow: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+        .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; }
+        
+        /* Empty state */
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h4 { font-size: 18px; margin-bottom: 8px; color: #64748b; }
+        
+        /* Tabs */
+        .tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .tab { padding: 12px 24px; cursor: pointer; font-weight: 500; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+        .tab:hover { color: #6366f1; }
+        .tab.active { color: #6366f1; border-bottom-color: #6366f1; }
+        
+        /* Annotation card */
+        .annotation-card { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 12px; transition: all 0.2s; }
+        .annotation-card:hover { border-color: #6366f1; }
+        .annotation-card.selected { border-color: #6366f1; background: #eef2ff; }
+        .annotation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .annotator { font-weight: 600; color: #334155; }
+        .confidence { font-size: 12px; color: #64748b; }
+        .annotation-label { font-size: 18px; font-weight: 700; color: #6366f1; margin-bottom: 8px; }
+        .annotation-reasoning { font-size: 13px; color: #64748b; font-style: italic; }
+        
+        /* Decision options */
+        .decision-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .decision-option { padding: 16px; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .decision-option:hover { border-color: #6366f1; }
+        .decision-option.selected { border-color: #6366f1; background: #eef2ff; }
+        .decision-option i { font-size: 24px; margin-bottom: 8px; color: #6366f1; }
+        .decision-option h4 { font-size: 14px; margin-bottom: 4px; }
+        .decision-option p { font-size: 12px; color: #64748b; }
+        
+        /* Progress */
+        .progress-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); border-radius: 4px; transition: width 0.3s; }
+        
+        /* History timeline */
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+        .timeline-item { position: relative; margin-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -20px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #6366f1; border: 2px solid #fff; }
+        .timeline-time { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+        .timeline-content { background: #f8fafc; border-radius: 8px; padding: 12px; }
+        .timeline-content .user { font-weight: 600; color: #334155; }
+        .timeline-content .action { color: #6366f1; }
+        
+        /* Alert */
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        
+        /* Upload area */
+        .upload-area { border: 2px dashed #e2e8f0; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .upload-area:hover, .upload-area.drag-over { border-color: #6366f1; background: #eef2ff; }
+        .upload-area i { font-size: 36px; color: #94a3b8; margin-bottom: 12px; }
+        .upload-area h4 { font-size: 16px; margin-bottom: 4px; }
+        .upload-area p { font-size: 13px; color: #94a3b8; }
+        
+        /* Version item */
+        .version-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #f1f5f9; }
+        .version-item:last-child { border-bottom: none; }
+        .version-info h4 { font-size: 14px; margin-bottom: 4px; }
+        .version-info p { font-size: 12px; color: #64748b; }
+        .version-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; background: #ede9fe; color: #7c3aed; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="app">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h1><i class="fas fa-clipboard-check"></i> 标注审计器</h1>
+                <div v-for="item in navItems" :key="item.id" 
+                     class="nav-item" 
+                     :class="{ active: currentView === item.id }"
+                     @click="currentView = item.id">
+                    <i :class="item.icon"></i>
+                    <span>{{ item.name }}</span>
+                </div>
+            </div>
+            
+            <!-- Main -->
+            <div class="main">
+                <!-- Dashboard -->
+                <div v-if="currentView === 'dashboard'">
+                    <div class="header">
+                        <div>
+                            <h2>概览</h2>
+                            <div class="breadcrumb">标注样本一致性审计器</div>
+                        </div>
+                        <button class="btn btn-primary" @click="showCreateProjectModal = true">
+                            <i class="fas fa-plus"></i> 新建项目
+                        </button>
+                    </div>
+                    
+                    <div v-if="currentProject" class="stats-grid">
+                        <div class="stat-card purple">
+                            <div class="icon"><i class="fas fa-database"></i></div>
+                            <div class="value">{{ projectStats.total_samples || 0 }}</div>
+                            <div class="label">总样本数</div>
+                        </div>
+                        <div class="stat-card blue">
+                            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="value">{{ projectStats.total_conflicts || 0 }}</div>
+                            <div class="label">冲突总数</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="icon"><i class="fas fa-check-circle"></i></div>
+                            <div class="value">{{ projectStats.resolved_conflicts || 0 }}</div>
+                            <div class="label">已解决</div>
+                        </div>
+                        <div class="stat-card red">
+                            <div class="icon"><i class="fas fa-clock"></i></div>
+                            <div class="value">{{ projectStats.pending_conflicts || 0 }}</div>
+                            <div class="label">待处理</div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="projects.length === 0" class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h4>还没有项目</h4>
+                                <p>创建一个新项目开始审计标注样本</p>
+                                <button class="btn btn-primary mt-4" @click="showCreateProjectModal = true">
+                                    <i class="fas fa-plus"></i> 新建项目
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else class="card">
+                        <div class="card-header">
+                            <h3>项目列表</h3>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>项目名称</th>
+                                        <th>描述</th>
+                                        <th>样本数</th>
+                                        <th>冲突数</th>
+                                        <th>冲突率</th>
+                                        <th>更新时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="project in projects" :key="project.id">
+                                        <td>
+                                            <a href="#" @click.prevent="selectProject(project.id)">{{ project.name }}</a>
+                                        </td>
+                                        <td>{{ project.description || '-' }}</td>
+                                        <td>{{ projectStats[project.id]?.total_samples || 0 }}</td>
+                                        <td>{{ projectStats[project.id]?.total_conflicts || 0 }}</td>
+                                        <td>{{ projectStats[project.id]?.conflict_rate || 0 }}%</td>
+                                        <td>{{ formatDate(project.updated_at) }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-secondary" @click="selectProject(project.id)">进入</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Import -->
+                <div v-if="currentView === 'import'">
+                    <div class="header">
+                        <div>
+                            <h2>数据导入</h2>
+                            <div class="breadcrumb">项目: {{ currentProjectInfo?.name || '未选择' }}</div>
+                        </div>
+                        <select v-model="selectedProjectId" class="form-input" style="width: 200px" @change="loadProject">
+                            <option :value="null">选择项目</option>
+                            <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+                        </select>
+                    </div>
+                    
+                    <div v-if="!selectedProjectId" class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-arrow-left"></i>
+                                <h4>请先选择项目</h4>
+                                <p>在上方下拉框选择一个项目进行数据导入</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else class="card">
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>支持的格式: JSON、JSONL、CSV、Excel。文件需包含 content/text 列和 label、annotator 列。</span>
+                            </div>
+                            
+                            <div class="upload-area" 
+                                 :class="{ 'drag-over': dragOver }"
+                                 @click="triggerFileInput"
+                                 @dragover.prevent="dragOver = true"
+                                 @dragleave.prevent="dragOver = false"
+                                 @drop.prevent="handleDrop">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>点击或拖拽文件到此处</h4>
+                                <p>支持 .json, .jsonl, .csv, .xlsx</p>
+                            </div>
+                            <input type="file" ref="fileInput" style="display: none" @change="handleFileSelect" 
+                                   accept=".json,.jsonl,.csv,.xlsx">
+                            
+                            <div v-if="uploadResult" class="mt-4" 
+                                 :class="uploadResult.success ? 'alert alert-success' : 'alert alert-warning'">
+                                <i :class="uploadResult.success ? 'fas fa-check' : 'fas fa-exclamation'"></i>
+                                <span>{{ uploadResult.message }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="selectedProjectId" class="card mt-4">
+                        <div class="card-header">
+                            <h3>数据格式示例</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="tabs">
+                                <div class="tab active" @click="exampleFormat = 'json'">JSON</div>
+                                <div class="tab" @click="exampleFormat = 'csv'">CSV</div>
+                            </div>
+                            
+                            <div v-if="exampleFormat === 'json'" style="background: #1e293b; padding: 16px; border-radius: 8px; color: #e2e8f0; font-family: monospace; font-size: 13px;">
+[{<br>
+&nbsp;&nbsp;"id": "sample_001",<br>
+&nbsp;&nbsp;"content": "这是一个标注样本",<br>
+&nbsp;&nbsp;"annotations": [<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "annotator": "张三", "label": "正面", "confidence": 0.9 },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "annotator": "李四", "label": "负面", "confidence": 0.85 },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;{ "annotator": "王五", "label": "正面", "confidence": 0.95 }<br>
+&nbsp;&nbsp;]<br>
+}]
+                            </div>
+                            
+                            <div v-else style="background: #1e293b; padding: 16px; border-radius: 8px; color: #e2e8f0; font-family: monospace; font-size: 13px;">
+content,id,annotator,label,confidence<br>
+这是样本1,sample_001,张三,正面,0.9<br>
+这是样本1,sample_001,李四,负面,0.85<br>
+这是样本1,sample_001,王五,正面,0.95<br>
+这是样本2,sample_002,张三,负面,0.8
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conflicts -->
+                <div v-if="currentView === 'conflicts'">
+                    <div class="header">
+                        <div>
+                            <h2>冲突复核</h2>
+                            <div class="breadcrumb">项目: {{ currentProjectInfo?.name || '未选择' }}</div>
+                        </div>
+                        <div style="display: flex; gap: 10px">
+                            <select v-model="conflictFilter.status" class="form-input" style="width: 140px" @change="loadConflicts">
+                                <option value="">全部状态</option>
+                                <option value="pending">待处理</option>
+                                <option value="resolved">已解决</option>
+                            </select>
+                            <select v-model="conflictFilter.severity" class="form-input" style="width: 140px" @change="loadConflicts">
+                                <option value="">全部严重度</option>
+                                <option value="high">高</option>
+                                <option value="medium">中</option>
+                                <option value="low">低</option>
+                            </select>
+                            <button class="btn btn-primary" @click="runConflictDetection">
+                                <i class="fas fa-sync"></i> 重新检测
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div v-if="conflicts.length === 0" class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-check-circle"></i>
+                                <h4>没有发现冲突</h4>
+                                <p>所有样本的标注结果一致</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span>复核进度</span>
+                                    <span>{{ resolvedCount }}/{{ conflicts.length }} 已解决</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body" style="padding: 0">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px">
+                                                <input type="checkbox" v-model="selectAllConflicts" @change="toggleSelectAll">
+                                            </th>
+                                            <th>样本内容</th>
+                                            <th>标注分歧</th>
+                                            <th>严重度</th>
+                                            <th>状态</th>
+                                            <th>检测时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="conflict in conflicts" :key="conflict.id">
+                                            <td>
+                                                <input type="checkbox" v-model="selectedConflictIds" :value="conflict.id" @change="updateSelectAll">
+                                            </td>
+                                            <td>
+                                                <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    {{ conflict.sample?.content || '' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span v-for="(count, label) in getLabelDistribution(conflict)" :key="label" 
+                                                      style="display: inline-block; margin-right: 8px;">
+                                                    <span style="font-weight: 600;">{{ label }}</span>
+                                                    <span style="color: #94a3b8; font-size: 12px;">({{ count }})</span>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" :class="'badge-' + conflict.severity">
+                                                    {{ severityText(conflict.severity) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge" :class="'badge-' + conflict.status">
+                                                    {{ statusText(conflict.status) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ formatDate(conflict.created_at) }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary" @click="openReviewModal(conflict)">
+                                                    {{ conflict.status === 'pending' ? '复核' : '查看' }}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div v-if="selectedConflictIds.length > 0" class="card-footer" style="padding: 16px 20px; border-top: 1px solid #e2e8f0; background: #f8fafc;">
+                                <span style="margin-right: 16px;">已选择 {{ selectedConflictIds.length }} 项</span>
+                                <select v-model="batchDecision" class="form-input" style="width: 160px; display: inline; margin-right: 10px;">
+                                    <option value="accept_majority">接受多数票</option>
+                                    <option value="mark_invalid">标记无效</option>
+                                </select>
+                                <input v-model="batchReasoning" class="form-input" style="width: 300px; display: inline; margin-right: 10px;" placeholder="批处理理由...">
+                                <input v-model="batchReviewer" class="form-input" style="width: 120px; display: inline; margin-right: 10px;" placeholder="复核人">
+                                <button class="btn btn-success" @click="executeBatchDecide">批量处理</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History -->
+                <div v-if="currentView === 'history'">
+                    <div class="header">
+                        <div>
+                            <h2>版本历史</h2>
+                            <div class="breadcrumb">项目: {{ currentProjectInfo?.name || '未选择' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="versions.length === 0" class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-history"></i>
+                                <h4>暂无版本记录</h4>
+                                <p>进行数据导入或复核操作后会自动生成版本快照</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else class="card">
+                        <div class="card-body" style="padding: 0">
+                            <div v-for="version in versions" :key="version.id" class="version-item">
+                                <div class="version-info">
+                                    <h4>
+                                        <span class="version-badge">v{{ version.version_number }}</span>
+                                        <span style="margin-left: 12px;">{{ version.description }}</span>
+                                    </h4>
+                                    <p>
+                                        操作: {{ version.action }} | 
+                                        影响样本: {{ version.affected_samples }} | 
+                                        操作人: {{ version.created_by }} | 
+                                        {{ formatDate(version.created_at) }}
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-sm btn-secondary" @click="viewVersionDiff(version.id)">查看差异</button>
+                                    <button class="btn btn-sm btn-warning" @click="confirmRollback(version)">回滚</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports -->
+                <div v-if="currentView === 'reports'">
+                    <div class="header">
+                        <div>
+                            <h2>报告导出</h2>
+                            <div class="breadcrumb">项目: {{ currentProjectInfo?.name || '未选择' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="reportSummary" class="card mb-4">
+                        <div class="card-header">
+                            <h3>统计概览</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                                <div class="stat-card purple">
+                                    <div class="icon"><i class="fas fa-percentage"></i></div>
+                                    <div class="value">{{ reportSummary.conflict_rate || 0 }}%</div>
+                                    <div class="label">冲突率</div>
+                                </div>
+                                <div class="stat-card green">
+                                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                                    <div class="value">{{ reportSummary.reviewer_consistency || 0 }}%</div>
+                                    <div class="label">解决率</div>
+                                </div>
+                                <div class="stat-card blue">
+                                    <div class="icon"><i class="fas fa-users"></i></div>
+                                    <div class="value">{{ reportSummary.total_annotators || 0 }}</div>
+                                    <div class="label">标注者</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>导出选项</h3>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                <div class="card" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                                    <div class="card-body">
+                                        <h4 style="margin-bottom: 12px;"><i class="fas fa-file-code" style="color: #6366f1; margin-right: 8px;"></i>JSON 报告</h4>
+                                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">导出完整的审计报告，包含所有冲突详情和复核历史</p>
+                                        <button class="btn btn-primary btn-sm" @click="exportReport('json')">
+                                            <i class="fas fa-download"></i> 导出 JSON
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                                    <div class="card-body">
+                                        <h4 style="margin-bottom: 12px;"><i class="fas fa-file-csv" style="color: #10b981; margin-right: 8px;"></i>CSV 导出</h4>
+                                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">导出冲突列表、样本列表或决策记录</p>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-success btn-sm" @click="exportReport('csv', 'conflicts')">冲突</button>
+                                            <button class="btn btn-success btn-sm" @click="exportReport('csv', 'samples')">样本</button>
+                                            <button class="btn btn-success btn-sm" @click="exportReport('csv', 'decisions')">决策</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                                    <div class="card-body">
+                                        <h4 style="margin-bottom: 12px;"><i class="fas fa-file-excel" style="color: #f59e0b; margin-right: 8px;"></i>Excel 报告</h4>
+                                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">导出多工作表的完整审计报告</p>
+                                        <button class="btn btn-warning btn-sm" @click="exportReport('excel')">
+                                            <i class="fas fa-download"></i> 导出 Excel
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="card" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                                    <div class="card-body">
+                                        <h4 style="margin-bottom: 12px;"><i class="fas fa-brain" style="color: #8b5cf6; margin-right: 8px;"></i>训练数据</h4>
+                                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">导出经过复核的最终训练数据（多数投票）</p>
+                                        <button class="btn btn-primary btn-sm" @click="exportTrainingData">
+                                            <i class="fas fa-download"></i> 导出训练集
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="annotatorConsistency && Object.keys(annotatorConsistency).length > 0" class="card mt-4">
+                        <div class="card-header">
+                            <h3>标注者一致性矩阵</h3>
+                        </div>
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>标注者对</th>
+                                        <th>一致性</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(score, pair) in annotatorConsistency" :key="pair">
+                                        <td>{{ pair }}</td>
+                                        <td>{{ (score * 100).toFixed(1) }}%</td>
+                                        <td>
+                                            <span class="badge" :class="score >= 0.8 ? 'badge-resolved' : score >= 0.6 ? 'badge-medium' : 'badge-high'">
+                                                {{ score >= 0.8 ? '高一致' : score >= 0.6 ? '中一致' : '低一致' }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Samples -->
+                <div v-if="currentView === 'samples'">
+                    <div class="header">
+                        <div>
+                            <h2>样本管理</h2>
+                            <div class="breadcrumb">项目: {{ currentProjectInfo?.name || '未选择' }}</div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="samples.length === 0" class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <i class="fas fa-file-alt"></i>
+                                <h4>暂无样本</h4>
+                                <p>请先导入数据</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else class="card">
+                        <div class="card-body" style="padding: 0">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>内容</th>
+                                        <th>标注数</th>
+                                        <th>标签</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="sample in samples" :key="sample.id">
+                                        <td>{{ sample.external_id || sample.id }}</td>
+                                        <td>
+                                            <div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                {{ sample.content }}
+                                            </div>
+                                        </td>
+                                        <td>{{ sample.annotations.length }}</td>
+                                        <td>
+                                            <span v-for="(count, label) in getSampleLabels(sample)" :key="label" 
+                                                  class="badge" style="margin-right: 4px; background: #eef2ff; color: #6366f1;">
+                                                {{ label }} ({{ count }})
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" :class="hasConflict(sample) ? 'badge-pending' : 'badge-resolved'">
+                                                {{ hasConflict(sample) ? '有冲突' : '一致' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-secondary" @click="viewSampleDetail(sample)">查看历史</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Create Project Modal -->
+        <div v-if="showCreateProjectModal" class="modal-overlay" @click.self="showCreateProjectModal = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>新建项目</h3>
+                    <button class="close-btn" @click="showCreateProjectModal = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">项目名称</label>
+                        <input v-model="newProject.name" class="form-input" placeholder="输入项目名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">项目描述</label>
+                        <textarea v-model="newProject.description" class="form-input form-textarea" placeholder="可选的项目描述"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="showCreateProjectModal = false">取消</button>
+                    <button class="btn btn-primary" @click="createProject" :disabled="!newProject.name">创建</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Review Modal -->
+        <div v-if="showReviewModal && selectedConflict" class="modal-overlay" @click.self="showReviewModal = false">
+            <div class="modal" style="max-width: 900px;">
+                <div class="modal-header">
+                    <h3>复核冲突 #{{ selectedConflict.id }}</h3>
+                    <button class="close-btn" @click="showReviewModal = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-4" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                        <div class="card-header">
+                            <h4>样本内容</h4>
+                        </div>
+                        <div class="card-body">
+                            <p style="white-space: pre-wrap; line-height: 1.6;">{{ selectedConflict.sample?.content }}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 16px;">标注结果</h4>
+                    <div v-if="selectedConflict.status === 'pending'" style="margin-bottom: 20px;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span>选择一个你认为正确的标注，或使用下面的快速决策选项</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+                        <div v-for="annotation in selectedConflict.annotations" :key="annotation.id"
+                             class="annotation-card" 
+                             :class="{ selected: reviewForm.annotation_id === annotation.id }"
+                             @click="selectAnnotation(annotation)">
+                            <div class="annotation-header">
+                                <span class="annotator"><i class="fas fa-user" style="margin-right: 6px; color: #94a3b8;"></i>{{ annotation.annotator }}</span>
+                                <span class="confidence">置信度: {{ annotation.confidence }}</span>
+                            </div>
+                            <div class="annotation-label">{{ annotation.label }}</div>
+                            <div v-if="annotation.reasoning" class="annotation-reasoning">
+                                <i class="fas fa-comment" style="margin-right: 4px;"></i>{{ annotation.reasoning }}
+                            </div>
+                            <div v-if="!annotation.is_active" class="mt-2">
+                                <span class="badge badge-high">已失效</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="selectedConflict.status === 'pending'">
+                        <h4 style="margin-bottom: 12px;">决策类型</h4>
+                        <div class="decision-options">
+                            <div class="decision-option" 
+                                 :class="{ selected: reviewForm.decision === 'accept_annotation' }"
+                                 @click="reviewForm.decision = 'accept_annotation'">
+                                <i class="fas fa-check"></i>
+                                <h4>接受选中标注</h4>
+                                <p>选中上方的一个标注作为最终结果</p>
+                            </div>
+                            <div class="decision-option" 
+                                 :class="{ selected: reviewForm.decision === 'accept_majority' }"
+                                 @click="reviewForm.decision = 'accept_majority'">
+                                <i class="fas fa-users"></i>
+                                <h4>接受多数票</h4>
+                                <p>自动选择票数最多的标签</p>
+                            </div>
+                            <div class="decision-option" 
+                                 :class="{ selected: reviewForm.decision === 'mark_invalid' }"
+                                 @click="reviewForm.decision = 'mark_invalid'">
+                                <i class="fas fa-ban"></i>
+                                <h4>标记无效</h4>
+                                <p>该样本不适合标注，排除出训练集</p>
+                            </div>
+                            <div class="decision-option" 
+                                 :class="{ selected: reviewForm.decision === 'reopen_for_reannotation' }"
+                                 @click="reviewForm.decision = 'reopen_for_reannotation'">
+                                <i class="fas fa-redo"></i>
+                                <h4>重新标注</h4>
+                                <p>标记需要送回重新标注</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">复核人</label>
+                            <input v-model="reviewForm.reviewer" class="form-input" placeholder="输入你的姓名">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">决策理由 <span style="color: #ef4444;">*</span></label>
+                            <textarea v-model="reviewForm.reasoning" class="form-input form-textarea" 
+                                      placeholder="请详细说明你的决策理由，这将被记录在审计历史中..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div v-else>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <span>该冲突已于 {{ formatDate(selectedConflict.resolved_at) }} 由 {{ selectedConflict.resolved_by }} 解决</span>
+                        </div>
+                        
+                        <h4 style="margin: 20px 0 12px;">历史决策</h4>
+                        <div class="timeline">
+                            <div v-for="decision in selectedConflict.review_decisions" :key="decision.id" class="timeline-item">
+                                <div class="timeline-time">{{ formatDate(decision.created_at) }}</div>
+                                <div class="timeline-content">
+                                    <span class="user">{{ decision.reviewer }}</span>
+                                    <span class="action"> 决定: {{ decisionText(decision.decision) }}</span>
+                                    <p style="margin-top: 8px; font-size: 13px; color: #64748b;">{{ decision.reasoning }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button v-if="selectedConflict.status === 'resolved'" class="btn btn-warning" @click="revertDecision">
+                        <i class="fas fa-undo"></i> 撤销决策
+                    </button>
+                    <button class="btn btn-secondary" @click="showReviewModal = false">关闭</button>
+                    <button v-if="selectedConflict.status === 'pending'" 
+                            class="btn btn-primary" 
+                            @click="submitReview"
+                            :disabled="!canSubmitReview">
+                        <i class="fas fa-check"></i> 提交决策
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample Detail Modal -->
+        <div v-if="showSampleDetailModal && sampleDetail" class="modal-overlay" @click.self="showSampleDetailModal = false">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>样本历史 #{{ sampleDetail.sample_id }}</h3>
+                    <button class="close-btn" @click="showSampleDetailModal = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-4" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                        <div class="card-body">
+                            <p style="white-space: pre-wrap; line-height: 1.6;">{{ sampleDetail.content }}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-bottom: 16px;">标注记录</h4>
+                    <div v-for="ann in sampleDetail.annotations" :key="ann.id" class="annotation-card">
+                        <div class="annotation-header">
+                            <span class="annotator">{{ ann.annotator }}</span>
+                            <span class="confidence">
+                                {{ ann.is_active ? '生效中' : '已失效' }} | 置信度: {{ ann.confidence }}
+                            </span>
+                        </div>
+                        <div class="annotation-label">{{ ann.label }}</div>
+                        <div v-if="ann.reasoning" class="annotation-reasoning">{{ ann.reasoning }}</div>
+                    </div>
+                    
+                    <h4 style="margin: 24px 0 16px;">冲突历史</h4>
+                    <div v-if="sampleDetail.conflicts.length === 0" class="empty-state" style="padding: 30px;">
+                        <i class="fas fa-check-circle" style="font-size: 32px;"></i>
+                        <h4 style="font-size: 14px; margin-bottom: 0;">无冲突记录</h4>
+                    </div>
+                    <div v-else>
+                        <div v-for="conflict in sampleDetail.conflicts" :key="conflict.id" class="card mb-3" style="box-shadow: none; border: 1px solid #e2e8f0;">
+                            <div class="card-header">
+                                <span>冲突 #{{ conflict.id }}</span>
+                                <span class="badge" :class="'badge-' + conflict.status">{{ statusText(conflict.status) }}</span>
+                            </div>
+                            <div class="card-body">
+                                <div v-for="decision in conflict.decisions" :key="decision.reviewer + decision.created_at" style="margin-bottom: 8px;">
+                                    <strong>{{ decision.reviewer }}</strong> - {{ decisionText(decision.decision) }}
+                                    <br>
+                                    <span style="font-size: 12px; color: #64748b;">{{ decision.reasoning }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="showSampleDetailModal = false">关闭</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rollback Confirm Modal -->
+        <div v-if="showRollbackModal" class="modal-overlay" @click.self="showRollbackModal = false">
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>确认回滚</h3>
+                    <button class="close-btn" @click="showRollbackModal = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>你正在将项目回滚到版本 v{{ rollbackVersion?.version_number }}</span>
+                    </div>
+                    <p style="margin-bottom: 16px;">回滚操作：</p>
+                    <ul style="margin-left: 20px; color: #64748b; line-height: 1.8;">
+                        <li>恢复该版本时的标注状态</li>
+                        <li>回滚后的操作将被记录为新版本</li>
+                        <li>原始历史仍然可追溯</li>
+                    </ul>
+                    <div class="form-group mt-4">
+                        <label class="form-label">操作人</label>
+                        <input v-model="rollbackReviewer" class="form-input" placeholder="输入你的姓名">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @click="showRollbackModal = false">取消</button>
+                    <button class="btn btn-danger" @click="executeRollback" :disabled="!rollbackReviewer">确认回滚</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+        
+        createApp({
+            setup() {
+                const currentView = ref('dashboard');
+                const projects = ref([]);
+                const selectedProjectId = ref(null);
+                const currentProjectInfo = ref(null);
+                
+                const navItems = [
+                    { id: 'dashboard', name: '概览', icon: 'fas fa-home' },
+                    { id: 'import', name: '数据导入', icon: 'fas fa-upload' },
+                    { id: 'conflicts', name: '冲突复核', icon: 'fas fa-exclamation-triangle' },
+                    { id: 'samples', name: '样本管理', icon: 'fas fa-file-alt' },
+                    { id: 'history', name: '版本历史', icon: 'fas fa-history' },
+                    { id: 'reports', name: '报告导出', icon: 'fas fa-chart-bar' }
+                ];
+                
+                const showCreateProjectModal = ref(false);
+                const newProject = reactive({ name: '', description: '' });
+                
+                const dragOver = ref(false);
+                const uploadResult = ref(null);
+                const exampleFormat = ref('json');
+                
+                const conflictFilter = reactive({ status: '', severity: '' });
+                const conflicts = ref([]);
+                const selectedConflictIds = ref([]);
+                const selectAllConflicts = ref(false);
+                const batchDecision = ref('accept_majority');
+                const batchReasoning = ref('');
+                const batchReviewer = ref('');
+                
+                const showReviewModal = ref(false);
+                const selectedConflict = ref(null);
+                const reviewForm = reactive({
+                    decision: '',
+                    reasoning: '',
+                    reviewer: '',
+                    annotation_id: null
+                });
+                
+                const samples = ref([]);
+                const showSampleDetailModal = ref(false);
+                const sampleDetail = ref(null);
+                
+                const versions = ref([]);
+                const showRollbackModal = ref(false);
+                const rollbackVersion = ref(null);
+                const rollbackReviewer = ref('');
+                
+                const reportSummary = ref(null);
+                const annotatorConsistency = ref({});
+                const projectStats = ref({});
+                
+                const API_BASE = '/api';
+                
+                async function fetchProjects() {
+                    const res = await fetch(API_BASE + '/projects');
+                    projects.value = await res.json();
+                    
+                    for (const p of projects.value) {
+                        try {
+                            const rRes = await fetch(API_BASE + `/projects/${p.id}/report/summary`);
+                            projectStats.value[p.id] = await rRes.json();
+                        } catch (e) {
+                            projectStats.value[p.id] = { total_samples: 0, total_conflicts: 0, conflict_rate: 0 };
+                        }
+                    }
+                }
+                
+                async function selectProject(id) {
+                    selectedProjectId.value = id;
+                    await loadProject();
+                    currentView.value = 'conflicts';
+                }
+                
+                async function loadProject() {
+                    if (!selectedProjectId.value) {
+                        currentProjectInfo.value = null;
+                        return;
+                    }
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}`);
+                    currentProjectInfo.value = await res.json();
+                    
+                    loadConflicts();
+                    loadVersions();
+                    loadSamples();
+                    loadReportSummary();
+                }
+                
+                async function loadConflicts() {
+                    if (!selectedProjectId.value) return;
+                    
+                    let url = API_BASE + `/projects/${selectedProjectId.value}/conflicts?`;
+                    if (conflictFilter.status) url += `status=${conflictFilter.status}&`;
+                    if (conflictFilter.severity) url += `severity=${conflictFilter.severity}&`;
+                    
+                    const res = await fetch(url);
+                    conflicts.value = await res.json();
+                    selectedConflictIds.value = [];
+                    selectAllConflicts.value = false;
+                }
+                
+                async function loadVersions() {
+                    if (!selectedProjectId.value) return;
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/versions`);
+                    versions.value = await res.json();
+                }
+                
+                async function loadSamples() {
+                    if (!selectedProjectId.value) return;
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/samples?limit=50`);
+                    samples.value = await res.json();
+                }
+                
+                async function loadReportSummary() {
+                    if (!selectedProjectId.value) return;
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/report/full`);
+                    const full = await res.json();
+                    reportSummary.value = full;
+                    
+                    try {
+                        const cRes = await fetch(API_BASE + `/projects/${selectedProjectId.value}/annotator-consistency`);
+                        annotatorConsistency.value = await cRes.json();
+                    } catch (e) {
+                        annotatorConsistency.value = {};
+                    }
+                }
+                
+                async function createProject() {
+                    const res = await fetch(API_BASE + '/projects', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newProject)
+                    });
+                    
+                    if (res.ok) {
+                        showCreateProjectModal.value = false;
+                        newProject.name = '';
+                        newProject.description = '';
+                        await fetchProjects();
+                    }
+                }
+                
+                function triggerFileInput() {
+                    document.querySelector('input[type="file"]').click();
+                }
+                
+                async function handleFileSelect(e) {
+                    const file = e.target.files[0];
+                    if (file) await uploadFile(file);
+                }
+                
+                async function handleDrop(e) {
+                    dragOver.value = false;
+                    const file = e.dataTransfer.files[0];
+                    if (file) await uploadFile(file);
+                }
+                
+                async function uploadFile(file) {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    const format = ext === 'xlsx' ? 'xlsx' : ext;
+                    
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/import?format=${format}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await res.json();
+                    uploadResult.value = {
+                        success: res.ok,
+                        message: res.ok ? result.message : result.detail
+                    };
+                    
+                    if (res.ok) {
+                        await loadProject();
+                    }
+                }
+                
+                async function runConflictDetection() {
+                    if (!selectedProjectId.value) return;
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/detect-conflicts?method=rule_based`, {
+                        method: 'POST'
+                    });
+                    
+                    if (res.ok) {
+                        await loadConflicts();
+                    }
+                }
+                
+                function openReviewModal(conflict) {
+                    selectedConflict.value = conflict;
+                    reviewForm.decision = '';
+                    reviewForm.reasoning = '';
+                    reviewForm.annotation_id = null;
+                    showReviewModal.value = true;
+                }
+                
+                function selectAnnotation(annotation) {
+                    reviewForm.annotation_id = annotation.id;
+                    reviewForm.decision = 'accept_annotation';
+                }
+                
+                const canSubmitReview = computed(() => {
+                    if (!reviewForm.reasoning || !reviewForm.reviewer) return false;
+                    if (reviewForm.decision === 'accept_annotation' && !reviewForm.annotation_id) return false;
+                    return true;
+                });
+                
+                async function submitReview() {
+                    const res = await fetch(API_BASE + `/conflicts/${selectedConflict.value.id}/decide`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reviewForm)
+                    });
+                    
+                    if (res.ok) {
+                        showReviewModal.value = false;
+                        await loadConflicts();
+                        await loadVersions();
+                        await loadReportSummary();
+                    }
+                }
+                
+                async function revertDecision() {
+                    if (!confirm('确定要撤销这个决策吗？')) return;
+                    
+                    const reviewer = prompt('请输入操作人姓名:');
+                    if (!reviewer) return;
+                    
+                    const res = await fetch(API_BASE + `/conflicts/${selectedConflict.value.id}/revert?reviewer=${encodeURIComponent(reviewer)}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (res.ok) {
+                        showReviewModal.value = false;
+                        await loadConflicts();
+                        await loadVersions();
+                    }
+                }
+                
+                function toggleSelectAll() {
+                    if (selectAllConflicts.value) {
+                        selectedConflictIds.value = conflicts.value
+                            .filter(c => c.status === 'pending')
+                            .map(c => c.id);
+                    } else {
+                        selectedConflictIds.value = [];
+                    }
+                }
+                
+                function updateSelectAll() {
+                    const pendingIds = conflicts.value.filter(c => c.status === 'pending').map(c => c.id);
+                    selectAllConflicts.value = pendingIds.length > 0 && 
+                        selectedConflictIds.value.length === pendingIds.length;
+                }
+                
+                async function executeBatchDecide() {
+                    if (selectedConflictIds.value.length === 0) return;
+                    if (!batchReviewer.value || !batchReasoning.value) {
+                        alert('请填写复核人和理由');
+                        return;
+                    }
+                    
+                    const res = await fetch(API_BASE + `/projects/${selectedProjectId.value}/batch-decide?` + 
+                        `conflict_ids=${JSON.stringify(selectedConflictIds.value)}&` +
+                        `decision=${batchDecision.value}&` +
+                        `reviewer=${encodeURIComponent(batchReviewer.value)}&` +
+                        `reasoning=${encodeURIComponent(batchReasoning.value)}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (res.ok) {
+                        selectedConflictIds.value = [];
+                        batchReasoning.value = '';
+                        await loadConflicts();
+                        await loadVersions();
+                    }
+                }
+                
+                async function viewSampleDetail(sample) {
+                    const res = await fetch(API_BASE + `/samples/${sample.id}`);
+                    sampleDetail.value = await res.json();
+                    showSampleDetailModal.value = true;
+                }
+                
+                function confirmRollback(version) {
+                    rollbackVersion.value = version;
+                    rollbackReviewer.value = '';
+                    showRollbackModal.value = true;
+                }
+                
+                async function executeRollback() {
+                    const res = await fetch(API_BASE + `/versions/${rollbackVersion.value.id}/rollback?reviewer=${encodeURIComponent(rollbackReviewer.value)}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (res.ok) {
+                        showRollbackModal.value = false;
+                        await loadVersions();
+                        await loadConflicts();
+                    }
+                }
+                
+                async function viewVersionDiff(versionId) {
+                    const versionsList = versions.value;
+                    const idx = versionsList.findIndex(v => v.id === versionId);
+                    if (idx < versionsList.length - 1) {
+                        const prevVersion = versionsList[idx + 1];
+                        const res = await fetch(API_BASE + `/versions/diff?version_id1=${prevVersion.id}&version_id2=${versionId}`);
+                        const diff = await res.json();
+                        alert(`版本差异: ${diff.total_changes} 处变更\n\n${JSON.stringify(diff.changes.slice(0, 10), null, 2)}`);
+                    }
+                }
+                
+                async function exportReport(format, dataType = null) {
+                    if (!selectedProjectId.value) return;
+                    
+                    let url = API_BASE + `/projects/${selectedProjectId.value}/export/`;
+                    if (format === 'json') url += 'json';
+                    else if (format === 'csv') url += `csv?data_type=${dataType || 'conflicts'}`;
+                    else if (format === 'excel') url += 'excel';
+                    
+                    window.open(url, '_blank');
+                }
+                
+                async function exportTrainingData() {
+                    if (!selectedProjectId.value) return;
+                    window.open(API_BASE + `/projects/${selectedProjectId.value}/export/training`, '_blank');
+                }
+                
+                function formatDate(dateStr) {
+                    if (!dateStr) return '-';
+                    const d = new Date(dateStr);
+                    return d.toLocaleString('zh-CN');
+                }
+                
+                function severityText(s) {
+                    const map = { high: '高', medium: '中', low: '低' };
+                    return map[s] || s;
+                }
+                
+                function statusText(s) {
+                    const map = { pending: '待处理', resolved: '已解决' };
+                    return map[s] || s;
+                }
+                
+                function decisionText(d) {
+                    const map = {
+                        'accept_annotation': '接受选中标注',
+                        'accept_majority': '接受多数票',
+                        'mark_invalid': '标记无效',
+                        'reopen_for_reannotation': '重新标注',
+                        'reverted': '已撤销'
+                    };
+                    return map[d] || d;
+                }
+                
+                function getLabelDistribution(conflict) {
+                    const dist = {};
+                    if (conflict.annotations) {
+                        for (const a of conflict.annotations) {
+                            if (!dist[a.label]) dist[a.label] = 0;
+                            dist[a.label]++;
+                        }
+                    }
+                    return dist;
+                }
+                
+                function getSampleLabels(sample) {
+                    const dist = {};
+                    for (const a of sample.annotations) {
+                        if (!dist[a.label]) dist[a.label] = 0;
+                        dist[a.label]++;
+                    }
+                    return dist;
+                }
+                
+                function hasConflict(sample) {
+                    const labels = new Set(sample.annotations.map(a => a.label));
+                    return labels.size > 1;
+                }
+                
+                const resolvedCount = computed(() => 
+                    conflicts.value.filter(c => c.status === 'resolved').length
+                );
+                
+                const progressPercent = computed(() => 
+                    conflicts.value.length > 0 ? (resolvedCount.value / conflicts.value.length * 100).toFixed(0) : 0
+                );
+                
+                watch(currentView, (view) => {
+                    if (view === 'conflicts') loadConflicts();
+                    if (view === 'history') loadVersions();
+                    if (view === 'samples') loadSamples();
+                    if (view === 'reports') loadReportSummary();
+                });
+                
+                onMounted(async () => {
+                    await fetchProjects();
+                });
+                
+                return {
+                    currentView, navItems, projects, selectedProjectId, currentProjectInfo,
+                    showCreateProjectModal, newProject,
+                    dragOver, uploadResult, exampleFormat,
+                    conflictFilter, conflicts, selectedConflictIds, selectAllConflicts,
+                    batchDecision, batchReasoning, batchReviewer,
+                    showReviewModal, selectedConflict, reviewForm,
+                    samples, showSampleDetailModal, sampleDetail,
+                    versions, showRollbackModal, rollbackVersion, rollbackReviewer,
+                    reportSummary, annotatorConsistency, projectStats,
+                    resolvedCount, progressPercent, canSubmitReview,
+                    
+                    fetchProjects, selectProject, loadProject,
+                    createProject,
+                    triggerFileInput, handleFileSelect, handleDrop,
+                    runConflictDetection,
+                    openReviewModal, selectAnnotation, submitReview, revertDecision,
+                    toggleSelectAll, updateSelectAll, executeBatchDecide,
+                    viewSampleDetail,
+                    confirmRollback, executeRollback, viewVersionDiff,
+                    exportReport, exportTrainingData,
+                    formatDate, severityText, statusText, decisionText,
+                    getLabelDistribution, getSampleLabels, hasConflict
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
