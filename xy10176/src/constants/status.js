@@ -1,0 +1,31 @@
+const SampleStatus = {
+  INIT: 'INIT',
+  COLLECTED: 'COLLECTED',
+  CENTRIFUGED: 'CENTRIFUGED',
+  TESTED: 'TESTED',
+  REVIEWED: 'REVIEWED',
+  EXCEPTION: 'EXCEPTION'
+};
+
+const StepType = {
+  COLLECT: 'COLLECT',
+  CENTRIFUGE: 'CENTRIFUGE',
+  TEST: 'TEST',
+  REVIEW: 'REVIEW'
+};
+
+const ErrorCode = {
+  SUCCESS: 0,
+  PARAM_ERROR: 40001,
+  SAMPLE_NOT_FOUND: 40401,
+  STATE_TRANSITION_ERROR: 40901,
+  DUPLICATE_REQUEST: 40902,
+  BARCODE_IDEMPOTENT: 40903,
+  SERVER_ERROR: 50001
+};
+
+module.exports = {
+  SampleStatus,
+  StepType,
+  ErrorCode
+};
