@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas 审计时间轴工具 - 演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      color: #e4e4e7;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0;
+      border-bottom: 1px solid #3f3f46;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #71717a;
+      font-size: 1.1rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .control-panel {
+      background: rgba(39, 39, 42, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #3f3f46;
+    }
+
+    .control-panel h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #a78bfa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .btn-info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+    }
+
+    input[type="text"],
+    input[type="search"] {
+      padding: 10px 14px;
+      border: 1px solid #3f3f46;
+      border-radius: 8px;
+      background: #18181b;
+      color: #e4e4e7;
+      font-size: 14px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    input[type="text"]:focus,
+    input[type="search"]:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    select {
+      padding: 10px 14px;
+      border: 1px solid #3f3f46;
+      border-radius: 8px;
+      background: #18181b;
+      color: #e4e4e7;
+      font-size: 14px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+
+    .canvas-container {
+      background: rgba(39, 39, 42, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #3f3f46;
+      margin-bottom: 30px;
+      overflow: auto;
+    }
+
+    #timelineCanvas {
+      display: block;
+      border-radius: 8px;
+      background: #1a1a2e;
+    }
+
+    .info-panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+    }
+
+    .info-panel {
+      background: rgba(39, 39, 42, 0.8);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #3f3f46;
+      max-height: 400px;
+      overflow: auto;
+    }
+
+    .info-panel h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .log-entry {
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    }
+
+    .log-entry.success {
+      background: rgba(16, 185, 129, 0.15);
+      border-left: 3px solid #10b981;
+    }
+
+    .log-entry.error {
+      background: rgba(239, 68, 68, 0.15);
+      border-left: 3px solid #ef4444;
+    }
+
+    .log-time {
+      color: #71717a;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .log-message {
+      color: #e4e4e7;
+    }
+
+    .event-details {
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+    }
+
+    .event-detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #3f3f46;
+    }
+
+    .event-detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .event-detail-label {
+      color: #71717a;
+    }
+
+    .event-detail-value {
+      color: #e4e4e7;
+      font-weight: 500;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat-item {
+      background: rgba(63, 63, 70, 0.5);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #a78bfa;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #71717a;
+      margin-top: 4px;
+    }
+
+    .no-selection {
+      text-align: center;
+      color: #71717a;
+      padding: 40px 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .badge-create { background: #10b981; color: white; }
+    .badge-update { background: #3b82f6; color: white; }
+    .badge-delete { background: #ef4444; color: white; }
+    .badge-rollback { background: #f59e0b; color: white; }
+    .badge-restore { background: #8b5cf6; color: white; }
+    .badge-read { background: #64748b; color: white; }
+    .badge-login { background: #06b6d4; color: white; }
+    .badge-logout { background: #78716c; color: white; }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #27272a;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #52525b;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #71717a;
+    }
+
+    .tooltip {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 1000;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Canvas 审计时间轴工具</h1>
+      <p class="subtitle">可视化审计事件 · 缩放拖拽 · 事件分组 · 回滚标记 · 搜索定位 · 导出图片</p>
+    </header>
+
+    <div class="controls">
+      <div class="control-panel">
+        <h3>
+          <span>📊</span>
+          数据操作
+        </h3>
+        <div class="control-group">
+          <button class="btn-primary" id="loadSampleBtn">加载示例数据</button>
+          <button class="btn-success" id="loadLargeBtn">加载大量数据 (50条)</button>
+          <button class="btn-warning" id="loadEdgeBtn">加载边缘案例</button>
+          <button class="btn-danger" id="clearBtn">清空数据</button>
+        </div>
+        <div class="control-group">
+          <button class="btn-info" id="testInvalidBtn">测试无效数据</button>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h3>
+          <span>🔍</span>
+          缩放控制
+        </h3>
+        <div class="control-group">
+          <button class="btn-primary" id="zoomInBtn">放大 +</button>
+          <button class="btn-primary" id="zoomOutBtn">缩小 -</button>
+          <button class="btn-warning" id="resetZoomBtn">重置</button>
+          <span id="zoomLevel" style="color: #a78bfa; font-weight: 500;">缩放: 100%</span>
+        </div>
+        <div class="control-group">
+          <span style="color: #71717a; font-size: 13px;">提示: 滚轮缩放 · 拖拽平移 · 点击选择事件</span>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h3>
+          <span>🔎</span>
+          搜索定位
+        </h3>
+        <div class="control-group">
+          <input type="search" id="searchInput" placeholder="输入关键词搜索..." style="flex: 1;">
+          <button class="btn-primary" id="searchBtn">搜索</button>
+          <button class="btn-danger" id="clearSearchBtn">清除</button>
+        </div>
+        <div class="control-group">
+          <select id="searchField">
+            <option value="all">全部字段</option>
+            <option value="action">操作</option>
+            <option value="details">详情</option>
+            <option value="userName">用户</option>
+            <option value="resourceName">资源</option>
+            <option value="tags">标签</option>
+          </select>
+        </div>
+        <div class="control-group" id="searchResults" style="color: #60a5fa; font-size: 13px;"></div>
+      </div>
+
+      <div class="control-panel">
+        <h3>
+          <span>📷</span>
+          导出图片
+        </h3>
+        <div class="control-group">
+          <select id="exportFormat">
+            <option value="png">PNG 格式</option>
+            <option value="jpeg">JPEG 格式</option>
+          </select>
+          <button class="btn-success" id="exportBtn">导出图片</button>
+        </div>
+        <div class="control-group">
+          <label style="font-size: 13px; color: #71717a;">
+            <input type="checkbox" id="includeLegend" checked> 包含图例
+          </label>
+          <label style="font-size: 13px; color: #71717a; margin-left: 15px;">
+            <input type="checkbox" id="includeTimestamp" checked> 包含时间戳
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="timelineCanvas" width="1360" height="500"></canvas>
+    </div>
+
+    <div class="info-panels">
+      <div class="info-panel">
+        <h3>
+          <span>📝</span>
+          执行记录
+          <button class="btn-danger" id="clearLogsBtn" style="padding: 6px 12px; font-size: 12px;">清空</button>
+        </h3>
+        <div id="logContainer">
+          <div class="no-selection">暂无执行记录</div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <h3>
+          <span>📋</span>
+          选中事件详情
+        </h3>
+        <div id="eventDetails">
+          <div class="no-selection">点击时间轴上的事件查看详情</div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <h3>
+          <span>📈</span>
+          统计信息
+        </h3>
+        <div id="statsPanel">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="totalEvents">0</div>
+              <div class="stat-label">总事件数</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="rollbackEvents">0</div>
+              <div class="stat-label">回滚事件</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="userCount">0</div>
+              <div class="stat-label">操作用户</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="resourceCount">0</div>
+              <div class="stat-label">涉及资源</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+  <script type="module">
+    import {
+      CanvasAuditTimeline,
+      generateValidSampleEvents,
+      generateLargeDataset,
+      generateEdgeCaseEvents,
+      generateInvalidSampleEvents,
+    } from './dist/index.js';
+
+    const canvas = document.getElementById('timelineCanvas');
+    const timeline = new CanvasAuditTimeline({
+      canvasWidth: 1360,
+      canvasHeight: 500,
+    });
+
+    timeline.attach(canvas);
+
+    const logContainer = document.getElementById('logContainer');
+    const eventDetails = document.getElementById('eventDetails');
+    const searchResults = document.getElementById('searchResults');
+    const zoomLevel = document.getElementById('zoomLevel');
+
+    function updateLogs() {
+      const logs = timeline.getExecutionLogs().reverse();
+      if (logs.length === 0) {
+        logContainer.innerHTML = '<div class="no-selection">暂无执行记录</div>';
+        return;
+      }
+
+      logContainer.innerHTML = logs.slice(0, 50).map(log => `
+        <div class="log-entry ${log.success ? 'success' : 'error'}">
+          <div class="log-time">${new Date(log.timestamp).toLocaleTimeString()}</div>
+          <div class="log-message">[${log.action}] ${log.message}${log.details ? ` - ${JSON.stringify(log.details)}` : ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function updateEventDetails() {
+      const selected = timeline.getSelectedEvent();
+      if (!selected) {
+        eventDetails.innerHTML = '<div class="no-selection">点击时间轴上的事件查看详情</div>';
+        return;
+      }
+
+      const typeClass = `badge-${selected.type}`;
+      const typeLabel = {
+        create: '创建',
+        update: '更新',
+        delete: '删除',
+        rollback: '回滚',
+        restore: '恢复',
+        read: '读取',
+        login: '登录',
+        logout: '登出',
+      }[selected.type];
+
+      eventDetails.innerHTML = `
+        <div class="event-details">
+          <div class="event-detail-item">
+            <span class="event-detail-label">事件ID</span>
+            <span class="event-detail-value">${selected.id}</span>
+          </div>
+          <div class="event-detail-item">
+            <span class="event-detail-label">类型</span>
+            <span class="badge ${typeClass}">${typeLabel}</span>
+          </div>
+          <div class="event-detail-item">
+            <span class="event-detail-label">时间</span>
+            <span class="event-detail-value">${new Date(selected.timestamp).toLocaleString()}</span>
+          </div>
+          <div class="event-detail-item">
+            <span class="event-detail-label">用户</span>
+            <span class="event-detail-value">${selected.userName} (${selected.userId})</span>
+          </div>
+          <div class="event-detail-item">
+            <span class="event-detail-label">资源</span>
+            <span class="event-detail-value">${selected.resourceName} (${selected.resourceType})</span>
+          </div>
+          <div class="event-detail-item">
+            <span class="event-detail-label">操作</span>
+            <span class="event-detail-value">${selected.action}</span>
+          </div>
+          ${selected.details ? `
+          <div class="event-detail-item">
+            <span class="event-detail-label">详情</span>
+            <span class="event-detail-value" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${selected.details}</span>
+          </div>
+          ` : ''}
+          ${selected.isRollback ? `
+          <div class="event-detail-item">
+            <span class="event-detail-label">回滚目标</span>
+            <span class="event-detail-value">${selected.rollbackTargetId}</span>
+          </div>
+          ` : ''}
+          ${selected.tags.length > 0 ? `
+          <div class="event-detail-item">
+            <span class="event-detail-label">标签</span>
+            <span class="event-detail-value">${selected.tags.join(', ')}</span>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function updateStats() {
+      const events = timeline.getEvents();
+      const rollbackCount = events.filter(e => e.isRollback).length;
+      const users = new Set(events.map(e => e.userId)).size;
+      const resources = new Set(events.map(e => e.resourceId)).size;
+
+      document.getElementById('totalEvents').textContent = events.length;
+      document.getElementById('rollbackEvents').textContent = rollbackCount;
+      document.getElementById('userCount').textContent = users;
+      document.getElementById('resourceCount').textContent = resources;
+    }
+
+    function updateZoomLevel() {
+      const zoom = Math.round(timeline.getState().zoom * 100);
+      zoomLevel.textContent = `缩放: ${zoom}%`;
+    }
+
+    setInterval(() => {
+      updateLogs();
+      updateEventDetails();
+      updateZoomLevel();
+    }, 500);
+
+    document.getElementById('loadSampleBtn').addEventListener('click', () => {
+      const events = generateValidSampleEvents();
+      const result = timeline.addEvents(events);
+      updateStats();
+      alert(`成功添加 ${result.success} 条事件，失败 ${result.failed} 条`);
+    });
+
+    document.getElementById('loadLargeBtn').addEventListener('click', () => {
+      const events = generateLargeDataset(50);
+      const result = timeline.addEvents(events);
+      updateStats();
+      alert(`成功添加 ${result.success} 条事件，失败 ${result.failed} 条`);
+    });
+
+    document.getElementById('loadEdgeBtn').addEventListener('click', () => {
+      const events = generateEdgeCaseEvents();
+      const result = timeline.addEvents(events);
+      updateStats();
+      alert(`成功添加 ${result.success} 条事件，失败 ${result.failed} 条`);
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (confirm('确定要清空所有数据吗？')) {
+        const emptyTimeline = new CanvasAuditTimeline({
+          canvasWidth: 1360,
+          canvasHeight: 500,
+        });
+        emptyTimeline.attach(canvas);
+        window.timeline = emptyTimeline;
+        updateStats();
+      }
+    });
+
+    document.getElementById('testInvalidBtn').addEventListener('click', () => {
+      const invalidEvents = generateInvalidSampleEvents();
+      let errorCount = 0;
+      const errorMessages = [];
+
+      for (const item of invalidEvents) {
+        const result = timeline.addEvent(item.event);
+        if (!result) {
+          errorCount++;
+          errorMessages.push(`${item.reason}`);
+        }
+      }
+
+      alert(`测试完成\n\n无效样本: ${invalidEvents.length}\n\n预期全部被拒绝\n\n拒绝原因示例:\n${errorMessages.slice(0, 5).join('\n')}`);
+    });
+
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+      timeline.zoomIn();
+      updateZoomLevel();
+    });
+
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+      timeline.zoomOut();
+      updateZoomLevel();
+    });
+
+    document.getElementById('resetZoomBtn').addEventListener('click', () => {
+      timeline.resetZoom();
+      updateZoomLevel();
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const query = document.getElementById('searchInput').value.trim();
+      const field = document.getElementById('searchField').value;
+
+      if (!query) {
+        alert('请输入搜索关键词');
+        return;
+      }
+
+      const searchFields = field === 'all'
+        ? ['action', 'details', 'userName', 'resourceName', 'resourceType', 'tags']
+        : [field];
+
+      const results = timeline.search({
+        query,
+        searchIn: searchFields,
+        caseSensitive: false,
+        exactMatch: false,
+      });
+
+      searchResults.textContent = `找到 ${results.length} 条匹配结果`;
+
+      if (results.length > 0) {
+        timeline.highlightEvent(results[0]);
+      }
+    });
+
+    document.getElementById('clearSearchBtn').addEventListener('click', () => {
+      timeline.clearSearch();
+      document.getElementById('searchInput').value = '';
+      searchResults.textContent = '';
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const format = document.getElementById('exportFormat').value;
+      const includeLegend = document.getElementById('includeLegend').checked;
+      const includeTimestamp = document.getElementById('includeTimestamp').checked;
+
+      timeline.downloadImage('audit-timeline-' + Date.now(), {
+        format,
+        quality: 0.9,
+        backgroundColor: '#1a1a2e',
+        includeLegend,
+        includeTimestamp,
+      });
+    });
+
+    document.getElementById('clearLogsBtn').addEventListener('click', () => {
+      timeline.getLogger().clear();
+      updateLogs();
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+      }
+    });
+
+    window.timeline = timeline;
+    console.log('Canvas 审计时间轴已初始化，可通过 window.timeline 访问');
+  </script>
+</body>
+</html>

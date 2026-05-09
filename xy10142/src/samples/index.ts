@@ -1,0 +1,551 @@
+import type { AuditEvent, EventGroup } from '../types';
+
+const now = Date.now();
+
+export function generateValidSampleEvents(): AuditEvent[] {
+  const baseTime = now - 3600000;
+
+  const users = [
+    { id: 'user-001', name: '张三' },
+    { id: 'user-002', name: '李四' },
+    { id: 'user-003', name: '王五' },
+    { id: 'user-004', name: '赵六' },
+  ];
+
+  const resources = [
+    { id: 'res-001', name: '用户配置', type: 'configuration' },
+    { id: 'res-002', name: '订单管理', type: 'order' },
+    { id: 'res-003', name: '商品信息', type: 'product' },
+    { id: 'res-004', name: '支付记录', type: 'payment' },
+  ];
+
+  const events: AuditEvent[] = [];
+
+  events.push({
+    id: 'event-001',
+    timestamp: baseTime + 10000,
+    type: 'login',
+    userId: 'user-001',
+    userName: '张三',
+    resourceId: 'res-001',
+    resourceName: '用户配置',
+    resourceType: 'configuration',
+    action: '登录系统',
+    details: 'IP: 192.168.1.100',
+    tags: ['登录', '认证'],
+  });
+
+  events.push({
+    id: 'event-002',
+    timestamp: baseTime + 20000,
+    type: 'create',
+    userId: 'user-001',
+    userName: '张三',
+    resourceId: 'res-002',
+    resourceName: '订单管理',
+    resourceType: 'order',
+    action: '创建订单',
+    details: '订单号: ORD-2024-001',
+    beforeValue: 'null',
+    afterValue: '{"id":"ORD-2024-001","status":"pending"}',
+    tags: ['订单', '创建'],
+  });
+
+  events.push({
+    id: 'event-003',
+    timestamp: baseTime + 30000,
+    type: 'update',
+    userId: 'user-002',
+    userName: '李四',
+    resourceId: 'res-002',
+    resourceName: '订单管理',
+    resourceType: 'order',
+    action: '更新订单状态',
+    details: '状态变更: pending -> processing',
+    beforeValue: '{"status":"pending"}',
+    afterValue: '{"status":"processing"}',
+    tags: ['订单', '更新'],
+  });
+
+  events.push({
+    id: 'event-004',
+    timestamp: baseTime + 45000,
+    type: 'create',
+    userId: 'user-001',
+    userName: '张三',
+    resourceId: 'res-003',
+    resourceName: '商品信息',
+    resourceType: 'product',
+    action: '创建商品',
+    details: '商品: 测试商品 A',
+    beforeValue: 'null',
+    afterValue: '{"id":"PROD-001","name":"测试商品","price":99.00"}',
+    tags: ['商品', '创建'],
+  });
+
+  events.push({
+    id: 'event-005',
+    timestamp: baseTime + 60000,
+    type: 'update',
+    userId: 'user-003',
+    userName: '王五',
+    resourceId: 'res-003',
+    resourceName: '商品信息',
+    resourceType: 'product',
+    action: '修改商品价格',
+    details: '价格变更: 99.00 -> 129.00',
+    beforeValue: '{"price":99.00}',
+    afterValue: '{"price":129.00}',
+    tags: ['商品', '更新', '价格'],
+  });
+
+  events.push({
+    id: 'event-006',
+    timestamp: baseTime + 80000,
+    type: 'rollback',
+    userId: 'user-003',
+    userName: '王五',
+    resourceId: 'res-003',
+    resourceName: '商品信息',
+    resourceType: '商品',
+    action: '回滚价格修改',
+    details: '回滚到之前的价格',
+    isRollback: true,
+    rollbackTargetId: 'event-005',
+    tags: ['回滚', '价格'],
+  });
+
+  events.push({
+    id: 'event-007',
+    timestamp: baseTime + 100000,
+    type: 'delete',
+    userId: 'user-002',
+    userName: '李四',
+    resourceId: 'res-002',
+    resourceName: '订单管理',
+    resourceType: 'order',
+    action: '删除订单',
+    details: '订单号: ORD-2024-001',
+    beforeValue: '{"id":"ORD-2024-001","status":"processing"}',
+    tags: ['订单', '删除'],
+  });
+
+  events.push({
+    id: 'event-008',
+    timestamp: baseTime + 120000,
+    type: 'update',
+    userId: 'user-004',
+    userName: '赵六',
+    resourceId: 'res-004',
+    resourceName: '支付记录',
+    resourceType: 'payment',
+    action: '更新支付状态',
+    details: '支付成功',
+    beforeValue: '{"status":"pending"}',
+    afterValue: '{"status":"success"}',
+    tags: ['支付', '更新'],
+  });
+
+  events.push({
+    id: 'event-009',
+    timestamp: baseTime + 150000,
+    type: 'read',
+    userId: 'user-001',
+    userName: '张三',
+    resourceId: 'res-001',
+    resourceName: '用户配置',
+    resourceType: 'configuration',
+    action: '查看用户配置',
+    details: '查看个人设置',
+    tags: ['配置', '查看'],
+  });
+
+  events.push({
+    id: 'event-010',
+    timestamp: baseTime + 180000,
+    type: 'logout',
+    userId: 'user-001',
+    userName: '张三',
+    resourceId: 'res-001',
+    resourceName: '用户配置',
+    resourceType: 'configuration',
+    action: '登出系统',
+    details: '正常登出',
+    tags: ['登出', '安全'],
+  });
+
+  return events;
+}
+
+export function generateInvalidSampleEvents(): Array<{ event: Partial<AuditEvent>; reason: string }> {
+  return [
+    {
+      event: {} as Partial<AuditEvent>,
+      reason: '空对象',
+    },
+    {
+      event: {
+        id: '',
+        timestamp: now,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: 'ID 为空字符串',
+    },
+    {
+      event: {
+        id: 'event-bad-type',
+        timestamp: now,
+        type: 'invalid_type' as AuditEvent['type'],
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '无效的事件类型',
+    },
+    {
+      event: {
+        id: 'event-bad-timestamp',
+        timestamp: -1000,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '无效的时间戳（负数）',
+    },
+    {
+      event: {
+        id: 'event-no-user',
+        timestamp: now,
+        type: 'update',
+        userId: '',
+        userName: '',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '用户信息缺失',
+    },
+    {
+      event: {
+        id: 'event-no-resource',
+        timestamp: now,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: '',
+        resourceName: '',
+        resourceType: '',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '资源信息缺失',
+    },
+    {
+      event: {
+        id: 'event-rollback-no-target',
+        timestamp: now,
+        type: 'rollback',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '回滚操作',
+        details: '测试详情',
+        isRollback: true,
+        tags: [],
+      },
+      reason: '回滚事件缺少目标ID',
+    },
+    {
+      event: {
+        id: 'event-bad-tags',
+        timestamp: now,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: 'invalid_tags' as unknown as string[],
+      },
+      reason: '标签不是数组',
+    },
+    {
+      event: {
+        id: 'event-null',
+        timestamp: null as unknown as number,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '测试操作',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '时间戳为 null',
+    },
+    {
+      event: {
+        id: 'event-no-action',
+        timestamp: now,
+        type: 'update',
+        userId: 'user-001',
+        userName: '测试用户',
+        resourceId: 'res-001',
+        resourceName: '测试资源',
+        resourceType: 'test',
+        action: '',
+        details: '测试详情',
+        tags: [],
+      },
+      reason: '操作描述为空',
+    },
+  ];
+}
+
+export function generateSampleGroups(): EventGroup[] {
+  return [
+    {
+      id: 'group-001',
+      name: '订单相关操作',
+      color: '#3b82f6',
+      events: ['event-002', 'event-003', 'event-007'],
+      startTimestamp: now - 3600000 + 20000,
+      endTimestamp: now - 3600000 + 100000,
+      collapsed: false,
+    },
+    {
+      id: 'group-002',
+      name: '商品价格调整',
+      color: '#10b981',
+      events: ['event-004', 'event-005', 'event-006'],
+      startTimestamp: now - 3600000 + 45000,
+      endTimestamp: now - 3600000 + 80000,
+      collapsed: false,
+    },
+  ];
+}
+
+export function generateEdgeCaseEvents(): AuditEvent[] {
+  const baseTime = now;
+
+  return [
+    {
+      id: 'edge-same-time-1',
+      timestamp: baseTime,
+      type: 'update',
+      userId: 'user-001',
+      userName: '用户A',
+      resourceId: 'res-edge-001',
+      resourceName: '边缘资源',
+      resourceType: 'edge',
+      action: '同时发生的事件1',
+      details: '测试同时事件',
+      tags: ['边缘', '测试'],
+    },
+    {
+      id: 'edge-same-time-2',
+      timestamp: baseTime,
+      type: 'update',
+      userId: 'user-002',
+      userName: '用户B',
+      resourceId: 'res-edge-001',
+      resourceName: '边缘资源',
+      resourceType: 'edge',
+      action: '同时发生的事件2',
+      details: '测试同时事件',
+      tags: ['边缘', '测试'],
+    },
+    {
+      id: 'edge-same-time-3',
+      timestamp: baseTime,
+      type: 'delete',
+      userId: 'user-003',
+      userName: '用户C',
+      resourceId: 'res-edge-002',
+      resourceName: '另一资源',
+      resourceType: 'edge',
+      action: '同时发生的事件3',
+      details: '不同资源的同时事件',
+      tags: ['边缘', '测试'],
+    },
+    {
+      id: 'edge-very-old',
+      timestamp: 0,
+      type: 'create',
+      userId: 'user-001',
+      userName: '系统用户',
+      resourceId: 'res-old',
+      resourceName: '古老资源',
+      resourceType: 'historical',
+      action: '极早时间点事件',
+      details: '时间戳为0',
+      tags: ['历史', '测试'],
+    },
+    {
+      id: 'edge-very-new',
+      timestamp: baseTime + 31536000000,
+      type: 'read',
+      userId: 'user-001',
+      userName: '未来用户',
+      resourceId: 'res-future',
+      resourceName: '未来资源',
+      resourceType: 'future',
+      action: '未来时间点事件',
+      details: '一年后的事件',
+      tags: ['未来', '测试'],
+    },
+    {
+      id: 'edge-minimal-tags',
+      timestamp: baseTime + 5000,
+      type: 'login',
+      userId: 'user-001',
+      userName: '测试用户',
+      resourceId: 'res-minimal',
+      resourceName: '最小资源',
+      resourceType: 'minimal',
+      action: '最小信息事件',
+      details: '',
+      tags: [],
+    },
+    {
+      id: 'edge-long-details',
+      timestamp: baseTime + 10000,
+      type: 'update',
+      userId: 'user-001',
+      userName: '测试用户',
+      resourceId: 'res-long',
+      resourceName: '长名称资源用于测试显示',
+      resourceType: 'long_name_type_for_testing_purposes',
+      action: '这是一个非常长的操作描述用来测试在时间轴上的显示效果',
+      details: '这是一个非常长的详情描述，包含大量的文本信息，用来测试详情字段的处理能力。Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      tags: ['长标签1', '长标签2', '长标签3', '长标签4', '长标签5', '长标签6', '长标签7', '长标签8', '长标签9', '长标签10'],
+    },
+    {
+      id: 'edge-null-before',
+      timestamp: baseTime + 15000,
+      type: 'create',
+      userId: 'user-001',
+      userName: '测试用户',
+      resourceId: 'res-null',
+      resourceName: '空值测试',
+      resourceType: 'null_test',
+      action: '创建资源',
+      details: 'beforeValue 为空的情况',
+      beforeValue: undefined,
+      afterValue: '{"data":"test"}',
+      tags: ['空值', '测试'],
+    },
+    {
+      id: 'edge-null-after',
+      timestamp: baseTime + 20000,
+      type: 'delete',
+      userId: 'user-001',
+      userName: '测试用户',
+      resourceId: 'res-null',
+      resourceName: '空值测试',
+      resourceType: 'null_test',
+      action: '删除资源',
+      details: 'afterValue 为空的情况',
+      beforeValue: '{"data":"test"}',
+      afterValue: undefined,
+      tags: ['空值', '测试'],
+    },
+    {
+      id: 'edge-rolled-back',
+      timestamp: baseTime + 25000,
+      type: 'update',
+      userId: 'user-001',
+      userName: '测试用户',
+      resourceId: 'res-rolled',
+      resourceName: '被回滚资源',
+      resourceType: 'rolled_back',
+      action: '被回滚的操作',
+      details: '这个操作后来被回滚了',
+      beforeValue: '{"value":"original"',
+      afterValue: '{"value":"changed"',
+      isRolledBack: true,
+      rollbackBy: 'user-002',
+      tags: ['回滚', '测试'],
+    },
+    {
+      id: 'edge-rollback-target',
+      timestamp: baseTime + 30000,
+      type: 'rollback',
+      userId: 'user-002',
+      userName: '管理员',
+      resourceId: 'res-rolled',
+      resourceName: '被回滚资源',
+      resourceType: 'rolled_back',
+      action: '回滚操作',
+      details: '回滚之前的修改',
+      isRollback: true,
+      rollbackTargetId: 'edge-rolled-back',
+      tags: ['回滚', '测试'],
+    },
+  ];
+}
+
+export function generateLargeDataset(count: number = 100): AuditEvent[] {
+  const baseTime = now - 86400000;
+  const events: AuditEvent[] = [];
+  const types: AuditEvent['type'][] = ['create', 'update', 'delete', 'read'];
+  const users = ['user-001', 'user-002', 'user-003', 'user-004', 'user-005'];
+  const userNames = ['张三', '李四', '王五', '王五', '赵六', '钱七', '孙八'];
+  const resources = ['res-order', 'res-product', 'res-config', 'res-payment', 'res-user'];
+  const resourceNames = ['订单管理', '商品信息', '系统配置', '支付记录', '用户中心'];
+  const resourceTypes = ['order', 'product', 'config', 'payment', 'user'];
+  const actions = ['创建记录', '更新数据', '删除记录', '查看详情', '修改状态', '批量操作'];
+
+  for (let i = 0; i < count; i++) {
+    const userIndex = i % users.length;
+    const resourceIndex = i % resources.length;
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    events.push({
+      id: `large-event-${String(i + 1).padStart(3, '0')}`,
+      timestamp: baseTime + Math.floor(Math.random() * 86400000),
+      type,
+      userId: users[userIndex],
+      userName: userNames[userIndex],
+      resourceId: resources[resourceIndex],
+      resourceName: resourceNames[resourceIndex],
+      resourceType: resourceTypes[resourceIndex],
+      action: actions[Math.floor(Math.random() * actions.length)],
+      details: `这是第 ${i + 1} 个事件的详细信息，包含一些随机的描述文本用来测试大数据量下的性能表现。`,
+      tags: ['批量', '测试', type],
+    });
+  }
+
+  events.sort((a, b) => a.timestamp - b.timestamp);
+
+  return events;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "canvas-audit-timeline",
+  "version": "1.0.0",
+  "description": "Canvas 审计时间轴工具 - 可视化审计事件的时间线",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "canvas",
+    "timeline",
+    "audit",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
