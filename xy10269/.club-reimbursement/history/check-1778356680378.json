@@ -1,0 +1,208 @@
+{
+  "id": "0115c342-c981-49af-86bd-873d43cb4bb3",
+  "timestamp": "2026-05-09T19:58:00.373Z",
+  "summary": {
+    "total": 4,
+    "pass": 4,
+    "warn": 0,
+    "fail": 0
+  },
+  "results": [
+    {
+      "activityId": "ACT-2026-001",
+      "status": "PASS",
+      "budget": {
+        "activityId": "ACT-2026-001",
+        "activityName": "春季校园文化节",
+        "clubName": "学生会",
+        "totalAmount": "15000.00",
+        "status": "approved",
+        "submittedBy": "张三",
+        "submittedDate": "2026-03-01",
+        "approvedDate": "2026-03-05"
+      },
+      "invoices": [
+        {
+          "activityId": "ACT-2026-001",
+          "invoiceNumber": "INV-2026-0001",
+          "description": "场地租赁",
+          "amount": "5000.00",
+          "date": "2026-03-15",
+          "vendor": "校园活动中心"
+        },
+        {
+          "activityId": "ACT-2026-001",
+          "invoiceNumber": "INV-2026-0002",
+          "description": "宣传物料",
+          "amount": "3000.00",
+          "date": "2026-03-16",
+          "vendor": "广告印刷公司"
+        },
+        {
+          "activityId": "ACT-2026-001",
+          "invoiceNumber": "INV-2026-0003",
+          "description": "礼品奖品",
+          "amount": "4500.00",
+          "date": "2026-03-17",
+          "vendor": "礼品商城"
+        }
+      ],
+      "approval": {
+        "activityId": "ACT-2026-001",
+        "activityName": "春季校园文化节",
+        "status": "approved",
+        "approver": "李主任",
+        "approvalDate": "2026-03-20",
+        "approvedAmount": "12500.00",
+        "comments": "同意报销，请按规定流程办理"
+      },
+      "issues": [],
+      "summary": {
+        "activityId": "ACT-2026-001",
+        "activityName": "春季校园文化节",
+        "budgetAmount": 15000,
+        "budgetStatus": "approved",
+        "invoiceCount": 3,
+        "totalInvoiceAmount": 12500,
+        "approvalStatus": "approved",
+        "approvedAmount": 12500,
+        "overallStatus": "PASS"
+      }
+    },
+    {
+      "activityId": "ACT-2026-002",
+      "status": "PASS",
+      "budget": {
+        "activityId": "ACT-2026-002",
+        "activityName": "编程大赛",
+        "clubName": "计算机协会",
+        "totalAmount": "8000.00",
+        "status": "approved",
+        "submittedBy": "李四",
+        "submittedDate": "2026-03-10",
+        "approvedDate": "2026-03-12"
+      },
+      "invoices": [
+        {
+          "activityId": "ACT-2026-002",
+          "invoiceNumber": "INV-2026-0004",
+          "description": "设备租赁",
+          "amount": "2000.00",
+          "date": "2026-03-25",
+          "vendor": "IT设备租赁公司"
+        }
+      ],
+      "approval": {
+        "activityId": "ACT-2026-002",
+        "activityName": "编程大赛",
+        "status": "approved",
+        "approver": "张老师",
+        "approvalDate": "2026-04-01",
+        "approvedAmount": "2000.00",
+        "comments": "同意报销设备租赁费用"
+      },
+      "issues": [],
+      "summary": {
+        "activityId": "ACT-2026-002",
+        "activityName": "编程大赛",
+        "budgetAmount": 8000,
+        "budgetStatus": "approved",
+        "invoiceCount": 1,
+        "totalInvoiceAmount": 2000,
+        "approvalStatus": "approved",
+        "approvedAmount": 2000,
+        "overallStatus": "PASS"
+      }
+    },
+    {
+      "activityId": "ACT-2026-003",
+      "status": "PASS",
+      "budget": {
+        "activityId": "ACT-2026-003",
+        "activityName": "志愿者招募活动",
+        "clubName": "青年志愿者协会",
+        "totalAmount": "3000.00",
+        "status": "approved",
+        "submittedBy": "王五",
+        "submittedDate": "2026-03-15",
+        "approvedDate": "2026-03-18"
+      },
+      "invoices": [
+        {
+          "activityId": "ACT-2026-003",
+          "invoiceNumber": "INV-2026-0005",
+          "description": "志愿者服装",
+          "amount": "2500.00",
+          "date": "2026-03-28",
+          "vendor": "服装定制店"
+        }
+      ],
+      "approval": {
+        "activityId": "ACT-2026-003",
+        "activityName": "志愿者招募活动",
+        "status": "approved",
+        "approver": "王老师",
+        "approvalDate": "2026-03-30",
+        "approvedAmount": "2500.00",
+        "comments": "同意报销"
+      },
+      "issues": [],
+      "summary": {
+        "activityId": "ACT-2026-003",
+        "activityName": "志愿者招募活动",
+        "budgetAmount": 3000,
+        "budgetStatus": "approved",
+        "invoiceCount": 1,
+        "totalInvoiceAmount": 2500,
+        "approvalStatus": "approved",
+        "approvedAmount": 2500,
+        "overallStatus": "PASS"
+      }
+    },
+    {
+      "activityId": "ACT-2026-004",
+      "status": "PASS",
+      "budget": {
+        "activityId": "ACT-2026-004",
+        "activityName": "演讲比赛",
+        "clubName": "辩论社",
+        "totalAmount": "5000.00",
+        "status": "approved",
+        "submittedBy": "赵六",
+        "submittedDate": "2026-03-20",
+        "approvedDate": "2026-03-22"
+      },
+      "invoices": [
+        {
+          "activityId": "ACT-2026-004",
+          "invoiceNumber": "INV-2026-0006",
+          "description": "证书制作",
+          "amount": "1500.00",
+          "date": "2026-04-01",
+          "vendor": "印务中心"
+        }
+      ],
+      "approval": {
+        "activityId": "ACT-2026-004",
+        "activityName": "演讲比赛",
+        "status": "approved",
+        "approver": "刘主任",
+        "approvalDate": "2026-04-05",
+        "approvedAmount": "1500.00",
+        "comments": "同意报销"
+      },
+      "issues": [],
+      "summary": {
+        "activityId": "ACT-2026-004",
+        "activityName": "演讲比赛",
+        "budgetAmount": 5000,
+        "budgetStatus": "approved",
+        "invoiceCount": 1,
+        "totalInvoiceAmount": 1500,
+        "approvalStatus": "approved",
+        "approvedAmount": 1500,
+        "overallStatus": "PASS"
+      }
+    }
+  ]
+}

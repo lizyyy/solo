@@ -1,0 +1,28 @@
+{
+  "name": "club-reimbursement-cli",
+  "version": "1.0.0",
+  "description": "校园社团经费票据管理 CLI 工具 - 解决活动预算、票据和审批意见跨表错位问题",
+  "main": "index.js",
+  "bin": {
+    "club-reimburse": "./index.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "cli",
+    "reimbursement",
+    "club",
+    "finance",
+    "budget"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^9.0.1"
+  }
+}
