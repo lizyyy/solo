@@ -1,0 +1,13 @@
+{
+  "name": "warehouse-robot-game",
+  "version": "1.0.0",
+  "description": "仓库机器人拣货游戏 - 多机器人窄巷道协作拣货",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["game", "robot", "warehouse"],
+  "author": "",
+  "license": "MIT"
+}
