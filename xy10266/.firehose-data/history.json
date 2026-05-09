@@ -1,0 +1,72 @@
+[
+  {
+    "id": "HIS-1778355420384-o7g0",
+    "operation": "INIT_SAMPLE",
+    "details": "初始化示例数据",
+    "operator": "",
+    "createdAt": "2026-05-09T19:37:00.384Z"
+  },
+  {
+    "id": "HIS-1778355451360-93cm",
+    "operation": "CHECK_ALL",
+    "details": "执行全量归仓检查，共检查 6 条记录",
+    "operator": "",
+    "createdAt": "2026-05-09T19:37:31.361Z"
+  },
+  {
+    "id": "HIS-1778355493743-t69i",
+    "operation": "STORAGE_BLOCKED",
+    "details": "阻止归仓 \"HD-0002\": 水带状态为\"潮湿\"，必须先晾晒才能归仓",
+    "operator": "",
+    "createdAt": "2026-05-09T19:38:13.743Z"
+  },
+  {
+    "id": "HIS-1778355514477-dwem",
+    "operation": "STORE",
+    "details": "归仓 \"HD-0004\"，状态改为已归仓",
+    "operator": "",
+    "createdAt": "2026-05-09T19:38:34.477Z"
+  },
+  {
+    "id": "HIS-1778355552164-aofj",
+    "operation": "START_DRYING",
+    "details": "开始晾晒 \"HD-0002\"",
+    "operator": "",
+    "createdAt": "2026-05-09T19:39:12.164Z"
+  },
+  {
+    "id": "HIS-1778355553075-84qu",
+    "operation": "COMPLETE_DRYING",
+    "details": "完成晾晒 \"HD-0002\"，状态改为已晾干",
+    "operator": "",
+    "createdAt": "2026-05-09T19:39:13.076Z"
+  },
+  {
+    "id": "HIS-1778355553791-2rts",
+    "operation": "STORE",
+    "details": "归仓 \"HD-0002\"，状态改为已归仓",
+    "operator": "",
+    "createdAt": "2026-05-09T19:39:13.791Z"
+  },
+  {
+    "id": "HIS-1778355570815-1atg",
+    "operation": "IMPORT_HOSES",
+    "details": "从 test-import.json 导入 2 条水带记录",
+    "operator": "",
+    "createdAt": "2026-05-09T19:39:30.815Z"
+  },
+  {
+    "id": "HIS-1778355598912-lk8s",
+    "operation": "CHECK_ALL",
+    "details": "执行全量归仓检查，共检查 5 条记录",
+    "operator": "export",
+    "createdAt": "2026-05-09T19:39:58.912Z"
+  },
+  {
+    "id": "HIS-1778355598914-ozby",
+    "operation": "EXPORT_CHECK",
+    "details": "导出归仓检查报告到 ./check-report.json",
+    "operator": "",
+    "createdAt": "2026-05-09T19:39:58.914Z"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "firehose-drying-cli",
+  "version": "1.0.0",
+  "description": "消防水带晾晒归仓 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "firehose": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test"
+  },
+  "type": "module",
+  "keywords": [
+    "firehose",
+    "drying",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "BOR-0001",
+    "hoseId": "HD-0002",
+    "borrowDate": "2026-05-08T19:37:00.145Z",
+    "purpose": "日常训练",
+    "borrower": "张三",
+    "returnDate": "2026-05-09T19:37:00.150Z"
+  },
+  {
+    "id": "BOR-0002",
+    "hoseId": "HD-0003",
+    "borrowDate": "2026-05-07T19:37:00.150Z",
+    "purpose": "演练",
+    "borrower": "李四",
+    "returnDate": "2026-05-08T19:37:00.150Z"
+  },
+  {
+    "id": "BOR-0003",
+    "hoseId": "HD-0005",
+    "borrowDate": "2026-05-09T19:37:00.150Z",
+    "purpose": "技能考核",
+    "borrower": "王五",
+    "returnDate": null
+  }
+]

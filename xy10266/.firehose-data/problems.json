@@ -1,0 +1,67 @@
+[
+  {
+    "id": "PRB-1778355493178-71ks",
+    "type": "storage_check",
+    "severity": "error",
+    "message": "HD-0002 归仓被拦截: 水带状态为\"潮湿\"，必须先晾晒才能归仓",
+    "source": "storage",
+    "data": {
+      "hose": {
+        "id": "HD-0002",
+        "number": "HD-0002",
+        "name": "65mm 水带 (2号)",
+        "status": "wet",
+        "location": "晾晒场 A区",
+        "notes": "今日训练使用，待晾晒"
+      },
+      "reasons": [
+        "水带状态为\"潮湿\"，必须先晾晒才能归仓"
+      ]
+    },
+    "createdAt": "2026-05-09T19:38:13.178Z"
+  },
+  {
+    "id": "PRB-1778355570497-wtvb",
+    "type": "hose_number_format",
+    "severity": "error",
+    "message": "水带编号格式不正确，应为 HD-XXXX（四位数字），实际值: BAD-001",
+    "source": "file:test-import.json:row:2",
+    "data": {
+      "hose": {
+        "id": "HD-1778355570493-0001",
+        "number": "BAD-001",
+        "name": "格式错误的编号",
+        "status": "dry",
+        "location": "应该失败",
+        "notes": ""
+      }
+    },
+    "createdAt": "2026-05-09T19:39:30.497Z"
+  },
+  {
+    "id": "PRB-1778355570500-m742",
+    "type": "hose_number_unique",
+    "severity": "error",
+    "message": "水带编号重复: HD-0001 已存在于系统中",
+    "source": "file:test-import.json:row:3",
+    "data": {
+      "newHose": {
+        "id": "HD-1778355570500-0002",
+        "number": "HD-0001",
+        "name": "已存在的编号",
+        "status": "storage",
+        "location": "应该被跳过",
+        "notes": ""
+      },
+      "existingHose": {
+        "id": "HD-0001",
+        "number": "HD-0001",
+        "name": "65mm 水带 (1号)",
+        "status": "storage",
+        "location": "A区货架 1-1",
+        "notes": "2023年采购，状况良好"
+      }
+    },
+    "createdAt": "2026-05-09T19:39:30.500Z"
+  }
+]
