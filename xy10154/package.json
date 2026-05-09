@@ -1,0 +1,29 @@
+{
+  "name": "logistics-trace-analyzer",
+  "version": "1.0.0",
+  "description": "物流轨迹异常归因 CLI 工具 - 检测签收后揽收、跨城市跳点、重复扫描等异常",
+  "main": "index.js",
+  "bin": {
+    "logistics": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": [
+    "logistics",
+    "tracking",
+    "anomaly-detection",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-writer": "^1.6.0",
+    "dayjs": "^1.11.10",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {}
+}

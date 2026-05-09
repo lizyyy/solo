@@ -1,0 +1,62 @@
+{
+  "trackingNumber": "YT9876543210987",
+  "source": "圆通速递",
+  "carrier": "YT",
+  "description": "异常样例：先签收后揽收",
+  "traces": [
+    {
+      "status": "DELIVERED",
+      "time": "2024-01-12 15:00:00",
+      "location": "北京市朝阳区",
+      "city": "北京",
+      "message": "已签收，签收人：门卫代收",
+      "operatorId": "COURIER_BJ001",
+      "deviceId": "PDA_BJ001"
+    },
+    {
+      "status": "DELIVERING",
+      "time": "2024-01-12 13:00:00",
+      "location": "北京市朝阳区站点",
+      "city": "北京",
+      "message": "快递员正在派送",
+      "operatorId": "COURIER_BJ001",
+      "deviceId": "PDA_BJ001"
+    },
+    {
+      "status": "ARRIVED",
+      "time": "2024-01-12 10:00:00",
+      "location": "北京转运中心",
+      "city": "北京",
+      "message": "已到达北京转运中心",
+      "operatorId": "SORTER_BJ001",
+      "deviceId": "SCANNER_BJ001"
+    },
+    {
+      "status": "IN_TRANSIT",
+      "time": "2024-01-11 20:00:00",
+      "location": "运输途中",
+      "city": "天津",
+      "message": "发往北京中",
+      "operatorId": "SYS001",
+      "deviceId": "GPS002"
+    },
+    {
+      "status": "COLLECTED",
+      "time": "2024-01-13 10:00:00",
+      "location": "上海市松江区",
+      "city": "上海",
+      "message": "快递员已揽收",
+      "operatorId": "COURIER_SH001",
+      "deviceId": "PDA_SH001"
+    },
+    {
+      "status": "CREATED",
+      "time": "2024-01-13 09:00:00",
+      "location": "上海市",
+      "city": "上海",
+      "message": "订单创建成功",
+      "operatorId": "SYS001",
+      "deviceId": "WEB002"
+    }
+  ]
+}

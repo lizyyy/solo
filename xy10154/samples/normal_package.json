@@ -1,0 +1,79 @@
+{
+  "trackingNumber": "SF1234567890123",
+  "source": "顺丰速运",
+  "carrier": "SF",
+  "traces": [
+    {
+      "status": "CREATED",
+      "time": "2024-01-15 09:00:00",
+      "location": "杭州市",
+      "city": "杭州",
+      "message": "订单已创建，等待揽收",
+      "operatorId": "SYS001",
+      "deviceId": "WEB001"
+    },
+    {
+      "status": "COLLECTED",
+      "time": "2024-01-15 10:30:00",
+      "location": "杭州市西湖区",
+      "city": "杭州",
+      "message": "快递员已揽收",
+      "operatorId": "COURIER001",
+      "deviceId": "PDA001"
+    },
+    {
+      "status": "IN_TRANSIT",
+      "time": "2024-01-15 12:00:00",
+      "location": "杭州转运中心",
+      "city": "杭州",
+      "message": "已到达杭州转运中心，准备发往上海",
+      "operatorId": "SORTER001",
+      "deviceId": "SCANNER001"
+    },
+    {
+      "status": "IN_TRANSIT",
+      "time": "2024-01-15 14:30:00",
+      "location": "运输途中",
+      "city": "嘉兴",
+      "message": "包裹正在运往上海",
+      "operatorId": "SYS001",
+      "deviceId": "GPS001"
+    },
+    {
+      "status": "ARRIVED",
+      "time": "2024-01-15 16:00:00",
+      "location": "上海转运中心",
+      "city": "上海",
+      "message": "已到达上海转运中心",
+      "operatorId": "SORTER002",
+      "deviceId": "SCANNER002"
+    },
+    {
+      "status": "ARRIVED",
+      "time": "2024-01-16 08:00:00",
+      "location": "上海市浦东新区站点",
+      "city": "上海",
+      "message": "已到达派送站点",
+      "operatorId": "SORTER003",
+      "deviceId": "SCANNER003"
+    },
+    {
+      "status": "DELIVERING",
+      "time": "2024-01-16 09:30:00",
+      "location": "上海市浦东新区",
+      "city": "上海",
+      "message": "快递员正在派送中",
+      "operatorId": "COURIER002",
+      "deviceId": "PDA002"
+    },
+    {
+      "status": "DELIVERED",
+      "time": "2024-01-16 11:20:00",
+      "location": "上海市浦东新区收件地址",
+      "city": "上海",
+      "message": "已签收，签收人：本人签收",
+      "operatorId": "COURIER002",
+      "deviceId": "PDA002"
+    }
+  ]
+}

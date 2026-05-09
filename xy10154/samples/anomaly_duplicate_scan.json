@@ -1,0 +1,71 @@
+{
+  "trackingNumber": "JD555666777888",
+  "source": "京东物流",
+  "carrier": "JD",
+  "description": "异常样例：重复扫描",
+  "traces": [
+    {
+      "status": "CREATED",
+      "time": "2024-01-12 10:00:00",
+      "location": "深圳市",
+      "city": "深圳",
+      "message": "订单已创建",
+      "operatorId": "SYS001",
+      "deviceId": "WEB004"
+    },
+    {
+      "status": "COLLECTED",
+      "time": "2024-01-12 11:30:00",
+      "location": "深圳市南山区",
+      "city": "深圳",
+      "message": "快递员已揽收",
+      "operatorId": "COURIER_SZ001",
+      "deviceId": "PDA_SZ001"
+    },
+    {
+      "status": "IN_TRANSIT",
+      "time": "2024-01-12 13:00:00",
+      "location": "深圳转运中心",
+      "city": "深圳",
+      "message": "到达转运中心",
+      "operatorId": "SORTER_SZ001",
+      "deviceId": "SCANNER_SZ001"
+    },
+    {
+      "status": "IN_TRANSIT",
+      "time": "2024-01-12 13:00:00",
+      "location": "深圳转运中心",
+      "city": "深圳",
+      "message": "到达转运中心",
+      "operatorId": "SORTER_SZ001",
+      "deviceId": "SCANNER_SZ001"
+    },
+    {
+      "status": "ARRIVED",
+      "time": "2024-01-13 09:00:00",
+      "location": "成都转运中心",
+      "city": "成都",
+      "message": "到达成都转运中心",
+      "operatorId": "SORTER_CD001",
+      "deviceId": "SCANNER_CD001"
+    },
+    {
+      "status": "DELIVERING",
+      "time": "2024-01-13 11:00:00",
+      "location": "成都市锦江区",
+      "city": "成都",
+      "message": "派送中",
+      "operatorId": "COURIER_CD001",
+      "deviceId": "PDA_CD001"
+    },
+    {
+      "status": "DELIVERED",
+      "time": "2024-01-13 14:30:00",
+      "location": "成都市锦江区收件地址",
+      "city": "成都",
+      "message": "已签收",
+      "operatorId": "COURIER_CD001",
+      "deviceId": "PDA_CD001"
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "name": "测试批次 - 混合样例",
+  "source": "samples",
+  "packages": [
+    {
+      "trackingNumber": "SF1234567890123",
+      "source": "顺丰速运",
+      "carrier": "SF",
+      "traces": [
+        {
+          "status": "CREATED",
+          "time": "2024-01-15 09:00:00",
+          "location": "杭州市",
+          "city": "杭州",
+          "message": "订单已创建",
+          "operatorId": "SYS001",
+          "deviceId": "WEB001"
+        },
+        {
+          "status": "COLLECTED",
+          "time": "2024-01-15 10:30:00",
+          "location": "杭州市西湖区",
+          "city": "杭州",
+          "message": "已揽收",
+          "operatorId": "COURIER001",
+          "deviceId": "PDA001"
+        },
+        {
+          "status": "IN_TRANSIT",
+          "time": "2024-01-15 12:00:00",
+          "location": "杭州转运中心",
+          "city": "杭州",
+          "message": "发往上海",
+          "operatorId": "SORTER001",
+          "deviceId": "SCANNER001"
+        },
+        {
+          "status": "ARRIVED",
+          "time": "2024-01-15 16:00:00",
+          "location": "上海转运中心",
+          "city": "上海",
+          "message": "到达上海",
+          "operatorId": "SORTER002",
+          "deviceId": "SCANNER002"
+        },
+        {
+          "status": "DELIVERING",
+          "time": "2024-01-16 09:30:00",
+          "location": "上海市浦东新区",
+          "city": "上海",
+          "message": "派送中",
+          "operatorId": "COURIER002",
+          "deviceId": "PDA002"
+        },
+        {
+          "status": "DELIVERED",
+          "time": "2024-01-16 11:20:00",
+          "location": "上海市浦东新区",
+          "city": "上海",
+          "message": "已签收",
+          "operatorId": "COURIER002",
+          "deviceId": "PDA002"
+        }
+      ]
+    },
+    {
+      "trackingNumber": "YT9876543210987",
+      "source": "圆通速递",
+      "carrier": "YT",
+      "description": "先签收后揽收异常",
+      "traces": [
+        {
+          "status": "DELIVERED",
+          "time": "2024-01-12 15:00:00",
+          "location": "北京市朝阳区",
+          "city": "北京",
+          "message": "已签收",
+          "operatorId": "COURIER_BJ001",
+          "deviceId": "PDA_BJ001"
+        },
+        {
+          "status": "DELIVERING",
+          "time": "2024-01-12 13:00:00",
+          "location": "北京市朝阳区站点",
+          "city": "北京",
+          "message": "派送中",
+          "operatorId": "COURIER_BJ001",
+          "deviceId": "PDA_BJ001"
+        },
+        {
+          "status": "ARRIVED",
+          "time": "2024-01-12 10:00:00",
+          "location": "北京转运中心",
+          "city": "北京",
+          "message": "到达北京",
+          "operatorId": "SORTER_BJ001",
+          "deviceId": "SCANNER_BJ001"
+        },
+        {
+          "status": "COLLECTED",
+          "time": "2024-01-13 10:00:00",
+          "location": "上海市松江区",
+          "city": "上海",
+          "message": "已揽收",
+          "operatorId": "COURIER_SH001",
+          "deviceId": "PDA_SH001"
+        },
+        {
+          "status": "CREATED",
+          "time": "2024-01-13 09:00:00",
+          "location": "上海市",
+          "city": "上海",
+          "message": "订单创建",
+          "operatorId": "SYS001",
+          "deviceId": "WEB002"
+        }
+      ]
+    },
+    {
+      "trackingNumber": "ZTO111222333444",
+      "source": "中通快递",
+      "carrier": "ZTO",
+      "description": "跨城市跳点异常",
+      "traces": [
+        {
+          "status": "CREATED",
+          "time": "2024-01-10 08:00:00",
+          "location": "广州市",
+          "city": "广州",
+          "message": "订单创建",
+          "operatorId": "SYS001",
+          "deviceId": "WEB003"
+        },
+        {
+          "status": "COLLECTED",
+          "time": "2024-01-10 09:30:00",
+          "location": "广州市天河区",
+          "city": "广州",
+          "message": "已揽收",
+          "operatorId": "COURIER_GZ001",
+          "deviceId": "PDA_GZ001"
+        },
+        {
+          "status": "IN_TRANSIT",
+          "time": "2024-01-10 11:00:00",
+          "location": "广州转运中心",
+          "city": "广州",
+          "message": "到达转运中心",
+          "operatorId": "SORTER_GZ001",
+          "deviceId": "SCANNER_GZ001"
+        },
+        {
+          "status": "IN_TRANSIT",
+          "time": "2024-01-10 11:30:00",
+          "location": "北京市朝阳区",
+          "city": "北京",
+          "message": "发往北京",
+          "operatorId": "SORTER_GZ002",
+          "deviceId": "SCANNER_GZ002"
+        },
+        {
+          "status": "DELIVERED",
+          "time": "2024-01-11 14:00:00",
+          "location": "北京市海淀区",
+          "city": "北京",
+          "message": "已签收",
+          "operatorId": "COURIER_BJ002",
+          "deviceId": "PDA_BJ002"
+        }
+      ]
+    }
+  ]
+}
