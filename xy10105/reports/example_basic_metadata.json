@@ -1,0 +1,192 @@
+{
+  "audit_metadata": {
+    "generated_at": "2026-05-09T18:29:53.818456",
+    "duration_seconds": 1.397197,
+    "step_durations": {
+      "data_loading": 0.006784,
+      "quality_control": 0.044879,
+      "drift_detection": 0.103398,
+      "calibration": 0.006045,
+      "report_generation": 1.235956
+    }
+  },
+  "configuration": {
+    "sensor_id_column": "sensor_id",
+    "timestamp_column": "timestamp",
+    "temperature_column": "temperature",
+    "humidity_column": "humidity",
+    "location_column": "location",
+    "batch_column": "batch_id",
+    "temperature_valid_units": [
+      "C",
+      "c",
+      "°C",
+      "摄氏度",
+      "℃",
+      "F",
+      "f",
+      "°F",
+      "华氏度"
+    ],
+    "humidity_valid_units": [
+      "%",
+      "%RH",
+      "RH",
+      "相对湿度"
+    ],
+    "default_temperature_unit": "C",
+    "default_humidity_unit": "%RH",
+    "temperature_range": [
+      -40.0,
+      85.0
+    ],
+    "humidity_range": [
+      0.0,
+      100.0
+    ],
+    "temperature_delta_threshold": 2.0,
+    "humidity_delta_threshold": 5.0,
+    "iqr_multiplier": 1.5,
+    "z_score_threshold": 3.0,
+    "duplicate_check_columns": [
+      "sensor_id",
+      "timestamp"
+    ],
+    "timestamp_format": null,
+    "timezone": null,
+    "drift_window_size": 30,
+    "drift_threshold_temp": 1.5,
+    "drift_threshold_humidity": 3.0,
+    "calibration_reference_sensor": null,
+    "calibration_method": "linear",
+    "report_output_dir": "reports",
+    "data_output_dir": "output",
+    "export_excel": true,
+    "export_html": true
+  },
+  "summary": {
+    "data": {
+      "raw_rows": 1818,
+      "raw_columns": 8,
+      "processed_rows": 1818,
+      "processed_columns": 8,
+      "sensor_count": 5,
+      "location_count": 4,
+      "batch_count": 2,
+      "date_start": "2024-06-01T00:00:00",
+      "date_end": "2024-06-30T11:00:00",
+      "total_duration_days": 29
+    },
+    "quality_control": {
+      "quality_score": 87.27172717271728,
+      "total_records": 1818,
+      "valid_records": 1815,
+      "invalid_records": 3,
+      "total_issues": 795,
+      "issues_by_type": {
+        "missing_values": 67,
+        "duplicates": 18,
+        "range_outliers": 14,
+        "statistical_outliers": 15,
+        "temporal_breaks": 681
+      }
+    },
+    "drift": {
+      "total_events": 89,
+      "by_metric": {
+        "temperature": {
+          "count": 45,
+          "total_drift": 248.97564639175948,
+          "avg_drift": 5.532792142039099
+        },
+        "humidity": {
+          "count": 44,
+          "total_drift": 558.1590562284088,
+          "avg_drift": 12.6854330961002
+        }
+      },
+      "by_severity": {
+        "MODERATE_DRIFT": 27,
+        "SEVERE_DRIFT": 62
+      },
+      "by_sensor": {
+        "SENSOR_000": {
+          "count": 2,
+          "metrics": {
+            "temperature": 2
+          }
+        },
+        "SENSOR_001": {
+          "count": 2,
+          "metrics": {
+            "temperature": 2
+          }
+        },
+        "SENSOR_002": {
+          "count": 36,
+          "metrics": {
+            "temperature": 17,
+            "humidity": 19
+          }
+        },
+        "SENSOR_003": {
+          "count": 39,
+          "metrics": {
+            "temperature": 18,
+            "humidity": 21
+          }
+        },
+        "SENSOR_004": {
+          "count": 10,
+          "metrics": {
+            "temperature": 6,
+            "humidity": 4
+          }
+        }
+      },
+      "avg_drift_magnitude": 9.06892924292324
+    },
+    "calibration": {
+      "total_parameters": 8,
+      "by_metric": {
+        "temperature": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "humidity": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "by_sensor": {
+        "SENSOR_000": [
+          "temperature"
+        ],
+        "SENSOR_001": [
+          "temperature"
+        ],
+        "SENSOR_002": [
+          "temperature",
+          "humidity"
+        ],
+        "SENSOR_003": [
+          "temperature",
+          "humidity"
+        ],
+        "SENSOR_004": [
+          "temperature",
+          "humidity"
+        ]
+      },
+      "average_r_squared": 1.0
+    },
+    "generated_files": {
+      "html": "reports/example_basic.html",
+      "excel": "reports/example_basic.xlsx"
+    }
+  }
+}
