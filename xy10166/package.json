@@ -1,0 +1,23 @@
+{
+  "name": "clinic-schedule-cli",
+  "version": "1.0.0",
+  "description": "诊疗预约冲突检查 CLI 工具",
+  "main": "cli.js",
+  "bin": {
+    "clinic-schedule": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": ["clinic", "schedule", "conflict", "checker", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "date-fns": "^3.6.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.5",
+    "uuid": "^9.0.1"
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "apt_006",
+    "patientId": "P006",
+    "patientName": "孙八",
+    "startTime": "2024-05-10T08:15:00.000Z",
+    "endTime": "2024-05-10T08:45:00.000Z",
+    "doctorId": "D001",
+    "roomId": "R001",
+    "equipmentId": null,
+    "appointmentType": "emergency",
+    "description": "临时加号 - 与张三、李四冲突"
+  },
+  {
+    "id": "apt_007",
+    "patientId": "P007",
+    "patientName": "周九",
+    "startTime": "2024-05-10T08:20:00.000Z",
+    "endTime": "2024-05-10T08:50:00.000Z",
+    "doctorId": "D001",
+    "roomId": "R001",
+    "equipmentId": null,
+    "appointmentType": "emergency",
+    "description": "紧急加号 - 医生 D001 多重冲突"
+  },
+  {
+    "id": "apt_008",
+    "patientId": "P008",
+    "patientName": "吴十",
+    "startTime": "2024-05-10T09:15:00.000Z",
+    "endTime": "2024-05-10T09:45:00.000Z",
+    "doctorId": "D002",
+    "roomId": "R002",
+    "equipmentId": "E001",
+    "appointmentType": "examination",
+    "description": "与王五、赵六冲突（诊室+设备）"
+  },
+  {
+    "id": "apt_009",
+    "patientId": "P009",
+    "patientName": "郑十一",
+    "startTime": "2024-05-10T23:00:00.000Z",
+    "endTime": "2024-05-11T01:00:00.000Z",
+    "doctorId": "D003",
+    "roomId": "R003",
+    "equipmentId": null,
+    "appointmentType": "night_shift",
+    "description": "跨午夜预约 - 夜间急诊处理"
+  },
+  {
+    "id": "apt_010",
+    "patientId": "P010",
+    "patientName": "王十二",
+    "startTime": "2024-05-10T23:30:00.000Z",
+    "endTime": "2024-05-11T00:30:00.000Z",
+    "doctorId": "D003",
+    "roomId": "R003",
+    "equipmentId": null,
+    "appointmentType": "night_shift",
+    "description": "跨午夜冲突 - 与郑十一重叠"
+  }
+]

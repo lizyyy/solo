@@ -1,0 +1,4 @@
+id,patient_id,patient_name,start_time,end_time,doctor_id,room_id,equipment_id,appointment_type,description
+apt_csv_001,C201,CSV患者1,2024-05-10T11:00:00.000Z,2024-05-10T11:30:00.000Z,D005,R005,,regular,CSV导入测试1
+apt_csv_002,C202,CSV患者2,2024-05-10T11:30:00.000Z,2024-05-10T12:00:00.000Z,D005,R005,,regular,CSV导入测试2
+apt_csv_003,C203,CSV患者3,2024-05-10T11:15:00.000Z,2024-05-10T11:45:00.000Z,D005,R005,,emergency,CSV冲突测试

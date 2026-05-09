@@ -1,0 +1,62 @@
+[
+  {
+    "id": "apt_001",
+    "patientId": "P001",
+    "patientName": "张三",
+    "startTime": "2024-05-10T08:00:00.000Z",
+    "endTime": "2024-05-10T08:30:00.000Z",
+    "doctorId": "D001",
+    "roomId": "R001",
+    "equipmentId": null,
+    "appointmentType": "regular",
+    "description": "常规门诊"
+  },
+  {
+    "id": "apt_002",
+    "patientId": "P002",
+    "patientName": "李四",
+    "startTime": "2024-05-10T08:30:00.000Z",
+    "endTime": "2024-05-10T09:00:00.000Z",
+    "doctorId": "D001",
+    "roomId": "R001",
+    "equipmentId": null,
+    "appointmentType": "regular",
+    "description": "常规门诊"
+  },
+  {
+    "id": "apt_003",
+    "patientId": "P003",
+    "patientName": "王五",
+    "startTime": "2024-05-10T09:00:00.000Z",
+    "endTime": "2024-05-10T09:30:00.000Z",
+    "doctorId": "D002",
+    "roomId": "R002",
+    "equipmentId": "E001",
+    "appointmentType": "examination",
+    "description": "CT检查"
+  },
+  {
+    "id": "apt_004",
+    "patientId": "P004",
+    "patientName": "赵六",
+    "startTime": "2024-05-10T09:30:00.000Z",
+    "endTime": "2024-05-10T10:00:00.000Z",
+    "doctorId": "D002",
+    "roomId": "R002",
+    "equipmentId": null,
+    "appointmentType": "regular",
+    "description": "复诊"
+  },
+  {
+    "id": "apt_005",
+    "patientId": "P005",
+    "patientName": "钱七",
+    "startTime": "2024-05-10T10:00:00.000Z",
+    "endTime": "2024-05-10T10:30:00.000Z",
+    "doctorId": "D003",
+    "roomId": "R003",
+    "equipmentId": "E002",
+    "appointmentType": "examination",
+    "description": "心电图检查"
+  }
+]

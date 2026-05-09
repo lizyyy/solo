@@ -1,0 +1,47 @@
+[
+  {
+    "id": "bad_001",
+    "patientId": "P101",
+    "patientName": "测试患者1",
+    "startTime": "2024-05-10T10:00:00.000Z",
+    "endTime": "2024-05-10T09:00:00.000Z",
+    "doctorId": "D004",
+    "roomId": "R004",
+    "appointmentType": "regular",
+    "description": "结束时间早于开始时间"
+  },
+  {
+    "id": "bad_002",
+    "patientId": "P102",
+    "patientName": "测试患者2",
+    "startTime": "invalid-date",
+    "endTime": "2024-05-10T10:00:00.000Z",
+    "doctorId": "D004",
+    "roomId": "R004",
+    "appointmentType": "regular",
+    "description": "无效的开始时间格式"
+  },
+  {
+    "id": "bad_003",
+    "patientId": "",
+    "patientName": "",
+    "startTime": "2024-05-10T10:00:00.000Z",
+    "endTime": "2024-05-10T10:30:00.000Z",
+    "doctorId": "",
+    "roomId": "",
+    "appointmentType": "regular",
+    "description": "缺少必填字段"
+  },
+  {
+    "id": "good_001",
+    "patientId": "P201",
+    "patientName": "有效患者",
+    "startTime": "2024-05-10T14:00:00.000Z",
+    "endTime": "2024-05-10T14:30:00.000Z",
+    "doctorId": "D004",
+    "roomId": "R004",
+    "equipmentId": null,
+    "appointmentType": "regular",
+    "description": "正常有效的预约"
+  }
+]
