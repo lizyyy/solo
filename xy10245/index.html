@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书法班作品点评归档台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="logo">📜 书法班作品点评归档台</h1>
+                <span class="version">v1.0</span>
+            </div>
+            <div class="header-right">
+                <div class="workspace-indicator">
+                    <span class="indicator-dot"></span>
+                    <span id="workspace-status">工作区已加载</span>
+                </div>
+                <button class="btn btn-secondary" onclick="app.exportData()">导出数据</button>
+                <button class="btn btn-secondary" onclick="app.importData()">导入数据</button>
+                <button class="btn btn-danger" onclick="app.clearAll()">清空数据</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>📊 统计概览</h3>
+                    <div class="stats-grid" id="stats-grid">
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🎯 快速操作</h3>
+                    <button class="btn btn-primary btn-block" onclick="app.showAddWorkModal()">+ 新增作品</button>
+                    <button class="btn btn-secondary btn-block" onclick="app.showVerification()">验证数据</button>
+                    <button class="btn btn-secondary btn-block" onclick="app.showAcceptance()">验收报告</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🔔 问题提示</h3>
+                    <div class="alerts-container" id="alerts-container">
+                        <p class="text-muted">暂无问题</p>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="content-tabs">
+                    <button class="tab-btn active" data-tab="works" onclick="app.switchTab('works')">作品管理</button>
+                    <button class="tab-btn" data-tab="tags" onclick="app.switchTab('tags')">标签管理</button>
+                    <button class="tab-btn" data-tab="compare" onclick="app.switchTab('compare')">轮次对比</button>
+                    <button class="tab-btn" data-tab="docs" onclick="app.switchTab('docs')">验收文档</button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-works">
+                        <div class="filter-bar">
+                            <input type="text" id="search-input" placeholder="搜索学生姓名、作品名称..." 
+                                   oninput="app.filterWorks()" class="search-input">
+                            <select id="filter-student" onchange="app.filterWorks()" class="filter-select">
+                                <option value="">全部学生</option>
+                            </select>
+                            <select id="filter-status" onchange="app.filterWorks()" class="filter-select">
+                                <option value="">全部状态</option>
+                                <option value="pending">待点评</option>
+                                <option value="in_progress">点评中</option>
+                                <option value="completed">已完成</option>
+                            </select>
+                        </div>
+                        <div class="works-list" id="works-list"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-tags">
+                        <div class="tags-header">
+                            <h2>标签管理</h2>
+                            <button class="btn btn-primary" onclick="app.showAddTagModal()">+ 新增标签</button>
+                        </div>
+                        <div class="tags-container" id="tags-container"></div>
+                        <div class="validation-result" id="tag-validation"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-compare">
+                        <div class="compare-header">
+                            <h2>作品轮次对比</h2>
+                            <div class="compare-controls">
+                                <select id="compare-work" onchange="app.loadCompareRounds()" class="filter-select">
+                                    <option value="">选择作品</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="compare-container" id="compare-container">
+                            <p class="text-muted center">请选择作品进行轮次对比</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-docs">
+                        <div class="docs-container">
+                            <h2>📋 验收标准文档</h2>
+                            
+                            <section class="doc-section">
+                                <h3>✅ 通过标准</h3>
+                                <p>以下输出代表验收通过，无需人工处理：</p>
+                                <ul class="pass-criteria">
+                                    <li><span class="status-success">✓</span> 所有作品至少有一轮完整点评（笔画、结构、章法三个维度均有内容）</li>
+                                    <li><span class="status-success">✓</span> 所有使用的标签均在标签库中存在</li>
+                                    <li><span class="status-success">✓</span> 同一作品的轮次编号连续且不重复</li>
+                                    <li><span class="status-success">✓</span> 每个维度的评分在 1-5 分范围内</li>
+                                    <li><span class="status-success">✓</span> 所有必填字段（学生姓名、作品名称、轮次、日期）均已填写</li>
+                                </ul>
+                            </section>
+
+                            <section class="doc-section">
+                                <h3>⚠️ 需要人工处理</h3>
+                                <p>以下输出代表需要人工检查或修复：</p>
+                                <ul class="fail-criteria">
+                                    <li><span class="status-warning">!</span> <strong>缺失数据</strong>：作品缺少某轮点评、某维度未填写</li>
+                                    <li><span class="status-warning">!</span> <strong>标签冲突</strong>：使用了不存在的标签</li>
+                                    <li><span class="status-warning">!</span> <strong>轮次冲突</strong>：轮次编号不连续或重复</li>
+                                    <li><span class="status-warning">!</span> <strong>数据异常</strong>：评分超出范围、日期格式错误</li>
+                                    <li><span class="status-warning">!</span> <strong>对比不一致</strong>：修改后的数据与原始记录不符</li>
+                                </ul>
+                            </section>
+
+                            <section class="doc-section">
+                                <h3>🔄 验收流程</h3>
+                                <div class="process-flow">
+                                    <div class="flow-step">
+                                        <span class="step-number">1</span>
+                                        <span>验证数据：点击「验证数据」按钮</span>
+                                    </div>
+                                    <div class="flow-step">
+                                        <span class="step-number">2</span>
+                                        <span>查看报告：检查正常处理和失败原因</span>
+                                    </div>
+                                    <div class="flow-step">
+                                        <span class="step-number">3</span>
+                                        <span>修复问题：根据提示修改数据</span>
+                                    </div>
+                                    <div class="flow-step">
+                                        <span class="step-number">4</span>
+                                        <span>重跑验证：修正后再次验证</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="doc-section">
+                                <h3>📐 书法点评维度说明</h3>
+                                <div class="dimensions-grid">
+                                    <div class="dimension-card">
+                                        <h4>✍️ 笔画</h4>
+                                        <p>用笔的起收、转折、轻重变化，线条的质感和力度</p>
+                                        <div class="dimension-tags">
+                                            <span class="tag-info">起笔</span>
+                                            <span class="tag-info">收笔</span>
+                                            <span class="tag-info">转折</span>
+                                            <span class="tag-info">力度</span>
+                                            <span class="tag-info">线条</span>
+                                        </div>
+                                    </div>
+                                    <div class="dimension-card">
+                                        <h4>🏗️ 结构</h4>
+                                        <p>字的间架结构、比例关系、重心稳定、疏密安排</p>
+                                        <div class="dimension-tags">
+                                            <span class="tag-info">比例</span>
+                                            <span class="tag-info">重心</span>
+                                            <span class="tag-info">疏密</span>
+                                            <span class="tag-info">呼应</span>
+                                            <span class="tag-info">平衡</span>
+                                        </div>
+                                    </div>
+                                    <div class="dimension-card">
+                                        <h4>🎨 章法</h4>
+                                        <p>整体布局、字距行距、落款印章、整体气韵</p>
+                                        <div class="dimension-tags">
+                                            <span class="tag-info">布局</span>
+                                            <span class="tag-info">字距</span>
+                                            <span class="tag-info">行距</span>
+                                            <span class="tag-info">落款</span>
+                                            <span class="tag-info">气韵</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="modal" id="modal">
+            <div class="modal-overlay" onclick="app.closeModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">标题</h3>
+                    <button class="modal-close" onclick="app.closeModal()">×</button>
+                </div>
+                <div class="modal-body" id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
