@@ -1,0 +1,402 @@
+{
+  "WH20260510001": {
+    "raw_sample": {
+      "sample_id": "WH20260510001",
+      "leaf_area_cm2": 45.0,
+      "lesion_area_cm2": 1.2,
+      "lesion_color": "黄色",
+      "collected_at": "2026-05-10 08:00:00",
+      "technician_id": "TECH001",
+      "field_id": "FIELD_A"
+    },
+    "review_status": "已确认",
+    "final_grade": "轻度",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510001",
+      "area_features": {
+        "lesion_area_cm2": 1.2,
+        "leaf_area_cm2": 45.0,
+        "lesion_ratio": 0.026666666666666665
+      },
+      "color_features": {
+        "r": 255,
+        "g": 215,
+        "b": 0,
+        "h": 50.588235294117645,
+        "s": 1.0,
+        "v": 1.0,
+        "color_category": "黄色",
+        "brown_index": 0.1,
+        "yellow_index": 0.9
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "轻度",
+      "score": 0.22999999999999998,
+      "rules_applied": [
+        "病斑比例 2.67% ≤ 5%，符合轻度区间",
+        "病斑颜色为黄色（黄色指数 0.90），属于初期病变"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 2.67% ≤ 5%，符合轻度区间\n   面积得分：0.20\n\n2. 颜色分析：\n   - 病斑颜色为黄色（黄色指数 0.90），属于初期病变\n   颜色得分：0.30\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.20 + 颜色权重 30.0% × 0.30\n   - 综合得分：0.23"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:04",
+      "final_grade": "轻度",
+      "comment": "规则分级准确"
+    }
+  },
+  "WH20260510002": {
+    "raw_sample": {
+      "sample_id": "WH20260510002",
+      "leaf_area_cm2": 52.0,
+      "lesion_area_cm2": 4.5,
+      "lesion_color": "黄褐色",
+      "collected_at": "2026-05-10 07:00:00",
+      "technician_id": "TECH001",
+      "field_id": "FIELD_A"
+    },
+    "review_status": "已确认",
+    "final_grade": "中度",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510002",
+      "area_features": {
+        "lesion_area_cm2": 4.5,
+        "leaf_area_cm2": 52.0,
+        "lesion_ratio": 0.08653846153846154
+      },
+      "color_features": {
+        "r": 194,
+        "g": 140,
+        "b": 88,
+        "h": 29.433962264150953,
+        "s": 0.5463917525773195,
+        "v": 0.7607843137254902,
+        "color_category": "黄褐色",
+        "brown_index": 0.5,
+        "yellow_index": 0.6
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "中度",
+      "score": 0.5,
+      "rules_applied": [
+        "病斑比例 8.65% 在 5%-15% 之间，符合中度区间",
+        "病斑颜色为黄褐色（褐黄指数较高 0.60），属于中期病变"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 8.65% 在 5%-15% 之间，符合中度区间\n   面积得分：0.50\n\n2. 颜色分析：\n   - 病斑颜色为黄褐色（褐黄指数较高 0.60），属于中期病变\n   颜色得分：0.50\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.50 + 颜色权重 30.0% × 0.50\n   - 综合得分：0.50"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:04",
+      "final_grade": "中度",
+      "comment": "规则分级准确"
+    }
+  },
+  "WH20260510003": {
+    "raw_sample": {
+      "sample_id": "WH20260510003",
+      "leaf_area_cm2": 38.0,
+      "lesion_area_cm2": 8.2,
+      "lesion_color": "褐色",
+      "collected_at": "2026-05-10 06:00:00",
+      "technician_id": "TECH002",
+      "field_id": "FIELD_B"
+    },
+    "review_status": "已确认",
+    "final_grade": "极严重",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510003",
+      "area_features": {
+        "lesion_area_cm2": 8.2,
+        "leaf_area_cm2": 38.0,
+        "lesion_ratio": 0.2157894736842105
+      },
+      "color_features": {
+        "r": 139,
+        "g": 69,
+        "b": 19,
+        "h": 24.999999999999996,
+        "s": 0.8633093525179856,
+        "v": 0.5450980392156862,
+        "color_category": "褐色",
+        "brown_index": 1.0,
+        "yellow_index": 0.2
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "极严重",
+      "score": 0.7699999999999999,
+      "rules_applied": [
+        "病斑比例 21.58% 在 15%-30% 之间，符合严重区间",
+        "病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 21.58% 在 15%-30% 之间，符合严重区间\n   面积得分：0.80\n\n2. 颜色分析：\n   - 病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重\n   颜色得分：0.70\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.80 + 颜色权重 30.0% × 0.70\n   - 综合得分：0.77"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:04",
+      "final_grade": "极严重",
+      "comment": "规则分级准确"
+    }
+  },
+  "WH20260510004": {
+    "raw_sample": {
+      "sample_id": "WH20260510004",
+      "leaf_area_cm2": 60.0,
+      "lesion_area_cm2": 2.5,
+      "lesion_color": "浅褐色",
+      "collected_at": "2026-05-10 05:00:00",
+      "technician_id": "TECH002",
+      "field_id": "FIELD_B"
+    },
+    "review_status": "已修正",
+    "final_grade": "中度",
+    "version": 2,
+    "features": {
+      "sample_id": "WH20260510004",
+      "area_features": {
+        "lesion_area_cm2": 2.5,
+        "leaf_area_cm2": 60.0,
+        "lesion_ratio": 0.041666666666666664
+      },
+      "color_features": {
+        "r": 199,
+        "g": 129,
+        "b": 96,
+        "h": 19.223300970873783,
+        "s": 0.5175879396984925,
+        "v": 0.7803921568627451,
+        "color_category": "浅褐色",
+        "brown_index": 0.9,
+        "yellow_index": 0.2
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "中度",
+      "score": 0.31999999999999995,
+      "rules_applied": [
+        "病斑比例 4.17% ≤ 5%，符合轻度区间",
+        "病斑颜色为浅褐色（褐色指数 0.90），颜色越深病情越重"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 4.17% ≤ 5%，符合轻度区间\n   面积得分：0.20\n\n2. 颜色分析：\n   - 病斑颜色为浅褐色（褐色指数 0.90），颜色越深病情越重\n   颜色得分：0.60\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.20 + 颜色权重 30.0% × 0.60\n   - 综合得分：0.32"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:04",
+      "final_grade": "中度",
+      "comment": "考虑到植株整体情况，病情实际上更严重"
+    }
+  },
+  "WH20260510005": {
+    "raw_sample": {
+      "sample_id": "WH20260510005",
+      "leaf_area_cm2": 48.0,
+      "lesion_area_cm2": 18.5,
+      "lesion_color": "褐色",
+      "collected_at": "2026-05-10 04:00:00",
+      "technician_id": "TECH003",
+      "field_id": "FIELD_C"
+    },
+    "review_status": "已驳回",
+    "final_grade": null,
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510005",
+      "area_features": {
+        "lesion_area_cm2": 18.5,
+        "leaf_area_cm2": 48.0,
+        "lesion_ratio": 0.3854166666666667
+      },
+      "color_features": {
+        "r": 139,
+        "g": 69,
+        "b": 19,
+        "h": 24.999999999999996,
+        "s": 0.8633093525179856,
+        "v": 0.5450980392156862,
+        "color_category": "褐色",
+        "brown_index": 1.0,
+        "yellow_index": 0.2
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "极严重",
+      "score": 0.8749999999999999,
+      "rules_applied": [
+        "病斑比例 38.54% > 30%，符合极严重区间",
+        "病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 38.54% > 30%，符合极严重区间\n   面积得分：0.95\n\n2. 颜色分析：\n   - 病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重\n   颜色得分：0.70\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.95 + 颜色权重 30.0% × 0.70\n   - 综合得分：0.87"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:04",
+      "final_grade": null,
+      "comment": "该样本病斑特征不典型，需要重新采集数据"
+    }
+  },
+  "WH20260510006": {
+    "raw_sample": {
+      "sample_id": "WH20260510006",
+      "leaf_area_cm2": 55.0,
+      "lesion_area_cm2": 0.8,
+      "lesion_color": "枯黄",
+      "collected_at": "2026-05-10 03:00:00",
+      "technician_id": "TECH003",
+      "field_id": "FIELD_C"
+    },
+    "review_status": "已确认",
+    "final_grade": "中度",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510006",
+      "area_features": {
+        "lesion_area_cm2": 0.8,
+        "leaf_area_cm2": 55.0,
+        "lesion_ratio": 0.014545454545454545
+      },
+      "color_features": {
+        "r": 218,
+        "g": 165,
+        "b": 32,
+        "h": 42.903225806451616,
+        "s": 0.8532110091743119,
+        "v": 0.8549019607843137,
+        "color_category": "枯黄",
+        "brown_index": 0.3,
+        "yellow_index": 0.7
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "中度",
+      "score": 0.26,
+      "rules_applied": [
+        "病斑比例 1.45% ≤ 5%，符合轻度区间",
+        "病斑颜色为枯黄（枯黄指数 0.70），处于枯亡期病变"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 1.45% ≤ 5%，符合轻度区间\n   面积得分：0.20\n\n2. 颜色分析：\n   - 病斑颜色为枯黄（枯黄指数 0.70），处于枯亡期病变\n   颜色得分：0.40\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.20 + 颜色权重 30.0% × 0.40\n   - 综合得分：0.26"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:10",
+      "final_grade": "中度",
+      "comment": "规则分级准确"
+    }
+  },
+  "WH20260510007": {
+    "raw_sample": {
+      "sample_id": "WH20260510007",
+      "leaf_area_cm2": 42.0,
+      "lesion_area_cm2": 6.8,
+      "lesion_color": "黄褐色",
+      "collected_at": "2026-05-10 02:00:00",
+      "technician_id": "TECH001",
+      "field_id": "FIELD_A"
+    },
+    "review_status": "已确认",
+    "final_grade": "严重",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510007",
+      "area_features": {
+        "lesion_area_cm2": 6.8,
+        "leaf_area_cm2": 42.0,
+        "lesion_ratio": 0.1619047619047619
+      },
+      "color_features": {
+        "r": 194,
+        "g": 140,
+        "b": 88,
+        "h": 29.433962264150953,
+        "s": 0.5463917525773195,
+        "v": 0.7607843137254902,
+        "color_category": "黄褐色",
+        "brown_index": 0.5,
+        "yellow_index": 0.6
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "严重",
+      "score": 0.71,
+      "rules_applied": [
+        "病斑比例 16.19% 在 15%-30% 之间，符合严重区间",
+        "病斑颜色为黄褐色（褐黄指数较高 0.60），属于中期病变"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 16.19% 在 15%-30% 之间，符合严重区间\n   面积得分：0.80\n\n2. 颜色分析：\n   - 病斑颜色为黄褐色（褐黄指数较高 0.60），属于中期病变\n   颜色得分：0.50\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.80 + 颜色权重 30.0% × 0.50\n   - 综合得分：0.71"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:10",
+      "final_grade": "严重",
+      "comment": "规则分级准确"
+    }
+  },
+  "WH20260510008": {
+    "raw_sample": {
+      "sample_id": "WH20260510008",
+      "leaf_area_cm2": 50.0,
+      "lesion_area_cm2": 16.0,
+      "lesion_color": "褐色",
+      "collected_at": "2026-05-10 01:00:00",
+      "technician_id": "TECH002",
+      "field_id": "FIELD_B"
+    },
+    "review_status": "已确认",
+    "final_grade": "极严重",
+    "version": 1,
+    "features": {
+      "sample_id": "WH20260510008",
+      "area_features": {
+        "lesion_area_cm2": 16.0,
+        "leaf_area_cm2": 50.0,
+        "lesion_ratio": 0.32
+      },
+      "color_features": {
+        "r": 139,
+        "g": 69,
+        "b": 19,
+        "h": 24.999999999999996,
+        "s": 0.8633093525179856,
+        "v": 0.5450980392156862,
+        "color_category": "褐色",
+        "brown_index": 1.0,
+        "yellow_index": 0.2
+      },
+      "extracted_at": "2026-05-10 02:42:04"
+    },
+    "processed_at": "2026-05-10 02:42:04",
+    "rule_grade": {
+      "grade": "极严重",
+      "score": 0.8749999999999999,
+      "rules_applied": [
+        "病斑比例 32.00% > 30%，符合极严重区间",
+        "病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重"
+      ],
+      "explanation": "【分级理由】\n1. 面积分析：\n   - 病斑比例 32.00% > 30%，符合极严重区间\n   面积得分：0.95\n\n2. 颜色分析：\n   - 病斑颜色为褐色（褐色指数 1.00），颜色越深病情越重\n   颜色得分：0.70\n\n3. 综合评分：\n   - 面积权重 70.0% × 0.95 + 颜色权重 30.0% × 0.70\n   - 综合得分：0.87"
+    },
+    "review_info": {
+      "reviewer_id": "REVIEWER001",
+      "reviewed_at": "2026-05-10 02:42:10",
+      "final_grade": "极严重",
+      "comment": "规则分级准确"
+    }
+  }
+}
