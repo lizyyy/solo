@@ -1,0 +1,29 @@
+{
+  "name": "outsourcing-portal",
+  "version": "1.0.0",
+  "description": "外包交付验收门户 - 管理项目里程碑、交付物版本、验收状态、返工记录和付款条件",
+  "private": true,
+  "scripts": {
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "clean": "rm -rf backend/node_modules frontend/node_modules backend/package-lock.json frontend/package-lock.json"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "外包",
+    "验收",
+    "交付物",
+    "里程碑",
+    "项目管理"
+  ],
+  "author": "",
+  "license": "MIT"
+}
