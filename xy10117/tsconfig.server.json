@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/server",
+    "jsx": "preserve",
+    "lib": ["ES2020"]
+  },
+  "include": ["src/server/**/*"],
+  "exclude": ["src/client", "node_modules", "dist"]
+}
