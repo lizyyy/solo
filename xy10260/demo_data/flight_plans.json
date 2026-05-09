@@ -1,0 +1,41 @@
+[
+    {
+        "flight_number": "CA1234",
+        "aircraft_type": "B737-800",
+        "route": "PEK-SHA",
+        "scheduled_departure": "2026-05-10T08:00:00",
+        "economy_passengers": 145,
+        "business_passengers": 10,
+        "first_class_passengers": 0,
+        "status": "active",
+        "special_meals": [
+            {
+                "meal_code": "VLML",
+                "count": 3,
+                "passenger_names": "Zhang San, Li Si, Wang Wu"
+            },
+            {
+                "meal_code": "GFML",
+                "count": 1,
+                "passenger_names": "Zhao Liu"
+            }
+        ]
+    },
+    {
+        "flight_number": "MU5678",
+        "aircraft_type": "A320",
+        "route": "SHA-CTU",
+        "scheduled_departure": "2026-05-10T10:30:00",
+        "economy_passengers": 135,
+        "business_passengers": 6,
+        "first_class_passengers": 0,
+        "status": "active",
+        "special_meals": [
+            {
+                "meal_code": "MOML",
+                "count": 2,
+                "passenger_names": "Chen Qi, Sun Ba"
+            }
+        ]
+    }
+]

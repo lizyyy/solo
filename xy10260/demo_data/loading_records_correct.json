@@ -1,0 +1,43 @@
+[
+    {
+        "flight_number": "CA1234",
+        "aircraft_type": "B737-800",
+        "economy_meals_loaded": 150,
+        "business_meals_loaded": 12,
+        "first_class_meals_loaded": 0,
+        "snacks_loaded": 180,
+        "beverages_loaded": 300,
+        "cutlery_sets_loaded": 170,
+        "blankets_loaded": 80,
+        "pillows_loaded": 80,
+        "headsets_loaded": 30,
+        "amenity_kits_loaded": 12,
+        "loader_name": "装卸组A",
+        "load_time": "2026-05-10T06:00:00",
+        "status": "completed",
+        "special_meals": [
+            { "meal_code": "VLML", "loaded_count": 3 },
+            { "meal_code": "GFML", "loaded_count": 1 }
+        ]
+    },
+    {
+        "flight_number": "MU5678",
+        "aircraft_type": "A320",
+        "economy_meals_loaded": 140,
+        "business_meals_loaded": 8,
+        "first_class_meals_loaded": 0,
+        "snacks_loaded": 160,
+        "beverages_loaded": 280,
+        "cutlery_sets_loaded": 155,
+        "blankets_loaded": 70,
+        "pillows_loaded": 70,
+        "headsets_loaded": 25,
+        "amenity_kits_loaded": 8,
+        "loader_name": "装卸组B",
+        "load_time": "2026-05-10T08:30:00",
+        "status": "completed",
+        "special_meals": [
+            { "meal_code": "MOML", "loaded_count": 2 }
+        ]
+    }
+]
