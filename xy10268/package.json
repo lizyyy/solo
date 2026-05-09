@@ -1,0 +1,16 @@
+{
+  "name": "herbal-medicine-verification-api",
+  "version": "1.0.0",
+  "description": "中药代煎包裹核验API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "node scripts/demo.js",
+    "demo-error": "node scripts/demo-error.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
+  }
+}
