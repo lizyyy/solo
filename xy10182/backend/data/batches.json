@@ -1,0 +1,50 @@
+[
+  {
+    "id": "b001",
+    "reagentId": "r001",
+    "batchNo": "B-20260101-001",
+    "manufacturer": "国药集团化学试剂有限公司",
+    "productionDate": "2026-01-01",
+    "expiryDate": "2028-01-01",
+    "totalQuantity": 20,
+    "usedQuantity": 5,
+    "remainingQuantity": 15,
+    "status": "in_stock",
+    "storageLocation": "A-01-03",
+    "qrCode": "QR-B001-20260101",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "b002",
+    "reagentId": "r002",
+    "batchNo": "B-20260201-001",
+    "manufacturer": "西陇化工股份有限公司",
+    "productionDate": "2026-02-01",
+    "expiryDate": "2027-02-01",
+    "totalQuantity": 10,
+    "usedQuantity": 8,
+    "remainingQuantity": 2,
+    "status": "low_stock",
+    "storageLocation": "B-02-05",
+    "qrCode": "QR-B002-20260201",
+    "createdAt": "2026-02-01T00:00:00.000Z",
+    "updatedAt": "2026-02-01T00:00:00.000Z"
+  },
+  {
+    "id": "b003",
+    "reagentId": "r003",
+    "batchNo": "B-20250501-001",
+    "manufacturer": "国药集团化学试剂有限公司",
+    "productionDate": "2025-05-01",
+    "expiryDate": "2026-05-01",
+    "totalQuantity": 5,
+    "usedQuantity": 0,
+    "remainingQuantity": 5,
+    "status": "expiring",
+    "storageLocation": "C-03-02",
+    "qrCode": "QR-B003-20250501",
+    "createdAt": "2025-05-01T00:00:00.000Z",
+    "updatedAt": "2025-05-01T00:00:00.000Z"
+  }
+]

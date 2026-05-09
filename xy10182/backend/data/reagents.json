@@ -1,0 +1,47 @@
+[
+  {
+    "id": "r001",
+    "name": "氯化钠分析纯",
+    "code": "NaCl-001",
+    "category": "无机盐",
+    "specification": "500g",
+    "unit": "瓶",
+    "minStock": 5,
+    "maxStock": 50,
+    "shelfLifeDays": 730,
+    "description": "实验室常用分析试剂",
+    "status": "active",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "r002",
+    "name": "乙醇(95%)",
+    "code": "EtOH-001",
+    "category": "有机溶剂",
+    "specification": "500mL",
+    "unit": "瓶",
+    "minStock": 3,
+    "maxStock": 30,
+    "shelfLifeDays": 365,
+    "description": "消毒和溶剂用",
+    "status": "active",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "r003",
+    "name": "氢氧化钠",
+    "code": "NaOH-001",
+    "category": "强碱",
+    "specification": "500g",
+    "unit": "瓶",
+    "minStock": 2,
+    "maxStock": 20,
+    "shelfLifeDays": 1095,
+    "description": "酸碱滴定用",
+    "status": "active",
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z"
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rec001",
+    "batchId": "b001",
+    "reagentId": "r001",
+    "type": "stock_in",
+    "quantity": 20,
+    "operator": "张三",
+    "operatorId": "u001",
+    "location": "仓库A",
+    "remark": "新批次入库",
+    "scanCode": "QR-B001-20260101",
+    "createdAt": "2026-01-01T09:00:00.000Z"
+  },
+  {
+    "id": "rec002",
+    "batchId": "b001",
+    "reagentId": "r001",
+    "type": "open",
+    "quantity": 1,
+    "operator": "李四",
+    "operatorId": "u002",
+    "location": "实验室1",
+    "remark": "首次开封",
+    "scanCode": "QR-B001-20260101",
+    "createdAt": "2026-01-15T14:30:00.000Z"
+  },
+  {
+    "id": "rec003",
+    "batchId": "b001",
+    "reagentId": "r001",
+    "type": "claim",
+    "quantity": 2,
+    "operator": "王五",
+    "operatorId": "u003",
+    "location": "实验室2",
+    "remark": "实验领用",
+    "scanCode": "QR-B001-20260101",
+    "createdAt": "2026-03-01T10:00:00.000Z"
+  },
+  {
+    "id": "rec004",
+    "batchId": "b002",
+    "reagentId": "r002",
+    "type": "stock_in",
+    "quantity": 10,
+    "operator": "张三",
+    "operatorId": "u001",
+    "location": "仓库B",
+    "remark": "新批次入库",
+    "scanCode": "QR-B002-20260201",
+    "createdAt": "2026-02-01T09:00:00.000Z"
+  },
+  {
+    "id": "rec005",
+    "batchId": "b002",
+    "reagentId": "r002",
+    "type": "claim",
+    "quantity": 3,
+    "operator": "赵六",
+    "operatorId": "u004",
+    "location": "实验室3",
+    "remark": "消毒使用",
+    "scanCode": "QR-B002-20260201",
+    "createdAt": "2026-02-15T11:00:00.000Z"
+  },
+  {
+    "id": "rec006",
+    "batchId": "b002",
+    "reagentId": "r002",
+    "type": "claim",
+    "quantity": 5,
+    "operator": "李四",
+    "operatorId": "u002",
+    "location": "实验室1",
+    "remark": "实验溶剂",
+    "scanCode": "QR-B002-20260201",
+    "createdAt": "2026-04-01T15:00:00.000Z"
+  }
+]
