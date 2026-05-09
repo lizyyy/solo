@@ -1,0 +1,13 @@
+{
+  "name": "baby-milk-sample-api",
+  "version": "1.0.0",
+  "description": "母婴店奶粉试用装分发 API - 可运行原型",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/direct-test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
