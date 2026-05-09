@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日志分析系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>日志分析系统</h1>
+            <div class="header-actions">
+                <span id="status-badge" class="status-badge status-ok">运行中</span>
+                <button onclick="refreshData()" class="btn btn-primary">刷新数据</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="overview">概览</button>
+            <button class="tab-btn" data-tab="logs">日志管理</button>
+            <button class="tab-btn" data-tab="audit">操作审计</button>
+            <button class="tab-btn" data-tab="reports">报告导出</button>
+        </nav>
+
+        <main class="main-content">
+            <div id="tab-overview" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">总日志数</div>
+                        <div id="stat-total" class="stat-value">-</div>
+                    </div>
+                    <div class="stat-card stat-error">
+                        <div class="stat-title">ERROR 级别</div>
+                        <div id="stat-error" class="stat-value">-</div>
+                    </div>
+                    <div class="stat-card stat-warning">
+                        <div class="stat-title">WARN 级别</div>
+                        <div id="stat-warn" class="stat-value">-</div>
+                    </div>
+                    <div class="stat-card stat-info">
+                        <div class="stat-title">INFO 级别</div>
+                        <div id="stat-info" class="stat-value">-</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>最近错误日志</h3>
+                    <div id="recent-errors" class="log-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-logs" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>日志列表</h3>
+                        <div class="card-actions">
+                            <button onclick="showCreateLogModal()" class="btn btn-primary">添加日志</button>
+                            <button onclick="exportLogs()" class="btn btn-secondary">导出CSV</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>级别</label>
+                            <select id="filter-level">
+                                <option value="">全部</option>
+                                <option value="DEBUG">DEBUG</option>
+                                <option value="INFO">INFO</option>
+                                <option value="WARN">WARN</option>
+                                <option value="ERROR">ERROR</option>
+                                <option value="FATAL">FATAL</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>来源</label>
+                            <select id="filter-source">
+                                <option value="">全部</option>
+                                <option value="file">文件</option>
+                                <option value="database">数据库</option>
+                                <option value="api">API</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>状态</label>
+                            <select id="filter-status">
+                                <option value="">全部</option>
+                                <option value="pending">待处理</option>
+                                <option value="processed">已处理</option>
+                                <option value="ignored">已忽略</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>搜索</label>
+                            <input type="text" id="filter-search" placeholder="搜索消息内容...">
+                        </div>
+                        <button onclick="applyFilters()" class="btn btn-secondary">应用筛选</button>
+                    </div>
+
+                    <div id="logs-table" class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>级别</th>
+                                    <th>来源</th>
+                                    <th>消息</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="logs-pagination" class="pagination"></div>
+                </div>
+            </div>
+
+            <div id="tab-audit" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>操作审计日志</h3>
+                        <button onclick="exportAuditLogs()" class="btn btn-secondary">导出审计报告</button>
+                    </div>
+                    
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>操作类型</label>
+                            <select id="audit-action"></select>
+                        </div>
+                        <div class="filter-group">
+                            <label>用户ID</label>
+                            <input type="text" id="audit-user" placeholder="用户ID...">
+                        </div>
+                        <button onclick="loadAuditLogs()" class="btn btn-secondary">查询</button>
+                    </div>
+
+                    <div id="audit-table" class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>操作</th>
+                                    <th>用户</th>
+                                    <th>实体类型</th>
+                                    <th>实体ID</th>
+                                    <th>状态</th>
+                                    <th>详情</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-reports" class="tab-content">
+                <div class="card">
+                    <h3>报告生成</h3>
+                    <div class="report-options">
+                        <div class="report-item">
+                            <h4>日志统计报告</h4>
+                            <p>生成日志统计分析报告，包含按级别、来源的统计信息</p>
+                            <div class="report-filters">
+                                <div class="filter-group">
+                                    <label>开始时间</label>
+                                    <input type="datetime-local" id="report-start">
+                                </div>
+                                <div class="filter-group">
+                                    <label>结束时间</label>
+                                    <input type="datetime-local" id="report-end">
+                                </div>
+                                <button onclick="generateStatisticsReport()" class="btn btn-primary">生成报告</button>
+                            </div>
+                        </div>
+                        
+                        <div class="report-item">
+                            <h4>日志数据导出</h4>
+                            <p>导出完整的日志数据到 CSV 文件</p>
+                            <button onclick="exportLogs()" class="btn btn-secondary">立即导出</button>
+                        </div>
+
+                        <div class="report-item">
+                            <h4>审计报告</h4>
+                            <p>生成系统操作审计报告</p>
+                            <button onclick="generateAuditReport()" class="btn btn-secondary">生成审计报告</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="report-result" class="card hidden">
+                    <div class="card-header">
+                        <h3>报告结果</h3>
+                        <button onclick="closeReport()" class="btn btn-secondary">关闭</button>
+                    </div>
+                    <div id="report-content"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button onclick="closeModal()" class="btn-close">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body"></div>
+            <div id="modal-footer" class="modal-footer"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
