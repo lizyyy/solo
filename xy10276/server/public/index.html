@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市井盖巡检风险图</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .step-active { border-left: 4px solid #3b82f6; }
+    .step-completed { border-left: 4px solid #10b981; }
+    .step-pending { border-left: 4px solid #9ca3af; }
+    .risk-critical { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .risk-high { background: linear-gradient(135deg, #f97316, #ea580c); }
+    .risk-medium { background: linear-gradient(135deg, #eab308, #ca8a04); }
+    .risk-low { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div id="app">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <header class="mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-800">城市井盖巡检风险图</h1>
+            <p class="text-sm text-gray-500">巡检导入 → 风险评分 → 重复合并 → 处理</p>
+          </div>
+          <div class="flex gap-2">
+            <button @click="runDemo" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">运行演示</button>
+            <button @click="runError" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm">异常演示</button>
+            <button @click="resetData" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm">重置</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-3">
+          <div class="bg-white rounded-lg shadow p-4 mb-4">
+            <h2 class="font-semibold text-gray-700 mb-3">工作流状态</h2>
+            <div class="space-y-2">
+              <div v-for="(step, key) in workflowSteps" :key="key" 
+                   :class="['p-3 rounded', getStepClass(key)]">
+                <div class="flex items-center justify-between">
+                  <span class="font-medium">{{ step.name }}</span>
+                  <span v-if="key === currentStep" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">当前</span>
+                  <span v-else-if="isStepPassed(key)" class="text-xs text-green-600">✓</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">{{ step.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-4 mb-4">
+            <h2 class="font-semibold text-gray-700 mb-3">数据概览</h2>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="text-center p-3 bg-blue-50 rounded">
+                <div class="text-2xl font-bold text-blue-600">{{ status.totalInspections }}</div>
+                <div class="text-xs text-gray-500">巡检记录</div>
+              </div>
+              <div class="text-center p-3 bg-orange-50 rounded">
+                <div class="text-2xl font-bold text-orange-600">{{ status.pendingMerges }}</div>
+                <div class="text-xs text-gray-500">待合并</div>
+              </div>
+              <div class="text-center p-3 bg-red-50 rounded">
+                <div class="text-2xl font-bold text-red-600">{{ status.highRiskCount }}</div>
+                <div class="text-xs text-gray-500">高危</div>
+              </div>
+              <div class="text-center p-3 bg-purple-50 rounded">
+                <div class="text-2xl font-bold text-purple-600">{{ status.history?.length || 0 }}</div>
+                <div class="text-xs text-gray-500">状态变更</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="font-semibold text-gray-700 mb-3">处理建议</h2>
+            <div v-if="suggestions.length === 0" class="text-sm text-gray-500 text-center py-4">
+              暂无建议
+            </div>
+            <div v-else class="space-y-2">
+              <div v-for="(s, idx) in suggestions" :key="idx" 
+                   :class="['p-3 rounded text-sm', s.type === 'urgent' ? 'bg-red-50 border-l-4 border-red-500' : s.type === 'warning' ? 'bg-yellow-50 border-l-4 border-yellow-500' : 'bg-blue-50 border-l-4 border-blue-500']">
+                <div class="font-medium">{{ s.message }}</div>
+                <div class="text-xs text-gray-600 mt-1">{{ s.action }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-9">
+          <div class="bg-white rounded-lg shadow mb-4">
+            <div class="border-b px-4 py-3">
+              <div class="flex gap-4">
+                <button v-for="tab in tabs" :key="tab.key"
+                        @click="activeTab = tab.key"
+                        :class="['px-4 py-2 rounded-t text-sm font-medium', activeTab === tab.key ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:text-gray-700']">
+                  {{ tab.name }}
+                  <span v-if="tab.key === 'inspections'" class="ml-1 text-xs text-gray-400">({{ inspections.length }})</span>
+                  <span v-if="tab.key === 'merge'" class="ml-1 text-xs text-gray-400">({{ pendingMerges.length }})</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="p-4" v-if="activeTab === 'inspections'">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold">巡检记录</h3>
+                <div class="flex gap-2">
+                  <button @click="showAddModal = true" class="px-3 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                    + 新增
+                  </button>
+                  <button @click="calculateRisk" :disabled="currentStep === 'import' && inspections.length === 0" 
+                          class="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50">
+                    风险评分
+                  </button>
+                  <button @click="detectDuplicates" :disabled="inspections.length < 2"
+                          class="px-3 py-1.5 bg-purple-600 text-white rounded text-sm hover:bg-purple-700 disabled:opacity-50">
+                    检测重复
+                  </button>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="text-left p-2">队伍</th>
+                      <th class="text-left p-2">位置</th>
+                      <th class="text-left p-2">松动</th>
+                      <th class="text-left p-2">沉降</th>
+                      <th class="text-left p-2">风险</th>
+                      <th class="text-left p-2">重复次数</th>
+                      <th class="text-left p-2">状态</th>
+                      <th class="text-left p-2">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="ins in sortedInspections" :key="ins.id" class="border-b hover:bg-gray-50">
+                      <td class="p-2">{{ ins.team }}</td>
+                      <td class="p-2 text-xs">{{ ins.location?.lat?.toFixed(4) }}, {{ ins.location?.lng?.toFixed(4) }}</td>
+                      <td class="p-2">{{ ins.looseness || '-' }}</td>
+                      <td class="p-2">{{ ins.settlement || '-' }}</td>
+                      <td class="p-2">
+                        <span v-if="ins.riskScore !== null" 
+                              :class="['px-2 py-1 rounded text-white text-xs font-medium', `risk-${ins.riskLevel}`]">
+                          {{ ins.riskScore }}分
+                        </span>
+                        <span v-else class="text-gray-400 text-xs">未评分</span>
+                      </td>
+                      <td class="p-2">
+                        <span v-if="ins.reportCount > 1" class="text-orange-600 font-medium">{{ ins.reportCount }}次</span>
+                        <span v-else>-</span>
+                      </td>
+                      <td class="p-2">
+                        <span :class="getStatusClass(ins.status)">{{ getStatusText(ins.status) }}</span>
+                      </td>
+                      <td class="p-2">
+                        <button @click="viewHistory(ins.id)" class="text-blue-600 hover:underline text-xs mr-2">历史</button>
+                        <button @click="editInspection(ins)" class="text-green-600 hover:underline text-xs mr-2">编辑</button>
+                        <button @click="withdrawInspection(ins.id)" class="text-red-600 hover:underline text-xs">撤回</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="p-4" v-if="activeTab === 'merge'">
+              <h3 class="font-semibold mb-4">待合并记录</h3>
+              <div v-if="pendingMerges.length === 0" class="text-center py-8 text-gray-500">
+                暂无待合并记录，请先点击「检测重复」
+              </div>
+              <div v-else class="space-y-4">
+                <div v-for="group in pendingMerges" :key="group.id" class="border rounded-lg p-4">
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 class="font-medium">合并组</h4>
+                      <p class="text-xs text-gray-500">{{ group.inspectionCount }} 条记录待合并</p>
+                    </div>
+                    <button @click="confirmMerge(group)" class="px-3 py-1.5 bg-purple-600 text-white rounded text-sm hover:bg-purple-700">
+                      确认合并
+                    </button>
+                  </div>
+                  
+                  <div v-if="group.suggestedPrimary" class="bg-green-50 p-3 rounded mb-2 border-l-4 border-green-500">
+                    <div class="text-xs text-green-700 font-medium mb-1">建议作为主记录</div>
+                    <div class="flex justify-between">
+                      <div>
+                        <div class="font-medium">{{ group.suggestedPrimary.team }}</div>
+                        <div class="text-xs text-gray-600">{{ group.suggestedPrimary.description }}</div>
+                      </div>
+                      <span v-if="group.suggestedPrimary.riskScore !== null" 
+                            :class="['px-2 py-1 rounded text-white text-xs', `risk-${group.suggestedPrimary.riskLevel}`]">
+                        {{ group.suggestedPrimary.riskScore }}分
+                      </span>
+                    </div>
+                  </div>
+
+                  <div v-for="other in group.others" :key="other.id" class="bg-gray-50 p-3 rounded mb-2">
+                    <div class="flex justify-between">
+                      <div>
+                        <div class="font-medium">{{ other.team }}</div>
+                        <div class="text-xs text-gray-600">{{ other.description }}</div>
+                      </div>
+                      <span v-if="other.riskScore !== null" 
+                            :class="['px-2 py-1 rounded text-white text-xs', `risk-${other.riskLevel}`]">
+                        {{ other.riskScore }}分
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4" v-if="activeTab === 'history'">
+              <h3 class="font-semibold mb-4">状态变更历史</h3>
+              <div class="space-y-2">
+                <div v-for="(h, idx) in statusHistory" :key="idx" class="flex gap-3 text-sm">
+                  <div class="w-2 h-2 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></div>
+                  <div>
+                    <div class="text-gray-700">{{ h.message }}</div>
+                    <div class="text-xs text-gray-400">{{ formatTime(h.timestamp) }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4" v-if="activeTab === 'demo'">
+              <h3 class="font-semibold mb-4">演示路径</h3>
+              <div class="space-y-4">
+                <div class="border-l-4 border-blue-500 pl-4">
+                  <h4 class="font-medium text-blue-700">正常流程</h4>
+                  <ol class="list-decimal ml-4 mt-2 text-sm space-y-1 text-gray-600">
+                    <li>查看初始导入的 6 条巡检记录（3 个队伍）</li>
+                    <li>点击「风险评分」，查看每条记录的风险等级</li>
+                    <li>点击「检测重复」，发现同一位置的多次报修</li>
+                    <li>在「合并」标签页确认合并，系统重新计算风险（重复报修加分）</li>
+                    <li>查看历史记录，追踪整个过程</li>
+                  </ol>
+                  <button @click="runDemo" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                    一键运行演示
+                  </button>
+                </div>
+
+                <div class="border-l-4 border-red-500 pl-4">
+                  <h4 class="font-medium text-red-700">异常流程</h4>
+                  <ol class="list-decimal ml-4 mt-2 text-sm space-y-1 text-gray-600">
+                    <li>尝试添加缺少 team/location 的记录（验证错误）</li>
+                    <li>尝试合并不存在的记录组（404 错误）</li>
+                    <li>撤回记录后查看历史（数据可追溯）</li>
+                  </ol>
+                  <button @click="runError" class="mt-3 px-4 py-2 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                    运行异常演示
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showHistoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg w-full max-w-2xl max-h-[80vh] overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h3 class="font-semibold">记录历史</h3>
+          <button @click="showHistoryModal = false" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div v-if="recordHistory.length === 0" class="text-center text-gray-500 py-8">暂无历史</div>
+          <div v-else class="space-y-4">
+            <div v-for="(h, idx) in recordHistory" :key="idx" class="border-l-4 border-blue-200 pl-4">
+              <div class="flex justify-between">
+                <span class="font-medium text-sm">{{ h.action }} - {{ h.operator }}</span>
+                <span class="text-xs text-gray-400">{{ formatTime(h.timestamp) }}</span>
+              </div>
+              <div v-if="h.reason" class="text-xs text-gray-500">原因: {{ h.reason }}</div>
+              <div v-if="h.changes" class="mt-2 bg-gray-50 p-2 rounded text-xs">
+                <div class="font-medium text-gray-700 mb-1">变更字段:</div>
+                <div v-for="(v, k) in h.changes" :key="k" class="flex gap-2">
+                  <span class="text-gray-600">{{ k }}:</span>
+                  <span class="text-red-500">{{ JSON.stringify(v.before) }}</span>
+                  <span>→</span>
+                  <span class="text-green-500">{{ JSON.stringify(v.after) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg w-full max-w-md">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h3 class="font-semibold">{{ editingId ? '编辑记录' : '新增记录' }}</h3>
+          <button @click="closeAddModal" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <div class="p-4 space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">队伍 *</label>
+            <input v-model="newRecord.team" class="w-full border rounded px-3 py-2 text-sm" placeholder="如：巡查一队">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">纬度 *</label>
+              <input v-model.number="newRecord.lat" type="number" step="0.0001" class="w-full border rounded px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">经度 *</label>
+              <input v-model.number="newRecord.lng" type="number" step="0.0001" class="w-full border rounded px-3 py-2 text-sm">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">井盖标签</label>
+            <input v-model="newRecord.manholeTag" class="w-full border rounded px-3 py-2 text-sm" placeholder="如：MH-1001">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">松动情况</label>
+              <select v-model="newRecord.looseness" class="w-full border rounded px-3 py-2 text-sm">
+                <option value="">无</option>
+                <option value="轻微">轻微</option>
+                <option value="中度">中度</option>
+                <option value="严重">严重</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">沉降情况</label>
+              <select v-model="newRecord.settlement" class="w-full border rounded px-3 py-2 text-sm">
+                <option value="">无</option>
+                <option value="轻微">轻微</option>
+                <option value="中度">中度</option>
+                <option value="严重">严重</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <textarea v-model="newRecord.description" class="w-full border rounded px-3 py-2 text-sm" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 p-4 border-t">
+          <button @click="closeAddModal" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded text-sm">取消</button>
+          <button @click="saveRecord" class="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="toast.show" 
+         :class="['fixed top-4 right-4 px-4 py-3 rounded shadow-lg text-sm z-50', toast.type === 'error' ? 'bg-red-500 text-white' : toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-blue-500 text-white']">
+      {{ toast.message }}
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+
+    const API_BASE = '';
+
+    createApp({
+      setup() {
+        const currentStep = ref('import');
+        const workflowSteps = ref({});
+        const status = ref({ totalInspections: 0, pendingMerges: 0, highRiskCount: 0, history: [] });
+        const inspections = ref([]);
+        const pendingMerges = ref([]);
+        const suggestions = ref([]);
+        const statusHistory = ref([]);
+        const activeTab = ref('inspections');
+        const tabs = [
+          { key: 'inspections', name: '巡检记录' },
+          { key: 'merge', name: '重复合并' },
+          { key: 'history', name: '状态历史' },
+          { key: 'demo', name: '演示路径' }
+        ];
+
+        const showHistoryModal = ref(false);
+        const recordHistory = ref([]);
+        const showAddModal = ref(false);
+        const editingId = ref(null);
+        const newRecord = ref({ team: '', lat: 39.9042, lng: 116.4074, manholeTag: '', looseness: '', settlement: '', description: '' });
+        const toast = ref({ show: false, message: '', type: 'info' });
+
+        const sortedInspections = computed(() => {
+          return [...inspections.value].sort((a, b) => {
+            const scoreA = a.riskScore ?? -1;
+            const scoreB = b.riskScore ?? -1;
+            return scoreB - scoreA;
+          });
+        });
+
+        const showToast = (message, type = 'info') => {
+          toast.value = { show: true, message, type };
+          setTimeout(() => { toast.value.show = false; }, 3000);
+        };
+
+        const fetchStatus = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/status`);
+            const data = await res.json();
+            currentStep.value = data.currentStep;
+            status.value = data;
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const fetchWorkflow = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/status`);
+            const data = await res.json();
+          } catch (e) {}
+        };
+
+        const fetchInspections = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/inspections`);
+            const data = await res.json();
+            inspections.value = data.data;
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const fetchPendingMerges = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/merge/pending`);
+            const data = await res.json();
+            pendingMerges.value = data.groups;
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const fetchSuggestions = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/risk/suggestions`);
+            const data = await res.json();
+            suggestions.value = data;
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const fetchStatusHistory = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/history/status`);
+            const data = await res.json();
+            statusHistory.value = data.history;
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const refresh = async () => {
+          await Promise.all([
+            fetchStatus(),
+            fetchInspections(),
+            fetchPendingMerges(),
+            fetchSuggestions(),
+            fetchStatusHistory()
+          ]);
+        };
+
+        const getStepClass = (key) => {
+          if (key === currentStep.value) return 'step-active bg-blue-50';
+          const steps = ['import', 'risk_scoring', 'merge', 'processing', 'completed'];
+          const currentIdx = steps.indexOf(currentStep.value);
+          const keyIdx = steps.indexOf(key);
+          if (keyIdx < currentIdx) return 'step-completed bg-green-50';
+          return 'step-pending bg-gray-50 opacity-60';
+        };
+
+        const isStepPassed = (key) => {
+          const steps = ['import', 'risk_scoring', 'merge', 'processing', 'completed'];
+          const currentIdx = steps.indexOf(currentStep.value);
+          const keyIdx = steps.indexOf(key);
+          return keyIdx < currentIdx;
+        };
+
+        const getStatusClass = (status) => {
+          const map = {
+            pending: 'bg-gray-100 text-gray-700',
+            merged: 'bg-purple-100 text-purple-700',
+            processing: 'bg-blue-100 text-blue-700',
+            completed: 'bg-green-100 text-green-700'
+          };
+          return `px-2 py-1 rounded text-xs ${map[status] || map.pending}`;
+        };
+
+        const getStatusText = (status) => {
+          const map = {
+            pending: '待处理',
+            merged: '已合并',
+            processing: '处理中',
+            completed: '已完成'
+          };
+          return map[status] || '未知';
+        };
+
+        const formatTime = (ts) => {
+          const d = new Date(ts);
+          return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+        };
+
+        const calculateRisk = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/risk/calculate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ operator: 'web-user' })
+            });
+            const data = await res.json();
+            showToast(`风险评分完成: 高危${data.summary.critical + data.summary.high}条`, 'success');
+            await refresh();
+          } catch (e) {
+            showToast('风险评分失败', 'error');
+          }
+        };
+
+        const detectDuplicates = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/merge/detect`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ threshold: 5, operator: 'web-user' })
+            });
+            const data = await res.json();
+            showToast(data.message, 'success');
+            await refresh();
+            activeTab.value = 'merge';
+          } catch (e) {
+            showToast('检测失败', 'error');
+          }
+        };
+
+        const confirmMerge = async (group) => {
+          if (!confirm('确认合并这些记录？主记录将保留，其他记录将标记为已合并。')) return;
+          try {
+            const res = await fetch(`${API_BASE}/api/merge/${group.id}/confirm`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ primaryId: group.suggestedPrimary?.id, operator: 'web-user' })
+            });
+            const data = await res.json();
+            showToast(`合并完成，共合并 ${data.mergedCount} 条记录`, 'success');
+            await refresh();
+          } catch (e) {
+            showToast('合并失败', 'error');
+          }
+        };
+
+        const viewHistory = async (id) => {
+          try {
+            const res = await fetch(`${API_BASE}/api/history/inspection/${id}`);
+            const data = await res.json();
+            recordHistory.value = data.history;
+            showHistoryModal.value = true;
+          } catch (e) {
+            showToast('获取历史失败', 'error');
+          }
+        };
+
+        const editInspection = (ins) => {
+          editingId.value = ins.id;
+          newRecord.value = {
+            team: ins.team,
+            lat: ins.location?.lat || 0,
+            lng: ins.location?.lng || 0,
+            manholeTag: ins.manholeTag || '',
+            looseness: ins.looseness || '',
+            settlement: ins.settlement || '',
+            description: ins.description || ''
+          };
+          showAddModal.value = true;
+        };
+
+        const closeAddModal = () => {
+          showAddModal.value = false;
+          editingId.value = null;
+          newRecord.value = { team: '', lat: 39.9042, lng: 116.4074, manholeTag: '', looseness: '', settlement: '', description: '' };
+        };
+
+        const saveRecord = async () => {
+          if (!newRecord.value.team) {
+            showToast('请填写队伍', 'error');
+            return;
+          }
+          try {
+            const payload = {
+              team: newRecord.value.team,
+              location: { lat: newRecord.value.lat, lng: newRecord.value.lng },
+              manholeTag: newRecord.value.manholeTag || null,
+              looseness: newRecord.value.looseness || null,
+              settlement: newRecord.value.settlement || null,
+              description: newRecord.value.description,
+              operator: 'web-user'
+            };
+
+            if (editingId.value) {
+              await fetch(`${API_BASE}/api/inspections/${editingId.value}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...payload, reason: '用户编辑' })
+              });
+              showToast('记录已更新', 'success');
+            } else {
+              await fetch(`${API_BASE}/api/inspections`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              showToast('记录已添加', 'success');
+            }
+
+            closeAddModal();
+            await refresh();
+          } catch (e) {
+            showToast('保存失败', 'error');
+          }
+        };
+
+        const withdrawInspection = async (id) => {
+          if (!confirm('确定要撤回这条记录吗？')) return;
+          try {
+            const res = await fetch(`${API_BASE}/api/inspections/${id}/withdraw`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ operator: 'web-user', reason: '用户撤回' })
+            });
+            if (res.ok) {
+              showToast('记录已撤回', 'success');
+              await refresh();
+            } else {
+              showToast('撤回失败', 'error');
+            }
+          } catch (e) {
+            showToast('撤回失败', 'error');
+          }
+        };
+
+        const runDemo = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/demo/run-demo`, { method: 'POST' });
+            const data = await res.json();
+            showToast('演示路径执行完成', 'success');
+            console.log('Demo result:', data);
+            await refresh();
+          } catch (e) {
+            showToast('演示执行失败', 'error');
+          }
+        };
+
+        const runError = async () => {
+          try {
+            const res = await fetch(`${API_BASE}/api/demo/run-error`, { method: 'POST' });
+            const data = await res.json();
+            showToast('异常路径演示完成，查看控制台详情', 'info');
+            console.log('Error demo result:', data);
+            await refresh();
+          } catch (e) {
+            showToast('异常演示执行失败', 'error');
+          }
+        };
+
+        const resetData = async () => {
+          if (!confirm('确定要重置所有数据吗？')) return;
+          try {
+            await fetch(`${API_BASE}/api/demo/reset`, { method: 'POST' });
+            showToast('数据已重置', 'success');
+            await refresh();
+          } catch (e) {
+            showToast('重置失败', 'error');
+          }
+        };
+
+        onMounted(async () => {
+          await refresh();
+        });
+
+        return {
+          currentStep, workflowSteps, status, inspections, pendingMerges, suggestions, statusHistory,
+          activeTab, tabs, showHistoryModal, recordHistory, showAddModal, editingId, newRecord, toast,
+          sortedInspections,
+          getStepClass, isStepPassed, getStatusClass, getStatusText, formatTime,
+          calculateRisk, detectDuplicates, confirmMerge, viewHistory,
+          editInspection, closeAddModal, saveRecord, withdrawInspection,
+          runDemo, runError, resetData
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
