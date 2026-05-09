@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./warehouse.db"
+}
+
+enum UserRole {
+  ADMIN
+  CHECKER
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCING
+  SUCCESS
+  FAILED
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  DEBUG
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      UserRole @default(CHECKER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks       InventoryTask[]
+  records     InventoryRecord[]
+  syncQueues  SyncQueue[]
+  logs        AuditLog[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  sku         String   @unique
+  name        String
+  category    String?
+  unit        String   @default("个")
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  inventory Inventory?
+  records   InventoryRecord[]
+}
+
+model Inventory {
+  id          String   @id @default(uuid())
+  productId   String   @unique
+  quantity    Int      @default(0)
+  minQuantity Int      @default(0)
+  location    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  history InventoryHistory[]
+}
+
+model InventoryTask {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  status      TaskStatus @default(PENDING)
+  assigneeId  String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  assignee User?             @relation(fields: [assigneeId], references: [id])
+  records  InventoryRecord[]
+  history  TaskHistory[]
+}
+
+model InventoryRecord {
+  id        String   @id @default(uuid())
+  taskId    String
+  productId String
+  userId    String
+  expectedQty Int
+  actualQty   Int
+  difference  Int
+  remark      String?
+  createdAt   DateTime @default(now())
+
+  task    InventoryTask @relation(fields: [taskId], references: [id])
+  product Product       @relation(fields: [productId], references: [id])
+  user    User          @relation(fields: [userId], references: [id])
+}
+
+model SyncQueue {
+  id          String     @id @default(uuid())
+  type        String
+  payload     String
+  status      SyncStatus @default(PENDING)
+  retryCount  Int        @default(0)
+  maxRetries  Int        @default(5)
+  lastError   String?
+  lastAttempt DateTime?
+  userId      String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model InventoryHistory {
+  id           String   @id @default(uuid())
+  inventoryId  String
+  oldQuantity  Int
+  newQuantity  Int
+  changeReason String
+  changedBy    String
+  changedAt    DateTime @default(now())
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id])
+}
+
+model TaskHistory {
+  id        String   @id @default(uuid())
+  taskId    String
+  oldStatus TaskStatus?
+  newStatus TaskStatus
+  remark    String?
+  changedBy String
+  changedAt DateTime @default(now())
+
+  task InventoryTask @relation(fields: [taskId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  module    String
+  details   String
+  level     LogLevel @default(INFO)
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SystemConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

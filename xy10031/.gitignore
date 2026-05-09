@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.vscode/
+.idea/
+*.log
+.DS_Store
+prisma/*.db
+prisma/*.db-journal
+coverage/
+.env
+.env.local
+electron/main.js
+npm-debug.log*
