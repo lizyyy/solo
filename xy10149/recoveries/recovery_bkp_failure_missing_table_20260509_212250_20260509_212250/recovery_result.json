@@ -1,0 +1,20 @@
+{
+  "recovery_id": "recovery_bkp_failure_missing_table_20260509_212250_20260509_212250",
+  "backup_id": "bkp_failure_missing_table_20260509_212250",
+  "recovery_path": "/Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250",
+  "start_time": "2026-05-09T21:22:50.293962",
+  "status": "success",
+  "restored_tables": [
+    "users",
+    "orders",
+    "products",
+    "audit_logs"
+  ],
+  "failed_tables": [],
+  "errors": [],
+  "metadata": {
+    "injected_failure": "missing_table"
+  },
+  "end_time": "2026-05-09T21:22:50.295598",
+  "duration_seconds": 0.001657
+}

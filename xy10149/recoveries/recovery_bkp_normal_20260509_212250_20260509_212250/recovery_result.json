@@ -1,0 +1,19 @@
+{
+  "recovery_id": "recovery_bkp_normal_20260509_212250_20260509_212250",
+  "backup_id": "bkp_normal_20260509_212250",
+  "recovery_path": "/Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250",
+  "start_time": "2026-05-09T21:22:50.274842",
+  "status": "success",
+  "restored_tables": [
+    "users",
+    "orders",
+    "products",
+    "transactions",
+    "audit_logs"
+  ],
+  "failed_tables": [],
+  "errors": [],
+  "metadata": {},
+  "end_time": "2026-05-09T21:22:50.275713",
+  "duration_seconds": 0.000873
+}

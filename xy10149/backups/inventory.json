@@ -1,0 +1,78 @@
+[
+  {
+    "backup_id": "bkp_failure_missing_table_20260509_212250",
+    "timestamp": "20260509_212250",
+    "datetime": "2026-05-09T21:22:50.291057",
+    "backup_type": "full",
+    "status": "success",
+    "backup_path": "/Users/mac/pro/solo/workspaces/xy10149/backups/bkp_failure_missing_table_20260509_212250.tar.gz",
+    "tables": [
+      "users",
+      "orders",
+      "products",
+      "audit_logs"
+    ],
+    "table_count": 4,
+    "size_bytes": 5242880,
+    "size_mb": 5.0,
+    "metadata": {
+      "scenario": "failure_missing_table",
+      "created_for": "backup_recovery_drill"
+    },
+    "drill_runs": [
+      {
+        "drill_id": "drill_fail_missing_critical_table_20260509_212250",
+        "scenario": "failure_missing_critical_table",
+        "start_time": "2026-05-09T21:22:50.293962",
+        "end_time": "2026-05-09T21:22:50.295598",
+        "overall_status": "failed",
+        "missing_tables": [
+          "transactions"
+        ],
+        "missing_permissions": [],
+        "validation_failures": [],
+        "report_id": "drill_fail_missing_critical_table_20260509_212250",
+        "injected_failure": "missing_critical_table"
+      }
+    ],
+    "last_drill_status": "failed",
+    "last_drill_time": "2026-05-09T21:22:50.293962"
+  },
+  {
+    "backup_id": "bkp_normal_20260509_212250",
+    "timestamp": "20260509_212250",
+    "datetime": "2026-05-09T21:22:50.273949",
+    "backup_type": "full",
+    "status": "success",
+    "backup_path": "/Users/mac/pro/solo/workspaces/xy10149/backups/bkp_normal_20260509_212250.tar.gz",
+    "tables": [
+      "users",
+      "orders",
+      "products",
+      "transactions",
+      "audit_logs"
+    ],
+    "table_count": 5,
+    "size_bytes": 5242880,
+    "size_mb": 5.0,
+    "metadata": {
+      "scenario": "normal",
+      "created_for": "backup_recovery_drill"
+    },
+    "drill_runs": [
+      {
+        "drill_id": "drill_normal_20260509_212250",
+        "scenario": "normal",
+        "start_time": "2026-05-09T21:22:50.274842",
+        "end_time": "2026-05-09T21:22:50.275713",
+        "overall_status": "success",
+        "missing_tables": [],
+        "missing_permissions": [],
+        "validation_failures": [],
+        "report_id": "drill_normal_20260509_212250"
+      }
+    ],
+    "last_drill_status": "success",
+    "last_drill_time": "2026-05-09T21:22:50.274842"
+  }
+]

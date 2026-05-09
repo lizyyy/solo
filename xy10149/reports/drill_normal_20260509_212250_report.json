@@ -1,0 +1,225 @@
+{
+  "drill_id": "drill_normal_20260509_212250",
+  "generated_at": "2026-05-09T21:22:50.276796",
+  "timestamp": "20260509_212250",
+  "scenario_type": "normal",
+  "scenario_description": "正常流程演练 - 备份完整、权限充足、数据一致",
+  "summary": {
+    "overall_status": "success",
+    "start_time": "2026-05-09T21:22:50.274842",
+    "end_time": "2026-05-09T21:22:50.275713",
+    "duration_seconds": 0.000873,
+    "backup_id": "bkp_normal_20260509_212250",
+    "backup_time": "20260509_212250"
+  },
+  "backup_details": {
+    "backup_id": "bkp_normal_20260509_212250",
+    "backup_type": "full",
+    "backup_status": "success",
+    "backup_path": "/Users/mac/pro/solo/workspaces/xy10149/backups/bkp_normal_20260509_212250.tar.gz",
+    "tables_in_backup": [
+      "users",
+      "orders",
+      "products",
+      "transactions",
+      "audit_logs"
+    ],
+    "table_count": 5,
+    "size_mb": 5.0
+  },
+  "recovery_result": {
+    "recovery_id": "recovery_bkp_normal_20260509_212250_20260509_212250",
+    "recovery_path": "/Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250",
+    "status": "success",
+    "restored_tables": [
+      "users",
+      "orders",
+      "products",
+      "transactions",
+      "audit_logs"
+    ],
+    "failed_tables": [],
+    "restored_count": 5,
+    "failed_count": 0,
+    "errors": []
+  },
+  "table_integrity_check": {
+    "status": "passed",
+    "critical_tables_expected": [
+      "users",
+      "orders",
+      "products",
+      "transactions",
+      "audit_logs"
+    ],
+    "tables_present": [
+      "users",
+      "orders",
+      "products",
+      "transactions",
+      "audit_logs"
+    ],
+    "tables_missing": [],
+    "count_expected": 5,
+    "count_present": 5,
+    "count_missing": 0
+  },
+  "permission_check": {
+    "overall_status": "passed",
+    "database_permissions": {
+      "check_type": "database_permissions",
+      "checked_at": "2026-05-09T21:22:50.274287",
+      "database": {
+        "host": "localhost",
+        "port": 5432,
+        "user": "postgres",
+        "database": "testdb"
+      },
+      "required_permissions": [
+        "CREATE",
+        "DROP",
+        "INSERT",
+        "SELECT",
+        "UPDATE",
+        "DELETE",
+        "TRUNCATE",
+        "REFERENCES",
+        "TRIGGER"
+      ],
+      "actual_permissions": [
+        "CREATE",
+        "DROP",
+        "INSERT",
+        "SELECT",
+        "UPDATE",
+        "DELETE",
+        "TRUNCATE",
+        "REFERENCES",
+        "TRIGGER"
+      ],
+      "missing_permissions": [],
+      "recommendations": [],
+      "count_total": 9,
+      "count_granted": 9,
+      "count_missing": 0,
+      "status": "passed"
+    },
+    "restoration_privileges": {
+      "check_type": "restoration_privileges",
+      "checked_at": "2026-05-09T21:22:50.274458",
+      "required_privileges": [
+        {
+          "privilege": "CREATE TABLE",
+          "description": "创建表结构的权限"
+        },
+        {
+          "privilege": "INSERT",
+          "description": "插入数据的权限"
+        },
+        {
+          "privilege": "TRUNCATE",
+          "description": "清理临时表的权限"
+        },
+        {
+          "privilege": "CREATE INDEX",
+          "description": "创建索引的权限"
+        },
+        {
+          "privilege": "CREATE CONSTRAINT",
+          "description": "创建约束的权限"
+        },
+        {
+          "privilege": "CREATE TRIGGER",
+          "description": "创建触发器的权限"
+        }
+      ],
+      "privileges_granted": [
+        {
+          "privilege": "CREATE TABLE",
+          "description": "创建表结构的权限"
+        },
+        {
+          "privilege": "INSERT",
+          "description": "插入数据的权限"
+        },
+        {
+          "privilege": "TRUNCATE",
+          "description": "清理临时表的权限"
+        },
+        {
+          "privilege": "CREATE INDEX",
+          "description": "创建索引的权限"
+        },
+        {
+          "privilege": "CREATE CONSTRAINT",
+          "description": "创建约束的权限"
+        },
+        {
+          "privilege": "CREATE TRIGGER",
+          "description": "创建触发器的权限"
+        }
+      ],
+      "privileges_missing": [],
+      "status": "passed",
+      "summary": {
+        "total": 6,
+        "granted": 6,
+        "missing": 0
+      }
+    },
+    "file_permissions": {
+      "check_type": "file_permissions",
+      "checked_at": "2026-05-09T21:22:50.274564",
+      "paths": [
+        {
+          "path": "/Users/mac/pro/solo/workspaces/xy10149/backups",
+          "exists": true,
+          "readable": true,
+          "writable": true,
+          "executable": true
+        },
+        {
+          "path": "/Users/mac/pro/solo/workspaces/xy10149/recoveries",
+          "exists": true,
+          "readable": true,
+          "writable": true,
+          "executable": true
+        },
+        {
+          "path": "/Users/mac/pro/solo/workspaces/xy10149/temp",
+          "exists": true,
+          "readable": true,
+          "writable": true,
+          "executable": true
+        }
+      ],
+      "issues": [],
+      "status": "passed",
+      "summary": {
+        "total_paths": 3,
+        "with_issues": 0
+      }
+    },
+    "missing_permissions": []
+  },
+  "data_validation": {
+    "status": "passed",
+    "summary": {
+      "total_queries": 25,
+      "passed": 25,
+      "failed": 0
+    },
+    "failures": [],
+    "total_queries": 25,
+    "queries_passed": 25,
+    "queries_failed": 0
+  },
+  "issues_found": [],
+  "recommendations": [
+    "继续保持当前的备份和恢复流程",
+    "建议定期（至少每月）执行一次完整演练"
+  ],
+  "next_steps": [
+    "记录本次演练结果，安排下次演练时间"
+  ]
+}

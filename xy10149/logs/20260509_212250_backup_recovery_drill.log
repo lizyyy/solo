@@ -1,0 +1,113 @@
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始正常流程演练
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/backups/inventory.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已添加备份记录: bkp_normal_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已创建模拟备份: bkp_normal_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始执行完整权限检查
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查数据库权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 CREATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 DROP: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 INSERT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 SELECT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 UPDATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 DELETE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 TRUNCATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 REFERENCES: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 TRIGGER: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 权限检查完成: 9/9 权限已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查恢复操作所需的特殊权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE TABLE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ INSERT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ TRUNCATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE INDEX: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE CONSTRAINT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE TRIGGER: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查文件系统权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 文件权限检查完成: 3 路径正常
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 完整权限检查结果: 通过
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查表完整性...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 表完整性检查通过: 5 张关键表全部存在
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 创建临时恢复目录: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始恢复备份: bkp_normal_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 恢复模式: 模拟
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/users.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: users
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/orders.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: orders
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/products.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: products
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/transactions.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: transactions
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/audit_logs.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: audit_logs
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 恢复成功: 恢复了 5 张表
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_normal_20260509_212250_20260509_212250/recovery_result.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始执行数据校验查询...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 数据校验完成: 25 通过, 0 失败
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 生成演练报告: drill_normal_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_normal_20260509_212250_report.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 演练报告已生成: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_normal_20260509_212250_report.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 文本报告已生成: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_normal_20260509_212250_report.txt
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/backups/inventory.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已为备份 bkp_normal_20260509_212250 添加演练结果
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始失败流程演练: missing_critical_table
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/backups/inventory.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已添加备份记录: bkp_failure_missing_table_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已创建模拟备份: bkp_failure_missing_table_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始执行完整权限检查
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查数据库权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 CREATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 DROP: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 INSERT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 SELECT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 UPDATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 DELETE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 TRUNCATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 REFERENCES: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ 权限 TRIGGER: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 权限检查完成: 9/9 权限已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查恢复操作所需的特殊权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE TABLE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ INSERT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ TRUNCATE: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE INDEX: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE CONSTRAINT: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill |   ✓ CREATE TRIGGER: 已授予
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查文件系统权限...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 文件权限检查完成: 3 路径正常
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 完整权限检查结果: 通过
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | ============================================================
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始检查表完整性...
+2026-05-09 21:22:50 | WARNING | backup_recovery_drill | 表完整性检查失败: 缺少 1 张关键表 - ['transactions']
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 创建临时恢复目录: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始恢复备份: bkp_failure_missing_table_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 恢复模式: 模拟
+2026-05-09 21:22:50 | WARNING | backup_recovery_drill | 注入故障模式: missing_table
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250/users.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: users
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250/orders.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: orders
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250/products.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: products
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250/audit_logs.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已恢复表: audit_logs
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 恢复成功: 恢复了 4 张表
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/recoveries/recovery_bkp_failure_missing_table_20260509_212250_20260509_212250/recovery_result.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 开始执行数据校验查询...
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 数据校验完成: 20 通过, 0 失败
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 生成演练报告: drill_fail_missing_critical_table_20260509_212250
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_fail_missing_critical_table_20260509_212250_report.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 演练报告已生成: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_fail_missing_critical_table_20260509_212250_report.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 文本报告已生成: /Users/mac/pro/solo/workspaces/xy10149/reports/drill_fail_missing_critical_table_20260509_212250_report.txt
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已保存文件: /Users/mac/pro/solo/workspaces/xy10149/backups/inventory.json
+2026-05-09 21:22:50 | INFO | backup_recovery_drill | 已为备份 bkp_failure_missing_table_20260509_212250 添加演练结果

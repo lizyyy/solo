@@ -1,0 +1,28 @@
+{
+  "table_name": "transactions",
+  "backup_id": "bkp_normal_20260509_212250",
+  "restored_at": "20260509_212250",
+  "row_count": 1000,
+  "schema": {
+    "columns": [
+      "id",
+      "name",
+      "created_at"
+    ],
+    "constraints": [
+      "PRIMARY KEY (id)"
+    ]
+  },
+  "sample_data": [
+    {
+      "id": 1,
+      "name": "example_1",
+      "created_at": "2024-01-01"
+    },
+    {
+      "id": 2,
+      "name": "example_2",
+      "created_at": "2024-01-02"
+    }
+  ]
+}
