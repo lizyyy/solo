@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>棋类培训升班评估器</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 30px 0; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    header h1 { text-align: center; font-size: 32px; font-weight: 700; }
+    header p { text-align: center; font-size: 14px; opacity: 0.9; margin-top: 5px; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+    .tab { padding: 12px 24px; background: white; border: none; cursor: pointer; font-size: 14px; border-radius: 6px 6px 0 0; transition: all 0.2s; }
+    .tab:hover { background: #e3f2fd; }
+    .tab.active { background: #3498db; color: white; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 18px; margin-bottom: 16px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; display: inline-block; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 6px; color: #555; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-primary:hover { background: #2980b9; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; color: #555; }
+    tr:hover { background: #f8f9fa; }
+    
+    .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-green { background: #d4edda; color: #155724; }
+    .badge-blue { background: #d1ecf1; color: #0c5460; }
+    .badge-yellow { background: #fff3cd; color: #856404; }
+    .badge-red { background: #f8d7da; color: #721c24; }
+    .badge-purple { background: #e2d5f1; color: #563d7c; }
+    
+    .tags-container { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag { padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; border: 1px solid #ddd; background: #f8f9fa; }
+    .tag.positive.selected { background: #d4edda; border-color: #155724; }
+    .tag.negative.selected { background: #f8d7da; border-color: #721c24; }
+    
+    .progress-bar { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #3498db, #27ae60); }
+    
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
+    .alert-info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    .alert-success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+    .alert-warning { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; }
+    .alert-danger { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    
+    .chart-container { height: 300px; margin-top: 20px; }
+    .report-section { margin-bottom: 24px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .metric-card { background: #f8f9fa; padding: 16px; border-radius: 6px; text-align: center; }
+    .metric-value { font-size: 28px; font-weight: 700; color: #3498db; }
+    .metric-label { font-size: 12px; color: #666; margin-top: 4px; }
+    
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal.active { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; border-radius: 8px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .close { font-size: 24px; cursor: pointer; color: #999; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>♟️ 棋类培训升班评估器</h1>
+    <p>基于对局记录、出勤记录和老师评价的智能升班评估系统</p>
+  </header>
+  
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('students')">学生管理</button>
+      <button class="tab" onclick="switchTab('evaluation')">升班评估</button>
+      <button class="tab" onclick="switchTab('import')">数据导入</button>
+      <button class="tab" onclick="switchTab('demo')">样例演示</button>
+    </div>
+    
+    <div id="students" class="tab-content active">
+      <div class="card">
+        <h2>学生列表</h2>
+        <table id="studentsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>姓名</th>
+              <th>当前班次</th>
+              <th>入班日期</th>
+              <th>评估状态</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      
+      <div class="card">
+        <h2>新增学生</h2>
+        <form id="addStudentForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>姓名</label>
+              <input type="text" id="newStudentName" required>
+            </div>
+            <div class="form-group">
+              <label>当前班次</label>
+              <select id="newStudentLevel"></select>
+            </div>
+            <div class="form-group">
+              <label>入班日期</label>
+              <input type="date" id="newStudentJoinDate" required>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="submit" class="btn btn-primary">添加学生</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div id="evaluation" class="tab-content">
+      <div class="card">
+        <h2>选择学生</h2>
+        <div class="form-group">
+          <select id="evalStudentSelect" onchange="loadStudentDetails()">
+            <option value="">请选择学生</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="studentDetails" style="display: none;">
+        <div class="card">
+          <h2>学生信息</h2>
+          <div id="studentInfo"></div>
+        </div>
+        
+        <div class="card">
+          <h2>胜率趋势</h2>
+          <div id="winRateStats"></div>
+          <div class="chart-container">
+            <canvas id="winRateChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2>出勤情况</h2>
+          <div id="attendanceStats"></div>
+        </div>
+        
+        <div class="card">
+          <h2>老师评价标签</h2>
+          <div id="teacherTags"></div>
+        </div>
+        
+        <div class="card">
+          <h2>执行评估</h2>
+          <div class="form-group">
+            <button class="btn btn-primary" onclick="runEvaluation()">执行升班评估</button>
+          </div>
+          <div id="evaluationResult"></div>
+        </div>
+        
+        <div id="decisionArea" style="display: none;">
+          <div class="card">
+            <h2>决策操作</h2>
+            <div id="decisionButtons" style="display: flex; gap: 10px;">
+              <button class="btn btn-success" onclick="confirmPromotion()">确认升班</button>
+              <button class="btn btn-danger" onclick="rejectPromotion()">拒绝升班</button>
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+              <label>备注（可选）</label>
+              <textarea id="decisionComment" rows="2" placeholder="请输入备注..."></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2>家长报告</h2>
+          <div class="form-group">
+            <button class="btn btn-primary" onclick="generateReport()">生成家长报告</button>
+          </div>
+          <div id="parentReport"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="import" class="tab-content">
+      <div class="card">
+        <h2>导入对局记录</h2>
+        <div class="form-group">
+          <label>选择学生</label>
+          <select id="importStudentSelect"></select>
+        </div>
+        <div class="form-group">
+          <label>对局记录（JSON格式）</label>
+          <textarea id="gameImportData" rows="8" style="font-family: monospace; font-size: 12px;">[
+  {
+    "opponent": "张小明",
+    "opponent_level": "初级班",
+    "result": "win",
+    "game_date": "2024-01-15",
+    "notes": "中局战术不错"
+  }
+]</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="importGames()">导入对局</button>
+      </div>
+      
+      <div class="card">
+        <h2>导入出勤记录</h2>
+        <div class="form-group">
+          <label>选择学生</label>
+          <select id="importAttendanceStudentSelect"></select>
+        </div>
+        <div class="form-group">
+          <label>出勤记录（JSON格式）</label>
+          <textarea id="attendanceImportData" rows="8" style="font-family: monospace; font-size: 12px;">[
+  {
+    "attendance_date": "2024-01-01",
+    "status": "present"
+  }
+]</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="importAttendances()">导入出勤</button>
+      </div>
+    </div>
+    
+    <div id="demo" class="tab-content">
+      <div class="card">
+        <h2>样例数据入口</h2>
+        <div class="alert alert-info">
+          此页面提供预设的样例数据，可直接点击按钮快速体验完整业务闭环。
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+          <div class="card" style="margin-bottom: 0;">
+            <h3>🎯 样例一：优秀学生（升班成功</h3>
+            <p>高胜率、高出勤、正面评价，预期：推荐升班</p>
+            <button class="btn btn-success" style="margin-top: 10px;" onclick="runDemo('promote')">运行样例一</button>
+          </div>
+          
+          <div class="card" style="margin-bottom: 0;">
+            <h3>⚠️ 样例二：边缘学生</h3>
+            <p>胜率一般、出勤一般，预期：暂不推荐</p>
+            <button class="btn btn-warning" style="margin-top: 10px;" onclick="runDemo('marginal')">运行样例二</button>
+          </div>
+          
+          <div class="card" style="margin-bottom: 0;">
+            <h3>❌ 样例三：异常操作演示</h3>
+            <p>数据不足或评价负面，预期：拒绝升班</p>
+            <button class="btn btn-danger" style="margin-top: 10px;" onclick="runDemo('reject')">运行样例三</button>
+          </div>
+        </div>
+        
+        <div id="demoOutput" style="margin-top: 20px; background: #2c3e50; color: #fff; padding: 16px; border-radius: 6px; font-family: monospace; font-size: 12px; white-space: pre-wrap;"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
