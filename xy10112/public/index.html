@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小门店离线会员补录工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-content">
+        <h1>📋 小门店离线会员补录工具</h1>
+        <p class="subtitle">解决断网后手写消费记录，联网补录时重复或漏记的问题</p>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section class="stats-section">
+        <div class="stats-grid">
+          <div class="stat-card stat-pending">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <span class="stat-label">待审核</span>
+              <span class="stat-value" id="stat-pending">0</span>
+            </div>
+          </div>
+          <div class="stat-card stat-approved">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <span class="stat-label">已通过</span>
+              <span class="stat-value" id="stat-approved">0</span>
+            </div>
+          </div>
+          <div class="stat-card stat-rejected">
+            <div class="stat-icon">❌</div>
+            <div class="stat-info">
+              <span class="stat-label">已拒绝</span>
+              <span class="stat-value" id="stat-rejected">0</span>
+            </div>
+          </div>
+          <div class="stat-card stat-total">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <span class="stat-label">已审核金额</span>
+              <span class="stat-value" id="stat-amount">¥0</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="import">📤 文件导入</button>
+          <button class="tab-btn" data-tab="review">🔍 人工复核</button>
+          <button class="tab-btn" data-tab="history">📜 历史记录</button>
+          <button class="tab-btn" data-tab="export">📥 导出清单</button>
+        </div>
+
+        <div class="tab-content active" id="tab-import">
+          <div class="import-section">
+            <div class="upload-area" id="upload-area">
+              <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
+              <div class="upload-icon">📁</div>
+              <h3>拖拽文件到此处或点击选择</h3>
+              <p class="upload-hint">支持 CSV、Excel 格式，最大 10MB</p>
+              <button class="btn btn-primary" id="select-file-btn">选择文件</button>
+            </div>
+            
+            <div class="import-info">
+              <h4>📝 文件格式要求</h4>
+              <p>文件必须包含以下字段（支持中文别名）：</p>
+              <ul class="format-list">
+                <li><strong>phone / 手机号</strong> - 会员手机号码</li>
+                <li><strong>name / 姓名</strong> - 会员姓名</li>
+                <li><strong>amount / 金额</strong> - 消费金额</li>
+                <li><strong>date / 日期</strong> - 消费日期</li>
+                <li><strong>note / 备注</strong> - 可选，备注信息</li>
+              </ul>
+            </div>
+
+            <div class="sample-section">
+              <h4>📋 示例文件</h4>
+              <button class="btn btn-secondary" id="download-sample-btn">下载示例 CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-review">
+          <div class="review-section">
+            <div class="review-header">
+              <div class="filter-group">
+                <label>筛选状态：</label>
+                <select id="status-filter" class="form-select">
+                  <option value="">全部</option>
+                  <option value="pending" selected>待审核</option>
+                  <option value="approved">已通过</option>
+                  <option value="rejected">已拒绝</option>
+                </select>
+              </div>
+              <div class="batch-actions">
+                <button class="btn btn-success" id="batch-approve-btn">✅ 批量通过</button>
+                <button class="btn btn-danger" id="batch-reject-btn">❌ 批量拒绝</button>
+              </div>
+            </div>
+
+            <div class="records-table-container">
+              <table class="records-table">
+                <thead>
+                  <tr>
+                    <th><input type="checkbox" id="select-all"></th>
+                    <th>手机号</th>
+                    <th>姓名</th>
+                    <th>金额</th>
+                    <th>日期</th>
+                    <th>备注</th>
+                    <th>状态</th>
+                    <th>来源文件</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="records-tbody">
+                  <tr>
+                    <td colspan="9" class="empty-state">暂无数据，请先导入文件</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-history">
+          <div class="history-section">
+            <div class="history-list" id="history-list">
+              <div class="empty-state">暂无历史记录</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-export">
+          <div class="export-section">
+            <div class="export-options">
+              <h3>选择导出内容</h3>
+              <div class="export-filters">
+                <label class="checkbox-label">
+                  <input type="checkbox" value="approved" checked class="export-checkbox">
+                  <span>已通过</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="pending" class="export-checkbox">
+                  <span>待审核</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" value="rejected" class="export-checkbox">
+                  <span>已拒绝</span>
+                </label>
+              </div>
+              <div class="export-format">
+                <label>导出格式：</label>
+                <select id="export-format" class="form-select">
+                  <option value="excel">Excel (.xlsx)</option>
+                  <option value="csv">CSV</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="export-btn">📥 导出清单</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">提示</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-confirm">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "member-record-tool",
+  "version": "1.0.0",
+  "description": "小门店离线会员补录工具",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["member", "record", "offline"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5"
+  }
+}
