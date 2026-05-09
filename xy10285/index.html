@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童体适能闯关评分器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🎯 儿童体适能闯关评分器</h1>
+            <p class="subtitle">按年龄组、项目成绩和安全观察给出综合评价</p>
+        </header>
+
+        <main class="app-main">
+            <!-- 控制面板 -->
+            <section class="control-panel">
+                <div class="panel-card">
+                    <h3>📁 数据操作</h3>
+                    <div class="action-buttons">
+                        <button id="btnAdd" class="btn btn-primary">➕ 新增记录</button>
+                        <button id="btnLoadSamples" class="btn btn-secondary">📦 加载示例数据</button>
+                        <button id="btnExport" class="btn btn-success">📤 导出数据</button>
+                        <button id="btnClearAll" class="btn btn-danger">🗑️ 清空数据</button>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <h3>🔍 筛选与验证</h3>
+                    <div class="filter-controls">
+                        <select id="filterAgeGroup">
+                            <option value="">全部年龄组</option>
+                            <option value="toddler">幼儿组 (3-5岁)</option>
+                            <option value="lower">低年级组 (6-8岁)</option>
+                            <option value="upper">中高年级组 (9-12岁)</option>
+                            <option value="teen">青少年组 (13-16岁)</option>
+                        </select>
+                        <select id="filterStatus">
+                            <option value="">全部状态</option>
+                            <option value="pending">待审核</option>
+                            <option value="confirmed">已确认</option>
+                            <option value="rejected">已拒绝</option>
+                            <option value="error">异常</option>
+                        </select>
+                        <button id="btnVerifyAll" class="btn btn-info">🔬 批量验证</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 统计面板 -->
+            <section class="stats-panel">
+                <div class="stat-card">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">总记录数</div>
+                </div>
+                <div class="stat-card stat-pending">
+                    <div class="stat-number" id="statPending">0</div>
+                    <div class="stat-label">待审核</div>
+                </div>
+                <div class="stat-card stat-confirmed">
+                    <div class="stat-number" id="statConfirmed">0</div>
+                    <div class="stat-label">已确认</div>
+                </div>
+                <div class="stat-card stat-rejected">
+                    <div class="stat-number" id="statRejected">0</div>
+                    <div class="stat-label">已拒绝</div>
+                </div>
+                <div class="stat-card stat-error">
+                    <div class="stat-number" id="statError">0</div>
+                    <div class="stat-label">异常</div>
+                </div>
+            </section>
+
+            <!-- 记录列表 -->
+            <section class="records-section">
+                <h2>📋 评分记录</h2>
+                <div id="recordsList" class="records-list">
+                    <div class="empty-state">
+                        <p>暂无数据</p>
+                        <p class="hint">点击"📦 加载示例数据"或"➕ 新增记录"开始</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 弹窗：新增/编辑记录 -->
+        <div id="recordModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">新增记录</h2>
+                    <button class="modal-close" id="modalClose">&times;</button>
+                </div>
+                <form id="recordForm" class="record-form">
+                    <input type="hidden" id="recordId">
+                    
+                    <div class="form-section">
+                        <h3>👶 儿童基本信息</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="childName">姓名 *</label>
+                                <input type="text" id="childName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="childAge">年龄 (岁) *</label>
+                                <input type="number" id="childAge" min="3" max="16" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="childGender">性别</label>
+                                <select id="childGender">
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="testDate">测试日期</label>
+                                <input type="date" id="testDate">
+                            </div>
+                        </div>
+                        <div class="age-group-display" id="ageGroupDisplay">
+                            <span class="age-group-label">自动计算年龄组：</span>
+                            <span id="ageGroupResult" class="age-group-badge">-</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🏃 体适能项目成绩</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="itemShuttle">10米折返跑 (秒)</label>
+                                <input type="number" id="itemShuttle" step="0.1" min="0">
+                                <small class="field-hint">越快越好</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemJump">立定跳远 (厘米)</label>
+                                <input type="number" id="itemJump" step="1" min="0">
+                                <small class="field-hint">越远越好</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemFlex">坐位体前屈 (厘米)</label>
+                                <input type="number" id="itemFlex" step="0.5" min="-30" max="40">
+                                <small class="field-hint">越远越好</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="itemRope">一分钟跳绳 (个)</label>
+                                <input type="number" id="itemRope" step="1" min="0">
+                                <small class="field-hint">越多越好</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🛡️ 安全观察</h3>
+                        <div class="safety-observations">
+                            <div class="observation-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="safetyDanger" value="danger">
+                                    <span>存在危险动作</span>
+                                </label>
+                            </div>
+                            <div class="observation-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="safetyHelp" value="help">
+                                    <span>需要老师帮助</span>
+                                </label>
+                            </div>
+                            <div class="observation-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="safetyDiscomfort" value="discomfort">
+                                    <span>出现身体不适</span>
+                                </label>
+                            </div>
+                            <div class="observation-item">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="safetyFollowRules" value="followRules">
+                                    <span>严格遵守规则</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="safetyNotes">安全观察备注</label>
+                            <textarea id="safetyNotes" rows="3" placeholder="记录观察到的特殊情况..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📝 审核信息</h3>
+                        <div class="form-group">
+                            <label for="adminNotes">审核备注</label>
+                            <textarea id="adminNotes" rows="2" placeholder="审核时的备注信息..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="btnCancel">取消</button>
+                        <button type="button" class="btn btn-warning" id="btnValidate">🔍 验证数据</button>
+                        <button type="submit" class="btn btn-primary">💾 保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 弹窗：验证结果 -->
+        <div id="validateModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="validateTitle">验证结果</h2>
+                    <button class="modal-close" id="validateModalClose">&times;</button>
+                </div>
+                <div id="validateContent" class="validate-content">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="btnValidateClose">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 弹窗：详细信息 -->
+        <div id="detailModal" class="modal hidden">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2 id="detailTitle">详细信息</h2>
+                    <button class="modal-close" id="detailModalClose">&times;</button>
+                </div>
+                <div id="detailContent" class="detail-content">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnDetailClose">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <section class="documentation-section">
+            <h2>📖 使用说明</h2>
+            <div class="docs-container">
+                <div class="doc-card">
+                    <h3>🎯 年龄分组规则</h3>
+                    <ul>
+                        <li><strong>幼儿组 (3-5岁)：</strong>学龄前儿童</li>
+                        <li><strong>低年级组 (6-8岁)：</strong>小学1-2年级</li>
+                        <li><strong>中高年级组 (9-12岁)：</strong>小学3-6年级</li>
+                        <li><strong>青少年组 (13-16岁)：</strong>中学生</li>
+                    </ul>
+                </div>
+                <div class="doc-card">
+                    <h3>✅ 状态说明</h3>
+                    <ul>
+                        <li><span class="status-badge status-confirmed">已确认</span>：数据验证通过，评分有效</li>
+                        <li><span class="status-badge status-pending">待审核</span>：新录入，等待验证</li>
+                        <li><span class="status-badge status-rejected">已拒绝</span>：数据异常，需要人工处理</li>
+                        <li><span class="status-badge status-error">异常</span>：系统检测到问题</li>
+                    </ul>
+                </div>
+                <div class="doc-card">
+                    <h3>⚠️ 验证失败原因</h3>
+                    <ul>
+                        <li>年龄超出有效范围 (3-16岁)</li>
+                        <li>项目成绩超出合理阈值</li>
+                        <li>安全观察存在危险标记</li>
+                        <li>必填字段缺失</li>
+                    </ul>
+                </div>
+                <div class="doc-card">
+                    <h3>📋 常见操作</h3>
+                    <ul>
+                        <li>点击记录可查看详情</li>
+                        <li>✅ 确认：标记数据有效</li>
+                        <li>❌ 拒绝：标记数据异常</li>
+                        <li>✏️ 修改：编辑记录后可重跑</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
