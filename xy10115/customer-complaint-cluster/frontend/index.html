@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客诉文本聚类复盘器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>客诉文本聚类复盘器</h1>
+        <p>让错误样本、解释理由和修正历史都能追踪</p>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" data-tab="dashboard">仪表盘</button>
+        <button class="nav-btn" data-tab="import">数据导入</button>
+        <button class="nav-btn" data-tab="clusters">聚类管理</button>
+        <button class="nav-btn" data-tab="complaints">投诉列表</button>
+        <button class="nav-btn" data-tab="rules">规则管理</button>
+        <button class="nav-btn" data-tab="history">版本历史</button>
+        <button class="nav-btn" data-tab="operations">操作日志</button>
+        <button class="nav-btn" data-tab="export">报告导出</button>
+    </nav>
+
+    <main>
+        <!-- Dashboard -->
+        <section id="dashboard" class="tab-content active">
+            <h2>仪表盘</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">总投诉数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-with-cluster">0</div>
+                    <div class="stat-label">已聚类</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-without-cluster">0</div>
+                    <div class="stat-label">未聚类</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-versions">0</div>
+                    <div class="stat-label">版本数</div>
+                </div>
+            </div>
+            
+            <div class="summary-section">
+                <h3>聚类概览</h3>
+                <div id="summary-content">
+                    <p class="loading">加载中...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Import -->
+        <section id="import" class="tab-content">
+            <h2>数据导入</h2>
+            <div class="import-section">
+                <div class="upload-area" id="upload-area">
+                    <p>拖拽文件到此处或点击选择</p>
+                    <p class="small-text">支持 CSV、Excel (.xlsx/.xls) 格式</p>
+                    <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
+                    <button id="select-file-btn">选择文件</button>
+                </div>
+                
+                <div class="import-config" id="import-config" style="display: none;">
+                    <h3>导入配置</h3>
+                    <div class="form-group">
+                        <label>文件: <span id="file-name"></span></label>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="text-column">投诉文本列名</label>
+                            <input type="text" id="text-column" value="text" placeholder="text">
+                        </div>
+                        <div class="form-group">
+                            <label for="tag-column">原始标签列名</label>
+                            <input type="text" id="tag-column" value="tags" placeholder="tags">
+                        </div>
+                        <div class="form-group">
+                            <label for="id-column">原始ID列名 (可选)</label>
+                            <input type="text" id="id-column" placeholder="id">
+                        </div>
+                    </div>
+                    <button id="import-btn" class="primary-btn">开始导入</button>
+                    <button id="cancel-import-btn">取消</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Clusters -->
+        <section id="clusters" class="tab-content">
+            <h2>聚类管理</h2>
+            <div class="action-bar">
+                <button id="run-clustering-btn" class="primary-btn">运行聚类分析</button>
+                <button id="create-cluster-btn">新建聚类</button>
+                <button id="refresh-clusters-btn">刷新</button>
+            </div>
+            <div id="clusters-list">
+                <p class="loading">加载中...</p>
+            </div>
+        </section>
+
+        <!-- Complaints -->
+        <section id="complaints" class="tab-content">
+            <h2>投诉列表</h2>
+            <div class="filter-bar">
+                <select id="filter-cluster">
+                    <option value="">全部聚类</option>
+                </select>
+                <button id="refresh-complaints-btn">刷新</button>
+            </div>
+            <div id="complaints-list">
+                <p class="loading">加载中...</p>
+            </div>
+        </section>
+
+        <!-- Rules -->
+        <section id="rules" class="tab-content">
+            <h2>规则管理</h2>
+            <div class="action-bar">
+                <button id="create-rule-btn" class="primary-btn">新建规则</button>
+                <button id="refresh-rules-btn">刷新</button>
+            </div>
+            <div id="rules-list">
+                <p class="loading">加载中...</p>
+            </div>
+        </section>
+
+        <!-- History -->
+        <section id="history" class="tab-content">
+            <h2>版本历史</h2>
+            <div id="versions-list">
+                <p class="loading">加载中...</p>
+            </div>
+        </section>
+
+        <!-- Operations -->
+        <section id="operations" class="tab-content">
+            <h2>操作日志</h2>
+            <div id="operations-list">
+                <p class="loading">加载中...</p>
+            </div>
+        </section>
+
+        <!-- Export -->
+        <section id="export" class="tab-content">
+            <h2>报告导出</h2>
+            <div class="export-options">
+                <div class="export-card">
+                    <h3>聚类结果导出</h3>
+                    <p>导出所有聚类及其对应的投诉数据</p>
+                    <button class="export-btn" data-export="clusters-csv">导出 CSV</button>
+                    <button class="export-btn" data-export="clusters-excel">导出 Excel</button>
+                </div>
+                <div class="export-card">
+                    <h3>操作日志导出</h3>
+                    <p>导出所有操作记录，用于追踪修正历史</p>
+                    <button class="export-btn" data-export="operations-csv">导出 CSV</button>
+                    <button class="export-btn" data-export="operations-excel">导出 Excel</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for details/movement -->
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">详情</h3>
+                <button id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
