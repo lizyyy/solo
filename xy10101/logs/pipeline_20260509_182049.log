@@ -1,0 +1,33 @@
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 日志文件已创建: /Users/mac/pro/solo/workspaces/xy10101/logs/pipeline_20260509_182049.log
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 开始执行 雨量站缺测补全处理流水线
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - ============================================================
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 开始执行雨量站缺测补全处理流水线
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - ============================================================
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 
+[步骤 1/6] 数据加载与预处理
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 步骤 data_loading 完成
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 原始数据 数据统计: {'总记录数': 864, '站点数': 3, '时间范围': '2024-06-01 00:00:00 ~ 2024-06-01 23:55:00', '缺失值数': 85, '加载错误数': 0}
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - 
+[步骤 2/6] 质量控制 (QC)
+2026-05-09 18:20:51 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 步骤 quality_control 完成
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 质量控制后 数据统计: {'通过质控': 757, '缺测数': 85, '异常数': 22, '异常样本详情数': 107}
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 
+[步骤 3/6] 缺测补全处理
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 步骤 gap_filling 完成
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 补全处理后 数据统计: {'补全记录数': 107, '补全方法分布': {'spline': 107}}
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - 
+[步骤 4/6] 生成报告
+2026-05-09 18:20:52 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 步骤 report_generation 完成
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 
+[步骤 5/6] 导出文件
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 步骤 file_export 完成
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 
+[步骤 6/6] 保存流水线记录
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - ------------------------------------------------------------
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 流水线记录已保存: /Users/mac/pro/solo/workspaces/xy10101/logs/pipeline_record_20260509_182049.json
+2026-05-09 18:21:06 - rainfall_qc_pipeline - INFO - 流水线执行成功，耗时 14.83 秒

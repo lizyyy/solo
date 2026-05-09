@@ -1,0 +1,109 @@
+{
+  "pipeline_name": "雨量站缺测补全处理流水线",
+  "start_time": "2026-05-09T18:20:51.696509",
+  "config": {
+    "time_column": "time",
+    "value_column": "rainfall",
+    "station_column": "station",
+    "rainfall_unit": "mm",
+    "min_value": 0.0,
+    "max_value": 1000.0,
+    "min_interval": 5,
+    "spike_threshold": 50.0,
+    "neighbor_count": 3,
+    "min_neighbor_overlap": 0.3,
+    "min_valid_ratio": 0.5,
+    "qc_tests": [
+      "range_check",
+      "spike_check",
+      "constant_check",
+      "logic_check"
+    ],
+    "interpolation_methods": [
+      "linear",
+      "polynomial",
+      "spline",
+      "neighbor_weighted"
+    ],
+    "random_seed": 42,
+    "timestamp": "20260509_182049"
+  },
+  "steps": [
+    {
+      "step_name": "data_loading",
+      "timestamp": "2026-05-09T18:20:51.709389",
+      "status": "success",
+      "details": {
+        "total_records": 864,
+        "stations": 3,
+        "loading_errors_count": 0
+      }
+    },
+    {
+      "step_name": "data_stats_原始数据",
+      "timestamp": "2026-05-09T18:20:51.710634",
+      "status": "info",
+      "details": {
+        "总记录数": 864,
+        "站点数": 3,
+        "时间范围": "2024-06-01 00:00:00 ~ 2024-06-01 23:55:00",
+        "缺失值数": "85",
+        "加载错误数": 0
+      }
+    },
+    {
+      "step_name": "quality_control",
+      "timestamp": "2026-05-09T18:20:52.840993",
+      "status": "success",
+      "details": {
+        "pass_count": 757,
+        "missing_count": 85,
+        "fail_count": 22,
+        "failed_samples_count": 107
+      }
+    },
+    {
+      "step_name": "data_stats_质量控制后",
+      "timestamp": "2026-05-09T18:20:52.841601",
+      "status": "info",
+      "details": {
+        "通过质控": 757,
+        "缺测数": 85,
+        "异常数": 22,
+        "异常样本详情数": 107
+      }
+    },
+    {
+      "step_name": "gap_filling",
+      "timestamp": "2026-05-09T18:20:52.964782",
+      "status": "success",
+      "details": {
+        "total_filled": 107,
+        "fill_methods": {
+          "spline": 107
+        }
+      }
+    },
+    {
+      "step_name": "data_stats_补全处理后",
+      "timestamp": "2026-05-09T18:20:52.964916",
+      "status": "info",
+      "details": {
+        "补全记录数": 107,
+        "补全方法分布": {
+          "spline": 107
+        }
+      }
+    },
+    {
+      "step_name": "report_generation",
+      "timestamp": "2026-05-09T18:21:06.183835",
+      "status": "success",
+      "details": {
+        "figures_generated": 6,
+        "tables_generated": 7
+      }
+    }
+  ],
+  "errors": []
+}
