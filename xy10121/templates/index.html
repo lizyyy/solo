@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医疗随访文本风险分层器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="app-title">医疗随访文本风险分层器</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="showImportModal()">导入数据</button>
+                <button class="btn btn-secondary" onclick="showRulesModal()">查看规则</button>
+                <button class="btn btn-secondary" onclick="showTestModal()">测试分层</button>
+            </div>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="dashboard">概览</button>
+            <button class="tab-btn" data-tab="records">记录列表</button>
+            <button class="tab-btn" data-tab="misjudgments">误判追踪</button>
+            <button class="tab-btn" data-tab="batches">导入批次</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">总记录数</div>
+                        <div class="stat-value" id="stat-total">0</div>
+                    </div>
+                    <div class="stat-card stat-high">
+                        <div class="stat-label">高风险</div>
+                        <div class="stat-value" id="stat-high">0</div>
+                    </div>
+                    <div class="stat-card stat-medium">
+                        <div class="stat-label">中风险</div>
+                        <div class="stat-value" id="stat-medium">0</div>
+                    </div>
+                    <div class="stat-card stat-low">
+                        <div class="stat-label">低风险</div>
+                        <div class="stat-value" id="stat-low">0</div>
+                    </div>
+                    <div class="stat-card stat-pending">
+                        <div class="stat-label">待复核</div>
+                        <div class="stat-value" id="stat-pending">0</div>
+                    </div>
+                    <div class="stat-card stat-misjudgment">
+                        <div class="stat-label">误判记录</div>
+                        <div class="stat-value" id="stat-misjudgments">0</div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="filterByRisk('high')">查看高风险记录</button>
+                    <button class="btn btn-warning" onclick="filterByStatus('pending')">查看待复核记录</button>
+                    <button class="btn btn-success" onclick="exportRecords()">导出当前筛选</button>
+                </div>
+            </section>
+
+            <section id="records" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>风险等级</label>
+                        <select id="filter-risk" onchange="loadRecords()">
+                            <option value="">全部</option>
+                            <option value="high">高风险</option>
+                            <option value="medium">中风险</option>
+                            <option value="low">低风险</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>复核状态</label>
+                        <select id="filter-status" onchange="loadRecords()">
+                            <option value="">全部</option>
+                            <option value="pending">待复核</option>
+                            <option value="approved">已确认</option>
+                            <option value="modified">已修正</option>
+                            <option value="rejected">已回滚</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>搜索</label>
+                        <input type="text" id="search-input" placeholder="患者ID/姓名/内容..." onkeypress="handleSearch(event)">
+                        <button class="btn btn-small" onclick="loadRecords()">搜索</button>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-danger" onclick="showBatchModal()">批量操作</button>
+                    </div>
+                </div>
+
+                <div class="records-list" id="records-list"></div>
+
+                <div class="pagination" id="pagination"></div>
+            </section>
+
+            <section id="misjudgments" class="tab-content">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>误判类型</label>
+                        <select id="filter-misjudgment-type" onchange="loadMisjudgments()">
+                            <option value="">全部</option>
+                            <option value="误判">误判（假阳性）</option>
+                            <option value="漏判">漏判（假阴性）</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn btn-success" onclick="exportMisjudgments()">导出误判报告</button>
+                    </div>
+                </div>
+                <div class="misjudgments-list" id="misjudgments-list"></div>
+            </section>
+
+            <section id="batches" class="tab-content">
+                <div class="batches-list" id="batches-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>导入数据</h3>
+                <span class="close" onclick="closeModal('import-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="import-info">
+                    <p><strong>支持格式：</strong>CSV, XLSX, XLS</p>
+                    <p><strong>必填列：</strong></p>
+                    <ul>
+                        <li><code>patient_id</code> - 患者ID</li>
+                        <li><code>follow_up_text</code> - 随访文本</li>
+                    </ul>
+                    <p><strong>可选列：</strong></p>
+                    <ul>
+                        <li><code>patient_name</code> - 患者姓名</li>
+                        <li><code>visit_date</code> - 随访日期</li>
+                    </ul>
+                </div>
+                <input type="file" id="import-file" accept=".csv,.xlsx,.xls">
+                <div id="import-progress" class="import-progress" style="display:none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p>正在导入...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('import-modal')">取消</button>
+                <button class="btn btn-primary" onclick="importData()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="review-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>复核记录</h3>
+                <span class="close" onclick="closeModal('review-modal')">&times;</span>
+            </div>
+            <div class="modal-body" id="review-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('review-modal')">取消</button>
+                <button class="btn btn-danger" onclick="rollbackRecord()">回滚</button>
+                <button class="btn btn-success" onclick="approveRecord()">确认</button>
+                <button class="btn btn-warning" onclick="modifyRecord()">修正</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>版本历史</h3>
+                <span class="close" onclick="closeModal('history-modal')">&times;</span>
+            </div>
+            <div class="modal-body" id="history-content"></div>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>分层规则</h3>
+                <span class="close" onclick="closeModal('rules-modal')">&times;</span>
+            </div>
+            <div class="modal-body" id="rules-content"></div>
+        </div>
+    </div>
+
+    <div id="test-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>测试分层</h3>
+                <span class="close" onclick="closeModal('test-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <textarea id="test-text" rows="6" placeholder="请输入随访文本进行测试..."></textarea>
+                <button class="btn btn-primary" onclick="testStratify()">测试</button>
+                <div id="test-result" class="test-result" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="batch-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量操作</h3>
+                <span class="close" onclick="closeModal('batch-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>已选择 <strong id="batch-count">0</strong> 条记录</p>
+                <div class="filter-group">
+                    <label>操作类型</label>
+                    <select id="batch-action">
+                        <option value="approve">批量确认</option>
+                        <option value="modify">批量修正</option>
+                        <option value="rollback">批量回滚</option>
+                    </select>
+                </div>
+                <div class="filter-group" id="batch-risk-group" style="display:none;">
+                    <label>修正为</label>
+                    <select id="batch-risk-level">
+                        <option value="high">高风险</option>
+                        <option value="medium">中风险</option>
+                        <option value="low">低风险</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>理由（可选）</label>
+                    <textarea id="batch-reason" rows="3" placeholder="请输入操作理由..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('batch-modal')">取消</button>
+                <button class="btn btn-primary" onclick="executeBatchAction()">执行</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
