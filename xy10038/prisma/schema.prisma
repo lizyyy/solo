@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  OPERATOR
+  VIEWER
+}
+
+enum RefundStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REJECTED
+}
+
+enum RefundReason {
+  QUALITY_ISSUE
+  WRONG_ITEM
+  DAMAGED
+  NOT_AS_DESCRIBED
+  CUSTOMER_CHANGED_MIND
+  OTHER
+}
+
+enum BatchStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  PARTIAL
+}
+
+enum LogAction {
+  CREATE
+  UPDATE
+  STATUS_CHANGE
+  APPROVE
+  REJECT
+  CANCEL
+  EXPORT
+  IMPORT
+  BATCH_PROCESS
+  RETRY
+  ROLLBACK
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(OPERATOR)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  refunds          Refund[]
+  refundLogs       RefundLog[]
+  batchOperations  BatchOperation[]
+  
+  @@map("users")
+}
+
+model Refund {
+  id             String        @id @default(uuid())
+  refundNo       String        @unique
+  orderNo        String
+  customerName   String
+  customerPhone  String?
+  amount         Decimal       @db.Decimal(10, 2)
+  currency       String        @default("CNY")
+  reason         RefundReason
+  reasonDetail   String?
+  status         RefundStatus  @default(DRAFT)
+  version        Int           @default(1)
+  paymentMethod  String?
+  bankAccount    String?
+  bankName       String?
+  bankBranch     String?
+  operatorId     String?
+  reviewedById   String?
+  approvedById   String?
+  batchId        String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  completedAt    DateTime?
+  
+  statusHistories RefundStatusHistory[]
+  logs            RefundLog[]
+  operator        User?           @relation(fields: [operatorId], references: [id], onDelete: SetNull)
+  reviewedBy      User?           @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+  approvedBy      User?           @relation(fields: [approvedById], references: [id], onDelete: SetNull)
+  batchOperation  BatchOperation? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  
+  @@map("refunds")
+}
+
+model RefundStatusHistory {
+  id           String       @id @default(uuid())
+  refundId     String
+  fromStatus   RefundStatus?
+  toStatus     RefundStatus
+  changedBy    String?
+  changeReason String?
+  createdAt    DateTime     @default(now())
+  
+  refund Refund @relation(fields: [refundId], references: [id], onDelete: Cascade)
+  
+  @@index([refundId])
+  @@index([createdAt])
+  @@map("refund_status_histories")
+}
+
+model RefundLog {
+  id          String    @id @default(uuid())
+  refundId    String
+  userId      String?
+  action      LogAction
+  details     String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  
+  refund Refund  @relation(fields: [refundId], references: [id], onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([refundId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("refund_logs")
+}
+
+model BatchOperation {
+  id            String      @id @default(uuid())
+  name          String
+  description   String?
+  status        BatchStatus @default(PENDING)
+  totalCount    Int         @default(0)
+  successCount  Int         @default(0)
+  failedCount   Int         @default(0)
+  operationType String
+  createdById   String
+  createdAt     DateTime    @default(now())
+  completedAt   DateTime?
+  
+  createdBy User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  refunds   Refund[]
+  
+  @@index([status])
+  @@index([createdAt])
+  @@map("batch_operations")
+}
+
+model FailedRetry {
+  id           String   @id @default(uuid())
+  refundId     String
+  retryCount   Int      @default(0)
+  maxRetries   Int      @default(3)
+  errorMessage String?
+  lastError    String?
+  nextRetryAt  DateTime?
+  isResolved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@index([refundId])
+  @@index([isResolved])
+  @@index([nextRetryAt])
+  @@map("failed_retries")
+}
+
+model ImportExportLog {
+  id           String    @id @default(uuid())
+  type         String
+  fileName     String
+  recordCount  Int       @default(0)
+  successCount Int       @default(0)
+  failedCount  Int       @default(0)
+  userId       String?
+  createdAt    DateTime  @default(now())
+  
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([type])
+  @@index([createdAt])
+  @@map("import_export_logs")
+}
