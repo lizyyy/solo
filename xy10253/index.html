@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合唱团声部分配器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>合唱团声部分配器</h1>
+            <p class="subtitle">根据音域、出勤和站位经验智能分配声部</p>
+        </header>
+
+        <main class="main-content">
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="members">成员管理</button>
+                <button class="tab-btn" data-tab="sections">声部配置</button>
+                <button class="tab-btn" data-tab="attendance">出勤管理</button>
+                <button class="tab-btn" data-tab="allocation">声部分配</button>
+                <button class="tab-btn" data-tab="verification">验证验收</button>
+            </nav>
+
+            <div class="tab-content">
+                <section id="members-tab" class="tab-panel active">
+                    <div class="panel-header">
+                        <h2>成员管理</h2>
+                        <button id="add-member-btn" class="btn-primary">添加成员</button>
+                        <button id="import-sample-btn" class="btn-secondary">导入示例数据</button>
+                    </div>
+                    
+                    <div class="member-form-container hidden" id="member-form">
+                        <h3>成员信息</h3>
+                        <form id="member-form-element">
+                            <input type="hidden" id="member-id">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="member-name">姓名 *</label>
+                                    <input type="text" id="member-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="member-gender">性别</label>
+                                    <select id="member-gender">
+                                        <option value="female">女</option>
+                                        <option value="male">男</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="voice-low">最低音 *</label>
+                                    <select id="voice-low" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="voice-high">最高音 *</label>
+                                    <select id="voice-high" required></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="preferred-section">偏好声部</label>
+                                <select id="preferred-section"></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="standing-experience">站位经验</label>
+                                <input type="text" id="standing-experience" placeholder="如：习惯站高音区、需要靠近指挥等">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="is-core-member">
+                                    核心成员（优先分配）
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">保存</button>
+                                <button type="button" id="cancel-member-btn" class="btn-secondary">取消</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="member-list" id="member-list"></div>
+                </section>
+
+                <section id="sections-tab" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>声部配置</h2>
+                        <button id="add-section-btn" class="btn-primary">添加声部</button>
+                    </div>
+                    
+                    <div class="section-form-container hidden" id="section-form">
+                        <h3>声部信息</h3>
+                        <form id="section-form-element">
+                            <input type="hidden" id="section-id">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="section-name">声部名称 *</label>
+                                    <input type="text" id="section-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="section-short">简称</label>
+                                    <input type="text" id="section-short" placeholder="如：S1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="section-low">最低音 *</label>
+                                    <select id="section-low" required></select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="section-high">最高音 *</label>
+                                    <select id="section-high" required></select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="min-capacity">最小人数</label>
+                                    <input type="number" id="min-capacity" min="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="max-capacity">最大人数 *</label>
+                                    <input type="number" id="max-capacity" min="1" value="10" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="section-priority">优先级（数字越大越优先）</label>
+                                <input type="number" id="section-priority" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="section-color">显示颜色</label>
+                                <input type="color" id="section-color" value="#e3f2fd">
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">保存</button>
+                                <button type="button" id="cancel-section-btn" class="btn-secondary">取消</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="section-list" id="section-list"></div>
+                </section>
+
+                <section id="attendance-tab" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>出勤管理</h2>
+                        <div class="date-selector">
+                            <label for="rehearsal-date">排练日期：</label>
+                            <input type="date" id="rehearsal-date">
+                        </div>
+                    </div>
+                    
+                    <div class="attendance-summary" id="attendance-summary"></div>
+                    <div class="attendance-list" id="attendance-list"></div>
+                    
+                    <div class="panel-actions">
+                        <button id="mark-all-present" class="btn-secondary">全部出勤</button>
+                        <button id="mark-all-absent" class="btn-secondary">全部缺勤</button>
+                    </div>
+                </section>
+
+                <section id="allocation-tab" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>声部分配</h2>
+                        <button id="run-allocation-btn" class="btn-primary">开始分配</button>
+                        <button id="reset-allocation-btn" class="btn-secondary">重置分配</button>
+                    </div>
+                    
+                    <div class="allocation-settings">
+                        <h3>分配参数</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="use-voice-range" checked>
+                                    优先匹配音域
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="use-preference" checked>
+                                    考虑偏好声部
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="use-standing" checked>
+                                    参考站位经验
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="balance-sections" checked>
+                                    平衡各声部人数
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="allocation-result" id="allocation-result"></div>
+                </section>
+
+                <section id="verification-tab" class="tab-panel">
+                    <div class="panel-header">
+                        <h2>验证验收</h2>
+                        <button id="run-verification-btn" class="btn-primary">运行验证</button>
+                    </div>
+                    
+                    <div class="verification-result" id="verification-result">
+                        <div class="empty-state">
+                            <p>点击"运行验证"按钮开始验证</p>
+                        </div>
+                    </div>
+                    
+                    <div class="documentation">
+                        <h3>验证结果说明</h3>
+                        <div class="doc-section">
+                            <h4>通过标准</h4>
+                            <ul>
+                                <li><span class="status-pass">✓ 通过</span>：所有音域匹配有效，声部容量正常，出勤数据一致</li>
+                                <li><span class="status-warning">⚠ 警告</span>：存在可接受的问题，建议但非必须人工处理</li>
+                            </ul>
+                        </div>
+                        <div class="doc-section">
+                            <h4>需要人工处理</h4>
+                            <ul>
+                                <li><span class="status-fail">✗ 失败</span>：存在必须修正的问题，分配结果不可用</li>
+                                <li><span class="status-conflict">⚡ 冲突</span>：需要人工决策的分配冲突</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <script src="data/notes.js"></script>
+    <script src="data/defaultData.js"></script>
+    <script src="utils/storage.js"></script>
+    <script src="utils/validation.js"></script>
+    <script src="models/Member.js"></script>
+    <script src="models/Section.js"></script>
+    <script src="models/AllocationResult.js"></script>
+    <script src="services/AllocationService.js"></script>
+    <script src="services/VerificationService.js"></script>
+    <script src="ui/TabManager.js"></script>
+    <script src="ui/MemberUI.js"></script>
+    <script src="ui/SectionUI.js"></script>
+    <script src="ui/AttendanceUI.js"></script>
+    <script src="ui/AllocationUI.js"></script>
+    <script src="ui/VerificationUI.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
