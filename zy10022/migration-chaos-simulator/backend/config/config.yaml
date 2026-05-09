@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  mode: debug
+  read_timeout: 30s
+  write_timeout: 30s
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  database: chaos_sim
+  sslmode: disable
+  max_connections: 100
+  min_connections: 10
+  conn_max_lifetime: 1h
+  conn_max_idle_time: 30m
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  user: guest
+  password: guest
+  vhost: /
+  reconnect_attempts: 5
+  reconnect_delay: 3s
+
+chaos:
+  enabled: true
+  default_experiment_duration: 5m
+  max_concurrent_experiments: 10
+
+tracer:
+  enabled: true
+  buffer_size: 10000
+  flush_interval: 1s
+
+logging:
+  level: debug
+  format: json
+  output: stdout
