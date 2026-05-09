@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>早教中心课包消课台</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>早教中心课包消课台</h1>
+            <nav>
+                <button class="nav-btn active" data-view="dashboard">仪表盘</button>
+                <button class="nav-btn" data-view="packages">课包管理</button>
+                <button class="nav-btn" data-view="attendance">签到消课</button>
+                <button class="nav-btn" data-view="leave">请假冻结</button>
+                <button class="nav-btn" data-view="reconciliation">家长对账</button>
+            </nav>
+        </header>
+
+        <main id="main-content">
+            <div class="view active" id="dashboard-view">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-packages">0</div>
+                        <div class="stat-label">总课包数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-active-packages">0</div>
+                        <div class="stat-label">激活中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-frozen-packages">0</div>
+                        <div class="stat-label">冻结中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-attendances">0</div>
+                        <div class="stat-label">总消课数</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>最近活动</h2>
+                    <div class="activity-list" id="activity-list">
+                        <p class="empty-state">暂无活动记录</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view" id="packages-view">
+                <div class="section">
+                    <div class="section-header">
+                        <h2>课包管理</h2>
+                        <div class="actions">
+                            <button class="btn btn-primary" id="add-package-btn">购买新课包</button>
+                            <button class="btn btn-secondary" id="export-packages-btn">导出Excel</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>孩子</th>
+                                    <th>课程</th>
+                                    <th>总课时</th>
+                                    <th>已消课</th>
+                                    <th>冻结中</th>
+                                    <th>剩余</th>
+                                    <th>状态</th>
+                                    <th>购买日期</th>
+                                    <th>到期日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packages-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view" id="attendance-view">
+                <div class="section">
+                    <h2>签到消课</h2>
+                    <form id="attendance-form" class="form-grid">
+                        <div class="form-group">
+                            <label>选择课包 *</label>
+                            <select id="attendance-package" required>
+                                <option value="">请选择...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>上课日期 *</label>
+                            <input type="date" id="attendance-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>上课时间</label>
+                            <input type="time" id="attendance-time">
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <input type="text" id="attendance-note" placeholder="可选">
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn btn-primary btn-large">确认签到消课</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="package-info" id="attendance-package-info" style="display: none;">
+                    <h3>当前课包信息</h3>
+                    <div class="info-grid">
+                        <div>孩子: <span id="info-child"></span></div>
+                        <div>课程: <span id="info-course"></span></div>
+                        <div>总课时: <span id="info-total"></span></div>
+                        <div>已消课: <span id="info-used"></span></div>
+                        <div>冻结中: <span id="info-frozen"></span></div>
+                        <div>剩余: <span id="info-remaining"></span></div>
+                        <div class="full-width">状态: <span id="info-status"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view" id="leave-view">
+                <div class="section">
+                    <h2>请假管理</h2>
+                    <form id="leave-form" class="form-grid">
+                        <div class="form-group">
+                            <label>选择课包 *</label>
+                            <select id="leave-package" required>
+                                <option value="">请选择...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>请假日期 *</label>
+                            <input type="date" id="leave-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>请假课时数 *</label>
+                            <input type="number" id="leave-count" value="1" min="1" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>请假原因</label>
+                            <input type="text" id="leave-reason" placeholder="可选">
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn btn-primary btn-large">提交请假</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="section">
+                    <h2>冻结管理</h2>
+                    <form id="freeze-form" class="form-grid">
+                        <div class="form-group">
+                            <label>选择课包 *</label>
+                            <select id="freeze-package" required>
+                                <option value="">请选择...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>冻结开始日期 *</label>
+                            <input type="date" id="freeze-start" required>
+                        </div>
+                        <div class="form-group">
+                            <label>冻结结束日期</label>
+                            <input type="date" id="freeze-end">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>冻结原因</label>
+                            <input type="text" id="freeze-reason" placeholder="可选">
+                        </div>
+                        <div class="form-group full-width">
+                            <button type="submit" class="btn btn-warning btn-large">冻结课包</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="section">
+                    <h2>当前冻结</h2>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>孩子</th>
+                                    <th>课程</th>
+                                    <th>开始日期</th>
+                                    <th>结束日期</th>
+                                    <th>冻结课时</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="freezes-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view" id="reconciliation-view">
+                <div class="section">
+                    <h2>家长对账</h2>
+                    <div class="form-group">
+                        <label>选择课包 *</label>
+                        <select id="reconciliation-package" required>
+                            <option value="">请选择...</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="load-reconciliation-btn">加载对账信息</button>
+                    <button class="btn btn-secondary" id="export-reconciliation-btn" style="display: none;">导出对账Excel</button>
+                </div>
+                
+                <div id="reconciliation-content" style="display: none;">
+                    <div class="section">
+                        <h2>课包摘要</h2>
+                        <div class="reconciliation-summary" id="reconciliation-summary"></div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>签到记录</h2>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>时间</th>
+                                        <th>状态</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendances-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>请假记录</h2>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>课时数</th>
+                                        <th>原因</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leaves-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>操作历史</h2>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>操作</th>
+                                        <th>详情</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
