@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>舞台灯位碰撞检查器</title>
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>舞台灯位碰撞检查器</h1>
+      <div class="header-actions">
+        <button id="saveBtn" class="btn btn-primary">保存方案</button>
+        <button id="loadBtn" class="btn btn-secondary">加载方案</button>
+        <button id="exportBtn" class="btn btn-success">导出报告</button>
+        <button id="resetBtn" class="btn btn-danger">重置场景</button>
+      </div>
+    </header>
+    
+    <main class="main-container">
+      <aside class="sidebar">
+        <div class="panel">
+          <h3>场景元素</h3>
+          <div id="elementList" class="element-list"></div>
+        </div>
+        
+        <div class="panel">
+          <h3>选中元素</h3>
+          <div id="selectedInfo" class="element-info">
+            <p class="hint">点击场景中的元素进行选择</p>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h3>碰撞检测</h3>
+          <div id="collisionList" class="collision-list">
+            <p class="hint">暂无碰撞信息</p>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h3>控制</h3>
+          <div class="controls">
+            <div class="control-item">
+              <label>拖拽模式</label>
+              <select id="dragMode">
+                <option value="axis">坐标轴</option>
+                <option value="free">自由</option>
+              </select>
+            </div>
+            <div class="control-item">
+              <label>边界警告</label>
+              <input type="checkbox" id="showBoundary" checked>
+            </div>
+            <div class="control-item">
+              <label>碰撞提示</label>
+              <input type="checkbox" id="showCollision" checked>
+            </div>
+          </div>
+        </div>
+      </aside>
+      
+      <div class="scene-container">
+        <div id="scene" class="scene"></div>
+        <div class="scene-controls">
+          <button id="topView" class="btn btn-small">俯视图</button>
+          <button id="frontView" class="btn btn-small">正视图</button>
+          <button id="sideView" class="btn btn-small">侧视图</button>
+          <button id="perspectiveView" class="btn btn-small">透视图</button>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="footer">
+      <div class="status">
+        <span id="statusText">就绪</span>
+      </div>
+    </footer>
+  </div>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
