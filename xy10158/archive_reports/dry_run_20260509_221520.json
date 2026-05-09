@@ -1,0 +1,533 @@
+{
+  "report_type": "dry_run",
+  "timestamp": "2026-05-09T22:15:20.263204",
+  "config": {
+    "database": {
+      "connection_string": "sqlite:///./examples/test_db.sqlite",
+      "schema": null
+    },
+    "archive": {
+      "source_table": "transactions",
+      "target_table": "transactions_archive",
+      "partition_type": "range",
+      "partition_column": "txn_date"
+    }
+  },
+  "summary": {
+    "success": true,
+    "total_partitions": 13,
+    "partitions_with_data": 12,
+    "total_rows_to_archive": 100,
+    "total_rows_by_partition": {},
+    "estimated_duration_minutes": 0.010000000000000002,
+    "error_count": 0,
+    "warning_count": 1,
+    "rows_by_partition": {
+      "partition_20220101_20220131": 9,
+      "partition_20220131_20220302": 5,
+      "partition_20220302_20220401": 7,
+      "partition_20220401_20220501": 11,
+      "partition_20220501_20220531": 10,
+      "partition_20220531_20220630": 8,
+      "partition_20220630_20220730": 14,
+      "partition_20220730_20220829": 4,
+      "partition_20220829_20220928": 13,
+      "partition_20220928_20221028": 6,
+      "partition_20221028_20221127": 4,
+      "partition_20221127_20221227": 9,
+      "partition_20221227_20230101": 0
+    }
+  },
+  "details": {
+    "errors": [],
+    "warnings": [
+      "Target table 'transactions_archive' does not exist. Will be created automatically."
+    ],
+    "partitions": [
+      {
+        "name": "partition_20220101_20220131",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-01-01T00:00:00",
+          "end_date": "2022-01-31T00:00:00"
+        },
+        "row_count": 9,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220131_20220302",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-01-31T00:00:00",
+          "end_date": "2022-03-02T00:00:00"
+        },
+        "row_count": 5,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220302_20220401",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-03-02T00:00:00",
+          "end_date": "2022-04-01T00:00:00"
+        },
+        "row_count": 7,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220401_20220501",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-04-01T00:00:00",
+          "end_date": "2022-05-01T00:00:00"
+        },
+        "row_count": 11,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220501_20220531",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-05-01T00:00:00",
+          "end_date": "2022-05-31T00:00:00"
+        },
+        "row_count": 10,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220531_20220630",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-05-31T00:00:00",
+          "end_date": "2022-06-30T00:00:00"
+        },
+        "row_count": 8,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220630_20220730",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-06-30T00:00:00",
+          "end_date": "2022-07-30T00:00:00"
+        },
+        "row_count": 14,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220730_20220829",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-07-30T00:00:00",
+          "end_date": "2022-08-29T00:00:00"
+        },
+        "row_count": 4,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220829_20220928",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-08-29T00:00:00",
+          "end_date": "2022-09-28T00:00:00"
+        },
+        "row_count": 13,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20220928_20221028",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-09-28T00:00:00",
+          "end_date": "2022-10-28T00:00:00"
+        },
+        "row_count": 6,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20221028_20221127",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-10-28T00:00:00",
+          "end_date": "2022-11-27T00:00:00"
+        },
+        "row_count": 4,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20221127_20221227",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-11-27T00:00:00",
+          "end_date": "2022-12-27T00:00:00"
+        },
+        "row_count": 9,
+        "status": "pending"
+      },
+      {
+        "name": "partition_20221227_20230101",
+        "condition": "txn_date >= :start_date AND txn_date < :end_date",
+        "parameters": {
+          "start_date": "2022-12-27T00:00:00",
+          "end_date": "2023-01-01T00:00:00"
+        },
+        "row_count": 0,
+        "status": "pending"
+      }
+    ]
+  },
+  "sql_snippets": [
+    {
+      "partition_name": "partition_20220101_20220131",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-01-01T00:00:00",
+        "end_date": "2022-01-31T00:00:00"
+      },
+      "estimated_rows": 9
+    },
+    {
+      "partition_name": "partition_20220101_20220131",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-01-01T00:00:00",
+        "end_date": "2022-01-31T00:00:00"
+      },
+      "estimated_rows": 9
+    },
+    {
+      "partition_name": "partition_20220131_20220302",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-01-31T00:00:00",
+        "end_date": "2022-03-02T00:00:00"
+      },
+      "estimated_rows": 5
+    },
+    {
+      "partition_name": "partition_20220131_20220302",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-01-31T00:00:00",
+        "end_date": "2022-03-02T00:00:00"
+      },
+      "estimated_rows": 5
+    },
+    {
+      "partition_name": "partition_20220302_20220401",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-03-02T00:00:00",
+        "end_date": "2022-04-01T00:00:00"
+      },
+      "estimated_rows": 7
+    },
+    {
+      "partition_name": "partition_20220302_20220401",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-03-02T00:00:00",
+        "end_date": "2022-04-01T00:00:00"
+      },
+      "estimated_rows": 7
+    },
+    {
+      "partition_name": "partition_20220401_20220501",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-04-01T00:00:00",
+        "end_date": "2022-05-01T00:00:00"
+      },
+      "estimated_rows": 11
+    },
+    {
+      "partition_name": "partition_20220401_20220501",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-04-01T00:00:00",
+        "end_date": "2022-05-01T00:00:00"
+      },
+      "estimated_rows": 11
+    },
+    {
+      "partition_name": "partition_20220501_20220531",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-05-01T00:00:00",
+        "end_date": "2022-05-31T00:00:00"
+      },
+      "estimated_rows": 10
+    },
+    {
+      "partition_name": "partition_20220501_20220531",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-05-01T00:00:00",
+        "end_date": "2022-05-31T00:00:00"
+      },
+      "estimated_rows": 10
+    },
+    {
+      "partition_name": "partition_20220531_20220630",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-05-31T00:00:00",
+        "end_date": "2022-06-30T00:00:00"
+      },
+      "estimated_rows": 8
+    },
+    {
+      "partition_name": "partition_20220531_20220630",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-05-31T00:00:00",
+        "end_date": "2022-06-30T00:00:00"
+      },
+      "estimated_rows": 8
+    },
+    {
+      "partition_name": "partition_20220630_20220730",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-06-30T00:00:00",
+        "end_date": "2022-07-30T00:00:00"
+      },
+      "estimated_rows": 14
+    },
+    {
+      "partition_name": "partition_20220630_20220730",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-06-30T00:00:00",
+        "end_date": "2022-07-30T00:00:00"
+      },
+      "estimated_rows": 14
+    },
+    {
+      "partition_name": "partition_20220730_20220829",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-07-30T00:00:00",
+        "end_date": "2022-08-29T00:00:00"
+      },
+      "estimated_rows": 4
+    },
+    {
+      "partition_name": "partition_20220730_20220829",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-07-30T00:00:00",
+        "end_date": "2022-08-29T00:00:00"
+      },
+      "estimated_rows": 4
+    },
+    {
+      "partition_name": "partition_20220829_20220928",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-08-29T00:00:00",
+        "end_date": "2022-09-28T00:00:00"
+      },
+      "estimated_rows": 13
+    },
+    {
+      "partition_name": "partition_20220829_20220928",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-08-29T00:00:00",
+        "end_date": "2022-09-28T00:00:00"
+      },
+      "estimated_rows": 13
+    },
+    {
+      "partition_name": "partition_20220928_20221028",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-09-28T00:00:00",
+        "end_date": "2022-10-28T00:00:00"
+      },
+      "estimated_rows": 6
+    },
+    {
+      "partition_name": "partition_20220928_20221028",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-09-28T00:00:00",
+        "end_date": "2022-10-28T00:00:00"
+      },
+      "estimated_rows": 6
+    },
+    {
+      "partition_name": "partition_20221028_20221127",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-10-28T00:00:00",
+        "end_date": "2022-11-27T00:00:00"
+      },
+      "estimated_rows": 4
+    },
+    {
+      "partition_name": "partition_20221028_20221127",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-10-28T00:00:00",
+        "end_date": "2022-11-27T00:00:00"
+      },
+      "estimated_rows": 4
+    },
+    {
+      "partition_name": "partition_20221127_20221227",
+      "operation": "SELECT (Archive)",
+      "sql": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-11-27T00:00:00",
+        "end_date": "2022-12-27T00:00:00"
+      },
+      "estimated_rows": 9
+    },
+    {
+      "partition_name": "partition_20221127_20221227",
+      "operation": "DELETE (Cleanup)",
+      "sql": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+      "parameters": {
+        "start_date": "2022-11-27T00:00:00",
+        "end_date": "2022-12-27T00:00:00"
+      },
+      "estimated_rows": 9
+    }
+  ],
+  "rollback_plan": {
+    "description": "Rollback plan to restore archived data",
+    "steps": [
+      {
+        "step": "Restore partition: partition_20220101_20220131",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 9
+      },
+      {
+        "step": "Restore partition: partition_20220131_20220302",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 5
+      },
+      {
+        "step": "Restore partition: partition_20220302_20220401",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 7
+      },
+      {
+        "step": "Restore partition: partition_20220401_20220501",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 11
+      },
+      {
+        "step": "Restore partition: partition_20220501_20220531",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 10
+      },
+      {
+        "step": "Restore partition: partition_20220531_20220630",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 8
+      },
+      {
+        "step": "Restore partition: partition_20220630_20220730",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 14
+      },
+      {
+        "step": "Restore partition: partition_20220730_20220829",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 4
+      },
+      {
+        "step": "Restore partition: partition_20220829_20220928",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 13
+      },
+      {
+        "step": "Restore partition: partition_20220928_20221028",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 6
+      },
+      {
+        "step": "Restore partition: partition_20221028_20221127",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 4
+      },
+      {
+        "step": "Restore partition: partition_20221127_20221227",
+        "action": "INSERT BACK",
+        "source_query": "SELECT * FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "target_table": "original_table",
+        "condition": "DELETE FROM transactions WHERE txn_date >= :start_date AND txn_date < :end_date AND (status = 'SETTLED')",
+        "estimated_rows": 9
+      }
+    ],
+    "validation_checks": [
+      "Verify target table exists before restore",
+      "Check for primary key conflicts",
+      "Verify row count matches original",
+      "Compare hash checksums if available"
+    ]
+  },
+  "metadata": {
+    "generated_at": "2026-05-09T22:15:20.263204",
+    "version": "0.1.0",
+    "source": "archive-cli"
+  }
+}

@@ -1,0 +1,29 @@
+database:
+  connection_string: "sqlite:///./examples/test_db.sqlite"
+  schema: null
+
+archive:
+  source_table: "transactions"
+  target_table: "transactions_archive"
+  primary_key: "txn_id"
+  batch_size: 1000
+  
+  partition:
+    type: "range"
+    column: "txn_date"
+    interval: "1m"
+    start_date: "2022-01-01"
+    end_date: "2023-01-01"
+  
+  archive_condition: "status = 'SETTLED'"
+  validate_columns:
+    - "account_id"
+    - "amount"
+  exclude_columns: []
+
+report:
+  output_dir: "./archive_reports"
+  format: "json"
+  include_sql: true
+  include_sample_data: true
+  sample_limit: 10
