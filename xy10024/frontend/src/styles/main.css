@@ -1,0 +1,171 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-box {
+  width: 400px;
+  padding: 40px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.layout-container {
+  height: 100vh;
+}
+
+.sidebar {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.main-content {
+  padding: 20px;
+  background: #f0f2f5;
+  min-height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+}
+
+.stat-card {
+  padding: 20px;
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #409eff;
+}
+
+.stat-label {
+  margin-top: 8px;
+  color: #606266;
+}
+
+.event-timeline {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.event-item {
+  padding: 12px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.event-item:last-child {
+  border-bottom: none;
+}
+
+.event-type {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.event-time {
+  font-size: 12px;
+  color: #909399;
+}
+
+.event-payload {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.audit-log-item {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #409eff;
+}
+
+.audit-action {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.audit-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #909399;
+}
+
+.audit-state {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.state-section {
+  padding: 8px;
+  background: #f5f7fa;
+  border-radius: 4px;
+}
+
+.state-label {
+  font-size: 12px;
+  color: #606266;
+  margin-bottom: 4px;
+}
+
+.state-content {
+  font-family: monospace;
+  font-size: 11px;
+  word-break: break-all;
+}
