@@ -1,0 +1,22 @@
+{
+  "validRule": {
+    "name": "有效规则",
+    "pattern": "\\d{3}",
+    "severity": "low"
+  },
+  "invalidPattern": {
+    "name": "无效正则",
+    "pattern": "[invalid",
+    "severity": "medium"
+  },
+  "missingPattern": {
+    "name": "缺少 pattern",
+    "severity": "high"
+  },
+  "disabledRule": {
+    "name": "被禁用的规则",
+    "pattern": "disabled",
+    "severity": "low",
+    "enabled": false
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "test-email-1",
+    "ruleId": "email",
+    "match": "test@example.com",
+    "reason": "测试用例示例邮箱，安全无害"
+  },
+  {
+    "id": "internal-token",
+    "ruleId": "token",
+    "pattern": "token:\\s*[\"']?internal-[\\w-]+[\"']?",
+    "reason": "内部测试 token，生产环境不会暴露"
+  }
+]

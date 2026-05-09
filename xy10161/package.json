@@ -1,0 +1,20 @@
+{
+  "name": "log-scan-cli",
+  "version": "1.0.0",
+  "description": "日志脱敏发布检查 CLI - 检查日志中是否包含敏感信息",
+  "main": "src/index.js",
+  "bin": {
+    "log-scan": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "keywords": ["log", "security", "scan", "cli", "脱敏"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}
