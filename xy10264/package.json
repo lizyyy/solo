@@ -1,0 +1,19 @@
+{
+  "name": "bnb-noise-complaint-api",
+  "version": "1.0.0",
+  "description": "民宿噪音投诉证据管理API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "seed:success": "node examples/success-flow.js",
+    "seed:intercept": "node examples/intercept-flow.js",
+    "test": "node examples/success-flow.js && node examples/intercept-flow.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "date-fns": "^3.0.6",
+    "csv-stringify": "^6.4.5"
+  }
+}
