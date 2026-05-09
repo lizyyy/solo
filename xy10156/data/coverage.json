@@ -1,0 +1,67 @@
+{
+  "items": [
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "AuthService",
+      "startLine": 1,
+      "endLine": 47,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "constructor",
+      "startLine": 2,
+      "endLine": 4,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "login",
+      "startLine": 6,
+      "endLine": 18,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "if",
+      "startLine": 8,
+      "endLine": 10,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "register",
+      "startLine": 20,
+      "endLine": 34,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "verifyPassword",
+      "startLine": 36,
+      "endLine": 38,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "hashPassword",
+      "startLine": 40,
+      "endLine": 42,
+      "testCases": []
+    },
+    {
+      "path": "examples/src/authService.js",
+      "functionName": "generateToken",
+      "startLine": 44,
+      "endLine": 46,
+      "testCases": []
+    }
+  ],
+  "lastUpdated": "2026-05-09T14:12:54.242Z",
+  "stats": {
+    "totalFiles": 1,
+    "totalCodePaths": 8,
+    "linkedCodePaths": 0,
+    "parseErrors": 0
+  }
+}

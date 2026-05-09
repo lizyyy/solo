@@ -1,0 +1,19 @@
+{
+  "project": {
+    "name": "test-coverage-demo",
+    "description": "测试覆盖证据映射示例项目"
+  },
+  "paths": {
+    "requirements": "./data/requirements.json",
+    "testCases": "./data/test-cases.json",
+    "sourceCode": [
+      "./examples/src/**/*.js"
+    ],
+    "coverage": "./data/coverage.json",
+    "output": "./reports"
+  },
+  "mappings": {
+    "autoMatch": true,
+    "caseSensitive": false
+  }
+}

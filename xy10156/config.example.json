@@ -1,0 +1,20 @@
+{
+  "project": {
+    "name": "my-project",
+    "description": "项目名称和描述"
+  },
+  "paths": {
+    "requirements": "./data/requirements.json",
+    "testCases": "./data/test-cases.json",
+    "sourceCode": [
+      "./src/**/*.js",
+      "./src/**/*.ts"
+    ],
+    "coverage": "./data/coverage.json",
+    "output": "./reports"
+  },
+  "mappings": {
+    "autoMatch": true,
+    "caseSensitive": false
+  }
+}

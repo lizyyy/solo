@@ -1,0 +1,37 @@
+[
+  {
+    "id": "REQ-001",
+    "title": "用户登录功能",
+    "description": "用户可以通过用户名和密码登录系统",
+    "status": "active",
+    "tags": ["authentication", "core"]
+  },
+  {
+    "id": "REQ-002",
+    "title": "用户注册功能",
+    "description": "新用户可以创建账户",
+    "status": "active",
+    "tags": ["authentication", "user-management"]
+  },
+  {
+    "id": "REQ-003",
+    "title": "密码重置功能",
+    "description": "用户可以通过邮箱重置密码",
+    "status": "active",
+    "tags": ["authentication", "security"]
+  },
+  {
+    "id": "REQ-004",
+    "title": "用户信息管理",
+    "description": "用户可以查看和编辑个人信息",
+    "status": "active",
+    "tags": ["user-management"]
+  },
+  {
+    "id": "REQ-005",
+    "title": "权限控制",
+    "description": "系统根据用户角色控制访问权限",
+    "status": "planned",
+    "tags": ["security", "authorization"]
+  }
+]

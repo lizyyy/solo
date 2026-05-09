@@ -1,0 +1,107 @@
+{
+  "items": [
+    {
+      "id": "TC-001",
+      "title": "验证正确的用户名和密码可以登录",
+      "description": "使用有效的用户名和密码进行登录测试",
+      "requirements": [
+        "REQ-001"
+      ],
+      "codePaths": [
+        "authService.js:login",
+        "userController.js:handleLogin"
+      ],
+      "status": "passed",
+      "lastRun": "2026-05-09T10:30:00Z"
+    },
+    {
+      "id": "TC-002",
+      "title": "验证错误的密码无法登录",
+      "description": "使用错误的密码进行登录测试，应该拒绝访问",
+      "requirements": [
+        "REQ-001"
+      ],
+      "codePaths": [
+        "authService.js:login",
+        "authService.js:verifyPassword"
+      ],
+      "status": "passed",
+      "lastRun": "2026-05-09T10:32:00Z"
+    },
+    {
+      "id": "TC-003",
+      "title": "验证新用户可以注册",
+      "description": "使用新的用户名和邮箱进行注册测试",
+      "requirements": [
+        "REQ-002"
+      ],
+      "codePaths": [
+        "authService.js:register",
+        "userController.js:handleRegister"
+      ],
+      "status": "passed",
+      "lastRun": "2026-05-09T10:35:00Z"
+    },
+    {
+      "id": "TC-004",
+      "title": "验证重复用户名无法注册",
+      "description": "使用已存在的用户名进行注册测试，应该失败",
+      "requirements": [
+        "REQ-002"
+      ],
+      "codePaths": [
+        "authService.js:register",
+        "userRepository.js:findByUsername"
+      ],
+      "status": "failed",
+      "lastRun": "2026-05-09T10:38:00Z"
+    },
+    {
+      "id": "TC-005",
+      "title": "验证密码重置流程",
+      "description": "测试通过邮箱请求密码重置链接",
+      "requirements": [
+        "REQ-003"
+      ],
+      "codePaths": [
+        "passwordService.js:requestReset",
+        "emailService.js:sendResetEmail"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "TC-006",
+      "title": "验证用户可以查看个人信息",
+      "description": "登录用户应该能够查看自己的个人信息",
+      "requirements": [
+        "REQ-004"
+      ],
+      "codePaths": [
+        "userService.js:getProfile",
+        "userController.js:getUserInfo"
+      ],
+      "status": "passed",
+      "lastRun": "2026-05-09T10:40:00Z"
+    },
+    {
+      "id": "TC-007",
+      "title": "验证用户可以编辑个人信息",
+      "description": "登录用户应该能够编辑自己的个人信息",
+      "requirements": [
+        "REQ-004"
+      ],
+      "codePaths": [
+        "userService.js:updateProfile",
+        "userController.js:updateUserInfo"
+      ],
+      "status": "pending"
+    }
+  ],
+  "lastUpdated": "2026-05-09T14:12:54.193Z",
+  "stats": {
+    "added": 7,
+    "updated": 0,
+    "skipped": 0,
+    "duplicates": 0
+  }
+}
