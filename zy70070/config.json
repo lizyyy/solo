@@ -1,0 +1,18 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "database": {
+    "path": "./data/dorm.db"
+  },
+  "logging": {
+    "level": "info",
+    "dir": "./logs"
+  },
+  "business": {
+    "approvalTimeoutHours": 48,
+    "defaultDormFee": 1200,
+    "feeRatePerDay": 40
+  }
+}
