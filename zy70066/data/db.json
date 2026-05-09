@@ -1,0 +1,363 @@
+{
+  "students": [
+    {
+      "studentNo": "202401001",
+      "name": "测试学生",
+      "gender": "男",
+      "grade": "2024",
+      "major": "计算机科学与技术",
+      "class": "1班",
+      "status": "active",
+      "id": 1001,
+      "createdAt": "2026-05-09T15:46:03.106Z",
+      "updatedAt": "2026-05-09T15:46:03.106Z"
+    }
+  ],
+  "feeItems": [
+    {
+      "code": "TUITION",
+      "name": "学费",
+      "defaultAmount": 8000,
+      "description": "",
+      "status": "active",
+      "id": 2001,
+      "createdAt": "2026-05-09T15:46:03.107Z",
+      "updatedAt": "2026-05-09T15:46:03.107Z"
+    },
+    {
+      "code": "ACCOMMODATION",
+      "name": "住宿费",
+      "defaultAmount": 1200,
+      "description": "",
+      "status": "active",
+      "id": 2002,
+      "createdAt": "2026-05-09T15:46:03.114Z",
+      "updatedAt": "2026-05-09T15:46:03.114Z"
+    }
+  ],
+  "deductionRules": [
+    {
+      "name": "国家一等奖学金",
+      "type": "scholarship",
+      "category": "general",
+      "deductionType": "percentage",
+      "amount": 0,
+      "percentage": 80,
+      "maxAmount": 10000,
+      "applicableFeeTypes": [
+        "TUITION"
+      ],
+      "priority": 1,
+      "description": "",
+      "status": "active",
+      "id": 3001,
+      "createdAt": "2026-05-09T15:46:03.108Z",
+      "updatedAt": "2026-05-09T15:46:03.108Z"
+    },
+    {
+      "name": "困难补助",
+      "type": "hardship",
+      "category": "general",
+      "deductionType": "fixed",
+      "amount": 3000,
+      "percentage": 0,
+      "maxAmount": null,
+      "applicableFeeTypes": [],
+      "priority": 10,
+      "description": "",
+      "status": "active",
+      "id": 3002,
+      "createdAt": "2026-05-09T15:46:03.108Z",
+      "updatedAt": "2026-05-09T15:46:03.108Z"
+    },
+    {
+      "name": "三等奖学金",
+      "type": "scholarship",
+      "category": "general",
+      "deductionType": "percentage",
+      "amount": 0,
+      "percentage": 30,
+      "maxAmount": null,
+      "applicableFeeTypes": [
+        "TUITION"
+      ],
+      "priority": 1,
+      "description": "",
+      "status": "active",
+      "id": 3003,
+      "createdAt": "2026-05-09T15:46:03.108Z",
+      "updatedAt": "2026-05-09T15:46:03.108Z"
+    },
+    {
+      "name": "一般困难补助",
+      "type": "hardship",
+      "category": "general",
+      "deductionType": "fixed",
+      "amount": 2000,
+      "percentage": 0,
+      "maxAmount": null,
+      "applicableFeeTypes": [],
+      "priority": 10,
+      "description": "",
+      "status": "active",
+      "id": 3004,
+      "createdAt": "2026-05-09T15:46:03.109Z",
+      "updatedAt": "2026-05-09T15:46:03.109Z"
+    }
+  ],
+  "studentDeductions": [],
+  "arrearRecords": [
+    {
+      "studentId": 1001,
+      "feeTypeId": 2001,
+      "feeTypeName": "学费",
+      "originalAmount": 8000,
+      "deductionAmount": 4400,
+      "totalAmount": 3600,
+      "paidAmount": 3600,
+      "remainingAmount": 0,
+      "status": "paid",
+      "academicYear": "2024-2025",
+      "semester": "1",
+      "remark": "",
+      "id": 5001,
+      "createdAt": "2026-05-09T15:46:03.109Z",
+      "updatedAt": "2026-05-09T15:46:03.114Z",
+      "installmentPlanId": 6001
+    },
+    {
+      "studentId": 1001,
+      "feeTypeId": 2002,
+      "feeTypeName": "住宿费",
+      "originalAmount": 1200,
+      "deductionAmount": 0,
+      "totalAmount": 1200,
+      "paidAmount": 0,
+      "remainingAmount": 1200,
+      "status": "frozen",
+      "academicYear": "2024-2025",
+      "semester": "1",
+      "remark": "",
+      "id": 5002,
+      "createdAt": "2026-05-09T15:46:03.114Z",
+      "updatedAt": "2026-05-09T15:46:03.116Z",
+      "approvalStatus": "approved",
+      "approvalProcessId": 7001,
+      "frozenAt": "2026-05-09T15:46:03.116Z"
+    },
+    {
+      "studentId": 1001,
+      "feeTypeId": 2001,
+      "feeTypeName": "学费",
+      "originalAmount": 5000,
+      "deductionAmount": 0,
+      "totalAmount": 5000,
+      "paidAmount": 5100,
+      "remainingAmount": 0,
+      "status": "paid",
+      "academicYear": "2023-2024",
+      "semester": "2",
+      "remark": "",
+      "id": 5003,
+      "createdAt": "2026-05-09T15:46:03.116Z",
+      "updatedAt": "2026-05-09T15:46:03.117Z"
+    },
+    {
+      "studentId": 1001,
+      "feeTypeId": 2001,
+      "feeTypeName": "学费",
+      "originalAmount": 1000,
+      "deductionAmount": 1000,
+      "totalAmount": 0,
+      "paidAmount": 0,
+      "remainingAmount": 0,
+      "status": "paid",
+      "academicYear": "2024-2025",
+      "semester": "2",
+      "remark": "",
+      "id": 5004,
+      "createdAt": "2026-05-09T15:46:03.118Z",
+      "updatedAt": "2026-05-09T15:46:03.119Z"
+    }
+  ],
+  "installmentPlans": [
+    {
+      "arrearId": 5001,
+      "studentId": 1001,
+      "totalAmount": 3600,
+      "installmentCount": 3,
+      "installments": [
+        {
+          "period": 1,
+          "amount": 1200,
+          "paidAmount": 1200,
+          "status": "paid",
+          "dueDate": "2026-06-01T15:46:03.112Z",
+          "paidAt": "2026-05-09T15:46:03.112Z"
+        },
+        {
+          "period": 2,
+          "amount": 1200,
+          "paidAmount": 1200,
+          "status": "paid",
+          "dueDate": "2026-07-01T15:46:03.112Z",
+          "paidAt": "2026-05-09T15:46:03.113Z"
+        },
+        {
+          "period": 3,
+          "amount": 1200,
+          "paidAmount": 1200,
+          "status": "paid",
+          "dueDate": "2026-08-01T15:46:03.112Z",
+          "paidAt": "2026-05-09T15:46:03.113Z"
+        }
+      ],
+      "status": "completed",
+      "description": "",
+      "id": 6001,
+      "createdAt": "2026-05-09T15:46:03.112Z",
+      "updatedAt": "2026-05-09T15:46:03.114Z"
+    }
+  ],
+  "approvalProcesses": [
+    {
+      "type": "arrear_freeze",
+      "studentId": 1001,
+      "relatedId": 5002,
+      "relatedType": "arrear",
+      "title": "住宿费缓缴申请",
+      "applicant": "测试学生",
+      "approver": "审批人",
+      "status": "approved",
+      "data": {},
+      "rejectReason": null,
+      "id": 7001,
+      "createdAt": "2026-05-09T15:46:03.115Z",
+      "updatedAt": "2026-05-09T15:46:03.116Z",
+      "approvedAt": "2026-05-09T15:46:03.116Z",
+      "approveRemark": "同意"
+    }
+  ],
+  "paymentRecords": [
+    {
+      "orderNo": "TEST_PAY_1778341563116",
+      "studentId": 1001,
+      "arrearId": 5003,
+      "amount": 5000,
+      "paymentMethod": "online",
+      "channel": "alipay",
+      "status": "success",
+      "paidAt": "2026-05-09T15:46:03.116Z",
+      "remark": "",
+      "callbackData": {
+        "success": true,
+        "amount": 5000
+      },
+      "id": 8001,
+      "createdAt": "2026-05-09T15:46:03.116Z",
+      "updatedAt": "2026-05-09T15:46:03.117Z",
+      "callbackAt": "2026-05-09T15:46:03.116Z",
+      "paidAmount": 5000
+    },
+    {
+      "orderNo": "FAILED_PAY_1778341563117",
+      "studentId": 1001,
+      "arrearId": 5003,
+      "amount": 100,
+      "paymentMethod": "online",
+      "channel": "wechat",
+      "status": "success",
+      "paidAt": "2026-05-09T15:46:03.117Z",
+      "remark": "",
+      "callbackData": {
+        "success": true,
+        "amount": 100
+      },
+      "id": 8002,
+      "createdAt": "2026-05-09T15:46:03.117Z",
+      "updatedAt": "2026-05-09T15:46:03.118Z",
+      "callbackAt": "2026-05-09T15:46:03.117Z",
+      "paidAmount": 100
+    },
+    {
+      "orderNo": "RECON_PAY_1778341563118",
+      "studentId": 1001,
+      "arrearId": 5004,
+      "amount": 0,
+      "paymentMethod": "online",
+      "channel": "alipay",
+      "status": "success",
+      "paidAt": "2026-05-09T15:46:03.119Z",
+      "remark": "",
+      "callbackData": {
+        "success": true,
+        "amount": 0
+      },
+      "id": 8003,
+      "createdAt": "2026-05-09T15:46:03.118Z",
+      "updatedAt": "2026-05-09T15:46:03.119Z",
+      "callbackAt": "2026-05-09T15:46:03.119Z",
+      "paidAmount": 0
+    }
+  ],
+  "reconciliationRecords": [
+    {
+      "reconciliationDate": "2026-05-09",
+      "channel": "alipay",
+      "totalAmount": null,
+      "totalCount": null,
+      "matchedAmount": 5000,
+      "matchedCount": 2,
+      "unmatchedAmount": 0,
+      "unmatchedCount": 0,
+      "status": "matched",
+      "matchedOrders": [
+        {
+          "orderNo": "TEST_PAY_1778341563116",
+          "amount": 5000
+        },
+        {
+          "orderNo": "RECON_PAY_1778341563118",
+          "amount": 0
+        }
+      ],
+      "unmatchedOrders": [],
+      "id": 9001,
+      "createdAt": "2026-05-09T15:46:03.119Z",
+      "updatedAt": "2026-05-09T15:46:03.119Z"
+    }
+  ],
+  "failedTasks": [
+    {
+      "type": "payment_callback",
+      "relatedId": 5003,
+      "errorMessage": "模拟失败",
+      "data": {
+        "orderNo": "FAILED_PAY_1778341563117",
+        "callbackData": {
+          "success": true,
+          "amount": 100
+        }
+      },
+      "retryCount": 1,
+      "status": "success",
+      "lastAttemptAt": "2026-05-09T15:46:03.117Z",
+      "id": 10001,
+      "createdAt": "2026-05-09T15:46:03.117Z",
+      "updatedAt": "2026-05-09T15:46:03.118Z",
+      "successAt": "2026-05-09T15:46:03.118Z"
+    }
+  ],
+  "idCounters": {
+    "students": 1002,
+    "feeItems": 2003,
+    "deductionRules": 3005,
+    "studentDeductions": 4001,
+    "arrearRecords": 5005,
+    "installmentPlans": 6002,
+    "approvalProcesses": 7002,
+    "paymentRecords": 8004,
+    "reconciliationRecords": 9002,
+    "failedTasks": 10002
+  }
+}
