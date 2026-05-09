@@ -1,0 +1,94 @@
+{
+  "records": [
+    {
+      "id": "db3ef140-1243-4c20-a602-2c1dd9e84afb",
+      "timestamp": "2026-05-09T15:05:07.484Z",
+      "lotNumber": "LOT-001",
+      "zone": "冷冻区",
+      "temperature": -20.5,
+      "recordTime": "2026-05-09 08:00:00",
+      "sensorId": "S001"
+    },
+    {
+      "id": "3ef166f4-c0f5-41b0-8569-82d54a80a304",
+      "timestamp": "2026-05-09T15:05:07.486Z",
+      "lotNumber": "LOT-001",
+      "zone": "冷冻区",
+      "temperature": -19.8,
+      "recordTime": "2026-05-09 10:00:00",
+      "sensorId": "S001"
+    },
+    {
+      "id": "ab0fc311-d24a-4996-8212-c1dec33eb124",
+      "timestamp": "2026-05-09T15:05:07.487Z",
+      "lotNumber": "LOT-001",
+      "zone": "冷藏区",
+      "temperature": 5,
+      "recordTime": "2026-05-09 15:00:00",
+      "sensorId": "S002"
+    },
+    {
+      "id": "81bcc392-44d3-4363-b94e-3ea6918eed06",
+      "timestamp": "2026-05-09T15:05:07.487Z",
+      "lotNumber": "LOT-001",
+      "zone": "冷冻区",
+      "temperature": -21.2,
+      "recordTime": "2026-05-09 17:00:00",
+      "sensorId": "S001"
+    },
+    {
+      "id": "0dd98d73-77b9-4407-bb51-11f32d104604",
+      "timestamp": "2026-05-09T15:05:07.488Z",
+      "lotNumber": "LOT-002",
+      "zone": "冷藏区",
+      "temperature": 6.5,
+      "recordTime": "2026-05-09 08:30:00",
+      "sensorId": "S003"
+    },
+    {
+      "id": "4b38b246-e140-45a0-81e4-6ca56fd5a788",
+      "timestamp": "2026-05-09T15:05:07.488Z",
+      "lotNumber": "LOT-002",
+      "zone": "冷藏区",
+      "temperature": 7.2,
+      "recordTime": "2026-05-09 10:30:00",
+      "sensorId": "S003"
+    },
+    {
+      "id": "a317695c-5fff-4a2e-8c38-1f5c95f66f27",
+      "timestamp": "2026-05-09T15:05:07.489Z",
+      "lotNumber": "LOT-002",
+      "zone": "冷藏区",
+      "temperature": 12,
+      "recordTime": "2026-05-09 14:30:00",
+      "sensorId": "S003"
+    },
+    {
+      "id": "a658fb7b-f2e7-4c5d-b263-6e881b94f9f4",
+      "timestamp": "2026-05-09T15:05:07.489Z",
+      "lotNumber": "LOT-003",
+      "zone": "保鲜区",
+      "temperature": 12,
+      "recordTime": "2026-05-09 09:00:00",
+      "sensorId": "S004"
+    },
+    {
+      "id": "f21aee2e-1c30-439c-a531-fe4fc6b68dcd",
+      "timestamp": "2026-05-09T15:05:07.489Z",
+      "lotNumber": "LOT-003",
+      "zone": "保鲜区",
+      "temperature": 11.5,
+      "recordTime": "2026-05-09 13:00:00",
+      "sensorId": "S004"
+    },
+    {
+      "id": "985de19c-fce1-448b-8061-e3b11c595ccc",
+      "timestamp": "2026-05-09T15:05:07.490Z",
+      "lotNumber": "LOT-004",
+      "zone": "常温区",
+      "temperature": 22.5,
+      "recordTime": "2026-05-09 10:00:00",
+      "sensorId": "S005"
+    }
+  ]
+}

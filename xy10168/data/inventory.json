@@ -1,0 +1,298 @@
+{
+  "lots": [
+    {
+      "id": "edafdb49-d29a-4fcb-aa17-8033cd95941b",
+      "lotNumber": "LOT-001",
+      "productName": "冷冻牛排",
+      "zone": "冷藏区",
+      "quantity": 60,
+      "unit": "箱",
+      "entryDate": "2026-05-01 10:00:00",
+      "expiryDate": "2026-12-31",
+      "createdAt": "2026-05-09T15:04:52.746Z",
+      "updatedAt": "2026-05-09T15:05:58.997Z",
+      "updateSource": "WMS系统",
+      "version": 3,
+      "history": [
+        {
+          "timestamp": "2026-05-09T15:04:52.746Z",
+          "data": {
+            "id": "edafdb49-d29a-4fcb-aa17-8033cd95941b",
+            "lotNumber": "LOT-001",
+            "productName": "冷冻牛排",
+            "zone": "冷冻区",
+            "quantity": 50,
+            "unit": "箱",
+            "entryDate": "2026-05-01 10:00:00",
+            "expiryDate": "2026-12-31",
+            "createdAt": "2026-05-09T15:04:52.746Z",
+            "updatedAt": "2026-05-09T15:04:52.746Z",
+            "updateSource": "WMS系统",
+            "version": 1,
+            "history": []
+          }
+        },
+        {
+          "timestamp": "2026-05-09T15:05:14.678Z",
+          "data": {
+            "id": "edafdb49-d29a-4fcb-aa17-8033cd95941b",
+            "lotNumber": "LOT-001",
+            "productName": "冷冻牛排",
+            "zone": "冷冻区",
+            "quantity": 50,
+            "unit": "箱",
+            "entryDate": "2026-05-01 10:00:00",
+            "expiryDate": "2026-12-31",
+            "createdAt": "2026-05-09T15:04:52.746Z",
+            "updatedAt": "2026-05-09T15:05:14.678Z",
+            "updateSource": "人工盘点",
+            "version": 2,
+            "history": [
+              {
+                "timestamp": "2026-05-09T15:04:52.746Z",
+                "data": {
+                  "id": "edafdb49-d29a-4fcb-aa17-8033cd95941b",
+                  "lotNumber": "LOT-001",
+                  "productName": "冷冻牛排",
+                  "zone": "冷冻区",
+                  "quantity": 50,
+                  "unit": "箱",
+                  "entryDate": "2026-05-01 10:00:00",
+                  "expiryDate": "2026-12-31",
+                  "createdAt": "2026-05-09T15:04:52.746Z",
+                  "updatedAt": "2026-05-09T15:04:52.746Z",
+                  "updateSource": "WMS系统",
+                  "version": 1,
+                  "history": []
+                }
+              }
+            ],
+            "lastCounted": {
+              "quantity": 45,
+              "zone": "冷冻区",
+              "countedBy": "张三",
+              "countedAt": "2026-05-09 16:00:00",
+              "source": "人工盘点"
+            }
+          }
+        }
+      ],
+      "lastCounted": {
+        "quantity": 45,
+        "zone": "冷冻区",
+        "countedBy": "张三",
+        "countedAt": "2026-05-09 16:00:00",
+        "source": "人工盘点"
+      }
+    },
+    {
+      "id": "0211beb8-0826-4247-b129-aba038efa66f",
+      "lotNumber": "LOT-002",
+      "productName": "冷藏牛奶",
+      "zone": "冷藏区",
+      "quantity": 120,
+      "unit": "箱",
+      "entryDate": "2026-05-05 09:30:00",
+      "expiryDate": "2026-06-01",
+      "createdAt": "2026-05-09T15:04:52.747Z",
+      "updatedAt": "2026-05-09T15:05:59.000Z",
+      "updateSource": "WMS系统",
+      "version": 3,
+      "history": [
+        {
+          "timestamp": "2026-05-09T15:04:52.747Z",
+          "data": {
+            "id": "0211beb8-0826-4247-b129-aba038efa66f",
+            "lotNumber": "LOT-002",
+            "productName": "冷藏牛奶",
+            "zone": "冷藏区",
+            "quantity": 100,
+            "unit": "箱",
+            "entryDate": "2026-05-05 09:30:00",
+            "expiryDate": "2026-06-01",
+            "createdAt": "2026-05-09T15:04:52.747Z",
+            "updatedAt": "2026-05-09T15:04:52.747Z",
+            "updateSource": "WMS系统",
+            "version": 1,
+            "history": []
+          }
+        },
+        {
+          "timestamp": "2026-05-09T15:05:14.678Z",
+          "data": {
+            "id": "0211beb8-0826-4247-b129-aba038efa66f",
+            "lotNumber": "LOT-002",
+            "productName": "冷藏牛奶",
+            "zone": "冷藏区",
+            "quantity": 100,
+            "unit": "箱",
+            "entryDate": "2026-05-05 09:30:00",
+            "expiryDate": "2026-06-01",
+            "createdAt": "2026-05-09T15:04:52.747Z",
+            "updatedAt": "2026-05-09T15:05:14.678Z",
+            "updateSource": "人工盘点",
+            "version": 2,
+            "history": [
+              {
+                "timestamp": "2026-05-09T15:04:52.747Z",
+                "data": {
+                  "id": "0211beb8-0826-4247-b129-aba038efa66f",
+                  "lotNumber": "LOT-002",
+                  "productName": "冷藏牛奶",
+                  "zone": "冷藏区",
+                  "quantity": 100,
+                  "unit": "箱",
+                  "entryDate": "2026-05-05 09:30:00",
+                  "expiryDate": "2026-06-01",
+                  "createdAt": "2026-05-09T15:04:52.747Z",
+                  "updatedAt": "2026-05-09T15:04:52.747Z",
+                  "updateSource": "WMS系统",
+                  "version": 1,
+                  "history": []
+                }
+              }
+            ],
+            "lastCounted": {
+              "quantity": 100,
+              "zone": "冷藏区",
+              "countedBy": "张三",
+              "countedAt": "2026-05-09 16:15:00",
+              "source": "人工盘点"
+            }
+          }
+        }
+      ],
+      "lastCounted": {
+        "quantity": 100,
+        "zone": "冷藏区",
+        "countedBy": "张三",
+        "countedAt": "2026-05-09 16:15:00",
+        "source": "人工盘点"
+      }
+    },
+    {
+      "id": "4dbb4dfe-d17f-4924-b39e-c511a5fc8ad8",
+      "lotNumber": "LOT-003",
+      "productName": "新鲜蔬菜",
+      "zone": "保鲜区",
+      "quantity": 80,
+      "unit": "箱",
+      "entryDate": "2026-05-07 14:20:00",
+      "expiryDate": "2026-05-15",
+      "createdAt": "2026-05-09T15:04:52.751Z",
+      "updatedAt": "2026-05-09T15:05:14.678Z",
+      "updateSource": "人工盘点",
+      "version": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-09T15:04:52.751Z",
+          "data": {
+            "id": "4dbb4dfe-d17f-4924-b39e-c511a5fc8ad8",
+            "lotNumber": "LOT-003",
+            "productName": "新鲜蔬菜",
+            "zone": "保鲜区",
+            "quantity": 80,
+            "unit": "箱",
+            "entryDate": "2026-05-07 14:20:00",
+            "expiryDate": "2026-05-15",
+            "createdAt": "2026-05-09T15:04:52.751Z",
+            "updatedAt": "2026-05-09T15:04:52.751Z",
+            "updateSource": "WMS系统",
+            "version": 1,
+            "history": []
+          }
+        }
+      ],
+      "lastCounted": {
+        "quantity": 75,
+        "zone": "冷藏区",
+        "countedBy": "李四",
+        "countedAt": "2026-05-09 16:30:00",
+        "source": "人工盘点"
+      }
+    },
+    {
+      "id": "f16af389-6b13-4cf5-bd9b-d7dd7af93176",
+      "lotNumber": "LOT-004",
+      "productName": "常温饮料",
+      "zone": "常温区",
+      "quantity": 200,
+      "unit": "箱",
+      "entryDate": "2026-04-15 11:00:00",
+      "expiryDate": "2027-04-15",
+      "createdAt": "2026-05-09T15:04:52.753Z",
+      "updatedAt": "2026-05-09T15:05:14.678Z",
+      "updateSource": "人工盘点",
+      "version": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-09T15:04:52.753Z",
+          "data": {
+            "id": "f16af389-6b13-4cf5-bd9b-d7dd7af93176",
+            "lotNumber": "LOT-004",
+            "productName": "常温饮料",
+            "zone": "常温区",
+            "quantity": 200,
+            "unit": "箱",
+            "entryDate": "2026-04-15 11:00:00",
+            "expiryDate": "2027-04-15",
+            "createdAt": "2026-05-09T15:04:52.753Z",
+            "updatedAt": "2026-05-09T15:04:52.753Z",
+            "updateSource": "WMS系统",
+            "version": 1,
+            "history": []
+          }
+        }
+      ],
+      "lastCounted": {
+        "quantity": 200,
+        "zone": "常温区",
+        "countedBy": "李四",
+        "countedAt": "2026-05-09 16:45:00",
+        "source": "人工盘点"
+      }
+    },
+    {
+      "id": "ac5b750d-dc85-44a3-bedc-e99a987cbabf",
+      "lotNumber": "LOT-005",
+      "productName": "冷冻海鲜",
+      "zone": "冷冻区",
+      "quantity": 30,
+      "unit": "箱",
+      "entryDate": "2026-05-03 16:45:00",
+      "expiryDate": "2026-10-01",
+      "createdAt": "2026-05-09T15:04:52.754Z",
+      "updatedAt": "2026-05-09T15:04:52.754Z",
+      "updateSource": "WMS系统",
+      "version": 1,
+      "history": []
+    },
+    {
+      "id": "0fefa9f2-71cf-4222-aaf3-8268cda59885",
+      "lotNumber": "LOT-006",
+      "productName": "冰淇淋",
+      "zone": "冷冻区",
+      "quantity": 25,
+      "unit": "箱",
+      "entryDate": "2026-05-08 12:00:00",
+      "expiryDate": "2026-11-30",
+      "createdAt": "2026-05-09T15:05:59.001Z",
+      "updatedAt": "2026-05-09T15:05:59.001Z",
+      "updateSource": "WMS系统",
+      "version": 1,
+      "history": []
+    }
+  ],
+  "crossZoneMovements": [
+    {
+      "id": "21fa73a6-673d-4fc3-94cc-ec894b1a3cea",
+      "timestamp": "2026-05-09T15:05:58.999Z",
+      "lotNumber": "LOT-001",
+      "fromZone": "冷冻区",
+      "toZone": "冷藏区",
+      "movementType": "wms_update",
+      "recordedAt": "2026-05-09T15:05:58.993Z",
+      "source": "WMS系统"
+    }
+  ]
+}

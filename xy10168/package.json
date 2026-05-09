@@ -1,0 +1,24 @@
+{
+  "name": "cold-storage-inventory-cli",
+  "version": "1.0.0",
+  "description": "仓储冷库温区盘点 CLI - 解决跨温区暂存的批号、温度记录和盘点数量管理",
+  "main": "bin/index.js",
+  "bin": {
+    "cold-inventory": "./bin/index.js"
+  },
+  "scripts": {
+    "start": "node bin/index.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["cold-storage", "inventory", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "dayjs": "^1.11.10",
+    "exceljs": "^4.4.0",
+    "uuid": "^9.0.1"
+  }
+}
