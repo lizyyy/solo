@@ -1,0 +1,134 @@
+{
+  "description": "异常样例 - 包含死信、重复消费、永久失败等异常场景",
+  "messages": [
+    {
+      "id": "msg-dead-001",
+      "topic": "payment.reconciliation",
+      "payload": {
+        "order_id": "ORD-PAY-001",
+        "transaction_id": "TXN-20240115-0001",
+        "amount": 2999.00,
+        "currency": "CNY"
+      },
+      "status": "dead_letter",
+      "retry_count": 5,
+      "max_retries": 5,
+      "last_error_message": "Connection refused to reconciliation-service:8443",
+      "error_category": "network_error",
+      "idempotent_key": "reconcile:ORD-PAY-001"
+    },
+    {
+      "id": "msg-dead-002",
+      "topic": "order.confirm",
+      "payload": {
+        "order_id": "ORD-2024-DEAD-001",
+        "user_id": "user-999",
+        "confirm_status": "delivered"
+      },
+      "status": "dead_letter",
+      "retry_count": 3,
+      "max_retries": 3,
+      "last_error_message": "订单状态验证失败: 订单已取消，无法确认收货",
+      "error_category": "business_error",
+      "idempotent_key": "confirm:ORD-2024-DEAD-001"
+    },
+    {
+      "id": "msg-dead-003",
+      "topic": "coupon.redeem",
+      "payload": {
+        "coupon_code": "INVALID-CODE-001",
+        "user_id": "user-888"
+      },
+      "status": "dead_letter",
+      "retry_count": 2,
+      "max_retries": 3,
+      "last_error_message": "优惠券不存在或已过期",
+      "error_category": "validation_error",
+      "idempotent_key": "redeem:INVALID-CODE-001:user-888"
+    },
+    {
+      "id": "msg-dup-001",
+      "topic": "order.create",
+      "payload": {
+        "order_id": "ORD-DUP-001",
+        "user_id": "user-555",
+        "items": [{"sku": "SKU-DUP", "qty": 1}]
+      },
+      "status": "success",
+      "retry_count": 0,
+      "max_retries": 3,
+      "idempotent_key": "create-order:ORD-DUP-001"
+    },
+    {
+      "id": "msg-dup-002",
+      "topic": "order.create",
+      "payload": {
+        "order_id": "ORD-DUP-001",
+        "user_id": "user-555",
+        "items": [{"sku": "SKU-DUP", "qty": 1}]
+      },
+      "status": "dead_letter",
+      "retry_count": 3,
+      "max_retries": 3,
+      "last_error_message": "订单已存在: ORD-DUP-001",
+      "error_category": "business_error",
+      "idempotent_key": "create-order:ORD-DUP-001"
+    },
+    {
+      "id": "msg-dup-003",
+      "topic": "order.create",
+      "payload": {
+        "order_id": "ORD-DUP-001",
+        "user_id": "user-555",
+        "items": [{"sku": "SKU-DUP", "qty": 1}]
+      },
+      "status": "pending",
+      "retry_count": 1,
+      "max_retries": 3,
+      "last_error_message": "重复提交，正在验证幂等性",
+      "idempotent_key": "create-order:ORD-DUP-001"
+    },
+    {
+      "id": "msg-perm-001",
+      "topic": "external.api.call",
+      "payload": {
+        "api_name": "third_party_shipping",
+        "params": {"tracking_no": "SF1234567890"}
+      },
+      "status": "dead_letter",
+      "retry_count": 5,
+      "max_retries": 5,
+      "last_error_message": "403 Forbidden: Invalid API key",
+      "error_category": "permission_error",
+      "idempotent_key": "api-call:SF1234567890"
+    },
+    {
+      "id": "msg-data-001",
+      "topic": "data.sync",
+      "payload": {
+        "source": "legacy_system",
+        "raw_data": "{invalid json structure..."
+      },
+      "status": "dead_letter",
+      "retry_count": 3,
+      "max_retries": 3,
+      "last_error_message": "JSON parse error: Invalid control character",
+      "error_category": "data_error",
+      "idempotent_key": "sync:legacy_system:20240115"
+    },
+    {
+      "id": "msg-unknown-001",
+      "topic": "risk.assessment",
+      "payload": {
+        "user_id": "user-UNKNOWN",
+        "action": "high_value_purchase"
+      },
+      "status": "dead_letter",
+      "retry_count": 5,
+      "max_retries": 5,
+      "last_error_message": "Internal server error: NullPointerException at line 42",
+      "error_category": "system_error",
+      "idempotent_key": "risk:user-UNKNOWN:high_value_purchase"
+    }
+  ]
+}

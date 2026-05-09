@@ -1,0 +1,82 @@
+{
+  "description": "正常样例 - 包含成功、待处理、重试中的消息",
+  "messages": [
+    {
+      "id": "msg-success-001",
+      "topic": "order.payment.success",
+      "payload": {
+        "order_id": "ORD-20240001",
+        "user_id": "user-123",
+        "amount": 199.00,
+        "payment_method": "alipay",
+        "timestamp": "2024-01-15T10:30:00"
+      },
+      "status": "success",
+      "retry_count": 0,
+      "max_retries": 3,
+      "idempotent_key": "payment:ORD-20240001:199.00"
+    },
+    {
+      "id": "msg-success-002",
+      "topic": "user.notification.send",
+      "payload": {
+        "user_id": "user-456",
+        "notification_type": "sms",
+        "template_id": "tpl-welcome",
+        "params": {
+          "username": "张三",
+          "product": "会员服务"
+        }
+      },
+      "status": "success",
+      "retry_count": 0,
+      "max_retries": 3,
+      "idempotent_key": "notify:user-456:tpl-welcome"
+    },
+    {
+      "id": "msg-pending-001",
+      "topic": "inventory.deduct",
+      "payload": {
+        "order_id": "ORD-20240002",
+        "items": [
+          {"sku": "SKU-001", "qty": 2},
+          {"sku": "SKU-002", "qty": 1}
+        ],
+        "warehouse_id": "WH-BJ-01"
+      },
+      "status": "pending",
+      "retry_count": 0,
+      "max_retries": 3,
+      "idempotent_key": "inventory:ORD-20240002"
+    },
+    {
+      "id": "msg-pending-002",
+      "topic": "coupon.issue",
+      "payload": {
+        "user_id": "user-789",
+        "coupon_template_id": "CP-NEWYEAR-2024",
+        "source": "promotion"
+      },
+      "status": "pending",
+      "retry_count": 0,
+      "max_retries": 5,
+      "idempotent_key": "coupon:user-789:CP-NEWYEAR-2024"
+    },
+    {
+      "id": "msg-retrying-001",
+      "topic": "points.earn",
+      "payload": {
+        "user_id": "user-111",
+        "order_id": "ORD-20240003",
+        "points": 199,
+        "rule_id": "rule-order-points"
+      },
+      "status": "retrying",
+      "retry_count": 1,
+      "max_retries": 3,
+      "last_error_message": "连接超时: Connection refused to points-service:8080",
+      "error_category": "timeout",
+      "idempotent_key": "points:ORD-20240003"
+    }
+  ]
+}

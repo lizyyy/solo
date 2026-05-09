@@ -1,0 +1,3 @@
+[console_scripts]
+qi = queue_inspector.cli:cli
+queue-inspector = queue_inspector.cli:cli
