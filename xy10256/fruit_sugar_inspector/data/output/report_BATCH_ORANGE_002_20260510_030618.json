@@ -1,0 +1,2759 @@
+{
+  "report_id": "RPT_BATCH_ORANGE_002_20260510_030618",
+  "generated_at": "2026-05-10T03:06:18.167379",
+  "batch_info": {
+    "batch_id": "BATCH_ORANGE_002",
+    "fruit_type": "orange",
+    "batch_size": 2000,
+    "production_date": "2026-05-08",
+    "source_farm": "orange_farm_002"
+  },
+  "validation_result": {
+    "valid": true,
+    "errors": [],
+    "summary": {
+      "batch_id": "BATCH_ORANGE_002",
+      "fruit_type": "orange",
+      "batch_size": 2000,
+      "production_date": "2026-05-08",
+      "source_farm": "orange_farm_002",
+      "import_time": "2026-05-10T03:06:18.163023",
+      "total_measurements": 2000,
+      "sugar_min": 8.5,
+      "sugar_max": 11.0,
+      "sugar_avg": 10.113799999999994
+    }
+  },
+  "sampling_info": {
+    "batch_size": 2000,
+    "sample_size": 100,
+    "sample_ratio": 0.05,
+    "meets_min_requirement": true,
+    "meets_recommended": true,
+    "min_required": 30,
+    "recommended": 50
+  },
+  "sampling_statistics": {
+    "sample_count": 100,
+    "sugar_min": 8.5,
+    "sugar_max": 11.0,
+    "sugar_avg": 9.751000000000005,
+    "sugar_variance": 0.45444343434343476,
+    "sample_ids": [
+      "SBATCH_ORANGE_002_0217",
+      "SBATCH_ORANGE_002_0786",
+      "SBATCH_ORANGE_002_0321",
+      "SBATCH_ORANGE_002_1269",
+      "SBATCH_ORANGE_002_1983",
+      "SBATCH_ORANGE_002_0375",
+      "SBATCH_ORANGE_002_0174",
+      "SBATCH_ORANGE_002_1174",
+      "SBATCH_ORANGE_002_1696",
+      "SBATCH_ORANGE_002_1771",
+      "SBATCH_ORANGE_002_1008",
+      "SBATCH_ORANGE_002_1043",
+      "SBATCH_ORANGE_002_1986",
+      "SBATCH_ORANGE_002_0507",
+      "SBATCH_ORANGE_002_0468",
+      "SBATCH_ORANGE_002_1012",
+      "SBATCH_ORANGE_002_1894",
+      "SBATCH_ORANGE_002_1874",
+      "SBATCH_ORANGE_002_0737",
+      "SBATCH_ORANGE_002_0547",
+      "SBATCH_ORANGE_002_0027",
+      "SBATCH_ORANGE_002_1374",
+      "SBATCH_ORANGE_002_1981",
+      "SBATCH_ORANGE_002_1170",
+      "SBATCH_ORANGE_002_0286",
+      "SBATCH_ORANGE_002_0032",
+      "SBATCH_ORANGE_002_0957",
+      "SBATCH_ORANGE_002_1382",
+      "SBATCH_ORANGE_002_0371",
+      "SBATCH_ORANGE_002_0199",
+      "SBATCH_ORANGE_002_0330",
+      "SBATCH_ORANGE_002_0478",
+      "SBATCH_ORANGE_002_0433",
+      "SBATCH_ORANGE_002_1860",
+      "SBATCH_ORANGE_002_0031",
+      "SBATCH_ORANGE_002_0692",
+      "SBATCH_ORANGE_002_1029",
+      "SBATCH_ORANGE_002_1364",
+      "SBATCH_ORANGE_002_1132",
+      "SBATCH_ORANGE_002_0630",
+      "SBATCH_ORANGE_002_1115",
+      "SBATCH_ORANGE_002_0079",
+      "SBATCH_ORANGE_002_1801",
+      "SBATCH_ORANGE_002_0731",
+      "SBATCH_ORANGE_002_0828",
+      "SBATCH_ORANGE_002_1243",
+      "SBATCH_ORANGE_002_1905",
+      "SBATCH_ORANGE_002_1140",
+      "SBATCH_ORANGE_002_0479",
+      "SBATCH_ORANGE_002_1958",
+      "SBATCH_ORANGE_002_1457",
+      "SBATCH_ORANGE_002_1528",
+      "SBATCH_ORANGE_002_1252",
+      "SBATCH_ORANGE_002_1346",
+      "SBATCH_ORANGE_002_1923",
+      "SBATCH_ORANGE_002_0760",
+      "SBATCH_ORANGE_002_0019",
+      "SBATCH_ORANGE_002_0952",
+      "SBATCH_ORANGE_002_1540",
+      "SBATCH_ORANGE_002_1214",
+      "SBATCH_ORANGE_002_1035",
+      "SBATCH_ORANGE_002_1616",
+      "SBATCH_ORANGE_002_1285",
+      "SBATCH_ORANGE_002_1527",
+      "SBATCH_ORANGE_002_1885",
+      "SBATCH_ORANGE_002_1583",
+      "SBATCH_ORANGE_002_1256",
+      "SBATCH_ORANGE_002_1882",
+      "SBATCH_ORANGE_002_1767",
+      "SBATCH_ORANGE_002_1025",
+      "SBATCH_ORANGE_002_1101",
+      "SBATCH_ORANGE_002_1400",
+      "SBATCH_ORANGE_002_0891",
+      "SBATCH_ORANGE_002_0792",
+      "SBATCH_ORANGE_002_1080",
+      "SBATCH_ORANGE_002_0066",
+      "SBATCH_ORANGE_002_1802",
+      "SBATCH_ORANGE_002_1599",
+      "SBATCH_ORANGE_002_1353",
+      "SBATCH_ORANGE_002_0379",
+      "SBATCH_ORANGE_002_1529",
+      "SBATCH_ORANGE_002_1728",
+      "SBATCH_ORANGE_002_0176",
+      "SBATCH_ORANGE_002_1921",
+      "SBATCH_ORANGE_002_1026",
+      "SBATCH_ORANGE_002_1383",
+      "SBATCH_ORANGE_002_0549",
+      "SBATCH_ORANGE_002_0357",
+      "SBATCH_ORANGE_002_0702",
+      "SBATCH_ORANGE_002_0713",
+      "SBATCH_ORANGE_002_1167",
+      "SBATCH_ORANGE_002_0825",
+      "SBATCH_ORANGE_002_1873",
+      "SBATCH_ORANGE_002_0162",
+      "SBATCH_ORANGE_002_1520",
+      "SBATCH_ORANGE_002_0961",
+      "SBATCH_ORANGE_002_0817",
+      "SBATCH_ORANGE_002_1209",
+      "SBATCH_ORANGE_002_1646",
+      "SBATCH_ORANGE_002_0718"
+    ]
+  },
+  "classification_result": {
+    "batch_grade": "二级",
+    "confidence": 0.902,
+    "distribution": {
+      "二级": {
+        "count": 50,
+        "percentage": 0.5
+      },
+      "一级": {
+        "count": 50,
+        "percentage": 0.5
+      }
+    },
+    "total_samples": 100
+  },
+  "anomaly_detection": {
+    "anomalies": [
+      {
+        "type": "boundary_samples_detail",
+        "severity": "low",
+        "count": 48,
+        "samples": [
+          {
+            "sample_id": "SBATCH_ORANGE_002_0786",
+            "sugar": 8.6,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1983",
+            "sugar": 8.6,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1174",
+            "sugar": 8.6,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1894",
+            "sugar": 8.5,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0547",
+            "sugar": 8.7,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1374",
+            "sugar": 8.6,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1860",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0031",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0692",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1029",
+            "sugar": 9.9,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1364",
+            "sugar": 10.0,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1132",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0630",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0079",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1801",
+            "sugar": 10.0,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0731",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1243",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1905",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1140",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0479",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1958",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1457",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1528",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1252",
+            "sugar": 10.0,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1346",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1923",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0760",
+            "sugar": 10.0,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0019",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0952",
+            "sugar": 9.8,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1214",
+            "sugar": 9.9,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1035",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1616",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1285",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1527",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1885",
+            "sugar": 10.1,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1256",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1767",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1400",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0792",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1353",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0379",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1921",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1026",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1383",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0357",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1873",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_1209",
+            "sugar": 10.2,
+            "current_grade": "一级",
+            "boundary_details": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "sample_id": "SBATCH_ORANGE_002_0718",
+            "sugar": 8.6,
+            "current_grade": "二级",
+            "boundary_details": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          }
+        ],
+        "message": "详细边界样本信息"
+      }
+    ],
+    "warnings": [
+      {
+        "type": "confidence_low",
+        "severity": "medium",
+        "confidence": 0.902,
+        "threshold": 0.95,
+        "message": "分级置信度较低: 90.2%，建议增加抽样数量",
+        "action_required": "建议增加抽样或复核"
+      }
+    ],
+    "alerts": [
+      {
+        "type": "batch_mixing",
+        "severity": "high",
+        "mix_ratio": 0.5,
+        "threshold": 0.15,
+        "grade_distribution": {
+          "二级": 50,
+          "一级": 50
+        },
+        "variance": 0.45444343434343426,
+        "message": "检测到批次混入风险: 次要等级占比 50.0%，超过阈值 15%",
+        "action_required": "建议核查批次来源，确认是否存在混批情况"
+      },
+      {
+        "type": "grade_controversy",
+        "severity": "high",
+        "controversy_ratio": 0.48,
+        "threshold": 0.08,
+        "count": 48,
+        "samples": [
+          {
+            "id": "SBATCH_ORANGE_002_0786",
+            "sugar": 8.6,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1983",
+            "sugar": 8.6,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1174",
+            "sugar": 8.6,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1894",
+            "sugar": 8.5,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0547",
+            "sugar": 8.7,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1374",
+            "sugar": 8.6,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1860",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0031",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0692",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1029",
+            "sugar": 9.9,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1364",
+            "sugar": 10.0,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1132",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0630",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0079",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1801",
+            "sugar": 10.0,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0731",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1243",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1905",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1140",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0479",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1958",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1457",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1528",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1252",
+            "sugar": 10.0,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1346",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1923",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0760",
+            "sugar": 10.0,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.0
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.0
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0019",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0952",
+            "sugar": 9.8,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1214",
+            "sugar": 9.9,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1035",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1616",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1285",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1527",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1885",
+            "sugar": 10.1,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1256",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1767",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1400",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0792",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1353",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0379",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1921",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1026",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1383",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0357",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1873",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_1209",
+            "sugar": 10.2,
+            "grade": "一级",
+            "near_boundaries": [
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "min",
+                "adjacent_grade": "一级",
+                "distance": 0.1999999999999993
+              },
+              {
+                "boundary_value": 10.0,
+                "boundary_type": "max",
+                "adjacent_grade": "二级",
+                "distance": 0.1999999999999993
+              }
+            ]
+          },
+          {
+            "id": "SBATCH_ORANGE_002_0718",
+            "sugar": 8.6,
+            "grade": "二级",
+            "near_boundaries": [
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "min",
+                "adjacent_grade": "二级",
+                "distance": 0.09999999999999964
+              },
+              {
+                "boundary_value": 8.5,
+                "boundary_type": "max",
+                "adjacent_grade": "等外",
+                "distance": 0.09999999999999964
+              }
+            ]
+          }
+        ],
+        "message": "等级争议风险较高: 48 个样本靠近分级边界 (48.0%)",
+        "action_required": "建议对边界样本进行复核检测"
+      }
+    ],
+    "interception_needed": true,
+    "review_needed": true,
+    "overall_status": "intercepted"
+  },
+  "recommendations": [
+    "【紧急】批次检测存在严重问题，请立即暂停出货并进行全面复核",
+    "  - 建议核查批次来源，确认是否存在混批情况",
+    "  - 建议对边界样本进行复核检测"
+  ],
+  "classification_details": {
+    "total_samples": 100,
+    "sugar_statistics": {
+      "min": 8.5,
+      "max": 11.0,
+      "average": 9.751000000000005,
+      "range": 2.5
+    },
+    "samples": [
+      {
+        "id": "SBATCH_ORANGE_002_0217",
+        "sugar": 9.2,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0786",
+        "sugar": 8.6,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0321",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1269",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1983",
+        "sugar": 8.6,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0375",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0174",
+        "sugar": 9.3,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1174",
+        "sugar": 8.6,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1696",
+        "sugar": 9.3,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1771",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1008",
+        "sugar": 8.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1043",
+        "sugar": 8.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1986",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0507",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0468",
+        "sugar": 9.2,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1012",
+        "sugar": 8.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1894",
+        "sugar": 8.5,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1874",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0737",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0547",
+        "sugar": 8.7,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0027",
+        "sugar": 9.2,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1374",
+        "sugar": 8.6,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1981",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1170",
+        "sugar": 9.2,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0286",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0032",
+        "sugar": 9.1,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0957",
+        "sugar": 9.1,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1382",
+        "sugar": 9.2,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0371",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0199",
+        "sugar": 8.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0330",
+        "sugar": 9.0,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0478",
+        "sugar": 8.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0433",
+        "sugar": 8.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1860",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0031",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0692",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1029",
+        "sugar": 9.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1364",
+        "sugar": 10.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1132",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0630",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1115",
+        "sugar": 9.4,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0079",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1801",
+        "sugar": 10.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0731",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0828",
+        "sugar": 9.7,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1243",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1905",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1140",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0479",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1958",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1457",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1528",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1252",
+        "sugar": 10.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1346",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1923",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0760",
+        "sugar": 10.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0019",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0952",
+        "sugar": 9.8,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1540",
+        "sugar": 9.7,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1214",
+        "sugar": 9.9,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1035",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1616",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1285",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1527",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1885",
+        "sugar": 10.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1583",
+        "sugar": 9.4,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1256",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1882",
+        "sugar": 10.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1767",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1025",
+        "sugar": 10.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1101",
+        "sugar": 10.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1400",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0891",
+        "sugar": 10.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0792",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1080",
+        "sugar": 10.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0066",
+        "sugar": 10.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1802",
+        "sugar": 10.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1599",
+        "sugar": 10.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1353",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0379",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1529",
+        "sugar": 10.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1728",
+        "sugar": 10.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0176",
+        "sugar": 10.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1921",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1026",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1383",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0549",
+        "sugar": 10.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0357",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0702",
+        "sugar": 10.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0713",
+        "sugar": 11.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1167",
+        "sugar": 10.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0825",
+        "sugar": 10.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1873",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0162",
+        "sugar": 10.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1520",
+        "sugar": 10.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0961",
+        "sugar": 10.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0817",
+        "sugar": 10.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1209",
+        "sugar": 10.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": true
+      },
+      {
+        "id": "SBATCH_ORANGE_002_1646",
+        "sugar": 10.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_ORANGE_002_0718",
+        "sugar": 8.6,
+        "grade": "二级",
+        "is_valid": true,
+        "near_boundary": true
+      }
+    ]
+  },
+  "overall_conclusion": {
+    "status": "已拦截",
+    "status_code": "intercepted",
+    "grade": "二级",
+    "confidence": 0.902,
+    "can_ship": false,
+    "summary": "批次被拦截，存在严重质量风险。建议等级: 二级"
+  }
+}

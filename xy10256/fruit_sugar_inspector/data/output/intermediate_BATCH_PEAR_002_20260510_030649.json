@@ -1,0 +1,175 @@
+{
+  "batch_info": {
+    "batch_id": "BATCH_PEAR_002",
+    "fruit_type": "pear",
+    "batch_size": 1000,
+    "production_date": "2026-05-08",
+    "source_farm": "pear_farm_004",
+    "import_time": "2026-05-10T03:06:49.949909",
+    "total_measurements": 50,
+    "sugar_min": 11.5,
+    "sugar_max": 12.4,
+    "sugar_avg": 12.015999999999998
+  },
+  "sampling_info": {
+    "batch_size": 50,
+    "sample_size": 30,
+    "sample_ratio": 0.6,
+    "meets_min_requirement": true,
+    "meets_recommended": false,
+    "min_required": 30,
+    "recommended": 50
+  },
+  "selected_samples": [
+    {
+      "id": "SBATCH_PEAR_002_0003",
+      "sugar": 11.7,
+      "measurement_time": "2026-05-10 09:56:28"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0017",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 10:01:55"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0022",
+      "sugar": 11.7,
+      "measurement_time": "2026-05-10 17:37:03"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0034",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 17:47:05"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0035",
+      "sugar": 11.6,
+      "measurement_time": "2026-05-10 11:52:19"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0046",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 15:46:37"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0049",
+      "sugar": 11.6,
+      "measurement_time": "2026-05-10 17:01:47"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0002",
+      "sugar": 12.0,
+      "measurement_time": "2026-05-10 08:28:56"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0016",
+      "sugar": 12.0,
+      "measurement_time": "2026-05-10 16:30:18"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0004",
+      "sugar": 11.8,
+      "measurement_time": "2026-05-10 13:29:29"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0027",
+      "sugar": 11.8,
+      "measurement_time": "2026-05-10 12:21:15"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0047",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 18:41:54"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0007",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 13:44:02"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0050",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 10:23:25"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0021",
+      "sugar": 12.0,
+      "measurement_time": "2026-05-10 11:41:49"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0040",
+      "sugar": 12.0,
+      "measurement_time": "2026-05-10 18:56:20"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0028",
+      "sugar": 12.0,
+      "measurement_time": "2026-05-10 13:41:42"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0030",
+      "sugar": 12.4,
+      "measurement_time": "2026-05-10 18:08:26"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0048",
+      "sugar": 12.3,
+      "measurement_time": "2026-05-10 14:35:56"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0006",
+      "sugar": 12.4,
+      "measurement_time": "2026-05-10 14:15:25"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0015",
+      "sugar": 12.4,
+      "measurement_time": "2026-05-10 11:30:24"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0012",
+      "sugar": 12.3,
+      "measurement_time": "2026-05-10 13:08:37"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0043",
+      "sugar": 12.2,
+      "measurement_time": "2026-05-10 15:28:27"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0025",
+      "sugar": 12.3,
+      "measurement_time": "2026-05-10 13:25:22"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0038",
+      "sugar": 12.3,
+      "measurement_time": "2026-05-10 16:36:37"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0032",
+      "sugar": 12.4,
+      "measurement_time": "2026-05-10 18:48:00"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0011",
+      "sugar": 12.2,
+      "measurement_time": "2026-05-10 18:15:18"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0013",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 11:28:47"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0001",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 18:26:05"
+    },
+    {
+      "id": "SBATCH_PEAR_002_0029",
+      "sugar": 11.9,
+      "measurement_time": "2026-05-10 11:21:11"
+    }
+  ]
+}

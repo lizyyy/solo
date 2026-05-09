@@ -1,0 +1,886 @@
+{
+  "report_id": "RPT_BATCH_APPLE_001_20260510_030557",
+  "generated_at": "2026-05-10T03:05:57.733666",
+  "batch_info": {
+    "batch_id": "BATCH_APPLE_001",
+    "fruit_type": "apple",
+    "batch_size": 2000,
+    "production_date": "2026-05-08",
+    "source_farm": "apple_farm_001"
+  },
+  "validation_result": {
+    "valid": true,
+    "errors": [],
+    "summary": {
+      "batch_id": "BATCH_APPLE_001",
+      "fruit_type": "apple",
+      "batch_size": 2000,
+      "production_date": "2026-05-08",
+      "source_farm": "apple_farm_001",
+      "import_time": "2026-05-10T03:05:57.728950",
+      "total_measurements": 2000,
+      "sugar_min": 12.5,
+      "sugar_max": 13.5,
+      "sugar_avg": 13.010149999999967
+    }
+  },
+  "sampling_info": {
+    "batch_size": 2000,
+    "sample_size": 100,
+    "sample_ratio": 0.05,
+    "meets_min_requirement": true,
+    "meets_recommended": true,
+    "min_required": 30,
+    "recommended": 50
+  },
+  "sampling_statistics": {
+    "sample_count": 100,
+    "sugar_min": 12.5,
+    "sugar_max": 13.5,
+    "sugar_avg": 13.013000000000003,
+    "sugar_variance": 0.08417272727272727,
+    "sample_ids": [
+      "SBATCH_APPLE_001_0183",
+      "SBATCH_APPLE_001_0892",
+      "SBATCH_APPLE_001_0290",
+      "SBATCH_APPLE_001_1324",
+      "SBATCH_APPLE_001_0880",
+      "SBATCH_APPLE_001_0372",
+      "SBATCH_APPLE_001_0141",
+      "SBATCH_APPLE_001_1231",
+      "SBATCH_APPLE_001_1696",
+      "SBATCH_APPLE_001_1775",
+      "SBATCH_APPLE_001_1077",
+      "SBATCH_APPLE_001_1095",
+      "SBATCH_APPLE_001_0536",
+      "SBATCH_APPLE_001_0476",
+      "SBATCH_APPLE_001_1087",
+      "SBATCH_APPLE_001_1774",
+      "SBATCH_APPLE_001_1078",
+      "SBATCH_APPLE_001_0818",
+      "SBATCH_APPLE_001_0544",
+      "SBATCH_APPLE_001_0005",
+      "SBATCH_APPLE_001_1407",
+      "SBATCH_APPLE_001_1862",
+      "SBATCH_APPLE_001_1227",
+      "SBATCH_APPLE_001_0235",
+      "SBATCH_APPLE_001_0016",
+      "SBATCH_APPLE_001_1024",
+      "SBATCH_APPLE_001_1445",
+      "SBATCH_APPLE_001_0335",
+      "SBATCH_APPLE_001_0150",
+      "SBATCH_APPLE_001_0306",
+      "SBATCH_APPLE_001_0489",
+      "SBATCH_APPLE_001_0436",
+      "SBATCH_APPLE_001_0058",
+      "SBATCH_APPLE_001_0925",
+      "SBATCH_APPLE_001_1433",
+      "SBATCH_APPLE_001_1873",
+      "SBATCH_APPLE_001_1559",
+      "SBATCH_APPLE_001_0840",
+      "SBATCH_APPLE_001_1542",
+      "SBATCH_APPLE_001_0109",
+      "SBATCH_APPLE_001_0972",
+      "SBATCH_APPLE_001_1123",
+      "SBATCH_APPLE_001_1714",
+      "SBATCH_APPLE_001_1570",
+      "SBATCH_APPLE_001_0634",
+      "SBATCH_APPLE_001_1726",
+      "SBATCH_APPLE_001_1849",
+      "SBATCH_APPLE_001_1022",
+      "SBATCH_APPLE_001_0033",
+      "SBATCH_APPLE_001_1323",
+      "SBATCH_APPLE_001_1687",
+      "SBATCH_APPLE_001_1447",
+      "SBATCH_APPLE_001_1751",
+      "SBATCH_APPLE_001_1961",
+      "SBATCH_APPLE_001_1591",
+      "SBATCH_APPLE_001_1713",
+      "SBATCH_APPLE_001_1384",
+      "SBATCH_APPLE_001_1223",
+      "SBATCH_APPLE_001_1679",
+      "SBATCH_APPLE_001_0098",
+      "SBATCH_APPLE_001_0578",
+      "SBATCH_APPLE_001_0266",
+      "SBATCH_APPLE_001_1598",
+      "SBATCH_APPLE_001_0835",
+      "SBATCH_APPLE_001_0538",
+      "SBATCH_APPLE_001_1092",
+      "SBATCH_APPLE_001_0927",
+      "SBATCH_APPLE_001_1546",
+      "SBATCH_APPLE_001_1081",
+      "SBATCH_APPLE_001_0208",
+      "SBATCH_APPLE_001_1254",
+      "SBATCH_APPLE_001_1073",
+      "SBATCH_APPLE_001_1607",
+      "SBATCH_APPLE_001_0924",
+      "SBATCH_APPLE_001_0068",
+      "SBATCH_APPLE_001_0526",
+      "SBATCH_APPLE_001_1640",
+      "SBATCH_APPLE_001_0243",
+      "SBATCH_APPLE_001_1787",
+      "SBATCH_APPLE_001_1012",
+      "SBATCH_APPLE_001_0052",
+      "SBATCH_APPLE_001_0982",
+      "SBATCH_APPLE_001_0641",
+      "SBATCH_APPLE_001_1125",
+      "SBATCH_APPLE_001_1462",
+      "SBATCH_APPLE_001_1366",
+      "SBATCH_APPLE_001_0163",
+      "SBATCH_APPLE_001_1817",
+      "SBATCH_APPLE_001_0792",
+      "SBATCH_APPLE_001_1349",
+      "SBATCH_APPLE_001_1789",
+      "SBATCH_APPLE_001_0660",
+      "SBATCH_APPLE_001_1507",
+      "SBATCH_APPLE_001_1311",
+      "SBATCH_APPLE_001_0470",
+      "SBATCH_APPLE_001_0399",
+      "SBATCH_APPLE_001_1481",
+      "SBATCH_APPLE_001_1230",
+      "SBATCH_APPLE_001_1056",
+      "SBATCH_APPLE_001_1622"
+    ]
+  },
+  "classification_result": {
+    "batch_grade": "一级",
+    "confidence": 0.99,
+    "distribution": {
+      "一级": {
+        "count": 100,
+        "percentage": 1.0
+      }
+    },
+    "total_samples": 100
+  },
+  "anomaly_detection": {
+    "anomalies": [],
+    "warnings": [],
+    "alerts": [],
+    "interception_needed": false,
+    "review_needed": false,
+    "overall_status": "normal"
+  },
+  "recommendations": [
+    "批次检测通过，可正常进入下一道工序"
+  ],
+  "classification_details": {
+    "total_samples": 100,
+    "sugar_statistics": {
+      "min": 12.5,
+      "max": 13.5,
+      "average": 13.013000000000003,
+      "range": 1.0
+    },
+    "samples": [
+      {
+        "id": "SBATCH_APPLE_001_0183",
+        "sugar": 12.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0892",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0290",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1324",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0880",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0372",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0141",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1231",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1696",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1775",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1077",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1095",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0536",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0476",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1087",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1774",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1078",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0818",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0544",
+        "sugar": 12.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0005",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1407",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1862",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1227",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0235",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0016",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1024",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1445",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0335",
+        "sugar": 12.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0150",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0306",
+        "sugar": 12.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0489",
+        "sugar": 12.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0436",
+        "sugar": 12.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0058",
+        "sugar": 12.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0925",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1433",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1873",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1559",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0840",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1542",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0109",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0972",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1123",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1714",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1570",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0634",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1726",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1849",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1022",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0033",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1323",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1687",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1447",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1751",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1961",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1591",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1713",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1384",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1223",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1679",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0098",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0578",
+        "sugar": 13.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0266",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1598",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0835",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0538",
+        "sugar": 12.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1092",
+        "sugar": 13.1,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0927",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1546",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1081",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0208",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1254",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1073",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1607",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0924",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0068",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0526",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1640",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0243",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1787",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1012",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0052",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0982",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0641",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1125",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1462",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1366",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0163",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1817",
+        "sugar": 13.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0792",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1349",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1789",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0660",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1507",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1311",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0470",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_0399",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1481",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1230",
+        "sugar": 13.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1056",
+        "sugar": 13.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_APPLE_001_1622",
+        "sugar": 13.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      }
+    ]
+  },
+  "overall_conclusion": {
+    "status": "正常",
+    "status_code": "normal",
+    "grade": "一级",
+    "confidence": 0.99,
+    "can_ship": true,
+    "summary": "批次检测正常，建议等级: 一级 (置信度: 99.0%)"
+  }
+}

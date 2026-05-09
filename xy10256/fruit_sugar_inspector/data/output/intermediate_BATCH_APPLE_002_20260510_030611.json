@@ -1,0 +1,525 @@
+{
+  "batch_info": {
+    "batch_id": "BATCH_APPLE_002",
+    "fruit_type": "apple",
+    "batch_size": 2000,
+    "production_date": "2026-05-08",
+    "source_farm": "apple_farm_003",
+    "import_time": "2026-05-10T03:06:11.554908",
+    "total_measurements": 2000,
+    "sugar_min": 10.5,
+    "sugar_max": 16.5,
+    "sugar_avg": 14.179600000000008
+  },
+  "sampling_info": {
+    "batch_size": 2000,
+    "sample_size": 100,
+    "sample_ratio": 0.05,
+    "meets_min_requirement": true,
+    "meets_recommended": true,
+    "min_required": 30,
+    "recommended": 50
+  },
+  "selected_samples": [
+    {
+      "id": "SBATCH_APPLE_002_0159",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 11:12:19"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0893",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 17:58:46"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0283",
+      "sugar": 11.2,
+      "measurement_time": "2026-05-10 17:10:00"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1382",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 09:12:14"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0890",
+      "sugar": 10.8,
+      "measurement_time": "2026-05-10 11:43:07"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0372",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 16:03:06"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0101",
+      "sugar": 10.7,
+      "measurement_time": "2026-05-10 15:41:24"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1293",
+      "sugar": 10.8,
+      "measurement_time": "2026-05-10 16:25:30"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1892",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 17:53:03"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1976",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 17:33:20"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1138",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 11:25:51"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1167",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 13:31:40"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0542",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 09:20:05"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0461",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 08:11:34"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1155",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 11:26:12"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1970",
+      "sugar": 11.2,
+      "measurement_time": "2026-05-10 15:06:21"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1144",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 15:22:06"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0817",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 15:26:57"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0555",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 08:33:22"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0009",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 17:30:54"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1515",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 18:39:44"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1291",
+      "sugar": 11.2,
+      "measurement_time": "2026-05-10 13:21:04"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0204",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 09:29:54"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0024",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 14:14:42"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1077",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 15:24:39"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1566",
+      "sugar": 10.9,
+      "measurement_time": "2026-05-10 14:49:46"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0348",
+      "sugar": 10.6,
+      "measurement_time": "2026-05-10 15:31:10"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0121",
+      "sugar": 11.1,
+      "measurement_time": "2026-05-10 13:08:36"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0318",
+      "sugar": 10.6,
+      "measurement_time": "2026-05-10 13:26:55"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0487",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 15:10:10"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0446",
+      "sugar": 11.1,
+      "measurement_time": "2026-05-10 10:32:34"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0062",
+      "sugar": 11.3,
+      "measurement_time": "2026-05-10 11:24:02"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0982",
+      "sugar": 11.1,
+      "measurement_time": "2026-05-10 15:40:02"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1256",
+      "sugar": 16.0,
+      "measurement_time": "2026-05-10 13:47:40"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1658",
+      "sugar": 14.6,
+      "measurement_time": "2026-05-10 18:42:09"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1403",
+      "sugar": 16.2,
+      "measurement_time": "2026-05-10 08:08:19"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0790",
+      "sugar": 15.2,
+      "measurement_time": "2026-05-10 18:59:40"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1379",
+      "sugar": 15.7,
+      "measurement_time": "2026-05-10 08:06:24"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0120",
+      "sugar": 16.4,
+      "measurement_time": "2026-05-10 15:05:07"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0901",
+      "sugar": 16.0,
+      "measurement_time": "2026-05-10 12:53:33"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1011",
+      "sugar": 15.1,
+      "measurement_time": "2026-05-10 13:35:03"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1517",
+      "sugar": 15.3,
+      "measurement_time": "2026-05-10 14:21:03"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1420",
+      "sugar": 15.9,
+      "measurement_time": "2026-05-10 09:59:45"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0616",
+      "sugar": 15.8,
+      "measurement_time": "2026-05-10 14:02:49"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1767",
+      "sugar": 15.7,
+      "measurement_time": "2026-05-10 13:06:05"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1846",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 11:34:54"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1528",
+      "sugar": 14.9,
+      "measurement_time": "2026-05-10 15:05:05"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1633",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 12:02:38"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0935",
+      "sugar": 15.3,
+      "measurement_time": "2026-05-10 17:08:00"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0042",
+      "sugar": 16.3,
+      "measurement_time": "2026-05-10 15:54:43"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1164",
+      "sugar": 15.2,
+      "measurement_time": "2026-05-10 17:17:33"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1867",
+      "sugar": 14.8,
+      "measurement_time": "2026-05-10 16:10:17"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1494",
+      "sugar": 14.8,
+      "measurement_time": "2026-05-10 12:05:26"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1264",
+      "sugar": 15.9,
+      "measurement_time": "2026-05-10 15:18:01"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1982",
+      "sugar": 14.8,
+      "measurement_time": "2026-05-10 13:51:28"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1561",
+      "sugar": 15.9,
+      "measurement_time": "2026-05-10 08:29:01"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1845",
+      "sugar": 14.9,
+      "measurement_time": "2026-05-10 08:23:23"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1927",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 13:44:57"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1729",
+      "sugar": 15.1,
+      "measurement_time": "2026-05-10 13:14:16"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1426",
+      "sugar": 15.2,
+      "measurement_time": "2026-05-10 16:18:56"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1513",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 12:53:15"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1934",
+      "sugar": 16.3,
+      "measurement_time": "2026-05-10 10:24:55"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1225",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 15:28:15"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1097",
+      "sugar": 14.9,
+      "measurement_time": "2026-05-10 13:03:15"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1488",
+      "sugar": 14.8,
+      "measurement_time": "2026-05-10 13:43:38"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0108",
+      "sugar": 15.2,
+      "measurement_time": "2026-05-10 11:07:09"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1793",
+      "sugar": 14.7,
+      "measurement_time": "2026-05-10 11:41:19"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1598",
+      "sugar": 14.7,
+      "measurement_time": "2026-05-10 09:06:23"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1362",
+      "sugar": 14.7,
+      "measurement_time": "2026-05-10 11:01:31"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0386",
+      "sugar": 16.0,
+      "measurement_time": "2026-05-10 18:39:46"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1538",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 10:02:06"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1736",
+      "sugar": 16.5,
+      "measurement_time": "2026-05-10 12:33:20"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0179",
+      "sugar": 15.5,
+      "measurement_time": "2026-05-10 17:22:48"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1935",
+      "sugar": 16.3,
+      "measurement_time": "2026-05-10 09:01:41"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1026",
+      "sugar": 15.6,
+      "measurement_time": "2026-05-10 15:00:13"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1390",
+      "sugar": 11.2,
+      "measurement_time": "2026-05-10 09:49:01"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0556",
+      "sugar": 14.6,
+      "measurement_time": "2026-05-10 12:44:20"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0362",
+      "sugar": 16.3,
+      "measurement_time": "2026-05-10 11:02:21"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0706",
+      "sugar": 10.5,
+      "measurement_time": "2026-05-10 17:54:51"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0711",
+      "sugar": 14.6,
+      "measurement_time": "2026-05-10 15:56:56"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1171",
+      "sugar": 10.8,
+      "measurement_time": "2026-05-10 10:41:55"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0824",
+      "sugar": 14.9,
+      "measurement_time": "2026-05-10 12:17:49"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1871",
+      "sugar": 16.1,
+      "measurement_time": "2026-05-10 16:41:16"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0160",
+      "sugar": 14.9,
+      "measurement_time": "2026-05-10 14:13:41"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1532",
+      "sugar": 15.9,
+      "measurement_time": "2026-05-10 11:44:44"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0962",
+      "sugar": 16.4,
+      "measurement_time": "2026-05-10 08:41:54"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0815",
+      "sugar": 15.2,
+      "measurement_time": "2026-05-10 12:07:58"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1209",
+      "sugar": 14.8,
+      "measurement_time": "2026-05-10 08:43:30"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1649",
+      "sugar": 15.5,
+      "measurement_time": "2026-05-10 09:38:11"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0709",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 10:43:25"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0036",
+      "sugar": 15.4,
+      "measurement_time": "2026-05-10 17:27:25"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0402",
+      "sugar": 16.4,
+      "measurement_time": "2026-05-10 13:36:00"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1237",
+      "sugar": 11.1,
+      "measurement_time": "2026-05-10 08:37:40"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0190",
+      "sugar": 16.0,
+      "measurement_time": "2026-05-10 09:53:58"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1760",
+      "sugar": 14.6,
+      "measurement_time": "2026-05-10 10:25:22"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1327",
+      "sugar": 15.6,
+      "measurement_time": "2026-05-10 11:14:36"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0765",
+      "sugar": 11.0,
+      "measurement_time": "2026-05-10 12:20:55"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0029",
+      "sugar": 10.8,
+      "measurement_time": "2026-05-10 10:13:23"
+    },
+    {
+      "id": "SBATCH_APPLE_002_1897",
+      "sugar": 11.5,
+      "measurement_time": "2026-05-10 11:38:40"
+    },
+    {
+      "id": "SBATCH_APPLE_002_0741",
+      "sugar": 11.4,
+      "measurement_time": "2026-05-10 13:22:54"
+    }
+  ]
+}

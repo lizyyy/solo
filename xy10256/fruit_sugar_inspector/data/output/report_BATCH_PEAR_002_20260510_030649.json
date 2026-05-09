@@ -1,0 +1,335 @@
+{
+  "report_id": "RPT_BATCH_PEAR_002_20260510_030649",
+  "generated_at": "2026-05-10T03:06:49.950477",
+  "batch_info": {
+    "batch_id": "BATCH_PEAR_002",
+    "fruit_type": "pear",
+    "batch_size": 1000,
+    "production_date": "2026-05-08",
+    "source_farm": "pear_farm_004"
+  },
+  "validation_result": {
+    "valid": true,
+    "errors": [],
+    "summary": {
+      "batch_id": "BATCH_PEAR_002",
+      "fruit_type": "pear",
+      "batch_size": 1000,
+      "production_date": "2026-05-08",
+      "source_farm": "pear_farm_004",
+      "import_time": "2026-05-10T03:06:49.949909",
+      "total_measurements": 50,
+      "sugar_min": 11.5,
+      "sugar_max": 12.4,
+      "sugar_avg": 12.015999999999998
+    }
+  },
+  "sampling_info": {
+    "batch_size": 50,
+    "sample_size": 30,
+    "sample_ratio": 0.6,
+    "meets_min_requirement": true,
+    "meets_recommended": false,
+    "min_required": 30,
+    "recommended": 50
+  },
+  "sampling_statistics": {
+    "sample_count": 30,
+    "sugar_min": 11.5,
+    "sugar_max": 12.4,
+    "sugar_avg": 11.976666666666665,
+    "sugar_variance": 0.08460919540229896,
+    "sample_ids": [
+      "SBATCH_PEAR_002_0003",
+      "SBATCH_PEAR_002_0017",
+      "SBATCH_PEAR_002_0022",
+      "SBATCH_PEAR_002_0034",
+      "SBATCH_PEAR_002_0035",
+      "SBATCH_PEAR_002_0046",
+      "SBATCH_PEAR_002_0049",
+      "SBATCH_PEAR_002_0002",
+      "SBATCH_PEAR_002_0016",
+      "SBATCH_PEAR_002_0004",
+      "SBATCH_PEAR_002_0027",
+      "SBATCH_PEAR_002_0047",
+      "SBATCH_PEAR_002_0007",
+      "SBATCH_PEAR_002_0050",
+      "SBATCH_PEAR_002_0021",
+      "SBATCH_PEAR_002_0040",
+      "SBATCH_PEAR_002_0028",
+      "SBATCH_PEAR_002_0030",
+      "SBATCH_PEAR_002_0048",
+      "SBATCH_PEAR_002_0006",
+      "SBATCH_PEAR_002_0015",
+      "SBATCH_PEAR_002_0012",
+      "SBATCH_PEAR_002_0043",
+      "SBATCH_PEAR_002_0025",
+      "SBATCH_PEAR_002_0038",
+      "SBATCH_PEAR_002_0032",
+      "SBATCH_PEAR_002_0011",
+      "SBATCH_PEAR_002_0013",
+      "SBATCH_PEAR_002_0001",
+      "SBATCH_PEAR_002_0029"
+    ]
+  },
+  "classification_result": {
+    "batch_grade": "一级",
+    "confidence": 0.99,
+    "distribution": {
+      "一级": {
+        "count": 30,
+        "percentage": 1.0
+      }
+    },
+    "total_samples": 30
+  },
+  "anomaly_detection": {
+    "anomalies": [],
+    "warnings": [
+      {
+        "type": "sample_count_below_recommended",
+        "severity": "medium",
+        "message": "抽样数量低于推荐值: 实际 30 个，推荐 50 个",
+        "action_required": "可考虑增加抽样以提高置信度"
+      }
+    ],
+    "alerts": [],
+    "interception_needed": false,
+    "review_needed": true,
+    "overall_status": "needs_review"
+  },
+  "recommendations": [
+    "【建议】批次存在需要关注的问题，建议进行人工复核",
+    "  - 可考虑增加抽样以提高置信度",
+    "建议增加抽样数量以提高检测置信度"
+  ],
+  "classification_details": {
+    "total_samples": 30,
+    "sugar_statistics": {
+      "min": 11.5,
+      "max": 12.4,
+      "average": 11.976666666666665,
+      "range": 0.9000000000000004
+    },
+    "samples": [
+      {
+        "id": "SBATCH_PEAR_002_0003",
+        "sugar": 11.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0017",
+        "sugar": 11.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0022",
+        "sugar": 11.7,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0034",
+        "sugar": 11.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0035",
+        "sugar": 11.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0046",
+        "sugar": 11.5,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0049",
+        "sugar": 11.6,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0002",
+        "sugar": 12.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0016",
+        "sugar": 12.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0004",
+        "sugar": 11.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0027",
+        "sugar": 11.8,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0047",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0007",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0050",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0021",
+        "sugar": 12.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0040",
+        "sugar": 12.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0028",
+        "sugar": 12.0,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0030",
+        "sugar": 12.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0048",
+        "sugar": 12.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0006",
+        "sugar": 12.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0015",
+        "sugar": 12.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0012",
+        "sugar": 12.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0043",
+        "sugar": 12.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0025",
+        "sugar": 12.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0038",
+        "sugar": 12.3,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0032",
+        "sugar": 12.4,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0011",
+        "sugar": 12.2,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0013",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0001",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      },
+      {
+        "id": "SBATCH_PEAR_002_0029",
+        "sugar": 11.9,
+        "grade": "一级",
+        "is_valid": true,
+        "near_boundary": false
+      }
+    ]
+  },
+  "overall_conclusion": {
+    "status": "待复核",
+    "status_code": "needs_review",
+    "grade": "一级",
+    "confidence": 0.99,
+    "can_ship": false,
+    "summary": "批次需要人工复核。建议等级: 一级 (置信度: 99.0%)"
+  }
+}
