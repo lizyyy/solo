@@ -1,0 +1,458 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+#app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.game-header {
+    background: white;
+    border-radius: 16px;
+    padding: 20px 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.game-header h1 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 28px;
+}
+
+.game-info {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+}
+
+.info-item .label {
+    color: #666;
+    font-weight: 500;
+}
+
+.info-item span:not(.label) {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 22px;
+}
+
+.game-main {
+    position: relative;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.screen.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.screen.overlay.active {
+    display: flex;
+}
+
+.rules-box, .pause-box, .gameover-box, .replay-box {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.rules-box h2, .pause-box h2, .gameover-box h2, .replay-box h2 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+.rules-box ul {
+    list-style: none;
+    margin-bottom: 30px;
+}
+
+.rules-box li {
+    padding: 12px 0;
+    padding-left: 30px;
+    position: relative;
+    color: #555;
+    line-height: 1.6;
+}
+
+.rules-box li::before {
+    content: '💊';
+    position: absolute;
+    left: 0;
+}
+
+.btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn.primary:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#game-screen {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.prescription-area, .cabinet-area {
+    margin-bottom: 30px;
+}
+
+.prescription-area h3, .cabinet-area h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.prescription-card {
+    background: linear-gradient(135deg, #fff9f0 0%, #fff5e6 100%);
+    border: 2px solid #ffc107;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(255, 193, 7, 0.2);
+}
+
+.prescription-card .patient {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #ffc107;
+}
+
+.prescription-card .medicine-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #e65100;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.prescription-card .dosage {
+    font-size: 18px;
+    color: #666;
+    text-align: center;
+}
+
+.prescription-card .warnings {
+    margin-top: 15px;
+    padding: 10px;
+    background: #ffebee;
+    border-radius: 8px;
+    border-left: 4px solid #f44336;
+}
+
+.prescription-card .warnings h4 {
+    color: #c62828;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.prescription-card .warnings ul {
+    list-style: none;
+    font-size: 13px;
+    color: #c62828;
+}
+
+.prescription-card .warnings li {
+    padding: 2px 0;
+}
+
+.cabinet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.medicine-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.medicine-card:hover {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+}
+
+.medicine-card.correct {
+    border-color: #4caf50;
+    background: #e8f5e9;
+    animation: correctPulse 0.5s ease;
+}
+
+.medicine-card.wrong {
+    border-color: #f44336;
+    background: #ffebee;
+    animation: wrongShake 0.5s ease;
+}
+
+.medicine-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.medicine-card .name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.medicine-card .dosage {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.medicine-card .tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.medicine-card .tag.similar {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.medicine-card .tag.forbidden {
+    background: #ffebee;
+    color: #c62828;
+}
+
+@keyframes correctPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.final-score {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 20px;
+    color: #555;
+}
+
+.final-score p {
+    margin: 10px 0;
+}
+
+.final-score span {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 28px;
+}
+
+.score-details {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.score-details h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.score-details .detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+.score-details .detail-item:last-child {
+    border-bottom: none;
+}
+
+.score-details .detail-item.correct {
+    color: #4caf50;
+}
+
+.score-details .detail-item.wrong {
+    color: #f44336;
+}
+
+.score-details .detail-item .points {
+    font-weight: bold;
+}
+
+.gameover-controls, .replay-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.replay-content {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.replay-content .replay-step {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    background: white;
+}
+
+.replay-content .replay-step.wrong {
+    border-left-color: #f44336;
+    background: #ffebee;
+}
+
+.replay-content .replay-step .step-number {
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.replay-content .replay-step .step-info {
+    font-size: 14px;
+    color: #555;
+}
+
+.replay-content .replay-step.wrong .step-info {
+    color: #c62828;
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        padding: 15px;
+    }
+    
+    .game-header h1 {
+        font-size: 22px;
+    }
+    
+    .game-info {
+        gap: 20px;
+    }
+    
+    .info-item {
+        font-size: 14px;
+    }
+    
+    .info-item span:not(.label) {
+        font-size: 18px;
+    }
+    
+    #game-screen {
+        padding: 20px;
+    }
+    
+    .prescription-card .medicine-name {
+        font-size: 22px;
+    }
+    
+    .cabinet-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .medicine-card {
+        padding: 15px;
+    }
+    
+    .medicine-card .name {
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药房配药避错游戏</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="game-header">
+            <h1>药房配药避错游戏</h1>
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="label">关卡:</span>
+                    <span id="level">1</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">得分:</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">时间:</span>
+                    <span id="time">60</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">生命:</span>
+                    <span id="lives">3</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <div id="start-screen" class="screen active">
+                <div class="rules-box">
+                    <h2>游戏规则</h2>
+                    <ul>
+                        <li>根据处方上的药品名称和剂量，从药柜中选取正确的药品</li>
+                        <li>注意: 存在<strong>相似药名</strong>和<strong>禁忌药品</strong></li>
+                        <li>选取错误药品或超时会<strong>扣减生命</strong></li>
+                        <li>生命耗尽则游戏结束</li>
+                        <li>正确配药可获得分数，连续正确可获得连击加成</li>
+                    </ul>
+                    <button id="start-btn" class="btn primary">开始游戏</button>
+                </div>
+            </div>
+
+            <div id="game-screen" class="screen">
+                <div class="prescription-area">
+                    <h3>当前处方</h3>
+                    <div id="prescription" class="prescription-card"></div>
+                </div>
+
+                <div class="cabinet-area">
+                    <h3>药柜</h3>
+                    <div id="cabinet" class="cabinet-grid"></div>
+                </div>
+
+                <div class="controls">
+                    <button id="pause-btn" class="btn">暂停</button>
+                    <button id="restart-btn" class="btn">重新开始</button>
+                </div>
+            </div>
+
+            <div id="pause-screen" class="screen overlay">
+                <div class="pause-box">
+                    <h2>游戏暂停</h2>
+                    <button id="resume-btn" class="btn primary">继续游戏</button>
+                    <button id="pause-restart-btn" class="btn">重新开始</button>
+                </div>
+            </div>
+
+            <div id="gameover-screen" class="screen overlay">
+                <div class="gameover-box">
+                    <h2>游戏结束</h2>
+                    <div class="final-score">
+                        <p>最终得分: <span id="final-score">0</span></p>
+                        <p>到达关卡: <span id="final-level">1</span></p>
+                    </div>
+                    <div id="score-details" class="score-details"></div>
+                    <div class="gameover-controls">
+                        <button id="replay-btn" class="btn">失败回放</button>
+                        <button id="gameover-restart-btn" class="btn primary">再玩一次</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="replay-screen" class="screen overlay">
+                <div class="replay-box">
+                    <h2>失败回放</h2>
+                    <div id="replay-content" class="replay-content"></div>
+                    <div class="replay-controls">
+                        <button id="replay-back-btn" class="btn">返回</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="game.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
