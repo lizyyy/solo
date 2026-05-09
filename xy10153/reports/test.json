@@ -1,0 +1,102 @@
+{
+  "batch": {
+    "total_vouchers": 12,
+    "source_files": [
+      "examples/problematic_vouchers.csv"
+    ]
+  },
+  "gap": {
+    "issue_count": 2,
+    "issues": [
+      {
+        "voucher_type": "付",
+        "missing_number": 3,
+        "detail": "前一凭证: 付2 (行 8) | 后一凭证: 付4 (行 10)"
+      },
+      {
+        "voucher_type": "转",
+        "missing_number": 6,
+        "detail": "前一凭证: 转5 (行 22) | 后一凭证: 转7 (行 24)"
+      }
+    ]
+  },
+  "duplicate": {
+    "issue_count": 1,
+    "total_duplicates": 1,
+    "issues": [
+      {
+        "voucher_type": "转",
+        "voucher_number": "2",
+        "count": 2,
+        "sources": [
+          "examples/problematic_vouchers.csv:14",
+          "examples/problematic_vouchers.csv:18"
+        ]
+      }
+    ]
+  },
+  "reverse": {
+    "pair_count": 1,
+    "unmatched_count": 0
+  },
+  "repair_plan": {
+    "can_auto_apply": false,
+    "summary": {
+      "total_issues": 4,
+      "auto_applicable": 3,
+      "high_risk": 1,
+      "action_types": {
+        "insert_placeholder": 2,
+        "remove_duplicate": 1,
+        "resolve_reversal": 1
+      }
+    },
+    "actions": [
+      {
+        "id": "FIX-001",
+        "type": "insert_placeholder",
+        "title": "付字凭证断号 (1 处)",
+        "description": "检测到 付 字凭证断号，缺失编号: 3。共 1 个编号。",
+        "impact": "插入占位凭证或重新编号均可修复",
+        "source": "前一凭证: 付2 (行 8) | 后一凭证: 付4 (行 10)",
+        "risk_level": "low",
+        "can_auto_apply": true
+      },
+      {
+        "id": "FIX-002",
+        "type": "insert_placeholder",
+        "title": "转字凭证断号 (1 处)",
+        "description": "检测到 转 字凭证断号，缺失编号: 6。共 1 个编号。",
+        "impact": "插入占位凭证或重新编号均可修复",
+        "source": "前一凭证: 转5 (行 22) | 后一凭证: 转7 (行 24)",
+        "risk_level": "low",
+        "can_auto_apply": true
+      },
+      {
+        "id": "FIX-003",
+        "type": "remove_duplicate",
+        "title": "转2 重复 (2 次)",
+        "description": "凭证 转2 出现 2 次。",
+        "impact": "需要确认保留哪一个，其余删除或重新编号",
+        "source": "examples/problematic_vouchers.csv:14 | examples/problematic_vouchers.csv:18",
+        "risk_level": "high",
+        "can_auto_apply": false
+      },
+      {
+        "id": "FIX-004",
+        "type": "resolve_reversal",
+        "title": "冲销配对: 转3 <-> 转4",
+        "description": "匹配方式: exact_entry_match, 置信度: 100%, 日期差: 1 天",
+        "impact": "已建立配对关系，可在报告中查看",
+        "source": "examples/problematic_vouchers.csv:16 | examples/problematic_vouchers.csv:20",
+        "risk_level": "low",
+        "can_auto_apply": true
+      }
+    ]
+  },
+  "audit_summary": {
+    "total": 7,
+    "success": 7,
+    "error": 0
+  }
+}
