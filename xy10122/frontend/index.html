@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品标题归类纠错器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+        
+        .nav { background: white; padding: 0 30px; border-bottom: 1px solid #e0e0e0; display: flex; gap: 5px; }
+        .nav button { padding: 15px 25px; border: none; background: transparent; cursor: pointer; font-size: 14px; color: #666; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .nav button:hover { color: #667eea; }
+        .nav button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+        
+        .main { padding: 25px 30px; }
+        
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-card .label { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: #333; }
+        .stat-card.pending .value { color: #f59e0b; }
+        .stat-card.auto .value { color: #3b82f6; }
+        .stat-card.reviewed .value { color: #10b981; }
+        .stat-card.total .value { color: #667eea; }
+        
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 25px; }
+        .card-header { padding: 18px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .card-header h2 { font-size: 16px; font-weight: 600; }
+        .card-body { padding: 25px; }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #e5e7eb; color: #374151; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 12px; color: #666; }
+        input, select, textarea { padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; background: white; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #fafafa; font-weight: 600; color: #555; font-size: 13px; }
+        tr:hover { background: #fafafa; }
+        
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-review { background: #dbeafe; color: #1e40af; }
+        .badge-auto { background: #d1fae5; color: #065f46; }
+        .badge-reviewed { background: #e0e7ff; color: #3730a3; }
+        .badge-rollback { background: #fee2e2; color: #991b1b; }
+        
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 25px; }
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; }
+        
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .close-btn:hover { color: #333; }
+        
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #555; }
+        .form-group textarea { width: 100%; min-height: 80px; resize: vertical; }
+        .form-group input, .form-group select { width: 100%; }
+        
+        .history-item { padding: 15px; background: #f8fafc; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #e5e7eb; }
+        .history-item.manual { border-left-color: #10b981; }
+        .history-item.auto { border-left-color: #3b82f6; }
+        .history-item.rollback { border-left-color: #ef4444; }
+        .history-item .meta { font-size: 12px; color: #666; margin-top: 8px; }
+        .history-item .arrow { margin: 0 10px; color: #999; }
+        
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 20px; align-items: center; }
+        .pagination button { padding: 8px 14px; border: 1px solid #e0e0e0; background: white; border-radius: 6px; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #667eea; color: white; border-color: #667eea; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination .page-info { font-size: 14px; color: #666; }
+        
+        .upload-area { border: 2px dashed #e0e0e0; border-radius: 12px; padding: 40px; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .upload-area:hover, .upload-area.drag-over { border-color: #667eea; background: #f8f9ff; }
+        .upload-area .icon { font-size: 48px; color: #ccc; margin-bottom: 15px; }
+        .upload-area .text { color: #666; margin-bottom: 10px; }
+        .upload-area .hint { font-size: 12px; color: #999; }
+        
+        .category-bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+        .category-bar .bar { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+        .category-bar .bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 4px; }
+        .category-bar .name { width: 100px; font-size: 13px; }
+        .category-bar .count { width: 60px; text-align: right; font-size: 13px; color: #666; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #e0e0e0; }
+        .tabs button { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; }
+        .tabs button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+        
+        .actions { display: flex; gap: 8px; }
+        .title-cell { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .reason-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #666; }
+        
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 14px 24px; border-radius: 8px; z-index: 2000; opacity: 0; transition: opacity 0.3s; }
+        .toast.show { opacity: 1; }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        
+        .checkbox { display: flex; align-items: center; gap: 8px; }
+        .checkbox input { width: 16px; height: 16px; }
+        
+        .batch-actions { display: flex; gap: 10px; align-items: center; padding: 15px; background: #f8fafc; border-radius: 8px; margin-bottom: 15px; }
+        .batch-actions.hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛍️ 商品标题归类纠错器</h1>
+        <p>解决商家标题写法不统一、类目错标问题，让错误样本、解释理由和修正历史可追踪</p>
+    </div>
+    
+    <div class="nav">
+        <button class="active" onclick="switchTab('dashboard')">📊 概览</button>
+        <button onclick="switchTab('import')">📥 数据导入</button>
+        <button onclick="switchTab('review')">✅ 人工复核</button>
+        <button onclick="switchTab('products')">📋 商品列表</button>
+        <button onclick="switchTab('batches')">📦 版本记录</button>
+        <button onclick="switchTab('rules')">⚙️ 规则管理</button>
+    </div>
+    
+    <div class="main">
+        <div id="tab-dashboard" class="tab-content">
+            <div id="stats-container" class="stats"></div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2>📈 类目分布</h2>
+                </div>
+                <div class="card-body" id="category-distribution"></div>
+            </div>
+        </div>
+        
+        <div id="tab-import" class="tab-content" style="display:none">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📥 导入商品数据</h2>
+                </div>
+                <div class="card-body">
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleFileSelect(event)">
+                        <div class="icon">📁</div>
+                        <div class="text">点击或拖拽文件到此处上传</div>
+                        <div class="hint">支持 CSV、Excel 格式，必须包含 product_id、title 列，可选 category 列</div>
+                    </div>
+                    
+                    <div id="importResult" style="margin-top:20px;display:none"></div>
+                    
+                    <div style="margin-top:25px;padding:20px;background:#f8fafc;border-radius:8px;">
+                        <h4 style="margin-bottom:10px;">📝 数据格式示例</h4>
+                        <table style="font-size:13px;">
+                            <tr><th>product_id</th><th>title</th><th>category</th></tr>
+                            <tr><td>P001</td><td>iPhone 15 Pro Max 256GB 钛金属</td><td>手机</td></tr>
+                            <tr><td>P002</td><td>纯棉男士长袖T恤 春秋款</td><td>男装</td></tr>
+                            <tr><td>P003</td><td>罗技MX Master 3S无线鼠标</td><td></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-review" class="tab-content" style="display:none">
+            <div class="card">
+                <div class="card-header">
+                    <h2>✅ 待复核商品</h2>
+                    <div>
+                        <button class="btn btn-secondary btn-sm" onclick="loadReviewProducts()">🔄 刷新</button>
+                        <button class="btn btn-primary btn-sm" onclick="exportReport()">📊 导出报告</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>搜索</label>
+                            <input type="text" id="reviewSearch" placeholder="商品ID或标题" onkeyup="if(event.key==='Enter')loadReviewProducts()">
+                        </div>
+                        <div class="filter-group">
+                            <label>当前类目</label>
+                            <select id="reviewCategory"></select>
+                        </div>
+                        <div class="filter-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-secondary" onclick="loadReviewProducts()">🔍 搜索</button>
+                        </div>
+                    </div>
+                    
+                    <div id="batchActions" class="batch-actions hidden">
+                        <span id="selectedCount">已选择 0 个商品</span>
+                        <button class="btn btn-primary btn-sm" onclick="openBatchReviewModal()">📝 批量复核</button>
+                        <button class="btn btn-secondary btn-sm" onclick="clearSelection()">取消选择</button>
+                    </div>
+                    
+                    <table id="reviewTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                <th>商品ID</th>
+                                <th>商品标题</th>
+                                <th>原始类目</th>
+                                <th>预测类目</th>
+                                <th>归类理由</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody"></tbody>
+                    </table>
+                    <div id="reviewPagination" class="pagination"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-products" class="tab-content" style="display:none">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 商品列表</h2>
+                    <div>
+                        <button class="btn btn-secondary btn-sm" onclick="loadProducts()">🔄 刷新</button>
+                        <button class="btn btn-primary btn-sm" onclick="exportHistory()">📜 导出历史</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>搜索</label>
+                            <input type="text" id="productSearch" placeholder="商品ID或标题" onkeyup="if(event.key==='Enter')loadProducts()">
+                        </div>
+                        <div class="filter-group">
+                            <label>状态</label>
+                            <select id="productStatus">
+                                <option value="">全部</option>
+                                <option value="pending_review">待复核</option>
+                                <option value="auto_classified">已自动归类</option>
+                                <option value="reviewed">已复核</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>类目</label>
+                            <select id="productCategory"></select>
+                        </div>
+                        <div class="filter-group">
+                            <label>批次</label>
+                            <select id="productBatch">
+                                <option value="">全部</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-secondary" onclick="loadProducts()">🔍 搜索</button>
+                        </div>
+                    </div>
+                    
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>商品ID</th>
+                                <th>商品标题</th>
+                                <th>原始类目</th>
+                                <th>当前类目</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody"></tbody>
+                    </table>
+                    <div id="productsPagination" class="pagination"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-batches" class="tab-content" style="display:none">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📦 版本记录</h2>
+                </div>
+                <div class="card-body">
+                    <table id="batchesTable">
+                        <thead>
+                            <tr>
+                                <th>批次ID</th>
+                                <th>文件名</th>
+                                <th>总数</th>
+                                <th>自动归类</th>
+                                <th>待复核</th>
+                                <th>状态</th>
+                                <th>导入时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batchesTableBody"></tbody>
+                    </table>
+                    <div id="batchesPagination" class="pagination"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-rules" class="tab-content" style="display:none">
+            <div class="card">
+                <div class="card-header">
+                    <h2>⚙️ 归类规则</h2>
+                    <button class="btn btn-primary btn-sm" onclick="openRuleModal()">➕ 新增规则</button>
+                </div>
+                <div class="card-body">
+                    <table id="rulesTable">
+                        <thead>
+                            <tr>
+                                <th>类目</th>
+                                <th>关键词</th>
+                                <th>优先级</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rulesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 人工复核</h3>
+                <button class="close-btn" onclick="closeModal('reviewModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="reviewProductInfo" style="margin-bottom:20px;padding:15px;background:#f8fafc;border-radius:8px;"></div>
+                <div id="reviewHistory" style="margin-bottom:20px;"></div>
+                <div class="form-group">
+                    <label>选择正确类目</label>
+                    <select id="reviewCategorySelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>复核理由</label>
+                    <textarea id="reviewReason" placeholder="请输入复核理由（可选）"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="reviewOperator" value="系统管理员" placeholder="操作人姓名">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('reviewModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">确认复核</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="batchReviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 批量复核</h3>
+                <button class="close-btn" onclick="closeModal('batchReviewModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:15px;color:#666;">已选择 <strong id="batchSelectedCount">0</strong> 个商品，将统一归类为：</p>
+                <div class="form-group">
+                    <label>目标类目</label>
+                    <select id="batchReviewCategory"></select>
+                </div>
+                <div class="form-group">
+                    <label>复核理由</label>
+                    <textarea id="batchReviewReason" placeholder="请输入复核理由（可选）"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="batchReviewOperator" value="系统管理员">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('batchReviewModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitBatchReview()">确认复核</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="ruleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="ruleModalTitle">➕ 新增规则</h3>
+                <button class="close-btn" onclick="closeModal('ruleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>类目名称</label>
+                    <input type="text" id="ruleCategory" placeholder="如：食品">
+                </div>
+                <div class="form-group">
+                    <label>关键词（逗号分隔）</label>
+                    <textarea id="ruleKeywords" placeholder="如：零食,坚果,饼干,糖果"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>优先级（数字越大优先级越高）</label>
+                    <input type="number" id="rulePriority" value="100" min="1" max="999">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('ruleModal')">取消</button>
+                <button class="btn btn-primary" onclick="submitRule()">保存规则</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        let currentTab = 'dashboard';
+        let reviewPage = 1;
+        let productsPage = 1;
+        let batchesPage = 1;
+        let pageSize = 20;
+        let currentReviewProductId = null;
+        let editingRuleId = null;
+        let selectedReviewIds = [];
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tab).style.display = 'block';
+            currentTab = tab;
+            
+            if (tab === 'dashboard') loadDashboard();
+            else if (tab === 'review') { loadCategories(); loadReviewProducts(); }
+            else if (tab === 'products') { loadCategories(); loadBatchesSelect(); loadProducts(); }
+            else if (tab === 'batches') loadBatches();
+            else if (tab === 'rules') loadRules();
+        }
+        
+        async function loadDashboard() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            
+            document.getElementById('stats-container').innerHTML = `
+                <div class="stat-card total">
+                    <div class="label">商品总数</div>
+                    <div class="value">${data.total_products}</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="label">待复核</div>
+                    <div class="value">${data.pending_review}</div>
+                </div>
+                <div class="stat-card auto">
+                    <div class="label">已自动归类</div>
+                    <div class="value">${data.auto_classified}</div>
+                </div>
+                <div class="stat-card reviewed">
+                    <div class="label">已复核</div>
+                    <div class="value">${data.reviewed}</div>
+                </div>
+                <div class="stat-card" style="grid-column: span 1;">
+                    <div class="label">有效修正</div>
+                    <div class="value">${data.total_corrections}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">误判回滚</div>
+                    <div class="value" style="color:#ef4444;">${data.rolled_back}</div>
+                </div>
+            `;
+            
+            const maxCount = Math.max(...data.category_distribution.map(c => c.count), 1);
+            document.getElementById('category-distribution').innerHTML = data.category_distribution.length ?
+                data.category_distribution.map(c => `
+                    <div class="category-bar">
+                        <span class="name">${c.category}</span>
+                        <div class="bar"><div class="bar-fill" style="width:${(c.count/maxCount)*100}%"></div></div>
+                        <span class="count">${c.count} 件</span>
+                    </div>
+                `).join('') :
+                '<p style="text-align:center;color:#999;padding:20px;">暂无数据</p>';
+        }
+        
+        async function loadCategories() {
+            const res = await fetch('/api/categories');
+            const data = await res.json();
+            const options = '<option value="">全部</option>' + data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('reviewCategory').innerHTML = options;
+            document.getElementById('productCategory').innerHTML = options;
+            const catOptions = data.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('reviewCategorySelect').innerHTML = catOptions;
+            document.getElementById('batchReviewCategory').innerHTML = catOptions;
+        }
+        
+        async function loadBatchesSelect() {
+            const res = await fetch('/api/batches?page_size=100');
+            const data = await res.json();
+            const options = '<option value="">全部</option>' + data.items.map(b => `<option value="${b.batch_id}">${b.filename || b.batch_id}</option>`).join('');
+            document.getElementById('productBatch').innerHTML = options;
+        }
+        
+        async function loadReviewProducts() {
+            const search = document.getElementById('reviewSearch').value;
+            const category = document.getElementById('reviewCategory').value;
+            const params = new URLSearchParams({
+                page: reviewPage,
+                page_size: pageSize,
+                status: 'pending_review'
+            });
+            if (search) params.append('search', search);
+            if (category) params.append('category', category);
+            
+            const res = await fetch('/api/products?' + params);
+            const data = await res.json();
+            
+            selectedReviewIds = [];
+            document.getElementById('selectAll').checked = false;
+            updateBatchActions();
+            
+            document.getElementById('reviewTableBody').innerHTML = data.items.length ?
+                data.items.map(p => `
+                    <tr>
+                        <td><input type="checkbox" class="review-checkbox" value="${p.id}" onchange="updateSelectedIds()"></td>
+                        <td>${p.product_id}</td>
+                        <td class="title-cell" title="${p.title}">${p.title}</td>
+                        <td>${p.original_category || '<span style="color:#999">-</span>'}</td>
+                        <td><span class="badge badge-review">${p.current_category || '未归类'}</span></td>
+                        <td class="reason-cell" title="${p.latest_reason || ''}">${p.latest_reason || '-'}</td>
+                        <td class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="openReviewModal(${p.id})">复核</button>
+                        </td>
+                    </tr>
+                `).join('') :
+                '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">暂无待复核商品</td></tr>';
+            
+            renderPagination('reviewPagination', data.total, reviewPage, (page) => { reviewPage = page; loadReviewProducts(); });
+        }
+        
+        function updateSelectedIds() {
+            selectedReviewIds = Array.from(document.querySelectorAll('.review-checkbox:checked')).map(cb => parseInt(cb.value));
+            updateBatchActions();
+        }
+        
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.review-checkbox').forEach(cb => cb.checked = checked);
+            updateSelectedIds();
+        }
+        
+        function updateBatchActions() {
+            const actions = document.getElementById('batchActions');
+            document.getElementById('selectedCount').textContent = `已选择 ${selectedReviewIds.length} 个商品`;
+            if (selectedReviewIds.length > 0) {
+                actions.classList.remove('hidden');
+            } else {
+                actions.classList.add('hidden');
+            }
+        }
+        
+        function clearSelection() {
+            document.querySelectorAll('.review-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('selectAll').checked = false;
+            selectedReviewIds = [];
+            updateBatchActions();
+        }
+        
+        function openBatchReviewModal() {
+            document.getElementById('batchSelectedCount').textContent = selectedReviewIds.length;
+            document.getElementById('batchReviewModal').classList.add('active');
+        }
+        
+        async function submitBatchReview() {
+            const category = document.getElementById('batchReviewCategory').value;
+            const reason = document.getElementById('batchReviewReason').value;
+            const operator = document.getElementById('batchReviewOperator').value;
+            
+            const res = await fetch('/api/products/batch-review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_ids: selectedReviewIds, category, reason, operator })
+            });
+            
+            const data = await res.json();
+            showToast(data.message, 'success');
+            closeModal('batchReviewModal');
+            loadReviewProducts();
+        }
+        
+        async function loadProducts() {
+            const search = document.getElementById('productSearch').value;
+            const status = document.getElementById('productStatus').value;
+            const category = document.getElementById('productCategory').value;
+            const batch = document.getElementById('productBatch').value;
+            const params = new URLSearchParams({ page: productsPage, page_size: pageSize });
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (category) params.append('category', category);
+            if (batch) params.append('batch_id', batch);
+            
+            const res = await fetch('/api/products?' + params);
+            const data = await res.json();
+            
+            const statusBadge = (s) => {
+                const map = {
+                    'pending': 'badge-pending',
+                    'pending_review': 'badge-review',
+                    'auto_classified': 'badge-auto',
+                    'reviewed': 'badge-reviewed'
+                };
+                const name = {
+                    'pending': '待处理',
+                    'pending_review': '待复核',
+                    'auto_classified': '已自动归类',
+                    'reviewed': '已复核'
+                };
+                return `<span class="badge ${map[s] || 'badge-pending'}">${name[s] || s}</span>`;
+            };
+            
+            document.getElementById('productsTableBody').innerHTML = data.items.length ?
+                data.items.map(p => `
+                    <tr>
+                        <td>${p.product_id}</td>
+                        <td class="title-cell" title="${p.title}">${p.title}</td>
+                        <td>${p.original_category || '-'}</td>
+                        <td>${p.current_category || '<span style="color:#999">未归类</span>'}</td>
+                        <td>${statusBadge(p.status)}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="openHistoryModal(${p.id})">📜 历史</button>
+                            ${p.status !== 'reviewed' ? `<button class="btn btn-primary btn-sm" onclick="openReviewModal(${p.id})">复核</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('') :
+                '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">暂无数据</td></tr>';
+            
+            renderPagination('productsPagination', data.total, productsPage, (page) => { productsPage = page; loadProducts(); });
+        }
+        
+        async function loadBatches() {
+            const res = await fetch('/api/batches?page=' + batchesPage + '&page_size=' + pageSize);
+            const data = await res.json();
+            
+            document.getElementById('batchesTableBody').innerHTML = data.items.length ?
+                data.items.map(b => `
+                    <tr>
+                        <td><span style="font-family:monospace;font-size:12px;">${b.batch_id}</span></td>
+                        <td>${b.filename || '-'}</td>
+                        <td>${b.total_count}</td>
+                        <td>${b.auto_classified_count}</td>
+                        <td>${b.pending_review_count}</td>
+                        <td><span class="badge ${b.status === 'completed' ? 'badge-auto' : 'badge-pending'}">${b.status === 'completed' ? '已完成' : '处理中'}</span></td>
+                        <td>${new Date(b.created_at).toLocaleString('zh-CN')}</td>
+                    </tr>
+                `).join('') :
+                '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">暂无导入记录</td></tr>';
+            
+            renderPagination('batchesPagination', data.total, batchesPage, (page) => { batchesPage = page; loadBatches(); });
+        }
+        
+        async function loadRules() {
+            const res = await fetch('/api/rules');
+            const rules = await res.json();
+            
+            document.getElementById('rulesTableBody').innerHTML = rules.length ?
+                rules.map(r => `
+                    <tr>
+                        <td><strong>${r.category}</strong></td>
+                        <td style="max-width:400px;">${r.keywords}</td>
+                        <td>${r.priority}</td>
+                        <td class="actions">
+                            <button class="btn btn-secondary btn-sm" onclick="editRule(${r.id}, '${r.category}', '${r.keywords.replace(/'/g, "\\'")}', ${r.priority})">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRule(${r.id})">删除</button>
+                        </td>
+                    </tr>
+                `).join('') :
+                '<tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">暂无自定义规则，使用默认规则</td></tr>';
+        }
+        
+        async function openReviewModal(productId) {
+            currentReviewProductId = productId;
+            const res = await fetch('/api/products/' + productId);
+            const p = await res.json();
+            
+            document.getElementById('reviewProductInfo').innerHTML = `
+                <div style="margin-bottom:8px;"><strong>商品ID:</strong> ${p.product_id}</div>
+                <div style="margin-bottom:8px;"><strong>标题:</strong> ${p.title}</div>
+                <div style="display:flex;gap:20px;">
+                    <span><strong>原始类目:</strong> ${p.original_category || '-'} →</span>
+                    <span><strong>当前类目:</strong> ${p.current_category || '-'}</span>
+                </div>
+            `;
+            
+            const sourceText = { 'auto': '自动归类', 'manual': '人工复核', 'rollback': '误判回滚' };
+            const sourceClass = { 'auto': 'auto', 'manual': 'manual', 'rollback': 'rollback' };
+            document.getElementById('reviewHistory').innerHTML = `
+                <h4 style="margin-bottom:10px;font-size:14px;">📜 修正历史</h4>
+                ${p.correction_history.length ? p.correction_history.map(c => `
+                    <div class="history-item ${sourceClass[c.source] || ''}">
+                        <div>
+                            <strong>${c.old_category || '-'}</strong>
+                            <span class="arrow">→</span>
+                            <strong>${c.new_category || '-'}</strong>
+                            ${c.is_rolled_back ? '<span class="badge badge-rollback" style="margin-left:10px;">已回滚</span>' : ''}
+                        </div>
+                        <div class="meta">
+                            ${sourceText[c.source] || c.source} | 
+                            理由: ${c.reason || '-'} | 
+                            操作人: ${c.operator || '系统'} | 
+                            ${new Date(c.created_at).toLocaleString('zh-CN')}
+                        </div>
+                    </div>
+                `).join('') : '<p style="color:#999;font-size:13px;">暂无修正历史</p>'}
+            `;
+            
+            if (p.current_category) {
+                document.getElementById('reviewCategorySelect').value = p.current_category;
+            }
+            document.getElementById('reviewReason').value = '';
+            document.getElementById('reviewModal').classList.add('active');
+        }
+        
+        async function openHistoryModal(productId) {
+            const res = await fetch('/api/products/' + productId);
+            const p = await res.json();
+            
+            const sourceText = { 'auto': '自动归类', 'manual': '人工复核', 'rollback': '误判回滚' };
+            const sourceClass = { 'auto': 'auto', 'manual': 'manual', 'rollback': 'rollback' };
+            
+            document.getElementById('reviewProductInfo').innerHTML = `
+                <div style="margin-bottom:8px;"><strong>商品ID:</strong> ${p.product_id}</div>
+                <div style="margin-bottom:8px;"><strong>标题:</strong> ${p.title}</div>
+                <div style="display:flex;gap:20px;">
+                    <span><strong>原始类目:</strong> ${p.original_category || '-'} →</span>
+                    <span><strong>当前类目:</strong> ${p.current_category || '-'}</span>
+                </div>
+            `;
+            
+            document.getElementById('reviewHistory').innerHTML = `
+                <h4 style="margin-bottom:10px;font-size:14px;">📜 修正历史</h4>
+                ${p.correction_history.length ? p.correction_history.map(c => `
+                    <div class="history-item ${sourceClass[c.source] || ''}">
+                        <div>
+                            <strong>${c.old_category || '-'}</strong>
+                            <span class="arrow">→</span>
+                            <strong>${c.new_category || '-'}</strong>
+                            ${c.is_rolled_back ? '<span class="badge badge-rollback" style="margin-left:10px;">已回滚</span>' : ''}
+                        </div>
+                        <div class="meta">
+                            ${sourceText[c.source] || c.source} | 
+                            理由: ${c.reason || '-'} | 
+                            操作人: ${c.operator || '系统'} | 
+                            ${new Date(c.created_at).toLocaleString('zh-CN')}
+                        </div>
+                        ${!c.is_rolled_back && c.source !== 'rollback' ? `
+                            <button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="rollbackCorrection(${productId}, ${c.id})">↩️ 回滚此操作</button>
+                        ` : ''}
+                    </div>
+                `).join('') : '<p style="color:#999;font-size:13px;">暂无修正历史</p>'}
+            `;
+            
+            document.getElementById('reviewModal').classList.add('active');
+            document.querySelector('#reviewModal .modal-footer').style.display = 'none';
+            document.querySelector('#reviewModal .modal-body .form-group').forEach ? 
+                document.querySelectorAll('#reviewModal .modal-body .form-group').forEach(el => el.style.display = 'none') :
+                Array.from(document.querySelectorAll('#reviewModal .modal-body .form-group')).forEach(el => el.style.display = 'none');
+        }
+        
+        async function submitReview() {
+            const category = document.getElementById('reviewCategorySelect').value;
+            const reason = document.getElementById('reviewReason').value;
+            const operator = document.getElementById('reviewOperator').value;
+            
+            const res = await fetch(`/api/products/${currentReviewProductId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, reason, operator })
+            });
+            
+            const data = await res.json();
+            showToast(data.message, 'success');
+            closeModal('reviewModal');
+            
+            if (currentTab === 'review') loadReviewProducts();
+            else if (currentTab === 'products') loadProducts();
+            else loadDashboard();
+        }
+        
+        async function rollbackCorrection(productId, correctionId) {
+            if (!confirm('确定要回滚此操作吗？')) return;
+            
+            const res = await fetch(`/api/products/${productId}/rollback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason: '误判回滚', operator: '系统管理员' })
+            });
+            
+            const data = await res.json();
+            showToast(data.message, 'success');
+            openHistoryModal(productId);
+        }
+        
+        function openRuleModal() {
+            editingRuleId = null;
+            document.getElementById('ruleModalTitle').textContent = '➕ 新增规则';
+            document.getElementById('ruleCategory').value = '';
+            document.getElementById('ruleKeywords').value = '';
+            document.getElementById('rulePriority').value = 100;
+            document.getElementById('ruleModal').classList.add('active');
+        }
+        
+        function editRule(id, category, keywords, priority) {
+            editingRuleId = id;
+            document.getElementById('ruleModalTitle').textContent = '✏️ 编辑规则';
+            document.getElementById('ruleCategory').value = category;
+            document.getElementById('ruleKeywords').value = keywords;
+            document.getElementById('rulePriority').value = priority;
+            document.getElementById('ruleModal').classList.add('active');
+        }
+        
+        async function submitRule() {
+            const category = document.getElementById('ruleCategory').value.trim();
+            const keywords = document.getElementById('ruleKeywords').value.trim();
+            const priority = parseInt(document.getElementById('rulePriority').value);
+            
+            if (!category || !keywords) {
+                showToast('请填写类目和关键词', 'error');
+                return;
+            }
+            
+            const url = editingRuleId ? `/api/rules/${editingRuleId}` : '/api/rules';
+            const method = editingRuleId ? 'PUT' : 'POST';
+            
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, keywords, priority })
+            });
+            
+            const data = await res.json();
+            showToast(data.message, 'success');
+            closeModal('ruleModal');
+            loadRules();
+        }
+        
+        async function deleteRule(id) {
+            if (!confirm('确定要删除此规则吗？')) return;
+            
+            const res = await fetch(`/api/rules/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            showToast(data.message, 'success');
+            loadRules();
+        }
+        
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length) handleFile(files[0]);
+        });
+        
+        function handleFileSelect(e) {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        }
+        
+        async function handleFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const resultDiv = document.getElementById('importResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p style="color:#666;">正在导入和归类中...</p>';
+            
+            try {
+                const res = await fetch('/api/import', { method: 'POST', body: formData });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    resultDiv.innerHTML = `
+                        <div style="padding:20px;background:#d1fae5;color:#065f46;border-radius:8px;">
+                            <strong>✅ 导入成功</strong><br><br>
+                            批次ID: ${data.batch_id}<br>
+                            总数量: ${data.total}<br>
+                            自动归类: ${data.auto_classified} 个<br>
+                            待复核: ${data.pending_review} 个
+                        </div>
+                    `;
+                    showToast('导入完成', 'success');
+                } else {
+                    resultDiv.innerHTML = `<div style="padding:20px;background:#fee2e2;color:#991b1b;border-radius:8px;"><strong>❌ 导入失败</strong><br>${data.detail}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div style="padding:20px;background:#fee2e2;color:#991b1b;border-radius:8px;"><strong>❌ 导入失败</strong><br>${err.message}</div>`;
+            }
+        }
+        
+        function exportReport() {
+            window.location.href = '/api/export/report';
+        }
+        
+        function exportHistory() {
+            window.location.href = '/api/export/history';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'reviewModal') {
+                document.querySelector('#reviewModal .modal-footer').style.display = 'flex';
+                Array.from(document.querySelectorAll('#reviewModal .modal-body .form-group')).forEach(el => el.style.display = 'block');
+            }
+        }
+        
+        function renderPagination(containerId, total, currentPage, onChange) {
+            const totalPages = Math.ceil(total / pageSize);
+            const container = document.getElementById(containerId);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = `<button onclick="onChange(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一页</button>`;
+            html += `<span class="page-info">第 ${currentPage} / ${totalPages} 页，共 ${total} 条</span>`;
+            html += `<button onclick="onChange(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一页</button>`;
+            
+            container.innerHTML = html;
+            
+            const buttons = container.querySelectorAll('button');
+            buttons[0].onclick = () => { if (currentPage > 1) onChange(currentPage - 1); };
+            buttons[1].onclick = () => { if (currentPage < totalPages) onChange(currentPage + 1); };
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        loadDashboard();
+    </script>
+</body>
+</html>
