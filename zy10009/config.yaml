@@ -1,0 +1,41 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  dbname: chaos_demo
+  max_conns: 10
+  min_conns: 2
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0
+  pool_size: 10
+
+chaos:
+  enabled: false
+  connection_pool_exhausted:
+    enabled: false
+    duration_seconds: 30
+  message_backlog:
+    enabled: false
+    backlog_threshold: 1000
+  goroutine_leak:
+    enabled: false
+    leak_rate: 0.1
+  db_lock_wait:
+    enabled: false
+    lock_timeout_ms: 5000
+    wait_probability: 0.3
+  cache_dirty_data:
+    enabled: false
+    dirty_probability: 0.2
+  config_drift:
+    enabled: false
+    drift_interval_seconds: 60

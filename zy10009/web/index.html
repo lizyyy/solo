@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaos Demo - 分布式系统故障复现系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.normal {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.5);
+        }
+
+        .status-badge.chaos {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #00d4ff;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .metric-card .label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .metric-card.warning .value {
+            color: #ffaa00;
+        }
+
+        .metric-card.danger .value {
+            color: #ff4444;
+        }
+
+        .fault-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .fault-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .fault-item.active {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.5);
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.off {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+
+        .toggle-btn.off:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .toggle-btn.on {
+            background: #ff4444;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .events-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .events-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .events-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .events-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 3px;
+        }
+
+        .event-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .event-item.event-success {
+            border-left-color: #00ff88;
+        }
+
+        .event-item.event-failed {
+            border-left-color: #ff4444;
+        }
+
+        .event-item.event-pending {
+            border-left-color: #ffaa00;
+        }
+
+        .event-item.event-retrying {
+            border-left-color: #ff6600;
+        }
+
+        .event-type {
+            font-size: 12px;
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        .event-time {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .event-payload {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .stock-item, .order-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .stock-item .product-id, .order-item .order-id {
+            font-weight: 600;
+            color: #00d4ff;
+        }
+
+        .stock-item .qty, .order-item .qty {
+            float: right;
+            color: #888;
+        }
+
+        .status-created { color: #00ff88; }
+        .status-pending { color: #ffaa00; }
+        .status-failed { color: #ff4444; }
+        .status-compensating { color: #ff6600; }
+        .status-rolledback { color: #888; }
+        .status-completed { color: #00ff88; }
+
+        .replay-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .replay-controls input {
+            width: 100px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: #fff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #0066ff 100%);
+            transition: width 0.3s ease;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 Chaos Demo - 分布式系统故障复现系统</h1>
+        <div class="status-badge normal" id="chaosStatus">系统正常</div>
+    </div>
+
+    <div class="container">
+        <div class="section full-width">
+            <h2>📊 系统指标</h2>
+            <div class="card-grid" id="metricsGrid">
+                <div class="metric-card">
+                    <div class="value" id="goroutineCount">0</div>
+                    <div class="label">Goroutine 数量</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="pendingMessages">0</div>
+                    <div class="label">消息队列待处理</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="backlogPressure">0%</div>
+                    <div class="label">消息积压压力</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="activeLocks">0</div>
+                    <div class="label">活跃锁数量</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="configVersion">1</div>
+                    <div class="label">配置版本</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="eventSequence">0</div>
+                    <div class="label">事件序列</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔴 故障注入控制</h2>
+            <div class="fault-controls" id="faultControls">
+                <div class="fault-item" id="fault_connection_pool">
+                    <span>连接池耗尽</span>
+                    <button class="toggle-btn off" onclick="toggleFault('connection_pool_exhausted', this)">OFF</button>
+                </div>
+                <div class="fault-item" id="fault_message_backlog">
+                    <span>消息积压</span>
+                    <button class="toggle-btn off" onclick="toggleFault('message_backlog', this)">OFF</button>
+                </div>
+                <div class="fault-item" id="fault_goroutine_leak">
+                    <span>Goroutine 泄漏</span>
+                    <button class="toggle-btn off" onclick="toggleFault('goroutine_leak', this)">OFF</button>
+                </div>
+                <div class="fault-item" id="fault_db_lock_wait">
+                    <span>数据库锁等待</span>
+                    <button class="toggle-btn off" onclick="toggleFault('db_lock_wait', this)">OFF</button>
+                </div>
+                <div class="fault-item" id="fault_cache_dirty">
+                    <span>缓存脏数据</span>
+                    <button class="toggle-btn off" onclick="toggleFault('cache_dirty_data', this)">OFF</button>
+                </div>
+                <div class="fault-item" id="fault_config_drift">
+                    <span>配置漂移</span>
+                    <button class="toggle-btn off" onclick="toggleFault('config_drift', this)">OFF</button>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-danger" onclick="enableChaos()">开启故障模式</button>
+                <button class="btn btn-success" onclick="disableChaos()">关闭故障模式</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🛒 创建订单</h2>
+            <form id="orderForm" onsubmit="createOrder(event)">
+                <div class="form-group">
+                    <label>商品 ID</label>
+                    <select id="productId" required>
+                        <option value="PROD-001">PROD-001</option>
+                        <option value="PROD-002">PROD-002</option>
+                        <option value="PROD-003">PROD-003</option>
+                        <option value="PROD-004">PROD-004</option>
+                        <option value="PROD-005">PROD-005</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>数量</label>
+                    <input type="number" id="quantity" value="1" min="1" max="100" required>
+                </div>
+                <button type="submit" class="btn btn-primary">提交订单</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>📦 库存状态</h2>
+            <div id="inventoryList"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 订单状态</h2>
+            <div id="orderList"></div>
+        </div>
+
+        <div class="section full-width">
+            <h2>⏮️ 状态回放</h2>
+            <div class="replay-controls">
+                <input type="number" id="replayStartSeq" placeholder="起始序列">
+                <input type="number" id="replayEndSeq" placeholder="结束序列">
+                <input type="number" id="replaySpeed" placeholder="速度 (1.0)" value="1.0" step="0.1">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="startReplay()">开始回放</button>
+                    <button class="btn btn-danger" onclick="stopReplay()">停止</button>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="replayProgress" style="width: 0%"></div>
+            </div>
+            <div id="replayStatus" style="margin-top: 10px; color: #888;"></div>
+        </div>
+
+        <div class="section full-width">
+            <h2>📜 事件时间线</h2>
+            <div class="events-container" id="eventsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let eventSource = null;
+        let updateInterval = null;
+
+        async function fetchAPI(url, options = {}) {
+            const response = await fetch(API_BASE + url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            return response.json();
+        }
+
+        async function updateMetrics() {
+            try {
+                const metrics = await fetchAPI('/system/metrics');
+                document.getElementById('goroutineCount').textContent = metrics.goroutine_count;
+                document.getElementById('pendingMessages').textContent = metrics.message_queue.pending_count;
+                document.getElementById('backlogPressure').textContent = (metrics.message_queue.backlog_pressure * 100).toFixed(1) + '%';
+                document.getElementById('activeLocks').textContent = metrics.active_locks;
+                document.getElementById('configVersion').textContent = metrics.config_version;
+                document.getElementById('eventSequence').textContent = metrics.current_sequence;
+
+                if (metrics.message_queue.backlog_pressure > 0.5) {
+                    document.querySelector('#metricsGrid .metric-card:nth-child(3)').classList.add('warning');
+                } else {
+                    document.querySelector('#metricsGrid .metric-card:nth-child(3)').classList.remove('warning');
+                }
+
+                if (metrics.active_locks > 5) {
+                    document.querySelector('#metricsGrid .metric-card:nth-child(4)').classList.add('danger');
+                } else {
+                    document.querySelector('#metricsGrid .metric-card:nth-child(4)').classList.remove('danger');
+                }
+            } catch (e) {
+                console.error('Failed to fetch metrics:', e);
+            }
+        }
+
+        async function updateInventory() {
+            try {
+                const stocks = await fetchAPI('/inventory');
+                const html = Object.values(stocks).map(stock => `
+                    <div class="stock-item">
+                        <span class="product-id">${stock.product_id}</span>
+                        <span class="qty">可用: ${stock.quantity - stock.reserved} / ${stock.quantity}</span>
+                    </div>
+                `).join('');
+                document.getElementById('inventoryList').innerHTML = html;
+            } catch (e) {
+                console.error('Failed to fetch inventory:', e);
+            }
+        }
+
+        async function updateOrders() {
+            try {
+                const orders = await fetchAPI('/orders');
+                const orderList = Object.values(orders).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                const html = orderList.slice(0, 10).map(order => `
+                    <div class="order-item">
+                        <span class="order-id">${order.id.slice(0, 8)}...</span>
+                        <span class="qty">${order.product_id} x ${order.quantity}</span>
+                        <div style="margin-top: 5px;">
+                            <span class="status-${order.status.replace('_', '-')}">${order.status}</span>
+                            <span style="color: #666; float: right;">${new Date(order.updated_at).toLocaleTimeString()}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('orderList').innerHTML = html;
+            } catch (e) {
+                console.error('Failed to fetch orders:', e);
+            }
+        }
+
+        async function updateEvents() {
+            try {
+                const resp = await fetchAPI('/events?limit=50');
+                const events = resp.events || [];
+                const html = events.slice().reverse().map(event => `
+                    <div class="event-item event-${event.status}">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="event-type">#${event.sequence} ${event.type}</span>
+                            <span class="event-time">${new Date(event.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="event-payload">${formatPayload(event)}</div>
+                    </div>
+                `).join('');
+                document.getElementById('eventsList').innerHTML = html;
+            } catch (e) {
+                console.error('Failed to fetch events:', e);
+            }
+        }
+
+        function formatPayload(event) {
+            let text = `状态: ${event.status}`;
+            if (event.retry > 0) {
+                text += ` | 重试: ${event.retry}`;
+            }
+            if (event.error) {
+                text += ` | 错误: ${event.error}`;
+            }
+            if (event.payload && Object.keys(event.payload).length > 0) {
+                const details = Object.entries(event.payload).map(([k, v]) => `${k}=${v}`).join(', ');
+                text += ` | ${details}`;
+            }
+            return text;
+        }
+
+        async function createOrder(e) {
+            e.preventDefault();
+            const productId = document.getElementById('productId').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            try {
+                const response = await fetchAPI('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify({ product_id: productId, quantity, payload: {} })
+                });
+                if (response.error) {
+                    alert('订单创建失败: ' + response.error);
+                } else {
+                    console.log('Order created:', response);
+                }
+            } catch (e) {
+                console.error('Failed to create order:', e);
+            }
+        }
+
+        async function enableChaos() {
+            await fetchAPI('/chaos/enable', { method: 'POST' });
+            updateChaosStatus(true);
+        }
+
+        async function disableChaos() {
+            await fetchAPI('/chaos/disable', { method: 'POST' });
+            updateChaosStatus(false);
+        }
+
+        async function toggleFault(faultType, btn) {
+            const isOn = btn.classList.contains('off');
+            await fetchAPI(`/chaos/toggle/${faultType}`, {
+                method: 'POST',
+                body: JSON.stringify({ enabled: isOn })
+            });
+
+            if (isOn) {
+                btn.classList.remove('off');
+                btn.classList.add('on');
+                btn.textContent = 'ON';
+                btn.parentElement.classList.add('active');
+            } else {
+                btn.classList.remove('on');
+                btn.classList.add('off');
+                btn.textContent = 'OFF';
+                btn.parentElement.classList.remove('active');
+            }
+        }
+
+        function updateChaosStatus(enabled) {
+            const badge = document.getElementById('chaosStatus');
+            if (enabled) {
+                badge.classList.remove('normal');
+                badge.classList.add('chaos');
+                badge.textContent = '故障模式已开启';
+            } else {
+                badge.classList.remove('chaos');
+                badge.classList.add('normal');
+                badge.textContent = '系统正常';
+            }
+        }
+
+        async function startReplay() {
+            const startSeq = parseInt(document.getElementById('replayStartSeq').value) || 0;
+            const endSeq = parseInt(document.getElementById('replayEndSeq').value) || 0;
+            const speed = parseFloat(document.getElementById('replaySpeed').value) || 1.0;
+
+            await fetchAPI('/replay/start', {
+                method: 'POST',
+                body: JSON.stringify({ start_sequence: startSeq, end_sequence: endSeq, speed })
+            });
+
+            checkReplayStatus();
+        }
+
+        async function stopReplay() {
+            await fetchAPI('/replay/stop', { method: 'POST' });
+        }
+
+        async function checkReplayStatus() {
+            try {
+                const status = await fetchAPI('/replay/status');
+                const progressEl = document.getElementById('replayProgress');
+                const statusEl = document.getElementById('replayStatus');
+
+                if (status.is_replaying) {
+                    const progress = status.end_seq > 0 ? ((status.current_seq - status.start_seq) / (status.end_seq - status.start_seq) * 100) : 0;
+                    progressEl.style.width = progress + '%';
+                    statusEl.textContent = `回放中... 当前序列: ${status.current_seq} / ${status.end_seq}`;
+                    setTimeout(checkReplayStatus, 500);
+                } else {
+                    progressEl.style.width = '100%';
+                    statusEl.textContent = '回放完成或未开始';
+                }
+            } catch (e) {
+                console.error('Failed to check replay status:', e);
+            }
+        }
+
+        async function init() {
+            await updateMetrics();
+            await updateInventory();
+            await updateOrders();
+            await updateEvents();
+
+            updateInterval = setInterval(() => {
+                updateMetrics();
+                updateInventory();
+                updateOrders();
+                updateEvents();
+            }, 2000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
