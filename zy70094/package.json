@@ -1,0 +1,23 @@
+{
+  "name": "pv-grid-application-service",
+  "version": "1.0.0",
+  "description": "光伏并网申请服务 - 处理申请单、勘察预约、审批节点、电表任务、材料补正和并网报表",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "光伏",
+    "并网申请",
+    "审批系统"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
+  }
+}
