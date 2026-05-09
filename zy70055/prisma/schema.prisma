@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Merchant {
+  id            String    @id @default(cuid())
+  merchantNo    String    @unique
+  name          String
+  status        String    @default("ACTIVE")
+  feeRuleId     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  batches       SettlementBatch[]
+  feeRule       FeeRule?          @relation(fields: [feeRuleId], references: [id])
+  
+  @@index([merchantNo])
+}
+
+model FeeRule {
+  id            String    @id @default(cuid())
+  name          String
+  feeType       String
+  value         Float
+  minFee        Float
+  maxFee        Float?
+  tierConfig    String?   
+  isActive      Boolean   @default(true)
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  merchants     Merchant[]
+  
+  @@index([isActive, effectiveFrom])
+}
+
+model SettlementBatch {
+  id              String    @id @default(cuid())
+  batchNo         String    @unique
+  merchantId      String
+  settlementDate  DateTime
+  totalAmount     Float
+  refundAmount    Float     @default(0)
+  chargebackAmount Float    @default(0)
+  feeAmount       Float
+  netAmount       Float
+  status          String    @default("PENDING")
+  suspendReason   String?
+  suspendNote     String?
+  suspendedAt     DateTime?
+  approvedBy      String?
+  approvedAt      DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  merchant        Merchant            @relation(fields: [merchantId], references: [id])
+  transactions    BatchTransaction[]
+  exceptions      ExceptionRecord[]
+  approvals       ApprovalRecord[]
+  reports         SettlementReport[]
+  
+  @@index([merchantId, settlementDate])
+  @@index([status])
+}
+
+model BatchTransaction {
+  id              String    @id @default(cuid())
+  transactionNo   String    @unique
+  batchId         String
+  transactionDate DateTime
+  amount          Float
+  feeAmount       Float
+  refundAmount    Float     @default(0)
+  chargebackAmount Float    @default(0)
+  hasPendingRefund Boolean  @default(false)
+  hasPendingChargeback Boolean @default(false)
+  isSuspicious    Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  
+  batch           SettlementBatch @relation(fields: [batchId], references: [id])
+  
+  @@index([batchId])
+}
+
+model ExceptionRecord {
+  id              String    @id @default(cuid())
+  exceptionNo     String    @unique
+  batchId         String
+  exceptionType   String
+  severity        String
+  message         String
+  detail          String?
+  isResolved      Boolean   @default(false)
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  resolutionNote  String?
+  createdAt       DateTime  @default(now())
+  
+  batch           SettlementBatch @relation(fields: [batchId], references: [id])
+  
+  @@index([batchId, isResolved])
+  @@index([exceptionType])
+}
+
+model ApprovalRecord {
+  id              String    @id @default(cuid())
+  batchId         String
+  approvalType    String
+  status          String    @default("PENDING")
+  requester       String
+  approver        String?
+  requestNote     String?
+  approvalNote    String?
+  requestedAt     DateTime  @default(now())
+  approvedAt      DateTime?
+  
+  batch           SettlementBatch @relation(fields: [batchId], references: [id])
+  
+  @@index([batchId, status])
+}
+
+model SettlementReport {
+  id              String    @id @default(cuid())
+  reportNo        String    @unique
+  batchId         String
+  reportDate      DateTime
+  reportType      String
+  content         String
+  generatedBy     String?
+  createdAt       DateTime  @default(now())
+  
+  batch           SettlementBatch @relation(fields: [batchId], references: [id])
+  
+  @@index([batchId, reportDate])
+}
+
+model OperationLog {
+  id              String    @id @default(cuid())
+  operationNo     String    @unique
+  batchId         String?
+  operator        String
+  operationType   String
+  detail          String
+  ipAddress       String?
+  createdAt       DateTime  @default(now())
+  
+  @@index([batchId, createdAt])
+  @@index([operator, createdAt])
+}
