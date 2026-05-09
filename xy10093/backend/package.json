@@ -1,0 +1,17 @@
+{
+  "name": "rework-platform-backend",
+  "version": "1.0.0",
+  "description": "工厂返工单质量闭环台 - 后端",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "lowdb": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "xlsx": "^0.18.5"
+  }
+}

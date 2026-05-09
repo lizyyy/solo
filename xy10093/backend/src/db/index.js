@@ -1,0 +1,100 @@
+const path = require('path');
+const fs = require('fs');
+
+const dataDir = path.join(__dirname, '../../data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+const dbPath = path.join(dataDir, 'rework.json');
+
+function genId(collection) {
+  const ids = collection.map(x => x.id);
+  return ids.length > 0 ? Math.max(...ids) + 1 : 1;
+}
+
+function now() {
+  return new Date().toISOString();
+}
+
+const defaultData = {
+  rework_orders: [],
+  rework_records: [],
+  quality_checks: [],
+  anomalies: [],
+  order_history: []
+};
+
+let data = null;
+
+function loadData() {
+  if (data) return data;
+  
+  if (fs.existsSync(dbPath)) {
+    try {
+      const content = fs.readFileSync(dbPath, 'utf-8');
+      data = JSON.parse(content);
+    } catch {
+      data = JSON.parse(JSON.stringify(defaultData));
+    }
+  } else {
+    data = JSON.parse(JSON.stringify(defaultData));
+  }
+  
+  if (data.rework_orders.length === 0) {
+    const t = now();
+    
+    data.rework_orders = [
+      { id: 1, order_no: 'RW-2024-0001', product_name: '电机组件 A1', batch_no: 'BATCH-2024-01', qty: 100, defect_qty: 12, current_status: 'in_progress', created_at: t, updated_at: t },
+      { id: 2, order_no: 'RW-2024-0002', product_name: '电路板 B2', batch_no: 'BATCH-2024-05', qty: 250, defect_qty: 8, current_status: 'pending', created_at: t, updated_at: t },
+      { id: 3, order_no: 'RW-2024-0003', product_name: '外壳注塑件 C1', batch_no: 'BATCH-2024-08', qty: 500, defect_qty: 45, current_status: 'closed', created_at: t, updated_at: t },
+    ];
+    
+    data.rework_records = [
+      { id: 1, order_id: 1, rework_count: 1, defect_description: '焊接不良，引脚虚焊', root_cause: '烙铁温度不稳定', cause_category: '工艺参数', responsible_process: '焊接工序', responsible_person: '张三', correction_action: '更换烙铁头，校准温度', correction_date: '2024-05-01', created_at: t },
+      { id: 2, order_id: 1, rework_count: 2, defect_description: '再次出现焊接不良', root_cause: '操作员手法问题', cause_category: '人员操作', responsible_process: '焊接工序', responsible_person: '张三', correction_action: '加强培训，更换工位', correction_date: '2024-05-03', created_at: t },
+      { id: 3, order_id: 3, rework_count: 1, defect_description: '尺寸超差', root_cause: '模具磨损', cause_category: '设备工装', responsible_process: '注塑工序', responsible_person: '赵六', correction_action: '更换模具镶件', correction_date: '2024-04-15', created_at: t },
+    ];
+    
+    data.quality_checks = [
+      { id: 1, rework_record_id: 1, inspector: '李四', check_date: '2024-05-02', check_result: 'rework_required', defect_items: '仍有2件焊接不良', final_conclusion: '需再次返工', created_at: t },
+      { id: 2, rework_record_id: 2, inspector: '李四', check_date: '2024-05-04', check_result: 'pass', defect_items: '无', final_conclusion: '合格入库', created_at: t },
+      { id: 3, rework_record_id: 3, inspector: '钱七', check_date: '2024-04-16', check_result: 'pass', defect_items: '无', final_conclusion: '合格入库', created_at: t },
+    ];
+    
+    data.anomalies = [
+      { id: 1, order_id: 1, anomaly_type: 'process', description: '同一批次多次出现同类问题', severity: 'high', reported_by: '质检部', reported_date: t, status: 'open', created_at: t },
+    ];
+    
+    data.order_history = [
+      { id: 1, order_id: 1, action: 'create', details: '创建返工单 RW-2024-0001', operator: '系统', created_at: t },
+      { id: 2, order_id: 1, action: 'add_record', details: '第1次返工记录', operator: '张三', created_at: t },
+      { id: 3, order_id: 1, action: 'qc_check', details: '质检: 需再次返工', operator: '李四', created_at: t },
+      { id: 4, order_id: 1, action: 'add_record', details: '第2次返工记录', operator: '王五', created_at: t },
+      { id: 5, order_id: 1, action: 'qc_check', details: '质检: 合格', operator: '李四', created_at: t },
+    ];
+    
+    saveData();
+  }
+  
+  return data;
+}
+
+function saveData() {
+  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+const db = {
+  load: loadData,
+  save: saveData,
+  
+  orders: () => loadData().rework_orders,
+  records: () => loadData().rework_records,
+  checks: () => loadData().quality_checks,
+  anomalies: () => loadData().anomalies,
+  history: () => loadData().order_history,
+  
+  genId: genId,
+  now: now
+};
+
+module.exports = db;
