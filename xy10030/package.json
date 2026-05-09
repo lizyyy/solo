@@ -1,0 +1,21 @@
+{
+  "name": "event-registration-system",
+  "version": "1.0.0",
+  "description": "稳定可靠的活动报名系统",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "install:all": "npm install",
+    "build": "npm --workspace client run build",
+    "start": "npm --workspace server run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
