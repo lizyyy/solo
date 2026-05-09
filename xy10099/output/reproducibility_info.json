@@ -1,0 +1,61 @@
+{
+  "export_timestamp": "2026-05-09T18:15:05.179147",
+  "calculation_steps": [
+    {
+      "step_name": "计算比能耗",
+      "description": "能耗 / 产量",
+      "timestamp": "2026-05-09T18:15:02.342626",
+      "parameters": {
+        "energy_column": "能耗",
+        "production_column": "产量"
+      },
+      "result_summary": {
+        "valid_count": 1419,
+        "mean": 0.7845546866149445,
+        "median": 0.12083826627929363
+      }
+    },
+    {
+      "step_name": "建立基准线",
+      "description": "计算比能耗基准和异常阈值",
+      "timestamp": "2026-05-09T18:15:02.438318",
+      "parameters": {
+        "baseline_method": "filtered_mean",
+        "deviation_threshold_method": "2*std"
+      },
+      "result_summary": {
+        "baseline_value": 0.12043726677288585,
+        "baseline_std": 24.88986529445917,
+        "deviation_threshold": 49.77973058891834,
+        "anomaly_count": 1
+      }
+    },
+    {
+      "step_name": "计算预期能耗",
+      "description": "产量 * 单位能耗基准",
+      "timestamp": "2026-05-09T18:15:02.483089",
+      "parameters": {
+        "specific_energy_baseline": 0.12043726677288585
+      },
+      "result_summary": {
+        "total_expected_energy": 17208.68012702167,
+        "total_actual_energy": 117688.00186854436,
+        "total_waste": 100445.82168309498
+      }
+    }
+  ],
+  "config": {
+    "outlier_iqr_multiplier": 1.5,
+    "zscore_threshold": 3.0,
+    "missing_threshold": 0.3,
+    "pressure_normal_range": [
+      0.5,
+      1.0
+    ],
+    "leak_threshold": 0.1,
+    "default_energy_unit": "kWh",
+    "default_production_unit": "m³",
+    "default_pressure_unit": "MPa",
+    "default_leak_unit": "m³/min"
+  }
+}
