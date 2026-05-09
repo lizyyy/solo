@@ -1,0 +1,37 @@
+import { InvitationBatch, Enrollment, ExecutionRecord, SettlementResult, EventRecord } from '../types';
+export declare class DatabaseService {
+    private db;
+    private dbPath;
+    private constructor();
+    static create(dbPath?: string): Promise<DatabaseService>;
+    private initializeTables;
+    private persist;
+    saveBatch(batch: InvitationBatch, expectedVersion?: number): InvitationBatch;
+    getBatch(id: string): InvitationBatch | undefined;
+    getAllBatches(): InvitationBatch[];
+    saveEnrollment(enrollment: Enrollment, expectedVersion?: number): Enrollment;
+    getEnrollment(id: string): Enrollment | undefined;
+    getEnrollmentsByBatch(batchId: string): Enrollment[];
+    getEnrollmentByBatchAndEnterprise(batchId: string, enterpriseId: string): Enrollment | undefined;
+    saveExecutionRecord(record: ExecutionRecord): ExecutionRecord;
+    getExecutionRecordsByEnrollment(enrollmentId: string): ExecutionRecord[];
+    getExecutionRecordsByBatch(batchId: string): ExecutionRecord[];
+    saveSettlementResult(result: SettlementResult, expectedVersion?: number): SettlementResult;
+    getSettlementResult(enrollmentId: string): SettlementResult | undefined;
+    getSettlementResultsByBatch(batchId: string): SettlementResult[];
+    saveEvent(event: EventRecord): void;
+    getEventsByBatch(batchId: string): EventRecord[];
+    getEventsByEnrollment(enrollmentId: string): EventRecord[];
+    private mapResultToBatch;
+    private mapResultsToBatches;
+    private mapResultToEnrollment;
+    private mapResultsToEnrollments;
+    private mapResultToExecutionRecord;
+    private mapResultsToExecutionRecords;
+    private mapResultToSettlementResult;
+    private mapResultsToSettlementResults;
+    private mapResultToEventRecord;
+    private mapResultsToEventRecords;
+    private rowToObject;
+    close(): void;
+}
