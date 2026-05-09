@@ -1,0 +1,35 @@
+充电站负荷预测运行日志
+时间: 2026-05-09 18:24:17
+状态: 失败
+============================================================
+
+数据加载: 4420 条记录
+
+质量控制: 3634 有效 / 786 无效
+
+特征工程: 33 个特征
+
+模型评估: RMSE=6.0098
+
+报告生成: 8 图表, 6 表格
+
+错误: All arrays must be of the same length
+
+Traceback (most recent call last):
+  File "/Users/mac/pro/solo/workspaces/xy10102/main.py", line 106, in run
+    export_paths = self.exporter.export_all(
+  File "/Users/mac/pro/solo/workspaces/xy10102/charging_forecast/exporter.py", line 42, in export_all
+    export_paths['prediction'] = self._export_predictions(
+  File "/Users/mac/pro/solo/workspaces/xy10102/charging_forecast/exporter.py", line 129, in _export_predictions
+    df = pd.DataFrame(data)
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/pandas/core/frame.py", line 733, in __init__
+    mgr = dict_to_mgr(data, index, columns, dtype=dtype, copy=copy, typ=manager)
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/pandas/core/internals/construction.py", line 503, in dict_to_mgr
+    return arrays_to_mgr(arrays, columns, index, dtype=dtype, typ=typ, consolidate=copy)
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/pandas/core/internals/construction.py", line 114, in arrays_to_mgr
+    index = _extract_index(arrays)
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/pandas/core/internals/construction.py", line 677, in _extract_index
+    raise ValueError("All arrays must be of the same length")
+ValueError: All arrays must be of the same length
+
+

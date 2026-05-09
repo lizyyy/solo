@@ -1,0 +1,84 @@
+{
+  "export_time": "2026-05-09T18:24:56.624082",
+  "data_quality": {
+    "total_records": 4420,
+    "clean_records": 3634,
+    "failed_records": 786,
+    "valid_rate": 0.8221719457013574,
+    "failure_types": {
+      "missing_value": "86",
+      "out_of_range": 43,
+      "invalid_format": 0,
+      "duplicate": 200,
+      "negative_value": 86,
+      "inconsistent": 1114
+    }
+  },
+  "model_performance": {
+    "mse": 36.11817664109495,
+    "rmse": 6.009839984649753,
+    "mae": 4.067375679200928,
+    "r2": 0.9724692362433507,
+    "mape": 0.11386347798284065,
+    "max_error": 27.027384021993228,
+    "peak_rmse": 6.129721000364944,
+    "peak_mae": 4.6110847523125775,
+    "cv_rmse_mean": 6.213002111677815,
+    "cv_rmse_std": 0.27309621729910555
+  },
+  "feature_importance": {
+    "charging_duration": 0.002101706355367426,
+    "electricity_price": 0.023593560260563636,
+    "hour": 0.02778970650603548,
+    "day_of_week": 0.0002719544557950868,
+    "month": 5.9069699704758346e-05,
+    "is_weekend": 6.0555090059653595e-05,
+    "is_holiday": 0.0,
+    "hour_sin": 0.000405050476168748,
+    "hour_cos": 0.0002277119827101424,
+    "day_sin": 0.0003900658837589383,
+    "day_cos": 0.00020381090369863084,
+    "is_peak_hour": 0.7675663535612174,
+    "is_night": 0.06439023352627442,
+    "lag_1h": 0.006063287881194622,
+    "lag_24h": 0.0013698290801383538,
+    "lag_168h": 0.001377961307209654,
+    "rolling_mean_3h": 0.00471586904578396,
+    "rolling_std_3h": 0.002059232295731881,
+    "rolling_max_3h": 0.0410173161105694,
+    "rolling_min_3h": 0.012194590279626888,
+    "rolling_mean_6h": 0.0019398581067647778,
+    "rolling_std_6h": 0.0031472395124245577,
+    "rolling_max_6h": 0.03198679337098435,
+    "rolling_min_6h": 0.0007721450166408179,
+    "rolling_mean_12h": 0.002597201986667203,
+    "rolling_std_12h": 0.002045880796835265,
+    "rolling_max_12h": 0.0010523109503990477,
+    "rolling_min_12h": 0.0005130178733257259,
+    "price_low": 7.669167344119409e-07,
+    "price_medium": 6.00257213346175e-05,
+    "price_high": 4.834978788689001e-06,
+    "price_very_high": 2.083950483838125e-06,
+    "price_above_mean": 1.9976117007792398e-05
+  },
+  "output_files": {
+    "charts": [
+      "output/charging_load_timeseries.png",
+      "output/hourly_pattern.png",
+      "output/weekly_pattern.png",
+      "output/qc_summary.png",
+      "output/failure_types.png",
+      "output/prediction_comparison.png",
+      "output/prediction_errors.png",
+      "output/feature_importance.png"
+    ],
+    "tables": [
+      "qc_summary",
+      "statistics",
+      "model_metrics",
+      "feature_importance",
+      "prediction_results",
+      "failures"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+充电站负荷预测运行日志
+时间: 2026-05-09 18:22:57
+状态: 失败
+============================================================
+
+数据加载: 4420 条记录
+
+质量控制: 3634 有效 / 786 无效
+
+特征工程: 33 个特征
+
+模型评估: RMSE=6.0098
+
+错误: x and y must have same first dimension, but have shapes (0,) and (253,)
+
+Traceback (most recent call last):
+  File "/Users/mac/pro/solo/workspaces/xy10102/main.py", line 94, in run
+    report_output = self.report_generator.generate(
+  File "/Users/mac/pro/solo/workspaces/xy10102/charging_forecast/report.py", line 47, in generate
+    charts.update(self._generate_prediction_charts(prediction, output_dir))
+  File "/Users/mac/pro/solo/workspaces/xy10102/charging_forecast/report.py", line 226, in _generate_prediction_charts
+    self._plot_prediction_comparison(prediction, chart_path)
+  File "/Users/mac/pro/solo/workspaces/xy10102/charging_forecast/report.py", line 247, in _plot_prediction_comparison
+    ax.plot(prediction.timestamps, actual, label='实际值', linewidth=1.5)
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/matplotlib/axes/_axes.py", line 1721, in plot
+    lines = [*self._get_lines(self, *args, data=data, **kwargs)]
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/matplotlib/axes/_base.py", line 303, in __call__
+    yield from self._plot_args(
+  File "/Users/mac/Library/Python/3.9/lib/python/site-packages/matplotlib/axes/_base.py", line 499, in _plot_args
+    raise ValueError(f"x and y must have same first dimension, but "
+ValueError: x and y must have same first dimension, but have shapes (0,) and (253,)
+
+

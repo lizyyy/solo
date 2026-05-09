@@ -1,0 +1,92 @@
+data:
+  input_path: "data/sample_data.csv"
+  output_dir: "output"
+  encoding: "utf-8"
+  delimiter: ","
+
+columns:
+  timestamp: "timestamp"
+  charging_power: "charging_power"
+  energy_consumed: "energy_consumed"
+  charging_duration: "charging_duration"
+  station_id: "station_id"
+  charger_id: "charger_id"
+  electricity_price: "electricity_price"
+
+quality_control:
+  timestamp:
+    min_date: "2020-01-01"
+    max_date: "2030-12-31"
+  
+  charging_power:
+    min_value: 0
+    max_value: 500
+    unit: "kW"
+    default_unit: "kW"
+  
+  energy_consumed:
+    min_value: 0
+    max_value: 500
+    unit: "kWh"
+    default_unit: "kWh"
+  
+  charging_duration:
+    min_value: 0
+    max_value: 1440
+    unit: "minutes"
+    default_unit: "minutes"
+  
+  electricity_price:
+    min_value: 0
+    max_value: 10
+    unit: "yuan/kWh"
+    default_unit: "yuan/kWh"
+  
+  missing_threshold: 0.8
+  duplicate_check_columns: ["timestamp", "station_id", "charger_id"]
+
+unit_conversion:
+  charging_power:
+    W_to_kW: 0.001
+    MW_to_kW: 1000
+  
+  energy_consumed:
+    Wh_to_kWh: 0.001
+    MWh_to_kWh: 1000
+  
+  charging_duration:
+    seconds_to_minutes: 1/60
+    hours_to_minutes: 60
+
+feature_engineering:
+  time_features:
+    - "hour"
+    - "day_of_week"
+    - "month"
+    - "is_weekend"
+    - "is_holiday"
+  
+  lag_features:
+    - 1
+    - 24
+    - 168
+  
+  rolling_window:
+    - 3
+    - 6
+    - 12
+
+model:
+  type: "RandomForest"
+  test_size: 0.2
+  random_state: 42
+  parameters:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+
+report:
+  chart_format: "png"
+  chart_dpi: 300
+  include_failures: true
+  export_format: "xlsx"
