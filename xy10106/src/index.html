@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>离线巡检包导入复核工具</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部导航栏 -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">📋</span>
+        <h1>离线巡检包导入复核工具</h1>
+      </div>
+      <div class="header-actions">
+        <button id="btn-import" class="btn btn-primary">
+          <span>📦</span> 导入巡检包
+        </button>
+        <button id="btn-refresh" class="btn btn-secondary">
+          <span>🔄</span> 刷新
+        </button>
+      </div>
+    </header>
+
+    <!-- 主要内容区域 -->
+    <main class="main-container">
+      <!-- 左侧：历史记录列表 -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>历史记录</h2>
+          <span id="history-count" class="count-badge">0</span>
+        </div>
+        <div id="history-list" class="history-list">
+          <div class="empty-state">
+            <p>暂无历史记录</p>
+            <p class="hint">点击右上角「导入巡检包」开始</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 右侧：详情面板 -->
+      <section class="detail-panel">
+        <!-- 空状态 -->
+        <div id="empty-detail" class="empty-detail">
+          <div class="empty-icon">📁</div>
+          <h3>选择或导入巡检包</h3>
+          <p>从左侧列表选择，或导入新的巡检包进行复核</p>
+        </div>
+
+        <!-- 复核详情 -->
+        <div id="inspection-detail" class="inspection-detail hidden">
+          <!-- 基本信息 -->
+          <div class="detail-header">
+            <div class="detail-title">
+              <h2 id="detail-zipname">巡检包名称</h2>
+              <span id="detail-status" class="status-badge">待复核</span>
+            </div>
+            <div class="detail-meta">
+              <span id="detail-time">导入时间：--</span>
+            </div>
+          </div>
+
+          <!-- 统计卡片 -->
+          <div class="stats-cards">
+            <div class="stat-card" id="stat-photos">
+              <div class="stat-icon">📷</div>
+              <div class="stat-info">
+                <div class="stat-value" id="photo-count">0</div>
+                <div class="stat-label">照片</div>
+              </div>
+              <div class="stat-status" id="photo-status">✓ 完整</div>
+            </div>
+            <div class="stat-card" id="stat-locations">
+              <div class="stat-icon">📍</div>
+              <div class="stat-info">
+                <div class="stat-value" id="location-count">0</div>
+                <div class="stat-label">定位</div>
+              </div>
+              <div class="stat-status" id="location-status">✓ 完整</div>
+            </div>
+            <div class="stat-card" id="stat-forms">
+              <div class="stat-icon">📝</div>
+              <div class="stat-info">
+                <div class="stat-value" id="form-count">0</div>
+                <div class="stat-label">表单</div>
+              </div>
+              <div class="stat-status" id="form-status">✓ 完整</div>
+            </div>
+          </div>
+
+          <!-- 复核区域 -->
+          <div class="review-section">
+            <!-- 照片检查 -->
+            <div class="section-card">
+              <div class="section-header">
+                <h3>📷 照片检查</h3>
+                <div id="photo-validation" class="validation-badge valid">✓ 完整</div>
+              </div>
+              <div id="photo-list" class="photo-grid">
+                <!-- 照片列表 -->
+              </div>
+              <div id="photo-missing" class="missing-list hidden">
+                <h4>缺失文件：</h4>
+                <ul id="photo-missing-list"></ul>
+              </div>
+            </div>
+
+            <!-- 定位检查 -->
+            <div class="section-card">
+              <div class="section-header">
+                <h3>📍 定位检查</h3>
+                <div id="location-validation" class="validation-badge valid">✓ 完整</div>
+              </div>
+              <div id="location-list" class="data-list">
+                <!-- 定位列表 -->
+              </div>
+              <div id="location-missing" class="missing-list hidden">
+                <h4>缺失信息：</h4>
+                <ul id="location-missing-list"></ul>
+              </div>
+            </div>
+
+            <!-- 表单检查 -->
+            <div class="section-card">
+              <div class="section-header">
+                <h3>📝 表单检查</h3>
+                <div id="form-validation" class="validation-badge valid">✓ 完整</div>
+              </div>
+              <div id="form-data" class="form-display">
+                <!-- 表单数据 -->
+              </div>
+              <div id="form-missing" class="missing-list hidden">
+                <h4>缺失字段：</h4>
+                <ul id="form-missing-list"></ul>
+              </div>
+              <div id="form-conflicts" class="conflict-list hidden">
+                <h4>字段冲突：</h4>
+                <ul id="form-conflicts-list"></ul>
+              </div>
+            </div>
+
+            <!-- 复核备注 -->
+            <div class="section-card">
+              <div class="section-header">
+                <h3>📝 复核备注</h3>
+              </div>
+              <textarea id="review-notes" class="notes-textarea" placeholder="输入复核备注..."></textarea>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="action-bar">
+            <button id="btn-approve" class="btn btn-success">
+              <span>✓</span> 复核通过
+            </button>
+            <button id="btn-reject" class="btn btn-warning">
+              <span>✗</span> 复核不通过
+            </button>
+            <button id="btn-export" class="btn btn-info">
+              <span>📄</span> 导出清单
+            </button>
+            <button id="btn-delete" class="btn btn-danger">
+              <span>🗑️</span> 删除
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 提示框 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- 确认对话框 -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="modal-title">确认</h3>
+        <p id="modal-message">确定要执行此操作吗？</p>
+        <div class="modal-actions">
+          <button id="modal-cancel" class="btn btn-secondary">取消</button>
+          <button id="modal-confirm" class="btn btn-primary">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导入进度 -->
+    <div id="import-progress" class="import-progress hidden">
+      <div class="progress-content">
+        <div class="progress-spinner"></div>
+        <p id="progress-message">正在导入...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
