@@ -1,0 +1,1235 @@
+{
+  "export_time": "2026-05-09T17:56:39.639306",
+  "version": "1.0.0",
+  "qc_summary": {
+    "all_passed": false,
+    "total_checks": 4,
+    "passed_checks": 0,
+    "total_failures": 17,
+    "failures_by_type": {
+      "blank_exceed_threshold": 2,
+      "parallel_insufficient": 4,
+      "spike_recovery_outside_range": 2,
+      "outlier_detected": 9
+    },
+    "statistics": {
+      "sample_type_counts": {
+        "sample": 16,
+        "blank": 5,
+        "parallel": 4,
+        "spike": 3
+      },
+      "parameter_statistics": {
+        "COD": {
+          "count": 16,
+          "mean": 3292.0514791666687,
+          "median": 42.5,
+          "std": 12988.835648218745,
+          "min": 0.002,
+          "max": 52000.0,
+          "range": 51999.998
+        },
+        "总磷": {
+          "count": 7,
+          "mean": 28571.766571428572,
+          "median": 0.355,
+          "std": 75592.74555838907,
+          "min": 0.001,
+          "max": 200000.0,
+          "range": 199999.999
+        },
+        "氨氮": {
+          "count": 6,
+          "mean": 1.2883333333333333,
+          "median": 1.35,
+          "std": 0.7159725320615775,
+          "min": 0.02,
+          "max": 2.2,
+          "range": 2.18
+        }
+      }
+    },
+    "qc_summary": {
+      "total_checks": 4,
+      "passed_checks": 0,
+      "failed_checks": 4,
+      "total_failures": 17,
+      "check_details": [
+        {
+          "rule_name": "空白样检查",
+          "sample_type": "blank",
+          "passed": false,
+          "failure_count": 2
+        },
+        {
+          "rule_name": "平行样检查",
+          "sample_type": "parallel",
+          "passed": false,
+          "failure_count": 4
+        },
+        {
+          "rule_name": "加标回收检查",
+          "sample_type": "spike",
+          "passed": false,
+          "failure_count": 2
+        },
+        {
+          "rule_name": "异常值检测",
+          "sample_type": "all",
+          "passed": false,
+          "failure_count": 9
+        }
+      ]
+    }
+  },
+  "qc_checks": [
+    {
+      "rule_name": "空白样检查",
+      "sample_type": "blank",
+      "parameter": "all",
+      "passed": false,
+      "failure_count": 2,
+      "calculation_log": {
+        "COD": {
+          "mean": 0.019,
+          "max": 0.05,
+          "threshold": 0.01,
+          "sample_count": 3,
+          "values": [
+            0.002,
+            0.005,
+            0.05
+          ]
+        },
+        "总磷": {
+          "mean": 0.001,
+          "max": 0.001,
+          "threshold": 0.01,
+          "sample_count": 1,
+          "values": [
+            0.001
+          ]
+        },
+        "氨氮": {
+          "mean": 0.02,
+          "max": 0.02,
+          "threshold": 0.01,
+          "sample_count": 1,
+          "values": [
+            0.02
+          ]
+        }
+      }
+    },
+    {
+      "rule_name": "平行样检查",
+      "sample_type": "parallel",
+      "parameter": "all",
+      "passed": false,
+      "failure_count": 4,
+      "calculation_log": {
+        "PARA-A-001_COD": {
+          "error": "平行样数量不足，需要至少2个",
+          "count": 1
+        },
+        "PARA-A-002_COD": {
+          "error": "平行样数量不足，需要至少2个",
+          "count": 1
+        },
+        "PARA-B-001_总磷": {
+          "error": "平行样数量不足，需要至少2个",
+          "count": 1
+        },
+        "PARA-C-001_氨氮": {
+          "error": "平行样数量不足，需要至少2个",
+          "count": 1
+        }
+      }
+    },
+    {
+      "rule_name": "加标回收检查",
+      "sample_type": "spike",
+      "parameter": "all",
+      "passed": false,
+      "failure_count": 2,
+      "calculation_log": {
+        "SPIKE-001_COD_26": {
+          "spike_value": 88.0,
+          "original": 42.0,
+          "spike_amount": 50.0,
+          "recovery": 92.0,
+          "acceptable_range": [
+            80.0,
+            120.0
+          ]
+        },
+        "SPIKE-002_总磷_27": {
+          "spike_value": 0.95,
+          "original": 0.3,
+          "spike_amount": 0.5,
+          "recovery": 129.99999999999997,
+          "acceptable_range": [
+            80.0,
+            120.0
+          ]
+        },
+        "SPIKE-003_氨氮_28": {
+          "spike_value": 2.2,
+          "original": 1.5,
+          "spike_amount": 1.0,
+          "recovery": 70.00000000000001,
+          "acceptable_range": [
+            80.0,
+            120.0
+          ]
+        }
+      }
+    },
+    {
+      "rule_name": "异常值检测",
+      "sample_type": "all",
+      "parameter": "all",
+      "passed": false,
+      "failure_count": 9,
+      "calculation_log": {
+        "COD": {
+          "method": "IQR",
+          "q1": 37.725,
+          "q3": 50.450000000025,
+          "iqr": 12.725000000024998,
+          "factor": 1.5,
+          "bounds": [
+            18.637499999962504,
+            69.5375000000625
+          ],
+          "count": 16
+        },
+        "总磷": {
+          "method": "IQR",
+          "q1": 0.305,
+          "q3": 0.7,
+          "iqr": 0.39499999999999996,
+          "factor": 1.5,
+          "bounds": [
+            -0.2874999999999999,
+            1.2925
+          ],
+          "count": 7
+        },
+        "氨氮": {
+          "method": "IQR",
+          "q1": 1.2275,
+          "q3": 1.5550000000000002,
+          "iqr": 0.3275000000000001,
+          "factor": 1.5,
+          "bounds": [
+            0.7362499999999998,
+            2.0462500000000006
+          ],
+          "count": 6
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "sample_id": "BLANK-003",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "failure_type": "blank_exceed_threshold",
+      "rule_name": "空白样阈值检查",
+      "message": "空白样检测值 0.0500 超过阈值 0.01",
+      "value": 0.05,
+      "expected_range": [
+        0,
+        0.01
+      ],
+      "calculated_value": null,
+      "threshold": 0.01,
+      "affected_indices": [
+        17
+      ],
+      "raw_data": {
+        "mean": 0.019,
+        "all_values": [
+          0.002,
+          0.005,
+          0.05
+        ],
+        "max_value": 0.05
+      },
+      "timestamp": "2026-05-09T17:56:37.904328"
+    },
+    {
+      "sample_id": "BLANK-005",
+      "parameter": "氨氮",
+      "sample_type": "blank",
+      "failure_type": "blank_exceed_threshold",
+      "rule_name": "空白样阈值检查",
+      "message": "空白样检测值 0.0200 超过阈值 0.01",
+      "value": 0.02,
+      "expected_range": [
+        0,
+        0.01
+      ],
+      "calculated_value": null,
+      "threshold": 0.01,
+      "affected_indices": [
+        18
+      ],
+      "raw_data": {
+        "mean": 0.02,
+        "all_values": [
+          0.02
+        ],
+        "max_value": 0.02
+      },
+      "timestamp": "2026-05-09T17:56:37.904794"
+    },
+    {
+      "sample_id": "PARA-A-001",
+      "parameter": "COD",
+      "sample_type": "parallel",
+      "failure_type": "parallel_insufficient",
+      "rule_name": "平行样配对检查",
+      "message": "平行样数量不足: 1 个，需要至少2个",
+      "value": null,
+      "expected_range": null,
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        19
+      ],
+      "raw_data": {
+        "count": 1
+      },
+      "timestamp": "2026-05-09T17:56:37.905764"
+    },
+    {
+      "sample_id": "PARA-A-002",
+      "parameter": "COD",
+      "sample_type": "parallel",
+      "failure_type": "parallel_insufficient",
+      "rule_name": "平行样配对检查",
+      "message": "平行样数量不足: 1 个，需要至少2个",
+      "value": null,
+      "expected_range": null,
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        20
+      ],
+      "raw_data": {
+        "count": 1
+      },
+      "timestamp": "2026-05-09T17:56:37.905891"
+    },
+    {
+      "sample_id": "PARA-B-001",
+      "parameter": "总磷",
+      "sample_type": "parallel",
+      "failure_type": "parallel_insufficient",
+      "rule_name": "平行样配对检查",
+      "message": "平行样数量不足: 1 个，需要至少2个",
+      "value": null,
+      "expected_range": null,
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        21
+      ],
+      "raw_data": {
+        "count": 1
+      },
+      "timestamp": "2026-05-09T17:56:37.905998"
+    },
+    {
+      "sample_id": "PARA-C-001",
+      "parameter": "氨氮",
+      "sample_type": "parallel",
+      "failure_type": "parallel_insufficient",
+      "rule_name": "平行样配对检查",
+      "message": "平行样数量不足: 1 个，需要至少2个",
+      "value": null,
+      "expected_range": null,
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        22
+      ],
+      "raw_data": {
+        "count": 1
+      },
+      "timestamp": "2026-05-09T17:56:37.906102"
+    },
+    {
+      "sample_id": "SPIKE-002",
+      "parameter": "总磷",
+      "sample_type": "spike",
+      "failure_type": "spike_recovery_outside_range",
+      "rule_name": "加标回收率范围检查",
+      "message": "加标回收率 130.00% 超出范围 [80.0%, 120.0%]",
+      "value": 0.95,
+      "expected_range": [
+        80.0,
+        120.0
+      ],
+      "calculated_value": 129.99999999999997,
+      "threshold": null,
+      "affected_indices": [
+        27
+      ],
+      "raw_data": {
+        "spike_value": 0.95,
+        "original": 0.3,
+        "spike_amount": 0.5,
+        "recovery_calculation": "(0.95 - 0.3) / 0.5 * 100 = 129.99999999999997"
+      },
+      "timestamp": "2026-05-09T17:56:37.906499"
+    },
+    {
+      "sample_id": "SPIKE-003",
+      "parameter": "氨氮",
+      "sample_type": "spike",
+      "failure_type": "spike_recovery_outside_range",
+      "rule_name": "加标回收率范围检查",
+      "message": "加标回收率 70.00% 超出范围 [80.0%, 120.0%]",
+      "value": 2.2,
+      "expected_range": [
+        80.0,
+        120.0
+      ],
+      "calculated_value": 70.00000000000001,
+      "threshold": null,
+      "affected_indices": [
+        28
+      ],
+      "raw_data": {
+        "spike_value": 2.2,
+        "original": 1.5,
+        "spike_amount": 1.0,
+        "recovery_calculation": "(2.2 - 1.5) / 1.0 * 100 = 70.00000000000001"
+      },
+      "timestamp": "2026-05-09T17:56:37.906585"
+    },
+    {
+      "sample_id": "BLANK-001",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 0.0020 被识别为异常值",
+      "value": 0.002,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        15
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.908766"
+    },
+    {
+      "sample_id": "BLANK-002",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 0.0050 被识别为异常值",
+      "value": 0.005,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        16
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.908830"
+    },
+    {
+      "sample_id": "BLANK-003",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 0.0500 被识别为异常值",
+      "value": 0.05,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        17
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.908884"
+    },
+    {
+      "sample_id": "S-005",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 150.0000 被识别为异常值",
+      "value": 150.0,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        23
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.908933"
+    },
+    {
+      "sample_id": "S-011",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 52000.0000 被识别为异常值",
+      "value": 52000.0,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        24
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.908984"
+    },
+    {
+      "sample_id": "SPIKE-001",
+      "parameter": "COD",
+      "sample_type": "spike",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 88.0000 被识别为异常值",
+      "value": 88.0,
+      "expected_range": [
+        18.637499999962504,
+        69.5375000000625
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        26
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.909031"
+    },
+    {
+      "sample_id": "S-012",
+      "parameter": "总磷",
+      "sample_type": "sample",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 200000.0000 被识别为异常值",
+      "value": 200000.0,
+      "expected_range": [
+        -0.2874999999999999,
+        1.2925
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        25
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.910015"
+    },
+    {
+      "sample_id": "BLANK-005",
+      "parameter": "氨氮",
+      "sample_type": "blank",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 0.0200 被识别为异常值",
+      "value": 0.02,
+      "expected_range": [
+        0.7362499999999998,
+        2.0462500000000006
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        18
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.912223"
+    },
+    {
+      "sample_id": "SPIKE-003",
+      "parameter": "氨氮",
+      "sample_type": "spike",
+      "failure_type": "outlier_detected",
+      "rule_name": "异常值检测 (IQR)",
+      "message": "检测值 2.2000 被识别为异常值",
+      "value": 2.2,
+      "expected_range": [
+        0.7362499999999998,
+        2.0462500000000006
+      ],
+      "calculated_value": null,
+      "threshold": null,
+      "affected_indices": [
+        28
+      ],
+      "raw_data": {
+        "method": "iqr"
+      },
+      "timestamp": "2026-05-09T17:56:37.912365"
+    }
+  ],
+  "statistics": {
+    "sample_type_counts": {
+      "sample": 16,
+      "blank": 5,
+      "parallel": 4,
+      "spike": 3
+    },
+    "parameter_statistics": {
+      "COD": {
+        "count": 16,
+        "mean": 3292.0514791666687,
+        "median": 42.5,
+        "std": 12988.835648218745,
+        "min": 0.002,
+        "max": 52000.0,
+        "range": 51999.998
+      },
+      "总磷": {
+        "count": 7,
+        "mean": 28571.766571428572,
+        "median": 0.355,
+        "std": 75592.74555838907,
+        "min": 0.001,
+        "max": 200000.0,
+        "range": 199999.999
+      },
+      "氨氮": {
+        "count": 6,
+        "mean": 1.2883333333333333,
+        "median": 1.35,
+        "std": 0.7159725320615775,
+        "min": 0.02,
+        "max": 2.2,
+        "range": 2.18
+      }
+    }
+  },
+  "config_used": {
+    "blank_threshold": 0.01,
+    "parallel_max_rpd": 5.0,
+    "recovery_min": 80.0,
+    "recovery_max": 120.0,
+    "outlier_method": "iqr",
+    "outlier_factor": 1.5,
+    "sample_type_map": {
+      "空白": "blank",
+      "空白样": "blank",
+      "BLANK": "blank",
+      "blank": "blank",
+      "平行": "parallel",
+      "平行样": "parallel",
+      "DUPLICATE": "parallel",
+      "parallel": "parallel",
+      "加标": "spike",
+      "加标回收": "spike",
+      "SPIKE": "spike",
+      "spike": "spike",
+      "样品": "sample",
+      "样本": "sample",
+      "SAMPLE": "sample",
+      "sample": "sample"
+    },
+    "unit_conversion": {
+      "mg/L": {
+        "g/L": 1000.0,
+        "ug/L": 0.001
+      },
+      "g/L": {
+        "mg/L": 0.001,
+        "ug/L": 1e-06
+      },
+      "ug/L": {
+        "mg/L": 1000.0,
+        "g/L": 1000000.0
+      },
+      "mg/kg": {
+        "g/kg": 1000.0
+      },
+      "g/kg": {
+        "mg/kg": 0.001
+      }
+    },
+    "target_units": {
+      "pH": "",
+      "温度": "℃",
+      "总磷": "mg/L",
+      "总氮": "mg/L",
+      "氨氮": "mg/L",
+      "COD": "mg/L",
+      "BOD5": "mg/L"
+    },
+    "created_at": "2026-05-09T17:56:36.130723",
+    "version": "1.0.0"
+  },
+  "valid_samples": [
+    {
+      "sample_id": "BLANK-004",
+      "parameter": "总磷",
+      "sample_type": "blank",
+      "value": 0.001,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "blank"
+    },
+    {
+      "sample_id": "S-001",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 42.0,
+      "unit": "mg/L",
+      "spike_amount": 50.0,
+      "original_concentration": 42.0,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-001",
+      "parameter": "总磷",
+      "sample_type": "sample",
+      "value": 0.32,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-001",
+      "parameter": "氨氮",
+      "sample_type": "sample",
+      "value": 1.45,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-002",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 55.5,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-002",
+      "parameter": "总磷",
+      "sample_type": "sample",
+      "value": 0.29,
+      "unit": "mg/L",
+      "spike_amount": 0.5,
+      "original_concentration": 0.3,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-002",
+      "parameter": "氨氮",
+      "sample_type": "sample",
+      "value": 1.22,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-003",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 38.2,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-003",
+      "parameter": "总磷",
+      "sample_type": "sample",
+      "value": 0.45,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-003",
+      "parameter": "氨氮",
+      "sample_type": "sample",
+      "value": 1.59,
+      "unit": "mg/L",
+      "spike_amount": 1.0,
+      "original_concentration": 1.5,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-004",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 48.7666666667,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-006",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 44.3,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-007",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 41.9,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-008",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 39.8,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-013",
+      "parameter": "COD",
+      "sample_type": null,
+      "value": 43.0,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": null
+    }
+  ],
+  "invalid_samples": [
+    {
+      "sample_id": "BLANK-001",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "value": 0.002,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "blank"
+    },
+    {
+      "sample_id": "BLANK-002",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "value": 0.005,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "blank"
+    },
+    {
+      "sample_id": "BLANK-003",
+      "parameter": "COD",
+      "sample_type": "blank",
+      "value": 0.05,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "blank"
+    },
+    {
+      "sample_id": "BLANK-005",
+      "parameter": "氨氮",
+      "sample_type": "blank",
+      "value": 0.02,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "blank"
+    },
+    {
+      "sample_id": "PARA-A-001",
+      "parameter": "COD",
+      "sample_type": "parallel",
+      "value": 45.0,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "parallel"
+    },
+    {
+      "sample_id": "PARA-A-002",
+      "parameter": "COD",
+      "sample_type": "parallel",
+      "value": 36.3,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "parallel"
+    },
+    {
+      "sample_id": "PARA-B-001",
+      "parameter": "总磷",
+      "sample_type": "parallel",
+      "value": 0.355,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "parallel"
+    },
+    {
+      "sample_id": "PARA-C-001",
+      "parameter": "氨氮",
+      "sample_type": "parallel",
+      "value": 1.25,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "parallel"
+    },
+    {
+      "sample_id": "S-005",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 150.0,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-011",
+      "parameter": "COD",
+      "sample_type": "sample",
+      "value": 52000.0,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "ug/L",
+      "_unit_conversion_factor": 1000.0,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "S-012",
+      "parameter": "总磷",
+      "sample_type": "sample",
+      "value": 200000.0,
+      "unit": "mg/L",
+      "spike_amount": null,
+      "original_concentration": null,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "ug/L",
+      "_unit_conversion_factor": 1000.0,
+      "_original_sample_type": "sample"
+    },
+    {
+      "sample_id": "SPIKE-001",
+      "parameter": "COD",
+      "sample_type": "spike",
+      "value": 88.0,
+      "unit": "mg/L",
+      "spike_amount": 50.0,
+      "original_concentration": 42.0,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "spike"
+    },
+    {
+      "sample_id": "SPIKE-002",
+      "parameter": "总磷",
+      "sample_type": "spike",
+      "value": 0.95,
+      "unit": "mg/L",
+      "spike_amount": 0.5,
+      "original_concentration": 0.3,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "spike"
+    },
+    {
+      "sample_id": "SPIKE-003",
+      "parameter": "氨氮",
+      "sample_type": "spike",
+      "value": 2.2,
+      "unit": "mg/L",
+      "spike_amount": 1.0,
+      "original_concentration": 1.5,
+      "_value_source": "mean_of_duplicates",
+      "_unit_converted_from": "nan",
+      "_unit_conversion_factor": null,
+      "_original_sample_type": "spike"
+    }
+  ],
+  "execution_time_seconds": 0.02307295799255371,
+  "load_result": {
+    "success": true,
+    "file_path": "in_memory",
+    "file_type": "dataframe",
+    "row_count": 29,
+    "column_count": 11,
+    "issues": []
+  },
+  "preprocess_result": {
+    "original_rows": 29,
+    "cleaned_rows": 29,
+    "removed_rows": 0,
+    "issue_count": 4,
+    "issues_by_type": {
+      "missing_value": 4
+    }
+  },
+  "preprocess_issues": [
+    {
+      "type": "missing_value",
+      "severity": "warning",
+      "message": "列 'sample_type' 有 1 个缺失值",
+      "affected_rows": [
+        14
+      ],
+      "affected_columns": [
+        "sample_type"
+      ],
+      "details": {
+        "total": "1"
+      }
+    },
+    {
+      "type": "missing_value",
+      "severity": "warning",
+      "message": "列 'spike_amount' 有 23 个缺失值",
+      "affected_rows": [
+        0,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "affected_columns": [
+        "spike_amount"
+      ],
+      "details": {
+        "total": "23"
+      }
+    },
+    {
+      "type": "missing_value",
+      "severity": "warning",
+      "message": "列 'original_concentration' 有 23 个缺失值",
+      "affected_rows": [
+        0,
+        2,
+        3,
+        4,
+        6,
+        7,
+        8,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "affected_columns": [
+        "original_concentration"
+      ],
+      "details": {
+        "total": "23"
+      }
+    },
+    {
+      "type": "missing_value",
+      "severity": "warning",
+      "message": "列 '_unit_conversion_factor' 有 27 个缺失值",
+      "affected_rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "affected_columns": [
+        "_unit_conversion_factor"
+      ],
+      "details": {
+        "total": "27"
+      }
+    }
+  ],
+  "preprocess_actions": [
+    {
+      "action": "rename_columns",
+      "mapping": {
+        "sample_id": "sample_id",
+        "parameter": "parameter",
+        "sample_type": "sample_type",
+        "value": "value",
+        "unit": "unit",
+        "spike_amount": "spike_amount"
+      }
+    }
+  ]
+}
