@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>露天矿卡车盲区演示器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #e94560;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: #e94560;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .header p {
+            margin-top: 8px;
+            color: #a0a0a0;
+            font-size: 0.95rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .canvas-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            min-height: 300px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #2d3436 0%, #636e72 100%);
+            cursor: crosshair;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560, #c73659);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 184, 148, 0.4);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .panel h3 {
+            color: #e94560;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .risk-indicator {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .risk-safe {
+            background: rgba(0, 184, 148, 0.2);
+            border: 2px solid #00b894;
+            color: #00b894;
+        }
+
+        .risk-danger {
+            background: rgba(233, 69, 96, 0.2);
+            border: 2px solid #e94560;
+            color: #e94560;
+            animation: pulse-danger 1.5s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(233, 69, 96, 0); }
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list span.value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .test-section {
+            margin-top: 15px;
+        }
+
+        .test-btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .test-btn {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .status-msg {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .status-msg.show {
+            display: block;
+        }
+
+        .status-error {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid #e94560;
+            color: #e94560;
+        }
+
+        .status-warning {
+            background: rgba(253, 203, 110, 0.2);
+            border: 1px solid #fdcb6e;
+            color: #fdcb6e;
+        }
+
+        .status-success {
+            background: rgba(0, 184, 148, 0.2);
+            border: 1px solid #00b894;
+            color: #00b894;
+        }
+
+        .instructions {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #a0a0a0;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .coordinates {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: #00b894;
+            pointer-events: none;
+        }
+
+        .worker-info {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #fff;
+            pointer-events: none;
+        }
+
+        .truck-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .slider-container label {
+            font-size: 0.85rem;
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 50px;
+            text-align: right;
+            font-size: 0.85rem;
+            color: #00b894;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚛 露天矿卡车盲区演示器</h1>
+            <p>拖拽人员图标到卡车周围，体验大型矿用卡车转弯时的盲区风险</p>
+        </header>
+
+        <div class="main-content">
+            <div class="canvas-container">
+                <div class="canvas-wrapper">
+                    <div class="coordinates" id="coordinates">X: 0 | Y: 0</div>
+                    <div class="worker-info" id="workerInfo">人员位置：安全区域</div>
+                    <canvas id="blindSpotCanvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <div class="truck-controls">
+                        <div class="slider-container">
+                            <label>转向角度:</label>
+                            <input type="range" id="steeringAngle" min="-45" max="45" value="0" step="1">
+                            <span class="slider-value" id="steeringValue">0°</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="resetBtn">🔄 重置位置</button>
+                    <button class="btn btn-secondary" id="toggleBlindSpots">👁️ 切换盲区显示</button>
+                    <button class="btn btn-success" id="addWorkerBtn">➕ 添加人员</button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>⚠️ 风险状态</h3>
+                    <div class="risk-indicator risk-safe" id="riskIndicator">
+                        ✅ 安全状态
+                    </div>
+                    <div id="riskDetails">
+                        <ul class="info-list">
+                            <li>
+                                <span>人员数量:</span>
+                                <span class="value" id="workerCount">1</span>
+                            </li>
+                            <li>
+                                <span>危险位置:</span>
+                                <span class="value" id="dangerCount">0</span>
+                            </li>
+                            <li>
+                                <span>盲区类型:</span>
+                                <span class="value" id="blindSpotType">-</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>📋 图例说明</h3>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(233, 69, 96, 0.4); border: 2px solid #e94560;"></div>
+                            <span>前盲区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(253, 203, 110, 0.4); border: 2px solid #fdcb6e;"></div>
+                            <span>后盲区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(255, 118, 117, 0.4); border: 2px solid #ff7675;"></div>
+                            <span>内侧盲区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: rgba(116, 185, 255, 0.4); border: 2px solid #74b9ff;"></div>
+                            <span>外侧盲区</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e17055;"></div>
+                            <span>矿用卡车</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #00b894; border-radius: 50%;"></div>
+                            <span>作业人员</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>🔧 异常样例测试</h3>
+                    <p class="instructions">点击按钮加载不同类型的异常数据，测试系统的容错能力：</p>
+                    <div class="test-btn-group">
+                        <button class="btn btn-secondary test-btn" id="testDuplicate">重复数据</button>
+                        <button class="btn btn-secondary test-btn" id="testMissing">缺字段</button>
+                        <button class="btn btn-secondary test-btn" id="testInvalid">人工改错</button>
+                        <button class="btn btn-success test-btn" id="testNormal">正常数据</button>
+                    </div>
+                    <div class="status-msg" id="statusMsg"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>📖 使用说明</h3>
+                    <div class="instructions">
+                        <ol>
+                            <li>拖拽画布中的<strong>绿色圆点</strong>（人员）到不同位置</li>
+                            <li>观察<strong>红色扇形区域</strong>（盲区），判断人员是否安全</li>
+                            <li>调节<strong>转向角度</strong>滑块，观察盲区变化</li>
+                            <li>点击<strong>添加人员</strong>增加更多测试人员</li>
+                            <li>使用<strong>异常样例测试</strong>验证系统容错性</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('blindSpotCanvas');
+        const ctx = canvas.getContext('2d');
+        const coordinatesEl = document.getElementById('coordinates');
+        const workerInfoEl = document.getElementById('workerInfo');
+        const riskIndicator = document.getElementById('riskIndicator');
+        const workerCountEl = document.getElementById('workerCount');
+        const dangerCountEl = document.getElementById('dangerCount');
+        const blindSpotTypeEl = document.getElementById('blindSpotType');
+        const steeringSlider = document.getElementById('steeringAngle');
+        const steeringValue = document.getElementById('steeringValue');
+        const statusMsg = document.getElementById('statusMsg');
+
+        let canvasWidth, canvasHeight;
+        let showBlindSpots = true;
+        let steeringAngle = 0;
+
+        let truck = {
+            x: 0,
+            y: 0,
+            width: 140,
+            height: 280,
+            cabHeight: 70,
+            trailerOffset: 80
+        };
+
+        let workers = [];
+        let draggedWorker = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        const testDataSets = {
+            normal: {
+                name: '正常数据',
+                workers: [
+                    { id: 1, name: '张工', x: 0, y: 0, status: 'safe' }
+                ]
+            },
+            duplicate: {
+                name: '重复数据',
+                workers: [
+                    { id: 1, name: '张工', x: 0, y: 0, status: 'safe' },
+                    { id: 1, name: '张工', x: 50, y: 50, status: 'safe' },
+                    { id: 2, name: '李工', x: -50, y: 50, status: 'safe' },
+                    { id: 2, name: '李工', x: -50, y: 50, status: 'safe' }
+                ]
+            },
+            missing: {
+                name: '缺字段数据',
+                workers: [
+                    { name: '王工', x: 0, y: 0 },
+                    { id: 2, x: 50, y: 50 },
+                    { id: 3, name: '赵工', y: -30 },
+                    {}
+                ]
+            },
+            invalid: {
+                name: '人工改错数据',
+                workers: [
+                    { id: 'abc', name: '钱工', x: 'invalid', y: 100, status: 'unknown' },
+                    { id: null, name: null, x: null, y: null, status: null },
+                    { id: -1, name: '', x: NaN, y: Infinity, status: 'danger' },
+                    { id: {}, name: [], x: {}, y: {}, status: {} }
+                ]
+            }
+        };
+
+        function init() {
+            resizeCanvas();
+            initWorkers();
+            setupEventListeners();
+            draw();
+        }
+
+        function resizeCanvas() {
+            const wrapper = canvas.parentElement;
+            const rect = wrapper.getBoundingClientRect();
+            canvasWidth = rect.width;
+            canvasHeight = rect.height;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = canvasWidth * dpr;
+            canvas.height = canvasHeight * dpr;
+            ctx.scale(dpr, dpr);
+            truck.x = canvasWidth / 2;
+            truck.y = canvasHeight / 2;
+        }
+
+        function initWorkers() {
+            workers = [{
+                id: 1,
+                name: '张工',
+                x: truck.x + truck.width + 80,
+                y: truck.y,
+                radius: 15,
+                status: 'safe'
+            }];
+        }
+
+        function setupEventListeners() {
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                draw();
+            });
+
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseUp);
+
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', handleTouchEnd);
+
+            document.getElementById('resetBtn').addEventListener('click', resetWorkers);
+            document.getElementById('toggleBlindSpots').addEventListener('click', toggleBlindSpots);
+            document.getElementById('addWorkerBtn').addEventListener('click', addWorker);
+
+            steeringSlider.addEventListener('input', (e) => {
+                steeringAngle = parseInt(e.target.value);
+                steeringValue.textContent = `${steeringAngle}°`;
+                checkAllWorkers();
+                draw();
+            });
+
+            document.getElementById('testDuplicate').addEventListener('click', () => loadTestData('duplicate'));
+            document.getElementById('testMissing').addEventListener('click', () => loadTestData('missing'));
+            document.getElementById('testInvalid').addEventListener('click', () => loadTestData('invalid'));
+            document.getElementById('testNormal').addEventListener('click', () => loadTestData('normal'));
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            coordinatesEl.textContent = `X: ${Math.round(x)} | Y: ${Math.round(y)}`;
+
+            if (draggedWorker) {
+                draggedWorker.x = x - dragOffsetX;
+                draggedWorker.y = y - dragOffsetY;
+                checkWorkerPosition(draggedWorker);
+                draw();
+            }
+        }
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            for (let i = workers.length - 1; i >= 0; i--) {
+                const worker = workers[i];
+                const dist = Math.sqrt((x - worker.x) ** 2 + (y - worker.y) ** 2);
+                if (dist <= worker.radius) {
+                    draggedWorker = worker;
+                    dragOffsetX = x - worker.x;
+                    dragOffsetY = y - worker.y;
+                    canvas.style.cursor = 'grabbing';
+                    break;
+                }
+            }
+        }
+
+        function handleMouseUp() {
+            if (draggedWorker) {
+                draggedWorker = null;
+                canvas.style.cursor = 'crosshair';
+            }
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            for (let i = workers.length - 1; i >= 0; i--) {
+                const worker = workers[i];
+                const dist = Math.sqrt((x - worker.x) ** 2 + (y - worker.y) ** 2);
+                if (dist <= worker.radius + 20) {
+                    draggedWorker = worker;
+                    dragOffsetX = x - worker.x;
+                    dragOffsetY = y - worker.y;
+                    break;
+                }
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (draggedWorker) {
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+
+                coordinatesEl.textContent = `X: ${Math.round(x)} | Y: ${Math.round(y)}`;
+
+                draggedWorker.x = x - dragOffsetX;
+                draggedWorker.y = y - dragOffsetY;
+                checkWorkerPosition(draggedWorker);
+                draw();
+            }
+        }
+
+        function handleTouchEnd() {
+            if (draggedWorker) {
+                draggedWorker = null;
+            }
+        }
+
+        function getBlindSpots() {
+            const spots = [];
+            const halfWidth = truck.width / 2;
+            const halfHeight = truck.height / 2;
+
+            spots.push({
+                type: 'front',
+                name: '前盲区',
+                cx: truck.x,
+                cy: truck.y - halfHeight,
+                radius: 120,
+                startAngle: Math.PI * 0.3,
+                endAngle: Math.PI * 0.7,
+                color: 'rgba(233, 69, 96, 0.4)',
+                borderColor: '#e94560'
+            });
+
+            spots.push({
+                type: 'back',
+                name: '后盲区',
+                cx: truck.x,
+                cy: truck.y + halfHeight,
+                radius: 100,
+                startAngle: -Math.PI * 0.7,
+                endAngle: -Math.PI * 0.3,
+                color: 'rgba(253, 203, 110, 0.4)',
+                borderColor: '#fdcb6e'
+            });
+
+            const turnFactor = steeringAngle / 45;
+            const innerSide = turnFactor > 0 ? 'left' : 'right';
+            const outerSide = turnFactor > 0 ? 'right' : 'left';
+            const innerOffset = halfWidth * 1.2;
+            const outerOffset = halfWidth * 1.5;
+
+            spots.push({
+                type: 'inner',
+                name: '内侧盲区',
+                cx: truck.x + (turnFactor > 0 ? -innerOffset : innerOffset),
+                cy: truck.y + halfHeight * 0.3,
+                radius: 80 + Math.abs(turnFactor) * 60,
+                startAngle: turnFactor > 0 ? Math.PI * 0.1 : -Math.PI * 0.1,
+                endAngle: turnFactor > 0 ? Math.PI * 0.9 : -Math.PI * 0.9,
+                color: 'rgba(255, 118, 117, 0.4)',
+                borderColor: '#ff7675'
+            });
+
+            spots.push({
+                type: 'outer',
+                name: '外侧盲区',
+                cx: truck.x + (turnFactor > 0 ? outerOffset : -outerOffset),
+                cy: truck.y - halfHeight * 0.2,
+                radius: 60 + Math.abs(turnFactor) * 40,
+                startAngle: turnFactor > 0 ? -Math.PI * 0.8 : Math.PI * 0.8,
+                endAngle: turnFactor > 0 ? -Math.PI * 0.2 : Math.PI * 0.2,
+                color: 'rgba(116, 185, 255, 0.4)',
+                borderColor: '#74b9ff'
+            });
+
+            return spots;
+        }
+
+        function isPointInSector(px, py, cx, cy, radius, startAngle, endAngle) {
+            const dx = px - cx;
+            const dy = py - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > radius) return false;
+
+            let angle = Math.atan2(dy, dx);
+
+            let normalizedStart = startAngle;
+            let normalizedEnd = endAngle;
+
+            while (normalizedEnd < normalizedStart) {
+                normalizedEnd += 2 * Math.PI;
+            }
+
+            let normalizedAngle = angle;
+            while (normalizedAngle < normalizedStart) {
+                normalizedAngle += 2 * Math.PI;
+            }
+
+            return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+        }
+
+        function checkWorkerPosition(worker) {
+            const blindSpots = getBlindSpots();
+            worker.inBlindSpot = false;
+            worker.blindSpotType = null;
+
+            for (const spot of blindSpots) {
+                if (isPointInSector(
+                    worker.x, worker.y,
+                    spot.cx, spot.cy,
+                    spot.radius,
+                    spot.startAngle, spot.endAngle
+                )) {
+                    worker.inBlindSpot = true;
+                    worker.blindSpotType = spot.name;
+                    worker.blindSpotTypeKey = spot.type;
+                    break;
+                }
+            }
+
+            worker.status = worker.inBlindSpot ? 'danger' : 'safe';
+            updateWorkerInfo();
+            updateRiskStatus();
+        }
+
+        function checkAllWorkers() {
+            workers.forEach(worker => checkWorkerPosition(worker));
+        }
+
+        function updateWorkerInfo() {
+            const dragged = draggedWorker || workers[workers.length - 1];
+            if (dragged) {
+                if (dragged.inBlindSpot) {
+                    workerInfoEl.innerHTML = `人员位置：<span style="color: #e94560;">危险 - ${dragged.blindSpotType}</span>`;
+                } else {
+                    workerInfoEl.innerHTML = `人员位置：<span style="color: #00b894;">安全区域</span>`;
+                }
+            }
+        }
+
+        function updateRiskStatus() {
+            const dangerCount = workers.filter(w => w.inBlindSpot).length;
+            workerCountEl.textContent = workers.length;
+            dangerCountEl.textContent = dangerCount;
+
+            if (dangerCount > 0) {
+                const dangerWorker = workers.find(w => w.inBlindSpot);
+                riskIndicator.className = 'risk-indicator risk-danger';
+                riskIndicator.textContent = `⚠️ 危险！${dangerCount}人处于盲区`;
+                blindSpotTypeEl.textContent = dangerWorker.blindSpotType;
+            } else {
+                riskIndicator.className = 'risk-indicator risk-safe';
+                riskIndicator.textContent = '✅ 安全状态';
+                blindSpotTypeEl.textContent = '-';
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            drawGrid();
+
+            if (showBlindSpots) {
+                drawBlindSpots();
+            }
+
+            drawTruck();
+            drawWorkers();
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+
+            const gridSize = 40;
+            for (let x = 0; x < canvasWidth; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvasHeight; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvasWidth, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawBlindSpots() {
+            const blindSpots = getBlindSpots();
+
+            blindSpots.forEach(spot => {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(spot.cx, spot.cy);
+                ctx.arc(spot.cx, spot.cy, spot.radius, spot.startAngle, spot.endAngle);
+                ctx.closePath();
+                ctx.fillStyle = spot.color;
+                ctx.fill();
+                ctx.strokeStyle = spot.borderColor;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const midAngle = (spot.startAngle + spot.endAngle) / 2;
+                const labelX = spot.cx + Math.cos(midAngle) * spot.radius * 0.6;
+                const labelY = spot.cy + Math.sin(midAngle) * spot.radius * 0.6;
+
+                ctx.fillStyle = spot.borderColor;
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(spot.name, labelX, labelY);
+                ctx.restore();
+            });
+        }
+
+        function drawTruck() {
+            ctx.save();
+            ctx.translate(truck.x, truck.y);
+
+            const halfWidth = truck.width / 2;
+            const halfHeight = truck.height / 2;
+
+            ctx.fillStyle = '#e17055';
+            ctx.strokeStyle = '#d63031';
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.roundRect(-halfWidth, -halfHeight, truck.width, truck.cabHeight, [10, 10, 0, 0]);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#74b9ff';
+            ctx.beginPath();
+            ctx.roundRect(-halfWidth + 10, -halfHeight + 10, truck.width - 20, truck.cabHeight - 30, [5, 5, 0, 0]);
+            ctx.fill();
+
+            ctx.fillStyle = '#636e72';
+            ctx.beginPath();
+            ctx.roundRect(-halfWidth, -halfHeight + truck.cabHeight, truck.width, truck.height - truck.cabHeight, [0, 0, 5, 5]);
+            ctx.fill();
+            ctx.strokeStyle = '#2d3436';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.strokeStyle = '#2d3436';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 3; i++) {
+                const y = -halfHeight + truck.cabHeight + 30 + i * 50;
+                ctx.beginPath();
+                ctx.moveTo(-halfWidth + 10, y);
+                ctx.lineTo(halfWidth - 10, y);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#2d3436';
+            const wheelRadius = 20;
+            const wheelYFront = -halfHeight + truck.cabHeight - 5;
+            const wheelYBack1 = halfHeight - 30;
+            const wheelYBack2 = halfHeight - 70;
+
+            ctx.beginPath();
+            ctx.arc(-halfWidth + 5, wheelYFront, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(halfWidth - 5, wheelYFront, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(-halfWidth + 5, wheelYBack1, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(halfWidth - 5, wheelYBack1, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(-halfWidth + 5, wheelYBack2, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(halfWidth - 5, wheelYBack2, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (steeringAngle !== 0) {
+                ctx.strokeStyle = '#e94560';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 3]);
+                const arcRadius = 200;
+                const startAngle = steeringAngle > 0 ? -Math.PI * 0.3 : Math.PI * 0.7;
+                const endAngle = steeringAngle > 0 ? -Math.PI * 0.05 : Math.PI * 0.95;
+
+                ctx.beginPath();
+                ctx.arc(
+                    truck.x + (steeringAngle > 0 ? -100 : 100) - truck.x,
+                    truck.y + 100 - truck.y,
+                    arcRadius,
+                    startAngle,
+                    endAngle
+                );
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#e94560';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`转向: ${steeringAngle}°`, 0, -halfHeight - 20);
+            }
+
+            ctx.restore();
+        }
+
+        function drawWorkers() {
+            workers.forEach((worker, index) => {
+                ctx.save();
+
+                if (worker.inBlindSpot) {
+                    ctx.beginPath();
+                    ctx.arc(worker.x, worker.y, worker.radius + 15, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(233, 69, 96, 0.3)';
+                    ctx.fill();
+                }
+
+                ctx.beginPath();
+                ctx.arc(worker.x, worker.y, worker.radius, 0, Math.PI * 2);
+
+                const gradient = ctx.createRadialGradient(
+                    worker.x - 5, worker.y - 5, 0,
+                    worker.x, worker.y, worker.radius
+                );
+
+                if (worker.inBlindSpot) {
+                    gradient.addColorStop(0, '#e94560');
+                    gradient.addColorStop(1, '#c0392b');
+                } else {
+                    gradient.addColorStop(0, '#55efc4');
+                    gradient.addColorStop(1, '#00b894');
+                }
+
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                ctx.strokeStyle = worker.inBlindSpot ? '#c0392b' : '#00a085';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('👷', worker.x, worker.y);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.fillText(index + 1, worker.x, worker.y + worker.radius + 12);
+
+                if (worker.name) {
+                    ctx.fillStyle = worker.inBlindSpot ? '#e94560' : '#00b894';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText(worker.name, worker.x, worker.y - worker.radius - 8);
+                }
+
+                ctx.restore();
+            });
+        }
+
+        function resetWorkers() {
+            initWorkers();
+            steeringAngle = 0;
+            steeringSlider.value = 0;
+            steeringValue.textContent = '0°';
+            checkAllWorkers();
+            updateRiskStatus();
+            draw();
+            showStatus('已重置所有位置', 'success');
+        }
+
+        function toggleBlindSpots() {
+            showBlindSpots = !showBlindSpots;
+            const btn = document.getElementById('toggleBlindSpots');
+            btn.textContent = showBlindSpots ? '👁️ 切换盲区显示' : '🙈 切换盲区显示';
+            draw();
+        }
+
+        function addWorker() {
+            const names = ['张工', '李工', '王工', '赵工', '钱工', '孙工', '周工', '吴工'];
+            const newWorker = {
+                id: workers.length + 1,
+                name: names[workers.length % names.length],
+                x: truck.x + truck.width + 80 + (workers.length % 3) * 50,
+                y: truck.y - 100 + Math.floor(workers.length / 3) * 80,
+                radius: 15,
+                status: 'safe'
+            };
+            workers.push(newWorker);
+            checkWorkerPosition(newWorker);
+            updateRiskStatus();
+            draw();
+            showStatus(`已添加 ${newWorker.name}`, 'success');
+        }
+
+        function loadTestData(type) {
+            const data = testDataSets[type];
+
+            if (!data) {
+                showStatus('无效的测试数据类型', 'error');
+                return;
+            }
+
+            workers = [];
+            let processedCount = 0;
+            let warnings = [];
+
+            data.workers.forEach((rawWorker, index) => {
+                try {
+                    const worker = {
+                        id: rawWorker.id !== undefined ? rawWorker.id : `auto_${Date.now()}_${index}`,
+                        name: rawWorker.name || `人员${index + 1}`,
+                        x: truck.x + 200 + (index * 40),
+                        y: truck.y - 150 + (index * 60),
+                        radius: 15,
+                        status: 'safe'
+                    };
+
+                    if (rawWorker.id === undefined || rawWorker.id === null) {
+                        warnings.push(`第${index + 1}条数据缺少ID字段，已自动生成`);
+                    }
+                    if (rawWorker.name === undefined || rawWorker.name === null || rawWorker.name === '') {
+                        warnings.push(`第${index + 1}条数据缺少姓名字段`);
+                    }
+
+                    if (typeof rawWorker.x === 'number' && !isNaN(rawWorker.x) && isFinite(rawWorker.x)) {
+                        worker.x = truck.x + rawWorker.x;
+                    } else if (rawWorker.x !== undefined) {
+                        warnings.push(`第${index + 1}条数据X坐标无效：${JSON.stringify(rawWorker.x)}`);
+                    }
+
+                    if (typeof rawWorker.y === 'number' && !isNaN(rawWorker.y) && isFinite(rawWorker.y)) {
+                        worker.y = truck.y + rawWorker.y;
+                    } else if (rawWorker.y !== undefined) {
+                        warnings.push(`第${index + 1}条数据Y坐标无效：${JSON.stringify(rawWorker.y)}`);
+                    }
+
+                    if (type === 'duplicate') {
+                        const existing = workers.find(w => w.id === worker.id);
+                        if (existing) {
+                            warnings.push(`检测到重复ID：${worker.id}，这是第${workers.filter(w => w.id === worker.id).length + 1}次出现`);
+                        }
+                    }
+
+                    workers.push(worker);
+                    processedCount++;
+                } catch (error) {
+                    warnings.push(`第${index + 1}条数据处理失败：${error.message}`);
+                }
+            });
+
+            if (workers.length === 0) {
+                initWorkers();
+            }
+
+            checkAllWorkers();
+            updateRiskStatus();
+            draw();
+
+            if (warnings.length > 0) {
+                showStatus(`加载${data.name}：成功${processedCount}条，警告${warnings.length}条\n${warnings.slice(0, 3).join('\n')}${warnings.length > 3 ? '\n...' : ''}`, 'warning');
+            } else {
+                showStatus(`成功加载${data.name}（${processedCount}条）`, 'success');
+            }
+        }
+
+        function showStatus(message, type) {
+            statusMsg.textContent = message;
+            statusMsg.className = `status-msg show status-${type}`;
+
+            setTimeout(() => {
+                statusMsg.classList.remove('show');
+            }, 5000);
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
