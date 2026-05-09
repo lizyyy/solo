@@ -1,0 +1,36 @@
+{
+  "version_count": 4,
+  "tables": {
+    "sales_data": {
+      "current_version": 4,
+      "versions": [
+        {
+          "version": 1,
+          "imported_at": "2026-05-09T22:50:05.943242",
+          "comment": "\u7b2c\u4e00\u5468\u8fd0\u8425\u6570\u636e"
+        },
+        {
+          "version": 2,
+          "imported_at": "2026-05-09T22:50:07.887357",
+          "comment": "\u7b2c\u4e8c\u5468\u8fd0\u8425\u6570\u636e"
+        },
+        {
+          "version": 3,
+          "imported_at": "2026-05-09T22:50:09.883904",
+          "comment": "\u7b2c\u4e09\u5468\u8fd0\u8425\u6570\u636e-\u65b0\u589e\u6298\u6263\u5b57\u6bb5"
+        },
+        {
+          "version": 4,
+          "imported_at": "2026-05-09T22:50:12.475063",
+          "comment": "\u7b2c\u56db\u5468\u8fd0\u8425\u6570\u636e"
+        }
+      ],
+      "file_hashes": {
+        "26d212e4eb08eedb76186d6bbebb6cd1": 1,
+        "ef23c87f07a396abb7daf3487b2ff4ae": 2,
+        "fb3caae5ae9289640b88c4ba6e2b188d": 3,
+        "e9c21f63a5c6a387213d290f3595bcc2": 4
+      }
+    }
+  }
+}

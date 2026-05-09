@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV 字段血缘追踪报告 - sales_data</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .summary-card { background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #007bff; }
+        .summary-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; }
+        .summary-card .value { font-size: 28px; font-weight: bold; color: #333; }
+        .section { margin: 30px 0; }
+        .section h2 { color: #333; border-bottom: 2px solid #ddd; padding-bottom: 8px; }
+        .breaking { background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 5px; padding: 15px; margin: 10px 0; border-left: 4px solid #f44336; }
+        .warning { background: #fffde7; border: 1px solid #fff176; border-radius: 5px; padding: 15px; margin: 10px 0; border-left: 4px solid #ffc107; }
+        .change-item { background: #f8f9fa; border-radius: 5px; padding: 15px; margin: 10px 0; }
+        .change-item.added { border-left: 4px solid #4caf50; }
+        .change-item.removed { border-left: 4px solid #f44336; }
+        .change-item.changed { border-left: 4px solid #ff9800; }
+        .field-name { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .field-reason { color: #666; font-size: 14px; }
+        .source-info { margin-top: 10px; padding: 10px; background: #e3f2fd; border-radius: 4px; font-size: 12px; }
+        .alias-list { background: #e8f5e9; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .alias-list .current { font-weight: bold; color: #2e7d32; }
+        .timestamp { color: #999; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+        tr:hover { background: #fafafa; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .badge.added { background: #c8e6c9; color: #2e7d32; }
+        .badge.removed { background: #ffcdd2; color: #c62828; }
+        .badge.changed { background: #ffe0b2; color: #e65100; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSV 字段血缘追踪报告</h1>
+        <p class="timestamp">表名: sales_data | 生成时间: 2026-05-09 22:50:36 | 版本: v1 &rarr; v4</p>
+        
+        <div class="section">
+            <h2>变更概要</h2>
+            <div class="summary">
+                <div class="summary-card">
+                    <h3>原字段数</h3>
+                    <div class="value">8</div>
+                </div>
+                <div class="summary-card">
+                    <h3>新字段数</h3>
+                    <div class="value">8</div>
+                </div>
+                <div class="summary-card">
+                    <h3>新增字段</h3>
+                    <div class="value" style="color: #4caf50;">6</div>
+                </div>
+                <div class="summary-card">
+                    <h3>删除字段</h3>
+                    <div class="value" style="color: #f44336;">6</div>
+                </div>
+                <div class="summary-card">
+                    <h3>修改字段</h3>
+                    <div class="value" style="color: #ff9800;">0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>未变字段</h3>
+                    <div class="value">2</div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="section">
+            <h2 style="color: #f44336;">破坏性变更</h2>
+            
+            <div class="breaking">
+                <div class="field-name">discount</div>
+                <div class="field-reason">字段 'discount'（最后使用名: discount）在版本 4 被删除</div>
+                <div class="source-info">
+                    <strong>来源追踪:</strong><br>
+                    版本: 4<br>
+                    时间: 2026-05-09T22:50:12.483555<br>
+                    前一个名称: discount
+                </div>
+            </div>
+            
+        </div>
+        
+        
+        
+        
+        <div class="section">
+            <h2>字段血缘关系</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>标准名称</th>
+                        <th>历史别名</th>
+                        <th>首次出现</th>
+                        <th>最后出现</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td><strong>date</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                date &rarr; 
+                                
+                                
+                                
+                                order_date &rarr; 
+                                
+                                
+                                
+                                transaction_date &rarr; 
+                                
+                                
+                                
+                                <span class="current">sale_date (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>user_id</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                user_id &rarr; 
+                                
+                                
+                                
+                                customer_id &rarr; 
+                                
+                                
+                                
+                                <span class="current">buyer_id (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>user_name</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                user_name &rarr; 
+                                
+                                
+                                
+                                customer_name &rarr; 
+                                
+                                
+                                
+                                <span class="current">buyer_name (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>order_id</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                order_id &rarr; 
+                                
+                                
+                                
+                                order_no &rarr; 
+                                
+                                
+                                
+                                transaction_id &rarr; 
+                                
+                                
+                                
+                                <span class="current">order_number (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>order_amount</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                order_amount &rarr; 
+                                
+                                
+                                
+                                total_amount &rarr; 
+                                
+                                
+                                
+                                payment_amount &rarr; 
+                                
+                                
+                                
+                                <span class="current">amount (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>product_name</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                product_name &rarr; 
+                                
+                                
+                                
+                                item_name &rarr; 
+                                
+                                
+                                
+                                <span class="current">product (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>quantity</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                quantity &rarr; 
+                                
+                                
+                                
+                                qty &rarr; 
+                                
+                                
+                                
+                                <span class="current">qty_ordered (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>channel</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                channel &rarr; 
+                                
+                                
+                                
+                                purchase_channel &rarr; 
+                                
+                                
+                                
+                                <span class="current">sales_channel (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v1</td>
+                        <td>v4</td>
+                    </tr>
+                    
+                    <tr>
+                        <td><strong>discount</strong></td>
+                        <td>
+                            <div class="alias-list">
+                                
+                                
+                                <span class="current">discount (当前)</span>
+                                
+                                
+                            </div>
+                        </td>
+                        <td>v3</td>
+                        <td>v3</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        
+        <div class="section">
+            <h2>新增字段 <span class="badge added">+6</span></h2>
+            
+            <div class="change-item added">
+                <div class="field-name">+ sales_channel</div>
+                <div class="field-reason">字段 'sales_channel' 在新版本中新增，类型为 object</div>
+                
+                <div class="source-info">类型: object</div>
+                
+            </div>
+            
+            <div class="change-item added">
+                <div class="field-name">+ sale_date</div>
+                <div class="field-reason">字段 'sale_date' 在新版本中新增，类型为 object</div>
+                
+                <div class="source-info">类型: object</div>
+                
+            </div>
+            
+            <div class="change-item added">
+                <div class="field-name">+ order_number</div>
+                <div class="field-reason">字段 'order_number' 在新版本中新增，类型为 object</div>
+                
+                <div class="source-info">类型: object</div>
+                
+            </div>
+            
+            <div class="change-item added">
+                <div class="field-name">+ amount</div>
+                <div class="field-reason">字段 'amount' 在新版本中新增，类型为 float64</div>
+                
+                <div class="source-info">类型: float64</div>
+                
+            </div>
+            
+            <div class="change-item added">
+                <div class="field-name">+ customer_name</div>
+                <div class="field-reason">字段 'customer_name' 在新版本中新增，类型为 object</div>
+                
+                <div class="source-info">类型: object</div>
+                
+            </div>
+            
+            <div class="change-item added">
+                <div class="field-name">+ customer_id</div>
+                <div class="field-reason">字段 'customer_id' 在新版本中新增，类型为 object</div>
+                
+                <div class="source-info">类型: object</div>
+                
+            </div>
+            
+        </div>
+        
+        
+        
+        <div class="section">
+            <h2>删除字段 <span class="badge removed">-6</span></h2>
+            
+            <div class="change-item removed">
+                <div class="field-name">- user_name</div>
+                <div class="field-reason">字段 'user_name' 在新版本中缺失，原类型为 object</div>
+                
+                <div class="source-info">原类型: object</div>
+                
+            </div>
+            
+            <div class="change-item removed">
+                <div class="field-name">- order_amount</div>
+                <div class="field-reason">字段 'order_amount' 在新版本中缺失，原类型为 float64</div>
+                
+                <div class="source-info">原类型: float64</div>
+                
+            </div>
+            
+            <div class="change-item removed">
+                <div class="field-name">- order_id</div>
+                <div class="field-reason">字段 'order_id' 在新版本中缺失，原类型为 object</div>
+                
+                <div class="source-info">原类型: object</div>
+                
+            </div>
+            
+            <div class="change-item removed">
+                <div class="field-name">- channel</div>
+                <div class="field-reason">字段 'channel' 在新版本中缺失，原类型为 object</div>
+                
+                <div class="source-info">原类型: object</div>
+                
+            </div>
+            
+            <div class="change-item removed">
+                <div class="field-name">- date</div>
+                <div class="field-reason">字段 'date' 在新版本中缺失，原类型为 object</div>
+                
+                <div class="source-info">原类型: object</div>
+                
+            </div>
+            
+            <div class="change-item removed">
+                <div class="field-name">- user_id</div>
+                <div class="field-reason">字段 'user_id' 在新版本中缺失，原类型为 object</div>
+                
+                <div class="source-info">原类型: object</div>
+                
+            </div>
+            
+        </div>
+        
+        
+        
+        
+        <p class="timestamp" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+            报告由 CSV 字段血缘追踪 CLI 生成
+        </p>
+    </div>
+</body>
+</html>

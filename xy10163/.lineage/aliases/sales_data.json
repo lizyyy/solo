@@ -1,0 +1,45 @@
+{
+  "date": [
+    "date",
+    "order_date",
+    "transaction_date",
+    "sale_date"
+  ],
+  "user_id": [
+    "user_id",
+    "customer_id",
+    "buyer_id"
+  ],
+  "user_name": [
+    "user_name",
+    "customer_name",
+    "buyer_name"
+  ],
+  "order_id": [
+    "order_id",
+    "order_no",
+    "transaction_id",
+    "order_number"
+  ],
+  "order_amount": [
+    "order_amount",
+    "total_amount",
+    "payment_amount",
+    "amount"
+  ],
+  "product_name": [
+    "product_name",
+    "item_name",
+    "product"
+  ],
+  "quantity": [
+    "quantity",
+    "qty",
+    "qty_ordered"
+  ],
+  "channel": [
+    "channel",
+    "purchase_channel",
+    "sales_channel"
+  ]
+}

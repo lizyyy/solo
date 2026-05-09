@@ -1,0 +1,125 @@
+{
+  "version": 4,
+  "table_name": "sales_data",
+  "file_path": "examples/sales_week4_missing_fields.csv",
+  "file_hash": "e9c21f63a5c6a387213d290f3595bcc2",
+  "schema": {
+    "file_path": "examples/sales_week4_missing_fields.csv",
+    "row_count": 10,
+    "field_count": 8,
+    "fields": [
+      {
+        "name": "sale_date",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 5,
+        "sample_values": [
+          "2024-01-22",
+          "2024-01-22",
+          "2024-01-23",
+          "2024-01-23",
+          "2024-01-24"
+        ],
+        "max_length": 10
+      },
+      {
+        "name": "customer_id",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 7,
+        "sample_values": [
+          "U001",
+          "U002",
+          "U003",
+          "U004",
+          "U001"
+        ],
+        "max_length": 4
+      },
+      {
+        "name": "customer_name",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 7,
+        "sample_values": [
+          "张三",
+          "李四",
+          "王五",
+          "赵六",
+          "张三"
+        ],
+        "max_length": 2
+      },
+      {
+        "name": "order_number",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "sample_values": [
+          "S001",
+          "S002",
+          "S003",
+          "S004",
+          "S005"
+        ],
+        "max_length": 4
+      },
+      {
+        "name": "amount",
+        "dtype": "float64",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "min": 39.99,
+        "max": 1799.0,
+        "mean": 577.495
+      },
+      {
+        "name": "product_name",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "sample_values": [
+          "iPhone",
+          "MacBook",
+          "AirPods",
+          "Case",
+          "AirPods Pro"
+        ],
+        "max_length": 11
+      },
+      {
+        "name": "quantity",
+        "dtype": "int64",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 3,
+        "min": 1.0,
+        "max": 3.0,
+        "mean": 1.5
+      },
+      {
+        "name": "sales_channel",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 2,
+        "sample_values": [
+          "mobile",
+          "web",
+          "mobile",
+          "web",
+          "mobile"
+        ],
+        "max_length": 6
+      }
+    ]
+  },
+  "comment": "第四周运营数据",
+  "imported_at": "2026-05-09T22:50:12.475063"
+}

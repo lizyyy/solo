@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csv-lineage-tracker"
+version = "1.0.0"
+description = "CSV 字段血缘追踪 CLI - 追踪运营表字段名变化，管理别名，识别破坏性变更"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "CSV Lineage Tracker Team"}]
+dependencies = [
+    "click>=8.0.0",
+    "pandas>=1.3.0",
+    "pyvis>=0.3.0",
+    "jinja2>=3.0.0",
+    "rich>=12.0.0",
+]
+
+[project.scripts]
+csv-lineage = "csv_lineage.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["csv_lineage*"]
