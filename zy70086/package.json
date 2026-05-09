@@ -1,0 +1,32 @@
+{
+  "name": "waste-schedule-service",
+  "version": "1.0.0",
+  "description": "垃圾分类清运调度服务",
+  "scripts": {
+    "start": "node dist/main.js",
+    "dev": "ts-node src/main.ts",
+    "build": "tsc",
+    "seed": "ts-node src/seeds/initial-seed.ts",
+    "task:worker": "ts-node src/tasks/worker.ts"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20",
+    "reflect-metadata": "^0.2.2",
+    "express": "^4.19.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.11",
+    "bull": "^4.12.2",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2",
+    "@types/node": "^20.12.12",
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/uuid": "^9.0.8"
+  }
+}
