@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+      - "443:443"
+    environment:
+      - API_HOST=api
+  api:
+    build: ./api
+    ports:
+      - "3001:3000"
+    environment:
+      - DB_PORT=5432
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"

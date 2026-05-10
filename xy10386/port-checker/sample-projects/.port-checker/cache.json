@@ -1,0 +1,233 @@
+{
+  "scanned_at": "2026-05-11T02:09:08.770863",
+  "checked_at": "2026-05-11T02:09:08.766666",
+  "projects": {
+    "api-server": {
+      "name": "api-server",
+      "path": "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/api-server",
+      "config_files": [
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/api-server/.env",
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/api-server/package.json"
+      ],
+      "last_scanned": "2026-05-11T02:09:08.768423",
+      "last_checked": "2026-05-11T02:09:08.766666",
+      "ports": [
+        {
+          "port": 8080,
+          "source": ".env:1",
+          "service": "server_port",
+          "raw_value": "8080",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 8080 在多个项目中被配置"
+        },
+        {
+          "port": 5432,
+          "source": ".env:2",
+          "service": "db_port",
+          "raw_value": "5432",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 5432 在多个项目中被配置"
+        },
+        {
+          "port": 6379,
+          "source": ".env:3",
+          "service": "redis_port",
+          "raw_value": "6379",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 6379 在多个项目中被配置"
+        },
+        {
+          "port": 8080,
+          "source": "package.json:scripts.dev",
+          "service": "script:dev",
+          "raw_value": "8080",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 8080 在多个项目中被配置"
+        }
+      ]
+    },
+    "clean-app": {
+      "name": "clean-app",
+      "path": "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/clean-app",
+      "config_files": [
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/clean-app/.env"
+      ],
+      "last_scanned": "2026-05-11T02:09:08.769034",
+      "last_checked": "2026-05-11T02:09:08.766666",
+      "ports": [
+        {
+          "port": 9000,
+          "source": ".env:1",
+          "service": "port",
+          "raw_value": "9000",
+          "status": "available",
+          "process_name": null,
+          "process_id": null,
+          "error": null
+        },
+        {
+          "port": 9001,
+          "source": ".env:2",
+          "service": "admin_port",
+          "raw_value": "9001",
+          "status": "available",
+          "process_name": null,
+          "process_id": null,
+          "error": null
+        }
+      ]
+    },
+    "full-stack": {
+      "name": "full-stack",
+      "path": "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/full-stack",
+      "config_files": [
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/full-stack/docker-compose.yml"
+      ],
+      "last_scanned": "2026-05-11T02:09:08.769483",
+      "last_checked": "2026-05-11T02:09:08.766666",
+      "ports": [
+        {
+          "port": 80,
+          "source": "docker-compose.yml",
+          "service": "root.services.web.ports[0]",
+          "raw_value": "8080:80",
+          "status": "available",
+          "process_name": null,
+          "process_id": null,
+          "error": null
+        },
+        {
+          "port": 443,
+          "source": "docker-compose.yml",
+          "service": "root.services.web.ports[1]",
+          "raw_value": "443:443",
+          "status": "available",
+          "process_name": null,
+          "process_id": null,
+          "error": null
+        },
+        {
+          "port": 3000,
+          "source": "docker-compose.yml",
+          "service": "root.services.api.ports[0]",
+          "raw_value": "3001:3000",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 3000 在多个项目中被配置"
+        },
+        {
+          "port": 5432,
+          "source": "docker-compose.yml",
+          "service": "root.services.db.ports[0]",
+          "raw_value": "5432:5432",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 5432 在多个项目中被配置"
+        },
+        {
+          "port": 6379,
+          "source": "docker-compose.yml",
+          "service": "root.services.redis.ports[0]",
+          "raw_value": "6379:6379",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 6379 在多个项目中被配置"
+        }
+      ]
+    },
+    "web-frontend": {
+      "name": "web-frontend",
+      "path": "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/web-frontend",
+      "config_files": [
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/web-frontend/.env",
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/web-frontend/package.json"
+      ],
+      "last_scanned": "2026-05-11T02:09:08.769895",
+      "last_checked": "2026-05-11T02:09:08.766666",
+      "ports": [
+        {
+          "port": 3000,
+          "source": ".env:1",
+          "service": "port",
+          "raw_value": "3000",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 3000 在多个项目中被配置"
+        },
+        {
+          "port": 8080,
+          "source": ".env:2",
+          "service": "api_port",
+          "raw_value": "8080",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 8080 在多个项目中被配置"
+        },
+        {
+          "port": 3000,
+          "source": "package.json:scripts.dev",
+          "service": "script:dev",
+          "raw_value": "3000",
+          "status": "conflict",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 3000 在多个项目中被配置"
+        }
+      ]
+    },
+    "broken-config": {
+      "name": "broken-config",
+      "path": "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/broken-config",
+      "config_files": [
+        "/Users/mac/pro/solo/workspaces/xy10386/port-checker/sample-projects/broken-config/.env"
+      ],
+      "last_scanned": "2026-05-11T02:09:08.770859",
+      "last_checked": "2026-05-11T02:09:08.766666",
+      "ports": [
+        {
+          "port": 0,
+          "source": ".env:1",
+          "service": "port",
+          "raw_value": "abc",
+          "status": "invalid",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口格式错误: 'abc' 不是有效数字"
+        },
+        {
+          "port": 0,
+          "source": ".env:2",
+          "service": "api_port",
+          "raw_value": "99999",
+          "status": "invalid",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口 99999 超出有效范围 (1-65535)"
+        },
+        {
+          "port": 0,
+          "source": ".env:3",
+          "service": "invalid_port",
+          "raw_value": "",
+          "status": "invalid",
+          "process_name": null,
+          "process_id": null,
+          "error": "端口值为空"
+        }
+      ]
+    }
+  }
+}

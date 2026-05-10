@@ -1,0 +1,9 @@
+{
+  "name": "web-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "next dev --port 3000",
+    "build": "next build"
+  }
+}
