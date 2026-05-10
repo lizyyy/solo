@@ -1,0 +1,31 @@
+{
+  "name": "sample-review-api",
+  "version": "1.0.0",
+  "description": "采购样品评审 API 后端项目",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^11.0.0",
+    "uuid": "^9.0.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "moment": "^2.30.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "@types/uuid": "^9.0.8",
+    "@types/json2csv": "^5.0.7",
+    "@types/better-sqlite3": "^7.6.10",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "ts-jest": "^29.1.2"
+  }
+}
