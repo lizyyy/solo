@@ -60,7 +60,7 @@ class SyncService {
     }
     appendSystemEvent(aggregateId, eventType, payload, clientId) {
         const db = (0, database_1.getDatabase)();
-        const existingEvents = event_store_1.eventStore.getEventsByAggregate(aggregateId);
+        const existingEvents = this.getSystemEventsByAggregate(aggregateId);
         const currentVersion = existingEvents.length > 0
             ? existingEvents[existingEvents.length - 1].newVersion
             : 0;
@@ -85,6 +85,30 @@ class SyncService {
         client_id, ip_address, user_agent, correlation_id, sequence
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(event.id, event.eventType, event.aggregateId, event.aggregateType, JSON.stringify(event.payload), event.previousVersion, event.newVersion, event.userId, event.timestamp, event.clientId, null, null, null, event.sequence);
+    }
+    getSystemEventsByAggregate(aggregateId) {
+        const db = (0, database_1.getDatabase)();
+        const rows = db.prepare(`
+      SELECT * FROM events 
+      WHERE aggregate_id = ? AND aggregate_type = 'system'
+      ORDER BY sequence ASC
+    `).all(aggregateId);
+        return rows.map((row) => ({
+            id: row.id,
+            eventType: row.event_type,
+            aggregateId: row.aggregate_id,
+            aggregateType: row.aggregate_type,
+            payload: JSON.parse(row.payload),
+            previousVersion: row.previous_version,
+            newVersion: row.new_version,
+            userId: row.user_id,
+            timestamp: row.timestamp,
+            clientId: row.client_id,
+            ipAddress: row.ip_address || undefined,
+            userAgent: row.user_agent || undefined,
+            correlationId: row.correlation_id || undefined,
+            sequence: row.sequence,
+        }));
     }
     applyRemoteEvent(event) {
         const db = (0, database_1.getDatabase)();
@@ -178,11 +202,8 @@ class SyncService {
     async replayEvents(aggregateId, targetVersion) {
         try {
             const events = event_store_1.eventStore.replayEvents(aggregateId, targetVersion);
-            const currentEvents = event_store_1.eventStore.getEventsByAggregate(aggregateId);
-            const currentVersion = currentEvents.length > 0
-                ? currentEvents[currentEvents.length - 1].newVersion
-                : 0;
-            this.appendSystemEvent(aggregateId, 'CACHE_INVALIDATED', { aggregateId, targetVersion }, 'replay');
+            const systemAggregateId = 'system-' + aggregateId;
+            this.appendSystemEvent(systemAggregateId, 'CACHE_INVALIDATED', { aggregateId, targetVersion }, 'replay');
             const db = (0, database_1.getDatabase)();
             const existingRow = db.prepare('SELECT * FROM bills WHERE id = ?').get(aggregateId);
             if (existingRow) {
@@ -208,7 +229,8 @@ class SyncService {
             return true;
         }
         catch (error) {
-            this.appendSystemEvent(aggregateId, 'TRANSACTION_ROLLBACK', { aggregateId, targetVersion, error: error.message }, 'replay');
+            const systemAggregateId = 'system-' + aggregateId;
+            this.appendSystemEvent(systemAggregateId, 'TRANSACTION_ROLLBACK', { aggregateId, targetVersion, error: error.message }, 'replay');
             throw error;
         }
     }

@@ -14,35 +14,111 @@ localStorage.setItem('clientId', CLIENT_ID);
 console.log('Client ID:', CLIENT_ID);
 console.log('User ID:', USER_ID);
 
+interface PendingRequest {
+  correlationId: string;
+  promise: Promise<any>;
+  timestamp: number;
+}
+
+const pendingRequests = new Map<string, PendingRequest>();
+const CACHE_DURATION = 5000;
+
+function generateRequestKey(endpoint: string, method: string, body?: any): string {
+  return `${method}:${endpoint}:${JSON.stringify(body || {})}`;
+}
+
+function hashCode(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+function generateCorrelationId(endpoint: string, method: string, body?: any): string {
+  const bodyStr = body ? JSON.stringify(body) : '';
+  const bodyHash = hashCode(bodyStr);
+  return `corr-${endpoint.replace(/\//g, '-')}-${method}-${bodyHash}-${Date.now()}`;
+}
+
+function cleanupPendingRequests(): void {
+  const now = Date.now();
+  for (const [key, req] of pendingRequests.entries()) {
+    if (now - req.timestamp > CACHE_DURATION) {
+      pendingRequests.delete(key);
+    }
+  }
+}
+
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
   needHeaders: boolean = true
 ): Promise<T> {
+  cleanupPendingRequests();
+
+  let body: any = undefined;
+  if (options.body) {
+    try {
+      body = JSON.parse(options.body as string);
+    } catch {
+      body = options.body;
+    }
+  }
+
+  const method = options.method || 'GET';
+  const requestKey = generateRequestKey(endpoint, method, body);
+
+  const existing = pendingRequests.get(requestKey);
+  if (existing) {
+    return existing.promise as Promise<T>;
+  }
+
+  const correlationId = generateCorrelationId(endpoint, method, body);
+  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'X-Client-Id': CLIENT_ID,
     'X-User-Id': USER_ID,
+    'X-Correlation-Id': correlationId,
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers: needHeaders ? headers : options.headers,
-    credentials: 'include',
+  const requestPromise = (async (): Promise<T> => {
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        headers: needHeaders ? headers : options.headers,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} ${errorText}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return response.json();
+      }
+
+      return response.arrayBuffer() as unknown as T;
+    } finally {
+      setTimeout(() => {
+        pendingRequests.delete(requestKey);
+      }, CACHE_DURATION);
+    }
+  })();
+
+  pendingRequests.set(requestKey, {
+    correlationId,
+    promise: requestPromise,
+    timestamp: Date.now(),
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API Error: ${response.status} ${errorText}`);
-  }
-
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return response.json();
-  }
-
-  return response.arrayBuffer() as unknown as T;
+  return requestPromise;
 }
 
 export const api = {

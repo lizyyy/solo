@@ -11,6 +11,7 @@ declare class SyncService {
         newServerVersion: number;
     }>;
     private appendSystemEvent;
+    private getSystemEventsByAggregate;
     private applyRemoteEvent;
     private getEventsSinceVersion;
     private getLatestVersion;

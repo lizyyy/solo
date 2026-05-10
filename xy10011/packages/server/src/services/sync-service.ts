@@ -100,7 +100,7 @@ class SyncService {
     clientId: string
   ): void {
     const db = getDatabase();
-    const existingEvents = eventStore.getEventsByAggregate(aggregateId);
+    const existingEvents = this.getSystemEventsByAggregate(aggregateId);
     const currentVersion = existingEvents.length > 0 
       ? existingEvents[existingEvents.length - 1].newVersion 
       : 0;
@@ -142,6 +142,32 @@ class SyncService {
       null,
       event.sequence
     );
+  }
+
+  private getSystemEventsByAggregate(aggregateId: string): Event[] {
+    const db = getDatabase();
+    const rows = db.prepare(`
+      SELECT * FROM events 
+      WHERE aggregate_id = ? AND aggregate_type = 'system'
+      ORDER BY sequence ASC
+    `).all(aggregateId) as any[];
+
+    return rows.map((row: any) => ({
+      id: row.id,
+      eventType: row.event_type,
+      aggregateId: row.aggregate_id,
+      aggregateType: row.aggregate_type,
+      payload: JSON.parse(row.payload),
+      previousVersion: row.previous_version,
+      newVersion: row.new_version,
+      userId: row.user_id,
+      timestamp: row.timestamp,
+      clientId: row.client_id,
+      ipAddress: row.ip_address || undefined,
+      userAgent: row.user_agent || undefined,
+      correlationId: row.correlation_id || undefined,
+      sequence: row.sequence,
+    }));
   }
 
   private applyRemoteEvent(event: Event): void {
@@ -274,14 +300,10 @@ class SyncService {
   async replayEvents(aggregateId: string, targetVersion: number): Promise<boolean> {
     try {
       const events = eventStore.replayEvents(aggregateId, targetVersion);
-      
-      const currentEvents = eventStore.getEventsByAggregate(aggregateId);
-      const currentVersion = currentEvents.length > 0 
-        ? currentEvents[currentEvents.length - 1].newVersion 
-        : 0;
 
+      const systemAggregateId = 'system-' + aggregateId;
       this.appendSystemEvent(
-        aggregateId,
+        systemAggregateId,
         'CACHE_INVALIDATED',
         { aggregateId, targetVersion },
         'replay'
@@ -323,8 +345,9 @@ class SyncService {
       cacheService.invalidate(aggregateId);
       return true;
     } catch (error) {
+      const systemAggregateId = 'system-' + aggregateId;
       this.appendSystemEvent(
-        aggregateId,
+        systemAggregateId,
         'TRANSACTION_ROLLBACK',
         { aggregateId, targetVersion, error: (error as Error).message },
         'replay'

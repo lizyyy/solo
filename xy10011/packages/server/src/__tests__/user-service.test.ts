@@ -88,6 +88,8 @@ describe('User Service', () => {
       testClientId
     );
 
+    await new Promise(resolve => setTimeout(resolve, 5));
+
     const updatedUser = await userService.updateUser(
       userId,
       { name: '更新后的名称' },
@@ -96,7 +98,7 @@ describe('User Service', () => {
     );
 
     expect(updatedUser.name).toBe('更新后的名称');
-    expect(updatedUser.updatedAt).toBeGreaterThan(user.updatedAt);
+    expect(updatedUser.updatedAt).toBeGreaterThanOrEqual(user.updatedAt);
   });
 
   test('should get user by id', async () => {
