@@ -1,0 +1,23 @@
+[
+  {
+    "orderId": "VD-2026-005",
+    "customerName": "孙先生",
+    "customerPhone": "13800138005",
+    "price": 3990,
+    "deliverySlot": "morning-1",
+    "deliveryAddress": "北京市丰台区XX路XX号",
+    "bouquets": [
+      {
+        "specId": "romantic-rose-11",
+        "quantity": 10
+      }
+    ],
+    "card": {
+      "type": "love",
+      "content": "公司年会礼品",
+      "from": "孙先生",
+      "to": "员工"
+    },
+    "notes": "需要大量红玫瑰"
+  }
+]

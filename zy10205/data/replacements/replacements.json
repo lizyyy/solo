@@ -1,0 +1,47 @@
+[
+  {
+    "originalFlower": "红玫瑰",
+    "options": [
+      {
+        "name": "粉玫瑰",
+        "priority": 1,
+        "price": 22,
+        "note": "同级别替换"
+      },
+      {
+        "name": "香槟玫瑰",
+        "priority": 2,
+        "price": 24,
+        "note": "高级替换，需加收费用"
+      }
+    ]
+  },
+  {
+    "originalFlower": "粉玫瑰",
+    "options": [
+      {
+        "name": "红玫瑰",
+        "priority": 1,
+        "price": 20,
+        "note": "同级别替换"
+      },
+      {
+        "name": "白玫瑰",
+        "priority": 2,
+        "price": 21,
+        "note": "同级别替换"
+      }
+    ]
+  },
+  {
+    "originalFlower": "白桔梗",
+    "options": [
+      {
+        "name": "洋桔梗",
+        "priority": 1,
+        "price": 13,
+        "note": "同级别替换"
+      }
+    ]
+  }
+]

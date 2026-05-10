@@ -1,0 +1,59 @@
+[
+  {
+    "slotId": "morning-1",
+    "name": "早班 09:00-10:00",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "morning-2",
+    "name": "早班 10:00-11:00",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "morning-3",
+    "name": "早班 11:00-12:00",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "afternoon-1",
+    "name": "午班 14:00-15:00",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "afternoon-2",
+    "name": "午班 15:00-16:00",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "afternoon-3",
+    "name": "午班 16:00-17:00",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "evening-1",
+    "name": "晚班 18:00-19:00",
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "isPromised": true
+  },
+  {
+    "slotId": "evening-2",
+    "name": "晚班 19:00-20:00",
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "isPromised": false,
+    "note": "情人节特殊时段"
+  }
+]

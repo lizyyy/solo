@@ -1,0 +1,86 @@
+[
+  {
+    "orderId": "VD-2026-001",
+    "customerName": "张先生",
+    "customerPhone": "13800138001",
+    "price": 399,
+    "deliverySlot": "morning-1",
+    "deliveryAddress": "北京市朝阳区XX路XX号",
+    "bouquets": [
+      {
+        "specId": "romantic-rose-11",
+        "quantity": 1
+      }
+    ],
+    "card": {
+      "type": "love",
+      "content": "亲爱的，情人节快乐！永远爱你 ❤️",
+      "from": "张先生",
+      "to": "李女士"
+    },
+    "notes": "请上午配送"
+  },
+  {
+    "orderId": "VD-2026-002",
+    "customerName": "王女士",
+    "customerPhone": "13800138002",
+    "price": 599,
+    "deliverySlot": "morning-2",
+    "deliveryAddress": "北京市海淀区XX路XX号",
+    "bouquets": [
+      {
+        "specId": "eternal-love-19",
+        "quantity": 1
+      }
+    ],
+    "card": {
+      "type": "love",
+      "content": "愿我们的爱情像这些花一样美丽绽放 💕",
+      "from": "李先生",
+      "to": "王女士"
+    },
+    "notes": "希望准时送达"
+  },
+  {
+    "orderId": "VD-2026-003",
+    "customerName": "刘先生",
+    "customerPhone": "13800138003",
+    "price": 999,
+    "deliverySlot": "afternoon-1",
+    "deliveryAddress": "北京市西城区XX路XX号",
+    "bouquets": [
+      {
+        "specId": "premium-33",
+        "quantity": 1
+      }
+    ],
+    "card": {
+      "type": "love",
+      "content": "三生三世，只为你一人 💝",
+      "from": "刘先生",
+      "to": "陈女士"
+    },
+    "notes": ""
+  },
+  {
+    "orderId": "VD-2026-004",
+    "customerName": "赵女士",
+    "customerPhone": "13800138004",
+    "price": 798,
+    "deliverySlot": "evening-2",
+    "deliveryAddress": "北京市东城区XX路XX号",
+    "bouquets": [
+      {
+        "specId": "romantic-rose-11",
+        "quantity": 2
+      }
+    ],
+    "card": {
+      "type": "birthday",
+      "content": "生日快乐！愿你每天都像花一样灿烂 🌺",
+      "from": "周先生",
+      "to": "赵女士"
+    },
+    "notes": "晚上配送"
+  }
+]

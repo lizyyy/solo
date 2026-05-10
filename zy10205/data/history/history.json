@@ -1,0 +1,68 @@
+[
+  {
+    "id": "340853f3-afd7-4d29-98f7-3277abcf3006",
+    "action": "import",
+    "details": {
+      "orderId": "VD-2026-001"
+    },
+    "timestamp": "2026-05-10T18:48:09.483Z"
+  },
+  {
+    "id": "dc4bae95-f7a9-48af-b149-eba19d170bb6",
+    "action": "import",
+    "details": {
+      "orderId": "VD-2026-002"
+    },
+    "timestamp": "2026-05-10T18:48:09.492Z"
+  },
+  {
+    "id": "faf113f5-1e9f-4e52-8fff-b71ad505a7d2",
+    "action": "import",
+    "details": {
+      "orderId": "VD-2026-003"
+    },
+    "timestamp": "2026-05-10T18:48:09.494Z"
+  },
+  {
+    "id": "0640fcb3-3057-48e9-a810-35e91a7ce617",
+    "action": "import",
+    "details": {
+      "orderId": "VD-2026-004"
+    },
+    "timestamp": "2026-05-10T18:48:09.495Z"
+  },
+  {
+    "id": "acd16ecf-91be-481d-bf8c-8aff4ab3e0fb",
+    "action": "import",
+    "details": {
+      "orderId": "VD-2026-005"
+    },
+    "timestamp": "2026-05-10T18:48:31.311Z"
+  },
+  {
+    "id": "c823bfbb-5699-44cc-aa6b-65d79d623a5a",
+    "action": "confirm_replacement",
+    "details": {
+      "orderId": "VD-2026-005",
+      "replacements": [
+        {
+          "originalFlower": "红玫瑰",
+          "replacementFlower": "粉玫瑰",
+          "quantity": 10,
+          "priority": 1,
+          "note": "同级别替换"
+        }
+      ]
+    },
+    "timestamp": "2026-05-10T18:48:42.193Z"
+  },
+  {
+    "id": "42afc981-4eac-4379-8d57-66cb5e363e3f",
+    "action": "confirm_price_sync",
+    "details": {
+      "orderId": "VD-2026-005",
+      "newPrice": 4010
+    },
+    "timestamp": "2026-05-10T18:48:52.913Z"
+  }
+]

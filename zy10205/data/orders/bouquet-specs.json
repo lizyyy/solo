@@ -1,0 +1,71 @@
+[
+  {
+    "specId": "romantic-rose-11",
+    "name": "浪漫红玫瑰 11枝",
+    "description": "11枝红玫瑰搭配满天星和尤加利叶",
+    "price": 399,
+    "flowers": [
+      {
+        "name": "红玫瑰",
+        "quantity": 11,
+        "price": 20
+      },
+      {
+        "name": "满天星",
+        "quantity": 3,
+        "price": 8
+      },
+      {
+        "name": "尤加利叶",
+        "quantity": 5,
+        "price": 5
+      }
+    ]
+  },
+  {
+    "specId": "eternal-love-19",
+    "name": "永恒爱恋 19枝",
+    "description": "19枝粉玫瑰搭配白桔梗",
+    "price": 599,
+    "flowers": [
+      {
+        "name": "粉玫瑰",
+        "quantity": 19,
+        "price": 22
+      },
+      {
+        "name": "白桔梗",
+        "quantity": 5,
+        "price": 12
+      },
+      {
+        "name": "尤加利叶",
+        "quantity": 8,
+        "price": 5
+      }
+    ]
+  },
+  {
+    "specId": "premium-33",
+    "name": "豪华玫瑰 33枝",
+    "description": "33枝顶级红玫瑰",
+    "price": 999,
+    "flowers": [
+      {
+        "name": "红玫瑰",
+        "quantity": 33,
+        "price": 25
+      },
+      {
+        "name": "满天星",
+        "quantity": 5,
+        "price": 8
+      },
+      {
+        "name": "尤加利叶",
+        "quantity": 10,
+        "price": 5
+      }
+    ]
+  }
+]
