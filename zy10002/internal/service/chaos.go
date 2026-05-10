@@ -18,15 +18,18 @@ import (
 )
 
 type ChaosEngine struct {
-	db           *gorm.DB
-	cache        *cache.Cache
-	bus          *eventbus.EventBus
-	metrics      map[string]float64
-	metricsMu    sync.RWMutex
-	activeLeaks  int64
-	stopChannels []chan struct{}
-	stopMu       sync.Mutex
-	running      bool
+	db                 *gorm.DB
+	cache              *cache.Cache
+	bus                *eventbus.EventBus
+	metrics            map[string]float64
+	metricsMu          sync.RWMutex
+	activeLeaks        int64
+	stopChannels       []chan struct{}
+	stopMu             sync.Mutex
+	running            bool
+	configDriftStopCh  chan struct{}
+	configDriftMu      sync.Mutex
+	configDriftRunning bool
 }
 
 func NewChaosEngine(db *gorm.DB, c *cache.Cache, bus *eventbus.EventBus) *ChaosEngine {
@@ -334,6 +337,13 @@ func (ce *ChaosEngine) InjectCacheDirtyData(ctx context.Context, orderID string,
 }
 
 func (ce *ChaosEngine) startConfigDriftWatcher() {
+	ce.configDriftMu.Lock()
+	defer ce.configDriftMu.Unlock()
+
+	if ce.configDriftRunning {
+		return
+	}
+
 	cfg := config.Get()
 	scenario := cfg.Chaos.Scenarios.ConfigDrift
 
@@ -343,6 +353,14 @@ func (ce *ChaosEngine) startConfigDriftWatcher() {
 
 	interval := time.Duration(scenario.DriftIntervalMs) * time.Millisecond
 
+	stopCh := make(chan struct{})
+	ce.configDriftStopCh = stopCh
+	ce.configDriftRunning = true
+
+	ce.bus.Publish(eventbus.EventTypeChaosInjected, "", "config_drift", nil,
+		map[string]interface{}{"action": "started", "interval_ms": interval.Milliseconds()},
+		"chaos-engine")
+
 	go func() {
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
@@ -351,6 +369,9 @@ func (ce *ChaosEngine) startConfigDriftWatcher() {
 			select {
 			case <-ticker.C:
 				if !ce.running {
+					ce.configDriftMu.Lock()
+					ce.configDriftRunning = false
+					ce.configDriftMu.Unlock()
 					return
 				}
 
@@ -365,13 +386,40 @@ func (ce *ChaosEngine) startConfigDriftWatcher() {
 				ce.RecordMetric("config_drift_detected", 1,
 					"配置漂移检测: 配置值已更改")
 
+			case <-stopCh:
+				ce.configDriftMu.Lock()
+				ce.configDriftRunning = false
+				ce.configDriftMu.Unlock()
+				return
+
 			case <-time.After(1 * time.Second):
 				if !ce.running {
+					ce.configDriftMu.Lock()
+					ce.configDriftRunning = false
+					ce.configDriftMu.Unlock()
 					return
 				}
 			}
 		}
 	}()
+}
+
+func (ce *ChaosEngine) stopConfigDriftWatcher() {
+	ce.configDriftMu.Lock()
+	defer ce.configDriftMu.Unlock()
+
+	if !ce.configDriftRunning {
+		return
+	}
+
+	if ce.configDriftStopCh != nil {
+		close(ce.configDriftStopCh)
+		ce.configDriftStopCh = nil
+	}
+
+	ce.bus.Publish(eventbus.EventTypeChaosInjected, "", "config_drift", nil,
+		map[string]interface{}{"action": "stopped"},
+		"chaos-engine")
 }
 
 func (ce *ChaosEngine) ToggleScenario(scenarioName string, enabled bool) error {
@@ -394,6 +442,14 @@ func (ce *ChaosEngine) ToggleScenario(scenarioName string, enabled bool) error {
 
 	ce.bus.Publish(eventbus.EventTypeRecoveryAction, scenarioName, "scenario_toggle", nil,
 		map[string]interface{}{"enabled": enabled}, "chaos-engine")
+
+	if scenarioName == "config_drift" {
+		if enabled {
+			ce.startConfigDriftWatcher()
+		} else {
+			ce.stopConfigDriftWatcher()
+		}
+	}
 
 	return config.Save()
 }

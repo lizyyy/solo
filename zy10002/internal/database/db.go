@@ -63,6 +63,7 @@ func runMigrations(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&models.Order{},
 		&models.PaymentCallback{},
+		&models.FundFlow{},
 		&models.Event{},
 		&models.StateSnapshot{},
 		&models.ChaosMetric{},

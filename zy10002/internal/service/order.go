@@ -195,6 +195,29 @@ func (s *OrderService) ProcessPaymentCallback(ctx context.Context, req PaymentCa
 		return err
 	}
 
+	if req.Status == "SUCCESS" {
+		var totalPaid float64
+		tx.Model(&models.FundFlow{}).Where("order_id = ? AND flow_type = ?",
+			req.OrderID, models.FundFlowTypePayment).Select("COALESCE(SUM(amount), 0)").Scan(&totalPaid)
+
+		fundFlow := &models.FundFlow{
+			OrderID:       req.OrderID,
+			TransactionID: req.TransactionID,
+			FlowType:      models.FundFlowTypePayment,
+			Amount:        req.Amount,
+			BalanceBefore: totalPaid,
+			BalanceAfter:  totalPaid + req.Amount,
+			Description:   fmt.Sprintf("支付回调处理，交易ID: %s", req.TransactionID),
+			IsDuplicate:   isDuplicate,
+			CreatedAt:     time.Now(),
+		}
+
+		if err := tx.Create(fundFlow).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	if err := tx.Model(&models.Order{}).Where("id = ?", req.OrderID).
 		Update("callback_count", gorm.Expr("callback_count + 1")).
 		Update("last_callback_at", time.Now()).Error; err != nil {
@@ -217,6 +240,14 @@ func (s *OrderService) ProcessPaymentCallback(ctx context.Context, req PaymentCa
 		"status":         req.Status,
 		"is_duplicate":   isDuplicate,
 	}, "payment-gateway")
+
+	if isDuplicate && req.Status == "SUCCESS" {
+		s.bus.Publish(eventbus.EventTypeChaosInjected, req.OrderID, "fund_flow", nil, map[string]interface{}{
+			"type":        "duplicate_deduction",
+			"amount":      req.Amount,
+			"description": fmt.Sprintf("重复扣款: 交易ID %s 已存在，但仍写入了资金流水", req.TransactionID),
+		}, "chaos-engine")
+	}
 
 	order.CallbackCount++
 	now := time.Now()
@@ -300,7 +331,6 @@ func (s *OrderService) VerifyOrderConsistency(ctx context.Context, orderID strin
 
 	var uniqueSuccessAmount float64
 	seenTransactions := make(map[string]bool)
-
 	for _, cb := range callbacks {
 		if cb.Status == "SUCCESS" && !seenTransactions[cb.TransactionID] {
 			uniqueSuccessAmount += cb.Amount
@@ -308,14 +338,46 @@ func (s *OrderService) VerifyOrderConsistency(ctx context.Context, orderID strin
 		}
 	}
 
-	if uniqueSuccessAmount == order.Amount {
-		return true, "订单金额与成功交易金额一致", nil
+	var fundFlows []models.FundFlow
+	if err := s.db.Where("order_id = ? AND flow_type = ?", orderID, models.FundFlowTypePayment).
+		Order("created_at ASC").Find(&fundFlows).Error; err != nil {
+		return false, "", err
 	}
 
-	details := fmt.Sprintf("订单金额: %.2f, 唯一成功交易金额: %.2f, 差异: %.2f",
-		order.Amount, uniqueSuccessAmount, order.Amount-uniqueSuccessAmount)
+	var actualDeductedAmount float64
+	for _, ff := range fundFlows {
+		actualDeductedAmount += ff.Amount
+	}
 
-	return false, details, errors.New("订单状态不一致")
+	expectedAmount := order.Amount
+	isConsistent := actualDeductedAmount == expectedAmount
+
+	var details string
+	if isConsistent {
+		details = fmt.Sprintf("订单金额: %.2f, 实际扣款: %.2f (一致)",
+			expectedAmount, actualDeductedAmount)
+	} else {
+		details = fmt.Sprintf(
+			"订单金额: %.2f, 唯一成功交易金额: %.2f, 实际扣款(资金流水): %.2f, 多扣金额: %.2f",
+			expectedAmount, uniqueSuccessAmount, actualDeductedAmount,
+			actualDeductedAmount-expectedAmount)
+	}
+
+	s.bus.Publish(eventbus.EventType(eventbus.EventTypeChaosInjected), orderID, "consistency_check",
+		map[string]interface{}{
+			"expected_amount":       expectedAmount,
+			"unique_success_amount": uniqueSuccessAmount,
+			"actual_deducted":       actualDeductedAmount,
+			"is_consistent":         isConsistent,
+		},
+		nil,
+		"order-service")
+
+	if isConsistent {
+		return true, details, nil
+	}
+
+	return false, details, errors.New("订单金额与实际扣款不一致")
 }
 
 func (s *OrderService) GetStateManager() *eventbus.StateManager {
