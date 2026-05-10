@@ -1,0 +1,15 @@
+{
+  "name": "nail-salon-membership-system",
+  "version": "1.0.0",
+  "description": "美甲店会员卡欠次修正台系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5"
+  }
+}

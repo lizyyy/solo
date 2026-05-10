@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美甲店会员卡欠次修正台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 24px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .member-list {
+            list-style: none;
+        }
+
+        .member-item {
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+        }
+
+        .member-item:hover {
+            background: #f8f9ff;
+        }
+
+        .member-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: #667eea;
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .member-phone {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .project-card {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+        }
+
+        .project-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid #667eea;
+            background: white;
+        }
+
+        .timeline-dot.consume {
+            border-color: #f5576c;
+        }
+
+        .timeline-dot.purchase {
+            border-color: #38ef7d;
+        }
+
+        .timeline-dot.gift {
+            border-color: #f093fb;
+        }
+
+        .timeline-dot.refund {
+            border-color: #eb3349;
+        }
+
+        .timeline-dot.correction {
+            border-color: #764ba2;
+        }
+
+        .timeline-content {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .timeline-type {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .timeline-type.consume {
+            background: rgba(245, 87, 108, 0.1);
+            color: #f5576c;
+        }
+
+        .timeline-type.purchase {
+            background: rgba(56, 239, 125, 0.1);
+            color: #11998e;
+        }
+
+        .timeline-type.gift {
+            background: rgba(240, 147, 251, 0.1);
+            color: #764ba2;
+        }
+
+        .timeline-type.refund {
+            background: rgba(235, 51, 73, 0.1);
+            color: #eb3349;
+        }
+
+        .timeline-type.correction {
+            background: rgba(118, 75, 162, 0.1);
+            color: #764ba2;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .timeline-description {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .timeline-times {
+            font-size: 13px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .timeline-status {
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .status-refunded {
+            background: rgba(235, 51, 73, 0.1);
+            color: #eb3349;
+        }
+
+        .correction-card {
+            background: #fff9e6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ff9500;
+        }
+
+        .correction-card.approved {
+            background: #e6ffed;
+            border-left-color: #38ef7d;
+        }
+
+        .correction-card.rejected {
+            background: #ffe6e6;
+            border-left-color: #eb3349;
+        }
+
+        .correction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .correction-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: rgba(255, 149, 0, 0.1);
+            color: #ff9500;
+        }
+
+        .status-approved {
+            background: rgba(56, 239, 125, 0.1);
+            color: #11998e;
+        }
+
+        .status-rejected {
+            background: rgba(235, 51, 73, 0.1);
+            color: #eb3349;
+        }
+
+        .correction-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .correction-reason {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .correction-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background: #f8f9ff;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .table tr:hover td {
+            background: #f8f9ff;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(56, 239, 125, 0.1);
+            color: #11998e;
+            border: 1px solid rgba(56, 239, 125, 0.3);
+        }
+
+        .alert-error {
+            background: rgba(235, 51, 73, 0.1);
+            color: #eb3349;
+            border: 1px solid rgba(235, 51, 73, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .date-filters {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .member-info-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .member-info-name {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .member-info-phone {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .member-info-stats {
+            display: flex;
+            gap: 32px;
+            margin-top: 20px;
+        }
+
+        .member-info-stat {
+            text-align: center;
+        }
+
+        .member-info-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .member-info-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💅 美甲店会员卡欠次修正台</h1>
+            <p class="subtitle">会员卡管理 · 消费扣次 · 补赠修正 · 对账汇总</p>
+        </header>
+
+        <div class="main-layout">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">会员列表</h2>
+                    <button class="btn btn-primary btn-small" onclick="openAddMemberModal()">+ 新增会员</button>
+                </div>
+                <ul class="member-list" id="memberList"></ul>
+            </div>
+
+            <div class="panel" id="detailPanel">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">👈</div>
+                    <p>请从左侧选择一个会员查看详情</p>
+                </div>
+
+                <div id="memberDetail" style="display:none;">
+                    <div class="member-info-card" id="memberInfoCard"></div>
+
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('projects')">项目余额</div>
+                        <div class="tab" onclick="switchTab('timeline')">流水时间线</div>
+                        <div class="tab" onclick="switchTab('corrections')">待审核修正</div>
+                        <div class="tab" onclick="switchTab('reconciliation')">对账汇总</div>
+                    </div>
+
+                    <div class="tab-content active" id="tab-projects">
+                        <div id="projectsList"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-timeline">
+                        <div id="transactionsList"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-corrections">
+                        <div class="alert alert-success" id="correctionSuccessAlert"></div>
+                        <div class="alert alert-error" id="correctionErrorAlert"></div>
+                        <div id="correctionsList"></div>
+                    </div>
+
+                    <div class="tab-content" id="tab-reconciliation">
+                        <div class="filters">
+                            <div class="date-filters">
+                                <div class="form-group">
+                                    <label class="form-label">开始日期</label>
+                                    <input type="date" class="form-input" id="startDate">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">结束日期</label>
+                                    <input type="date" class="form-input" id="endDate">
+                                </div>
+                                <button class="btn btn-primary" onclick="loadReconciliation()">查询</button>
+                                <button class="btn btn-outline" onclick="exportCSV()">导出CSV</button>
+                            </div>
+                        </div>
+                        <div id="reconciliationTable"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="addMemberModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">新增会员卡</h3>
+                <button class="modal-close" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <div class="alert alert-success" id="addMemberSuccessAlert"></div>
+            <div class="alert alert-error" id="addMemberErrorAlert"></div>
+            <div class="form-group">
+                <label class="form-label">姓名</label>
+                <input type="text" class="form-input" id="newMemberName" placeholder="请输入会员姓名">
+            </div>
+            <div class="form-group">
+                <label class="form-label">手机号</label>
+                <input type="tel" class="form-input" id="newMemberPhone" placeholder="请输入11位手机号">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="addMember()">确认添加</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="purchaseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">购买/追加次数</h3>
+                <button class="modal-close" onclick="closeModal('purchaseModal')">&times;</button>
+            </div>
+            <div class="alert alert-success" id="purchaseSuccessAlert"></div>
+            <div class="alert alert-error" id="purchaseErrorAlert"></div>
+            <div class="form-group">
+                <label class="form-label">选择项目</label>
+                <select class="form-select" id="purchaseProject"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">购买次数</label>
+                <input type="number" class="form-input" id="purchaseTimes" min="1" value="1" placeholder="请输入购买次数">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="purchaseProject()">确认购买</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="giftModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">补赠次数</h3>
+                <button class="modal-close" onclick="closeModal('giftModal')">&times;</button>
+            </div>
+            <div class="alert alert-success" id="giftSuccessAlert"></div>
+            <div class="alert alert-error" id="giftErrorAlert"></div>
+            <div class="form-group">
+                <label class="form-label">选择项目</label>
+                <select class="form-select" id="giftProject"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">赠送次数</label>
+                <input type="number" class="form-input" id="giftTimes" min="1" value="1" placeholder="请输入赠送次数">
+            </div>
+            <div class="form-group">
+                <label class="form-label">赠送原因</label>
+                <textarea class="form-textarea" id="giftReason" placeholder="例如：会员生日、活动补偿等"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="giftProject()">确认赠送</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="correctionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">发起修正申请</h3>
+                <button class="modal-close" onclick="closeModal('correctionModal')">&times;</button>
+            </div>
+            <div class="alert alert-success" id="correctionModalSuccessAlert"></div>
+            <div class="alert alert-error" id="correctionModalErrorAlert"></div>
+            <div class="form-group">
+                <label class="form-label">修正类型</label>
+                <select class="form-select" id="correctionType">
+                    <option value="gift">补赠（加次数）</option>
+                    <option value="deduct">扣减（减次数）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">选择项目</label>
+                <select class="form-select" id="correctionProject"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">修正次数</label>
+                <input type="number" class="form-input" id="correctionTimes" min="1" value="1" placeholder="请输入修正次数">
+            </div>
+            <div class="form-group">
+                <label class="form-label">关联流水（可选）</label>
+                <select class="form-select" id="correctionTransaction">
+                    <option value="">不关联流水（独立修正）</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">修正原因</label>
+                <textarea class="form-textarea" id="correctionReason" placeholder="请详细说明修正原因"></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="submitCorrection()">提交审核</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="refundModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">发起退款</h3>
+                <button class="modal-close" onclick="closeModal('refundModal')">&times;</button>
+            </div>
+            <div class="alert alert-success" id="refundSuccessAlert"></div>
+            <div class="alert alert-error" id="refundErrorAlert"></div>
+            <div class="form-group">
+                <label class="form-label">选择流水</label>
+                <select class="form-select" id="refundTransaction"></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">退款原因</label>
+                <textarea class="form-textarea" id="refundReason" placeholder="请说明退款原因"></textarea>
+            </div>
+            <button class="btn btn-danger" style="width: 100%;" onclick="refundTransaction()">确认退款</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">审核修正申请</h3>
+                <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
+            </div>
+            <div id="reviewContent"></div>
+            <div class="form-group">
+                <label class="form-label">审核意见</label>
+                <textarea class="form-textarea" id="reviewComment" placeholder="请填写审核意见"></textarea>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-success" style="flex: 1;" onclick="reviewCorrection('approve')">通过</button>
+                <button class="btn btn-danger" style="flex: 1;" onclick="reviewCorrection('reject')">拒绝</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentMember = null;
+        let allProjects = [];
+        let allTransactions = [];
+        let currentCorrectionId = null;
+
+        async function init() {
+            await loadMembers();
+            await loadProjects();
+        }
+
+        async function loadMembers() {
+            try {
+                const res = await fetch(`${API_BASE}/api/members`);
+                const members = await res.json();
+                renderMembers(members);
+            } catch (err) {
+                console.error('加载会员列表失败:', err);
+            }
+        }
+
+        async function loadProjects() {
+            try {
+                const res = await fetch(`${API_BASE}/api/projects`);
+                allProjects = await res.json();
+            } catch (err) {
+                console.error('加载项目列表失败:', err);
+            }
+        }
+
+        function renderMembers(members) {
+            const list = document.getElementById('memberList');
+            list.innerHTML = members.map(m => `
+                <li class="member-item ${currentMember?.id === m.id ? 'active' : ''}" onclick="selectMember(${m.id})">
+                    <div class="member-name">${m.name}</div>
+                    <div class="member-phone">📱 ${m.phone}</div>
+                </li>
+            `).join('');
+        }
+
+        async function selectMember(memberId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/members/${memberId}`);
+                currentMember = await res.json();
+                
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('memberDetail').style.display = 'block';
+                
+                renderMemberInfo();
+                renderProjects();
+                await loadTransactions();
+                loadCorrections();
+                
+                await loadMembers();
+            } catch (err) {
+                console.error('加载会员详情失败:', err);
+            }
+        }
+
+        function renderMemberInfo() {
+            const totalRemaining = currentMember.projects.reduce((sum, p) => sum + p.remaining_times, 0);
+            const totalPurchased = currentMember.projects.reduce((sum, p) => sum + p.purchased_times, 0);
+            const totalGiven = currentMember.projects.reduce((sum, p) => sum + p.given_times, 0);
+
+            document.getElementById('memberInfoCard').innerHTML = `
+                <div class="member-info-name">${currentMember.name}</div>
+                <div class="member-info-phone">📱 ${currentMember.phone}</div>
+                <div class="member-info-stats">
+                    <div class="member-info-stat">
+                        <div class="member-info-stat-value">${totalRemaining}</div>
+                        <div class="member-info-stat-label">剩余次数</div>
+                    </div>
+                    <div class="member-info-stat">
+                        <div class="member-info-stat-value">${totalPurchased}</div>
+                        <div class="member-info-stat-label">累计购买</div>
+                    </div>
+                    <div class="member-info-stat">
+                        <div class="member-info-stat-value">${totalGiven}</div>
+                        <div class="member-info-stat-label">累计赠送</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projectsList');
+            
+            if (!currentMember.projects || currentMember.projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎁</div>
+                        <p>该会员暂无购买项目</p>
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="openPurchaseModal()">购买项目</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentMember.projects.map(p => `
+                <div class="project-card">
+                    <div class="project-name">${p.project_name}</div>
+                    <div style="font-size: 12px; color: #666; margin-bottom: 16px;">扣次规则：${p.deduction_rules}</div>
+                    <div class="project-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #667eea;">${p.remaining_times}</div>
+                            <div class="stat-label">剩余次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #38ef7d;">${p.purchased_times}</div>
+                            <div class="stat-label">购买次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #764ba2;">${p.given_times}</div>
+                            <div class="stat-label">赠送次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: #f5576c;">${p.total_used}</div>
+                            <div class="stat-label">已用次数</div>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-success btn-small" onclick="consumeProject(${p.project_id}, '${p.project_name}')">消费扣次</button>
+                        <button class="btn btn-primary btn-small" onclick="openPurchaseModal(${p.project_id})">追加购买</button>
+                        <button class="btn btn-warning btn-small" onclick="openGiftModal(${p.project_id})">补赠次数</button>
+                        <button class="btn btn-outline btn-small" onclick="openCorrectionModal(${p.project_id})">申请修正</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function consumeProject(projectId, projectName) {
+            const mp = currentMember.projects.find(p => p.project_id === projectId);
+            let deduction = 1;
+            if (mp.deduction_rules.includes('2次')) deduction = 2;
+            if (mp.deduction_rules.includes('0.5次')) deduction = 0.5;
+
+            if (mp.remaining_times < deduction) {
+                alert(`⚠️ 余额不足！\n\n当前剩余：${mp.remaining_times} 次\n需要扣减：${deduction} 次\n\n请先购买或补赠次数`);
+                return;
+            }
+
+            const confirmed = confirm(`确认消费【${projectName}】？\n\n将扣减 ${deduction} 次\n当前剩余：${mp.remaining_times} 次`);
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/members/${currentMember.id}/consume`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: projectId })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    alert(`✅ 消费成功！\n\n扣减：${deduction} 次\n剩余：${data.remaining_times} 次`);
+                    await selectMember(currentMember.id);
+                } else {
+                    alert('❌ ' + data.error);
+                }
+            } catch (err) {
+                alert('❌ 消费失败：' + err.message);
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const res = await fetch(`${API_BASE}/api/members/${currentMember.id}/transactions`);
+                allTransactions = await res.json();
+                renderTransactions();
+            } catch (err) {
+                console.error('加载流水失败:', err);
+            }
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('transactionsList');
+
+            if (!allTransactions || allTransactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>暂无流水记录</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const typeLabels = {
+                purchase: '购买',
+                gift: '赠送',
+                consume: '消费',
+                refund: '退款',
+                correction: '修正'
+            };
+
+            container.innerHTML = `
+                <div style="text-align: right; margin-bottom: 16px;">
+                    <button class="btn btn-outline btn-small" onclick="openRefundModal()">发起退款</button>
+                </div>
+                <div class="timeline">
+                    ${allTransactions.map(t => `
+                        <div class="timeline-item">
+                            <div class="timeline-dot ${t.type}"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <span class="timeline-type ${t.type}">${typeLabels[t.type]}</span>
+                                    <span class="timeline-time">${new Date(t.created_at).toLocaleString('zh-CN')}</span>
+                                </div>
+                                <div class="timeline-description">${t.description}</div>
+                                <div>
+                                    <span class="timeline-times">${t.times_change > 0 ? '+' : ''}${t.times_change} 次</span>
+                                    ${t.status === 'refunded' ? '<span class="timeline-status status-refunded">已退款</span>' : ''}
+                                    ${t.refunded_from ? '<span class="timeline-status" style="background: #f0f0f0;">关联退款</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function loadCorrections() {
+            try {
+                const res = await fetch(`${API_BASE}/api/corrections`);
+                const allCorrections = await res.json();
+                const memberCorrections = allCorrections.filter(c => c.member_id === currentMember.id);
+                renderCorrections(memberCorrections);
+            } catch (err) {
+                console.error('加载修正列表失败:', err);
+            }
+        }
+
+        function renderCorrections(corrections) {
+            const container = document.getElementById('correctionsList');
+
+            const pendingCount = corrections.filter(c => c.status === 'pending').length;
+            const approvedCount = corrections.filter(c => c.status === 'approved').length;
+            const rejectedCount = corrections.filter(c => c.status === 'rejected').length;
+
+            if (!corrections || corrections.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <p>暂无修正记录</p>
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="openCorrectionModal()">发起修正</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                    <div class="stat-item" style="flex: 1; background: #fff9e6;">
+                        <div class="stat-value" style="color: #ff9500;">${pendingCount}</div>
+                        <div class="stat-label">待审核</div>
+                    </div>
+                    <div class="stat-item" style="flex: 1; background: #e6ffed;">
+                        <div class="stat-value" style="color: #11998e;">${approvedCount}</div>
+                        <div class="stat-label">已通过</div>
+                    </div>
+                    <div class="stat-item" style="flex: 1; background: #ffe6e6;">
+                        <div class="stat-value" style="color: #eb3349;">${rejectedCount}</div>
+                        <div class="stat-label">已拒绝</div>
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-bottom: 16px;">
+                    <button class="btn btn-primary btn-small" onclick="openCorrectionModal()">发起新修正</button>
+                </div>
+
+                ${corrections.map(c => `
+                    <div class="correction-card ${c.status}">
+                        <div class="correction-header">
+                            <span><strong>${c.member_name}</strong> · ${c.project_name || '未指定项目'}</span>
+                            <span class="correction-status status-${c.status}">${{pending: '待审核', approved: '已通过', rejected: '已拒绝'}[c.status]}</span>
+                        </div>
+                        <div class="correction-meta">
+                            申请时间：${new Date(c.created_at).toLocaleString('zh-CN')}
+                            ${c.reviewed_at ? ` | 审核时间：${new Date(c.reviewed_at).toLocaleString('zh-CN')}` : ''}
+                            ${c.transaction_id ? ` | 关联流水：#${c.transaction_id}` : ''}
+                        </div>
+                        <div class="correction-reason">
+                            <strong>修正类型：</strong>${{gift: '补赠（加次数）', deduct: '扣减（减次数）'}[c.type]}<br>
+                            <strong>修正次数：</strong>${c.type === 'gift' ? '+' : '-'}${Math.abs(c.proposed_times_change)} 次<br>
+                            <strong>申请原因：</strong>${c.reason || '无'}
+                            ${c.review_comment ? `<br><strong>审核意见：</strong>${c.review_comment}` : ''}
+                            ${c.reviewer ? `<br><strong>审核人：</strong>${c.reviewer}` : ''}
+                        </div>
+                        ${c.status === 'pending' ? `
+                            <div class="correction-actions">
+                                <button class="btn btn-success btn-small" onclick="openReviewModal(${c.id}, 'approve')">通过</button>
+                                <button class="btn btn-danger btn-small" onclick="openReviewModal(${c.id}, 'reject')">拒绝</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        async function loadReconciliation() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let url = `${API_BASE}/api/reconciliation`;
+            const params = new URLSearchParams();
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (params.toString()) url += '?' + params.toString();
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                renderReconciliation(data);
+            } catch (err) {
+                console.error('加载对账数据失败:', err);
+            }
+        }
+
+        function renderReconciliation(data) {
+            const container = document.getElementById('reconciliationTable');
+
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>暂无对账数据</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>会员</th>
+                            <th>项目</th>
+                            <th>购买</th>
+                            <th>赠送</th>
+                            <th>消费</th>
+                            <th>修正</th>
+                            <th>退款</th>
+                            <th>账面剩余</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `
+                            <tr>
+                                <td>${row.member_name}<br><small>${row.member_phone}</small></td>
+                                <td>${row.project_name || '—'}</td>
+                                <td style="color: #11998e;">+${row.total_purchased}</td>
+                                <td style="color: #764ba2;">+${row.total_gifted}</td>
+                                <td style="color: #f5576c;">-${row.total_consumed}</td>
+                                <td style="color: ${row.total_correction >= 0 ? '#11998e' : '#f5576c'};">${row.total_correction >= 0 ? '+' : ''}${row.total_correction}</td>
+                                <td style="color: #eb3349;">${row.total_refunded}</td>
+                                <td style="font-weight: 700; color: #667eea;">${row.total_purchased + row.total_gifted - row.total_consumed + row.total_correction + row.total_refunded}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function exportCSV() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            let url = `${API_BASE}/api/reconciliation/export`;
+            const params = new URLSearchParams();
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (params.toString()) url += '?' + params.toString();
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (!data.csv) {
+                    alert('暂无数据可导出');
+                    return;
+                }
+
+                const blob = new Blob(['\uFEFF' + data.csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `对账汇总_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`;
+                link.click();
+            } catch (err) {
+                alert('导出失败：' + err.message);
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            if (tabName === 'reconciliation') {
+                loadReconciliation();
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            hideAllAlerts();
+        }
+
+        function hideAllAlerts() {
+            document.querySelectorAll('.alert').forEach(a => a.classList.remove('active'));
+        }
+
+        function showAlert(alertId, message) {
+            const alert = document.getElementById(alertId);
+            alert.textContent = message;
+            alert.classList.add('active');
+            setTimeout(() => alert.classList.remove('active'), 5000);
+        }
+
+        function openAddMemberModal() {
+            document.getElementById('newMemberName').value = '';
+            document.getElementById('newMemberPhone').value = '';
+            openModal('addMemberModal');
+        }
+
+        async function addMember() {
+            const name = document.getElementById('newMemberName').value.trim();
+            const phone = document.getElementById('newMemberPhone').value.trim();
+
+            if (!name || !phone) {
+                showAlert('addMemberErrorAlert', '请填写姓名和手机号');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/members`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('addMemberSuccessAlert', '会员添加成功！');
+                    setTimeout(() => {
+                        closeModal('addMemberModal');
+                        loadMembers();
+                    }, 1000);
+                } else {
+                    showAlert('addMemberErrorAlert', data.error);
+                }
+            } catch (err) {
+                showAlert('addMemberErrorAlert', '添加失败：' + err.message);
+            }
+        }
+
+        function openPurchaseModal(selectedProjectId) {
+            const select = document.getElementById('purchaseProject');
+            select.innerHTML = allProjects.map(p => `
+                <option value="${p.id}" ${selectedProjectId === p.id ? 'selected' : ''}>${p.name}（${p.deduction_rules}）</option>
+            `).join('');
+            document.getElementById('purchaseTimes').value = 1;
+            openModal('purchaseModal');
+        }
+
+        async function purchaseProject() {
+            const projectId = document.getElementById('purchaseProject').value;
+            const times = parseInt(document.getElementById('purchaseTimes').value);
+
+            if (!times || times <= 0) {
+                showAlert('purchaseErrorAlert', '请输入有效的购买次数');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/members/${currentMember.id}/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: projectId, times })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('purchaseSuccessAlert', '购买成功！');
+                    setTimeout(async () => {
+                        closeModal('purchaseModal');
+                        await selectMember(currentMember.id);
+                    }, 1000);
+                } else {
+                    showAlert('purchaseErrorAlert', data.error);
+                }
+            } catch (err) {
+                showAlert('purchaseErrorAlert', '购买失败：' + err.message);
+            }
+        }
+
+        function openGiftModal(selectedProjectId) {
+            const select = document.getElementById('giftProject');
+            select.innerHTML = allProjects.map(p => `
+                <option value="${p.id}" ${selectedProjectId === p.id ? 'selected' : ''}>${p.name}</option>
+            `).join('');
+            document.getElementById('giftTimes').value = 1;
+            document.getElementById('giftReason').value = '';
+            openModal('giftModal');
+        }
+
+        async function giftProject() {
+            const projectId = document.getElementById('giftProject').value;
+            const times = parseInt(document.getElementById('giftTimes').value);
+            const reason = document.getElementById('giftReason').value.trim();
+
+            if (!times || times <= 0) {
+                showAlert('giftErrorAlert', '请输入有效的赠送次数');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/members/${currentMember.id}/gift`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_id: projectId, times, reason })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('giftSuccessAlert', '赠送成功！');
+                    setTimeout(async () => {
+                        closeModal('giftModal');
+                        await selectMember(currentMember.id);
+                    }, 1000);
+                } else {
+                    showAlert('giftErrorAlert', data.error);
+                }
+            } catch (err) {
+                showAlert('giftErrorAlert', '赠送失败：' + err.message);
+            }
+        }
+
+        function openCorrectionModal(selectedProjectId) {
+            const projectSelect = document.getElementById('correctionProject');
+            projectSelect.innerHTML = allProjects.map(p => `
+                <option value="${p.id}" ${selectedProjectId === p.id ? 'selected' : ''}>${p.name}</option>
+            `).join('');
+
+            const transSelect = document.getElementById('correctionTransaction');
+            const memberTrans = allTransactions.filter(t => t.status !== 'refunded');
+            transSelect.innerHTML = '<option value="">不关联流水（独立修正）</option>' + 
+                memberTrans.map(t => `
+                    <option value="${t.id}">#${t.id} - ${t.description}（${t.times_change > 0 ? '+' : ''}${t.times_change}次）</option>
+                `).join('');
+
+            document.getElementById('correctionType').value = 'gift';
+            document.getElementById('correctionTimes').value = 1;
+            document.getElementById('correctionReason').value = '';
+            openModal('correctionModal');
+        }
+
+        async function submitCorrection() {
+            const type = document.getElementById('correctionType').value;
+            const projectId = document.getElementById('correctionProject').value;
+            const times = parseInt(document.getElementById('correctionTimes').value);
+            const transactionId = document.getElementById('correctionTransaction').value;
+            const reason = document.getElementById('correctionReason').value.trim();
+
+            if (!times || times <= 0) {
+                showAlert('correctionModalErrorAlert', '请输入有效的修正次数');
+                return;
+            }
+
+            if (!reason) {
+                showAlert('correctionModalErrorAlert', '请填写修正原因');
+                return;
+            }
+
+            const proposedTimesChange = type === 'gift' ? times : -times;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/corrections`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        member_id: currentMember.id,
+                        project_id: projectId,
+                        transaction_id: transactionId || null,
+                        type,
+                        proposed_times_change: proposedTimesChange,
+                        reason
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('correctionModalSuccessAlert', '修正申请已提交，等待审核！');
+                    setTimeout(async () => {
+                        closeModal('correctionModal');
+                        loadCorrections();
+                    }, 1500);
+                } else {
+                    showAlert('correctionModalErrorAlert', data.error);
+                }
+            } catch (err) {
+                showAlert('correctionModalErrorAlert', '提交失败：' + err.message);
+            }
+        }
+
+        function openRefundModal() {
+            const select = document.getElementById('refundTransaction');
+            const refundableTrans = allTransactions.filter(t => t.status !== 'refunded' && t.project_id);
+            select.innerHTML = refundableTrans.map(t => `
+                <option value="${t.id}">#${t.id} - ${t.description}（${t.times_change > 0 ? '+' : ''}${t.times_change}次） - ${new Date(t.created_at).toLocaleString('zh-CN')}</option>
+            `).join('');
+            document.getElementById('refundReason').value = '';
+            openModal('refundModal');
+        }
+
+        async function refundTransaction() {
+            const transactionId = document.getElementById('refundTransaction').value;
+            const reason = document.getElementById('refundReason').value.trim();
+
+            if (!reason) {
+                showAlert('refundErrorAlert', '请填写退款原因');
+                return;
+            }
+
+            const confirmed = confirm('确认发起退款？此操作将还原对应次数变动。');
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/transactions/${transactionId}/refund`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('refundSuccessAlert', '退款成功！');
+                    setTimeout(async () => {
+                        closeModal('refundModal');
+                        await selectMember(currentMember.id);
+                    }, 1000);
+                } else {
+                    showAlert('refundErrorAlert', data.error);
+                }
+            } catch (err) {
+                showAlert('refundErrorAlert', '退款失败：' + err.message);
+            }
+        }
+
+        function openReviewModal(correctionId, action) {
+            currentCorrectionId = correctionId;
+            document.getElementById('reviewContent').innerHTML = `
+                <div class="form-group">
+                    <label class="form-label">审核操作</label>
+                    <div style="padding: 12px; background: ${action === 'approve' ? '#e6ffed' : '#ffe6e6'}; border-radius: 8px; font-weight: 600; color: ${action === 'approve' ? '#11998e' : '#eb3349'};">
+                        ${action === 'approve' ? '✅ 通过该修正申请' : '❌ 拒绝该修正申请'}
+                    </div>
+                </div>
+            `;
+            document.getElementById('reviewComment').value = '';
+            openModal('reviewModal');
+        }
+
+        async function reviewCorrection(action) {
+            const comment = document.getElementById('reviewComment').value.trim();
+
+            if (!comment) {
+                alert('请填写审核意见');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/api/corrections/${currentCorrectionId}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, review_comment: comment, reviewer: '前台审核员' })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    alert('审核成功！');
+                    closeModal('reviewModal');
+                    loadCorrections();
+                    await selectMember(currentMember.id);
+                } else {
+                    alert('审核失败：' + data.error);
+                }
+            } catch (err) {
+                alert('审核失败：' + err.message);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
