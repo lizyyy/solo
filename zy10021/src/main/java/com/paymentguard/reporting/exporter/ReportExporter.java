@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -214,7 +215,7 @@ public class ReportExporter {
 
     public byte[] exportSummaryToCsv(List<IssueReport> reports) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintWriter writer = new PrintWriter(baos, true, StandardCharsets.UTF_8);
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(baos, StandardCharsets.UTF_8), true);
         
         writer.println("报告ID,订单ID,生成时间,问题总数,严重问题,高危问题,中危问题,低危问题");
         
@@ -222,10 +223,19 @@ public class ReportExporter {
             int critical = 0, high = 0, medium = 0, low = 0;
             for (IssueReport.IssueDetail issue : report.getIssues()) {
                 switch (issue.getSeverity()) {
-                    case CRITICAL -> critical++;
-                    case HIGH -> high++;
-                    case MEDIUM -> medium++;
-                    case LOW, INFO -> low++;
+                    case CRITICAL:
+                        critical++;
+                        break;
+                    case HIGH:
+                        high++;
+                        break;
+                    case MEDIUM:
+                        medium++;
+                        break;
+                    case LOW:
+                    case INFO:
+                        low++;
+                        break;
                 }
             }
             
@@ -246,12 +256,19 @@ public class ReportExporter {
     }
 
     private String formatSeverity(IssueDetector.IssueSeverity severity) {
-        return switch (severity) {
-            case CRITICAL -> "严重 🔴";
-            case HIGH -> "高危 🟠";
-            case MEDIUM -> "中危 🟡";
-            case LOW -> "低危 🔵";
-            case INFO -> "信息 ℹ️";
-        };
+        switch (severity) {
+            case CRITICAL:
+                return "严重 🔴";
+            case HIGH:
+                return "高危 🟠";
+            case MEDIUM:
+                return "中危 🟡";
+            case LOW:
+                return "低危 🔵";
+            case INFO:
+                return "信息 ℹ️";
+            default:
+                return severity.name();
+        }
     }
 }

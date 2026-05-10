@@ -68,11 +68,14 @@ public class GlobalExceptionHandler {
     }
 
     private HttpStatus determineHttpStatus(IssueType issueType) {
-        return switch (issueType) {
-            case DUPLICATE_PAYMENT, IDEMPOTENCY_FAILURE -> HttpStatus.CONFLICT;
-            case CALLBACK_TIMEOUT -> HttpStatus.REQUEST_TIMEOUT;
-            case CONCURRENCY_CONFLICT, LOCK_ACQUISITION_FAILED -> HttpStatus.TOO_MANY_REQUESTS;
-            case DATA_INTEGRITY_ISSUE, MESSAGE_CONSUME_FAILED, ORDER_STATUS_INCONSISTENCY -> HttpStatus.INTERNAL_SERVER_ERROR;
-        };
+        if (issueType == IssueType.DUPLICATE_PAYMENT || issueType == IssueType.IDEMPOTENCY_FAILURE) {
+            return HttpStatus.CONFLICT;
+        } else if (issueType == IssueType.CALLBACK_TIMEOUT) {
+            return HttpStatus.REQUEST_TIMEOUT;
+        } else if (issueType == IssueType.CONCURRENCY_CONFLICT || issueType == IssueType.LOCK_ACQUISITION_FAILED) {
+            return HttpStatus.TOO_MANY_REQUESTS;
+        } else {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
     }
 }

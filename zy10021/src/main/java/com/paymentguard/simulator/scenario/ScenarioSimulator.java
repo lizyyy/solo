@@ -235,18 +235,29 @@ public class ScenarioSimulator {
 
         for (int i = 0; i < config.getConcurrency(); i++) {
             final int requestId = i;
-            executor.submit(() -> {
-                int scenario = random.nextInt(4);
-                try {
-                    switch (scenario) {
-                        case 0 -> executeCallback(execution, orderId, requestId, false);
-                        case 1 -> executeCallback(execution, orderId, requestId, true);
-                        case 2 -> simulateTimeout(execution, requestId);
-                        case 3 -> simulateNetworkFailure(execution, requestId);
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    int scenario = random.nextInt(4);
+                    try {
+                        switch (scenario) {
+                            case 0:
+                                executeCallback(execution, orderId, requestId, false);
+                                break;
+                            case 1:
+                                executeCallback(execution, orderId, requestId, true);
+                                break;
+                            case 2:
+                                simulateTimeout(execution, requestId);
+                                break;
+                            case 3:
+                                simulateNetworkFailure(execution, requestId);
+                                break;
+                        }
+                    } catch (Exception e) {
+                        log.error("Mixed scenario request failed: requestId={}", requestId, e);
+                        execution.getFailureCount().incrementAndGet();
                     }
-                } catch (Exception e) {
-                    log.error("Mixed scenario request failed: requestId={}", requestId, e);
-                    execution.getFailureCount().incrementAndGet();
                 }
             });
         }

@@ -43,7 +43,7 @@ public class IssueDetector {
                 .reportId(reportId)
                 .orderId(orderId)
                 .generatedAt(LocalDateTime.now())
-                .issues(new ArrayList<>())
+                .issues(new ArrayList<IssueDetail>())
                 .orderDetails(order)
                 .build();
 
@@ -73,6 +73,20 @@ public class IssueDetector {
                 .collect(Collectors.toList());
 
         if (successTransactions.size() > 1) {
+            List<Map<String, Object>> transactionList = new ArrayList<>();
+            for (PaymentTransaction t : successTransactions) {
+                Map<String, Object> txMap = new HashMap<>();
+                txMap.put("transactionId", t.getTransactionId());
+                txMap.put("amount", t.getAmount().toString());
+                txMap.put("createdAt", t.getCreatedAt());
+                transactionList.add(txMap);
+            }
+
+            Map<String, Object> relatedData = new HashMap<>();
+            relatedData.put("successCount", successTransactions.size());
+            relatedData.put("paymentCount", order.getPaymentCount());
+            relatedData.put("transactions", transactionList);
+
             IssueDetail issue = IssueDetail.builder()
                     .issueType(IssueType.DUPLICATE_PAYMENT)
                     .severity(IssueSeverity.CRITICAL)
@@ -80,17 +94,7 @@ public class IssueDetector {
                     .description(String.format("订单存在 %d 次成功支付记录", successTransactions.size()))
                     .occurredAt(LocalDateTime.now())
                     .affectedEntity("Order: " + order.getOrderId())
-                    .relatedData(Map.of(
-                            "successCount", successTransactions.size(),
-                            "paymentCount", order.getPaymentCount(),
-                            "transactions", successTransactions.stream()
-                                    .map(t -> Map.of(
-                                            "transactionId", t.getTransactionId(),
-                                            "amount", t.getAmount().toString(),
-                                            "createdAt", t.getCreatedAt()
-                                    ))
-                                    .collect(Collectors.toList())
-                    ))
+                    .relatedData(relatedData)
                     .suggestedAction("检查支付流水，确认是否存在重复扣款。如果存在，发起退款流程。")
                     .build();
             report.getIssues().add(issue);
@@ -107,6 +111,11 @@ public class IssueDetector {
         boolean orderIsPaid = order.getStatus() == OrderStatus.PAID;
 
         if (hasSuccessPayment && !orderIsPaid) {
+            Map<String, Object> relatedData = new HashMap<>();
+            relatedData.put("orderStatus", order.getStatus().name());
+            relatedData.put("orderStatusDesc", order.getStatus().getDescription());
+            relatedData.put("successTransactionCount", successTransactions.size());
+
             IssueDetail issue = IssueDetail.builder()
                     .issueType(IssueType.ORDER_STATUS_INCONSISTENCY)
                     .severity(IssueSeverity.HIGH)
@@ -115,17 +124,17 @@ public class IssueDetector {
                             successTransactions.size(), order.getStatus().getDescription()))
                     .occurredAt(LocalDateTime.now())
                     .affectedEntity("Order: " + order.getOrderId())
-                    .relatedData(Map.of(
-                            "orderStatus", order.getStatus().name(),
-                            "orderStatusDesc", order.getStatus().getDescription(),
-                            "successTransactionCount", successTransactions.size()
-                    ))
+                    .relatedData(relatedData)
                     .suggestedAction("检查订单状态流转，可能需要手动更新订单状态。")
                     .build();
             report.getIssues().add(issue);
         }
 
         if (!hasSuccessPayment && orderIsPaid) {
+            Map<String, Object> relatedData = new HashMap<>();
+            relatedData.put("orderStatus", order.getStatus().name());
+            relatedData.put("successTransactionCount", 0);
+
             IssueDetail issue = IssueDetail.builder()
                     .issueType(IssueType.ORDER_STATUS_INCONSISTENCY)
                     .severity(IssueSeverity.HIGH)
@@ -133,10 +142,7 @@ public class IssueDetector {
                     .description("订单状态为已支付，但没有找到成功的支付记录")
                     .occurredAt(LocalDateTime.now())
                     .affectedEntity("Order: " + order.getOrderId())
-                    .relatedData(Map.of(
-                            "orderStatus", order.getStatus().name(),
-                            "successTransactionCount", 0
-                    ))
+                    .relatedData(relatedData)
                     .suggestedAction("核实支付记录，可能存在数据丢失或状态误更新。")
                     .build();
             report.getIssues().add(issue);
@@ -154,6 +160,22 @@ public class IssueDetector {
             if (records.size() > 1) {
                 long duplicateCount = records.stream().filter(CallbackRecord::getIsDuplicate).count();
                 
+                List<Map<String, Object>> callbackList = new ArrayList<>();
+                for (CallbackRecord r : records) {
+                    Map<String, Object> cbMap = new HashMap<>();
+                    cbMap.put("callbackId", r.getCallbackId());
+                    cbMap.put("status", r.getStatus().name());
+                    cbMap.put("isDuplicate", r.getIsDuplicate());
+                    cbMap.put("createdAt", r.getCreatedAt());
+                    callbackList.add(cbMap);
+                }
+
+                Map<String, Object> relatedData = new HashMap<>();
+                relatedData.put("transactionId", transactionId);
+                relatedData.put("totalCallbacks", records.size());
+                relatedData.put("duplicateCallbacks", duplicateCount);
+                relatedData.put("callbacks", callbackList);
+                
                 IssueDetail issue = IssueDetail.builder()
                         .issueType(IssueType.IDEMPOTENCY_FAILURE)
                         .severity(duplicateCount > 0 ? IssueSeverity.LOW : IssueSeverity.MEDIUM)
@@ -162,19 +184,7 @@ public class IssueDetector {
                                 transactionId, records.size(), duplicateCount))
                         .occurredAt(records.get(0).getCreatedAt())
                         .affectedEntity("Transaction: " + transactionId)
-                        .relatedData(Map.of(
-                                "transactionId", transactionId,
-                                "totalCallbacks", records.size(),
-                                "duplicateCallbacks", duplicateCount,
-                                "callbacks", records.stream()
-                                        .map(r -> Map.of(
-                                                "callbackId", r.getCallbackId(),
-                                                "status", r.getStatus().name(),
-                                                "isDuplicate", r.getIsDuplicate(),
-                                                "createdAt", r.getCreatedAt()
-                                        ))
-                                        .collect(Collectors.toList())
-                        ))
+                        .relatedData(relatedData)
                         .suggestedAction(duplicateCount > 0 
                                 ? "幂等性机制正常工作，重复回调已被拦截。" 
                                 : "幂等性校验可能失效，请检查幂等键和分布式锁配置。")
@@ -191,6 +201,18 @@ public class IssueDetector {
                 .collect(Collectors.toList());
 
         if (!slowCallbacks.isEmpty()) {
+            long maxProcessingTime = 0;
+            for (CallbackRecord r : slowCallbacks) {
+                if (r.getProcessingTimeMs() != null && r.getProcessingTimeMs() > maxProcessingTime) {
+                    maxProcessingTime = r.getProcessingTimeMs();
+                }
+            }
+
+            Map<String, Object> relatedData = new HashMap<>();
+            relatedData.put("thresholdMs", timeoutThreshold);
+            relatedData.put("slowCallbackCount", slowCallbacks.size());
+            relatedData.put("maxProcessingTime", maxProcessingTime);
+
             IssueDetail issue = IssueDetail.builder()
                     .issueType(IssueType.CALLBACK_TIMEOUT)
                     .severity(IssueSeverity.MEDIUM)
@@ -198,14 +220,7 @@ public class IssueDetector {
                     .description(String.format("发现 %d 个回调处理时间超过 %dms", 
                             slowCallbacks.size(), timeoutThreshold))
                     .occurredAt(LocalDateTime.now())
-                    .relatedData(Map.of(
-                            "thresholdMs", timeoutThreshold,
-                            "slowCallbackCount", slowCallbacks.size(),
-                            "maxProcessingTime", slowCallbacks.stream()
-                                    .mapToLong(CallbackRecord::getProcessingTimeMs)
-                                    .max()
-                                    .orElse(0)
-                    ))
+                    .relatedData(relatedData)
                     .suggestedAction("检查回调处理逻辑性能，考虑异步处理或优化数据库操作。")
                     .build();
             report.getIssues().add(issue);
@@ -219,6 +234,12 @@ public class IssueDetector {
         for (PaymentTransaction tx : transactions) {
             if (tx.getStatus() == PaymentStatus.SUCCESS && 
                 tx.getAmount().compareTo(orderAmount) != 0) {
+
+                Map<String, Object> relatedData = new HashMap<>();
+                relatedData.put("orderAmount", orderAmount.toString());
+                relatedData.put("paymentAmount", tx.getAmount().toString());
+                relatedData.put("transactionId", tx.getTransactionId());
+
                 IssueDetail issue = IssueDetail.builder()
                         .issueType(IssueType.DUPLICATE_PAYMENT)
                         .severity(IssueSeverity.CRITICAL)
@@ -227,11 +248,7 @@ public class IssueDetector {
                                 orderAmount, tx.getAmount()))
                         .occurredAt(tx.getCreatedAt())
                         .affectedEntity("Transaction: " + tx.getTransactionId())
-                        .relatedData(Map.of(
-                                "orderAmount", orderAmount.toString(),
-                                "paymentAmount", tx.getAmount().toString(),
-                                "transactionId", tx.getTransactionId()
-                        ))
+                        .relatedData(relatedData)
                         .suggestedAction("立即核实支付金额，可能存在串单或金额篡改风险。")
                         .build();
                 report.getIssues().add(issue);

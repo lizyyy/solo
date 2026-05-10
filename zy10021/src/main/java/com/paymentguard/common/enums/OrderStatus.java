@@ -29,11 +29,13 @@ public enum OrderStatus {
     }
 
     public boolean canTransitionTo(OrderStatus next) {
-        return switch (this) {
-            case PENDING -> next == PAID || next == FAILED || next == CANCELLED;
-            case PAID -> next == REFUNDING || next == REFUNDED;
-            case REFUNDING -> next == REFUNDED || next == PAID;
-            default -> false;
-        };
+        if (this == PENDING) {
+            return next == PAID || next == FAILED || next == CANCELLED;
+        } else if (this == PAID) {
+            return next == REFUNDING || next == REFUNDED;
+        } else if (this == REFUNDING) {
+            return next == REFUNDED || next == PAID;
+        }
+        return false;
     }
 }
