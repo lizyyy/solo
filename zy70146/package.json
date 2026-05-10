@@ -1,0 +1,32 @@
+{
+  "name": "error-budget-api",
+  "version": "1.0.0",
+  "description": "错误预算台账 API - 服务错误预算按接口、租户和时间窗计算",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.16",
+    "@types/uuid": "^9.0.8",
+    "@types/cors": "^2.8.17",
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

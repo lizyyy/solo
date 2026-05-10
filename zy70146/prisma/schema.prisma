@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  services    Service[]
+  sloConfigs  SLOConfiguration[]
+  errorSamples ErrorSample[]
+  budgets     TimeWindowBudget[]
+  freezes     BudgetFreeze[]
+  suppressions AlertSuppression[]
+  traces      ProcessTrace[]
+
+  @@map("tenants")
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  endpoints   APIEndpoint[]
+  sloConfigs  SLOConfiguration[]
+  errorSamples ErrorSample[]
+
+  @@unique([tenantId, name])
+  @@map("services")
+}
+
+model APIEndpoint {
+  id          String   @id @default(uuid())
+  serviceId   String
+  method      String
+  path        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  sloConfigs  SLOConfiguration[]
+  errorSamples ErrorSample[]
+
+  @@unique([serviceId, method, path])
+  @@map("api_endpoints")
+}
+
+model SLOConfiguration {
+  id               String          @id @default(uuid())
+  tenantId         String
+  serviceId        String?
+  endpointId       String?
+  name             String
+  type             String
+  targetValue      Float
+  timeWindowType   String
+  description      String?
+  isActive         Boolean         @default(true)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  service          Service?        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  endpoint         APIEndpoint?    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  budgets          TimeWindowBudget[]
+  traces           ProcessTrace[]
+
+  @@map("slo_configurations")
+}
+
+model ErrorSample {
+  id               String          @id @default(uuid())
+  tenantId         String
+  serviceId        String?
+  endpointId       String?
+  source           String
+  errorType        String?
+  errorMessage     String?
+  statusCode       Int?
+  timestamp        DateTime        @default(now())
+  durationMs       Int?
+  requestId        String?
+  userId           String?
+  metadata         String?
+  isDeducted       Boolean         @default(false)
+  deductedAt       DateTime?
+  createdAt        DateTime        @default(now())
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  service          Service?        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  endpoint         APIEndpoint?    @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  budgetDeductions BudgetDeduction[]
+
+  @@index([tenantId, timestamp])
+  @@index([tenantId, isDeducted])
+  @@map("error_samples")
+}
+
+model TimeWindowBudget {
+  id               String          @id @default(uuid())
+  tenantId         String
+  sloConfigId      String
+  windowStart      DateTime
+  windowEnd        DateTime
+  windowType       String
+  totalBudget      Float
+  usedBudget       Float           @default(0)
+  remainingBudget  Float
+  isFrozen         Boolean         @default(false)
+  frozenAt         DateTime?
+  frozenReason     String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sloConfig        SLOConfiguration @relation(fields: [sloConfigId], references: [id], onDelete: Cascade)
+  deductions       BudgetDeduction[]
+  freezes          BudgetFreeze[]
+  suppressions     AlertSuppression[]
+
+  @@unique([sloConfigId, windowStart])
+  @@index([tenantId, windowStart])
+  @@map("time_window_budgets")
+}
+
+model BudgetDeduction {
+  id               String          @id @default(uuid())
+  budgetId         String
+  errorSampleId    String
+  deductedAmount   Float
+  reason           String?
+  deductedAt       DateTime        @default(now())
+
+  budget           TimeWindowBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  errorSample      ErrorSample    @relation(fields: [errorSampleId], references: [id], onDelete: Cascade)
+
+  @@map("budget_deductions")
+}
+
+model BudgetFreeze {
+  id               String          @id @default(uuid())
+  tenantId         String
+  budgetId         String
+  reason           String
+  description      String?
+  frozenBy         String?
+  frozenAt         DateTime        @default(now())
+  isActive         Boolean         @default(true)
+  unfrozenAt       DateTime?
+  unfrozenBy       String?
+  unfreezeReason   String?
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  budget           TimeWindowBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@map("budget_freezes")
+}
+
+model AlertSuppression {
+  id               String          @id @default(uuid())
+  tenantId         String
+  budgetId         String
+  alertType        String
+  reason           String
+  suppressedBy     String?
+  suppressedAt     DateTime        @default(now())
+  expiresAt        DateTime?
+  isActive         Boolean         @default(true)
+  unsuppressedAt   DateTime?
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  budget           TimeWindowBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@map("alert_suppressions")
+}
+
+model ProcessTrace {
+  id               String          @id @default(uuid())
+  tenantId         String
+  sloConfigId      String?
+  step             String
+  status           String
+  currentCheckpoint String?
+  checkpointMessage String?
+  previousTraceId  String?
+  operator         String?
+  metadata         String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  tenant           Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sloConfig        SLOConfiguration? @relation(fields: [sloConfigId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, step, status])
+  @@map("process_traces")
+}
