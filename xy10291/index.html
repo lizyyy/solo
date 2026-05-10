@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>皮划艇租赁安全检查台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>皮划艇租赁安全检查台</h1>
+            <div class="header-actions">
+                <button id="btn-load-sample" class="btn btn-secondary">加载示例数据</button>
+                <button id="btn-clear-all" class="btn btn-danger">清空数据</button>
+            </div>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-item active" data-tab="dashboard">总览看板</button>
+            <button class="nav-item" data-tab="boats">艇只档案</button>
+            <button class="nav-item" data-tab="environment">环境数据</button>
+            <button class="nav-item" data-tab="visitors">游客管理</button>
+            <button class="nav-item" data-tab="checkout">安全检查</button>
+            <button class="nav-item" data-tab="records">租赁记录</button>
+            <button class="nav-item" data-tab="guide">使用指南</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="tab-dashboard" class="tab-content active">
+                <h2>安全检查总览</h2>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-boats">0</div>
+                        <div class="stat-label">在册艇只</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-safe-boats">0</div>
+                        <div class="stat-label">安全可用</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-today-checks">0</div>
+                        <div class="stat-label">今日检查</div>
+                    </div>
+                    <div class="stat-card stat-danger">
+                        <div class="stat-value" id="stat-rejected">0</div>
+                        <div class="stat-label">拦截次数</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>当前环境状态</h3>
+                    <div class="environment-status" id="environment-status">
+                        <p class="empty-state">暂无环境数据</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>近期安全检查记录</h3>
+                    <div class="recent-records" id="recent-records">
+                        <p class="empty-state">暂无检查记录</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-boats" class="tab-content">
+                <h2>艇只档案管理</h2>
+                <div class="section-actions">
+                    <button id="btn-add-boat" class="btn btn-primary">新增艇只</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>艇号</th>
+                                <th>类型</th>
+                                <th>容量</th>
+                                <th>救生衣配置</th>
+                                <th>状态</th>
+                                <th>最后检查</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="boats-table-body">
+                            <tr><td colspan="7" class="empty-state">暂无艇只档案</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tab-environment" class="tab-content">
+                <h2>环境数据管理</h2>
+                <div class="section-actions">
+                    <button id="btn-add-weather" class="btn btn-primary">录入天气</button>
+                    <button id="btn-add-water" class="btn btn-primary">录入水位</button>
+                </div>
+                
+                <div class="environment-layout">
+                    <div class="environment-section">
+                        <h3>天气记录</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期时间</th>
+                                        <th>天气状况</th>
+                                        <th>风速(m/s)</th>
+                                        <th>气温(°C)</th>
+                                        <th>预警状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="weather-table-body">
+                                    <tr><td colspan="5" class="empty-state">暂无天气记录</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="environment-section">
+                        <h3>水位记录</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期时间</th>
+                                        <th>水位(m)</th>
+                                        <th>水流速度</th>
+                                        <th>安全等级</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="water-table-body">
+                                    <tr><td colspan="4" class="empty-state">暂无水位记录</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-visitors" class="tab-content">
+                <h2>游客信息管理</h2>
+                <div class="section-actions">
+                    <button id="btn-add-visitor" class="btn btn-primary">新增游客</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>姓名</th>
+                                <th>手机号</th>
+                                <th>经验等级</th>
+                                <th>租赁次数</th>
+                                <th>备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitors-table-body">
+                            <tr><td colspan="6" class="empty-state">暂无游客记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tab-checkout" class="tab-content">
+                <h2>安全检查台</h2>
+                <div class="checkout-layout">
+                    <div class="checkout-form">
+                        <div class="form-group">
+                            <label>选择艇只 *</label>
+                            <select id="checkout-boat">
+                                <option value="">请选择艇只</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>选择游客 *</label>
+                            <select id="checkout-visitor">
+                                <option value="">请选择游客</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>游客人数 *</label>
+                            <input type="number" id="checkout-passengers" min="1" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>租赁时长（小时）</label>
+                            <input type="number" id="checkout-duration" min="1" value="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea id="checkout-notes" rows="3"></textarea>
+                        </div>
+                        
+                        <button id="btn-run-check" class="btn btn-primary btn-large">执行安全检查</button>
+                        <button id="btn-reset-check" class="btn btn-secondary">重置</button>
+                    </div>
+                    
+                    <div class="checkout-result" id="checkout-result">
+                        <h3>安全检查结果</h3>
+                        <div class="result-placeholder">
+                            <p>请先填写检查信息并点击"执行安全检查"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-records" class="tab-content">
+                <h2>租赁记录管理</h2>
+                <div class="section-actions">
+                    <button id="btn-export-records" class="btn btn-success">导出记录</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>检查单号</th>
+                                <th>艇只</th>
+                                <th>游客</th>
+                                <th>检查时间</th>
+                                <th>检查结果</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-table-body">
+                            <tr><td colspan="7" class="empty-state">暂无租赁记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tab-guide" class="tab-content">
+                <h2>使用指南</h2>
+                <div class="guide-content" id="guide-content">
+                    <p class="empty-state">指南内容加载中...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">表单</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+            </div>
+            <div class="modal-footer" id="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
