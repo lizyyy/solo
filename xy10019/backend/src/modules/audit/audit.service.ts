@@ -299,7 +299,7 @@ export class AuditService {
     }
 
     return {
-      ...logs[0].afterSnapshot,
+      ...((logs[0].afterSnapshot || {}) as object),
       timestamp: logs[0].timestamp,
     };
   }

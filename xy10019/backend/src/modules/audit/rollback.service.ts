@@ -1,16 +1,13 @@
 import { Injectable, Logger, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-import { AuditService, AuditLogData } from './audit.service';
+import { AuditService } from './audit.service';
 import { CacheService } from '../../infrastructure/redis/cache.service';
 import {
   AuditLog,
   AuditOperation,
   AuditEntity,
   TransferStatus,
-  Inventory,
-  TransferOrder,
 } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 
 export interface RollbackResult {
   success: boolean;
@@ -82,8 +79,8 @@ export class RollbackService {
     operatorName: string,
     requestId?: string,
   ): Promise<RollbackResult> {
-    const beforeSnapshot = log.beforeSnapshot as any;
-    const afterSnapshot = log.afterSnapshot as any;
+    const beforeSnapshot = (log.beforeSnapshot || {}) as Record<string, any>;
+    const afterSnapshot = (log.afterSnapshot || {}) as Record<string, any>;
 
     if (!log.entityId) {
       throw new BadRequestException('无法确定库存实体ID');
@@ -98,14 +95,14 @@ export class RollbackService {
     }
 
     const result = await this.prismaService.$transaction(async (prisma) => {
-      let updatedInventory: Inventory | null = null;
+      let updatedInventory: any = null;
 
       switch (log.operation) {
         case AuditOperation.ADJUST:
         case AuditOperation.BATCH: {
-          const originalQuantity = beforeSnapshot?.quantity ?? inventory.quantity;
-          const originalAvailableQty = beforeSnapshot?.availableQty ?? inventory.availableQty;
-          const originalPrice = beforeSnapshot?.price ?? inventory.price;
+          const originalQuantity = beforeSnapshot.quantity ?? inventory.quantity;
+          const originalAvailableQty = beforeSnapshot.availableQty ?? inventory.availableQty;
+          const originalPrice = beforeSnapshot.price ?? inventory.price;
 
           updatedInventory = await prisma.inventory.update({
             where: {
@@ -115,7 +112,7 @@ export class RollbackService {
             data: {
               quantity: originalQuantity,
               availableQty: originalAvailableQty,
-              price: new Decimal(originalPrice),
+              price: originalPrice,
               version: { increment: 1 },
               lastUpdated: new Date(),
             },
@@ -131,7 +128,7 @@ export class RollbackService {
               quantityAfter: originalQuantity,
               changeQuantity: originalQuantity - inventory.quantity,
               priceBefore: inventory.price,
-              priceAfter: new Decimal(originalPrice),
+              priceAfter: originalPrice,
               referenceId: log.id,
               referenceType: 'REVERT',
               operatorId,
@@ -143,7 +140,7 @@ export class RollbackService {
         }
 
         case AuditOperation.PRICE_CHANGE: {
-          const originalPrice = beforeSnapshot?.price ?? inventory.price;
+          const originalPrice = beforeSnapshot.price ?? inventory.price;
 
           updatedInventory = await prisma.inventory.update({
             where: {
@@ -151,7 +148,7 @@ export class RollbackService {
               version: inventory.version,
             },
             data: {
-              price: new Decimal(originalPrice),
+              price: originalPrice,
               version: { increment: 1 },
               lastUpdated: new Date(),
             },
@@ -167,12 +164,12 @@ export class RollbackService {
               quantityAfter: inventory.quantity,
               changeQuantity: 0,
               priceBefore: inventory.price,
-              priceAfter: new Decimal(originalPrice),
+              priceAfter: originalPrice,
               referenceId: log.id,
               referenceType: 'REVERT',
               operatorId,
               operatorName,
-              remark: `回滚改价: 恢复价格到 ${originalPrice}`,
+              remark: `回滚改价: 恢复价格`,
             },
           });
           break;
@@ -249,8 +246,8 @@ export class RollbackService {
       throw new BadRequestException('该日志不是调拨操作');
     }
 
-    const beforeStatus = (log.beforeSnapshot as any)?.status;
-    const afterStatus = (log.afterSnapshot as any)?.status;
+    const beforeStatus = (log.beforeSnapshot as Record<string, any>)?.status;
+    const afterStatus = (log.afterSnapshot as Record<string, any>)?.status;
 
     if (afterStatus === TransferStatus.COMPLETED && beforeStatus === TransferStatus.IN_PROGRESS) {
       return this.revertCompletedTransfer(transferOrder, log, operatorId, operatorName, requestId);
@@ -266,7 +263,7 @@ export class RollbackService {
   }
 
   private async revertCompletedTransfer(
-    transfer: TransferOrder & { items: any[] },
+    transfer: any,
     log: AuditLog,
     operatorId: string,
     operatorName: string,
@@ -333,7 +330,7 @@ export class RollbackService {
 
         if (targetInventory.quantity < item.quantity) {
           throw new BadRequestException(
-            `目标门店库存不足，无法回滚: 商品 ${item.productId}，当前库存: ${targetInventory.quantity}`,
+            `目标门店库存不足，无法回滚: 商品 ${item.productId}`,
           );
         }
 
@@ -411,7 +408,7 @@ export class RollbackService {
   }
 
   private async revertCancelledTransfer(
-    transfer: TransferOrder & { items: any[] },
+    transfer: any,
     log: AuditLog,
     operatorId: string,
     operatorName: string,
@@ -434,7 +431,7 @@ export class RollbackService {
 
         if (sourceInventory.availableQty < item.quantity) {
           throw new BadRequestException(
-            `源门店可用库存不足，无法恢复调拨: 商品 ${item.productId}，可用数量: ${sourceInventory.availableQty}`,
+            `源门店可用库存不足，无法恢复调拨: 商品 ${item.productId}`,
           );
         }
 
@@ -493,7 +490,7 @@ export class RollbackService {
   }
 
   private async revertCreatedTransfer(
-    transfer: TransferOrder & { items: any[] },
+    transfer: any,
     log: AuditLog,
     operatorId: string,
     operatorName: string,
@@ -516,7 +513,7 @@ export class RollbackService {
 
         if (sourceInventory.lockedQty < item.quantity) {
           throw new BadRequestException(
-            `锁定库存不足，无法回滚: 商品 ${item.productId}，锁定数量: ${sourceInventory.lockedQty}`,
+            `锁定库存不足，无法回滚: 商品 ${item.productId}`,
           );
         }
 
@@ -604,7 +601,8 @@ export class RollbackService {
     }
 
     if (log.entity === AuditEntity.INVENTORY) {
-      if (![AuditOperation.ADJUST, AuditOperation.BATCH, AuditOperation.PRICE_CHANGE].includes(log.operation)) {
+      const supportedOperations: AuditOperation[] = [AuditOperation.ADJUST, AuditOperation.BATCH, AuditOperation.PRICE_CHANGE];
+      if (!supportedOperations.includes(log.operation)) {
         return { canRollback: false, reason: `不支持回滚该类型的库存操作: ${log.operation}` };
       }
     } else if (log.entity === AuditEntity.TRANSFER_ORDER) {

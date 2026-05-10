@@ -25,8 +25,8 @@ export class IdempotentService {
   ): Promise<{ isDuplicate: boolean; response?: any }> {
     const cacheKey = `${IDEMPOTENT_PREFIX}${requestKey}`;
 
-    const cached = await this.redisService.getJson(cacheKey);
-    if (cached) {
+    const cached = await this.redisService.getJson<{ response: any }>(cacheKey);
+    if (cached && cached.response !== undefined) {
       return { isDuplicate: true, response: cached.response };
     }
 

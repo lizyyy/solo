@@ -41,10 +41,15 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async set(
     key: string,
     value: string,
+    ttlOrMode?: number | string,
     ttl?: number,
+    mode?: string,
   ): Promise<string | null> {
-    if (ttl) {
-      return this.client.set(key, value, 'EX', ttl);
+    if (typeof ttlOrMode === 'string' && ttl !== undefined && mode !== undefined) {
+      return (this.client.set as any)(key, value, ttlOrMode, ttl, mode);
+    }
+    if (typeof ttlOrMode === 'number') {
+      return this.client.set(key, value, 'EX', ttlOrMode);
     }
     return this.client.set(key, value);
   }

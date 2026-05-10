@@ -13,7 +13,7 @@ export interface JwtPayload {
 
 export interface LoginResult {
   accessToken: string;
-  user: Partial<User>;
+  user: Partial<User> & { store?: any };
 }
 
 @Injectable()

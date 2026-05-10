@@ -1,14 +1,12 @@
-import { Controller, Get, Query, Param, HttpCode, HttpStatus, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Param, HttpCode, HttpStatus, Post, Body, UseGuards, SetMetadata } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuditService } from './audit.service';
 import { RollbackService } from './rollback.service';
 import { AuditOperation, AuditEntity, UserRole } from '@prisma/client';
 import { success } from '../../common/types/api-response.type';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard, ROLES_KEY } from '../auth/auth.guard';
 import { CurrentUser, RequestId } from '../../common/decorators/user.decorator';
-import { SetMetadata } from '@nestjs/common';
 
-const ROLES_KEY = 'roles';
 const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
 
 interface RollbackRequest {
