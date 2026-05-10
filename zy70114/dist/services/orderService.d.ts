@@ -1,0 +1,11 @@
+import { Order, OrderNode, OrderStatus, NodeType } from '../types';
+export declare const getStatusName: (status: OrderStatus) => string;
+export declare const getNodeTypeName: (nodeType: NodeType) => string;
+export declare const canTransition: (from: OrderStatus, to: OrderStatus) => boolean;
+export declare const createOrder: (orderNo: string, merchantId: string, merchantName: string, userId: string, userName: string, orderAmount: number, expectedMealMinutes: number, operatorId: string, operatorRole: string) => Order;
+export declare const getOrderById: (orderId: string) => Order;
+export declare const getOrderByNo: (orderNo: string) => Order;
+export declare const updateOrderStatus: (orderId: string, newStatus: OrderStatus, operatorId: string, operatorRole: string) => Order;
+export declare const addOrderNode: (orderId: string, nodeType: NodeType, nodeStatus: string, operatorId: string, operatorRole: string, remark?: string) => OrderNode;
+export declare const getOrderNodes: (orderId: string) => OrderNode[];
+export declare const assignRider: (orderId: string, riderId: string, riderName: string, operatorId: string, operatorRole: string) => Order;

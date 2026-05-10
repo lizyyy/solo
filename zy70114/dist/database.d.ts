@@ -1,0 +1,10 @@
+import { Database, SqlValue } from 'sql.js';
+export declare const initDb: () => Promise<void>;
+export declare const saveDatabase: () => void;
+export declare const getDb: () => Database;
+export declare const generateId: () => string;
+export declare const now: () => number;
+export declare const convertRowToObject: (columnNames: string[], row: SqlValue[]) => Record<string, any>;
+export declare const convertRowsToObjects: (columnNames: string[], rows: SqlValue[][]) => Record<string, any>[];
+export declare const executeGet: <T = any>(query: string, params?: SqlValue[]) => T | null;
+export declare const executeAll: <T = any>(query: string, params?: SqlValue[]) => T[];
