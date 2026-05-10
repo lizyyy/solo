@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Member {
+  id               String           @id @default(uuid())
+  name             String
+  phone            String         @unique
+  email            String?
+  joinDate         DateTime       @default(now())
+  bodyMeasurements BodyMeasurement[]
+  injuries         Injury[]
+  plans            TrainingPlan[]
+  sessions         TrainingSession[]
+  payments         CoursePayment[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model BodyMeasurement {
+  id          String   @id @default(uuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id])
+  weight      Float?
+  height      Float?
+  bmi         Float?
+  bodyFat     Float?
+  muscleMass  Float?
+  flexibility Int?
+  strength    Int?
+  endurance   Int?
+  cardio      Int?
+  notes       String?
+  measuredAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model Injury {
+  id           String   @id @default(uuid())
+  memberId     String
+  member       Member   @relation(fields: [memberId], references: [id])
+  bodyPart     String
+  severity     String
+  description  String?
+  restrictedActions String
+  startDate    DateTime
+  endDate      DateTime?
+  isActive     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model TrainingPlan {
+  id            String            @id @default(uuid())
+  memberId      String
+  member        Member          @relation(fields: [memberId], references: [id])
+  name          String
+  description   String?
+  version       Int             @default(1)
+  isActive      Boolean         @default(true)
+  exercises     PlanExercise[]
+  sessions      TrainingSession[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model PlanExercise {
+  id           String        @id @default(uuid())
+  planId        String
+  plan          TrainingPlan @relation(fields: [planId], references: [id])
+  name          String
+  sets          Int
+  reps          Int
+  weight        Float?
+  notes         String?
+  orderIndex    Int
+  createdAt     DateTime    @default(now())
+}
+
+model CoursePayment {
+  id            String   @id @default(uuid())
+  memberId      String
+  member        Member   @relation(fields: [memberId], references: [id])
+  totalSessions  Int
+  usedSessions   Int      @default(0)
+  purchaseDate  DateTime @default(now())
+  note          String?
+  sessions      TrainingSession[]
+  createdAt     DateTime @default(now())
+}
+
+model TrainingSession {
+  id            String        @id @default(uuid())
+  memberId      String
+  member        Member        @relation(fields: [memberId], references: [id])
+  planId        String?
+  plan          TrainingPlan? @relation(fields: [planId], references: [id])
+  paymentId     String?
+  payment       CoursePayment? @relation(fields: [paymentId], references: [id])
+  sessionDate  DateTime
+  durationMinutes Int
+  feedback      String?
+  rating        Int?
+  exercises     SessionExercise[]
+  isCompleted   Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+}
+
+model SessionExercise {
+  id             String           @id @default(uuid())
+  sessionId        String
+  session          TrainingSession @relation(fields: [sessionId], references: [id])
+  exerciseName    String
+  completedSets  Int
+  completedReps  Int
+  actualWeight   Float?
+  notes            String?
+  createdAt        DateTime     @default(now())
+}
