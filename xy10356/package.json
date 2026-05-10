@@ -1,0 +1,16 @@
+{
+  "name": "mall-ad-scheduler-cli",
+  "version": "1.0.0",
+  "description": "商场广告位排期 CLI 工具",
+  "main": "index.js",
+  "bin": {
+    "ad-scheduler": "./index.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["advertising", "scheduler", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
