@@ -1,0 +1,39 @@
+[
+  {
+    "id": "S1",
+    "type": "SMALL",
+    "capacity": 4,
+    "status": "OCCUPIED",
+    "currentTicketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9"
+  },
+  {
+    "id": "S2",
+    "type": "SMALL",
+    "capacity": 4,
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "S3",
+    "type": "SMALL",
+    "capacity": 4,
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "M1",
+    "type": "MEDIUM",
+    "capacity": 8,
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "M2",
+    "type": "MEDIUM",
+    "capacity": 8,
+    "status": "AVAILABLE"
+  },
+  {
+    "id": "L1",
+    "type": "LARGE",
+    "capacity": 12,
+    "status": "AVAILABLE"
+  }
+]

@@ -1,0 +1,173 @@
+[
+  {
+    "id": "b202eea8-0c56-4b54-b1be-ae6f231b0201",
+    "eventType": "QUEUE.JOIN",
+    "timestamp": "2026-05-10T00:44:17.718Z",
+    "payload": {
+      "ticketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9",
+      "queueNumber": "A001",
+      "customerName": "张三",
+      "partySize": 3,
+      "tableType": "SMALL",
+      "position": 1
+    },
+    "details": "客户张三加入排队，人数3，桌型SMALL，号码A001"
+  },
+  {
+    "id": "b0ccb4cb-1f36-4140-a2e2-1de1d412e248",
+    "eventType": "QUEUE.JOIN",
+    "timestamp": "2026-05-10T00:44:23.600Z",
+    "payload": {
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "queueNumber": "B001",
+      "customerName": "李四",
+      "partySize": 6,
+      "tableType": "MEDIUM",
+      "position": 1
+    },
+    "details": "客户李四加入排队，人数6，桌型MEDIUM，号码B001"
+  },
+  {
+    "id": "05b02473-8efb-4a41-b242-afa0aad0ddc2",
+    "eventType": "QUEUE.JOIN",
+    "timestamp": "2026-05-10T00:44:23.613Z",
+    "payload": {
+      "ticketId": "bc9cdcc6-a046-43c3-9d1c-07eb17c3262c",
+      "queueNumber": "C001",
+      "customerName": "王五",
+      "partySize": 10,
+      "tableType": "LARGE",
+      "position": 1
+    },
+    "details": "客户王五加入排队，人数10，桌型LARGE，号码C001"
+  },
+  {
+    "id": "a8087e89-1b73-4524-a229-8dcd1e553c34",
+    "eventType": "QUEUE.CALL",
+    "timestamp": "2026-05-10T00:44:28.235Z",
+    "payload": {
+      "ticketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9",
+      "queueNumber": "A001",
+      "customerName": "张三",
+      "tableType": "SMALL"
+    },
+    "details": "呼叫号码A001，客户张三"
+  },
+  {
+    "id": "049094bf-ceb9-4d0c-8d98-ca6cb79f836b",
+    "eventType": "NOTIFICATION.SEND",
+    "timestamp": "2026-05-10T00:44:28.239Z",
+    "payload": {
+      "notificationId": "2f0fceb9-17ed-49c0-95a9-154f7975b989",
+      "ticketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9",
+      "customerName": "张三",
+      "type": "CALLING",
+      "message": "您的号码已到号，请尽快到前台入座！"
+    },
+    "details": "发送通知给张三，类型：CALLING"
+  },
+  {
+    "id": "26194207-c442-4642-a219-1a5048e3c311",
+    "eventType": "QUEUE.SEATED",
+    "timestamp": "2026-05-10T00:44:33.482Z",
+    "payload": {
+      "ticketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9",
+      "queueNumber": "A001",
+      "tableId": "S1",
+      "customerName": "张三",
+      "isCombined": false
+    },
+    "details": "号码A001入座，桌号S1，合桌：否"
+  },
+  {
+    "id": "eb12449c-87cf-4c94-a940-3500da32d395",
+    "eventType": "QUEUE.CALL",
+    "timestamp": "2026-05-10T00:44:37.953Z",
+    "payload": {
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "queueNumber": "B001",
+      "customerName": "李四",
+      "tableType": "MEDIUM"
+    },
+    "details": "呼叫号码B001，客户李四"
+  },
+  {
+    "id": "6eff5f64-3903-4117-abae-1c3b1ca1b204",
+    "eventType": "NOTIFICATION.SEND",
+    "timestamp": "2026-05-10T00:44:37.953Z",
+    "payload": {
+      "notificationId": "1c7299c3-1d19-457f-8623-7bf4118130d0",
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "customerName": "李四",
+      "type": "CALLING",
+      "message": "您的号码已到号，请尽快到前台入座！"
+    },
+    "details": "发送通知给李四，类型：CALLING"
+  },
+  {
+    "id": "6ca85e08-8930-49b6-8328-0d78501a9e8e",
+    "eventType": "QUEUE.OVERTIME",
+    "timestamp": "2026-05-10T00:44:37.975Z",
+    "payload": {
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "queueNumber": "B001",
+      "customerName": "李四",
+      "skipCount": 1
+    },
+    "details": "号码B001过号，已跳过1次"
+  },
+  {
+    "id": "86bf5313-23bc-48ca-941e-c09952d5fc6b",
+    "eventType": "QUEUE.RESTORE",
+    "timestamp": "2026-05-10T00:44:47.160Z",
+    "payload": {
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "queueNumber": "B001",
+      "customerName": "李四",
+      "newPosition": 3
+    },
+    "details": "号码B001恢复排队，新位置3"
+  },
+  {
+    "id": "f53ca396-8f5c-4235-bd21-4afba46d4a36",
+    "eventType": "NOTIFICATION.SEND",
+    "timestamp": "2026-05-10T00:44:47.161Z",
+    "payload": {
+      "notificationId": "5e52ab87-0885-4636-9845-0477eb7d1f95",
+      "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+      "customerName": "李四",
+      "type": "RESTORE",
+      "message": "您已恢复排队，当前位置：第3位"
+    },
+    "details": "发送通知给李四，类型：RESTORE"
+  },
+  {
+    "id": "b55e631d-4660-4efc-9210-870a9b6085fe",
+    "eventType": "QUEUE.MANUAL_ADJUST",
+    "timestamp": "2026-05-10T00:44:47.170Z",
+    "payload": {
+      "ticketId": "bc9cdcc6-a046-43c3-9d1c-07eb17c3262c",
+      "queueNumber": "C001",
+      "customerName": "王五",
+      "fromStatus": "WAITING",
+      "toStatus": "SEATED",
+      "reason": "客户直接入座了",
+      "operator": "前台小王"
+    },
+    "details": "人工调整号码C001状态：WAITING -> SEATED"
+  },
+  {
+    "id": "815902a5-e54d-41c5-8bd8-3ec9f03be3b9",
+    "eventType": "REPORT.GENERATE",
+    "timestamp": "2026-05-10T00:45:05.455Z",
+    "payload": {
+      "reportType": "DAILY",
+      "timeRange": "Sun May 10 2026",
+      "summary": {
+        "total": 3,
+        "seatingRate": 67
+      }
+    },
+    "details": "生成报表：DAILY，时间范围Sun May 10 2026"
+  }
+]

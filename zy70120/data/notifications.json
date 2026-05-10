@@ -1,0 +1,44 @@
+[
+  {
+    "id": "2f0fceb9-17ed-49c0-95a9-154f7975b989",
+    "ticketId": "fe3ef3a3-cd5d-4c82-9928-88bb881dbff9",
+    "queueNumber": "A001",
+    "customerName": "张三",
+    "phone": "13800138001",
+    "type": "CALLING",
+    "message": "您的号码已到号，请尽快到前台入座！",
+    "extraData": {
+      "priority": "high"
+    },
+    "sentAt": "2026-05-10T00:44:28.235Z",
+    "status": "SENT"
+  },
+  {
+    "id": "1c7299c3-1d19-457f-8623-7bf4118130d0",
+    "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+    "queueNumber": "B001",
+    "customerName": "李四",
+    "phone": "13800138002",
+    "type": "CALLING",
+    "message": "您的号码已到号，请尽快到前台入座！",
+    "extraData": {
+      "priority": "high"
+    },
+    "sentAt": "2026-05-10T00:44:37.953Z",
+    "status": "SENT"
+  },
+  {
+    "id": "5e52ab87-0885-4636-9845-0477eb7d1f95",
+    "ticketId": "80cf53ce-b464-446a-9826-75f280c56fec",
+    "queueNumber": "B001",
+    "customerName": "李四",
+    "phone": "13800138002",
+    "type": "RESTORE",
+    "message": "您已恢复排队，当前位置：第3位",
+    "extraData": {
+      "newPosition": 3
+    },
+    "sentAt": "2026-05-10T00:44:47.161Z",
+    "status": "SENT"
+  }
+]
