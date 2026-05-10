@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛事号码布芯片核验器</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>🏃 赛事号码布芯片核验器</h1>
+            <p class="subtitle">路跑赛事参赛名单、芯片绑定与分区信息核验系统</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-tab="data">数据管理</button>
+            <button class="tab-btn" data-tab="verification">核验操作</button>
+            <button class="tab-btn" data-tab="logs">操作日志</button>
+            <button class="tab-btn" data-tab="docs">使用文档</button>
+        </nav>
+
+        <main>
+            <section id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>参赛选手总数</h3>
+                        <p id="stat-total" class="stat-value">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>已验证通过</h3>
+                        <p id="stat-passed" class="stat-value passed">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>待人工处理</h3>
+                        <p id="stat-pending" class="stat-value pending">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>核验失败</h3>
+                        <p id="stat-failed" class="stat-value failed">0</p>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h2>快速操作</h2>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="quick-import">📥 导入数据</button>
+                        <button class="btn btn-success" id="quick-verify">✅ 开始核验</button>
+                        <button class="btn btn-danger" id="quick-clear">🗑️ 清空数据</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data" class="tab-content">
+                <div class="data-section">
+                    <h2>📁 数据导入</h2>
+                    <div class="import-section">
+                        <div class="file-upload" id="file-drop">
+                            <p>📤 拖拽Excel/CSV文件到此处，或</p>
+                            <button class="btn btn-secondary" id="select-file">选择文件</button>
+                            <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
+                        </div>
+                        <div class="import-preview">
+                            <h3>数据预览</h3>
+                            <div class="preview-container">
+                                <table id="preview-table">
+                                    <thead></thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-primary" id="confirm-import" disabled>确认导入</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section">
+                    <h2>✏️ 手动录入</h2>
+                    <form id="manual-entry-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>姓名 *</label>
+                                <input type="text" id="entry-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>参赛号码 *</label>
+                                <input type="text" id="entry-bib" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>芯片号 *</label>
+                                <input type="text" id="entry-chip" required>
+                            </div>
+                            <div class="form-group">
+                                <label>分区 *</label>
+                                <select id="entry-zone" required>
+                                    <option value="">请选择</option>
+                                    <option value="A">A区（全程马拉松）</option>
+                                    <option value="B">B区（半程马拉松）</option>
+                                    <option value="C">C区（迷你马拉松）</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>身份证号（可选）</label>
+                                <input type="text" id="entry-idcard">
+                            </div>
+                            <div class="form-group">
+                                <label>联系电话（可选）</label>
+                                <input type="text" id="entry-phone">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">添加记录</button>
+                    </form>
+                </div>
+
+                <div class="data-section">
+                    <h2>📋 数据列表</h2>
+                    <div class="table-container">
+                        <table id="data-table">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>参赛号码</th>
+                                    <th>芯片号</th>
+                                    <th>分区</th>
+                                    <th>验证状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="verification" class="tab-content">
+                <div class="verification-section">
+                    <h2>🔍 核验操作</h2>
+                    
+                    <div class="verification-steps">
+                        <div class="step active" id="step1">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>参赛名单验证</h3>
+                                <p>验证参赛选手信息是否在官方名单中</p>
+                                <button class="btn btn-primary" id="verify-list">执行名单验证</button>
+                            </div>
+                        </div>
+                        
+                        <div class="step" id="step2">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>芯片绑定验证</h3>
+                                <p>验证芯片号与参赛号码是否正确绑定</p>
+                                <button class="btn btn-primary" id="verify-chip">执行芯片绑定验证</button>
+                            </div>
+                        </div>
+                        
+                        <div class="step" id="step3">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>分区校验</h3>
+                                <p>验证选手分区是否与原始数据一致</p>
+                                <button class="btn btn-primary" id="verify-zone">执行分区校验</button>
+                            </div>
+                        </div>
+                        
+                        <div class="step" id="step4">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>全部核验</h3>
+                                <p>一次性执行所有核验项目</p>
+                                <button class="btn btn-success" id="verify-all">执行全部核验</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-results">
+                        <h3>核验结果</h3>
+                        <div class="results-summary">
+                            <div class="result-item">
+                                <span>通过：</span>
+                                <span id="result-passed" class="passed">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span>待处理：</span>
+                                <span id="result-pending" class="pending">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span>失败：</span>
+                                <span id="result-failed" class="failed">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="results-details" id="results-details">
+                            <p class="placeholder">执行核验后，结果将显示在这里</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="logs" class="tab-content">
+                <div class="logs-section">
+                    <h2>📝 操作日志</h2>
+                    <div class="logs-controls">
+                        <select id="log-filter">
+                            <option value="all">全部日志</option>
+                            <option value="import">数据导入</option>
+                            <option value="verify">核验操作</option>
+                            <option value="modify">数据修改</option>
+                            <option value="error">错误记录</option>
+                        </select>
+                        <button class="btn btn-secondary" id="refresh-logs">刷新日志</button>
+                        <button class="btn btn-danger" id="clear-logs">清空日志</button>
+                    </div>
+                    <div class="logs-container">
+                        <table id="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>操作类型</th>
+                                    <th>详情</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="docs" class="tab-content">
+                <div class="docs-section">
+                    <h2>📖 使用文档</h2>
+                    
+                    <div class="doc-section">
+                        <h3>概述</h3>
+                        <p>本系统用于路跑赛事发放号码布时的现场核验，确保参赛人、芯片号和分区信息准确无误。</p>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h3>数据导入格式</h3>
+                        <p>支持 Excel (.xlsx, .xls) 和 CSV 格式文件导入，文件应包含以下字段：</p>
+                        <ul>
+                            <li><strong>姓名</strong> - 参赛选手姓名</li>
+                            <li><strong>参赛号码</strong> - 选手的号码布编号</li>
+                            <li><strong>芯片号</strong> - 计时芯片编号</li>
+                            <li><strong>分区</strong> - 选手所在分区（A/B/C）</li>
+                            <li><strong>身份证号</strong>（可选）- 用于身份验证</li>
+                            <li><strong>联系电话</strong>（可选）- 用于紧急联系</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h3>核验项目说明</h3>
+                        
+                        <h4>1. 参赛名单验证</h4>
+                        <p>验证选手信息是否在官方参赛名单中，包括：</p>
+                        <ul>
+                            <li>姓名是否存在</li>
+                            <li>参赛号码格式是否正确</li>
+                            <li>参赛号码是否唯一</li>
+                        </ul>
+                        
+                        <h4>2. 芯片绑定验证</h4>
+                        <p>验证芯片号与参赛号码的绑定关系，包括：</p>
+                        <ul>
+                            <li>芯片号格式是否有效</li>
+                            <li>芯片号是否唯一绑定</li>
+                            <li>芯片号是否已激活</li>
+                        </ul>
+                        
+                        <h4>3. 分区校验</h4>
+                        <p>验证选手分区信息是否与原始数据一致，包括：</p>
+                        <ul>
+                            <li>分区编号是否有效（A/B/C）</li>
+                            <li>分区与参赛号段是否匹配</li>
+                            <li>分区是否符合赛事规则</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h3>结果标识说明</h3>
+                        
+                        <h4>✅ 通过（绿色）</h4>
+                        <p>表示该项核验已通过，符合要求：</p>
+                        <ul>
+                            <li>参赛名单验证通过：选手信息已确认在官方名单中</li>
+                            <li>芯片绑定验证通过：芯片与参赛号绑定关系正确</li>
+                            <li>分区校验通过：分区信息与原始数据一致</li>
+                        </ul>
+                        
+                        <h4>⏳ 待人工处理（黄色）</h4>
+                        <p>表示存在不确定性，需要人工确认：</p>
+                        <ul>
+                            <li>信息部分匹配，存在相似条目</li>
+                            <li>分区边界区域选手</li>
+                            <li>芯片号格式特殊，需人工确认</li>
+                            <li>存在历史变更记录</li>
+                        </ul>
+                        
+                        <h4>❌ 失败（红色）</h4>
+                        <p>表示核验失败，需要处理：</p>
+                        <ul>
+                            <li>参赛名单验证失败：选手信息不在官方名单中</li>
+                            <li>芯片绑定失败：芯片号不存在或绑定错误</li>
+                            <li>分区校验失败：分区信息与原始数据不符</li>
+                            <li>参赛号码重复或芯片号重复绑定</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="doc-section">
+                        <h3>操作流程</h3>
+                        <ol>
+                            <li>在「数据管理」页面导入或手动录入参赛数据</li>
+                            <li>在「核验操作」页面执行核验</li>
+                            <li>查看核验结果，处理失败和待处理项</li>
+                            <li>修改数据后可使用「重跑核验」功能</li>
+                            <li>在「操作日志」页面查看所有操作历史</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+    
+    <div id="modal-overlay" class="hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">标题</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-content"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
