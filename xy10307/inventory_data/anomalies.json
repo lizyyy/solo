@@ -1,0 +1,39 @@
+[
+  {
+    "equipment_id": "",
+    "borrower": "李四",
+    "borrow_date": "2024-09-20",
+    "return_date": "2024-09-22",
+    "notes": "器材编号缺失测试",
+    "imported_at": "2026-05-10",
+    "anomaly_reasons": [
+      "器材编号缺失"
+    ],
+    "source": "borrow_import"
+  },
+  {
+    "equipment_id": "INVALID001",
+    "borrower": "王五",
+    "borrow_date": "2024-10-01",
+    "return_date": "2024-10-03",
+    "notes": "不存在的器材编号",
+    "imported_at": "2026-05-10",
+    "anomaly_reasons": [
+      "器材编号 INVALID001 不存在于台账"
+    ],
+    "source": "borrow_import"
+  },
+  {
+    "equipment_id": "CAM001",
+    "equipment_name": "佳能单反相机",
+    "damage_type": "损坏",
+    "reported_by": "小红",
+    "reported_at": "2026-05-10",
+    "description": "再次登记测试",
+    "compensation_needed": false,
+    "anomaly_reasons": [
+      "器材已处于 损坏 状态"
+    ],
+    "source": "damage_report"
+  }
+]

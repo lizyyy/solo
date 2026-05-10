@@ -1,0 +1,52 @@
+{
+  "CAM001": {
+    "id": "CAM001",
+    "name": "佳能单反相机",
+    "category": "相机",
+    "owner": "小明",
+    "status": "损坏",
+    "notes": "2023年采购，状态良好",
+    "created_at": "2026-05-10",
+    "updated_at": "2026-05-10"
+  },
+  "CAM002": {
+    "id": "CAM002",
+    "name": "索尼微单相机",
+    "category": "相机",
+    "owner": "小红",
+    "status": "完好",
+    "notes": "",
+    "created_at": "2026-05-10",
+    "updated_at": "2026-05-10"
+  },
+  "SPK001": {
+    "id": "SPK001",
+    "name": "便携式音箱",
+    "category": "音箱",
+    "owner": "小华",
+    "status": "完好",
+    "notes": "",
+    "created_at": "2026-05-10",
+    "updated_at": "2026-05-10"
+  },
+  "TENT001": {
+    "id": "TENT001",
+    "name": "3米帐篷",
+    "category": "帐篷",
+    "owner": "小明",
+    "status": "遗失",
+    "notes": "",
+    "created_at": "2026-05-10",
+    "updated_at": "2026-05-10"
+  },
+  "BOARD001": {
+    "id": "BOARD001",
+    "name": "折叠展板",
+    "category": "展板",
+    "owner": "小红",
+    "status": "完好",
+    "notes": "",
+    "created_at": "2026-05-10",
+    "updated_at": "2026-05-10"
+  }
+}

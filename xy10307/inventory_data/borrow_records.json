@@ -1,0 +1,42 @@
+[
+  {
+    "equipment_id": "CAM001",
+    "borrower": "张三",
+    "borrow_date": "2024-09-10",
+    "return_date": "2024-09-15",
+    "notes": "社团招新活动使用",
+    "imported_at": "2026-05-10"
+  },
+  {
+    "equipment_id": "CAM002",
+    "borrower": "李四",
+    "borrow_date": "2024-09-20",
+    "return_date": "2024-09-22",
+    "notes": "摄影社团活动",
+    "imported_at": "2026-05-10"
+  },
+  {
+    "equipment_id": "SPK001",
+    "borrower": "王五",
+    "borrow_date": "2024-10-01",
+    "return_date": "2024-10-03",
+    "notes": "迎新晚会音响",
+    "imported_at": "2026-05-10"
+  },
+  {
+    "equipment_id": "TENT001",
+    "borrower": "赵六",
+    "borrow_date": "2024-10-05",
+    "return_date": "",
+    "notes": "户外拓展活动（未归还）",
+    "imported_at": "2026-05-10"
+  },
+  {
+    "equipment_id": "BOARD001",
+    "borrower": "钱七",
+    "borrow_date": "2024-10-10",
+    "return_date": "2024-10-12",
+    "notes": "招新展板使用",
+    "imported_at": "2026-05-10"
+  }
+]
