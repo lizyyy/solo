@@ -1,0 +1,2 @@
+失败时间,日志ID,失败操作,存储桶,对象键,操作用户,失败原因,对象当前状态,对象操作状态,请求ID
+2026-05-10T03:49:00.221Z,0c83fefb-e330-48d4-9aed-01dc8f06b35f,DELETE,test-bucket,images/photo-2024.jpg,test-user-001,Delete protection is enabled,"INFREQUENT_ACCESS, 删除保护: 是",无解冻任务,44e8ec17-6bf5-4aff-93dc-a9be1260b20a

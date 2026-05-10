@@ -1,0 +1,26 @@
+{
+  "name": "object-storage-lifecycle-api",
+  "version": "1.0.0",
+  "description": "对象存储生命周期 API 服务端原型",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "ts-node src/test.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/sqlite3": "^3.1.8",
+    "@types/uuid": "^9.0.2",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1"
+  }
+}
