@@ -49,6 +49,7 @@ func main() {
 }
 
 func registerScenarios(e *engine.Engine) {
+	e.RegisterScenario(scenarios.NewMigrationScenario(e.DB()))
 	e.RegisterScenario(scenarios.NewConnectionPoolScenario(e.DB()))
 	e.RegisterScenario(scenarios.NewMessageQueueScenario())
 	e.RegisterScenario(scenarios.NewGoroutineLeakScenario())

@@ -7,62 +7,89 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #334155; margin-bottom: 24px; }
+        .container { max-width: 1800px; margin: 0 auto; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #334155; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
         h1 { font-size: 28px; color: #f8fafc; }
-        h2 { font-size: 18px; margin-bottom: 16px; color: #94a3b8; font-weight: 600; }
+        h2 { font-size: 16px; margin-bottom: 16px; color: #94a3b8; font-weight: 600; }
+        h3 { font-size: 14px; margin-bottom: 12px; color: #cbd5e1; font-weight: 600; }
         .badge { background: #3b82f6; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; }
-        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .badge-warning { background: #f59e0b; }
+        .replay-indicator { padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .replay-indicator.active { background: #7c3aed; color: white; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .dashboard { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
         .metric-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
         .metric-label { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
         .metric-value { font-size: 32px; font-weight: bold; color: #f8fafc; }
-        .main-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; }
+        .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
         .scenarios-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .scenario-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; transition: border-color 0.3s; }
-        .scenario-card.running { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.1); }
+        .scenario-card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; transition: all 0.3s; }
+        .scenario-card.primary { border-left: 4px solid #f59e0b; background: linear-gradient(135deg, #1e293b 0%, #1e293b 100%); }
+        .scenario-card.running { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
         .scenario-card.error { border-color: #ef4444; }
-        .scenario-name { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+        .scenario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .scenario-name { font-size: 16px; font-weight: 600; }
+        .primary-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
         .scenario-status { font-size: 12px; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 12px; }
         .status-ready { background: #065f46; color: #a7f3d0; }
         .status-running { background: #78350f; color: #fcd34d; }
         .status-recovered { background: #1e40af; color: #93c5fd; }
         .status-error { background: #7f1d1d; color: #fca5a5; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; margin-right: 8px; transition: opacity 0.2s; }
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; margin-right: 6px; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.9; }
         .btn-start { background: #22c55e; color: white; }
         .btn-stop { background: #ef4444; color: white; }
         .btn-recover { background: #3b82f6; color: white; }
+        .btn-replay { background: #8b5cf6; color: white; }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .config-preview { font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace; }
-        .timeline-panel { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; max-height: 600px; overflow-y: auto; }
+        .config-preview { font-size: 11px; color: #64748b; margin-top: 12px; font-family: monospace; word-break: break-all; }
+        .scenario-desc { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5; }
+        .sidebar { display: flex; flex-direction: column; gap: 24px; }
+        .panel { background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid #334155; }
+        .timeline-panel { max-height: 400px; overflow-y: auto; }
+        .replay-panel { display: flex; flex-direction: column; gap: 12px; }
+        .snapshot-list { max-height: 200px; overflow-y: auto; background: #0f172a; border-radius: 8px; padding: 8px; }
+        .snapshot-item { padding: 8px; border-bottom: 1px solid #334155; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .snapshot-item:hover { background: #334155; }
+        .snapshot-item:last-child { border-bottom: none; }
         .event-item { padding: 12px; border-left: 3px solid #475569; margin-bottom: 8px; background: #0f172a; border-radius: 0 6px 6px 0; }
-        .event-item.error { border-left-color: #ef4444; }
-        .event-item.warn { border-left-color: #f59e0b; }
+        .event-item.error { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .event-item.warn { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
         .event-item.info { border-left-color: #3b82f6; }
         .event-time { font-size: 11px; color: #64748b; margin-bottom: 4px; }
-        .event-scenario { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+        .event-scenario { font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 500; }
         .event-message { font-size: 13px; color: #e2e8f0; }
-        .event-data { font-size: 11px; color: #64748b; margin-top: 4px; font-family: monospace; }
-        .state-panel { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 24px; }
-        .state-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #334155; }
-        .state-item:last-child { border-bottom: none; }
-        .state-label { color: #94a3b8; }
-        .state-value { font-weight: 600; }
-        @media (max-width: 1200px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
+        .event-data { font-size: 11px; color: #64748b; margin-top: 4px; font-family: monospace; white-space: pre-wrap; }
+        .section-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        @media (max-width: 1400px) {
+            .dashboard { grid-template-columns: repeat(3, 1fr); }
             .main-grid { grid-template-columns: 1fr; }
+            .scenarios-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
             .dashboard { grid-template-columns: 1fr; }
-            .scenarios-grid { grid-template-columns: 1fr; }
         }
+        .migration-steps { margin-top: 12px; padding: 12px; background: #0f172a; border-radius: 8px; }
+        .step-item { padding: 6px 0; font-size: 11px; display: flex; align-items: center; gap: 8px; font-family: monospace; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #334155; flex-shrink: 0; }
+        .step-dot.success { background: #22c55e; }
+        .step-dot.running { background: #f59e0b; animation: blink 1s infinite; }
+        .step-dot.failed { background: #ef4444; }
+        .step-dot.skipped { background: #8b5cf6; }
+        .step-text { flex: 1; }
+        .step-status { color: #64748b; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .checkpoint-box { margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1)); border-radius: 8px; border: 1px solid rgba(139, 92, 246, 0.3); }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🌀 Chaos Simulator</h1>
-            <span class="badge">v1.0</span>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <h1>🌀 Chaos Simulator</h1>
+                <span class="badge">v2.0</span>
+            </div>
+            <div id="replay-status"></div>
         </header>
 
         <div class="dashboard">
@@ -82,18 +109,41 @@
                 <div class="metric-label">Queue Length</div>
                 <div class="metric-value" id="queue">-</div>
             </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Events</div>
+                <div class="metric-value" id="event-count">-</div>
+            </div>
         </div>
 
         <div class="main-grid">
             <div>
-                <h2>问题场景 (点击开始模拟)</h2>
-                <div class="scenarios-grid" id="scenarios">
-                </div>
+                <h2>⭐ 核心场景：数据库迁移回滚</h2>
+                <div id="primary-scenario"></div>
+
+                <h2 style="margin-top: 32px;">其他问题场景</h2>
+                <div class="scenarios-grid" id="scenarios"></div>
             </div>
-            <div>
-                <h2>事件时间线</h2>
-                <div class="timeline-panel" id="timeline">
-                    <div style="text-align: center; color: #64748b; padding: 40px;">暂无事件</div>
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="section-label">状态回放控制</div>
+                    <div class="replay-panel">
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-replay" onclick="replayLastMinute()">回放最近1分钟</button>
+                            <button class="btn btn-replay" onclick="replayLast5Min()">回放最近5分钟</button>
+                            <button class="btn btn-replay" onclick="loadSnapshots()">📸 查看快照</button>
+                        </div>
+                        <div id="replay-result" style="margin-top: 12px; font-size: 11px; color: #94a3b8; font-family: monospace;"></div>
+                        <div id="snapshot-container" style="display: none;">
+                            <div class="section-label" style="margin-top: 12px;">状态快照列表</div>
+                            <div class="snapshot-list" id="snapshots"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="section-label">事件时间线（实时+汇总）</div>
+                    <div class="timeline-panel" id="timeline">
+                        <div style="text-align: center; color: #64748b; padding: 40px;">暂无事件</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,29 +151,34 @@
 
     <script>
         const scenarioInfo = {
+            'migration_rollback': {
+                name: '数据库迁移回滚',
+                desc: '模拟 migration 失败场景：迁移前校验 -> 执行迁移 -> 中途出错 -> 回滚流程 -> 数据对比校验 -> 恢复链路',
+                primary: true
+            },
             'connection_pool_exhaustion': {
                 name: '连接池耗尽',
-                desc: '模拟数据库连接池耗尽的情况。持续创建连接但不释放，观察连接耗尽后的请求阻塞。'
+                desc: '持续创建数据库连接但不释放，观察连接池耗尽后的请求阻塞和等待队列。'
             },
             'message_queue_backlog': {
                 name: '消息队列积压',
-                desc: '生产速度远大于消费速度，观察队列积压增长、消息丢弃等情况。'
+                desc: '生产速度远大于消费速度，观察队列积压增长、消息丢弃和堆积告警。'
             },
             'goroutine_leak': {
                 name: 'Goroutine泄漏',
-                desc: '创建goroutine但不释放，观察Go协程数量持续增长的情况。'
+                desc: '创建 goroutine 但不释放，观察 Go 协程数量持续增长导致的内存泄漏。'
             },
             'db_lock_wait': {
                 name: '数据库锁等待',
-                desc: '多线程竞争同一行数据，模拟行锁等待和超时问题。'
+                desc: '多线程竞争同一行数据，模拟行锁等待、锁超时和死锁前置场景。'
             },
             'cache_dirty_data': {
                 name: '缓存脏数据',
-                desc: '更新数据库后不更新缓存，模拟缓存与DB数据不一致问题。'
+                desc: '更新数据库后不更新缓存，模拟缓存与 DB 数据不一致问题。'
             },
             'config_drift': {
                 name: '配置漂移',
-                desc: '模拟配置在运行时偏离基线的情况，观察配置一致性丢失过程。'
+                desc: '配置值随机偏离基线，观察配置一致性丢失过程和一致性比例。'
             }
         };
 
@@ -138,6 +193,7 @@
                 updateMetrics(data.state);
                 updateTimeline(data.events);
                 updateScenarioStatus(data.scenario_status);
+                updatePrimaryScenarioUI(data.scenario_status);
             };
 
             ws.onclose = function() {
@@ -157,30 +213,95 @@
                 const card = document.getElementById(`scenario-${name}`);
                 if (!card) continue;
 
-                card.className = `scenario-card ${status}`;
+                card.className = card.className.replace(/ running| error| recovered/g, '');
+                if (status === 'running') card.className += ' running';
+                if (status === 'error') card.className += ' error';
+
                 const statusBadge = card.querySelector('.scenario-status');
-                statusBadge.textContent = status;
-                statusBadge.className = `scenario-status status-${status}`;
+                if (statusBadge) {
+                    statusBadge.textContent = status;
+                    statusBadge.className = `scenario-status status-${status}`;
+                }
 
                 const startBtn = card.querySelector('.btn-start');
                 const stopBtn = card.querySelector('.btn-stop');
-                const recoverBtn = card.querySelector('.btn-recover');
-
-                if (status === 'running') {
-                    startBtn.disabled = true;
-                    stopBtn.disabled = false;
-                    recoverBtn.disabled = false;
-                } else {
-                    startBtn.disabled = false;
-                    stopBtn.disabled = true;
-                }
+                if (startBtn) startBtn.disabled = status === 'running';
+                if (stopBtn) stopBtn.disabled = status !== 'running';
             }
         }
 
+        async function updatePrimaryScenarioUI(statuses) {
+            const status = statuses ? statuses['migration_rollback'] : null;
+            if (!status) return;
+
+            const res = await fetch('/api/scenarios/migration_rollback');
+            const data = await res.json();
+            renderPrimaryScenario(data);
+        }
+
+        function renderPrimaryScenario(data) {
+            const container = document.getElementById('primary-scenario');
+            if (!container) return;
+
+            let stepsHTML = '';
+            if (data.state && data.state.metrics && data.state.metrics.steps) {
+                stepsHTML = data.state.metrics.steps.map(step => {
+                    const dotClass = step.status || 'pending';
+                    const statusText = step.status ? 
+                        (step.error ? `${step.status}: ${step.error}` : step.status) : 'pending';
+                    return `
+                        <div class="step-item">
+                            <span class="step-dot ${dotClass}"></span>
+                            <span class="step-text">${step.name}</span>
+                            <span class="step-status">${statusText}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            let checkpointHTML = '';
+            if (data.state && data.state.metrics && data.state.metrics.checkpoint) {
+                const cp = data.state.metrics.checkpoint;
+                checkpointHTML = `
+                    <div class="checkpoint-box">
+                        <div style="font-size: 12px; color: #a78bfa; font-weight: 600; margin-bottom: 8px;">📦 Checkpoint (迁移前快照)</div>
+                        <div style="font-size: 11px; color: #cbd5e1;">
+                            Users: ${cp.user_count} | Orders: ${cp.order_count} | Avg Balance: ${cp.avg_balance?.toFixed ? cp.avg_balance.toFixed(2) : cp.avg_balance}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <div class="scenario-card primary ${data.status}" id="scenario-migration_rollback">
+                    <div class="scenario-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="scenario-name">数据库迁移回滚</span>
+                            <span class="primary-badge">PRIMARY</span>
+                        </div>
+                        <span class="scenario-status status-${data.status}">${data.status}</span>
+                    </div>
+                    <div class="scenario-desc">
+                        模拟完整的 migration 出错场景：Step 0 建校验点 → Step 1 加列 → Step 2 回填数据 → 
+                        <span style="color: #f59e0b;">Step 3 故意失败</span> → 触发回滚流程 → 数据差异校验 → 人工恢复链路
+                    </div>
+                    <div>
+                        <button class="btn btn-start" onclick="controlScenario('migration_rollback', 'start')" ${data.status === 'running' ? 'disabled' : ''}>▶ 执行迁移</button>
+                        <button class="btn btn-stop" onclick="controlScenario('migration_rollback', 'stop')" ${data.status !== 'running' ? 'disabled' : ''}>⏹ 停止</button>
+                        <button class="btn btn-recover" onclick="controlScenario('migration_rollback', 'recover')">↺ 恢复数据</button>
+                    </div>
+                    ${stepsHTML ? `<div class="migration-steps"><h3>迁移执行进度</h3>${stepsHTML}</div>` : ''}
+                    ${checkpointHTML}
+                </div>
+            `;
+        }
+
         function updateTimeline(events) {
+            document.getElementById('event-count').textContent = events ? events.length : 0;
+
             const container = document.getElementById('timeline');
             if (!events || events.length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">暂无事件</div>';
+                container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 40px;">暂无事件 - 点击"开始"模拟问题场景</div>';
                 return;
             }
 
@@ -208,22 +329,28 @@
             const scenarios = await res.json();
             const container = document.getElementById('scenarios');
 
-            container.innerHTML = scenarios.map(s => {
+            const others = scenarios.filter(s => s.name !== 'migration_rollback');
+
+            container.innerHTML = others.map(s => {
                 const info = scenarioInfo[s.name] || { name: s.name, desc: '' };
                 return `
                     <div class="scenario-card ${s.status}" id="scenario-${s.name}">
                         <div class="scenario-name">${info.name}</div>
                         <span class="scenario-status status-${s.status}">${s.status}</span>
-                        <div style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">${info.desc}</div>
+                        <div class="scenario-desc">${info.desc}</div>
                         <div>
                             <button class="btn btn-start" onclick="controlScenario('${s.name}', 'start')" ${s.status === 'running' ? 'disabled' : ''}>▶ 开始</button>
                             <button class="btn btn-stop" onclick="controlScenario('${s.name}', 'stop')" ${s.status !== 'running' ? 'disabled' : ''}>⏹ 停止</button>
                             <button class="btn btn-recover" onclick="controlScenario('${s.name}', 'recover')">↺ 恢复</button>
                         </div>
-                        <div class="config-preview">Config: ${JSON.stringify(s.config)}</div>
                     </div>
                 `;
             }).join('');
+
+            const primary = scenarios.find(s => s.name === 'migration_rollback');
+            if (primary) {
+                renderPrimaryScenario(primary);
+            }
         }
 
         async function controlScenario(name, action) {
@@ -232,6 +359,77 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action })
             });
+        }
+
+        async function replayLastMinute() {
+            const from = new Date(Date.now() - 60 * 1000).toISOString();
+            const to = new Date().toISOString();
+            await executeReplay(from, to, "最近1分钟");
+        }
+
+        async function replayLast5Min() {
+            const from = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+            const to = new Date().toISOString();
+            await executeReplay(from, to, "最近5分钟");
+        }
+
+        async function executeReplay(from, to, label) {
+            const indicator = document.getElementById('replay-status');
+            indicator.innerHTML = `<span class="replay-indicator active">⏳ 回放中: ${label}</span>`;
+
+            try {
+                const res = await fetch('/api/replay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ from, to })
+                });
+                const result = await res.json();
+
+                document.getElementById('replay-result').innerHTML = `
+                    <div>✅ 回放结果: ${result.events?.length || 0} 个事件, ${result.snapshots?.length || 0} 个快照</div>
+                    <div style="margin-top: 4px;">时间范围: ${new Date(result.from_time).toLocaleTimeString()} → ${new Date(result.to_time).toLocaleTimeString()}</div>
+                `;
+
+                if (result.events && result.events.length > 0) {
+                    updateTimeline(result.events);
+                }
+
+                setTimeout(() => {
+                    indicator.innerHTML = `<span class="replay-indicator" style="background: #065f46; color: #a7f3d0;">✓ 回放完成</span>`;
+                }, 1000);
+            } catch (e) {
+                indicator.innerHTML = `<span class="replay-indicator" style="background: #7f1d1d; color: #fca5a5;">✗ 回放失败</span>`;
+            }
+        }
+
+        async function loadSnapshots() {
+            const container = document.getElementById('snapshot-container');
+            const list = document.getElementById('snapshots');
+            container.style.display = 'block';
+
+            const res = await fetch('/api/snapshots');
+            const snapshots = await res.json();
+
+            if (!snapshots || snapshots.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 20px; color: #64748b; font-size: 12px;">暂无快照</div>';
+                return;
+            }
+
+            list.innerHTML = snapshots.slice().reverse().map((s, i) => `
+                <div class="snapshot-item" onclick="showSnapshot(${snapshots.length - 1 - i})">
+                    <span>#${snapshots.length - i} ${new Date(s.timestamp).toLocaleTimeString()}</span>
+                    <span style="color: #94a3b8; font-size: 11px;">G:${s.state.active_goroutines} DB:${s.state.db_connections}</span>
+                </div>
+            `).join('');
+        }
+
+        async function showSnapshot(idx) {
+            const res = await fetch('/api/snapshots');
+            const snapshots = await res.json();
+            const s = snapshots[idx];
+            if (!s) return;
+
+            alert(`快照 #${idx + 1}\n\n时间: ${new Date(s.timestamp).toLocaleString()}\n\nGoroutines: ${s.state.active_goroutines}\nDB连接: ${s.state.db_connections} (使用中: ${s.state.db_in_use}, 空闲: ${s.state.db_idle})\nRedis连接: ${s.state.redis_connections}\n队列长度: ${s.state.queue_length}\n\n事件数: ${s.events?.length || 0}`);
         }
 
         loadScenarios();

@@ -17,13 +17,13 @@ import (
 
 type CacheDirtyScenario struct {
 	*BaseScenario
-	db           *sql.DB
-	redisClient  *redis.Client
-	wg           sync.WaitGroup
-	dirtyCount   int64
-	cacheHits    int64
-	cacheMisses  int64
-	updates      int64
+	db          *sql.DB
+	redisClient *redis.Client
+	wg          sync.WaitGroup
+	dirtyCount  int64
+	cacheHits   int64
+	cacheMisses int64
+	updates     int64
 }
 
 func NewCacheDirtyScenario(db *sql.DB, redisClient *redis.Client) *CacheDirtyScenario {
@@ -84,9 +84,9 @@ func (s *CacheDirtyScenario) writerWorker() {
 			if rand.Float32() < 0.3 {
 				atomic.AddInt64(&s.dirtyCount, 1)
 				s.AddEvent(newEvent(s.Name(), models.LevelWarn, "Cache DIRTY data introduced", map[string]interface{}{
-					"user_id":       userID,
-					"db_balance":    fmt.Sprintf("%.2f", newBalance),
-					"dirty_count":   atomic.LoadInt64(&s.dirtyCount),
+					"user_id":     userID,
+					"db_balance":  fmt.Sprintf("%.2f", newBalance),
+					"dirty_count": atomic.LoadInt64(&s.dirtyCount),
 				}))
 			} else {
 				s.updateCache(userID, newBalance)
@@ -119,10 +119,10 @@ func (s *CacheDirtyScenario) readerWorker() {
 				if dbVal > 0 && cacheVal != dbVal {
 					atomic.AddInt64(&s.dirtyCount, 1)
 					s.AddEvent(newEvent(s.Name(), models.LevelError, "Dirty cache DETECTED!", map[string]interface{}{
-						"user_id":    userID,
-						"cache_val":  fmt.Sprintf("%.2f", cacheVal),
-						"db_val":     fmt.Sprintf("%.2f", dbVal),
-						"delta":      fmt.Sprintf("%.2f", dbVal-cacheVal),
+						"user_id":   userID,
+						"cache_val": fmt.Sprintf("%.2f", cacheVal),
+						"db_val":    fmt.Sprintf("%.2f", dbVal),
+						"delta":     fmt.Sprintf("%.2f", dbVal-cacheVal),
 					}))
 				}
 			}
@@ -206,11 +206,11 @@ func (s *CacheDirtyScenario) CurrentState() models.SystemState {
 	return models.SystemState{
 		Timestamp: time.Now(),
 		Metrics: map[string]interface{}{
-			"dirty_count":    atomic.LoadInt64(&s.dirtyCount),
-			"cache_hits":     atomic.LoadInt64(&s.cacheHits),
-			"cache_misses":   atomic.LoadInt64(&s.cacheMisses),
-			"updates":        atomic.LoadInt64(&s.updates),
-			"hit_ratio":      float64(atomic.LoadInt64(&s.cacheHits)) /
+			"dirty_count":  atomic.LoadInt64(&s.dirtyCount),
+			"cache_hits":   atomic.LoadInt64(&s.cacheHits),
+			"cache_misses": atomic.LoadInt64(&s.cacheMisses),
+			"updates":      atomic.LoadInt64(&s.updates),
+			"hit_ratio": float64(atomic.LoadInt64(&s.cacheHits)) /
 				float64(atomic.LoadInt64(&s.cacheHits)+atomic.LoadInt64(&s.cacheMisses)+1) * 100,
 		},
 	}

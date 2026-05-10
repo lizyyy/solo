@@ -16,10 +16,10 @@ import (
 )
 
 type Server struct {
-	engine       *engine.Engine
-	upgrader     websocket.Upgrader
-	clients      map[*websocket.Conn]bool
-	clientsMu    sync.RWMutex
+	engine    *engine.Engine
+	upgrader  websocket.Upgrader
+	clients   map[*websocket.Conn]bool
+	clientsMu sync.RWMutex
 }
 
 func NewServer(e *engine.Engine) *Server {
@@ -43,6 +43,7 @@ func (s *Server) Start() error {
 	mux.HandleFunc("/api/state", s.handleState)
 	mux.HandleFunc("/api/events", s.handleEvents)
 	mux.HandleFunc("/api/snapshots", s.handleSnapshots)
+	mux.HandleFunc("/api/replay", s.handleReplay)
 	mux.HandleFunc("/ws", s.handleWebSocket)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -146,6 +147,53 @@ func (s *Server) handleSnapshots(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, snapshots)
 }
 
+func (s *Server) handleReplay(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		From string `json:"from"`
+		To   string `json:"to"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var from, to time.Time
+	var err error
+
+	if req.From != "" {
+		from, err = time.Parse(time.RFC3339, req.From)
+		if err != nil {
+			http.Error(w, "Invalid 'from' time format, use RFC3339", http.StatusBadRequest)
+			return
+		}
+	} else {
+		from = time.Now().Add(-10 * time.Minute)
+	}
+
+	if req.To != "" {
+		to, err = time.Parse(time.RFC3339, req.To)
+		if err != nil {
+			http.Error(w, "Invalid 'to' time format, use RFC3339", http.StatusBadRequest)
+			return
+		}
+	} else {
+		to = time.Now()
+	}
+
+	result, err := s.engine.Replay(from, to)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, result)
+}
+
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -188,8 +236,8 @@ func (s *Server) broadcastState() {
 		}
 
 		msg := map[string]interface{}{
-			"state":          state,
-			"events":         lastNEvents(events, 50),
+			"state":           state,
+			"events":          lastNEvents(events, 50),
 			"scenario_status": scenarioStatuses,
 		}
 

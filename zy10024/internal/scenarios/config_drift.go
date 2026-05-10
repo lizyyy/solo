@@ -23,10 +23,10 @@ type ConfigValue struct {
 
 type ConfigDriftScenario struct {
 	*BaseScenario
-	db          *sql.DB
-	configs     map[string]*ConfigValue
-	driftCount  int64
-	wg          sync.WaitGroup
+	db         *sql.DB
+	configs    map[string]*ConfigValue
+	driftCount int64
+	wg         sync.WaitGroup
 }
 
 func NewConfigDriftScenario(db *sql.DB) *ConfigDriftScenario {
@@ -64,15 +64,15 @@ func (s *ConfigDriftScenario) Start() error {
 
 func (s *ConfigDriftScenario) initConfigs() {
 	defaultConfigs := map[string]interface{}{
-		"db.max_connections":         20,
-		"redis.pool_size":            50,
-		"api.timeout_ms":             30000,
-		"queue.max_size":             10000,
-		"cache.ttl_seconds":          300,
-		"retry.max_attempts":         3,
-		"retry.backoff_ms":           100,
-		"load_balancer.weight":       100,
-		"circuit_breaker.threshold":  50,
+		"db.max_connections":          20,
+		"redis.pool_size":             50,
+		"api.timeout_ms":              30000,
+		"queue.max_size":              10000,
+		"cache.ttl_seconds":           300,
+		"retry.max_attempts":          3,
+		"retry.backoff_ms":            100,
+		"load_balancer.weight":        100,
+		"circuit_breaker.threshold":   50,
 		"rate_limit.requests_per_min": 1000,
 	}
 
@@ -148,10 +148,10 @@ func (s *ConfigDriftScenario) introduceDrift(key string) {
 		atomic.AddInt64(&s.driftCount, 1)
 
 		s.AddEvent(newEvent(s.Name(), models.LevelWarn, "Config DRIFT detected", map[string]interface{}{
-			"key":        key,
-			"original":   originalVal,
-			"current":    newVal,
-			"drifted":    true,
+			"key":         key,
+			"original":    originalVal,
+			"current":     newVal,
+			"drifted":     true,
 			"drift_count": atomic.LoadInt64(&s.driftCount),
 		}))
 
@@ -228,9 +228,9 @@ func (s *ConfigDriftScenario) Recover() error {
 	for key, cfg := range s.configs {
 		if cfg.Drifted {
 			s.AddEvent(newEvent(s.Name(), models.LevelInfo, "Restoring config to baseline", map[string]interface{}{
-				"key":        key,
-				"from":       cfg.Current,
-				"to":         cfg.Original,
+				"key":  key,
+				"from": cfg.Current,
+				"to":   cfg.Original,
 			}))
 
 			cfg.Current = cfg.Original
@@ -268,10 +268,10 @@ func (s *ConfigDriftScenario) CurrentState() models.SystemState {
 	return models.SystemState{
 		Timestamp: time.Now(),
 		Metrics: map[string]interface{}{
-			"total_configs":    len(s.configs),
-			"drifted_count":    driftedCount,
-			"drift_events":     atomic.LoadInt64(&s.driftCount),
-			"drifted_configs":  driftedConfigs,
+			"total_configs":   len(s.configs),
+			"drifted_count":   driftedCount,
+			"drift_events":    atomic.LoadInt64(&s.driftCount),
+			"drifted_configs": driftedConfigs,
 			"consistency_ratio": fmt.Sprintf("%.1f%%",
 				float64(len(s.configs)-driftedCount)/float64(len(s.configs)+1)*100),
 		},

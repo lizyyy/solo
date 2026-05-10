@@ -8,21 +8,22 @@ import (
 )
 
 type BaseScenario struct {
-	name       string
+	name         string
 	scenarioType models.ScenarioType
-	mu         sync.RWMutex
-	status     models.ScenarioStatus
-	events     []models.Event
-	stopCh     chan struct{}
+	mu           sync.RWMutex
+	status       models.ScenarioStatus
+	events       []models.Event
+	stopCh       chan struct{}
+	emitter      models.EventEmitter
 }
 
 func NewBaseScenario(name string, scenarioType models.ScenarioType) *BaseScenario {
 	return &BaseScenario{
-		name:       name,
+		name:         name,
 		scenarioType: scenarioType,
-		status:     models.StatusReady,
-		events:     make([]models.Event, 0),
-		stopCh:     make(chan struct{}),
+		status:       models.StatusReady,
+		events:       make([]models.Event, 0),
+		stopCh:       make(chan struct{}),
 	}
 }
 
@@ -46,10 +47,34 @@ func (b *BaseScenario) SetStatus(status models.ScenarioStatus) {
 	b.status = status
 }
 
+func (b *BaseScenario) SetEventEmitter(emitter models.EventEmitter) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	b.emitter = emitter
+}
+
+func (b *BaseScenario) Emit(event models.Event) {
+	b.mu.RLock()
+	emitter := b.emitter
+	b.mu.RUnlock()
+
+	b.mu.Lock()
+	b.events = append(b.events, event)
+	b.mu.Unlock()
+
+	if emitter != nil {
+		emitter(event)
+	}
+}
+
 func (b *BaseScenario) AddEvent(event models.Event) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 	b.events = append(b.events, event)
+
+	if b.emitter != nil {
+		b.emitter(event)
+	}
 }
 
 func (b *BaseScenario) GetEvents() []models.Event {

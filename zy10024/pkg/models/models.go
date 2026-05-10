@@ -8,22 +8,23 @@ import (
 type ScenarioType string
 
 const (
-	ScenarioConnectionPool   ScenarioType = "connection_pool_exhaustion"
-	ScenarioMessageQueue ScenarioType = "message_queue_backlog"
-	ScenarioGoroutineLeak ScenarioType = "goroutine_leak"
-	ScenarioDBLockWait    ScenarioType = "db_lock_wait"
-	ScenarioCacheDirty  ScenarioType = "cache_dirty_data"
-	ScenarioConfigDrift ScenarioType = "config_drift"
+	ScenarioConnectionPool ScenarioType = "connection_pool_exhaustion"
+	ScenarioMessageQueue   ScenarioType = "message_queue_backlog"
+	ScenarioGoroutineLeak  ScenarioType = "goroutine_leak"
+	ScenarioDBLockWait     ScenarioType = "db_lock_wait"
+	ScenarioCacheDirty     ScenarioType = "cache_dirty_data"
+	ScenarioConfigDrift    ScenarioType = "config_drift"
+	ScenarioMigration      ScenarioType = "migration_rollback"
 )
 
 type ScenarioStatus string
 
 const (
-	StatusReady       ScenarioStatus = "ready"
+	StatusReady     ScenarioStatus = "ready"
 	StatusRunning   ScenarioStatus = "running"
 	StatusReplaying ScenarioStatus = "replaying"
 	StatusRecovered ScenarioStatus = "recovered"
-	StatusError   ScenarioStatus = "error"
+	StatusError     ScenarioStatus = "error"
 )
 
 type EventLevel string
@@ -39,21 +40,23 @@ type Event struct {
 	ID        string                 `json:"id"`
 	Timestamp time.Time              `json:"timestamp"`
 	Scenario  string                 `json:"scenario"`
-	Level     EventLevel           `json:"level"`
-	Message   string               `json:"message"`
+	Level     EventLevel             `json:"level"`
+	Message   string                 `json:"message"`
 	Data      map[string]interface{} `json:"data,omitempty"`
 }
 
 type SystemState struct {
-	Timestamp       time.Time              `json:"timestamp"`
-	ActiveGoroutines int                   `json:"active_goroutines"`
-	DBConnections  int                   `json:"db_connections"`
-	DBIdle      int                   `json:"db_idle"`
-	DBInUse     int                   `json:"db_in_use"`
-	RedisConnections int                 `json:"redis_connections"`
-	QueueLength int                       `json:"queue_length"`
-	Metrics   map[string]interface{}    `json:"metrics,omitempty"`
+	Timestamp        time.Time              `json:"timestamp"`
+	ActiveGoroutines int                    `json:"active_goroutines"`
+	DBConnections    int                    `json:"db_connections"`
+	DBIdle           int                    `json:"db_idle"`
+	DBInUse          int                    `json:"db_in_use"`
+	RedisConnections int                    `json:"redis_connections"`
+	QueueLength      int                    `json:"queue_length"`
+	Metrics          map[string]interface{} `json:"metrics,omitempty"`
 }
+
+type EventEmitter func(Event)
 
 type Scenario interface {
 	Name() string
@@ -65,12 +68,13 @@ type Scenario interface {
 	CurrentState() SystemState
 	Config() map[string]interface{}
 	Recover() error
+	SetEventEmitter(EventEmitter)
 }
 
 type Timeline struct {
-	mu      sync.RWMutex
-	events  []Event
-	lastID  int64
+	mu     sync.RWMutex
+	events []Event
+	lastID int64
 }
 
 func NewTimeline() *Timeline {

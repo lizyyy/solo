@@ -104,6 +104,7 @@ func (e *Engine) stateCollector() {
 func (e *Engine) RegisterScenario(scenario models.Scenario) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	scenario.SetEventEmitter(e.addEvent)
 	e.scenarios[scenario.Name()] = scenario
 }
 
@@ -270,16 +271,52 @@ func (e *Engine) GetSnapshots() []models.Snapshot {
 	return result
 }
 
-func (e *Engine) Replay(from time.Time, to time.Time) error {
+type ReplayResult struct {
+	FromTime  time.Time
+	ToTime    time.Time
+	Events    []models.Event
+	Snapshots []models.Snapshot
+}
+
+func (e *Engine) Replay(from time.Time, to time.Time) (*ReplayResult, error) {
+	e.mu.RLock()
+	snapshots := make([]models.Snapshot, len(e.snapshots))
+	copy(snapshots, e.snapshots)
+	e.mu.RUnlock()
+
+	var filteredSnapshots []models.Snapshot
+	for _, s := range snapshots {
+		if (s.Timestamp.Equal(from) || s.Timestamp.After(from)) &&
+			(s.Timestamp.Equal(to) || s.Timestamp.Before(to)) {
+			filteredSnapshots = append(filteredSnapshots, s)
+		}
+	}
+
+	events := e.timeline.GetAll()
+	var filteredEvents []models.Event
+	for _, ev := range events {
+		if (ev.Timestamp.Equal(from) || ev.Timestamp.After(from)) &&
+			(ev.Timestamp.Equal(to) || ev.Timestamp.Before(to)) {
+			filteredEvents = append(filteredEvents, ev)
+		}
+	}
+
+	result := &ReplayResult{
+		FromTime:  from,
+		ToTime:    to,
+		Events:    filteredEvents,
+		Snapshots: filteredSnapshots,
+	}
+
 	e.addEvent(models.Event{
 		ID:        generateID(),
 		Timestamp: time.Now(),
 		Scenario:  "system",
 		Level:     models.LevelInfo,
-		Message:   fmt.Sprintf("Replaying from %v to %v", from, to),
+		Message:   fmt.Sprintf("Replay completed: %v snapshots, %v events in range", len(filteredSnapshots), len(filteredEvents)),
 	})
 
-	return nil
+	return result, nil
 }
 
 func (e *Engine) addEvent(event models.Event) {
