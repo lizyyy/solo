@@ -1,0 +1,20 @@
+{
+  "name": "central-kitchen-api",
+  "version": "1.0.0",
+  "description": "中央厨房配餐路由 API - 实现过敏源、班级人数和配送线路同时匹配",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "init": "node src/scripts/init-db.js",
+    "seed": "node src/scripts/seed-data.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.29.4",
+    "xlsx": "^0.18.5"
+  }
+}
