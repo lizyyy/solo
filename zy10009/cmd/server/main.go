@@ -86,6 +86,7 @@ func main() {
 		config.Database.DBName,
 	)
 
+	var dbPool *pgxpool.Pool
 	poolConfig, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		log.Fatalf("Failed to parse DB config: %v", err)
@@ -93,10 +94,10 @@ func main() {
 	poolConfig.MaxConns = int32(config.Database.MaxConns)
 	poolConfig.MinConns = int32(config.Database.MinConns)
 
-	dbPool, err := pgxpool.NewWithConfig(ctx, poolConfig)
+	dbPool, err = pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
 		log.Printf("Warning: Failed to connect to PostgreSQL: %v", err)
-		log.Printf("Continuing without PostgreSQL, using in-memory storage only")
+		log.Printf("Continuing without PostgreSQL, connection pool exhaustion will be simulated")
 	} else {
 		defer dbPool.Close()
 		if err := dbPool.Ping(ctx); err != nil {
@@ -119,11 +120,11 @@ func main() {
 
 	eventStore := eventstore.NewEventStore(redisClient)
 
-	chaosService := services.NewChaosService(eventStore)
+	chaosService := services.NewChaosService(eventStore, dbPool)
 	chaosService.SetConfig(config.Chaos)
 	chaosService.StartConfigDriftTicker(ctx)
 
-	queue := messagequeue.NewMessageQueue(10000)
+	queue := messagequeue.NewMessageQueue(10000, chaosService)
 
 	inventoryService := services.NewInventoryService(dbPool, redisClient, eventStore, chaosService)
 	inventoryService.InitTestData()
@@ -151,7 +152,7 @@ func main() {
 	queue.Start(ctx)
 	defer queue.Stop()
 
-	replayService := replay.NewReplayService(eventStore)
+	replayService := replay.NewReplayService(eventStore, inventoryService, orderService, chaosService)
 
 	handler := api.NewHandler(inventoryService, orderService, chaosService, eventStore, replayService, queue)
 
@@ -176,6 +177,7 @@ func main() {
 	go func() {
 		addr := fmt.Sprintf(":%d", config.Server.Port)
 		log.Printf("Server starting on %s", addr)
+		log.Printf("Web UI available at http://localhost%s", addr)
 		if err := r.Run(addr); err != nil {
 			log.Fatalf("Server failed: %v", err)
 		}

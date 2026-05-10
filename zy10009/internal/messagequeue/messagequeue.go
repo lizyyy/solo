@@ -2,6 +2,7 @@ package messagequeue
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"sync"
 	"sync/atomic"
@@ -10,10 +11,17 @@ import (
 	"chaos-demo/internal/types"
 )
 
+type ChaosProvider interface {
+	ShouldInjectMessageBacklog() bool
+	GetMessageBacklogDelay() time.Duration
+	ShouldInjectCompensationRetryFailure() bool
+	GetConfig() types.FaultConfig
+}
+
 type Message struct {
-	ID        string
-	Payload   []byte
-	Timestamp time.Time
+	ID         string
+	Payload    []byte
+	Timestamp  time.Time
 	RetryCount int
 	MaxRetries int
 }
@@ -32,12 +40,15 @@ type MessageQueue struct {
 	failedCount     int64
 	totalProcessed  int64
 
-	maxBacklog     int
-	backlogThrottle bool
-	backlogThrottleMu sync.RWMutex
+	maxBacklog         int
+	backlogThrottle    bool
+	backlogThrottleMu  sync.RWMutex
+	chaos              ChaosProvider
+	compensationDelay  time.Duration
+	compensationDelayMu sync.RWMutex
 }
 
-func NewMessageQueue(maxBacklog int) *MessageQueue {
+func NewMessageQueue(maxBacklog int, chaos ChaosProvider) *MessageQueue {
 	if maxBacklog <= 0 {
 		maxBacklog = 10000
 	}
@@ -47,19 +58,32 @@ func NewMessageQueue(maxBacklog int) *MessageQueue {
 		failedChan:     make(chan Message, 1000),
 		handlers:       make(map[string]func(Message) error),
 		maxBacklog:     maxBacklog,
+		chaos:          chaos,
 	}
 }
 
 func (mq *MessageQueue) Publish(topic string, payload []byte) error {
-	if mq.IsBacklogThrottled() {
-		return errors.New("message queue backlog throttled")
+	if mq.ShouldInjectBacklog() {
+		mq.backlogThrottleMu.Lock()
+		mq.backlogThrottle = true
+		mq.backlogThrottleMu.Unlock()
+
+		delay := 5 * time.Second
+		if mq.chaos != nil {
+			config := mq.chaos.GetConfig()
+			if config.MessageBacklog != nil && config.MessageBacklog.BacklogThreshold > 0 {
+				delay = time.Duration(config.MessageBacklog.BacklogThreshold/100) * time.Millisecond
+			}
+		}
+
+		time.Sleep(delay)
 	}
 
 	msg := Message{
 		ID:        generateID(),
 		Payload:   payload,
 		Timestamp: time.Now(),
-		MaxRetries: 3,
+		MaxRetries: 5,
 	}
 
 	select {
@@ -67,7 +91,7 @@ func (mq *MessageQueue) Publish(topic string, payload []byte) error {
 		atomic.AddInt64(&mq.pendingCount, 1)
 		return nil
 	default:
-		return errors.New("message queue full")
+		return errors.New("message queue full - backlog pressure too high")
 	}
 }
 
@@ -100,6 +124,13 @@ func (mq *MessageQueue) processLoop(ctx context.Context) {
 			atomic.AddInt64(&mq.pendingCount, -1)
 			atomic.AddInt64(&mq.processingCount, 1)
 
+			if mq.chaos != nil && mq.chaos.ShouldInjectMessageBacklog() {
+				delay := mq.chaos.GetMessageBacklogDelay()
+				if delay > 0 {
+					time.Sleep(delay)
+				}
+			}
+
 			mq.processMessage(ctx, msg)
 
 			atomic.AddInt64(&mq.processingCount, -1)
@@ -109,20 +140,28 @@ func (mq *MessageQueue) processLoop(ctx context.Context) {
 }
 
 func (mq *MessageQueue) processMessage(ctx context.Context, msg Message) {
-	mq.handlersMu.RLock()
-	handler := mq.handlers["default"]
-	mq.handlersMu.RUnlock()
+	var task types.CompensationTask
+	err := json.Unmarshal(msg.Payload, &task)
+
+	handler := mq.getHandler("default")
+	if err == nil && task.OrderID != "" {
+		handler = mq.getHandler("compensation")
+	}
 
 	if handler == nil {
 		return
 	}
 
-	err := handler(msg)
+	err = handler(msg)
 	if err != nil {
 		msg.RetryCount++
 		if msg.RetryCount < msg.MaxRetries {
 			delay := time.Duration(msg.RetryCount) * time.Second
+			if mq.chaos != nil && mq.chaos.ShouldInjectCompensationRetryFailure() {
+				delay *= 2
+			}
 			time.Sleep(delay)
+
 			select {
 			case mq.pendingChan <- msg:
 				atomic.AddInt64(&mq.pendingCount, 1)
@@ -135,6 +174,12 @@ func (mq *MessageQueue) processMessage(ctx context.Context, msg Message) {
 			atomic.AddInt64(&mq.failedCount, 1)
 		}
 	}
+}
+
+func (mq *MessageQueue) getHandler(topic string) func(Message) error {
+	mq.handlersMu.RLock()
+	defer mq.handlersMu.RUnlock()
+	return mq.handlers[topic]
 }
 
 func (mq *MessageQueue) GetState() types.MessageQueueState {
@@ -169,6 +214,13 @@ func (mq *MessageQueue) IsBacklogThrottled() bool {
 	return mq.backlogThrottle
 }
 
+func (mq *MessageQueue) ShouldInjectBacklog() bool {
+	if mq.chaos == nil {
+		return false
+	}
+	return mq.chaos.ShouldInjectMessageBacklog()
+}
+
 func (mq *MessageQueue) GetMaxBacklog() int {
 	return mq.maxBacklog
 }
@@ -187,6 +239,18 @@ func (mq *MessageQueue) GetFailedCount() int64 {
 
 func (mq *MessageQueue) GetTotalProcessed() int64 {
 	return atomic.LoadInt64(&mq.totalProcessed)
+}
+
+func (mq *MessageQueue) SetCompensationDelay(delay time.Duration) {
+	mq.compensationDelayMu.Lock()
+	defer mq.compensationDelayMu.Unlock()
+	mq.compensationDelay = delay
+}
+
+func (mq *MessageQueue) GetCompensationDelay() time.Duration {
+	mq.compensationDelayMu.RLock()
+	defer mq.compensationDelayMu.RUnlock()
+	return mq.compensationDelay
 }
 
 func generateID() string {

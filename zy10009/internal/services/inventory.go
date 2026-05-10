@@ -43,6 +43,26 @@ func NewInventoryService(db *pgxpool.Pool, redis *redis.Client, eventStore *even
 func (s *InventoryService) DeductStock(ctx context.Context, productID string, quantity int) (bool, error) {
 	start := time.Now()
 
+	if err := s.chaos.MaybeExhaustConnectionPool(ctx); err != nil {
+		duration := time.Since(start).Milliseconds()
+		errMsg := err.Error()
+		s.eventStore.Append(types.Event{
+			ID:        uuid.New(),
+			Type:      types.EventTypeStateChange,
+			Status:    types.EventStatusFailed,
+			ProductID: &productID,
+			Payload: map[string]interface{}{
+				"action":   "deduct_stock_connection_pool_exhausted",
+				"quantity": quantity,
+				"error":    errMsg,
+			},
+			Timestamp: time.Now(),
+			Duration:  &duration,
+			Error:     &errMsg,
+		})
+		return false, err
+	}
+
 	s.eventStore.Append(types.Event{
 		ID:        uuid.New(),
 		Type:      types.EventTypeStateChange,
@@ -55,19 +75,42 @@ func (s *InventoryService) DeductStock(ctx context.Context, productID string, qu
 		Timestamp: time.Now(),
 	})
 
+	var lockID string
 	if s.chaos.ShouldInjectDBLockWait() {
-		s.eventStore.Append(types.Event{
-			ID:        uuid.New(),
-			Type:      types.EventTypeDBLockWait,
-			Status:    types.EventStatusPending,
-			ProductID: &productID,
-			Payload: map[string]interface{}{
-				"message": "Database lock wait injected",
-			},
-			Timestamp: time.Now(),
-		})
-		lockDuration := time.Duration(s.chaos.config.DBLockWait.LockTimeoutMs) * time.Millisecond
-		time.Sleep(lockDuration)
+		var err error
+		lockID, err = s.chaos.AcquireDBLock(ctx, productID)
+		if err != nil {
+			duration := time.Since(start).Milliseconds()
+			errMsg := err.Error()
+			s.eventStore.Append(types.Event{
+				ID:        uuid.New(),
+				Type:      types.EventTypeStockDeducted,
+				Status:    types.EventStatusFailed,
+				ProductID: &productID,
+				Payload: map[string]interface{}{
+					"error":   "failed to acquire DB lock",
+					"details": errMsg,
+				},
+				Timestamp: time.Now(),
+				Duration:  &duration,
+				Error:     &errMsg,
+			})
+			return false, err
+		}
+
+		config := s.chaos.GetConfig()
+		if config.DBLockWait != nil {
+			timeout := config.DBLockWait.LockTimeoutMs
+			if timeout <= 0 {
+				timeout = 5000
+			}
+			time.Sleep(time.Duration(timeout) * time.Millisecond)
+		}
+	}
+	defer s.chaos.ReleaseDBLock(lockID)
+
+	if s.chaos.ShouldInjectGoroutineLeak() {
+		s.chaos.LeakGoroutine(s.chaos.GetConfig().GoroutineLeak.LeakRate)
 	}
 
 	s.stocksMu.Lock()
@@ -101,7 +144,25 @@ func (s *InventoryService) DeductStock(ctx context.Context, productID string, qu
 	stock.Version++
 	stock.UpdatedAt = time.Now()
 
-	s.updateCache(productID, stock)
+	s.chaos.UpdateDBVersion(productID)
+
+	if s.chaos.ShouldInjectCacheDirtyData() {
+		s.chaos.MarkCacheDirty(productID)
+		s.eventStore.Append(types.Event{
+			ID:        uuid.New(),
+			Type:      types.EventTypeCacheDirty,
+			Status:    types.EventStatusSuccess,
+			ProductID: &productID,
+			Payload: map[string]interface{}{
+				"action":   "db_updated_cache_not_synced",
+				"db_version": s.chaos.GetDBVersion(productID),
+				"message":  "DB updated, cache intentionally not synced",
+			},
+			Timestamp: time.Now(),
+		})
+	} else {
+		s.updateCache(productID, stock)
+	}
 
 	duration := time.Since(start).Milliseconds()
 	s.eventStore.Append(types.Event{
@@ -113,7 +174,9 @@ func (s *InventoryService) DeductStock(ctx context.Context, productID string, qu
 			"quantity":       quantity,
 			"remaining":      stock.Quantity - stock.Reserved,
 			"version":        stock.Version,
+			"db_version":     s.chaos.GetDBVersion(productID),
 			"cache_hit_rate": s.getCacheHitRate(),
+			"lock_held":      lockID != "",
 		},
 		Timestamp: time.Now(),
 		Duration:  &duration,
@@ -138,19 +201,7 @@ func (s *InventoryService) RollbackStock(ctx context.Context, productID string, 
 	})
 
 	if s.chaos.ShouldInjectGoroutineLeak() {
-		s.eventStore.Append(types.Event{
-			ID:        uuid.New(),
-			Type:      types.EventTypeGoroutineLeak,
-			Status:    types.EventStatusPending,
-			ProductID: &productID,
-			Payload: map[string]interface{}{
-				"message": "Goroutine leak injected during rollback",
-			},
-			Timestamp: time.Now(),
-		})
-		go func() {
-			select {}
-		}()
+		s.chaos.LeakGoroutine(s.chaos.GetConfig().GoroutineLeak.LeakRate)
 	}
 
 	if s.chaos.ShouldCompensationFail() {
@@ -188,7 +239,13 @@ func (s *InventoryService) RollbackStock(ctx context.Context, productID string, 
 	stock.Version++
 	stock.UpdatedAt = time.Now()
 
-	s.updateCache(productID, stock)
+	s.chaos.UpdateDBVersion(productID)
+
+	if s.chaos.ShouldInjectCacheDirtyData() {
+		s.chaos.MarkCacheDirty(productID)
+	} else {
+		s.updateCache(productID, stock)
+	}
 
 	duration := time.Since(start).Milliseconds()
 	s.eventStore.Append(types.Event{
@@ -200,6 +257,7 @@ func (s *InventoryService) RollbackStock(ctx context.Context, productID string, 
 			"quantity":  quantity,
 			"available": stock.Quantity - stock.Reserved,
 			"version":   stock.Version,
+			"db_version": s.chaos.GetDBVersion(productID),
 		},
 		Timestamp: time.Now(),
 		Duration:  &duration,
@@ -221,24 +279,41 @@ func (s *InventoryService) RollbackStock(ctx context.Context, productID string, 
 }
 
 func (s *InventoryService) GetStock(ctx context.Context, productID string) (*types.Stock, error) {
-	if s.chaos.ShouldInjectCacheDirtyData() {
-		dirtyValue := rand.Intn(1000)
+	if s.chaos.IsCacheDirty(productID) {
+		s.stocksMu.RLock()
+		stock, exists := s.stocks[productID]
+		if !exists {
+			s.stocksMu.RUnlock()
+			return nil, errors.New("product not found")
+		}
+
+		cachedVersion := stock.Version
+		dbVersion := s.chaos.GetDBVersion(productID)
+
+		dirtyValue := cachedVersion + rand.Intn(100) + 50
+
+		s.stocksMu.RUnlock()
+
 		s.eventStore.Append(types.Event{
 			ID:        uuid.New(),
 			Type:      types.EventTypeCacheDirty,
 			Status:    types.EventStatusPending,
 			ProductID: &productID,
 			Payload: map[string]interface{}{
-				"message":     "Cache dirty data injected",
-				"dirty_value": dirtyValue,
+				"message":       "Cache dirty data returned",
+				"cached_qty":    dirtyValue,
+				"actual_qty":    stock.Quantity - stock.Reserved,
+				"cached_version": cachedVersion,
+				"db_version":    dbVersion,
 			},
 			Timestamp: time.Now(),
 		})
+
 		return &types.Stock{
 			ProductID: productID,
 			Quantity:  dirtyValue,
 			Reserved:  0,
-			Version:   999,
+			Version:   9999,
 		}, nil
 	}
 
@@ -274,6 +349,7 @@ func (s *InventoryService) AddStock(productID string, quantity int) {
 	stock.Version++
 	stock.UpdatedAt = time.Now()
 
+	s.chaos.UpdateDBVersion(productID)
 	s.updateCache(productID, stock)
 }
 
@@ -292,7 +368,9 @@ func (s *InventoryService) updateCache(productID string, stock *types.Stock) {
 	stockJSON, _ := json.Marshal(stock)
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
-	s.redis.Set(ctx, fmt.Sprintf("stock:%s", productID), stockJSON, 5*time.Minute)
+	if s.redis != nil {
+		s.redis.Set(ctx, fmt.Sprintf("stock:%s", productID), stockJSON, 5*time.Minute)
+	}
 }
 
 func (s *InventoryService) getCacheHitRate() float64 {
