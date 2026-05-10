@@ -1,0 +1,165 @@
+{
+  "containers": [
+    {
+      "container_no": "MAEU1234567",
+      "container_type": "20GP",
+      "voyage_no": "V1234",
+      "etd": "2025-05-10"
+    },
+    {
+      "container_no": "MAEU7654321",
+      "container_type": "40HQ",
+      "voyage_no": "V1235",
+      "etd": "2025-05-12"
+    }
+  ],
+  "cargos": [
+    {
+      "customer": "阿里巴巴国际",
+      "bl_no": "BL001",
+      "container_no": "MAEU1234567",
+      "volume": "5.2",
+      "volume_unit": "CBM",
+      "weight": "800",
+      "weight_unit": "KG",
+      "cargo_value": "50000",
+      "is_repack": "0",
+      "remark": "电子产品"
+    },
+    {
+      "customer": "腾讯科技",
+      "bl_no": "BL002",
+      "container_no": "MAEU1234567",
+      "volume": "8.5",
+      "volume_unit": "CBM",
+      "weight": "1200",
+      "weight_unit": "KG",
+      "cargo_value": "80000",
+      "is_repack": "1",
+      "remark": "需要重新装柜"
+    },
+    {
+      "customer": "华为技术",
+      "bl_no": "BL003",
+      "container_no": "MAEU1234567",
+      "volume": "12.0",
+      "volume_unit": "CBM",
+      "weight": "2500",
+      "weight_unit": "KG",
+      "cargo_value": "150000",
+      "is_repack": "1",
+      "remark": "需要重新装柜"
+    },
+    {
+      "customer": "字节跳动",
+      "bl_no": "BL004",
+      "container_no": "MAEU7654321",
+      "volume": "250",
+      "volume_unit": "CFT",
+      "weight": "3.5",
+      "weight_unit": "TON",
+      "cargo_value": "200000",
+      "is_repack": "0",
+      "remark": "使用英制单位"
+    },
+    {
+      "customer": "京东物流",
+      "bl_no": "BL005",
+      "container_no": "MAEU7654321",
+      "volume": "180",
+      "volume_unit": "CFT",
+      "weight": "8800",
+      "weight_unit": "LBS",
+      "cargo_value": "120000",
+      "is_repack": "0",
+      "remark": "混合单位测试"
+    }
+  ],
+  "fees": [
+    {
+      "container_no": "MAEU1234567",
+      "fee_type": "港杂费",
+      "amount": "3500.00",
+      "currency": "CNY",
+      "remark": "码头操作费"
+    },
+    {
+      "container_no": "MAEU1234567",
+      "fee_type": "THC",
+      "amount": "850.00",
+      "currency": "CNY",
+      "remark": "码头处理费"
+    },
+    {
+      "container_no": "MAEU1234567",
+      "fee_type": "文件费",
+      "amount": "500.00",
+      "currency": "CNY",
+      "remark": ""
+    },
+    {
+      "container_no": "MAEU1234567",
+      "fee_type": "查验费",
+      "amount": "2000.00",
+      "currency": "CNY",
+      "remark": "海关查验"
+    },
+    {
+      "container_no": "MAEU7654321",
+      "fee_type": "港杂费",
+      "amount": "5800.00",
+      "currency": "CNY",
+      "remark": "40尺柜"
+    },
+    {
+      "container_no": "MAEU7654321",
+      "fee_type": "THC",
+      "amount": "1500.00",
+      "currency": "CNY",
+      "remark": ""
+    },
+    {
+      "container_no": "MAEU7654321",
+      "fee_type": "电放费",
+      "amount": "400.00",
+      "currency": "CNY",
+      "remark": ""
+    }
+  ],
+  "return_records": [
+    {
+      "bl_no": "BL003",
+      "container_no": "MAEU1234567",
+      "return_date": "2025-05-08",
+      "amount": "500.00",
+      "currency": "CNY",
+      "remark": "部分退关"
+    }
+  ],
+  "payments": [
+    {
+      "customer": "阿里巴巴国际",
+      "bl_no": "BL001",
+      "amount": "1500.00",
+      "currency": "CNY",
+      "payment_date": "2025-05-09",
+      "remark": "预付款"
+    },
+    {
+      "customer": "腾讯科技",
+      "bl_no": "BL002",
+      "amount": "3000.00",
+      "currency": "CNY",
+      "payment_date": "2025-05-09",
+      "remark": "全款"
+    },
+    {
+      "customer": "字节跳动",
+      "bl_no": "BL004",
+      "amount": "5000.00",
+      "currency": "CNY",
+      "payment_date": "2025-05-11",
+      "remark": ""
+    }
+  ]
+}
