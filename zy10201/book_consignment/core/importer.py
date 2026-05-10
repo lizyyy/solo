@@ -346,12 +346,28 @@ def import_returns(file_path: str) -> Dict[str, Any]:
     }
 
 
+def _check_duplicate_payment_record(cursor, owner_id: int, amount: float, 
+                                     payment_date: str, method: Optional[str]) -> bool:
+    if method:
+        cursor.execute('''
+            SELECT COUNT(*) as cnt FROM payments 
+            WHERE owner_id = ? AND ABS(amount - ?) < 0.01 AND payment_date = ? AND method = ?
+        ''', (owner_id, amount, payment_date, method))
+    else:
+        cursor.execute('''
+            SELECT COUNT(*) as cnt FROM payments 
+            WHERE owner_id = ? AND ABS(amount - ?) < 0.01 AND payment_date = ? AND (method IS NULL OR method = '')
+        ''', (owner_id, amount, payment_date))
+    return cursor.fetchone()['cnt'] > 0
+
+
 def import_payments(file_path: str) -> Dict[str, Any]:
     is_dup, msg = _check_duplicate_import(file_path, 'payments')
     if is_dup:
-        return {'success': False, 'message': msg, 'imported': 0, 'errors': []}
+        return {'success': False, 'message': msg, 'imported': 0, 'skipped': 0, 'errors': []}
     
     imported = 0
+    skipped = 0
     errors = []
     now = datetime.now().isoformat()
     file_name = file_path.split('/')[-1]
@@ -378,6 +394,12 @@ def import_payments(file_path: str) -> Dict[str, Any]:
                     continue
                 owner_id = owner['id']
                 
+                if _check_duplicate_payment_record(cursor, owner_id, amount, payment_date, method):
+                    skipped += 1
+                    method_info = f'，方式: {method}' if method else ''
+                    errors.append(f"第{line_num}行: 书主 {owner_code} 在 {payment_date} 已存在 ¥{amount} 的付款记录{method_info}，已跳过（疑似重复导入）")
+                    continue
+                
                 cursor.execute('''
                     INSERT INTO payments 
                     (owner_id, amount, payment_date, method, remark, source_file, source_line, created_at)
@@ -389,9 +411,14 @@ def import_payments(file_path: str) -> Dict[str, Any]:
     
     _record_import(file_path, 'payments', imported)
     
+    message = f'导入 {imported} 条付款记录'
+    if skipped > 0:
+        message += f'，跳过 {skipped} 条疑似重复的记录'
+    
     return {
-        'success': len(errors) == 0,
-        'message': f'导入 {imported} 条付款记录' + (f'，有 {len(errors)} 条错误' if errors else ''),
+        'success': True,
+        'message': message,
         'imported': imported,
+        'skipped': skipped,
         'errors': errors
     }
