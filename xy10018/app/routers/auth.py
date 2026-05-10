@@ -3,13 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from ..database import get_db
-from ..security import (
-    authenticate_user, create_access_token, get_current_user, get_password_hash
-)
+from ..security import authenticate_user, create_access_token, get_current_user
 from ..config import get_settings
-from ..schemas import Token, UserResponse, UserCreate
-from ..services import create_user
-from ..models import UserRole
+from ..schemas import Token, UserResponse
 
 settings = get_settings()
 
@@ -39,19 +35,6 @@ async def login_for_access_token(
         expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-@router.post("/register", response_model=UserResponse)
-async def register(
-    user: UserCreate,
-    db: Session = Depends(get_db)
-):
-    from ..security import get_user
-    if get_user(db, user.username):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="用户名已存在"
-        )
-    return create_user(db, user)
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user = Depends(get_current_user)):

@@ -35,30 +35,62 @@ def test_get_current_user_no_token(client):
     response = client.get("/api/auth/me")
     assert response.status_code == 401
 
-def test_register_success(client):
+def test_register_endpoint_not_available(client):
     response = client.post(
         "/api/auth/register",
+        json={
+            "username": "hacker",
+            "email": "hacker@example.com",
+            "password": "hack123",
+            "full_name": "Hacker",
+            "role": "admin"
+        }
+    )
+    assert response.status_code == 404
+
+def test_admin_can_create_user(client, admin_token):
+    response = client.post(
+        "/api/users",
         json={
             "username": "newuser",
             "email": "newuser@example.com",
             "password": "newpass123",
             "full_name": "New User",
             "role": "cs"
-        }
+        },
+        headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == 200
     data = response.json()
     assert data["username"] == "newuser"
+    assert data["role"] == "cs"
 
-def test_register_duplicate_username(client, test_user):
+def test_non_admin_cannot_create_user(client, auth_token):
     response = client.post(
-        "/api/auth/register",
+        "/api/users",
         json={
-            "username": "testuser",
-            "email": "another@example.com",
-            "password": "test12345",
+            "username": "newuser2",
+            "email": "new2@example.com",
+            "password": "pass123",
             "full_name": "Test",
-            "role": "cs"
-        }
+            "role": "admin"
+        },
+        headers={"Authorization": f"Bearer {auth_token}"}
     )
-    assert response.status_code == 400
+    assert response.status_code == 403
+
+def test_admin_can_create_manager_user(client, admin_token):
+    response = client.post(
+        "/api/users",
+        json={
+            "username": "newmanager",
+            "email": "manager2@example.com",
+            "password": "pass123",
+            "full_name": "New Manager",
+            "role": "manager"
+        },
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["role"] == "manager"

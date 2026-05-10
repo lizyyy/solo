@@ -21,17 +21,35 @@ uvicorn app.main:app --reload
 
 ---
 
-## 默认账号
+## 🔑 默认账号
 
 运行 `python3 seeds.py` 后可用：
 
 | 用户名 | 密码 | 角色 | 权限 |
 |--------|------|------|------|
-| admin | admin123 | 管理员 | 全部权限 |
+| admin | admin123 | 管理员 | 全部权限（包括用户管理） |
 | manager | manager123 | 经理 | 除用户管理外全部 |
 | cs01 | cs123456 | 客服 | 补发单CRUD |
 | cs02 | cs123456 | 客服 | 补发单CRUD |
 | operator01 | op123456 | 运营 | 查看和状态变更 |
+
+> ⚠️ **安全提示**：系统没有公开注册功能，所有用户必须由管理员通过 `/api/users` 端点创建。
+
+---
+
+## 🔐 角色权限矩阵
+
+| 操作 | admin | manager | cs | operator |
+|------|:-----:|:-------:|:--:|:--------:|
+| 登录 | ✅ | ✅ | ✅ | ✅ |
+| 创建补发单 | ✅ | ✅ | ✅ | ❌ |
+| 查看补发单 | ✅ | ✅ | ✅ | ✅ |
+| 修改补发单 | ✅ | ✅ | ✅ | ❌ |
+| 状态变更 | ✅ | ✅ | ✅ | ✅ |
+| 批量操作 | ✅ | ✅ | ❌ | ❌ |
+| 导入导出 | ✅ | ✅ | ❌ | ❌ |
+| 查看日志 | ✅ | ✅ | ❌ | ❌ |
+| 用户管理 | ✅ | ❌ | ❌ | ❌ |
 
 ---
 
@@ -66,17 +84,7 @@ uvicorn app.main:app --reload
 - API 文档: http://localhost:8000/docs
 - pgAdmin: http://localhost:5050 (admin@example.com / admin123)
 
-## 默认账号
-
-运行 `python3 seeds.py` 后可用：
-
-| 用户名 | 密码 | 角色 | 权限 |
-|--------|------|------|------|
-| admin | admin123 | 管理员 | 全部权限 |
-| manager | manager123 | 经理 | 除用户管理外全部 |
-| cs01 | cs123456 | 客服 | 补发单CRUD |
-| cs02 | cs123456 | 客服 | 补发单CRUD |
-| operator01 | op123456 | 运营 | 查看和状态变更 |
+---
 
 ## 主要 API 端点
 
@@ -84,6 +92,15 @@ uvicorn app.main:app --reload
 ```
 POST /api/auth/login      登录（获取 JWT）
 GET  /api/auth/me         获取当前用户信息
+```
+
+### 用户管理（管理员专属）
+```
+GET    /api/users         用户列表
+POST   /api/users         创建用户
+GET    /api/users/{id}    用户详情
+PUT    /api/users/{id}    更新用户
+DELETE /api/users/{id}    禁用用户
 ```
 
 ### 补发单管理
@@ -120,6 +137,8 @@ POST /api/failed-tasks/{id}/retry  重试失败任务
 GET  /api/statistics        统计数据
 ```
 
+---
+
 ## 状态流转
 
 ```
@@ -136,6 +155,8 @@ COMPLETED（已完成）
 FAILED（失败）→ 可重试或取消
 CANCELLED（已取消）→ 终止
 ```
+
+---
 
 ## 项目结构
 
@@ -163,6 +184,8 @@ CANCELLED（已取消）→ 终止
 └── .env                     环境配置
 ```
 
+---
+
 ## 运行测试
 
 ```bash
@@ -176,16 +199,20 @@ python3 -m pytest tests/test_auth.py -v
 python3 -m pytest tests/ --cov=app
 ```
 
+---
+
 ## 技术栈
 
 - **FastAPI**: 现代异步 Web 框架
 - **PostgreSQL**: 关系型数据库
+- **SQLite**: 开发/测试数据库
 - **SQLAlchemy**: ORM
 - **Pydantic**: 数据验证
 - **JWT**: 认证
-- **Alembic**: 数据库迁移（可选）
 - **pytest**: 测试框架
 - **openpyxl**: Excel 导入导出
+
+---
 
 ## 故障排查
 
@@ -208,6 +235,8 @@ docker-compose logs db
 # 测试使用 SQLite 内存数据库，不需要 PostgreSQL
 python3 -m pytest tests/
 ```
+
+---
 
 ## 开发命令
 
