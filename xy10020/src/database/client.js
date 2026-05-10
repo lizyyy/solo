@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const config = require('../config');
 const logger = require('../utils/logger');
+const { runMigrations } = require('./migrations');
 
 let db = null;
 
@@ -22,6 +23,7 @@ const initDatabase = () => {
   logger.info('数据库连接成功');
 
   createTables();
+  runMigrations(db);
 
   return db;
 };
@@ -59,8 +61,7 @@ const createTables = () => {
       sequence_number INTEGER NOT NULL,
       version INTEGER DEFAULT 1,
       created_at INTEGER NOT NULL,
-      FOREIGN KEY (live_room_id) REFERENCES live_rooms(id),
-      FOREIGN KEY (sender_id) REFERENCES users(id)
+      FOREIGN KEY (live_room_id) REFERENCES live_rooms(id)
     )`,
 
     `CREATE TABLE IF NOT EXISTS push_tasks (
