@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: vaccine-cold-chain
+Version: 1.0.0
+Summary: 诊所疫苗冷链日志 CLI 工具
+Requires-Python: >=3.8
+Requires-Dist: click==8.1.7
+Requires-Dist: python-dateutil==2.9.0.post0
+Requires-Dist: tabulate==0.9.0
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
