@@ -1,0 +1,10 @@
+{
+  "name": "return-quality-station",
+  "version": "1.0.0",
+  "description": "小型仓库退货质检台",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev"
+  }
+}
