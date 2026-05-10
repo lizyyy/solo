@@ -1,0 +1,22 @@
+{
+  "name": "ticket-waitlist-service",
+  "version": "1.0.0",
+  "description": "票务候补递补服务 - 解决热门票退票后候补递补、支付时限和通知顺序问题",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node tests/run-tests.js",
+    "migrate": "node scripts/migrate.js",
+    "retry-failed": "node scripts/retry-failed.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.1.2",
+    "node-cron": "^3.0.3",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
