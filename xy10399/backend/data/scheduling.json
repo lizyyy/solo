@@ -1,0 +1,428 @@
+{
+  "stores": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "中心店",
+      "address": "市中心商业区88号",
+      "phone": "010-88888881"
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "东区店",
+      "address": "东区商业街123号",
+      "phone": "010-88888882"
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "西区店",
+      "address": "西区万达广场",
+      "phone": "010-88888883"
+    },
+    {
+      "id": 4,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "南区店",
+      "address": "南区购物中心",
+      "phone": "010-88888884"
+    }
+  ],
+  "skills": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "收银员",
+      "description": "熟练操作收银系统"
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "导购员",
+      "description": "商品推荐和客户服务"
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.277Z",
+      "name": "理货员",
+      "description": "商品陈列和库存管理"
+    },
+    {
+      "id": 4,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "店长",
+      "description": "门店管理和协调"
+    }
+  ],
+  "employees": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "张三",
+      "original_store_id": 1,
+      "max_hours_per_week": 40
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "李四",
+      "original_store_id": 1,
+      "max_hours_per_week": 40
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "王五",
+      "original_store_id": 2,
+      "max_hours_per_week": 35
+    },
+    {
+      "id": 4,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "赵六",
+      "original_store_id": 2,
+      "max_hours_per_week": 40
+    },
+    {
+      "id": 5,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "钱七",
+      "original_store_id": 3,
+      "max_hours_per_week": 38
+    },
+    {
+      "id": 6,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "孙八",
+      "original_store_id": 3,
+      "max_hours_per_week": 40
+    },
+    {
+      "id": 7,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "周九",
+      "original_store_id": 4,
+      "max_hours_per_week": 40
+    },
+    {
+      "id": 8,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "name": "吴十",
+      "original_store_id": 4,
+      "max_hours_per_week": 36
+    }
+  ],
+  "employeeSkills": [
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.278Z",
+      "employee_id": 1,
+      "skill_id": 1,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 1,
+      "skill_id": 2,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 2,
+      "skill_id": 1,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 2,
+      "skill_id": 3,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 3,
+      "skill_id": 2,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 3,
+      "skill_id": 4,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 4,
+      "skill_id": 1,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 4,
+      "skill_id": 2,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 5,
+      "skill_id": 3,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 5,
+      "skill_id": 1,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 6,
+      "skill_id": 2,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 6,
+      "skill_id": 4,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 7,
+      "skill_id": 1,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 7,
+      "skill_id": 2,
+      "proficiency_level": 2
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 8,
+      "skill_id": 3,
+      "proficiency_level": 1
+    },
+    {
+      "id": null,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 8,
+      "skill_id": 2,
+      "proficiency_level": 1
+    }
+  ],
+  "schedules": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 1,
+      "store_id": 1,
+      "date": "2026-05-10",
+      "start_time": "09:00",
+      "end_time": "18:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 2,
+      "store_id": 1,
+      "date": "2026-05-10",
+      "start_time": "10:00",
+      "end_time": "19:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 3,
+      "store_id": 2,
+      "date": "2026-05-10",
+      "start_time": "08:00",
+      "end_time": "17:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 4,
+      "created_at": "2026-05-10T19:09:06.279Z",
+      "employee_id": 4,
+      "store_id": 2,
+      "date": "2026-05-11",
+      "start_time": "09:00",
+      "end_time": "18:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 5,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 5,
+      "store_id": 3,
+      "date": "2026-05-11",
+      "start_time": "10:00",
+      "end_time": "19:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 6,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 6,
+      "store_id": 3,
+      "date": "2026-05-12",
+      "start_time": "08:00",
+      "end_time": "17:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 7,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 7,
+      "store_id": 4,
+      "date": "2026-05-12",
+      "start_time": "09:00",
+      "end_time": "18:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 8,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 8,
+      "store_id": 4,
+      "date": "2026-05-13",
+      "start_time": "10:00",
+      "end_time": "19:00",
+      "shift_type": "regular",
+      "status": "original"
+    },
+    {
+      "id": 9,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 1,
+      "store_id": 2,
+      "date": "2026-05-09",
+      "start_time": "14:00",
+      "end_time": "22:00",
+      "shift_type": "transfer",
+      "status": "active"
+    }
+  ],
+  "transferRequests": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 1,
+      "from_store_id": 1,
+      "to_store_id": 2,
+      "date": "2026-05-09",
+      "start_time": "14:00",
+      "end_time": "22:00",
+      "skill_required": 1,
+      "reason": "东区店周末促销支援",
+      "status": "approved",
+      "transport_allowance": 40,
+      "approver": "张经理",
+      "approval_comment": "正常借调，同意支援",
+      "approved_at": "2026-05-10T19:09:06.280Z"
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 2,
+      "from_store_id": 1,
+      "to_store_id": 3,
+      "date": "2026-05-14",
+      "start_time": "07:00",
+      "end_time": "17:00",
+      "skill_required": 1,
+      "reason": "西区店新品上市高峰支援",
+      "status": "pending",
+      "transport_allowance": 45,
+      "approver": null,
+      "approval_comment": null,
+      "approved_at": null
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "employee_id": 5,
+      "from_store_id": 3,
+      "to_store_id": 4,
+      "date": "2026-05-08",
+      "start_time": "09:00",
+      "end_time": "18:00",
+      "skill_required": null,
+      "reason": "南区店临时支援",
+      "status": "approved",
+      "transport_allowance": 48,
+      "approver": "李经理",
+      "approval_comment": "同意",
+      "approved_at": "2026-05-10T19:09:06.280Z"
+    }
+  ],
+  "transportAllowanceRules": [
+    {
+      "id": 1,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 1,
+      "to_store_id": 2,
+      "allowance_amount": 25
+    },
+    {
+      "id": 2,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 1,
+      "to_store_id": 3,
+      "allowance_amount": 30
+    },
+    {
+      "id": 3,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 1,
+      "to_store_id": 4,
+      "allowance_amount": 35
+    },
+    {
+      "id": 4,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 2,
+      "to_store_id": 3,
+      "allowance_amount": 20
+    },
+    {
+      "id": 5,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 2,
+      "to_store_id": 4,
+      "allowance_amount": 25
+    },
+    {
+      "id": 6,
+      "created_at": "2026-05-10T19:09:06.280Z",
+      "from_store_id": 3,
+      "to_store_id": 4,
+      "allowance_amount": 28
+    }
+  ]
+}

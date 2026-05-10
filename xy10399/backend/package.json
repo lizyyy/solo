@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "lowdb": "^3.0.0",
+    "dayjs": "^1.11.10",
+    "xlsx": "^0.18.5",
+    "uuid": "^9.0.0"
+  }
+}
