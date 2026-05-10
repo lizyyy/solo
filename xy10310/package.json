@@ -1,0 +1,21 @@
+{
+  "name": "vehicle-inspection-system",
+  "version": "1.0.0",
+  "description": "车辆年检代办进度管理系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "nodemon server/index.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": [
+    "vehicle",
+    "inspection",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
