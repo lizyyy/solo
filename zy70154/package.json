@@ -1,0 +1,22 @@
+{
+  "name": "service-dependency-subscription-api",
+  "version": "1.0.0",
+  "description": "Service Dependency Change Subscription API - 服务依赖变更订阅系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "pg": "^8.20.0",
+    "uuid": "^14.0.0"
+  }
+}
