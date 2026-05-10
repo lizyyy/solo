@@ -1,0 +1,4 @@
+room_number,billing_month,reduction_type,reduction_percent,reduction_amount,reason
+1-101,2025-01,错误比例,150,,减免比例超过100%
+1-102,2025-01,负金额,-50,负数减免金额
+1-201,2025-01,负数比例,-10,,负数比例
