@@ -1,0 +1,418 @@
+{
+  "artifacts": [
+    {
+      "id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "name": "order-service",
+      "version": "2.0.0",
+      "repository": "test-repo",
+      "stage": "test",
+      "created_at": "2026-05-10T02:21:40.625Z",
+      "updated_at": "2026-05-10T02:21:40.629Z"
+    },
+    {
+      "id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "name": "payment-service",
+      "version": "1.5.0",
+      "repository": "test-repo",
+      "stage": "test",
+      "created_at": "2026-05-10T02:21:40.630Z",
+      "updated_at": "2026-05-10T02:21:40.630Z"
+    }
+  ],
+  "artifact_metadata": [
+    {
+      "id": "d589722e-2f4c-4076-8690-f51daa63d511",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "key": "buildNumber",
+      "value": "1024",
+      "created_at": "2026-05-10T02:21:40.625Z"
+    },
+    {
+      "id": "a6d15e55-af11-45b6-a3a6-d15a19bbac51",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "key": "commitHash",
+      "value": "abc123def",
+      "created_at": "2026-05-10T02:21:40.625Z"
+    },
+    {
+      "id": "ad31ad52-6f72-4a24-9ba1-e5122877b645",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "key": "buildTime",
+      "value": "2026-05-10T02:21:40.625Z",
+      "created_at": "2026-05-10T02:21:40.625Z"
+    },
+    {
+      "id": "f19fef50-5674-4cce-b4ab-adf104c7c283",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "key": "buildNumber",
+      "value": "2048",
+      "created_at": "2026-05-10T02:21:40.630Z"
+    },
+    {
+      "id": "b6ceaf3f-ae68-441e-b25f-e8376bce5996",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "key": "commitHash",
+      "value": "xyz789",
+      "created_at": "2026-05-10T02:21:40.630Z"
+    }
+  ],
+  "signatures": [
+    {
+      "id": "82f6686b-43cb-48e6-9899-cd17a4b30ef8",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "signer": "jenkins-ci@example.com",
+      "signature": "sig_1778379700627",
+      "algorithm": "sha256",
+      "signed_at": "2026-05-10T02:21:40.627Z",
+      "verified_at": "2026-05-10T02:21:40.627Z",
+      "is_valid": true
+    },
+    {
+      "id": "bca9c0c4-bf2e-41d4-b250-397af6194a16",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "signer": "jenkins-ci@example.com",
+      "signature": "sig_1778379700630",
+      "algorithm": "sha256",
+      "signed_at": "2026-05-10T02:21:40.630Z",
+      "verified_at": "2026-05-10T02:21:40.631Z",
+      "is_valid": true
+    }
+  ],
+  "security_scans": [
+    {
+      "id": "1638d4f4-adff-4b2e-bc61-b981a63c6a7d",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "scanner": "trivy-v0.48.0",
+      "scan_time": "2026-05-10T02:21:40.627Z",
+      "critical_count": 0,
+      "high_count": 0,
+      "medium_count": 2,
+      "low_count": 5,
+      "report_url": "http://scan-server/reports/1024",
+      "is_passed": true,
+      "scan_result": "{\"scanTime\":\"2026-05-10T02:21:40.627Z\",\"critical\":0,\"high\":0,\"medium\":2,\"low\":5,\"passed\":true,\"reportUrl\":\"http://scan-server/reports/1024\"}",
+      "created_at": "2026-05-10T02:21:40.627Z"
+    },
+    {
+      "id": "802a3d03-5f54-4060-8aec-6449e41798ca",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "scanner": "trivy-v0.48.0",
+      "scan_time": "2026-05-10T02:21:40.631Z",
+      "critical_count": 1,
+      "high_count": 2,
+      "medium_count": 3,
+      "low_count": 0,
+      "report_url": "http://scan-server/reports/2048",
+      "is_passed": false,
+      "scan_result": "{\"scanTime\":\"2026-05-10T02:21:40.631Z\",\"critical\":1,\"high\":2,\"medium\":3,\"passed\":false,\"reportUrl\":\"http://scan-server/reports/2048\"}",
+      "created_at": "2026-05-10T02:21:40.631Z"
+    }
+  ],
+  "approvals": [
+    {
+      "id": "f74dda1b-ebc3-4df7-a069-1d29a4cec674",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "requestor": "developer-zhangsan",
+      "approver": "ops-manager",
+      "status": "approved",
+      "comment": "同意上线",
+      "requested_at": "2026-05-10T02:21:40.628Z",
+      "approved_at": "2026-05-10T02:21:40.628Z",
+      "rejected_at": null
+    },
+    {
+      "id": "7f65635f-803d-4a66-82ec-9262e876fd0f",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "requestor": "developer-lisi",
+      "approver": "ops-manager",
+      "status": "approved",
+      "comment": "紧急审批",
+      "requested_at": "2026-05-10T02:21:40.632Z",
+      "approved_at": "2026-05-10T02:21:40.633Z",
+      "rejected_at": null
+    }
+  ],
+  "promotion_requests": [
+    {
+      "id": "e9aa672d-5541-44d0-b2ef-f45a9d4440a4",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "source_stage": "test",
+      "target_stage": "production",
+      "status": "failed",
+      "gate_checks": "{\"summary\":{\"totalRules\":3,\"passedRules\":0,\"failedRules\":3,\"allPassed\":false,\"failedRuleNames\":[\"必须有有效签名\",\"安全扫描必须通过\",\"审批必须通过\"]},\"rules\":[{\"ruleId\":\"rule-signature-required\",\"ruleName\":\"必须有有效签名\",\"ruleType\":\"signature\",\"isPassed\":false,\"message\":\"签名校验失败：有效签名数量 0 < 1\",\"details\":{\"validSignatures\":0,\"required\":1}},{\"ruleId\":\"rule-security-scan-required\",\"ruleName\":\"安全扫描必须通过\",\"ruleType\":\"security_scan\",\"isPassed\":false,\"message\":\"安全扫描校验失败：未找到扫描记录\",\"details\":{\"hasScan\":false}},{\"ruleId\":\"rule-approval-required\",\"ruleName\":\"审批必须通过\",\"ruleType\":\"approval\",\"isPassed\":false,\"message\":\"审批校验失败：未找到已批准的审批记录\",\"details\":{\"requireApproval\":true,\"hasApproved\":false,\"approvalCount\":0,\"approvedCount\":0}}],\"evaluatedAt\":\"2026-05-10T02:21:40.627Z\"}",
+      "requested_by": "ops-lisi",
+      "requested_at": "2026-05-10T02:21:40.627Z",
+      "completed_at": "2026-05-10T02:21:40.627Z",
+      "failure_reason": "必须有有效签名; 安全扫描必须通过; 审批必须通过"
+    },
+    {
+      "id": "9a472f0b-82e3-4efe-abfe-95356e03fe6b",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "source_stage": "test",
+      "target_stage": "production",
+      "status": "passed",
+      "gate_checks": "{\"summary\":{\"totalRules\":3,\"passedRules\":3,\"failedRules\":0,\"allPassed\":true,\"failedRuleNames\":[]},\"rules\":[{\"ruleId\":\"rule-signature-required\",\"ruleName\":\"必须有有效签名\",\"ruleType\":\"signature\",\"isPassed\":true,\"message\":\"签名校验通过：有效签名数量 1 >= 1\",\"details\":{\"validSignatures\":1,\"required\":1}},{\"ruleId\":\"rule-security-scan-required\",\"ruleName\":\"安全扫描必须通过\",\"ruleType\":\"security_scan\",\"isPassed\":true,\"message\":\"安全扫描校验通过：致命 0，高危 0\",\"details\":{\"hasScan\":true,\"scanId\":\"1638d4f4-adff-4b2e-bc61-b981a63c6a7d\",\"critical\":0,\"high\":0,\"medium\":2,\"low\":5,\"scanPassed\":true,\"allowCritical\":0,\"allowHigh\":0}},{\"ruleId\":\"rule-approval-required\",\"ruleName\":\"审批必须通过\",\"ruleType\":\"approval\",\"isPassed\":true,\"message\":\"审批校验通过：已找到已批准的审批记录\",\"details\":{\"requireApproval\":true,\"hasApproved\":true,\"approvalCount\":1,\"approvedCount\":1}}],\"evaluatedAt\":\"2026-05-10T02:21:40.628Z\"}",
+      "requested_by": "ops-lisi",
+      "requested_at": "2026-05-10T02:21:40.628Z",
+      "completed_at": "2026-05-10T02:21:40.628Z",
+      "failure_reason": null
+    },
+    {
+      "id": "d0c14d36-1700-4d71-9732-0157cad23113",
+      "artifact_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "source_stage": "test",
+      "target_stage": "production",
+      "status": "failed",
+      "gate_checks": "{\"summary\":{\"totalRules\":3,\"passedRules\":2,\"failedRules\":1,\"allPassed\":false,\"failedRuleNames\":[\"安全扫描必须通过\"]},\"rules\":[{\"ruleId\":\"rule-signature-required\",\"ruleName\":\"必须有有效签名\",\"ruleType\":\"signature\",\"isPassed\":true,\"message\":\"签名校验通过：有效签名数量 1 >= 1\",\"details\":{\"validSignatures\":1,\"required\":1}},{\"ruleId\":\"rule-security-scan-required\",\"ruleName\":\"安全扫描必须通过\",\"ruleType\":\"security_scan\",\"isPassed\":false,\"message\":\"安全扫描校验失败：扫描未标记为通过\",\"details\":{\"hasScan\":true,\"scanId\":\"802a3d03-5f54-4060-8aec-6449e41798ca\",\"critical\":1,\"high\":2,\"medium\":3,\"low\":0,\"scanPassed\":false,\"allowCritical\":0,\"allowHigh\":0}},{\"ruleId\":\"rule-approval-required\",\"ruleName\":\"审批必须通过\",\"ruleType\":\"approval\",\"isPassed\":true,\"message\":\"审批校验通过：已找到已批准的审批记录\",\"details\":{\"requireApproval\":true,\"hasApproved\":true,\"approvalCount\":1,\"approvedCount\":1}}],\"evaluatedAt\":\"2026-05-10T02:21:40.634Z\"}",
+      "requested_by": "ops-lisi",
+      "requested_at": "2026-05-10T02:21:40.633Z",
+      "completed_at": "2026-05-10T02:21:40.633Z",
+      "failure_reason": "安全扫描必须通过"
+    }
+  ],
+  "rollbacks": [
+    {
+      "id": "28ae9088-3cf7-443d-bd15-2c1c096f0aa5",
+      "artifact_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "promotion_request_id": "9a472f0b-82e3-4efe-abfe-95356e03fe6b",
+      "rollback_reason": "发现生产环境性能问题，回滚至上一版本",
+      "rollback_by": "sre-lead",
+      "rolled_back_at": "2026-05-10T02:21:40.629Z",
+      "from_stage": "production",
+      "to_stage": "test"
+    }
+  ],
+  "gate_rules": [
+    {
+      "id": "rule-signature-required",
+      "name": "必须有有效签名",
+      "description": "制品必须至少有一个已验证的有效数字签名",
+      "rule_type": "signature",
+      "is_enabled": true,
+      "config": {
+        "minValidSignatures": 1
+      },
+      "priority": 100,
+      "created_at": "2026-05-10T02:21:33.897Z",
+      "updated_at": "2026-05-10T02:21:33.897Z"
+    },
+    {
+      "id": "rule-security-scan-required",
+      "name": "安全扫描必须通过",
+      "description": "制品必须通过安全扫描，且致命/高危漏洞数量为0",
+      "rule_type": "security_scan",
+      "is_enabled": true,
+      "config": {
+        "allowCritical": 0,
+        "allowHigh": 0
+      },
+      "priority": 90,
+      "created_at": "2026-05-10T02:21:33.897Z",
+      "updated_at": "2026-05-10T02:21:33.897Z"
+    },
+    {
+      "id": "rule-approval-required",
+      "name": "审批必须通过",
+      "description": "制品晋级必须有至少一个已批准的审批记录",
+      "rule_type": "approval",
+      "is_enabled": true,
+      "config": {
+        "requireApproval": true
+      },
+      "priority": 80,
+      "created_at": "2026-05-10T02:21:33.897Z",
+      "updated_at": "2026-05-10T02:21:33.897Z"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "63c21f85-ba32-4dad-85b5-1fbcefec1b52",
+      "entity_type": "artifact",
+      "entity_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "action": "create",
+      "actor": "builder-zhangsan",
+      "details": "{\"name\":\"order-service\",\"version\":\"2.0.0\",\"repository\":\"test-repo\",\"metadata\":{\"buildNumber\":\"1024\",\"commitHash\":\"abc123def\",\"buildTime\":\"2026-05-10T02:21:40.625Z\"}}",
+      "created_at": "2026-05-10T02:21:40.626Z"
+    },
+    {
+      "id": "04252e2b-d8fb-4e37-8a5b-ad0709a292b5",
+      "entity_type": "promotion",
+      "entity_id": "e9aa672d-5541-44d0-b2ef-f45a9d4440a4",
+      "action": "create",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"from\":\"test\",\"to\":\"production\"}",
+      "created_at": "2026-05-10T02:21:40.627Z"
+    },
+    {
+      "id": "9b9b67bd-5734-48b2-abe3-00a0e5cfd255",
+      "entity_type": "promotion",
+      "entity_id": "e9aa672d-5541-44d0-b2ef-f45a9d4440a4",
+      "action": "blocked",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"failedRules\":[\"必须有有效签名\",\"安全扫描必须通过\",\"审批必须通过\"]}",
+      "created_at": "2026-05-10T02:21:40.627Z"
+    },
+    {
+      "id": "fa778218-fede-4998-87a7-06d8e06c699b",
+      "entity_type": "signature",
+      "entity_id": "82f6686b-43cb-48e6-9899-cd17a4b30ef8",
+      "action": "create",
+      "actor": "jenkins-bot",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"signer\":\"jenkins-ci@example.com\",\"algorithm\":\"sha256\"}",
+      "created_at": "2026-05-10T02:21:40.627Z"
+    },
+    {
+      "id": "f950d020-2f5e-4b19-8d35-5d854c2839e0",
+      "entity_type": "signature",
+      "entity_id": "82f6686b-43cb-48e6-9899-cd17a4b30ef8",
+      "action": "verify",
+      "actor": "verifier-wangwu",
+      "details": "{\"isValid\":true,\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\"}",
+      "created_at": "2026-05-10T02:21:40.627Z"
+    },
+    {
+      "id": "31ebf9f9-9534-4f5f-8b66-172c34e7aad1",
+      "entity_type": "scan",
+      "entity_id": "1638d4f4-adff-4b2e-bc61-b981a63c6a7d",
+      "action": "record",
+      "actor": "scanner-bot",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"scanner\":\"trivy-v0.48.0\",\"passed\":true,\"critical\":0,\"high\":0}",
+      "created_at": "2026-05-10T02:21:40.628Z"
+    },
+    {
+      "id": "b01fbbc2-fcb1-4c07-a378-b78a0a070fb1",
+      "entity_type": "approval",
+      "entity_id": "f74dda1b-ebc3-4df7-a069-1d29a4cec674",
+      "action": "request",
+      "actor": "developer-zhangsan",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"comment\":\"功能测试通过，准备上线\"}",
+      "created_at": "2026-05-10T02:21:40.628Z"
+    },
+    {
+      "id": "e6b170a7-dda6-41ad-b2eb-c753852b45ba",
+      "entity_type": "approval",
+      "entity_id": "f74dda1b-ebc3-4df7-a069-1d29a4cec674",
+      "action": "approve",
+      "actor": "ops-manager",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\"}",
+      "created_at": "2026-05-10T02:21:40.628Z"
+    },
+    {
+      "id": "ce114e90-0c5c-4ba0-8863-5b50b1f86cfb",
+      "entity_type": "promotion",
+      "entity_id": "9a472f0b-82e3-4efe-abfe-95356e03fe6b",
+      "action": "create",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"from\":\"test\",\"to\":\"production\"}",
+      "created_at": "2026-05-10T02:21:40.628Z"
+    },
+    {
+      "id": "79a3b772-03c2-4381-904f-0bf374f14345",
+      "entity_type": "artifact",
+      "entity_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "action": "stage_change",
+      "actor": "ops-lisi",
+      "details": "{\"from\":\"test\",\"to\":\"production\"}",
+      "created_at": "2026-05-10T02:21:40.629Z"
+    },
+    {
+      "id": "f0ccd5e2-846d-4fbc-81c8-3ee450b39b37",
+      "entity_type": "promotion",
+      "entity_id": "9a472f0b-82e3-4efe-abfe-95356e03fe6b",
+      "action": "execute",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"to\":\"production\"}",
+      "created_at": "2026-05-10T02:21:40.629Z"
+    },
+    {
+      "id": "bc175e1c-51b5-4bba-b497-37b0f68215e7",
+      "entity_type": "artifact",
+      "entity_id": "b87976ff-a680-4655-9f89-518a5c0f7c1f",
+      "action": "stage_change",
+      "actor": "sre-lead",
+      "details": "{\"from\":\"production\",\"to\":\"test\"}",
+      "created_at": "2026-05-10T02:21:40.630Z"
+    },
+    {
+      "id": "66a3297b-492c-4073-af49-0154b664769e",
+      "entity_type": "rollback",
+      "entity_id": "28ae9088-3cf7-443d-bd15-2c1c096f0aa5",
+      "action": "execute",
+      "actor": "sre-lead",
+      "details": "{\"artifactId\":\"b87976ff-a680-4655-9f89-518a5c0f7c1f\",\"promotionRequestId\":\"9a472f0b-82e3-4efe-abfe-95356e03fe6b\",\"from\":\"production\",\"to\":\"test\",\"reason\":\"发现生产环境性能问题，回滚至上一版本\"}",
+      "created_at": "2026-05-10T02:21:40.630Z"
+    },
+    {
+      "id": "a76122b8-339d-4892-9907-ac9dd3f9234e",
+      "entity_type": "artifact",
+      "entity_id": "7723e37b-3aa2-4924-bb89-a66821564202",
+      "action": "create",
+      "actor": "builder-zhangsan",
+      "details": "{\"name\":\"payment-service\",\"version\":\"1.5.0\",\"repository\":\"test-repo\",\"metadata\":{\"buildNumber\":\"2048\",\"commitHash\":\"xyz789\"}}",
+      "created_at": "2026-05-10T02:21:40.630Z"
+    },
+    {
+      "id": "588e66bb-5c44-4280-a9fc-e99bd4ac70d1",
+      "entity_type": "signature",
+      "entity_id": "bca9c0c4-bf2e-41d4-b250-397af6194a16",
+      "action": "create",
+      "actor": "jenkins-bot",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\",\"signer\":\"jenkins-ci@example.com\",\"algorithm\":\"sha256\"}",
+      "created_at": "2026-05-10T02:21:40.631Z"
+    },
+    {
+      "id": "45d49588-438a-4a54-ac4d-174d92089141",
+      "entity_type": "signature",
+      "entity_id": "bca9c0c4-bf2e-41d4-b250-397af6194a16",
+      "action": "verify",
+      "actor": "verifier-wangwu",
+      "details": "{\"isValid\":true,\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\"}",
+      "created_at": "2026-05-10T02:21:40.631Z"
+    },
+    {
+      "id": "374ffd40-1826-450d-9bd1-9d2d4302947d",
+      "entity_type": "scan",
+      "entity_id": "802a3d03-5f54-4060-8aec-6449e41798ca",
+      "action": "record",
+      "actor": "scanner-bot",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\",\"scanner\":\"trivy-v0.48.0\",\"passed\":false,\"critical\":1,\"high\":2}",
+      "created_at": "2026-05-10T02:21:40.631Z"
+    },
+    {
+      "id": "7c2f7388-3516-4b3b-b281-3838375ba811",
+      "entity_type": "approval",
+      "entity_id": "7f65635f-803d-4a66-82ec-9262e876fd0f",
+      "action": "request",
+      "actor": "developer-lisi",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\",\"comment\":\"紧急修复版本\"}",
+      "created_at": "2026-05-10T02:21:40.632Z"
+    },
+    {
+      "id": "521817da-a785-4cae-aeab-53d98db2686c",
+      "entity_type": "approval",
+      "entity_id": "7f65635f-803d-4a66-82ec-9262e876fd0f",
+      "action": "approve",
+      "actor": "ops-manager",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\"}",
+      "created_at": "2026-05-10T02:21:40.633Z"
+    },
+    {
+      "id": "74cf2d7b-832c-4698-9261-0d086c8adfc9",
+      "entity_type": "promotion",
+      "entity_id": "d0c14d36-1700-4d71-9732-0157cad23113",
+      "action": "create",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\",\"from\":\"test\",\"to\":\"production\"}",
+      "created_at": "2026-05-10T02:21:40.634Z"
+    },
+    {
+      "id": "d892b26b-ae44-42b5-9d89-2766565cc2d1",
+      "entity_type": "promotion",
+      "entity_id": "d0c14d36-1700-4d71-9732-0157cad23113",
+      "action": "blocked",
+      "actor": "ops-lisi",
+      "details": "{\"artifactId\":\"7723e37b-3aa2-4924-bb89-a66821564202\",\"failedRules\":[\"安全扫描必须通过\"]}",
+      "created_at": "2026-05-10T02:21:40.634Z"
+    }
+  ]
+}
