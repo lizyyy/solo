@@ -1,0 +1,21 @@
+{
+  "name": "bakery-order-system",
+  "version": "1.0.0",
+  "description": "烘焙私房订单截单台 - 专为周末生产的私房烘焙店设计",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "init-data": "node server/initData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "keywords": ["bakery", "order", "system"],
+  "author": "",
+  "license": "MIT"
+}

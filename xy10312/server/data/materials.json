@@ -1,0 +1,86 @@
+{
+  "flour": {
+    "name": "低筋面粉",
+    "unit": "g",
+    "stock": 5000,
+    "minStock": 2000,
+    "costPerUnit": 0.02
+  },
+  "eggs": {
+    "name": "鸡蛋",
+    "unit": "个",
+    "stock": 30,
+    "minStock": 20,
+    "costPerUnit": 1.5
+  },
+  "sugar": {
+    "name": "白砂糖",
+    "unit": "g",
+    "stock": 3000,
+    "minStock": 1500,
+    "costPerUnit": 0.01
+  },
+  "butter": {
+    "name": "无盐黄油",
+    "unit": "g",
+    "stock": 2000,
+    "minStock": 1000,
+    "costPerUnit": 0.08
+  },
+  "milk": {
+    "name": "牛奶",
+    "unit": "ml",
+    "stock": 2000,
+    "minStock": 1000,
+    "costPerUnit": 0.015
+  },
+  "cocoa": {
+    "name": "可可粉",
+    "unit": "g",
+    "stock": 300,
+    "minStock": 200,
+    "costPerUnit": 0.15
+  },
+  "matcha": {
+    "name": "抹茶粉",
+    "unit": "g",
+    "stock": 200,
+    "minStock": 150,
+    "costPerUnit": 0.25
+  },
+  "redBean": {
+    "name": "红豆",
+    "unit": "g",
+    "stock": 400,
+    "minStock": 300,
+    "costPerUnit": 0.03
+  },
+  "strawberry": {
+    "name": "新鲜草莓",
+    "unit": "g",
+    "stock": 800,
+    "minStock": 500,
+    "costPerUnit": 0.05
+  },
+  "mango": {
+    "name": "新鲜芒果",
+    "unit": "g",
+    "stock": 600,
+    "minStock": 400,
+    "costPerUnit": 0.08
+  },
+  "cheese": {
+    "name": "奶油芝士",
+    "unit": "g",
+    "stock": 1000,
+    "minStock": 500,
+    "costPerUnit": 0.12
+  },
+  "cream": {
+    "name": "淡奶油",
+    "unit": "ml",
+    "stock": 1500,
+    "minStock": 1000,
+    "costPerUnit": 0.06
+  }
+}

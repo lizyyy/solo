@@ -1,0 +1,108 @@
+[
+  {
+    "id": "ORD2024001",
+    "customerName": "张女士",
+    "phone": "13800138001",
+    "flavor": "vanilla",
+    "size": "8inch",
+    "pickupDate": "2026-05-02",
+    "pickupTime": "14:00",
+    "message": "妈妈生日，祝生日快乐",
+    "totalPrice": 192,
+    "deposit": 100,
+    "depositPaid": true,
+    "status": "completed",
+    "capacityUsed": 1,
+    "createdAt": "2026-04-29T00:00:00.000Z",
+    "history": []
+  },
+  {
+    "id": "ORD2024002",
+    "customerName": "李先生",
+    "phone": "13800138002",
+    "flavor": "chocolate",
+    "size": "6inch",
+    "pickupDate": "2026-05-09",
+    "pickupTime": "11:00",
+    "message": "公司下午茶",
+    "totalPrice": 158,
+    "deposit": 80,
+    "depositPaid": true,
+    "status": "confirmed",
+    "capacityUsed": 1,
+    "createdAt": "2026-05-10T10:51:21.147Z",
+    "history": []
+  },
+  {
+    "id": "ORD2024003",
+    "customerName": "王小姐",
+    "phone": "13800138003",
+    "flavor": "strawberry",
+    "size": "10inch",
+    "pickupDate": "2026-05-09",
+    "pickupTime": "15:00",
+    "message": "宝宝满月",
+    "totalPrice": 356,
+    "deposit": 180,
+    "depositPaid": true,
+    "status": "confirmed",
+    "capacityUsed": 2,
+    "createdAt": "2026-05-10T10:51:21.147Z",
+    "history": []
+  },
+  {
+    "id": "ORD2024004",
+    "customerName": "赵先生",
+    "phone": "13800138004",
+    "flavor": "matcha",
+    "size": "8inch",
+    "pickupDate": "2026-05-17",
+    "pickupTime": "16:00",
+    "message": "",
+    "totalPrice": 252,
+    "deposit": 0,
+    "depositPaid": false,
+    "status": "pending",
+    "capacityUsed": 1.5,
+    "createdAt": "2026-05-10T10:51:21.148Z",
+    "history": []
+  },
+  {
+    "id": "ORD2024005",
+    "customerName": "陈女士",
+    "phone": "13800138005",
+    "flavor": "mango",
+    "size": "12inch",
+    "pickupDate": "2026-05-17",
+    "pickupTime": "12:00",
+    "message": "婚礼甜品台用",
+    "totalPrice": 526.4,
+    "deposit": 300,
+    "depositPaid": true,
+    "status": "reschedule_pending",
+    "capacityUsed": 2.8,
+    "originalPickupDate": "2026-05-09",
+    "createdAt": "2026-05-10T10:51:21.148Z",
+    "rescheduleRequested": {
+      "fromDate": "2026-05-09",
+      "toDate": "2026-05-17",
+      "reason": "婚礼改期",
+      "requestTime": "2026-05-10T10:51:21.148Z"
+    },
+    "history": [
+      {
+        "action": "create",
+        "date": "2026-05-09",
+        "time": "12:00",
+        "timestamp": "2026-05-10T10:51:21.148Z"
+      },
+      {
+        "action": "reschedule_request",
+        "fromDate": "2026-05-09",
+        "toDate": "2026-05-17",
+        "reason": "婚礼改期",
+        "timestamp": "2026-05-10T10:51:21.148Z"
+      }
+    ]
+  }
+]

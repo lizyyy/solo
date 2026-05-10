@@ -1,0 +1,21 @@
+module.exports = {
+  DAILY_CAPACITY: 50,
+  MAX_CAPACITY_WITH_DEPOSIT: 0.7,
+  DEPOSIT_THRESHOLD: 50,
+  CUTOFF_DAYS_BEFORE: 1,
+  FLAVORS: [
+    { id: 'vanilla', name: '香草奶油', price: 128, ingredients: { flour: 200, eggs: 3, sugar: 100, butter: 80, milk: 150 } },
+    { id: 'chocolate', name: '巧克力', price: 158, ingredients: { flour: 180, eggs: 3, sugar: 120, butter: 80, cocoa: 50 } },
+    { id: 'matcha', name: '抹茶红豆', price: 168, ingredients: { flour: 180, eggs: 3, sugar: 100, butter: 80, matcha: 30, redBean: 100 } },
+    { id: 'strawberry', name: '草莓慕斯', price: 178, ingredients: { flour: 150, eggs: 4, sugar: 110, butter: 60, strawberry: 200, cream: 150 } },
+    { id: 'mango', name: '芒果千层', price: 188, ingredients: { flour: 120, eggs: 5, sugar: 100, butter: 50, mango: 250, cream: 180 } },
+    { id: 'cheese', name: '芝士蛋糕', price: 158, ingredients: { flour: 100, eggs: 4, sugar: 120, butter: 60, cheese: 250, cream: 100 } }
+  ],
+  SIZES: [
+    { id: '6inch', name: '6寸', multiplier: 1.0, servings: 6 },
+    { id: '8inch', name: '8寸', multiplier: 1.5, servings: 10 },
+    { id: '10inch', name: '10寸', multiplier: 2.0, servings: 16 },
+    { id: '12inch', name: '12寸', multiplier: 2.8, servings: 24 }
+  ],
+  PICKUP_TIMES: ['10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00']
+};

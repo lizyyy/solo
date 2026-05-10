@@ -1,0 +1,2050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烘焙私房订单截单台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fdfbf7 0%, #fef3e2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #d4a574 0%, #c69c6d 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header .subtitle { font-size: 14px; opacity: 0.9; margin-top: 4px; }
+        
+        .nav {
+            display: flex;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px;
+            border-radius: 10px;
+        }
+        
+        .nav button {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .nav button:hover, .nav button.active {
+            background: white;
+            color: #c69c6d;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .help-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .help-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-card .label { font-size: 13px; color: #888; margin-bottom: 6px; }
+        .stat-card .value { font-size: 26px; font-weight: 600; color: #333; }
+        .stat-card.warning .value { color: #f59e0b; }
+        .stat-card.danger .value { color: #ef4444; }
+        
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h2 { font-size: 16px; font-weight: 600; }
+        
+        .card-body { padding: 24px; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { background: #c69c6d; color: white; }
+        .btn-primary:hover { background: #b88c5a; }
+        .btn-secondary { background: #f5f5f5; color: #333; }
+        .btn-secondary:hover { background: #e8e8e8; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-success:hover { background: #49a814; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .btn-danger:hover { background: #e63946; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #c69c6d;
+        }
+        
+        .price-display {
+            background: #fff7e6;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .price-display .total {
+            font-size: 32px;
+            font-weight: 700;
+            color: #c69c6d;
+        }
+        
+        .price-display .label { font-size: 13px; color: #888; margin-top: 4px; }
+        
+        .check-result {
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .check-result.success { background: #f6ffed; border: 1px solid #b7eb8f; }
+        .check-result.warning { background: #fffbe6; border: 1px solid #ffe58f; }
+        .check-result.error { background: #fff2f0; border: 1px solid #ffccc7; }
+        
+        .check-result h4 { margin-bottom: 10px; font-size: 14px; }
+        .check-result ul { padding-left: 20px; }
+        .check-result li { margin: 6px 0; font-size: 13px; color: #555; }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        
+        .table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .table tr:hover { background: #fafafa; }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending { background: #fffbe6; color: #d48806; }
+        .status-confirmed { background: #e6f7ff; color: #096dd9; }
+        .status-reschedule_pending { background: #fff1f0; color: #cf1322; }
+        .status-completed { background: #f6ffed; color: #389e0d; }
+        .status-cancelled { background: #f5f5f5; color: #8c8c8c; }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .weekend-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #f0f0f0;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .weekend-card:hover { border-color: #c69c6d; }
+        .weekend-card.full { border-color: #ffccc7; background: #fff9f9; }
+        .weekend-card.warning { border-color: #ffe58f; background: #fffbe6; }
+        .weekend-card.past { opacity: 0.6; cursor: not-allowed; }
+        .weekend-card.cutoff { border-color: #d9d9d9; }
+        
+        .weekend-card .date {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .weekend-card .weekday { font-size: 13px; color: #888; }
+        .weekend-card .saturday { color: #1890ff; }
+        .weekend-card .sunday { color: #f5222d; }
+        
+        .capacity-bar {
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0 8px;
+        }
+        
+        .capacity-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #52c41a, #73d13d);
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+        
+        .capacity-bar-fill.warning { background: linear-gradient(90deg, #faad14, #ffc53d); }
+        .capacity-bar-fill.danger { background: linear-gradient(90deg, #ff4d4f, #ff7875); }
+        
+        .capacity-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .order-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .order-item {
+            padding: 8px 0;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body { padding: 24px; }
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #f5f5f5;
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tabs button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .tabs button.active {
+            background: white;
+            color: #c69c6d;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .material-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        
+        .material-card.gap { border-color: #ffccc7; background: #fff9f9; }
+        .material-card.warning { border-color: #ffe58f; background: #fffbe6; }
+        
+        .material-card h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .material-card .stock {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .material-card .stock.gap { color: #ff4d4f; }
+        .material-card .stock.warning { color: #faad14; }
+        
+        .material-card .unit { font-size: 13px; color: #888; }
+        .material-card .usage {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .timeline {
+            padding-left: 20px;
+            border-left: 2px solid #f0f0f0;
+            margin-top: 16px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 16px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #c69c6d;
+        }
+        
+        .timeline-item .time { font-size: 12px; color: #999; margin-bottom: 4px; }
+        .timeline-item .action { font-size: 13px; color: #333; font-weight: 500; }
+        .timeline-item .detail { font-size: 12px; color: #666; margin-top: 2px; }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .badge-danger { background: #fff1f0; color: #cf1322; }
+        .badge-warning { background: #fffbe6; color: #d48806; }
+        .badge-info { background: #e6f7ff; color: #096dd9; }
+        
+        .order-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .detail-item {
+            margin-bottom: 16px;
+        }
+        
+        .detail-item .label {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .detail-item .value {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-bar input, .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .info-box {
+            background: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h4 { color: #096dd9; margin-bottom: 8px; }
+        .info-box p { font-size: 13px; color: #666; line-height: 1.6; }
+        
+        .help-modal .modal-content { max-width: 800px; }
+        .help-section { margin-bottom: 24px; }
+        .help-section h4 { 
+            color: #c69c6d; 
+            margin-bottom: 12px; 
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .help-section ol { padding-left: 24px; }
+        .help-section li { margin: 8px 0; font-size: 14px; line-height: 1.6; color: #555; }
+        .help-section code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+        
+        .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 20px 0;
+        }
+        
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .material-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .material-grid { grid-template-columns: 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+            .calendar { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🍰 烘焙私房订单截单台</h1>
+            <div class="subtitle">只在周末生产 · 智能产能管理 · 材料库存监控</div>
+        </div>
+        <div class="header-right">
+            <nav class="nav">
+                <button class="active" data-page="dashboard">首页</button>
+                <button data-page="orders">订单管理</button>
+                <button data-page="calendar">排产日历</button>
+                <button data-page="materials">材料库存</button>
+                <button data-page="export">生产清单</button>
+            </nav>
+            <button class="help-btn" onclick="showHelp()">📖 使用说明</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="stats-row" id="stats"></div>
+        
+        <div id="page-dashboard" class="page active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>快速操作</h2>
+                    <div>
+                        <button class="btn btn-primary" onclick="openNewOrderModal()">+ 新增订单</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-box">
+                        <h4>📋 内置示例说明</h4>
+                        <p>系统已预置5个示例订单，可用于测试各种场景：</p>
+                        <p>
+                            <strong>正常下单：</strong>点击"新增订单"，选择口味、尺寸和周末日期<br>
+                            <strong>库存不足：</strong>尝试订购大尺寸芒果千层（芒果库存紧张）<br>
+                            <strong>截单后改期：</strong>查看 <code>ORD2024005</code> 的改期审核<br>
+                            <strong>定金取消：</strong>对未付定金订单 <code>ORD2024004</code> 执行取消
+                        </p>
+                    </div>
+                    
+                    <div class="two-col">
+                        <div>
+                            <h3 style="margin-bottom: 16px; font-size: 16px;">📅 即将到来的周末</h3>
+                            <div id="dashboard-calendar" class="calendar"></div>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom: 16px; font-size: 16px;">⚠️ 需要关注</h3>
+                            <div id="alerts"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-orders" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2>订单管理</h2>
+                    <div>
+                        <button class="btn btn-primary" onclick="openNewOrderModal()">+ 新增订单</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tabs" id="order-tabs">
+                        <button class="active" data-status="all">全部订单</button>
+                        <button data-status="pending">待付定金</button>
+                        <button data-status="confirmed">已确认</button>
+                        <button data-status="reschedule_pending">改期待审核</button>
+                        <button data-status="completed">已完成</button>
+                        <button data-status="cancelled">已取消</button>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <input type="text" id="order-search" placeholder="搜索订单号/客户/电话...">
+                        <select id="date-filter">
+                            <option value="">全部日期</option>
+                        </select>
+                    </div>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>客户</th>
+                                <th>蛋糕</th>
+                                <th>取货时间</th>
+                                <th>金额/定金</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-calendar" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📅 排产日历</h2>
+                </div>
+                <div class="card-body">
+                    <div class="info-box">
+                        <h4>💡 产能规则说明</h4>
+                        <p>
+                            <strong>日产能：</strong>50 单位（6寸=1单位，8寸=1.5，10寸=2，12寸=2.8）<br>
+                            <strong>定金规则：</strong>未付定金订单最多占用 70% 产能（35单位）<br>
+                            <strong>截单时间：</strong>取货日前1天 18:00 前可下单/改期
+                        </p>
+                    </div>
+                    <div id="full-calendar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-materials" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📦 材料库存与缺口</h2>
+                </div>
+                <div class="card-body">
+                    <div id="material-gap-section"></div>
+                    <div class="divider"></div>
+                    <h3 style="margin-bottom: 16px;">全部材料</h3>
+                    <div id="materials-grid" class="material-grid"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="page-export" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📄 生产清单导出</h2>
+                </div>
+                <div class="card-body">
+                    <div class="export-options">
+                        <label>导出日期：</label>
+                        <select id="export-date">
+                            <option value="">全部待生产</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="exportProductionList()">导出生产清单</button>
+                    </div>
+                    
+                    <div id="export-preview"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="new-order-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增订单</h3>
+                <button class="close-btn" onclick="closeModal('new-order-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="new-order-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>客户姓名 *</label>
+                            <input type="text" name="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话 *</label>
+                            <input type="tel" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>蛋糕口味 *</label>
+                            <select name="flavor" id="flavor-select" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>蛋糕尺寸 *</label>
+                            <select name="size" id="size-select" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>取货日期 *</label>
+                            <input type="date" name="pickupDate" id="pickup-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>取货时间 *</label>
+                            <select name="pickupTime" id="pickup-time" required></select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>祝福语</label>
+                            <textarea name="message" rows="2" placeholder="写在蛋糕上的祝福语..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>定金金额（¥）</label>
+                            <input type="number" name="deposit" min="0" step="0.01" value="0" id="deposit-input">
+                        </div>
+                    </div>
+                    
+                    <div class="price-display">
+                        <div class="total" id="price-total">¥0</div>
+                        <div class="label">订单总金额</div>
+                    </div>
+                    
+                    <div id="check-result"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('new-order-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitOrder()">确认下单</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="order-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>订单详情</h3>
+                <button class="close-btn" onclick="closeModal('order-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="order-detail-content"></div>
+        </div>
+    </div>
+    
+    <div id="reschedule-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>改期申请</h3>
+                <button class="close-btn" onclick="closeModal('reschedule-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>新取货日期</label>
+                    <input type="date" id="reschedule-date">
+                </div>
+                <div class="form-group">
+                    <label>新取货时间</label>
+                    <select id="reschedule-time"></select>
+                </div>
+                <div class="form-group">
+                    <label>改期原因</label>
+                    <textarea id="reschedule-reason" rows="3" placeholder="请说明改期原因..."></textarea>
+                </div>
+                <div id="reschedule-check"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('reschedule-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReschedule()">提交改期</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="help-modal" class="modal help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📖 系统使用说明</h3>
+                <button class="close-btn" onclick="closeModal('help-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h4>🎂 1. 正常下单流程</h4>
+                    <ol>
+                        <li>点击首页或订单管理页的 <strong>"新增订单"</strong> 按钮</li>
+                        <li>填写客户信息（姓名、电话必填）</li>
+                        <li>选择蛋糕口味和尺寸，系统会自动计算价格和所需材料</li>
+                        <li>选择周末取货日期和时间（只能选周六/周日）</li>
+                        <li>填写定金金额（≥50元订单即确认，<50元处于待付定金状态）</li>
+                        <li>系统会自动检查 <strong>产能</strong> 和 <strong>材料库存</strong></li>
+                        <li>检查通过后点击"确认下单"完成</li>
+                    </ol>
+                </div>
+                
+                <div class="help-section">
+                    <h4>⚠️ 2. 库存不足场景演示</h4>
+                    <ol>
+                        <li>点击"新增订单"</li>
+                        <li>选择口味：<strong>芒果千层</strong></li>
+                        <li>选择尺寸：<strong>12寸</strong>（需要芒果700g）</li>
+                        <li>选择本周末日期</li>
+                        <li>系统会显示 <strong>"材料库存不足"</strong> 的提示</li>
+                        <li>查看详细：当前库存600g，已占用700g，本单需700g，缺口800g</li>
+                        <li>可前往"材料库存"页补充芒果库存后再下单</li>
+                    </ol>
+                </div>
+                
+                <div class="help-section">
+                    <h4>🔄 3. 截单后改期审核</h4>
+                    <ol>
+                        <li>查看订单 <code>ORD2024005</code>（已提交改期申请）</li>
+                        <li>该订单原订周六，申请改到周日</li>
+                        <li>由于原日期已过截单时间，需走审核流程</li>
+                        <li>在订单操作中点击 <strong>"改期审核"</strong></li>
+                        <li>可选择：<strong>通过</strong>（调整产能和材料占用）或 <strong>驳回</strong></li>
+                        <li>审核记录会保留在订单历史中</li>
+                    </ol>
+                </div>
+                
+                <div class="help-section">
+                    <h4>❌ 4. 定金取消</h4>
+                    <ol>
+                        <li>查看订单 <code>ORD2024004</code>（状态：待付定金）</li>
+                        <li>点击订单操作中的 <strong>"取消订单"</strong></li>
+                        <li>确认后：订单状态变为"已取消"，定金退还</li>
+                        <li>该订单占用的 <strong>产能</strong> 和 <strong>材料</strong> 会自动释放</li>
+                        <li>可在订单历史中查看取消记录</li>
+                    </ol>
+                </div>
+                
+                <div class="help-section">
+                    <h4>📊 5. 核心规则说明</h4>
+                    <ol>
+                        <li><strong>产能计算：</strong>6寸=1单位，8寸=1.5，10寸=2，12寸=2.8</li>
+                        <li><strong>日产能上限：</strong>50单位/天</li>
+                        <li><strong>定金规则：</strong>未付定金订单最多占用70%产能（35单位），防止占用过多产能后取消</li>
+                        <li><strong>截单时间：</strong>取货日前1天 18:00</li>
+                        <li><strong>材料检查：</strong>按"库存 - 已占用 - 本单所需"计算，小于0则无法接单</li>
+                        <li><strong>改期规则：</strong>截单前可自由改期，截单后需审核</li>
+                    </ol>
+                </div>
+                
+                <div class="help-section">
+                    <h4>📄 6. 生产清单导出</h4>
+                    <ol>
+                        <li>进入"生产清单"页</li>
+                        <li>选择要导出的日期（或全部待生产）</li>
+                        <li>点击"导出生产清单"</li>
+                        <li>导出文件包含：
+                            <ul>
+                                <li>订单列表（按取货时间排序）</li>
+                                <li>口味/尺寸汇总</li>
+                                <li>材料需求清单（含库存对比）</li>
+                                <li>关键计算口径说明</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let appConfig = null;
+        let orders = [];
+        let materials = {};
+        let capacity = {};
+        let currentOrderId = null;
+        let orderFilter = 'all';
+        
+        const API = '/api';
+        
+        async function fetchAPI(url, options = {}) {
+            const res = await fetch(API + url, {
+                headers: { 'Content-Type': 'application/json' },
+                ...options
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw { ...err, status: res.status };
+            }
+            return res.json();
+        }
+        
+        async function init() {
+            try {
+                appConfig = await fetchAPI('/config');
+                await loadAll();
+                setupEventListeners();
+            } catch (e) {
+                console.error('初始化失败:', e);
+                alert('系统初始化失败，请刷新重试');
+            }
+        }
+        
+        async function loadAll() {
+            try {
+                [orders, materials, capacity] = await Promise.all([
+                    fetchAPI('/orders'),
+                    fetchAPI('/materials'),
+                    fetchAPI('/capacity')
+                ]);
+                
+                renderStats();
+                renderDashboardCalendar();
+                renderAlerts();
+                renderOrders();
+                renderFullCalendar();
+                renderMaterials();
+                renderExportOptions();
+                updateExportPreview();
+                populateFormSelects();
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+        
+        function setupEventListeners() {
+            document.querySelectorAll('.nav button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const page = btn.dataset.page;
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    document.getElementById('page-' + page).classList.add('active');
+                });
+            });
+            
+            document.querySelectorAll('#order-tabs button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#order-tabs button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    orderFilter = btn.dataset.status;
+                    renderOrders();
+                });
+            });
+            
+            document.getElementById('order-search').addEventListener('input', renderOrders);
+            document.getElementById('date-filter').addEventListener('change', renderOrders);
+            document.getElementById('export-date').addEventListener('change', updateExportPreview);
+            
+            ['flavor-select', 'size-select', 'pickup-date', 'deposit-input'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updatePriceAndCheck);
+                document.getElementById(id).addEventListener('input', updatePriceAndCheck);
+            });
+            
+            document.getElementById('reschedule-date').addEventListener('change', checkReschedule);
+        }
+        
+        async function renderStats() {
+            const stats = await fetchAPI('/stats');
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="label">待生产订单</div>
+                    <div class="value">${stats.activeOrders}</div>
+                </div>
+                <div class="stat-card ${stats.pendingOrders > 0 ? 'warning' : ''}">
+                    <div class="label">待付定金</div>
+                    <div class="value">${stats.pendingOrders}</div>
+                </div>
+                <div class="stat-card ${stats.rescheduleOrders > 0 ? 'danger' : ''}">
+                    <div class="label">改期审核</div>
+                    <div class="value">${stats.rescheduleOrders}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">预计收入</div>
+                    <div class="value">¥${stats.totalRevenue.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">已收定金</div>
+                    <div class="value">¥${stats.totalDeposit.toFixed(2)}</div>
+                </div>
+                <div class="stat-card ${stats.materialGapCount > 0 ? 'danger' : stats.materialWarningCount > 0 ? 'warning' : ''}">
+                    <div class="label">材料缺口</div>
+                    <div class="value">${stats.materialGapCount}</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+        }
+        
+        function renderDashboardCalendar() {
+            const today = new Date().toISOString().split('T')[0];
+            const weekendDates = Object.keys(capacity)
+                .filter(d => d >= today)
+                .sort()
+                .slice(0, 4);
+            
+            const html = weekendDates.map(date => renderWeekendCard(date)).join('');
+            document.getElementById('dashboard-calendar').innerHTML = html || '<div class="empty-state"><div class="icon">📅</div><p>暂无排产数据</p></div>';
+        }
+        
+        function renderWeekendCard(date) {
+            const cap = capacity[date] || { total: 50, used: 0, orders: 0 };
+            const percent = (cap.used / cap.total) * 100;
+            const dateObj = new Date(date);
+            const isSaturday = dateObj.getDay() === 6;
+            const isPast = date < new Date().toISOString().split('T')[0];
+            const isCutoff = isPast || isCutoffPassed(date);
+            
+            let barClass = '';
+            let cardClass = '';
+            if (percent >= 100) { barClass = 'danger'; cardClass = 'full'; }
+            else if (percent >= 80) { barClass = 'warning'; cardClass = 'warning'; }
+            
+            const dayOrders = orders.filter(o => 
+                o.pickupDate === date && 
+                (o.status === 'confirmed' || o.status === 'reschedule_pending')
+            );
+            
+            return `
+                <div class="weekend-card ${cardClass} ${isPast ? 'past' : ''} ${isCutoff && !isPast ? 'cutoff' : ''}">
+                    <div class="date">
+                        <span class="${isSaturday ? 'saturday' : 'sunday'}">
+                            ${formatDate(date)}
+                        </span>
+                        <span class="weekday">${isSaturday ? '周六' : '周日'}</span>
+                    </div>
+                    ${isCutoff && !isPast ? '<div style="font-size:12px;color:#999;margin-bottom:8px;">⛔ 已截单</div>' : ''}
+                    <div class="capacity-bar">
+                        <div class="capacity-bar-fill ${barClass}" style="width:${Math.min(percent, 100)}%"></div>
+                    </div>
+                    <div class="capacity-info">
+                        <span>产能：${cap.used.toFixed(1)}/${cap.total}</span>
+                        <span>${dayOrders.length} 单</span>
+                    </div>
+                    ${dayOrders.length > 0 ? `
+                        <div class="order-list">
+                            ${dayOrders.slice(0, 3).map(o => `
+                                <div class="order-item">
+                                    <span>${o.customerName}</span>
+                                    <span>${o.pickupTime}</span>
+                                </div>
+                            `).join('')}
+                            ${dayOrders.length > 3 ? `<div class="order-item" style="color:#999">...还有 ${dayOrders.length - 3} 单</div>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        async function renderAlerts() {
+            const gap = await fetchAPI('/material-gap');
+            const html = [];
+            
+            if (orders.filter(o => o.status === 'reschedule_pending').length > 0) {
+                html.push(`
+                    <div class="check-result error" style="margin-bottom:12px;cursor:pointer;" onclick="navigateTo('orders', 'reschedule_pending')">
+                        <h4>🔔 有待处理的改期申请</h4>
+                        <ul>
+                            ${orders.filter(o => o.status === 'reschedule_pending').map(o => `
+                                <li><strong>${o.id}</strong> - ${o.customerName} 申请改期</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `);
+            }
+            
+            if (orders.filter(o => o.status === 'pending').length > 0) {
+                html.push(`
+                    <div class="check-result warning" style="margin-bottom:12px;cursor:pointer;" onclick="navigateTo('orders', 'pending')">
+                        <h4>💰 有待确认的定金</h4>
+                        <ul>
+                            ${orders.filter(o => o.status === 'pending').map(o => `
+                                <li><strong>${o.id}</strong> - ${o.customerName} 定金￥${o.deposit || 0}/${appConfig.depositThreshold}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `);
+            }
+            
+            if (Object.keys(gap.gap).length > 0) {
+                html.push(`
+                    <div class="check-result error" style="margin-bottom:12px;cursor:pointer;" onclick="navigateTo('materials')">
+                        <h4>🚨 材料库存不足</h4>
+                        <ul>
+                            ${Object.values(gap.gap).map(m => `
+                                <li><strong>${m.name}</strong> 缺口 ${m.deficit}${m.unit}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `);
+            }
+            
+            if (Object.keys(gap.warnings).length > 0) {
+                html.push(`
+                    <div class="check-result warning" style="cursor:pointer;" onclick="navigateTo('materials')">
+                        <h4>⚠️ 材料库存预警</h4>
+                        <ul>
+                            ${Object.values(gap.warnings).map(m => `
+                                <li><strong>${m.name}</strong> 剩余 ${m.remaining}${m.unit}（安全线 ${m.minStock}${m.unit}）</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `);
+            }
+            
+            if (html.length === 0) {
+                html.push('<div class="empty-state"><div class="icon">✅</div><p>暂无需要关注的事项</p></div>');
+            }
+            
+            document.getElementById('alerts').innerHTML = html.join('');
+        }
+        
+        function renderOrders() {
+            const search = document.getElementById('order-search').value.toLowerCase();
+            const dateFilter = document.getElementById('date-filter').value;
+            
+            let filtered = orders;
+            
+            if (orderFilter !== 'all') {
+                filtered = filtered.filter(o => o.status === orderFilter);
+            }
+            
+            if (search) {
+                filtered = filtered.filter(o => 
+                    o.id.toLowerCase().includes(search) ||
+                    o.customerName.toLowerCase().includes(search) ||
+                    o.phone.includes(search)
+                );
+            }
+            
+            if (dateFilter) {
+                filtered = filtered.filter(o => o.pickupDate === dateFilter);
+            }
+            
+            const dates = [...new Set(orders.map(o => o.pickupDate))].sort();
+            document.getElementById('date-filter').innerHTML = '<option value="">全部日期</option>' +
+                dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
+            
+            if (filtered.length === 0) {
+                document.getElementById('orders-table').innerHTML = '<tr><td colspan="7" class="empty-state"><div class="icon">📋</div><p>暂无订单</p></td></tr>';
+                return;
+            }
+            
+            const html = filtered.map(order => {
+                const flavor = appConfig.flavors.find(f => f.id === order.flavor);
+                const size = appConfig.sizes.find(s => s.id === order.size);
+                const statusMap = {
+                    pending: { text: '待付定金', class: 'status-pending' },
+                    confirmed: { text: '已确认', class: 'status-confirmed' },
+                    reschedule_pending: { text: '改期待审核', class: 'status-reschedule_pending' },
+                    completed: { text: '已完成', class: 'status-completed' },
+                    cancelled: { text: '已取消', class: 'status-cancelled' }
+                };
+                const status = statusMap[order.status] || { text: order.status, class: '' };
+                
+                let actions = `
+                    <button class="btn btn-sm btn-secondary" onclick="viewOrder('${order.id}')">详情</button>
+                `;
+                
+                if (order.status === 'pending') {
+                    actions += `
+                        <button class="btn btn-sm btn-success" onclick="payDeposit('${order.id}')">收定金</button>
+                        <button class="btn btn-sm btn-danger" onclick="cancelDeposit('${order.id}')">取消</button>
+                    `;
+                } else if (order.status === 'confirmed' && !isCutoffPassed(order.pickupDate)) {
+                    actions += `
+                        <button class="btn btn-sm btn-secondary" onclick="openReschedule('${order.id}')">改期</button>
+                        <button class="btn btn-sm btn-success" onclick="completeOrder('${order.id}')">完成</button>
+                    `;
+                } else if (order.status === 'confirmed' && isCutoffPassed(order.pickupDate)) {
+                    actions += `
+                        <button class="btn btn-sm btn-secondary" onclick="openReschedule('${order.id}')">申请改期</button>
+                        <button class="btn btn-sm btn-success" onclick="completeOrder('${order.id}')">完成</button>
+                    `;
+                } else if (order.status === 'reschedule_pending') {
+                    actions += `
+                        <button class="btn btn-sm btn-success" onclick="approveReschedule('${order.id}')">通过</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectReschedule('${order.id}')">驳回</button>
+                    `;
+                }
+                
+                return `
+                    <tr>
+                        <td><strong>${order.id}</strong></td>
+                        <td>${order.customerName}<br><small style="color:#999">${order.phone}</small></td>
+                        <td>${flavor?.name || order.flavor}<br><small style="color:#666">${size?.name || order.size}</small></td>
+                        <td>${formatDate(order.pickupDate)}<br><small style="color:#666">${order.pickupTime}</small></td>
+                        <td>
+                            <strong>¥${order.totalPrice}</strong><br>
+                            <small style="color:${order.depositPaid ? '#52c41a' : '#faad14'}">定金: ¥${order.deposit || 0}${!order.depositPaid ? ` / ${appConfig.depositThreshold}` : ''}</small>
+                        </td>
+                        <td><span class="status-badge ${status.class}">${status.text}</span></td>
+                        <td><div class="actions">${actions}</div></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('orders-table').innerHTML = html;
+        }
+        
+        function renderFullCalendar() {
+            const today = new Date().toISOString().split('T')[0];
+            const weekendDates = Object.keys(capacity).sort();
+            
+            if (weekendDates.length === 0) {
+                document.getElementById('full-calendar').innerHTML = '<div class="empty-state"><div class="icon">📅</div><p>暂无排产数据</p></div>';
+                return;
+            }
+            
+            const html = weekendDates.map(date => renderWeekendCard(date)).join('');
+            document.getElementById('full-calendar').innerHTML = '<div class="calendar" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">' + html + '</div>';
+        }
+        
+        async function renderMaterials() {
+            const gap = await fetchAPI('/material-gap');
+            
+            let gapHtml = '';
+            if (Object.keys(gap.gap).length > 0) {
+                gapHtml += `
+                    <h3 style="margin-bottom: 16px; color:#ff4d4f;">🚨 材料缺口（必须补货）</h3>
+                    <div class="material-grid" style="margin-bottom:24px;">
+                        ${Object.entries(gap.gap).map(([key, m]) => `
+                            <div class="material-card gap">
+                                <h4>${m.name} <span class="badge badge-danger">缺口 ${m.deficit}${m.unit}</span></h4>
+                                <div class="stock gap">${m.remaining}${m.unit}</div>
+                                <div class="unit">库存 ${m.stock}${m.unit} · 安全线 ${m.minStock}${m.unit}</div>
+                                <div class="usage">
+                                    已占用: ${m.used}${m.unit}<br>
+                                    <strong style="color:#ff4d4f">需补货: ${m.deficit}${m.unit}</strong>
+                                </div>
+                                <div style="margin-top:12px;">
+                                    <input type="number" id="stock-${key}" value="${m.stock}" style="width:100px;padding:6px;border:1px solid #ddd;border-radius:4px;">
+                                    <button class="btn btn-sm btn-primary" style="margin-left:8px;" onclick="updateStock('${key}')">更新</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            if (Object.keys(gap.warnings).length > 0) {
+                gapHtml += `
+                    <h3 style="margin-bottom: 16px; color:#faad14;">⚠️ 材料预警（建议补货）</h3>
+                    <div class="material-grid" style="margin-bottom:24px;">
+                        ${Object.entries(gap.warnings).map(([key, m]) => `
+                            <div class="material-card warning">
+                                <h4>${m.name} <span class="badge badge-warning">接近安全线</span></h4>
+                                <div class="stock warning">${m.remaining}${m.unit}</div>
+                                <div class="unit">库存 ${m.stock}${m.unit} · 安全线 ${m.minStock}${m.unit}</div>
+                                <div class="usage">
+                                    已占用: ${m.used}${m.unit}<br>
+                                    <strong style="color:#faad14">建议补货: ${Math.max(0, m.minStock - m.remaining).toFixed(0)}${m.unit}</strong>
+                                </div>
+                                <div style="margin-top:12px;">
+                                    <input type="number" id="stock-${key}" value="${m.stock}" style="width:100px;padding:6px;border:1px solid #ddd;border-radius:4px;">
+                                    <button class="btn btn-sm btn-primary" style="margin-left:8px;" onclick="updateStock('${key}')">更新</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            if (gapHtml) {
+                document.getElementById('material-gap-section').innerHTML = gapHtml;
+            } else {
+                document.getElementById('material-gap-section').innerHTML = '<div class="empty-state"><div class="icon">✅</div><p>材料充足，无缺口或预警</p></div>';
+            }
+            
+            const allHtml = Object.entries(materials).map(([key, m]) => {
+                const used = gap.totalUsage[key] || 0;
+                const remaining = m.stock - used;
+                const isGap = remaining < 0;
+                const isWarning = remaining >= 0 && remaining < m.minStock;
+                
+                return `
+                    <div class="material-card ${isGap ? 'gap' : isWarning ? 'warning' : ''}">
+                        <h4>${m.name}</h4>
+                        <div class="stock ${isGap ? 'gap' : isWarning ? 'warning' : ''}">${remaining.toFixed(1)}${m.unit}</div>
+                        <div class="unit">库存 ${m.stock}${m.unit} · 安全线 ${m.minStock}${m.unit}</div>
+                        <div class="usage">
+                            已占用: ${used.toFixed(1)}${m.unit}
+                            ${isGap ? `<br><strong style="color:#ff4d4f">缺口: ${Math.abs(remaining).toFixed(1)}${m.unit}</strong>` : ''}
+                        </div>
+                        <div style="margin-top:12px;">
+                            <input type="number" id="stock-${key}" value="${m.stock}" style="width:100px;padding:6px;border:1px solid #ddd;border-radius:4px;">
+                            <button class="btn btn-sm btn-primary" style="margin-left:8px;" onclick="updateStock('${key}')">更新</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('materials-grid').innerHTML = allHtml;
+        }
+        
+        async function renderExportOptions() {
+            const today = new Date().toISOString().split('T')[0];
+            const dates = [...new Set(orders
+                .filter(o => o.pickupDate >= today && (o.status === 'confirmed' || o.status === 'reschedule_pending'))
+                .map(o => o.pickupDate)
+            )].sort();
+            
+            document.getElementById('export-date').innerHTML = 
+                '<option value="">全部待生产</option>' +
+                dates.map(d => `<option value="${d}">${formatDate(d)}</option>`).join('');
+        }
+        
+        async function updateExportPreview() {
+            const date = document.getElementById('export-date').value;
+            const url = date ? `/production-list?date=${date}` : '/production-list';
+            const data = await fetchAPI(url);
+            
+            if (data.orders.length === 0) {
+                document.getElementById('export-preview').innerHTML = '<div class="empty-state"><div class="icon">📄</div><p>暂无待生产订单</p></div>';
+                return;
+            }
+            
+            let html = `
+                <div class="info-box">
+                    <h4>📊 生产汇总</h4>
+                    <p>
+                        <strong>订单数：</strong>${data.summary.orderCount} 单 &nbsp;|&nbsp;
+                        <strong>产能占用：</strong>${data.summary.totalCapacity.toFixed(1)}/${data.config.dailyCapacity}${date ? '' : '（总）'} &nbsp;|&nbsp;
+                        <strong>预计收入：</strong>¥${data.summary.totalRevenue} &nbsp;|&nbsp;
+                        <strong>应收定金：</strong>¥${data.summary.totalDeposit}
+                    </p>
+                </div>
+                
+                <h3 style="margin:20px 0 12px;">📋 订单明细（按取货时间排序）</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>取货时间</th>
+                            <th>订单号</th>
+                            <th>客户</th>
+                            <th>蛋糕</th>
+                            <th>祝福语</th>
+                            <th>金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.orders.map(o => {
+                            const flavor = appConfig.flavors.find(f => f.id === o.flavor);
+                            const size = appConfig.sizes.find(s => s.id === o.size);
+                            return `
+                                <tr>
+                                    <td>${formatDate(o.pickupDate)}<br>${o.pickupTime}</td>
+                                    <td><strong>${o.id}</strong></td>
+                                    <td>${o.customerName}<br><small>${o.phone}</small></td>
+                                    <td>${flavor?.name} · ${size?.name}</td>
+                                    <td>${o.message || '-'}</td>
+                                    <td>¥${o.totalPrice}<br><small>定金 ¥${o.deposit || 0}</small></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+                
+                <h3 style="margin:20px 0 12px;">🍰 口味尺寸汇总</h3>
+                <table class="table" style="max-width:500px;">
+                    <thead>
+                        <tr><th>口味</th><th>尺寸</th><th>数量</th><th>产能</th></tr>
+                    </thead>
+                    <tbody>
+                        ${data.flavorSummary.map(s => `
+                            <tr>
+                                <td>${s.flavor}</td>
+                                <td>${s.size}</td>
+                                <td>${s.count}</td>
+                                <td>${s.totalCapacity.toFixed(1)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h3 style="margin:20px 0 12px;">📦 材料需求清单</h3>
+                <table class="table">
+                    <thead>
+                        <tr><th>材料</th><th>需求总量</th><th>当前库存</th><th>缺口/剩余</th></tr>
+                    </thead>
+                    <tbody>
+                        ${data.materialSummary.map(m => {
+                            const remaining = m.stock - m.required;
+                            const isGap = remaining < 0;
+                            return `
+                                <tr>
+                                    <td>${m.name}</td>
+                                    <td>${m.required.toFixed(1)}${m.unit}</td>
+                                    <td>${m.stock}${m.unit}</td>
+                                    <td style="color:${isGap ? '#ff4d4f' : '#52c41a'}">
+                                        ${isGap ? '缺口 ' + Math.abs(remaining).toFixed(1) : '剩余 ' + remaining.toFixed(1)}${m.unit}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="check-result success" style="margin-top:20px;">
+                    <h4>📐 计算口径说明</h4>
+                    <ul>
+                        <li><strong>产能计算：</strong>6寸=1单位，8寸=1.5，10寸=2，12寸=2.8</li>
+                        <li><strong>材料需求：</strong>各口味基础配方 × 尺寸倍数</li>
+                        <li><strong>材料缺口：</strong>当前库存 - 已占用 - 本次需求（负数为缺口）</li>
+                        <li><strong>订单状态：</strong>仅包含"已确认"和"改期待审核"订单</li>
+                        <li><strong>定金规则：</strong>≥${data.config.depositThreshold}元视为已付定金，订单确认</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('export-preview').innerHTML = html;
+        }
+        
+        function populateFormSelects() {
+            document.getElementById('flavor-select').innerHTML = 
+                appConfig.flavors.map(f => `<option value="${f.id}">${f.name} (¥${f.price})</option>`).join('');
+            
+            document.getElementById('size-select').innerHTML = 
+                appConfig.sizes.map(s => `<option value="${s.id}">${s.name} (×${s.multiplier}, ${s.servings}人份)</option>`).join('');
+            
+            document.getElementById('pickup-time').innerHTML = 
+                appConfig.pickupTimes.map(t => `<option value="${t}">${t}</option>`).join('');
+            
+            document.getElementById('reschedule-time').innerHTML = 
+                appConfig.pickupTimes.map(t => `<option value="${t}">${t}</option>`).join('');
+            
+            const pickupDate = document.getElementById('pickup-date');
+            const today = new Date();
+            const nextWeekend = getNextWeekend();
+            pickupDate.value = nextWeekend;
+            pickupDate.min = today.toISOString().split('T')[0];
+        }
+        
+        function getNextWeekend() {
+            const now = new Date();
+            const day = now.getDay();
+            const diff = day === 0 ? 0 : (day === 6 ? 0 : 6 - day);
+            const next = new Date(now);
+            next.setDate(next.getDate() + (diff === 0 ? 7 : diff));
+            return next.toISOString().split('T')[0];
+        }
+        
+        async function updatePriceAndCheck() {
+            const flavor = document.getElementById('flavor-select').value;
+            const size = document.getElementById('size-select').value;
+            const date = document.getElementById('pickup-date').value;
+            const deposit = parseFloat(document.getElementById('deposit-input').value) || 0;
+            
+            const flavorInfo = appConfig.flavors.find(f => f.id === flavor);
+            const sizeInfo = appConfig.sizes.find(s => s.id === size);
+            
+            if (flavorInfo && sizeInfo) {
+                const total = Math.round(flavorInfo.price * sizeInfo.multiplier * 100) / 100;
+                document.getElementById('price-total').textContent = '¥' + total.toFixed(2);
+            }
+            
+            if (date && flavor && size) {
+                try {
+                    const result = await fetchAPI('/orders/check', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            pickupDate: date,
+                            flavor,
+                            size,
+                            depositPaid: deposit >= appConfig.depositThreshold
+                        })
+                    });
+                    
+                    renderCheckResult(result);
+                } catch (e) {
+                    renderCheckResult(e);
+                }
+            }
+        }
+        
+        function renderCheckResult(result) {
+            let html = '';
+            
+            if (result.type === 'not_weekend') {
+                html = `<div class="check-result error"><h4>❌ 只能在周末生产</h4><p>${result.message}</p></div>`;
+            } else if (result.type === 'cutoff_passed') {
+                html = `<div class="check-result error"><h4>❌ 已过截单时间</h4><p>${result.message}</p></div>`;
+            } else if (result.canCreate) {
+                const cap = result.results?.capacity;
+                const mat = result.results?.materials;
+                
+                html = `<div class="check-result ${mat?.hasWarning ? 'warning' : 'success'}">
+                    <h4>✅ 可以接单</h4>
+                    <ul>
+                        ${cap ? `<li><strong>产能：</strong>${cap.message}</li>` : ''}
+                        ${mat ? `<li><strong>材料：</strong>${mat.message}</li>` : ''}
+                    </ul>
+                    ${mat?.hasWarning && Object.keys(mat.warnings).length > 0 ? `
+                        <div style="margin-top:10px;padding:10px;background:#fffbe6;border-radius:4px;">
+                            <strong>材料预警：</strong>
+                            ${Object.values(mat.warnings).map(w => `${w.name}剩余${w.remaining}${w.unit}（安全线${w.minStock}${w.unit}）`).join('；')}
+                        </div>
+                    ` : ''}
+                </div>`;
+            } else {
+                const cap = result.results?.capacity;
+                const mat = result.results?.materials;
+                
+                html = `<div class="check-result error"><h4>❌ 无法接单</h4><ul>`;
+                if (cap && !cap.available) html += `<li><strong>产能：</strong>${cap.message}</li>`;
+                if (mat && !mat.ok) {
+                    html += `<li><strong>材料缺口：</strong>`;
+                    html += Object.values(mat.gap).map(g => 
+                        `${g.name} 缺口${g.deficit}${g.unit}（库存${g.stock}${g.unit}，已用${g.alreadyUsed}${g.unit}，需${g.required}${g.unit}）`
+                    ).join('；');
+                    html += `</li>`;
+                }
+                html += `</ul></div>`;
+            }
+            
+            document.getElementById('check-result').innerHTML = html;
+        }
+        
+        async function submitOrder() {
+            const form = document.getElementById('new-order-form');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            data.deposit = parseFloat(data.deposit) || 0;
+            
+            try {
+                const order = await fetchAPI('/orders', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                alert('下单成功！订单号：' + order.id);
+                closeModal('new-order-modal');
+                form.reset();
+                document.getElementById('pickup-date').value = getNextWeekend();
+                document.getElementById('deposit-input').value = '0';
+                document.getElementById('check-result').innerHTML = '';
+                await loadAll();
+            } catch (e) {
+                alert(e.message || '下单失败，请检查订单信息');
+            }
+        }
+        
+        async function viewOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const flavor = appConfig.flavors.find(f => f.id === order.flavor);
+            const size = appConfig.sizes.find(s => s.id === order.size);
+            
+            const statusMap = {
+                pending: { text: '待付定金', class: 'status-pending' },
+                confirmed: { text: '已确认', class: 'status-confirmed' },
+                reschedule_pending: { text: '改期待审核', class: 'status-reschedule_pending' },
+                completed: { text: '已完成', class: 'status-completed' },
+                cancelled: { text: '已取消', class: 'status-cancelled' }
+            };
+            const status = statusMap[order.status];
+            
+            let historyHtml = '';
+            if (order.history && order.history.length > 0) {
+                historyHtml = `<h4 style="margin-top:24px;margin-bottom:12px;">📝 操作记录</h4>
+                    <div class="timeline">
+                        ${order.history.map(h => {
+                            const actionMap = {
+                                create: '创建订单',
+                                reschedule: '改期成功',
+                                reschedule_request: '申请改期',
+                                reschedule_approved: '改期审核通过',
+                                reschedule_rejected: '改期申请被驳回',
+                                deposit_payment: '支付定金',
+                                cancel_deposit: '取消订单',
+                                complete: '完成订单'
+                            };
+                            let detail = '';
+                            if (h.fromDate) detail += `${formatDate(h.fromDate)} → ${formatDate(h.toDate)}`;
+                            if (h.reason) detail += `（${h.reason}）`;
+                            if (h.amount) detail += `￥${h.amount}`;
+                            
+                            return `
+                                <div class="timeline-item">
+                                    <div class="time">${formatDateTime(h.timestamp)}</div>
+                                    <div class="action">${actionMap[h.action] || h.action}</div>
+                                    ${detail ? `<div class="detail">${detail}</div>` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>`;
+            }
+            
+            let rescheduleHtml = '';
+            if (order.rescheduleRequested) {
+                rescheduleHtml = `
+                    <div class="check-result warning" style="margin-top:20px;">
+                        <h4>🔄 改期申请待审核</h4>
+                        <ul>
+                            <li><strong>原日期：</strong>${formatDate(order.rescheduleRequested.fromDate)} ${order.rescheduleRequested.fromTime}</li>
+                            <li><strong>新日期：</strong>${formatDate(order.rescheduleRequested.toDate)} ${order.rescheduleRequested.toTime}</li>
+                            <li><strong>原因：</strong>${order.rescheduleRequested.reason}</li>
+                            <li><strong>申请时间：</strong>${formatDateTime(order.rescheduleRequested.requestTime)}</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            let ingredientsHtml = '';
+            if (order.ingredients) {
+                ingredientsHtml = `
+                    <h4 style="margin-top:24px;margin-bottom:12px;">📦 所需材料</h4>
+                    <table class="table">
+                        <thead><tr><th>材料</th><th>用量</th></tr></thead>
+                        <tbody>
+                            ${Object.entries(order.ingredients).map(([key, val]) => {
+                                const mat = materials[key];
+                                return `<tr><td>${mat?.name || key}</td><td>${val}${mat?.unit || ''}</td></tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            const html = `
+                <div class="order-detail">
+                    <div>
+                        <div class="detail-item">
+                            <div class="label">订单号</div>
+                            <div class="value"><strong>${order.id}</strong></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">客户信息</div>
+                            <div class="value">${order.customerName}</div>
+                            <div style="color:#666;">${order.phone}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">订单状态</div>
+                            <div class="value"><span class="status-badge ${status.class}">${status.text}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">蛋糕信息</div>
+                            <div class="value">${flavor?.name} · ${size?.name}</div>
+                            <div style="color:#666;">产能占用：${order.capacityUsed} 单位</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">取货时间</div>
+                            <div class="value">${formatDate(order.pickupDate)} ${order.pickupTime}</div>
+                        </div>
+                        ${order.message ? `
+                        <div class="detail-item">
+                            <div class="label">祝福语</div>
+                            <div class="value">"${order.message}"</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div>
+                        <div class="detail-item">
+                            <div class="label">订单金额</div>
+                            <div class="value" style="color:#c69c6d;font-size:24px;">¥${order.totalPrice}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">定金</div>
+                            <div class="value">¥${order.deposit || 0} <span class="badge ${order.depositPaid ? 'badge-info' : 'badge-warning'}">${order.depositPaid ? '已确认' : '待补足'}</span></div>
+                            <div style="color:#666;">应付定金 ≥ ¥${appConfig.depositThreshold}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="label">创建时间</div>
+                            <div class="value">${formatDateTime(order.createdAt)}</div>
+                        </div>
+                        ${order.originalPickupDate ? `
+                        <div class="detail-item">
+                            <div class="label">原取货日期</div>
+                            <div class="value" style="color:#999;text-decoration:line-through;">${formatDate(order.originalPickupDate)}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${rescheduleHtml}
+                ${ingredientsHtml}
+                ${historyHtml}
+            `;
+            
+            document.getElementById('order-detail-content').innerHTML = html;
+            document.getElementById('order-detail-modal').classList.add('active');
+        }
+        
+        async function payDeposit(orderId) {
+            const amount = prompt('请输入收款金额（元）：', appConfig.depositThreshold);
+            if (!amount || isNaN(parseFloat(amount))) return;
+            
+            try {
+                await fetchAPI(`/orders/${orderId}/pay-deposit`, {
+                    method: 'POST',
+                    body: JSON.stringify({ amount: parseFloat(amount) })
+                });
+                alert('定金收取成功！');
+                await loadAll();
+            } catch (e) {
+                alert('操作失败：' + (e.message || ''));
+            }
+        }
+        
+        async function cancelDeposit(orderId) {
+            if (!confirm('确定要取消该订单吗？\n\n将释放占用的产能和材料，已收定金将退还。')) return;
+            
+            const reason = prompt('请输入取消原因：', '客户取消');
+            try {
+                await fetchAPI(`/orders/${orderId}/cancel-deposit`, {
+                    method: 'POST',
+                    body: JSON.stringify({ reason })
+                });
+                alert('订单已取消！');
+                await loadAll();
+            } catch (e) {
+                alert('操作失败：' + (e.message || ''));
+            }
+        }
+        
+        function openReschedule(orderId) {
+            currentOrderId = orderId;
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            document.getElementById('reschedule-date').value = order.pickupDate;
+            document.getElementById('reschedule-time').value = order.pickupTime;
+            document.getElementById('reschedule-reason').value = '';
+            document.getElementById('reschedule-check').innerHTML = '';
+            document.getElementById('reschedule-modal').classList.add('active');
+        }
+        
+        async function checkReschedule() {
+            if (!currentOrderId) return;
+            
+            const newDate = document.getElementById('reschedule-date').value;
+            if (!newDate) return;
+            
+            try {
+                const order = orders.find(o => o.id === currentOrderId);
+                const result = await fetchAPI(`/orders/check`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        pickupDate: newDate,
+                        flavor: order.flavor,
+                        size: order.size,
+                        depositPaid: order.depositPaid
+                    })
+                });
+                
+                let html = '';
+                if (result.type === 'cutoff_passed') {
+                    html = `<div class="check-result warning">
+                        <h4>⚠️ 需要审核</h4>
+                        <p>原取货日期已过截单时间，改期需审核通过</p>
+                    </div>`;
+                } else if (result.canCreate) {
+                    html = `<div class="check-result success">
+                        <h4>✅ 可以改期</h4>
+                        <ul>
+                            ${result.results?.capacity ? `<li>产能：${result.results.capacity.message}</li>` : ''}
+                            ${result.results?.materials ? `<li>材料：${result.results.materials.message}</li>` : ''}
+                        </ul>
+                    </div>`;
+                } else {
+                    html = `<div class="check-result error">
+                        <h4>❌ 无法改期</h4>
+                        <ul>
+                            ${!result.results?.capacity?.available ? `<li>产能：${result.results?.capacity?.message}</li>` : ''}
+                            ${!result.results?.materials?.ok ? `<li>材料：${result.results?.materials?.message}</li>` : ''}
+                        </ul>
+                    </div>`;
+                }
+                
+                document.getElementById('reschedule-check').innerHTML = html;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        
+        async function submitReschedule() {
+            if (!currentOrderId) return;
+            
+            const newDate = document.getElementById('reschedule-date').value;
+            const newTime = document.getElementById('reschedule-time').value;
+            const reason = document.getElementById('reschedule-reason').value;
+            
+            if (!newDate || !reason) {
+                alert('请填写新日期和改期原因');
+                return;
+            }
+            
+            try {
+                const result = await fetchAPI(`/orders/${currentOrderId}/reschedule`, {
+                    method: 'POST',
+                    body: JSON.stringify({ newDate, newTime, reason })
+                });
+                
+                if (result.needsReview) {
+                    alert('已提交改期申请，等待审核');
+                } else {
+                    alert('改期成功！');
+                }
+                
+                closeModal('reschedule-modal');
+                currentOrderId = null;
+                await loadAll();
+            } catch (e) {
+                alert('改期失败：' + (e.message || ''));
+            }
+        }
+        
+        async function approveReschedule(orderId) {
+            if (!confirm('确认通过该改期申请？')) return;
+            
+            try {
+                await fetchAPI(`/orders/${orderId}/reschedule/approve`, {
+                    method: 'POST'
+                });
+                alert('改期已通过！');
+                await loadAll();
+            } catch (e) {
+                alert('操作失败：' + (e.message || ''));
+            }
+        }
+        
+        async function rejectReschedule(orderId) {
+            const reason = prompt('请输入驳回原因：', '产能/材料不足');
+            if (!reason) return;
+            
+            try {
+                await fetchAPI(`/orders/${orderId}/reschedule/reject`, {
+                    method: 'POST',
+                    body: JSON.stringify({ reason })
+                });
+                alert('改期已驳回');
+                await loadAll();
+            } catch (e) {
+                alert('操作失败：' + (e.message || ''));
+            }
+        }
+        
+        async function completeOrder(orderId) {
+            if (!confirm('确认完成该订单？')) return;
+            
+            try {
+                await fetchAPI(`/orders/${orderId}/complete`, {
+                    method: 'POST'
+                });
+                alert('订单已完成！');
+                await loadAll();
+            } catch (e) {
+                alert('操作失败：' + (e.message || ''));
+            }
+        }
+        
+        async function updateStock(materialId) {
+            const input = document.getElementById('stock-' + materialId);
+            const stock = parseFloat(input.value);
+            if (isNaN(stock) || stock < 0) {
+                alert('请输入有效的库存数量');
+                return;
+            }
+            
+            try {
+                await fetchAPI(`/materials/${materialId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ stock })
+                });
+                await loadAll();
+            } catch (e) {
+                alert('更新失败：' + (e.message || ''));
+            }
+        }
+        
+        async function exportProductionList() {
+            const date = document.getElementById('export-date').value;
+            const url = date ? `/production-list?date=${date}` : '/production-list';
+            const data = await fetchAPI(url);
+            
+            if (data.orders.length === 0) {
+                alert('暂无订单可导出');
+                return;
+            }
+            
+            let content = '═══════════════════════════════════════════════\n';
+            content += '           🍰 烘焙私房 生产清单\n';
+            content += '═══════════════════════════════════════════════\n';
+            content += `导出时间：${formatDateTime(new Date().toISOString())}\n`;
+            content += `导出范围：${date ? formatDate(date) : '全部待生产订单'}\n\n`;
+            
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += '【一、生产汇总】\n';
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += `订单总数：${data.summary.orderCount} 单\n`;
+            content += `产能占用：${data.summary.totalCapacity.toFixed(1)} 单位\n`;
+            content += `预计收入：¥${data.summary.totalRevenue}\n`;
+            content += `已收定金：¥${data.summary.totalDeposit}\n`;
+            content += `待收定金：¥${data.summary.pendingDeposit}\n\n`;
+            
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += '【二、订单明细（按取货时间排序）】\n';
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+            
+            data.orders.forEach((o, i) => {
+                const flavor = appConfig.flavors.find(f => f.id === o.flavor);
+                const size = appConfig.sizes.find(s => s.id === o.size);
+                content += `${i + 1}. ${formatDate(o.pickupDate)} ${o.pickupTime}\n`;
+                content += `   订单号：${o.id}\n`;
+                content += `   客户：${o.customerName} (${o.phone})\n`;
+                content += `   蛋糕：${flavor?.name} / ${size?.name}\n`;
+                content += `   祝福：${o.message || '(无)'}\n`;
+                content += `   金额：¥${o.totalPrice} | 定金：¥${o.deposit || 0}\n`;
+                content += `   状态：${o.status === 'reschedule_pending' ? '改期待审核' : '已确认'}\n\n`;
+            });
+            
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += '【三、口味尺寸汇总】\n';
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+            data.flavorSummary.forEach(s => {
+                content += `・${s.flavor} ${s.size} × ${s.count} 个（产能 ${s.totalCapacity.toFixed(1)}）\n`;
+            });
+            content += `\n总产能：${data.summary.totalCapacity.toFixed(1)} 单位 / 日产能 ${data.config.dailyCapacity} 单位\n\n`;
+            
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += '【四、材料需求清单】\n';
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+            
+            content += '材料名称          需求总量    当前库存    缺口/剩余    状态\n';
+            content += '──────────────────────────────────────────────────────\n';
+            data.materialSummary.forEach(m => {
+                const remaining = m.stock - m.required;
+                const status = remaining < 0 ? '❌ 缺口' : remaining < 500 ? '⚠️ 预警' : '✅ 充足';
+                content += `${m.name.padEnd(18)}${String(m.required.toFixed(1) + m.unit).padEnd(12)}`;
+                content += `${String(m.stock + m.unit).padEnd(12)}`;
+                content += `${(remaining < 0 ? '-' : '+') + Math.abs(remaining).toFixed(1) + m.unit}`.padEnd(12);
+                content += `${status}\n`;
+            });
+            
+            content += '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+            content += '【五、计算口径说明】\n';
+            content += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+            content += '1. 【产能计算】\n';
+            content += '   6寸 = 1.0 单位  |  8寸 = 1.5 单位\n';
+            content += '   10寸 = 2.0 单位 |  12寸 = 2.8 单位\n';
+            content += '   日产能上限：50 单位\n\n';
+            content += '2. 【材料计算】\n';
+            content += '   材料需求 = 基础配方用量 × 尺寸倍数\n';
+            content += '   各口味基础配方详见配置\n\n';
+            content += '3. 【库存计算】\n';
+            content += '   可用库存 = 当前库存 - 已占用\n';
+            content += '   缺口 = 可用库存 - 本次需求（负数为缺口）\n\n';
+            content += '4. 【订单范围】\n';
+            content += '   仅包含：已确认、改期待审核的订单\n';
+            content += '   不包含：已完成、已取消、待付定金的订单\n\n';
+            content += '5. 【定金规则】\n';
+            content += `   定金 ≥ ¥${data.config.depositThreshold} 视为已付\n`;
+            content += '   未付定金订单最多占用 70% 日产能\n';
+            content += '   截单时间：取货日前1天 18:00\n\n';
+            
+            content += '═══════════════════════════════════════════════\n';
+            content += '                  生产愉快 🍰\n';
+            content += '═══════════════════════════════════════════════\n';
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url2 = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url2;
+            a.download = `生产清单_${date || '全部'}_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url2);
+        }
+        
+        function openNewOrderModal() {
+            document.getElementById('new-order-form').reset();
+            document.getElementById('pickup-date').value = getNextWeekend();
+            document.getElementById('deposit-input').value = '0';
+            document.getElementById('check-result').innerHTML = '';
+            setTimeout(updatePriceAndCheck, 100);
+            document.getElementById('new-order-modal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function showHelp() {
+            document.getElementById('help-modal').classList.add('active');
+        }
+        
+        function navigateTo(page, status = null) {
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.nav button[data-page="${page}"]`).classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            
+            if (status && page === 'orders') {
+                document.querySelectorAll('#order-tabs button').forEach(b => b.classList.remove('active'));
+                document.querySelector(`#order-tabs button[data-status="${status}"]`)?.classList.add('active');
+                orderFilter = status;
+                renderOrders();
+            }
+        }
+        
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${month}月${day}日`;
+        }
+        
+        function formatDateTime(isoStr) {
+            const date = new Date(isoStr);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        }
+        
+        function isCutoffPassed(dateStr) {
+            const now = new Date();
+            const target = new Date(dateStr);
+            const cutoff = new Date(target);
+            cutoff.setDate(cutoff.getDate() - 1);
+            cutoff.setHours(18, 0, 0, 0);
+            return now >= cutoff;
+        }
+        
+        init();
+    </script>
+</body>
+</html>
