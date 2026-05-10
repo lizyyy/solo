@@ -25,38 +25,38 @@ const (
 )
 
 type Migration struct {
-	ID          string
-	Name        string
-	Version     string
-	Description string
-	Steps       []*MigrationStep
-	Status      MigrationStatus
-	StartTime   time.Time
-	EndTime     time.Time
-	Error       string
-	RollbackLog []RollbackEntry
-	TraceID     string
-	CreatedBy   string
-	Checksum    string
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Version     string           `json:"version"`
+	Description string           `json:"description"`
+	Steps       []*MigrationStep `json:"steps"`
+	Status      MigrationStatus  `json:"status"`
+	StartTime   time.Time        `json:"start_time"`
+	EndTime     time.Time        `json:"end_time"`
+	Error       string           `json:"error"`
+	RollbackLog []RollbackEntry  `json:"rollback_log"`
+	TraceID     string           `json:"trace_id"`
+	CreatedBy   string           `json:"created_by"`
+	Checksum    string           `json:"checksum"`
 }
 
 type MigrationStep struct {
-	ID           string
-	Index        int
-	Name         string
-	Description  string
-	Type         StepType
-	UpSQL        string
-	DownSQL      string
-	Status       MigrationStepStatus
-	StartTime    time.Time
-	EndTime      time.Time
-	RowsAffected int64
-	Error        string
-	Warnings     []string
-	RetryCount   int
-	Checksum     string
-	DataSnapshot *DataSnapshot
+	ID           string              `json:"id"`
+	Index        int                 `json:"index"`
+	Name         string              `json:"name"`
+	Description  string              `json:"description"`
+	Type         StepType            `json:"type"`
+	UpSQL        string              `json:"up_sql"`
+	DownSQL      string              `json:"down_sql"`
+	Status       MigrationStepStatus `json:"status"`
+	StartTime    time.Time           `json:"start_time"`
+	EndTime      time.Time           `json:"end_time"`
+	RowsAffected int64               `json:"rows_affected"`
+	Error        string              `json:"error"`
+	Warnings     []string            `json:"warnings"`
+	RetryCount   int                 `json:"retry_count"`
+	Checksum     string              `json:"checksum"`
+	DataSnapshot *DataSnapshot       `json:"data_snapshot"`
 }
 
 type StepType string

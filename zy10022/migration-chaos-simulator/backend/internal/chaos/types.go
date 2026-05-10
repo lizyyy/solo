@@ -99,20 +99,20 @@ const (
 )
 
 type ChaosExperiment struct {
-	ID            string
-	Name          string
-	Type          ChaosType
-	Target        string
-	Config        ExperimentConfig
-	Status        ChaosStatus
-	StartTime     time.Time
-	EndTime       time.Time
-	ErrorCount    int64
-	SuccessCount  int64
-	TotalRequests int64
-	Metadata      map[string]interface{}
-	CreatedBy     string
-	TraceID       string
+	ID            string                 `json:"id"`
+	Name          string                 `json:"name"`
+	Type          ChaosType              `json:"type"`
+	Target        string                 `json:"target"`
+	Config        ExperimentConfig       `json:"config"`
+	Status        ChaosStatus            `json:"status"`
+	StartTime     time.Time              `json:"start_time"`
+	EndTime       time.Time              `json:"end_time"`
+	ErrorCount    int64                  `json:"error_count"`
+	SuccessCount  int64                  `json:"success_count"`
+	TotalRequests int64                  `json:"total_requests"`
+	Metadata      map[string]interface{} `json:"metadata"`
+	CreatedBy     string                 `json:"created_by"`
+	TraceID       string                 `json:"trace_id"`
 }
 
 type ExperimentConfig struct {
