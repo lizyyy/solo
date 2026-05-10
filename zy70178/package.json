@@ -1,0 +1,24 @@
+{
+  "name": "contract-tax-separation-api",
+  "version": "1.0.0",
+  "description": "合同价税分离 API 服务 - 可反复验收的价税计算系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "test:watch": "node --test --watch test/*.test.js"
+  },
+  "keywords": [
+    "contract",
+    "tax",
+    "separation",
+    "api",
+    "pricing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
