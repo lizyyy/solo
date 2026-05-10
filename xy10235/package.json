@@ -1,0 +1,25 @@
+{
+  "name": "animal-cage-allocation-api",
+  "version": "1.0.0",
+  "description": "高校实验动物笼位分配API系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init": "node src/scripts/init-db.js",
+    "seed": "node src/scripts/seed-data.js",
+    "test": "node src/test/test-api.js"
+  },
+  "keywords": ["animal", "cage", "allocation", "university", "laboratory"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
