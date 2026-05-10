@@ -1,0 +1,230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BatchStatus {
+  DRAFT
+  PENDING_REVIEW
+  REVIEWING
+  APPROVED
+  PROCESSING
+  PARTIAL_SUCCESS
+  SUCCESS
+  REJECTED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  REFUNDED
+  PARTIAL_REFUND
+  CANCELLED
+}
+
+enum RefundReason {
+  INVALID_ACCOUNT
+  INSUFFICIENT_BALANCE
+  INVALID_AMOUNT
+  TIMEOUT
+  SYSTEM_ERROR
+  BANK_REJECT
+  OTHER
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SKIPPED
+}
+
+model ReceivingAccount {
+  id             String    @id @default(uuid())
+  accountNumber  String    @unique
+  accountName    String
+  bankCode       String
+  bankName       String
+  branchName     String?
+  accountType    String    @default("PERSONAL")
+  currency       String    @default("CNY")
+  isActive       Boolean   @default(true)
+  isVerified     Boolean   @default(false)
+  verifiedAt     DateTime?
+  verifiedBy     String?
+  description    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  payments       Payment[]
+
+  @@index([accountNumber])
+  @@index([bankCode])
+}
+
+model PaymentLimit {
+  id                   String    @id @default(uuid())
+  limitType            String
+  limitKey             String
+  dailyAmountLimit     Decimal   @db.Decimal(18, 2)
+  dailyCountLimit      Int
+  singleAmountMax      Decimal   @db.Decimal(18, 2)
+  singleAmountMin      Decimal   @db.Decimal(18, 2)
+  isActive             Boolean   @default(true)
+  description          String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@unique([limitType, limitKey])
+  @@index([limitType, limitKey])
+}
+
+model ApprovalFlow {
+  id             String    @id @default(uuid())
+  flowName       String    @unique
+  flowType       String
+  minAmount      Decimal   @db.Decimal(18, 2)
+  maxAmount      Decimal   @db.Decimal(18, 2)
+  levels         Json
+  isActive       Boolean   @default(true)
+  description    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model PaymentBatch {
+  id             String       @id @default(uuid())
+  batchNo        String       @unique
+  batchName      String?
+  totalAmount    Decimal      @db.Decimal(18, 2)
+  totalCount     Int
+  successCount   Int          @default(0)
+  failCount      Int          @default(0)
+  status         BatchStatus  @default(DRAFT)
+  currency       String       @default("CNY")
+  initiatorId    String
+  initiatorName  String
+  idempotencyKey String       @unique
+  notes          String?
+  approvedAt     DateTime?
+  approvedBy     String?
+  rejectedAt     DateTime?
+  rejectedBy     String?
+  rejectedReason String?
+  submittedAt    DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  payments       Payment[]
+  approvals      ApprovalRecord[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([idempotencyKey])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  batchId         String
+  paymentNo       String        @unique
+  accountId       String
+  amount          Decimal       @db.Decimal(18, 2)
+  currency        String        @default("CNY")
+  status          PaymentStatus @default(PENDING)
+  idempotencyKey  String        @unique
+  purpose         String?
+  remark          String?
+  bankTransactionNo String?
+  processedAt     DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+  failReason      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  batch           PaymentBatch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  account         ReceivingAccount @relation(fields: [accountId], references: [id])
+  refunds         Refund[]
+
+  @@index([batchId])
+  @@index([status])
+  @@index([idempotencyKey])
+}
+
+model ApprovalRecord {
+  id             String          @id @default(uuid())
+  batchId        String
+  level          Int
+  approverId     String?
+  approverName   String?
+  status         ApprovalStatus  @default(PENDING)
+  comment        String?
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  batch          PaymentBatch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@index([batchId, level])
+  @@index([status])
+}
+
+model Refund {
+  id              String        @id @default(uuid())
+  paymentId       String
+  refundNo        String        @unique
+  amount          Decimal       @db.Decimal(18, 2)
+  reason          RefundReason
+  reasonDetail    String?
+  idempotencyKey  String        @unique
+  processedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  payment         Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([reason])
+}
+
+model DailyLimitUsage {
+  id             String    @id @default(uuid())
+  limitType      String
+  limitKey       String
+  date           DateTime
+  usedAmount     Decimal   @db.Decimal(18, 2) @default(0)
+  usedCount      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([limitType, limitKey, date])
+  @@index([limitType, limitKey, date])
+}
+
+model AuditLog {
+  id             String    @id @default(uuid())
+  actionType     String
+  entityType     String
+  entityId       String?
+  operatorId     String
+  operatorName   String
+  beforeValue    Json?
+  afterValue     Json?
+  requestData    Json?
+  responseData   Json?
+  createdAt      DateTime  @default(now())
+
+  @@index([actionType])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
