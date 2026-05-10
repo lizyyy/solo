@@ -1,0 +1,29 @@
+{
+  "name": "early-education-conversion-platform",
+  "version": "1.0.0",
+  "description": "早教试听课转化台",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "npm run dev --prefix frontend",
+    "install:all": "npm install && npm install --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "lint": "eslint backend/**/*.js frontend/src/**/*.{ts,tsx}",
+    "test": "node backend/test-rules.js"
+  },
+  "keywords": ["early-education", "conversion", "trial-class"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0"
+  }
+}
