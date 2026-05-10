@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const ExportController_1 = __importDefault(require("../controllers/ExportController"));
+const router = (0, express_1.Router)();
+router.post('/export/request', ExportController_1.default.createExportRequest);
+router.get('/export/request/:id', ExportController_1.default.getRequest);
+router.post('/export/approve', ExportController_1.default.approveRequest);
+router.post('/export/reject', ExportController_1.default.rejectRequest);
+router.post('/export/process', ExportController_1.default.processApprovedRequest);
+router.post('/export/download/:id', ExportController_1.default.downloadFile);
+router.get('/export/report/:id', ExportController_1.default.getTaskReport);
+router.get('/sensitive-fields', ExportController_1.default.getSensitiveFields);
+router.post('/sensitive-fields', ExportController_1.default.createSensitiveField);
+router.get('/exceptions/pending', ExportController_1.default.getPendingExceptions);
+router.get('/exceptions', ExportController_1.default.getAllExceptions);
+router.post('/exceptions/:id/process', ExportController_1.default.processException);
+exports.default = router;
