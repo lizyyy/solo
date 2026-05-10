@@ -1,0 +1,81 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-card {
+  border-radius: 8px;
+}
+
+.stat-card {
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.load-progress {
+  margin-top: 8px;
+}
+
+.assignment-history-item {
+  padding: 12px;
+  border-left: 3px solid #1890ff;
+  background: #fafafa;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+.assignment-history-item.reassigned {
+  border-left-color: #faad14;
+}
+
+.reason-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.sales-card {
+  position: relative;
+}
+
+.sales-card.on-vacation {
+  opacity: 0.7;
+}
+
+.vacation-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
