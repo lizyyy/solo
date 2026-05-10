@@ -1,0 +1,200 @@
+{
+  "date": "2026-05-11",
+  "data": {
+    "actual": [
+      {
+        "date": "2026-05-11",
+        "department": "技术部",
+        "actualCount": 35,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "takenAt": "2026-05-11T12:00:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "产品部",
+        "actualCount": 17,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "takenAt": "2026-05-11T12:10:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "市场部",
+        "actualCount": 14,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "takenAt": "2026-05-11T12:05:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "人事部",
+        "actualCount": 9,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "takenAt": "2026-05-11T12:15:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "财务部",
+        "actualCount": 12,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "takenAt": "2026-05-11T12:20:00Z"
+      }
+    ],
+    "cancel": [
+      {
+        "date": "2026-05-11",
+        "department": "技术部",
+        "cancelCount": 2,
+        "reason": "外勤",
+        "mealType": "午餐",
+        "cancelTime": "09:00",
+        "cutOffTime": "10:00"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "市场部",
+        "cancelCount": 1,
+        "reason": "请假",
+        "mealType": "午餐",
+        "cancelTime": "08:30",
+        "cutOffTime": "10:00"
+      }
+    ],
+    "cost": [
+      {
+        "dish": "宫保鸡丁",
+        "unitCost": 38,
+        "unit": "kg",
+        "validFrom": "2026-05-01",
+        "validTo": "2026-05-31"
+      },
+      {
+        "dish": "蒜蓉西兰花",
+        "unitCost": 18,
+        "unit": "kg",
+        "validFrom": "2026-05-01",
+        "validTo": "2026-05-31"
+      },
+      {
+        "dish": "鱼香肉丝",
+        "unitCost": 35,
+        "unit": "kg",
+        "validFrom": "2026-05-01",
+        "validTo": "2026-05-31"
+      },
+      {
+        "dish": "米饭",
+        "unitCost": 6,
+        "unit": "kg",
+        "validFrom": "2026-05-01",
+        "validTo": "2026-05-31"
+      }
+    ],
+    "extra": [
+      {
+        "date": "2026-05-11",
+        "department": "技术部",
+        "extraCount": 1,
+        "reason": "技术交流",
+        "mealType": "午餐",
+        "requestedAt": "2026-05-11T11:30:00Z"
+      }
+    ],
+    "leftover": [
+      {
+        "date": "2026-05-11",
+        "dish": "宫保鸡丁",
+        "weight": 3.2,
+        "unit": "kg",
+        "mealType": "午餐"
+      },
+      {
+        "date": "2026-05-11",
+        "dish": "蒜蓉西兰花",
+        "weight": 2.1,
+        "unit": "kg",
+        "mealType": "午餐"
+      },
+      {
+        "date": "2026-05-11",
+        "dish": "鱼香肉丝",
+        "weight": 2.8,
+        "unit": "kg",
+        "mealType": "午餐"
+      },
+      {
+        "date": "2026-05-11",
+        "dish": "米饭",
+        "weight": 2.5,
+        "unit": "kg",
+        "mealType": "午餐"
+      }
+    ],
+    "reservation": [
+      {
+        "date": "2026-05-11",
+        "department": "技术部",
+        "headcount": 38,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "submittedAt": "2026-05-10T16:30:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "产品部",
+        "headcount": 18,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "submittedAt": "2026-05-10T17:10:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "市场部",
+        "headcount": 15,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "submittedAt": "2026-05-10T15:50:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "人事部",
+        "headcount": 10,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "submittedAt": "2026-05-10T16:25:00Z"
+      },
+      {
+        "date": "2026-05-11",
+        "department": "财务部",
+        "headcount": 13,
+        "dish": "综合套餐",
+        "mealType": "午餐",
+        "submittedAt": "2026-05-10T17:00:00Z"
+      }
+    ]
+  },
+  "review": {
+    "summary": {
+      "totalReservation": 94,
+      "totalActual": 87,
+      "totalCancel": 3,
+      "totalExtra": 1,
+      "effectiveReservation": 92,
+      "leftoverWeight": "10.60",
+      "leftoverCost": "272.40",
+      "attendanceRate": "94.6%",
+      "cancelRate": "3.2%",
+      "lateCancelRate": "0.0%"
+    },
+    "analysis": [],
+    "suggestions": [
+      "趋势向好：剩菜量较昨日减少52%",
+      "今日剩菜量过大(10.6kg)，建议明日基础采购量减少5%",
+      "相比昨日，剩菜减少52%，到岗率提升3.9个百分点，优化方向正确，继续保持"
+    ]
+  },
+  "confirmedAt": "2026-05-10T18:53:16.953Z"
+}

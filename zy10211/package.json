@@ -1,0 +1,16 @@
+{
+  "name": "canteen-review-cli",
+  "version": "1.0.0",
+  "description": "饭堂备餐余量复盘CLI工具",
+  "main": "index.js",
+  "bin": {
+    "canteen-review": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["canteen", "review", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}
