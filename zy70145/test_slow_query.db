@@ -1,0 +1,216 @@
+{
+  "owners": [
+    {
+      "id": 1,
+      "name": "system",
+      "email": "system@local",
+      "created_at": 1778381005,
+      "updated_at": 1778381005
+    },
+    {
+      "name": "zhangsan",
+      "email": "zhangsan@example.com",
+      "id": 2,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "name": "lisi",
+      "email": "lisi@example.com",
+      "id": 3,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "query_fingerprints": [
+    {
+      "fingerprint": "d88ee83205f4b19e62c1fb696552cd011092e26243b209c241b8a7933d451e0b",
+      "normalized_sql": "SELECT * FROM USERS WHERE ID = ? AND STATUS = '?'",
+      "sample_sql": "SELECT * FROM users WHERE id = 1 AND status = 'active'",
+      "owner_id": 2,
+      "status": "verified",
+      "total_count": 2,
+      "avg_execution_time": 3150,
+      "max_execution_time": 3800,
+      "first_seen_at": 1778381659,
+      "last_seen_at": 1778381659,
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "fingerprint": "c4fa3d457ef42ce47fb98ac7ea4b5ea6501005bf4511d06909c5f952397655d7",
+      "normalized_sql": "SELECT * FROM ORDERS WHERE USER_ID = ? AND CREATED_AT > '?'",
+      "sample_sql": "SELECT * FROM orders WHERE user_id = 100 AND created_at > '2024-01-01'",
+      "owner_id": null,
+      "status": "pending",
+      "total_count": 2,
+      "avg_execution_time": 4650,
+      "max_execution_time": 5200,
+      "first_seen_at": 1778381659,
+      "last_seen_at": 1778381659,
+      "id": 2,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "slow_queries": [
+    {
+      "fingerprint_id": 1,
+      "raw_sql": "SELECT * FROM users WHERE id = 1 AND status = 'active'",
+      "execution_time": 2500,
+      "source": "app-server-01",
+      "database_name": "production_db",
+      "user_name": null,
+      "occurred_at": 1778381659,
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "fingerprint_id": 1,
+      "raw_sql": "SELECT * FROM users WHERE id = 42 AND status = 'inactive'",
+      "execution_time": 3800,
+      "source": "app-server-02",
+      "database_name": null,
+      "user_name": null,
+      "occurred_at": 1778381659,
+      "id": 2,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "fingerprint_id": 2,
+      "raw_sql": "SELECT * FROM orders WHERE user_id = 100 AND created_at > '2024-01-01'",
+      "execution_time": 5200,
+      "source": "batch-server-01",
+      "database_name": null,
+      "user_name": null,
+      "occurred_at": 1778381659,
+      "id": 3,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "fingerprint_id": 2,
+      "raw_sql": "SELECT * FROM orders WHERE user_id = 200 AND created_at > '2024-02-01'",
+      "execution_time": 4100,
+      "source": "batch-server-02",
+      "database_name": null,
+      "user_name": null,
+      "occurred_at": 1778381659,
+      "id": 4,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "optimization_records": [
+    {
+      "fingerprint_id": 1,
+      "owner_id": 2,
+      "before_sql": "SELECT * FROM users WHERE id = ?",
+      "after_sql": "SELECT id, name, email FROM users WHERE id = ?",
+      "description": "Added covering index and limited columns",
+      "status": "verified",
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "rerun_results": [
+    {
+      "optimization_record_id": 1,
+      "before_time": 2500,
+      "after_time": 250,
+      "improvement_percent": 90,
+      "environment": "staging",
+      "status": "improved",
+      "notes": "Tested with same dataset",
+      "executed_at": 1778381659,
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "exception_logs": [
+    {
+      "type": "validation_error",
+      "source": "ingestSlowQuery",
+      "raw_data": "{\"sql\":\"\",\"execution_time\":-5}",
+      "error_message": "SQL is required; execution_time must be a positive number",
+      "resolved": 0,
+      "resolved_by": null,
+      "resolved_at": null,
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "task_queue": [
+    {
+      "type": "fingerprint_analysis",
+      "payload": "{\"fingerprintId\":1,\"fingerprintHash\":\"d88ee83205f4b19e62c1fb696552cd011092e26243b209c241b8a7933d451e0b\"}",
+      "priority": 10,
+      "status": "pending",
+      "retry_count": 0,
+      "error_message": null,
+      "available_at": 1778381659,
+      "locked_by": null,
+      "locked_at": null,
+      "completed_at": null,
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "type": "fingerprint_analysis",
+      "payload": "{\"fingerprintId\":2,\"fingerprintHash\":\"c4fa3d457ef42ce47fb98ac7ea4b5ea6501005bf4511d06909c5f952397655d7\"}",
+      "priority": 10,
+      "status": "pending",
+      "retry_count": 0,
+      "error_message": null,
+      "available_at": 1778381659,
+      "locked_by": null,
+      "locked_at": null,
+      "completed_at": null,
+      "id": 2,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ],
+  "status_history": [
+    {
+      "entity_type": "fingerprint",
+      "entity_id": 1,
+      "from_status": "pending",
+      "to_status": "claimed",
+      "changed_by": 2,
+      "note": "This is my responsibility",
+      "id": 1,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "entity_type": "fingerprint",
+      "entity_id": 1,
+      "from_status": "claimed",
+      "to_status": "in_progress",
+      "changed_by": 2,
+      "note": "Optimization started",
+      "id": 2,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    },
+    {
+      "entity_type": "fingerprint",
+      "entity_id": 1,
+      "from_status": "in_progress",
+      "to_status": "verified",
+      "changed_by": 2,
+      "note": "Rerun verified with 90.00% improvement",
+      "id": 3,
+      "created_at": 1778381659,
+      "updated_at": 1778381659
+    }
+  ]
+}

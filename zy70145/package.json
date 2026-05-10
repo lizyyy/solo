@@ -1,0 +1,18 @@
+{
+  "name": "slow-query-tracker",
+  "version": "1.0.0",
+  "description": "慢查询认领 API - 慢查询采集、指纹归并、负责人认领、优化追踪、复测对比、周报接口",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node tests/integration.test.js",
+    "migrate": "node scripts/migrate.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
