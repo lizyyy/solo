@@ -1,0 +1,379 @@
+{
+  "stores": [
+    {
+      "id": 1,
+      "name": "幸福路店",
+      "address": "幸福路123号",
+      "contact_person": "张经理",
+      "phone": "13800138001",
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 2,
+      "name": "建设路店",
+      "address": "建设路456号",
+      "contact_person": "李店长",
+      "phone": "13800138002",
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 3,
+      "name": "人民广场店",
+      "address": "人民广场B1层",
+      "contact_person": "王主管",
+      "phone": "13800138003",
+      "created_at": "2026-05-10T11:36:32.848Z"
+    }
+  ],
+  "dishes": [
+    {
+      "id": 1,
+      "name": "红烧肉",
+      "code": "HC001",
+      "category": "热菜",
+      "shelf_life_hours": 24,
+      "min_temp": 0,
+      "max_temp": 8,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 2,
+      "name": "清炒时蔬",
+      "code": "SC001",
+      "category": "素菜",
+      "shelf_life_hours": 12,
+      "min_temp": 0,
+      "max_temp": 8,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 3,
+      "name": "糖醋排骨",
+      "code": "PG001",
+      "category": "热菜",
+      "shelf_life_hours": 24,
+      "min_temp": 0,
+      "max_temp": 8,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 4,
+      "name": "米饭",
+      "code": "MF001",
+      "category": "主食",
+      "shelf_life_hours": 6,
+      "min_temp": 60,
+      "max_temp": 80,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 5,
+      "name": "酸辣汤",
+      "code": "ST001",
+      "category": "汤品",
+      "shelf_life_hours": 12,
+      "min_temp": 0,
+      "max_temp": 8,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    }
+  ],
+  "batches": [
+    {
+      "id": 1,
+      "batch_no": "BATCH-2026-05-09-001",
+      "dish_id": 1,
+      "production_date": "2026-05-09",
+      "production_time": "08:30",
+      "quantity": 50,
+      "unit": "份",
+      "responsible_person": "陈厨师",
+      "status": "delivered",
+      "notes": "正常生产",
+      "created_at": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 2,
+      "batch_no": "BATCH-2026-05-09-002",
+      "dish_id": 2,
+      "production_date": "2026-05-09",
+      "production_time": "09:00",
+      "quantity": 80,
+      "unit": "份",
+      "responsible_person": "王厨师",
+      "status": "delivered",
+      "notes": "正常生产",
+      "created_at": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 3,
+      "batch_no": "BATCH-2026-05-09-003",
+      "dish_id": 3,
+      "production_date": "2026-05-09",
+      "production_time": "23:30",
+      "quantity": 40,
+      "unit": "份",
+      "responsible_person": "刘厨师",
+      "status": "delivered",
+      "notes": "夜间批次（边界值：时间跨天）",
+      "created_at": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 4,
+      "batch_no": "BATCH-2026-05-10-001",
+      "dish_id": 4,
+      "production_date": "2026-05-10",
+      "production_time": "10:00",
+      "quantity": 0,
+      "unit": "份",
+      "responsible_person": "",
+      "status": "created",
+      "notes": "边界值：数量为零",
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 5,
+      "batch_no": "BATCH-2026-05-10-002",
+      "dish_id": 1,
+      "production_date": "2026-05-10",
+      "production_time": "11:00",
+      "quantity": 100,
+      "unit": "份",
+      "responsible_person": "陈厨师",
+      "status": "in_progress",
+      "notes": "部分完成批次",
+      "created_at": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 6,
+      "batch_no": "BATCH-2026-05-08-001",
+      "dish_id": 1,
+      "production_date": "2026-05-08",
+      "production_time": "09:00",
+      "quantity": 60,
+      "unit": "份",
+      "responsible_person": null,
+      "status": "delivered",
+      "notes": "边界值：负责人缺失",
+      "created_at": "2026-05-08T11:36:32.848Z"
+    }
+  ],
+  "samples": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "sample_weight": 150,
+      "storage_location": "冷藏柜A-01",
+      "sampler": "李质检员",
+      "status": "stored",
+      "destroyed_at": null,
+      "notes": "留样正常",
+      "sample_time": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 2,
+      "batch_id": 1,
+      "sample_weight": 150,
+      "storage_location": "冷藏柜A-02",
+      "sampler": "李质检员",
+      "status": "stored",
+      "destroyed_at": null,
+      "notes": "备份留样",
+      "sample_time": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 3,
+      "batch_id": 2,
+      "sample_weight": 100,
+      "storage_location": "冷藏柜A-03",
+      "sampler": "赵质检员",
+      "status": "stored",
+      "destroyed_at": null,
+      "notes": "新鲜蔬菜留样",
+      "sample_time": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 4,
+      "batch_id": 3,
+      "sample_weight": 150,
+      "storage_location": "冷藏柜B-01",
+      "sampler": "孙质检员",
+      "status": "stored",
+      "destroyed_at": null,
+      "notes": "夜间生产批次",
+      "sample_time": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 5,
+      "batch_id": 5,
+      "sample_weight": 150,
+      "storage_location": "冷藏柜C-01",
+      "sampler": "李质检员",
+      "status": "stored",
+      "destroyed_at": null,
+      "notes": "已留样",
+      "sample_time": "2026-05-10T11:36:32.848Z"
+    },
+    {
+      "id": 6,
+      "batch_id": 6,
+      "sample_weight": 150,
+      "storage_location": "冷藏柜D-01",
+      "sampler": null,
+      "status": "destroyed",
+      "destroyed_at": "2026-05-08T11:36:32.848Z",
+      "notes": "留样已销毁",
+      "sample_time": "2026-05-08T11:36:32.848Z"
+    }
+  ],
+  "deliveries": [
+    {
+      "id": 1,
+      "batch_id": 1,
+      "store_id": 1,
+      "delivery_quantity": 30,
+      "dispatched_at": "2026-05-09T11:36:32.848Z",
+      "arrived_at": "2026-05-09T11:36:32.848Z",
+      "transport_temp": 4.5,
+      "received_by": "张经理",
+      "signature": "签收",
+      "status": "completed",
+      "notes": "正常配送"
+    },
+    {
+      "id": 2,
+      "batch_id": 1,
+      "store_id": 2,
+      "delivery_quantity": 20,
+      "dispatched_at": "2026-05-09T11:36:32.848Z",
+      "arrived_at": "2026-05-09T11:36:32.848Z",
+      "transport_temp": 5.2,
+      "received_by": "李店长",
+      "signature": "签收",
+      "status": "completed",
+      "notes": "正常配送"
+    },
+    {
+      "id": 3,
+      "batch_id": 2,
+      "store_id": 3,
+      "delivery_quantity": 80,
+      "dispatched_at": "2026-05-09T11:36:32.848Z",
+      "arrived_at": "2026-05-09T11:36:32.848Z",
+      "transport_temp": 15.5,
+      "received_by": "王主管",
+      "signature": "签收",
+      "status": "completed",
+      "notes": "温度偏高"
+    },
+    {
+      "id": 4,
+      "batch_id": 3,
+      "store_id": 1,
+      "delivery_quantity": 40,
+      "dispatched_at": "2026-05-09T15:55:00.848Z",
+      "arrived_at": "2026-05-09T16:30:00.848Z",
+      "transport_temp": 3.8,
+      "received_by": "张经理",
+      "signature": "签收",
+      "status": "completed",
+      "notes": "跨天配送"
+    },
+    {
+      "id": 5,
+      "batch_id": 5,
+      "store_id": 2,
+      "delivery_quantity": 40,
+      "dispatched_at": "2026-05-10T11:36:32.848Z",
+      "arrived_at": null,
+      "transport_temp": null,
+      "received_by": null,
+      "signature": null,
+      "status": "in_transit",
+      "notes": "运输中"
+    },
+    {
+      "id": 6,
+      "batch_id": 5,
+      "store_id": 3,
+      "delivery_quantity": 60,
+      "dispatched_at": null,
+      "arrived_at": null,
+      "transport_temp": null,
+      "received_by": null,
+      "signature": null,
+      "status": "pending",
+      "notes": "待配送"
+    },
+    {
+      "id": 7,
+      "batch_id": 6,
+      "store_id": 1,
+      "delivery_quantity": 60,
+      "dispatched_at": "2026-05-08T11:36:32.848Z",
+      "arrived_at": "2026-05-08T11:36:32.848Z",
+      "transport_temp": 5,
+      "received_by": "张经理",
+      "signature": "签收",
+      "status": "completed",
+      "notes": "正常配送"
+    }
+  ],
+  "temperature_anomalies": [
+    {
+      "id": 1,
+      "delivery_id": 3,
+      "recorded_temp": 15.5,
+      "min_temp": 0,
+      "max_temp": 8,
+      "anomaly_type": "over_temp",
+      "handled": 1,
+      "handling_opinion": "配送车辆温控故障，已安排紧急检修。该批次菜品已通知门店退回处理。",
+      "handled_by": "周主管",
+      "handled_at": "2026-05-09T11:36:32.848Z",
+      "anomaly_time": "2026-05-09T11:36:32.848Z"
+    }
+  ],
+  "complaints": [
+    {
+      "id": 1,
+      "complaint_no": "COMP-2026-05-09-001",
+      "store_id": 3,
+      "complaint_date": "2026-05-09",
+      "dish_id": 2,
+      "batch_id": 2,
+      "complaint_type": "quality",
+      "description": "清炒时蔬配送温度过高，部分蔬菜发黄变质，口感不佳。",
+      "reporter": "王主管",
+      "reporter_phone": "13800138003",
+      "status": "resolved",
+      "resolution": "已确认温度异常记录，安排重新配送并对配送车辆进行检修。",
+      "resolved_at": "2026-05-09T11:36:32.848Z",
+      "created_at": "2026-05-09T11:36:32.848Z"
+    },
+    {
+      "id": 2,
+      "complaint_no": "COMP-2026-05-10-001",
+      "store_id": 1,
+      "complaint_date": "2026-05-10",
+      "dish_id": 4,
+      "batch_id": null,
+      "complaint_type": "delivery",
+      "description": "今日配送米饭数量不足，少送10份。",
+      "reporter": "张经理",
+      "reporter_phone": "13800138001",
+      "status": "pending",
+      "resolution": null,
+      "resolved_at": null,
+      "created_at": "2026-05-10T11:36:32.848Z"
+    }
+  ],
+  "nextIds": {
+    "stores": 4,
+    "dishes": 6,
+    "batches": 7,
+    "samples": 7,
+    "deliveries": 8,
+    "temperature_anomalies": 2,
+    "complaints": 3
+  }
+}

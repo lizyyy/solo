@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餐饮中央厨房留样台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: #1a1a2e;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border-left: 4px solid #667eea;
+    }
+
+    .stat-card.warning {
+      border-left-color: #f6c23e;
+    }
+
+    .stat-card.danger {
+      border-left-color: #e74c3c;
+    }
+
+    .stat-card.success {
+      border-left-color: #28a745;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: white;
+      border-radius: 12px;
+      padding: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .content-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .content-panel.active {
+      display: block;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+      color: #1a1a2e;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-group label {
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    input, select, textarea {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #667eea;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-warning {
+      background: #f6c23e;
+      color: #1a1a2e;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #1a1a2e;
+      font-size: 13px;
+    }
+
+    td {
+      font-size: 14px;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-created {
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    .status-in_progress {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .status-delivered {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .status-in_transit {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .status-completed {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-resolved {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal.large {
+      max-width: 900px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #1a1a2e;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+      padding: 0 8px;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .form-group label .required {
+      color: #e74c3c;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .trace-flow {
+      margin: 20px 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+      border-radius: 12px;
+    }
+
+    .flow-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 16px;
+    }
+
+    .flow-node {
+      position: relative;
+      padding-left: 30px;
+      padding-bottom: 20px;
+    }
+
+    .flow-node::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 24px;
+      bottom: 0;
+      width: 2px;
+      background: #667eea30;
+    }
+
+    .flow-node:last-child::before {
+      display: none;
+    }
+
+    .flow-node::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      background: #667eea;
+      border-radius: 50%;
+    }
+
+    .flow-node-title {
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+
+    .flow-node-content {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .flow-node-content .highlight {
+      color: #667eea;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .detail-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .detail-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .detail-item {
+      font-size: 13px;
+    }
+
+    .detail-item-label {
+      color: #666;
+    }
+
+    .detail-item-value {
+      color: #1a1a2e;
+      font-weight: 500;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #475569;
+    }
+
+    .tag-warning {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .tag-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .tag-success {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .scrollable-table {
+      overflow-x: auto;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      .tabs {
+        padding: 4px;
+      }
+
+      .tab-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+
+      .content-panel {
+        padding: 16px;
+      }
+
+      th, td {
+        padding: 8px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🍽️ 餐饮中央厨房留样台</h1>
+      <p>批次管理 · 留样登记 · 温度监控 · 投诉追溯</p>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="batches">📦 批次管理</button>
+      <button class="tab-btn" data-tab="samples">🧪 留样记录</button>
+      <button class="tab-btn" data-tab="deliveries">🚚 配送签收</button>
+      <button class="tab-btn" data-tab="anomalies">⚠️ 温度异常</button>
+      <button class="tab-btn" data-tab="complaints">📋 门店投诉</button>
+      <button class="tab-btn" data-tab="traceability">🔍 追溯报告</button>
+    </div>
+
+    <div id="panel-batches" class="content-panel active">
+      <div class="panel-header">
+        <h2>批次管理</h2>
+        <div class="filters">
+          <div class="input-group">
+            <label>生产日期:</label>
+            <input type="date" id="filterDate">
+          </div>
+          <div class="input-group">
+            <label>状态:</label>
+            <select id="filterStatus">
+              <option value="">全部</option>
+              <option value="created">已创建</option>
+              <option value="in_progress">配送中</option>
+              <option value="delivered">已完成</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="openCreateBatchModal()">+ 新建批次</button>
+        </div>
+      </div>
+      <div class="scrollable-table">
+        <table id="batchesTable">
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>菜品</th>
+              <th>生产日期</th>
+              <th>生产时间</th>
+              <th>数量</th>
+              <th>负责人</th>
+              <th>留样状态</th>
+              <th>配送进度</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-samples" class="content-panel">
+      <div class="panel-header">
+        <h2>留样记录</h2>
+        <div class="filters">
+          <button class="btn btn-primary" onclick="openCreateSampleModal()">+ 新增留样</button>
+        </div>
+      </div>
+      <div class="scrollable-table">
+        <table id="samplesTable">
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>菜品</th>
+              <th>留样重量(g)</th>
+              <th>存放位置</th>
+              <th>留样时间</th>
+              <th>留样人</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-deliveries" class="content-panel">
+      <div class="panel-header">
+        <h2>配送签收</h2>
+        <div class="filters">
+          <button class="btn btn-primary" onclick="openCreateDeliveryModal()">+ 新建配送</button>
+        </div>
+      </div>
+      <div class="scrollable-table">
+        <table id="deliveriesTable">
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>菜品</th>
+              <th>目的门店</th>
+              <th>配送数量</th>
+              <th>配送温度</th>
+              <th>状态</th>
+              <th>签收人</th>
+              <th>到达时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-anomalies" class="content-panel">
+      <div class="panel-header">
+        <h2>温度异常记录</h2>
+      </div>
+      <div class="scrollable-table">
+        <table id="anomaliesTable">
+          <thead>
+            <tr>
+              <th>批次号</th>
+              <th>菜品</th>
+              <th>门店</th>
+              <th>记录温度</th>
+              <th>允许范围</th>
+              <th>异常类型</th>
+              <th>处理意见</th>
+              <th>处理人</th>
+              <th>异常时间</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-complaints" class="content-panel">
+      <div class="panel-header">
+        <h2>门店投诉</h2>
+        <div class="filters">
+          <button class="btn btn-primary" onclick="openCreateComplaintModal()">+ 新建投诉</button>
+        </div>
+      </div>
+      <div class="scrollable-table">
+        <table id="complaintsTable">
+          <thead>
+            <tr>
+              <th>投诉编号</th>
+              <th>投诉门店</th>
+              <th>投诉日期</th>
+              <th>涉及菜品</th>
+              <th>关联批次</th>
+              <th>投诉类型</th>
+              <th>描述</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-traceability" class="content-panel">
+      <div class="panel-header">
+        <h2>追溯报告</h2>
+        <div class="filters">
+          <div class="input-group">
+            <label>追溯类型:</label>
+            <select id="traceType">
+              <option value="complaint">按投诉追溯</option>
+              <option value="batch">按批次追溯</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>选择:</label>
+            <select id="traceSelect"></select>
+          </div>
+          <button class="btn btn-primary" onclick="loadTraceability()">🔍 查看追溯</button>
+          <button class="btn btn-success" onclick="exportTraceability()">⬇️ 导出报告</button>
+        </div>
+      </div>
+      <div id="traceabilityContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <p>请选择追溯类型和对象，查看完整追溯链路</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+    </div>
+  </div>
+
+  <script>
+    const API = '/api';
+    let stores = [];
+    let dishes = [];
+    let batches = [];
+    let allDeliveries = [];
+    let complaints = [];
+    let anomalies = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadMasterData();
+      await loadStats();
+      await loadBatches();
+      await loadDeliveries();
+      await loadAnomalies();
+      await loadComplaints();
+      setupTabs();
+      setupFilters();
+      setupTraceSelect();
+    });
+
+    function setupTabs() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+        });
+      });
+    }
+
+    function setupFilters() {
+      document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('filterDate').addEventListener('change', loadBatches);
+      document.getElementById('filterStatus').addEventListener('change', loadBatches);
+    }
+
+    async function loadMasterData() {
+      const [storesRes, dishesRes] = await Promise.all([
+        fetch(`${API}/stores`),
+        fetch(`${API}/dishes`)
+      ]);
+      stores = await storesRes.json();
+      dishes = await dishesRes.json();
+    }
+
+    async function loadStats() {
+      const res = await fetch(`${API}/stats`);
+      const stats = await res.json();
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card success">
+          <div class="stat-value">${stats.today_batches}</div>
+          <div class="stat-label">今日批次</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.total_batches}</div>
+          <div class="stat-label">总批次</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.in_transit}</div>
+          <div class="stat-label">运输中</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.completed_deliveries}</div>
+          <div class="stat-label">已完成配送</div>
+        </div>
+        <div class="stat-card danger ${stats.without_samples > 0 ? 'warning' : ''}">
+          <div class="stat-value">${stats.without_samples}</div>
+          <div class="stat-label">未留样批次</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-value">${stats.pending_complaints}</div>
+          <div class="stat-label">待处理投诉</div>
+        </div>
+      `;
+    }
+
+    async function loadBatches() {
+      const date = document.getElementById('filterDate').value;
+      const status = document.getElementById('filterStatus').value;
+      let url = `${API}/batches`;
+      const params = [];
+      if (date) params.push(`date=${date}`);
+      if (status) params.push(`status=${status}`);
+      if (params.length > 0) url += '?' + params.join('&');
+
+      const res = await fetch(url);
+      batches = await res.json();
+
+      const tbody = document.querySelector('#batchesTable tbody');
+      if (batches.length === 0) {
+        tbody.innerHTML = `
+          <tr><td colspan="10" class="empty-state">暂无批次数据</td></tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = batches.map(b => {
+        const progress = b.delivery_count > 0 ? `${b.completed_deliveries}/${b.delivery_count}` : '未配送';
+        return `
+          <tr>
+            <td><strong>${b.batch_no}</strong></td>
+            <td>${b.dish_name} <span class="tag">${b.category}</span></td>
+            <td>${b.production_date}</td>
+            <td>${b.production_time}</td>
+            <td>${b.quantity} ${b.unit}${b.quantity === 0 ? ' <span class="tag tag-warning">边界值:0</span>' : ''}</td>
+            <td>${b.responsible_person || '<span class="tag tag-danger">缺失</span>'}</td>
+            <td>${b.has_sample ? '<span class="tag tag-success">已留样</span>' : '<span class="tag tag-danger">未留样</span>'}</td>
+            <td>${progress}</td>
+            <td><span class="status-badge status-${b.status}">${getStatusText(b.status)}</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-sm btn-primary" onclick="viewBatchDetail(${b.id})">详情</button>
+                ${!b.has_sample ? `<button class="btn btn-sm btn-warning" onclick="quickSample(${b.id})">快速留样</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      await loadSamplesFromBatches();
+    }
+
+    async function loadSamplesFromBatches() {
+      const allSamples = [];
+      for (const batch of batches) {
+        const res = await fetch(`${API}/batches/${batch.id}`);
+        const data = await res.json();
+        data.samples.forEach(s => {
+          allSamples.push({
+            ...s,
+            batch_no: batch.batch_no,
+            dish_name: batch.dish_name
+          });
+        });
+      }
+
+      const tbody = document.querySelector('#samplesTable tbody');
+      if (allSamples.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state">暂无留样记录</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allSamples.map(s => `
+        <tr>
+          <td>${s.batch_no}</td>
+          <td>${s.dish_name}</td>
+          <td>${s.sample_weight}</td>
+          <td>${s.storage_location}</td>
+          <td>${formatDateTime(s.sample_time)}</td>
+          <td>${s.sampler || '-'}</td>
+          <td><span class="status-badge ${s.status === 'destroyed' ? 'status-completed' : 'status-in_progress'}">
+            ${s.status === 'destroyed' ? '已销毁' : '保存中'}
+          </span></td>
+          <td><button class="btn btn-sm btn-primary" onclick="viewBatchDetail(${s.batch_id})">查看批次</button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadDeliveries() {
+      let allDeliveriesList = [];
+
+      for (const batch of batches) {
+        const res = await fetch(`${API}/batches/${batch.id}`);
+        const data = await res.json();
+        data.deliveries.forEach(d => {
+          allDeliveriesList.push({
+            ...d,
+            batch_no: batch.batch_no,
+            dish_name: batch.dish_name,
+            min_temp: batch.min_temp,
+            max_temp: batch.max_temp
+          });
+        });
+      }
+
+      allDeliveries = allDeliveriesList;
+
+      const tbody = document.querySelector('#deliveriesTable tbody');
+      if (allDeliveries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-state">暂无配送记录</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allDeliveries.map(d => {
+        const hasTempAnomaly = d.transport_temp !== null && (d.transport_temp < d.min_temp || d.transport_temp > d.max_temp);
+        return `
+          <tr>
+            <td>${d.batch_no}</td>
+            <td>${d.dish_name}</td>
+            <td>${d.store_name}</td>
+            <td>${d.delivery_quantity}</td>
+            <td>${d.transport_temp !== null ? d.transport_temp + '°C' : '-'}
+                ${hasTempAnomaly ? '<span class="tag tag-danger">异常</span>' : ''}</td>
+            <td><span class="status-badge status-${d.status}">${getDeliveryStatusText(d.status)}</span></td>
+            <td>${d.received_by || '-'}</td>
+            <td>${d.arrived_at ? formatDateTime(d.arrived_at) : '-'}</td>
+            <td>
+              <div class="action-buttons">
+                ${d.status !== 'completed' ? `
+                  <button class="btn btn-sm btn-success" onclick="completeDelivery(${d.id}, ${d.batch_id}, ${d.min_temp}, ${d.max_temp})">签收</button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadAnomalies() {
+      const res = await fetch(`${API}/temperature-anomalies`);
+      anomalies = await res.json();
+
+      const tbody = document.querySelector('#anomaliesTable tbody');
+      if (anomalies.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-state">暂无温度异常记录</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = anomalies.map(a => `
+        <tr>
+          <td>${a.batch_no}</td>
+          <td>${a.dish_name}</td>
+          <td>${a.store_name}</td>
+          <td><strong style="color: #e74c3c">${a.recorded_temp}°C</strong></td>
+          <td>${a.min_temp}°C ~ ${a.max_temp}°C</td>
+          <td><span class="tag tag-danger">${a.anomaly_type === 'over_temp' ? '温度过高' : '温度过低'}</span></td>
+          <td>${a.handling_opinion || '-'}</td>
+          <td>${a.handled_by || '-'}</td>
+          <td>${formatDateTime(a.anomaly_time)}</td>
+          <td><span class="status-badge ${a.handled ? 'status-resolved' : 'status-pending'}">${a.handled ? '已处理' : '待处理'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadComplaints() {
+      const res = await fetch(`${API}/complaints`);
+      complaints = await res.json();
+
+      const tbody = document.querySelector('#complaintsTable tbody');
+      if (complaints.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-state">暂无投诉记录</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = complaints.map(c => `
+        <tr>
+          <td><strong>${c.complaint_no}</strong></td>
+          <td>${c.store_name}</td>
+          <td>${c.complaint_date}</td>
+          <td>${c.dish_name}</td>
+          <td>${c.batch_no || '<span class="tag tag-warning">未关联</span>'}</td>
+          <td><span class="tag">${getComplaintTypeText(c.complaint_type)}</span></td>
+          <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${c.description}</td>
+          <td><span class="status-badge status-${c.status}">${c.status === 'resolved' ? '已处理' : '待处理'}</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn btn-sm btn-primary" onclick="viewComplaintDetail(${c.id})">详情</button>
+              ${c.status !== 'resolved' ? `
+                <button class="btn btn-sm btn-success" onclick="resolveComplaint(${c.id})">处理</button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      updateTraceSelect();
+    }
+
+    function setupTraceSelect() {
+      document.getElementById('traceType').addEventListener('change', updateTraceSelect);
+    }
+
+    async function updateTraceSelect() {
+      const type = document.getElementById('traceType').value;
+      const select = document.getElementById('traceSelect');
+
+      if (type === 'complaint') {
+        select.innerHTML = complaints.map(c =>
+          `<option value="${c.id}">${c.complaint_no} - ${c.store_name} - ${c.dish_name}</option>`
+        ).join('');
+      } else {
+        select.innerHTML = batches.map(b =>
+          `<option value="${b.id}">${b.batch_no} - ${b.dish_name}</option>`
+        ).join('');
+      }
+    }
+
+    async function loadTraceability() {
+      const type = document.getElementById('traceType').value;
+      const id = document.getElementById('traceSelect').value;
+
+      const res = await fetch(`${API}/traceability/${type}/${id}`);
+      const data = await res.json();
+
+      const container = document.getElementById('traceabilityContent');
+
+      if (type === 'complaint' && data.complaint) {
+        container.innerHTML = renderComplaintTrace(data);
+      } else if (type === 'batch' && data.batch) {
+        container.innerHTML = renderBatchTrace(data);
+      } else {
+        container.innerHTML = `<div class="alert alert-error">未找到追溯数据</div>`;
+      }
+    }
+
+    function renderComplaintTrace(data) {
+      const c = data.complaint;
+      let html = `
+        <div class="detail-card">
+          <div class="detail-card-title">📋 投诉信息</div>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="detail-item-label">投诉编号</div><div class="detail-item-value">${c.complaint_no}</div></div>
+            <div class="detail-item"><div class="detail-item-label">投诉门店</div><div class="detail-item-value">${c.store_name}</div></div>
+            <div class="detail-item"><div class="detail-item-label">投诉日期</div><div class="detail-item-value">${c.complaint_date}</div></div>
+            <div class="detail-item"><div class="detail-item-label">投诉类型</div><div class="detail-item-value">${getComplaintTypeText(c.complaint_type)}</div></div>
+            <div class="detail-item"><div class="detail-item-label">投诉人</div><div class="detail-item-value">${c.reporter || '-'}</div></div>
+            <div class="detail-item"><div class="detail-item-label">状态</div><div class="detail-item-value"><span class="status-badge status-${c.status}">${c.status === 'resolved' ? '已处理' : '待处理'}</span></div></div>
+            <div class="detail-item" style="grid-column: 1 / -1"><div class="detail-item-label">投诉描述</div><div class="detail-item-value">${c.description}</div></div>
+            ${c.resolution ? `<div class="detail-item" style="grid-column: 1 / -1"><div class="detail-item-label">处理方案</div><div class="detail-item-value">${c.resolution}</div></div>` : ''}
+          </div>
+        </div>
+      `;
+
+      if (data.batch || (data.complaint && data.complaint.batch_id)) {
+        html += `
+          <div class="trace-flow">
+            <div class="flow-title">🔗 追溯链路：投诉 → 批次 → 留样/配送 → 温度异常</div>
+        `;
+
+        if (data.samples && data.samples.length > 0) {
+          html += `
+            <div class="flow-node">
+              <div class="flow-node-title">🧪 留样记录</div>
+              <div class="flow-node-content">
+                ${data.samples.map((s, i) => `
+                  <div>留样${i + 1}: <span class="highlight">${s.sample_weight}g</span> 存放于 <span class="highlight">${s.storage_location}</span></div>
+                  <div style="margin-left: 20px">留样时间: ${formatDateTime(s.sample_time)} | 留样人: ${s.sampler || '-'} | 状态: ${s.status === 'destroyed' ? '已销毁' : '保存中'}</div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (data.deliveries && data.deliveries.length > 0) {
+          html += `
+            <div class="flow-node">
+              <div class="flow-node-title">🚚 配送记录</div>
+              <div class="flow-node-content">
+                ${data.deliveries.map((d, i) => `
+                  <div>配送${i + 1}: 送往 <span class="highlight">${d.store_name}</span> 数量 <span class="highlight">${d.delivery_quantity}</span></div>
+                  <div style="margin-left: 20px">
+                    状态: ${getDeliveryStatusText(d.status)} | 
+                    ${d.transport_temp !== null ? `温度: <span class="highlight">${d.transport_temp}°C</span>` : ''} | 
+                    ${d.received_by ? `签收人: ${d.received_by}` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (data.anomalies && data.anomalies.length > 0) {
+          html += `
+            <div class="flow-node">
+              <div class="flow-node-title">⚠️ 温度异常</div>
+              <div class="flow-node-content">
+                ${data.anomalies.map((a, i) => `
+                  <div>异常${i + 1}: 记录温度 <span class="highlight" style="color: #e74c3c">${a.recorded_temp}°C</span> (范围: ${a.min_temp}°C ~ ${a.max_temp}°C)</div>
+                  <div style="margin-left: 20px">
+                    类型: ${a.anomaly_type === 'over_temp' ? '温度过高' : '温度过低'} | 
+                    处理意见: ${a.handling_opinion || '-'}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      } else {
+        html += `
+          <div class="alert alert-warning">
+            ⚠️ 该投诉暂未关联到具体批次，无法追溯完整链路。请在投诉详情中关联对应批次。
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function renderBatchTrace(data) {
+      const b = data.batch;
+      let html = `
+        <div class="detail-card">
+          <div class="detail-card-title">📦 批次信息</div>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="detail-item-label">批次号</div><div class="detail-item-value">${b.batch_no}</div></div>
+            <div class="detail-item"><div class="detail-item-label">菜品</div><div class="detail-item-value">${b.dish_name} (${b.code})</div></div>
+            <div class="detail-item"><div class="detail-item-label">生产日期</div><div class="detail-item-value">${b.production_date} ${b.production_time}</div></div>
+            <div class="detail-item"><div class="detail-item-label">数量</div><div class="detail-item-value">${b.quantity} ${b.unit}</div></div>
+            <div class="detail-item"><div class="detail-item-label">负责人</div><div class="detail-item-value">${b.responsible_person || '<span class="tag tag-danger">缺失</span>'}</div></div>
+            <div class="detail-item"><div class="detail-item-label">温度要求</div><div class="detail-item-value">${b.min_temp}°C ~ ${b.max_temp}°C</div></div>
+            <div class="detail-item"><div class="detail-item-label">状态</div><div class="detail-item-value"><span class="status-badge status-${b.status}">${getStatusText(b.status)}</span></div></div>
+          </div>
+        </div>
+
+        <div class="trace-flow">
+          <div class="flow-title">🔗 追溯链路：批次 → 留样 → 配送 → 投诉</div>
+      `;
+
+      if (data.samples && data.samples.length > 0) {
+        html += `
+          <div class="flow-node">
+            <div class="flow-node-title">🧪 留样记录</div>
+            <div class="flow-node-content">
+              ${data.samples.map((s, i) => `
+                <div>留样${i + 1}: <span class="highlight">${s.sample_weight}g</span> @ <span class="highlight">${s.storage_location}</span></div>
+                <div style="margin-left: 20px">时间: ${formatDateTime(s.sample_time)} | 留样人: ${s.sampler || '-'} | ${s.status === 'destroyed' ? '已销毁' : '保存中'}</div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="flow-node">
+            <div class="flow-node-title">🧪 留样记录</div>
+            <div class="flow-node-content"><span style="color: #e74c3c">⚠️ 该批次尚未留样！</span></div>
+          </div>
+        `;
+      }
+
+      if (data.deliveries && data.deliveries.length > 0) {
+        html += `
+          <div class="flow-node">
+            <div class="flow-node-title">🚚 配送记录</div>
+            <div class="flow-node-content">
+              ${data.deliveries.map((d, i) => `
+                <div>配送${i + 1}: <span class="highlight">${d.store_name}</span> x ${d.delivery_quantity}</div>
+                <div style="margin-left: 20px">
+                  ${getDeliveryStatusText(d.status)}
+                  ${d.transport_temp !== null ? ` | 温度: <span class="highlight">${d.transport_temp}°C</span>` : ''}
+                  ${d.received_by ? ` | 签收: ${d.received_by}` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (data.anomalies && data.anomalies.length > 0) {
+        html += `
+          <div class="flow-node">
+            <div class="flow-node-title">⚠️ 温度异常</div>
+            <div class="flow-node-content">
+              ${data.anomalies.map((a, i) => `
+                <div>异常${i + 1}: <span class="highlight" style="color: #e74c3c">${a.recorded_temp}°C</span> (允许: ${a.min_temp}°C ~ ${a.max_temp}°C)</div>
+                <div style="margin-left: 20px">${a.anomaly_type === 'over_temp' ? '温度过高' : '温度过低'} | 处理: ${a.handling_opinion || '-'}</div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (data.complaints && data.complaints.length > 0) {
+        html += `
+          <div class="flow-node">
+            <div class="flow-node-title">📋 关联投诉</div>
+            <div class="flow-node-content">
+              ${data.complaints.map((c, i) => `
+                <div>投诉${i + 1}: <span class="highlight">${c.complaint_no}</span> - ${c.store_name}</div>
+                <div style="margin-left: 20px">${getComplaintTypeText(c.complaint_type)}: ${c.description}</div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    async function exportTraceability() {
+      const type = document.getElementById('traceType').value;
+      const id = document.getElementById('traceSelect').value;
+      window.open(`${API}/export/traceability/${type}/${id}`, '_blank');
+    }
+
+    function openModal(html, large = false) {
+      const overlay = document.getElementById('modalOverlay');
+      const content = document.getElementById('modalContent');
+      content.innerHTML = html;
+      content.className = 'modal' + (large ? ' large' : '');
+      overlay.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') closeModal();
+    });
+
+    function openCreateBatchModal() {
+      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      openModal(`
+        <div class="modal-header">
+          <h3>📦 新建批次</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form onsubmit="createBatch(event)">
+          <div id="batchFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>批次号 <span class="required">*</span></label>
+              <input type="text" id="batch_no" required placeholder="如: BATCH-20260510-001">
+            </div>
+            <div class="form-group">
+              <label>菜品 <span class="required">*</span></label>
+              <select id="dish_id" required>
+                <option value="">请选择菜品</option>
+                ${dishes.map(d => `<option value="${d.id}">${d.name} (${d.category})</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>生产日期 <span class="required">*</span></label>
+              <input type="date" id="production_date" value="${today}" required>
+            </div>
+            <div class="form-group">
+              <label>生产时间 <span class="required">*</span></label>
+              <input type="time" id="production_time" value="${time}" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>生产数量</label>
+              <input type="number" id="quantity" value="0" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+              <label>单位</label>
+              <input type="text" id="unit" value="份">
+            </div>
+            <div class="form-group">
+              <label>负责人</label>
+              <input type="text" id="responsible_person" placeholder="可选">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="notes" placeholder="可选"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">创建批次</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function createBatch(e) {
+      e.preventDefault();
+      const data = {
+        batch_no: document.getElementById('batch_no').value,
+        dish_id: parseInt(document.getElementById('dish_id').value),
+        production_date: document.getElementById('production_date').value,
+        production_time: document.getElementById('production_time').value,
+        quantity: parseFloat(document.getElementById('quantity').value) || 0,
+        unit: document.getElementById('unit').value,
+        responsible_person: document.getElementById('responsible_person').value,
+        notes: document.getElementById('notes').value
+      };
+
+      const res = await fetch(`${API}/batches`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('batchFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    function openCreateSampleModal() {
+      const batchesWithoutSample = batches.filter(b => !b.has_sample);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>🧪 新增留样</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form onsubmit="createSample(event)">
+          <div id="sampleFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>关联批次 <span class="required">*</span></label>
+              <select id="sample_batch_id" required>
+                <option value="">请选择批次</option>
+                ${batches.map(b => `<option value="${b.id}" ${!b.has_sample ? '' : 'disabled'}>
+                  ${b.batch_no} - ${b.dish_name} ${b.has_sample ? '(已留样)' : ''}
+                </option>`).join('')}
+              </select>
+              ${batchesWithoutSample.length === 0 ? '<p style="font-size: 12px; color: #666; margin-top: 4px;">所有批次均已留样</p>' : ''}
+            </div>
+            <div class="form-group">
+              <label>留样重量(g) <span class="required">*</span></label>
+              <input type="number" id="sample_weight" required min="0.01" step="0.01" value="150">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>存放位置 <span class="required">*</span></label>
+              <input type="text" id="storage_location" required placeholder="如: 冷藏柜A-01">
+            </div>
+            <div class="form-group">
+              <label>留样人</label>
+              <input type="text" id="sampler" placeholder="可选">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="sample_notes" placeholder="可选"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">登记留样</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function quickSample(batchId) {
+      const batch = batches.find(b => b.id === batchId);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>🧪 快速留样 - ${batch.batch_no}</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form onsubmit="createSample(event)">
+          <div id="sampleFormAlert"></div>
+          <input type="hidden" id="sample_batch_id" value="${batchId}">
+          <div class="form-row">
+            <div class="form-group">
+              <label>留样重量(g) <span class="required">*</span></label>
+              <input type="number" id="sample_weight" required min="0.01" step="0.01" value="150">
+            </div>
+            <div class="form-group">
+              <label>存放位置 <span class="required">*</span></label>
+              <input type="text" id="storage_location" required placeholder="如: 冷藏柜A-01">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>留样人</label>
+              <input type="text" id="sampler" placeholder="可选">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="sample_notes" placeholder="可选"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">登记留样</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function createSample(e) {
+      e.preventDefault();
+      const data = {
+        batch_id: parseInt(document.getElementById('sample_batch_id').value),
+        sample_weight: parseFloat(document.getElementById('sample_weight').value),
+        storage_location: document.getElementById('storage_location').value,
+        sampler: document.getElementById('sampler').value,
+        notes: document.getElementById('sample_notes').value
+      };
+
+      const res = await fetch(`${API}/samples`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('sampleFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    function openCreateDeliveryModal() {
+      const batchesWithSample = batches.filter(b => b.has_sample);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>🚚 新建配送</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form onsubmit="createDelivery(event)">
+          <div id="deliveryFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>批次 <span class="required">*</span></label>
+              <select id="delivery_batch_id" required>
+                <option value="">请选择批次</option>
+                ${batches.map(b => `<option value="${b.id}">${b.batch_no} - ${b.dish_name} ${b.has_sample ? '' : '(未留样)'}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>目的门店 <span class="required">*</span></label>
+              <select id="delivery_store_id" required>
+                <option value="">请选择门店</option>
+                ${stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>配送数量 <span class="required">*</span></label>
+              <input type="number" id="delivery_quantity" required min="0.01" step="0.01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="delivery_notes" placeholder="可选"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">创建配送</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function createDelivery(e) {
+      e.preventDefault();
+      const data = {
+        batch_id: parseInt(document.getElementById('delivery_batch_id').value),
+        store_id: parseInt(document.getElementById('delivery_store_id').value),
+        delivery_quantity: parseFloat(document.getElementById('delivery_quantity').value),
+        notes: document.getElementById('delivery_notes').value
+      };
+
+      const res = await fetch(`${API}/deliveries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('deliveryFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    function completeDelivery(deliveryId, batchId, minTemp, maxTemp) {
+      const delivery = allDeliveries.find(d => d.id === deliveryId);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>✅ 配送签收 - ${delivery.store_name}</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          <strong>注意:</strong> 该菜品要求温度范围为 ${minTemp}°C ~ ${maxTemp}°C。
+          <br>如温度异常，请先记录异常并填写处理意见后再签收。
+        </div>
+        <form onsubmit="submitCompleteDelivery(event, ${deliveryId}, ${batchId}, ${minTemp}, ${maxTemp})">
+          <div id="completeFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>配送温度(°C)</label>
+              <input type="number" id="transport_temp" step="0.1" placeholder="选填">
+            </div>
+            <div class="form-group">
+              <label>签收人</label>
+              <input type="text" id="received_by" placeholder="选填">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>签收备注</label>
+            <textarea id="complete_notes" placeholder="可选"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-warning" onclick="openTempAnomalyModal(${deliveryId}, ${batchId}, ${minTemp}, ${maxTemp})">
+              记录温度异常
+            </button>
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">确认签收</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function openTempAnomalyModal(deliveryId, batchId, minTemp, maxTemp) {
+      const delivery = allDeliveries.find(d => d.id === deliveryId);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>⚠️ 记录温度异常</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="alert alert-danger">
+          <strong>温度要求:</strong> ${minTemp}°C ~ ${maxTemp}°C<br>
+          <strong>配送:</strong> ${delivery.batch_no} → ${delivery.store_name}
+        </div>
+        <form onsubmit="submitTemperatureAnomaly(event, ${deliveryId}, ${minTemp}, ${maxTemp})">
+          <div id="anomalyFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>实际温度(°C) <span class="required">*</span></label>
+              <input type="number" id="recorded_temp" step="0.1" required placeholder="如: 15.5">
+            </div>
+            <div class="form-group">
+              <label>处理人</label>
+              <input type="text" id="handled_by" placeholder="选填">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>处理意见 <span class="required">*</span></label>
+            <textarea id="handling_opinion" required placeholder="请详细说明异常原因和处理措施..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">提交异常记录</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function submitTemperatureAnomaly(e, deliveryId, minTemp, maxTemp) {
+      e.preventDefault();
+      const data = {
+        delivery_id: deliveryId,
+        recorded_temp: parseFloat(document.getElementById('recorded_temp').value),
+        min_temp: minTemp,
+        max_temp: maxTemp,
+        handling_opinion: document.getElementById('handling_opinion').value,
+        handled_by: document.getElementById('handled_by').value
+      };
+
+      const res = await fetch(`${API}/temperature-anomalies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('anomalyFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    async function submitCompleteDelivery(e, deliveryId, batchId, minTemp, maxTemp) {
+      e.preventDefault();
+
+      const tempInput = document.getElementById('transport_temp').value;
+      const data = {
+        transport_temp: tempInput ? parseFloat(tempInput) : null,
+        received_by: document.getElementById('received_by').value,
+        notes: document.getElementById('complete_notes').value
+      };
+
+      const res = await fetch(`${API}/deliveries/${deliveryId}/complete`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        if (result.temp_anomaly) {
+          document.getElementById('completeFormAlert').innerHTML = `
+            <div class="alert alert-error">
+              ${result.error}<br>
+              <strong>记录温度:</strong> ${result.recorded_temp}°C<br>
+              <strong>允许范围:</strong> ${result.min_temp}°C ~ ${result.max_temp}°C<br>
+              请点击「记录温度异常」按钮先登记异常。
+            </div>
+          `;
+        } else {
+          document.getElementById('completeFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        }
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    function openCreateComplaintModal() {
+      const today = new Date().toISOString().split('T')[0];
+
+      openModal(`
+        <div class="modal-header">
+          <h3>📋 新建投诉</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          <strong>业务规则:</strong> 投诉只能关联到对应日期和菜品的批次（7天内）。
+        </div>
+        <form onsubmit="createComplaint(event)">
+          <div id="complaintFormAlert"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>投诉门店 <span class="required">*</span></label>
+              <select id="complaint_store_id" required>
+                <option value="">请选择门店</option>
+                ${stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>投诉日期 <span class="required">*</span></label>
+              <input type="date" id="complaint_date" value="${today}" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>涉及菜品 <span class="required">*</span></label>
+              <select id="complaint_dish_id" required onchange="updateBatchOptions()">
+                <option value="">请选择菜品</option>
+                ${dishes.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label>关联批次</label>
+              <select id="complaint_batch_id">
+                <option value="">不关联批次</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>投诉类型</label>
+              <select id="complaint_type">
+                <option value="quality">质量问题</option>
+                <option value="delivery">配送问题</option>
+                <option value="quantity">数量问题</option>
+                <option value="temperature">温度问题</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>投诉人</label>
+              <input type="text" id="reporter" placeholder="可选">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>投诉描述 <span class="required">*</span></label>
+            <textarea id="complaint_description" required placeholder="请详细描述投诉内容..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">提交投诉</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function updateBatchOptions() {
+      const dishId = parseInt(document.getElementById('complaint_dish_id').value);
+      const complaintDate = document.getElementById('complaint_date').value;
+      const batchSelect = document.getElementById('complaint_batch_id');
+
+      if (!dishId) {
+        batchSelect.innerHTML = '<option value="">不关联批次</option>';
+        return;
+      }
+
+      const today = new Date(complaintDate);
+      const sevenDaysAgo = new Date(today);
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const filteredBatches = batches.filter(b => {
+        if (b.dish_id !== dishId) return false;
+        const batchDate = new Date(b.production_date);
+        return batchDate >= sevenDaysAgo && batchDate <= today;
+      });
+
+      batchSelect.innerHTML = '<option value="">不关联批次</option>' +
+        filteredBatches.map(b => `<option value="${b.id}">${b.batch_no} (${b.production_date})</option>`).join('');
+    }
+
+    async function createComplaint(e) {
+      e.preventDefault();
+
+      const batchId = document.getElementById('complaint_batch_id').value;
+
+      const data = {
+        store_id: parseInt(document.getElementById('complaint_store_id').value),
+        complaint_date: document.getElementById('complaint_date').value,
+        dish_id: parseInt(document.getElementById('complaint_dish_id').value),
+        batch_id: batchId ? parseInt(batchId) : null,
+        complaint_type: document.getElementById('complaint_type').value,
+        description: document.getElementById('complaint_description').value,
+        reporter: document.getElementById('reporter').value
+      };
+
+      const res = await fetch(`${API}/complaints`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('complaintFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    async function viewBatchDetail(batchId) {
+      const res = await fetch(`${API}/batches/${batchId}`);
+      const data = await res.json();
+
+      const { batch, samples, deliveries, anomalies } = data;
+
+      openModal(`
+        <div class="modal-header">
+          <h3>📦 批次详情 - ${batch.batch_no}</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">基本信息</div>
+          <div class="detail-grid">
+            <div class="detail-item"><div class="detail-item-label">批次号</div><div class="detail-item-value">${batch.batch_no}</div></div>
+            <div class="detail-item"><div class="detail-item-label">菜品</div><div class="detail-item-value">${batch.dish_name}</div></div>
+            <div class="detail-item"><div class="detail-item-label">分类</div><div class="detail-item-value">${batch.category}</div></div>
+            <div class="detail-item"><div class="detail-item-label">生产日期</div><div class="detail-item-value">${batch.production_date} ${batch.production_time}</div></div>
+            <div class="detail-item"><div class="detail-item-label">数量</div><div class="detail-item-value">${batch.quantity} ${batch.unit}${batch.quantity === 0 ? ' <span class="tag tag-warning">边界值:0</span>' : ''}</div></div>
+            <div class="detail-item"><div class="detail-item-label">负责人</div><div class="detail-item-value">${batch.responsible_person || '<span class="tag tag-danger">缺失</span>'}</div></div>
+            <div class="detail-item"><div class="detail-item-label">温度要求</div><div class="detail-item-value">${batch.min_temp}°C ~ ${batch.max_temp}°C</div></div>
+            <div class="detail-item"><div class="detail-item-label">状态</div><div class="detail-item-value"><span class="status-badge status-${batch.status}">${getStatusText(batch.status)}</span></div></div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">🧪 留样记录 (${samples.length})</div>
+          ${samples.length === 0 ? '<p style="color: #e74c3c">⚠️ 尚未留样！</p>' : `
+            <table style="font-size: 13px;">
+              <thead>
+                <tr><th>重量(g)</th><th>位置</th><th>时间</th><th>留样人</th><th>状态</th></tr>
+              </thead>
+              <tbody>
+                ${samples.map(s => `
+                  <tr>
+                    <td>${s.sample_weight}</td>
+                    <td>${s.storage_location}</td>
+                    <td>${formatDateTime(s.sample_time)}</td>
+                    <td>${s.sampler || '-'}</td>
+                    <td>${s.status === 'destroyed' ? '已销毁' : '保存中'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `}
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-card-title">🚚 配送记录 (${deliveries.length})</div>
+          ${deliveries.length === 0 ? '<p style="color: #666">暂无配送</p>' : `
+            <table style="font-size: 13px;">
+              <thead>
+                <tr><th>门店</th><th>数量</th><th>温度</th><th>签收人</th><th>状态</th></tr>
+              </thead>
+              <tbody>
+                ${deliveries.map(d => `
+                  <tr>
+                    <td>${d.store_name}</td>
+                    <td>${d.delivery_quantity}</td>
+                    <td>${d.transport_temp !== null ? d.transport_temp + '°C' : '-'}</td>
+                    <td>${d.received_by || '-'}</td>
+                    <td><span class="status-badge status-${d.status}">${getDeliveryStatusText(d.status)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `}
+        </div>
+
+        ${anomalies.length > 0 ? `
+          <div class="detail-card">
+            <div class="detail-card-title">⚠️ 温度异常 (${anomalies.length})</div>
+            <table style="font-size: 13px;">
+              <thead>
+                <tr><th>温度</th><th>范围</th><th>类型</th><th>处理意见</th><th>状态</th></tr>
+              </thead>
+              <tbody>
+                ${anomalies.map(a => `
+                  <tr>
+                    <td style="color: #e74c3c"><strong>${a.recorded_temp}°C</strong></td>
+                    <td>${a.min_temp}°C ~ ${a.max_temp}°C</td>
+                    <td>${a.anomaly_type === 'over_temp' ? '过高' : '过低'}</td>
+                    <td>${a.handling_opinion || '-'}</td>
+                    <td>${a.handled ? '已处理' : '待处理'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="openTraceByBatch(${batchId})">查看追溯报告</button>
+          <button type="button" class="btn" onclick="closeModal()">关闭</button>
+        </div>
+      `, true);
+    }
+
+    function openTraceByBatch(batchId) {
+      closeModal();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.tab-btn[data-tab="traceability"]').classList.add('active');
+      document.getElementById('panel-traceability').classList.add('active');
+      document.getElementById('traceType').value = 'batch';
+      updateTraceSelect();
+      setTimeout(() => {
+        document.getElementById('traceSelect').value = batchId;
+        loadTraceability();
+      }, 100);
+    }
+
+    async function viewComplaintDetail(complaintId) {
+      const complaint = complaints.find(c => c.id === complaintId);
+
+      openModal(`
+        <div class="modal-header">
+          <h3>📋 投诉详情 - ${complaint.complaint_no}</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-grid">
+            <div class="detail-item"><div class="detail-item-label">投诉编号</div><div class="detail-item-value">${complaint.complaint_no}</div></div>
+            <div class="detail-item"><div class="detail-item-label">门店</div><div class="detail-item-value">${complaint.store_name}</div></div>
+            <div class="detail-item"><div class="detail-item-label">日期</div><div class="detail-item-value">${complaint.complaint_date}</div></div>
+            <div class="detail-item"><div class="detail-item-label">菜品</div><div class="detail-item-value">${complaint.dish_name}</div></div>
+            <div class="detail-item"><div class="detail-item-label">批次</div><div class="detail-item-value">${complaint.batch_no || '未关联'}</div></div>
+            <div class="detail-item"><div class="detail-item-label">类型</div><div class="detail-item-value">${getComplaintTypeText(complaint.complaint_type)}</div></div>
+            <div class="detail-item"><div class="detail-item-label">投诉人</div><div class="detail-item-value">${complaint.reporter || '-'}</div></div>
+            <div class="detail-item"><div class="detail-item-label">状态</div><div class="detail-item-value"><span class="status-badge status-${complaint.status}">${complaint.status === 'resolved' ? '已处理' : '待处理'}</span></div></div>
+            <div class="detail-item" style="grid-column: 1 / -1"><div class="detail-item-label">投诉描述</div><div class="detail-item-value">${complaint.description}</div></div>
+            ${complaint.resolution ? `<div class="detail-item" style="grid-column: 1 / -1"><div class="detail-item-label">处理方案</div><div class="detail-item-value">${complaint.resolution}</div></div>` : ''}
+          </div>
+        </div>
+
+        <div class="form-actions">
+          ${complaint.batch_id ? `<button class="btn btn-primary" onclick="openTraceByComplaint(${complaintId})">查看追溯报告</button>` : ''}
+          <button type="button" class="btn" onclick="closeModal()">关闭</button>
+        </div>
+      `);
+    }
+
+    function openTraceByComplaint(complaintId) {
+      closeModal();
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('.tab-btn[data-tab="traceability"]').classList.add('active');
+      document.getElementById('panel-traceability').classList.add('active');
+      document.getElementById('traceType').value = 'complaint';
+      updateTraceSelect();
+      setTimeout(() => {
+        document.getElementById('traceSelect').value = complaintId;
+        loadTraceability();
+      }, 100);
+    }
+
+    function resolveComplaint(complaintId) {
+      openModal(`
+        <div class="modal-header">
+          <h3>✅ 处理投诉</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form onsubmit="submitResolveComplaint(event, ${complaintId})">
+          <div id="resolveFormAlert"></div>
+          <div class="form-group">
+            <label>处理方案 <span class="required">*</span></label>
+            <textarea id="resolution" required placeholder="请详细说明处理方案..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal()">取消</button>
+            <button type="submit" class="btn btn-primary">标记已处理</button>
+          </div>
+        </form>
+      `);
+    }
+
+    async function submitResolveComplaint(e, complaintId) {
+      e.preventDefault();
+
+      const data = {
+        resolution: document.getElementById('resolution').value
+      };
+
+      const res = await fetch(`${API}/complaints/${complaintId}/resolve`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        document.getElementById('resolveFormAlert').innerHTML = `<div class="alert alert-error">${result.error}</div>`;
+        return;
+      }
+
+      closeModal();
+      await refreshAll();
+    }
+
+    async function refreshAll() {
+      await loadStats();
+      await loadBatches();
+      await loadDeliveries();
+      await loadAnomalies();
+      await loadComplaints();
+      updateTraceSelect();
+    }
+
+    function getStatusText(status) {
+      const map = {
+        created: '已创建',
+        in_progress: '配送中',
+        delivered: '已完成'
+      };
+      return map[status] || status;
+    }
+
+    function getDeliveryStatusText(status) {
+      const map = {
+        pending: '待配送',
+        in_transit: '运输中',
+        completed: '已完成'
+      };
+      return map[status] || status;
+    }
+
+    function getComplaintTypeText(type) {
+      const map = {
+        quality: '质量问题',
+        delivery: '配送问题',
+        quantity: '数量问题',
+        temperature: '温度问题',
+        other: '其他'
+      };
+      return map[type] || type;
+    }
+
+    function formatDateTime(dt) {
+      if (!dt) return '-';
+      const d = new Date(dt);
+      return d.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+  </script>
+</body>
+</html>
