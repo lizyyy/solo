@@ -1,0 +1,380 @@
+{
+  "id": "1118a862-5ea9-44d5-acb6-70b8964186ab",
+  "timestamp": 1778421234572,
+  "logEntries": [
+    {
+      "id": "74da9527-b0d4-4ec4-ad23-05dc9a5fcc90",
+      "timestamp": 1778421234549,
+      "operationId": "599f41a1-21c1-4ddb-8d4c-5e40c94f3527",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "READ",
+      "sql": "SELECT * FROM test_transfer WHERE account_id = ?",
+      "params": [
+        "ACCOUNT_A"
+      ],
+      "startTime": 1778421234549,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234549,
+      "duration": 0
+    },
+    {
+      "id": "74da9527-b0d4-4ec4-ad23-05dc9a5fcc90",
+      "timestamp": 1778421234549,
+      "operationId": "599f41a1-21c1-4ddb-8d4c-5e40c94f3527",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "READ",
+      "sql": "SELECT * FROM test_transfer WHERE account_id = ?",
+      "params": [
+        "ACCOUNT_A"
+      ],
+      "startTime": 1778421234549,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234549,
+      "duration": 0
+    },
+    {
+      "id": "2a73547a-ab4f-4ef7-b803-1cdd051c578e",
+      "timestamp": 1778421234549,
+      "operationId": "dc5e9f27-8b13-4113-b673-1e95b0fa2bfa",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "COMMIT",
+      "startTime": 1778421234549,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234551,
+      "duration": 2
+    },
+    {
+      "id": "2a73547a-ab4f-4ef7-b803-1cdd051c578e",
+      "timestamp": 1778421234549,
+      "operationId": "dc5e9f27-8b13-4113-b673-1e95b0fa2bfa",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "COMMIT",
+      "startTime": 1778421234549,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234551,
+      "duration": 2
+    },
+    {
+      "id": "1e61ac9e-1b2e-413b-8b6b-c7854a6b01b7",
+      "timestamp": 1778421234550,
+      "operationId": "b47ca708-f536-4b02-8635-b65743a6e06d",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "UPDATE test_transfer SET balance = balance - ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        100,
+        "ACCOUNT_A"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "1e61ac9e-1b2e-413b-8b6b-c7854a6b01b7",
+      "timestamp": 1778421234550,
+      "operationId": "b47ca708-f536-4b02-8635-b65743a6e06d",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "UPDATE test_transfer SET balance = balance - ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        100,
+        "ACCOUNT_A"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "a08c3252-3652-4155-9792-08693e36d437",
+      "timestamp": 1778421234550,
+      "operationId": "21559855-498d-4b21-a3ed-12a02f6a8833",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "UPDATE test_transfer SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        100,
+        "ACCOUNT_B"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "a08c3252-3652-4155-9792-08693e36d437",
+      "timestamp": 1778421234550,
+      "operationId": "21559855-498d-4b21-a3ed-12a02f6a8833",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "UPDATE test_transfer SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        100,
+        "ACCOUNT_B"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "cd210a93-a2f1-4e02-be3d-2bac4c117f2f",
+      "timestamp": 1778421234550,
+      "operationId": "2d4b9bad-8fb3-4e87-b678-f325905546d6",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO test_transfer_log (from_account, to_account, amount, status) VALUES (?, ?, ?, ?)",
+      "params": [
+        "ACCOUNT_A",
+        "ACCOUNT_B",
+        100,
+        "SUCCESS"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "cd210a93-a2f1-4e02-be3d-2bac4c117f2f",
+      "timestamp": 1778421234550,
+      "operationId": "2d4b9bad-8fb3-4e87-b678-f325905546d6",
+      "transactionId": "d184437c-71c7-4621-a103-81967323341a",
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO test_transfer_log (from_account, to_account, amount, status) VALUES (?, ?, ?, ?)",
+      "params": [
+        "ACCOUNT_A",
+        "ACCOUNT_B",
+        100,
+        "SUCCESS"
+      ],
+      "startTime": 1778421234550,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234550,
+      "duration": 0
+    },
+    {
+      "id": "c52d6720-6892-49dd-a86d-a99ea9175e9e",
+      "timestamp": 1778421234552,
+      "operationId": "dbc37fcb-1905-4f53-b308-3047dd7bc447",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "READ",
+      "sql": "SELECT * FROM test_transfer",
+      "startTime": 1778421234552,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234552,
+      "duration": 0
+    },
+    {
+      "id": "c52d6720-6892-49dd-a86d-a99ea9175e9e",
+      "timestamp": 1778421234552,
+      "operationId": "dbc37fcb-1905-4f53-b308-3047dd7bc447",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "READ",
+      "sql": "SELECT * FROM test_transfer",
+      "startTime": 1778421234552,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234552,
+      "duration": 0
+    },
+    {
+      "id": "9cd97b9c-3ef8-461e-a9e4-084214e51dce",
+      "timestamp": 1778421234552,
+      "operationId": "91870c89-ab68-43f5-80be-fa9d606f268c",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO test_transfer (account_id, balance) VALUES (?, ?)",
+      "params": [
+        "ACCOUNT_A",
+        2000
+      ],
+      "startTime": 1778421234552,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234552,
+      "duration": 0
+    },
+    {
+      "id": "9cd97b9c-3ef8-461e-a9e4-084214e51dce",
+      "timestamp": 1778421234552,
+      "operationId": "91870c89-ab68-43f5-80be-fa9d606f268c",
+      "transactionId": null,
+      "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO test_transfer (account_id, balance) VALUES (?, ?)",
+      "params": [
+        "ACCOUNT_A",
+        2000
+      ],
+      "startTime": 1778421234552,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "942f0934-b599-4989-98e4-21458dbc8b73",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778421234552,
+      "duration": 0
+    }
+  ],
+  "databaseState": {
+    "dbPath": "/Users/lzy/pro/solo/workspaces/zy10016/replay-data/replay.db",
+    "journalMode": "WAL",
+    "autoCommit": true,
+    "walCheckpoint": {
+      "busy": 0,
+      "log": 0,
+      "checkpointed": 0
+    },
+    "pageSize": 0,
+    "pageCount": 0,
+    "freelistCount": 0
+  },
+  "systemInfo": {
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "pid": 52683,
+    "uptime": 0.981343541,
+    "memory": {
+      "rss": 250773504,
+      "heapTotal": 153059328,
+      "heapUsed": 123580248,
+      "external": 7680104,
+      "arrayBuffers": 4907429
+    }
+  }
+}

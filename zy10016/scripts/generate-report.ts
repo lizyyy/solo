@@ -4,20 +4,37 @@ import { DEFAULT_DATABASE_CONFIG } from '../src/config/default';
 import { CacheManager } from '../src/cache/CacheManager';
 import { StateManager } from '../src/state/StateManager';
 import { ReportGenerator } from '../src/report/ReportGenerator';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 const REPORTS_DIR = join(process.cwd(), 'reports');
+const DATA_DIR = join(process.cwd(), 'data');
+const DB_PATH = join(DATA_DIR, 'report.db');
+
+function cleanupOldDb() {
+  const files = [DB_PATH, `${DB_PATH}-wal`, `${DB_PATH}-shm`];
+  for (const file of files) {
+    if (existsSync(file)) {
+      try {
+        unlinkSync(file);
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
 
 async function main() {
   console.log('=== 生成系统报告 ===\n');
 
   mkdirSync(REPORTS_DIR, { recursive: true });
+  mkdirSync(DATA_DIR, { recursive: true });
+  cleanupOldDb();
 
   const logger = new Logger({ level: 'INFO', enableConsole: false });
   const service = new DatabaseService({
     ...DEFAULT_DATABASE_CONFIG,
-    dbPath: join(process.cwd(), 'data', 'report.db'),
+    dbPath: DB_PATH,
   }, logger);
   const cache = new CacheManager();
   const stateManager = new StateManager();

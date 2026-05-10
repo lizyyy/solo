@@ -67,6 +67,16 @@ export class StateManager {
       },
       {
         from: 'WAITING',
+        to: 'IDLE',
+        operation: 'COMMIT',
+      },
+      {
+        from: 'WAITING',
+        to: 'IDLE',
+        operation: 'ROLLBACK',
+      },
+      {
+        from: 'WAITING',
         to: 'CONFLICT',
         operation: 'WRITE',
       },
