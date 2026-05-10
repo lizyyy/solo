@@ -1,47 +1,49 @@
 [
   {
-    "id": "6e63291c-b308-49f8-938c-2a004ff7926c",
+    "id": "6cc75540-7184-45cc-820b-929f0f470dde",
     "orderId": "VD-2026-005",
     "confirmationType": "replacement",
     "replacements": [
       {
         "originalFlower": "红玫瑰",
         "replacementFlower": "粉玫瑰",
-        "quantity": 10,
+        "quantity": 76,
         "priority": 1,
-        "note": "同级别替换"
+        "note": "同级别替换",
+        "originalAllocated": 34,
+        "originalRequired": 110
       }
     ],
     "priceAdjustments": [
       {
         "orderId": "VD-2026-005",
         "flower": "红玫瑰",
-        "originalPrice": 200,
-        "replacementPrice": 220,
-        "priceDiff": 20
+        "originalPrice": 1520,
+        "replacementPrice": 1672,
+        "priceDiff": 152
       }
     ],
-    "totalPriceDiff": 20,
-    "confirmedBy": "张经理",
+    "totalPriceDiff": 152,
+    "confirmedBy": "测试人员",
     "status": "confirmed",
-    "confirmedAt": "2026-05-10T18:48:42.193Z"
+    "confirmedAt": "2026-05-10T20:22:29.735Z"
   },
   {
-    "id": "a1f1f7b7-7af2-4db9-bb9d-9d9ecdd3cde4",
+    "id": "fb495175-0473-4c8a-bf7e-4379af57ae59",
     "orderId": "VD-2026-005",
     "confirmationType": "price_sync",
     "originalPrice": [
       {
         "orderId": "VD-2026-005",
         "flower": "红玫瑰",
-        "originalPrice": 200,
-        "replacementPrice": 220,
-        "priceDiff": 20
+        "originalPrice": 1520,
+        "replacementPrice": 1672,
+        "priceDiff": 152
       }
     ],
-    "newPrice": 4010,
-    "confirmedBy": "张经理",
+    "newPrice": 4142,
+    "confirmedBy": "测试人员",
     "status": "confirmed",
-    "confirmedAt": "2026-05-10T18:48:52.908Z"
+    "confirmedAt": "2026-05-10T20:22:33.780Z"
   }
 ]

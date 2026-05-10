@@ -2,70 +2,105 @@ const inventoryManager = require('./inventory-manager');
 const orderManager = require('./order-manager');
 const deliveryManager = require('./delivery-manager');
 const validation = require('./validation');
+const inventoryAllocation = require('./inventory-allocation');
 
-function calculateReplacementForOrder(order) {
+function calculateReplacementForOrderWithAllocation(order, allocation) {
   const bouquetSpecs = orderManager.getBouquetSpecs();
   const replacements = [];
   const priceAdjustments = [];
   
-  order.bouquets.forEach(bouquet => {
-    const spec = bouquetSpecs.find(s => s.specId === bouquet.specId);
-    if (!spec) return;
+  const orderAllocation = allocation?.allocationResults.find(
+    r => r.orderId === order.orderId
+  );
+  
+  if (!orderAllocation) {
+    return {
+      orderId: order.orderId,
+      replacements: [],
+      priceAdjustments: [],
+      totalPriceDiff: 0,
+      needsPriceSync: false
+    };
+  }
+  
+  Object.entries(orderAllocation.shortage).forEach(([flowerName, shortage]) => {
+    if (shortage <= 0) return;
     
-    spec.flowers.forEach(flower => {
-      const required = flower.quantity * bouquet.quantity;
-      const stock = inventoryManager.getFlowerStock(flower.name);
+    const replacementOptions = inventoryManager.getReplacementOptions(flowerName);
+    
+    if (replacementOptions.length > 0) {
+      const bestReplacement = replacementOptions[0];
       
-      if (stock < required) {
-        const shortage = required - stock;
-        const replacementOptions = inventoryManager.getReplacementOptions(flower.name);
-        
-        if (replacementOptions.length > 0) {
-          const bestReplacement = replacementOptions[0];
-          const replacementStock = inventoryManager.getFlowerStock(bestReplacement.name);
-          
-          if (replacementStock >= shortage) {
-            const originalCost = flower.price * shortage;
-            const replacementCost = bestReplacement.price * shortage;
-            const priceDiff = replacementCost - originalCost;
-            
-            replacements.push({
-              originalFlower: flower.name,
-              replacementFlower: bestReplacement.name,
-              quantity: shortage,
-              priority: bestReplacement.priority,
-              note: bestReplacement.note || ''
-            });
-            
-            if (priceDiff !== 0) {
-              priceAdjustments.push({
-                orderId: order.orderId,
-                flower: flower.name,
-                originalPrice: originalCost,
-                replacementPrice: replacementCost,
-                priceDiff
-              });
-            }
-          }
-        }
+      const flowerSpec = findFlowerPriceInOrder(order, flowerName);
+      const originalPrice = flowerSpec?.price || 0;
+      const replacementPrice = bestReplacement.price || originalPrice;
+      const priceDiff = (replacementPrice - originalPrice) * shortage;
+      
+      replacements.push({
+        originalFlower: flowerName,
+        replacementFlower: bestReplacement.name,
+        quantity: shortage,
+        priority: bestReplacement.priority,
+        note: bestReplacement.note || '',
+        originalAllocated: orderAllocation.allocation[flowerName]?.fromOriginalStock || 0,
+        originalRequired: orderAllocation.requirements[flowerName]
+      });
+      
+      if (priceDiff !== 0) {
+        priceAdjustments.push({
+          orderId: order.orderId,
+          flower: flowerName,
+          originalPrice: originalPrice * shortage,
+          replacementPrice: replacementPrice * shortage,
+          priceDiff
+        });
       }
-    });
+    }
   });
   
   const totalPriceDiff = priceAdjustments.reduce((sum, p) => sum + p.priceDiff, 0);
+  const originalOrderPrice = validation.calculateOrderOriginalPrice(order);
   
   return {
     orderId: order.orderId,
     replacements,
     priceAdjustments,
     totalPriceDiff,
-    needsPriceSync: totalPriceDiff !== 0 && order.price !== (validation.calculateOrderOriginalPrice(order) + totalPriceDiff)
+    needsPriceSync: totalPriceDiff !== 0 && order.price !== (originalOrderPrice + totalPriceDiff)
   };
 }
 
+function findFlowerPriceInOrder(order, flowerName) {
+  const bouquetSpecs = orderManager.getBouquetSpecs();
+  
+  for (const bouquet of order.bouquets) {
+    const spec = bouquetSpecs.find(s => s.specId === bouquet.specId);
+    if (spec) {
+      const flower = spec.flowers.find(f => f.name === flowerName);
+      if (flower) {
+        return flower;
+      }
+    }
+  }
+  
+  return null;
+}
+
+function calculateReplacementForOrder(orderId) {
+  const order = orderManager.getOrderById(orderId);
+  if (!order) {
+    return null;
+  }
+  
+  const allocation = inventoryAllocation.allocateInventory();
+  return calculateReplacementForOrderWithAllocation(order, allocation);
+}
+
 function calculateReplacementsForAllOrders() {
-  const orders = orderManager.getOrders();
-  return orders.map(order => calculateReplacementForOrder(order));
+  const allocation = inventoryAllocation.allocateInventory();
+  return allocation.orders.map(order => 
+    calculateReplacementForOrderWithAllocation(order, allocation)
+  );
 }
 
 function confirmReplacement(orderId, replacementData, confirmedBy) {
@@ -147,6 +182,7 @@ function confirmPriceSync(orderId, newPrice, confirmedBy) {
 
 module.exports = {
   calculateReplacementForOrder,
+  calculateReplacementForOrderWithAllocation,
   calculateReplacementsForAllOrders,
   confirmReplacement,
   confirmPriceSync

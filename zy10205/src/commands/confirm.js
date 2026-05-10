@@ -20,9 +20,9 @@ function confirmReplacement(orderId, options = {}) {
     return { success: false, duplicate: true };
   }
   
-  const replacementData = replacementCalculator.calculateReplacementForOrder(order);
+  const replacementData = replacementCalculator.calculateReplacementForOrder(orderId);
   
-  if (replacementData.replacements.length === 0) {
+  if (!replacementData || replacementData.replacements.length === 0) {
     console.log(chalk.green(`✅ 订单 ${orderId} 花材充足，无需替换`));
     return { success: true, noReplacementNeeded: true };
   }

@@ -19,8 +19,8 @@
       "to": "李女士"
     },
     "notes": "请上午配送",
-    "id": "17a44306-73dc-4097-a5d0-08851bdea953",
-    "importedAt": "2026-05-10T18:48:09.483Z",
+    "id": "650664bb-c0f3-48ba-903f-bc99550713a0",
+    "importedAt": "2026-05-10T20:21:57.079Z",
     "status": "imported",
     "validationIssues": [],
     "replacements": [],
@@ -46,8 +46,8 @@
       "to": "王女士"
     },
     "notes": "希望准时送达",
-    "id": "f3d08629-7819-4b45-b4c1-6623655b5bfe",
-    "importedAt": "2026-05-10T18:48:09.491Z",
+    "id": "62de32ef-0bb3-451c-956a-6d029c93f31d",
+    "importedAt": "2026-05-10T20:21:57.086Z",
     "status": "imported",
     "validationIssues": [],
     "replacements": [],
@@ -73,8 +73,8 @@
       "to": "陈女士"
     },
     "notes": "",
-    "id": "49cbee9b-ba78-43c9-ab76-8f655ec9eb27",
-    "importedAt": "2026-05-10T18:48:09.492Z",
+    "id": "a355d619-17d3-4a0e-b6fb-c232aaf4ae0e",
+    "importedAt": "2026-05-10T20:21:57.086Z",
     "status": "imported",
     "validationIssues": [],
     "replacements": [],
@@ -100,8 +100,8 @@
       "to": "赵女士"
     },
     "notes": "晚上配送",
-    "id": "fcb88a42-8ce1-4f2f-b511-78e9cc2ef122",
-    "importedAt": "2026-05-10T18:48:09.495Z",
+    "id": "c6f5d889-cfdc-4b3d-8acb-80d45fff34b8",
+    "importedAt": "2026-05-10T20:21:57.087Z",
     "status": "imported",
     "validationIssues": [],
     "replacements": [],
@@ -111,7 +111,7 @@
     "orderId": "VD-2026-005",
     "customerName": "孙先生",
     "customerPhone": "13800138005",
-    "price": 4010,
+    "price": 4142,
     "deliverySlot": "morning-1",
     "deliveryAddress": "北京市丰台区XX路XX号",
     "bouquets": [
@@ -127,22 +127,24 @@
       "to": "员工"
     },
     "notes": "需要大量红玫瑰",
-    "id": "268a8989-2820-4be3-a869-dde5437c430f",
-    "importedAt": "2026-05-10T18:48:31.310Z",
+    "id": "f835058e-c26b-4f13-aac7-096dd5ffd0c3",
+    "importedAt": "2026-05-10T20:21:57.171Z",
     "status": "replacement_confirmed",
     "validationIssues": [],
     "replacements": [
       {
         "originalFlower": "红玫瑰",
         "replacementFlower": "粉玫瑰",
-        "quantity": 10,
+        "quantity": 76,
         "priority": 1,
-        "note": "同级别替换"
+        "note": "同级别替换",
+        "originalAllocated": 34,
+        "originalRequired": 110
       }
     ],
     "confirmed": false,
-    "priceDiff": 20,
-    "updatedAt": "2026-05-10T18:48:52.912Z",
+    "priceDiff": 152,
+    "updatedAt": "2026-05-10T20:22:33.780Z",
     "priceSynced": true
   }
 ]
