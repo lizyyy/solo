@@ -42,14 +42,14 @@ type FullReport struct {
 }
 
 type ReportSummary struct {
-	TotalExperiments   int
-	TotalMigrations    int
-	SuccessRate        float64
-	ErrorRate          float64
-	TotalDuration      time.Duration
-	CriticalIssues     int
-	Warnings           int
-	HealthScore        int
+	TotalExperiments int
+	TotalMigrations  int
+	SuccessRate      float64
+	ErrorRate        float64
+	TotalDuration    time.Duration
+	CriticalIssues   int
+	Warnings         int
+	HealthScore      int
 }
 
 type MigrationReport struct {
@@ -76,17 +76,17 @@ type StepReport struct {
 }
 
 type ChaosReport struct {
-	ExperimentID    string
-	Name            string
-	Type            string
-	Status          string
-	Duration        time.Duration
-	TotalRequests   int
-	SuccessCount    int
-	ErrorCount      int
-	Config          chaos.ExperimentConfig
-	TopErrors       []ErrorOccurrence
-	LatencyMetrics  LatencyMetrics
+	ExperimentID   string
+	Name           string
+	Type           string
+	Status         string
+	Duration       time.Duration
+	TotalRequests  int64
+	SuccessCount   int64
+	ErrorCount     int64
+	Config         chaos.ExperimentConfig
+	TopErrors      []ErrorOccurrence
+	LatencyMetrics LatencyMetrics
 }
 
 type ErrorOccurrence struct {
@@ -98,13 +98,13 @@ type ErrorOccurrence struct {
 }
 
 type LatencyMetrics struct {
-	Min  time.Duration
-	Max  time.Duration
-	Avg  time.Duration
-	P50  time.Duration
-	P90  time.Duration
-	P95  time.Duration
-	P99  time.Duration
+	Min time.Duration
+	Max time.Duration
+	Avg time.Duration
+	P50 time.Duration
+	P90 time.Duration
+	P95 time.Duration
+	P99 time.Duration
 }
 
 type Recommendation struct {
@@ -204,9 +204,9 @@ func (r *Reporter) GenerateCombinedReport(m *migration.Migration, migResult *mig
 	exps []*chaos.ChaosExperiment, traces []*tracer.Trace) *FullReport {
 
 	report := &FullReport{
-		ID:         generateReportID(),
+		ID:          generateReportID(),
 		GeneratedAt: time.Now(),
-		ReportType: ReportTypeCombined,
+		ReportType:  ReportTypeCombined,
 	}
 
 	if m != nil {

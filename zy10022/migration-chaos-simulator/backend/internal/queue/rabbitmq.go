@@ -22,10 +22,10 @@ type RabbitMQClient struct {
 }
 
 type Message struct {
-	ID        string
-	Body      []byte
-	Headers   map[string]interface{}
-	Timestamp time.Time
+	ID         string
+	Body       []byte
+	Headers    map[string]interface{}
+	Timestamp  time.Time
 	RetryCount int
 }
 
@@ -177,12 +177,11 @@ func (c *RabbitMQClient) Publish(ctx context.Context, exchange, routingKey strin
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	if c.channel == nil || c.channel.IsClosed() {
+	if c.channel == nil || c.closed {
 		return fmt.Errorf("channel is closed")
 	}
 
-	return c.channel.PublishWithContext(
-		ctx,
+	return c.channel.Publish(
 		exchange,
 		routingKey,
 		false,

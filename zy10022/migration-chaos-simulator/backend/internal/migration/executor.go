@@ -16,10 +16,10 @@ import (
 )
 
 type MigrationExecutor struct {
-	dbPool  *storage.PostgresPool
-	tracer  *tracer.Tracer
-	config  MigrationConfig
-	mu      sync.Mutex
+	dbPool *storage.PostgresPool
+	tracer *tracer.Tracer
+	config MigrationConfig
+	mu     sync.Mutex
 }
 
 func NewExecutor(dbPool *storage.PostgresPool, tr *tracer.Tracer, config MigrationConfig) *MigrationExecutor {
@@ -347,9 +347,9 @@ func (e *MigrationExecutor) runDataIntegrityChecks(ctx context.Context, m *Migra
 	for _, step := range m.Steps {
 		if step.Type == StepTypeDataCheck {
 			check := DataCheck{
-				Name:     step.Name,
-				Passed:   step.Status == StepStatusCompleted,
-				Message:  step.Error,
+				Name:    step.Name,
+				Passed:  step.Status == StepStatusCompleted,
+				Message: step.Error,
 			}
 			if !check.Passed {
 				report.Passed = false

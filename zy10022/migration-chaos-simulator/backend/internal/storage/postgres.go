@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 
@@ -88,11 +89,11 @@ func (p *PostgresPool) Exec(ctx context.Context, sql string, args ...interface{}
 	return tag.RowsAffected(), nil
 }
 
-func (p *PostgresPool) QueryRow(ctx context.Context, sql string, args ...interface{}) *pgxpool.Row {
+func (p *PostgresPool) QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row {
 	return p.pool.QueryRow(ctx, sql, args...)
 }
 
-func (p *PostgresPool) Query(ctx context.Context, sql string, args ...interface{}) (pgxpool.Rows, error) {
+func (p *PostgresPool) Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error) {
 	return p.pool.Query(ctx, sql, args...)
 }
 
@@ -105,7 +106,7 @@ func (p *PostgresPool) BeginTx(ctx context.Context) (*Transaction, error) {
 }
 
 type Transaction struct {
-	tx pgxpool.Tx
+	tx pgx.Tx
 }
 
 func (t *Transaction) Commit(ctx context.Context) error {
@@ -124,6 +125,6 @@ func (t *Transaction) Exec(ctx context.Context, sql string, args ...interface{})
 	return tag.RowsAffected(), nil
 }
 
-func (t *Transaction) QueryRow(ctx context.Context, sql string, args ...interface{}) pgxpool.Row {
+func (t *Transaction) QueryRow(ctx context.Context, sql string, args ...interface{}) pgx.Row {
 	return t.tx.QueryRow(ctx, sql, args...)
 }

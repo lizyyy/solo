@@ -27,15 +27,15 @@ var upgrader = websocket.Upgrader{
 }
 
 type APIServer struct {
-	chaosEngine    *chaos.ChaosEngine
-	migExecutor    *migration.MigrationExecutor
-	tracer         *tracer.Tracer
-	reporter       *reporter.Reporter
-	wsClients      map[*websocket.Conn]bool
-	wsMutex        sync.RWMutex
-	migrations     map[string]*migration.Migration
-	migResults     map[string]*migration.MigrationResult
-	migrationsMu   sync.RWMutex
+	chaosEngine  *chaos.ChaosEngine
+	migExecutor  *migration.MigrationExecutor
+	tracer       *tracer.Tracer
+	reporter     *reporter.Reporter
+	wsClients    map[*websocket.Conn]bool
+	wsMutex      sync.RWMutex
+	migrations   map[string]*migration.Migration
+	migResults   map[string]*migration.MigrationResult
+	migrationsMu sync.RWMutex
 }
 
 func NewAPIServer(
@@ -83,8 +83,8 @@ func (s *APIServer) SetupRoutes(r *gin.Engine) {
 
 		reports := api.Group("/reports")
 		{
+			reports.GET("/export", s.exportReport)
 			reports.GET("/:id", s.getReport)
-			reports.GET("/:id/export", s.exportReport)
 		}
 
 		ws := api.Group("/ws")
@@ -105,8 +105,8 @@ func (s *APIServer) getStats(c *gin.Context) {
 	exps := s.chaosEngine.ListExperiments()
 
 	running := 0
-	totalRequests := 0
-	totalErrors := 0
+	var totalRequests int64
+	var totalErrors int64
 
 	for _, exp := range exps {
 		if exp.Status == chaos.ChaosStatusRunning {
@@ -243,9 +243,9 @@ func (s *APIServer) getMigrationTemplates(c *gin.Context) {
 }
 
 type CreateMigrationRequest struct {
-	Name        string                    `json:"name" binding:"required"`
-	Version     string                    `json:"version" binding:"required"`
-	Description string                    `json:"description"`
+	Name        string                     `json:"name" binding:"required"`
+	Version     string                     `json:"version" binding:"required"`
+	Description string                     `json:"description"`
 	Steps       []*migration.MigrationStep `json:"steps" binding:"required"`
 }
 

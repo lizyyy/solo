@@ -51,7 +51,7 @@ function ChaosExperiments() {
   const handleStart = () => {
     const config = {
       ...newExp.config,
-      Duration: newExp.config.duration ? `${newExp.config.duration}s` : undefined,
+      duration: newExp.config.duration ? `${newExp.config.duration}s` : undefined,
     };
     startMutation.mutate({ name: newExp.name, type: newExp.type, config });
   };

@@ -81,9 +81,9 @@ func (e *ChaosEngine) StartExperiment(ctx context.Context, name string, chaosTyp
 	}
 
 	_, traceCtx := e.tracer.StartTrace(name, map[string]interface{}{
-		"experiment_id":   experiment.ID,
-		"chaos_type":      string(chaosType),
-		"config":          cfg,
+		"experiment_id": experiment.ID,
+		"chaos_type":    string(chaosType),
+		"config":        cfg,
 	})
 	experiment.TraceID = ""
 
@@ -136,7 +136,7 @@ func (e *ChaosEngine) runExperiment(ctx context.Context, exp *ChaosExperiment) {
 		}
 	}()
 
-	duration := exp.Config.Duration
+	duration := exp.Config.Duration.Duration()
 	if duration == 0 {
 		duration = e.cfg.DefaultExperimentDuration
 	}
@@ -219,20 +219,20 @@ func (e *ChaosEngine) runHighConcurrency(ctx context.Context, exp *ChaosExperime
 				defer func() { <-sem }()
 
 				start := time.Now()
-				atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+				atomic.AddInt64(&result.TotalRequests, 1)
 
 				err := e.simulateDatabaseOperation(ctx, exp.Config)
 
 				latency := time.Since(start)
 
 				if err != nil {
-					atomic.AddInt64((*int64)(&result.ErrorCount), 1)
+					atomic.AddInt64(&result.ErrorCount, 1)
 					e.tracer.AddEvent(ctx, tracer.EventLevelError, "High concurrency request failed", map[string]interface{}{
 						"error":   err.Error(),
 						"latency": latency.String(),
 					})
 				} else {
-					atomic.AddInt64((*int64)(&result.SuccessCount), 1)
+					atomic.AddInt64(&result.SuccessCount, 1)
 				}
 			}()
 		}
@@ -258,10 +258,10 @@ func (e *ChaosEngine) runTimeoutInjection(ctx context.Context, exp *ChaosExperim
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+			atomic.AddInt64(&result.TotalRequests, 1)
 
 			if rand.Float64() < timeoutRate {
-				atomic.AddInt64((*int64)(&result.ErrorCount), 1)
+				atomic.AddInt64(&result.ErrorCount, 1)
 				e.tracer.AddEvent(ctx, tracer.EventLevelWarn, "Timeout injected", map[string]interface{}{
 					"timeout_ms": exp.Config.TimeoutMs,
 				})
@@ -272,7 +272,7 @@ func (e *ChaosEngine) runTimeoutInjection(ctx context.Context, exp *ChaosExperim
 					return
 				}
 			} else {
-				atomic.AddInt64((*int64)(&result.SuccessCount), 1)
+				atomic.AddInt64(&result.SuccessCount, 1)
 			}
 		}
 	}
@@ -292,10 +292,10 @@ func (e *ChaosEngine) runNetworkDrop(ctx context.Context, exp *ChaosExperiment, 
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+			atomic.AddInt64(&result.TotalRequests, 1)
 
 			if rand.Float64() < dropRate {
-				atomic.AddInt64((*int64)(&result.ErrorCount), 1)
+				atomic.AddInt64(&result.ErrorCount, 1)
 				e.tracer.AddEvent(ctx, tracer.EventLevelWarn, "Network connection dropped", map[string]interface{}{
 					"drop_rate": dropRate,
 				})
@@ -317,7 +317,7 @@ func (e *ChaosEngine) runNetworkDrop(ctx context.Context, exp *ChaosExperiment, 
 					}
 				}
 			} else {
-				atomic.AddInt64((*int64)(&result.SuccessCount), 1)
+				atomic.AddInt64(&result.SuccessCount, 1)
 			}
 		}
 	}
@@ -339,12 +339,12 @@ func (e *ChaosEngine) runDuplicateRequest(ctx context.Context, exp *ChaosExperim
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			atomic.AddInt64((*int64)(&result.TotalRequests), 1)
-			atomic.AddInt64((*int64)(&result.SuccessCount), 1)
+			atomic.AddInt64(&result.TotalRequests, 1)
+			atomic.AddInt64(&result.SuccessCount, 1)
 
 			if rand.Float64() < duplicateRate {
 				for i := 0; i < duplicateCount; i++ {
-					atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+					atomic.AddInt64(&result.TotalRequests, 1)
 					e.tracer.AddEvent(ctx, tracer.EventLevelWarn, "Duplicate request detected", map[string]interface{}{
 						"duplicate_index": i,
 					})
@@ -368,14 +368,14 @@ func (e *ChaosEngine) runDuplicateMessage(ctx context.Context, exp *ChaosExperim
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			atomic.AddInt64((*int64)(&result.TotalRequests), 1)
-			atomic.AddInt64((*int64)(&result.SuccessCount), 1)
+			atomic.AddInt64(&result.TotalRequests, 1)
+			atomic.AddInt64(&result.SuccessCount, 1)
 
 			if rand.Float64() < duplicateRate {
 				e.tracer.AddEvent(ctx, tracer.EventLevelWarn, "Duplicate message delivered", map[string]interface{}{
 					"queue_target": exp.Config.MessageQueueTarget,
 				})
-				atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+				atomic.AddInt64(&result.TotalRequests, 1)
 			}
 		}
 	}
@@ -422,8 +422,8 @@ func (e *ChaosEngine) runConnectionDrop(ctx context.Context, exp *ChaosExperimen
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			atomic.AddInt64((*int64)(&result.ErrorCount), 1)
-			atomic.AddInt64((*int64)(&result.TotalRequests), 1)
+			atomic.AddInt64(&result.ErrorCount, 1)
+			atomic.AddInt64(&result.TotalRequests, 1)
 			e.tracer.AddEvent(ctx, tracer.EventLevelCritical, "Database connection dropped", map[string]interface{}{
 				"reconnect_delay_ms": 5000,
 			})

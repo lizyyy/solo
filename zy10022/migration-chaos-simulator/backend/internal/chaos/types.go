@@ -1,20 +1,91 @@
 package chaos
 
 import (
+	"encoding/json"
+	"errors"
+	"strconv"
+	"strings"
 	"time"
 )
+
+type DurationString time.Duration
+
+func (d *DurationString) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		if s == "" {
+			*d = 0
+			return nil
+		}
+		parsed, err := time.ParseDuration(s)
+		if err != nil {
+			return err
+		}
+		*d = DurationString(parsed)
+		return nil
+	}
+
+	var n int64
+	if err := json.Unmarshal(data, &n); err == nil {
+		*d = DurationString(time.Duration(n))
+		return nil
+	}
+
+	var f float64
+	if err := json.Unmarshal(data, &f); err == nil {
+		*d = DurationString(time.Duration(f))
+		return nil
+	}
+
+	return errors.New("invalid duration format")
+}
+
+func (d DurationString) MarshalJSON() ([]byte, error) {
+	return json.Marshal(time.Duration(d).String())
+}
+
+func (d DurationString) Duration() time.Duration {
+	return time.Duration(d)
+}
+
+func (d DurationString) Seconds() int {
+	return int(time.Duration(d).Seconds())
+}
+
+func (d DurationString) String() string {
+	return time.Duration(d).String()
+}
+
+func ParseDuration(s string) (DurationString, error) {
+	if s == "" {
+		return 0, nil
+	}
+	s = strings.TrimSpace(s)
+	if !strings.ContainsAny(s, "hmsuµn") {
+		n, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return 0, err
+		}
+		return DurationString(time.Duration(n) * time.Second), nil
+	}
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return 0, err
+	}
+	return DurationString(d), nil
+}
 
 type ChaosType string
 
 const (
-	ChaosTypeHighConcurrency ChaosType = "high_concurrency"
-	ChaosTypeTimeout         ChaosType = "timeout"
-	ChaosTypeNetworkDrop     ChaosType = "network_drop"
+	ChaosTypeHighConcurrency  ChaosType = "high_concurrency"
+	ChaosTypeTimeout          ChaosType = "timeout"
+	ChaosTypeNetworkDrop      ChaosType = "network_drop"
 	ChaosTypeDuplicateRequest ChaosType = "duplicate_request"
 	ChaosTypeDuplicateMessage ChaosType = "duplicate_message"
-	ChaosTypeSlowQuery       ChaosType = "slow_query"
-	ChaosTypeConnectionDrop  ChaosType = "connection_drop"
-	ChaosTypeLockContention  ChaosType = "lock_contention"
+	ChaosTypeSlowQuery        ChaosType = "slow_query"
+	ChaosTypeConnectionDrop   ChaosType = "connection_drop"
+	ChaosTypeLockContention   ChaosType = "lock_contention"
 )
 
 type ChaosStatus string
@@ -28,43 +99,43 @@ const (
 )
 
 type ChaosExperiment struct {
-	ID             string
-	Name           string
-	Type           ChaosType
-	Target         string
-	Config         ExperimentConfig
-	Status         ChaosStatus
-	StartTime      time.Time
-	EndTime        time.Time
-	ErrorCount     int
-	SuccessCount   int
-	TotalRequests  int
-	Metadata       map[string]interface{}
-	CreatedBy      string
-	TraceID        string
+	ID            string
+	Name          string
+	Type          ChaosType
+	Target        string
+	Config        ExperimentConfig
+	Status        ChaosStatus
+	StartTime     time.Time
+	EndTime       time.Time
+	ErrorCount    int64
+	SuccessCount  int64
+	TotalRequests int64
+	Metadata      map[string]interface{}
+	CreatedBy     string
+	TraceID       string
 }
 
 type ExperimentConfig struct {
-	Duration              time.Duration
-	ConcurrentUsers       int
-	TimeoutMs             int
-	NetworkDropRate       float64
-	DuplicateRate         float64
-	SlowQueryDelayMs      int
-	LockHoldTimeMs        int
-	QueryPattern          string
-	RetryCount            int
-	RequestsPerSecond     int
-	PayloadSizeBytes      int
-	MessageQueueTarget    string
-	DatabaseTarget        string
+	Duration           DurationString `json:"duration"`
+	ConcurrentUsers    int            `json:"concurrent_users"`
+	TimeoutMs          int            `json:"timeout_ms"`
+	NetworkDropRate    float64        `json:"network_drop_rate"`
+	DuplicateRate      float64        `json:"duplicate_rate"`
+	SlowQueryDelayMs   int            `json:"slow_query_delay_ms"`
+	LockHoldTimeMs     int            `json:"lock_hold_time_ms"`
+	QueryPattern       string         `json:"query_pattern"`
+	RetryCount         int            `json:"retry_count"`
+	RequestsPerSecond  int            `json:"requests_per_second"`
+	PayloadSizeBytes   int            `json:"payload_size_bytes"`
+	MessageQueueTarget string         `json:"message_queue_target"`
+	DatabaseTarget     string         `json:"database_target"`
 }
 
 type ChaosResult struct {
 	ExperimentID   string
-	TotalRequests  int
-	SuccessCount   int
-	ErrorCount     int
+	TotalRequests  int64
+	SuccessCount   int64
+	ErrorCount     int64
 	LatencyStats   LatencyStats
 	ErrorDetails   []ErrorDetail
 	StartTimestamp time.Time
@@ -72,23 +143,23 @@ type ChaosResult struct {
 }
 
 type LatencyStats struct {
-	Min    time.Duration
-	Max    time.Duration
-	Avg    time.Duration
-	P50    time.Duration
-	P90    time.Duration
-	P95    time.Duration
-	P99    time.Duration
+	Min time.Duration
+	Max time.Duration
+	Avg time.Duration
+	P50 time.Duration
+	P90 time.Duration
+	P95 time.Duration
+	P99 time.Duration
 }
 
 type ErrorDetail struct {
-	Timestamp   time.Time
-	Type        string
-	Message     string
-	RequestID   string
-	TraceID     string
-	Stacktrace  string
-	Context     map[string]interface{}
+	Timestamp  time.Time
+	Type       string
+	Message    string
+	RequestID  string
+	TraceID    string
+	Stacktrace string
+	Context    map[string]interface{}
 }
 
 type InjectedError struct {
