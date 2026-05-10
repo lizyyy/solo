@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Supplier {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  contact     String?
+  phone       String?
+  email       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  deliveries  Delivery[]
+  claims      Claim[]
+  exceptions  ExceptionRecord[]
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  sku         String   @unique
+  name        String
+  unitPrice   Decimal
+  unit        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  deliveryItems   DeliveryItem[]
+  inspectionItems InspectionItem[]
+  claimItems      ClaimItem[]
+}
+
+model Delivery {
+  id            String   @id @default(uuid())
+  deliveryNo    String   @unique
+  supplierId    String
+  poNo          String?
+  deliveryDate  DateTime
+  receivedDate  DateTime?
+  status        String   @default("PENDING")
+  remark        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  supplier      Supplier @relation(fields: [supplierId], references: [id])
+  items         DeliveryItem[]
+  inspection    Inspection?
+  claim         Claim?
+  exceptions    ExceptionRecord[]
+}
+
+model DeliveryItem {
+  id              String  @id @default(uuid())
+  deliveryId      String
+  productId       String
+  expectedQty     Int
+  receivedQty     Int
+  differenceQty   Int
+  unitPrice       Decimal
+  amount          Decimal
+  remark          String?
+  
+  delivery        Delivery @relation(fields: [deliveryId], references: [id])
+  product         Product  @relation(fields: [productId], references: [id])
+  inspectionItem  InspectionItem?
+  claimItem       ClaimItem?
+}
+
+model Inspection {
+  id              String   @id @default(uuid())
+  inspectionNo    String   @unique
+  deliveryId      String   @unique
+  inspector       String
+  inspectionDate  DateTime @default(now())
+  result          String   @default("PENDING")
+  conclusion      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  delivery        Delivery   @relation(fields: [deliveryId], references: [id])
+  items           InspectionItem[]
+}
+
+model InspectionItem {
+  id              String  @id @default(uuid())
+  inspectionId    String
+  deliveryItemId  String  @unique
+  productId       String
+  inspectedQty    Int
+  qualifiedQty    Int
+  defectQty       Int
+  result          String  @default("PENDING")
+  conclusion      String?
+  
+  inspection      Inspection   @relation(fields: [inspectionId], references: [id])
+  deliveryItem    DeliveryItem @relation(fields: [deliveryItemId], references: [id])
+  product         Product      @relation(fields: [productId], references: [id])
+  claimItem       ClaimItem?
+}
+
+model Claim {
+  id                    String   @id @default(uuid())
+  claimNo               String   @unique
+  deliveryId            String   @unique
+  supplierId            String
+  status                String   @default("DRAFT")
+  totalShortageQty      Int      @default(0)
+  totalDefectQty        Int      @default(0)
+  totalClaimAmount      Decimal  @default(0)
+  supplierConfirmedAt   DateTime?
+  supplierConfirmRemark String?
+  deductionReceiptNo    String?
+  deductionReceiptDate  DateTime?
+  settledAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  supplier              Supplier   @relation(fields: [supplierId], references: [id])
+  delivery              Delivery   @relation(fields: [deliveryId], references: [id])
+  items                 ClaimItem[]
+  exceptions            ExceptionRecord[]
+}
+
+model ClaimItem {
+  id                String  @id @default(uuid())
+  claimId           String
+  deliveryItemId    String  @unique
+  inspectionItemId  String? @unique
+  productId         String
+  responsibility    String  @default("UNDEFINED")
+  shortageQty       Int     @default(0)
+  defectQty         Int     @default(0)
+  unitPrice         Decimal
+  claimAmount       Decimal
+  remark            String?
+  
+  claim           Claim          @relation(fields: [claimId], references: [id])
+  deliveryItem    DeliveryItem   @relation(fields: [deliveryItemId], references: [id])
+  inspectionItem  InspectionItem? @relation(fields: [inspectionItemId], references: [id])
+  product         Product        @relation(fields: [productId], references: [id])
+}
+
+model ExceptionRecord {
+  id              String   @id @default(uuid())
+  type            String
+  source          String
+  sourceId        String?
+  supplierId      String?
+  deliveryId      String?
+  claimId         String?
+  message         String
+  data            String?
+  status          String   @default("OPEN")
+  resolvedAt      DateTime?
+  resolvedBy      String?
+  resolutionNote  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  supplier        Supplier? @relation(fields: [supplierId], references: [id])
+  delivery        Delivery? @relation(fields: [deliveryId], references: [id])
+  claim           Claim?    @relation(fields: [claimId], references: [id])
+}
+
+model PendingTask {
+  id              String   @id @default(uuid())
+  type            String
+  source          String
+  sourceId        String
+  title           String
+  description     String?
+  assignee        String?
+  dueDate         DateTime?
+  priority        Int      @default(0)
+  completedAt     DateTime?
+  completedBy     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
