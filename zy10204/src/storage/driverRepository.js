@@ -67,8 +67,47 @@ function insertDriverAssignment(assignment) {
     ...assignment,
     isActive: assignment.isActive ? 1 : 0
   };
-  stmt.run(data);
-  return assignment;
+  try {
+    stmt.run(data);
+    return assignment;
+  } catch (e) {
+    if (e.message.includes('UNIQUE constraint failed')) {
+      return null;
+    }
+    throw e;
+  }
+}
+
+function findDriverAssignment(driverId, lineId, shiftId, effectiveDate) {
+  const db = getDatabase();
+  const row = db.prepare(`
+    SELECT da.*, d.name as driver_name, d.phone as driver_phone, d.license_plate,
+           l.code as line_code, l.name as line_name,
+           s.code as shift_code, s.name as shift_name, s.start_time, s.end_time
+    FROM driver_assignments da
+    JOIN drivers d ON da.driver_id = d.id
+    JOIN lines l ON da.line_id = l.id
+    JOIN shifts s ON da.shift_id = s.id
+    WHERE da.driver_id = ? AND da.line_id = ? AND da.shift_id = ? AND da.effective_date = ?
+  `).get(driverId, lineId, shiftId, effectiveDate);
+  return row ? {
+    id: row.id,
+    driverId: row.driver_id,
+    driverName: row.driver_name,
+    driverPhone: row.driver_phone,
+    licensePlate: row.license_plate,
+    lineId: row.line_id,
+    lineCode: row.line_code,
+    lineName: row.line_name,
+    shiftId: row.shift_id,
+    shiftCode: row.shift_code,
+    shiftName: row.shift_name,
+    startTime: row.start_time,
+    endTime: row.end_time,
+    effectiveDate: row.effective_date,
+    isActive: row.is_active === 1,
+    createdAt: row.created_at
+  } : null;
 }
 
 function getDriverAssignments(date) {
@@ -171,6 +210,7 @@ module.exports = {
   insertShift,
   findShiftByCode,
   insertDriverAssignment,
+  findDriverAssignment,
   getDriverAssignments,
   getAssignmentsByLine
 };

@@ -31,8 +31,29 @@ function addParent(studentId, parentName, phone, relationship) {
     };
   }
 
+  const existing = studentRepo.findParentByStudentAndPhone(student.id, phone);
+  if (existing) {
+    return {
+      success: false,
+      error: `该联系电话 ${phone} 已存在于该学生的联系人列表中`,
+      parent: existing,
+      isDuplicate: true
+    };
+  }
+
   const parent = models.createParent(parentName, phone, relationship, student.id);
-  studentRepo.insertParent(parent);
+  const inserted = studentRepo.insertParent(parent);
+
+  if (!inserted) {
+    const fallback = studentRepo.findParentByStudentAndPhone(student.id, phone);
+    return {
+      success: false,
+      error: `该联系电话 ${phone} 已存在于该学生的联系人列表中`,
+      parent: fallback,
+      isDuplicate: true
+    };
+  }
+
   return {
     success: true,
     parent

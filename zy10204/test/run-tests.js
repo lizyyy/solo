@@ -215,7 +215,65 @@ test('10. 检查站点被删除（停用）但有学生的警告', async () => {
   assertTrue(consistency2.warnings.length > 0, '应有关于已停用站点有学生的警告');
 });
 
-test('11. 导出存档', async () => {
+test('11. 验证driver assign 幂等性（重复执行不重复插入）', async () => {
+  const scheduleBefore = driverService.getDriverSchedule('2026-05-10');
+  const countBefore = scheduleBefore.filter(a => a.driverName === '张司机' && a.shiftCode === 'AM').length;
+
+  const result1 = driverService.assignDriverToLine('D01', 'L1', 'AM', '2026-05-10');
+  assertTrue(result1.success, '第一次分配应成功');
+
+  const scheduleAfter1 = driverService.getDriverSchedule('2026-05-10');
+  const countAfter1 = scheduleAfter1.filter(a => a.driverName === '张司机' && a.shiftCode === 'AM').length;
+  assertTrue(countAfter1 === countBefore + 1, '第一次分配后排班数应增加1');
+
+  const result2 = driverService.assignDriverToLine('D01', 'L1', 'AM', '2026-05-10');
+  assertFalse(result2.success, '重复分配应失败');
+  assertTrue(result2.isDuplicate, '应标记为重复');
+
+  const scheduleAfter2 = driverService.getDriverSchedule('2026-05-10');
+  const countAfter2 = scheduleAfter2.filter(a => a.driverName === '张司机' && a.shiftCode === 'AM').length;
+  assertTrue(countAfter2 === countAfter1, '重复分配后排班数应保持不变');
+});
+
+test('12. 验证student add-parent 幂等性（重复添加不变成2条）', async () => {
+  const detailsBefore = studentService.getStudentDetails('S002');
+  const countBefore = detailsBefore.parents.length;
+
+  const result1 = studentService.addParent('S002', '红母', '13800138005', '母亲');
+  assertTrue(result1.success, '第一次添加应成功');
+
+  const detailsAfter1 = studentService.getStudentDetails('S002');
+  const countAfter1 = detailsAfter1.parents.length;
+  assertTrue(countAfter1 === countBefore + 1, '第一次添加后联系人数应增加1');
+
+  const result2 = studentService.addParent('S002', '红母2号', '13800138005', '母亲');
+  assertFalse(result2.success, '同电话重复添加应失败');
+  assertTrue(result2.isDuplicate, '应标记为重复');
+
+  const detailsAfter2 = studentService.getStudentDetails('S002');
+  const countAfter2 = detailsAfter2.parents.length;
+  assertTrue(countAfter2 === countAfter1, '重复添加后联系人数应保持不变');
+});
+
+test('13. 验证多家长时通知应为每个家长生成一条', async () => {
+  const diversionRepo = require('../src/storage/diversionRepository');
+  const diversion = diversionService.getDiversion('2026-05-11');
+
+  const details = studentService.getStudentDetails('S001');
+  const parentCount = details.parents.length;
+  assertTrue(parentCount >= 2, '小明应有至少2个家长');
+
+  const notifications = diversionRepo.getNotifications(diversion.id, 'parent');
+  const xiaomingNotifications = notifications.filter(n => n.studentName === '小明');
+
+  assertTrue(xiaomingNotifications.length === parentCount, '小明的通知数应等于家长数（2条）');
+
+  const parentNames = xiaomingNotifications.map(n => n.parentName).sort();
+  assertTrue(parentNames.includes('明父'), '应有发给明父的通知');
+  assertTrue(parentNames.includes('明母'), '应有发给明母的通知');
+});
+
+test('14. 导出存档（包含多家长通知数据）', async () => {
   const exportDir = path.join(__dirname, '../exports');
   const result = exportService.exportDiversionArchive('2026-05-11', exportDir);
   assertTrue(result.success, '导出存档应成功');
@@ -228,6 +286,9 @@ test('11. 导出存档', async () => {
   assertTrue(jsonContent.diversionLines.length > 0, '存档应有改线记录');
   assertTrue(jsonContent.leaves.length > 0, '存档应有请假记录');
   assertTrue(jsonContent.notifications.length > 0, '存档应有通知记录');
+
+  const xiaomingNotifs = jsonContent.notifications.filter(n => n.studentName === '小明' && n.type === 'parent');
+  assertTrue(xiaomingNotifs.length === 2, '存档中小明应有2条家长通知');
 });
 
 async function runTests() {

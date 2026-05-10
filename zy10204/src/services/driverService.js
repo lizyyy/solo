@@ -63,13 +63,33 @@ function assignDriverToLine(driverId, lineCode, shiftCode, effectiveDate) {
     };
   }
 
+  const existing = driverRepo.findDriverAssignment(driver.id, line.id, shift.id, effectiveDate);
+  if (existing) {
+    return {
+      success: false,
+      error: `司机 ${driver.name} 在 ${effectiveDate} 的该班次已存在分配记录`,
+      assignment: existing,
+      isDuplicate: true
+    };
+  }
+
   const assignment = models.createDriverAssignment(
     driver.id,
     line.id,
     shift.id,
     effectiveDate
   );
-  driverRepo.insertDriverAssignment(assignment);
+  const inserted = driverRepo.insertDriverAssignment(assignment);
+
+  if (!inserted) {
+    const fallback = driverRepo.findDriverAssignment(driver.id, line.id, shift.id, effectiveDate);
+    return {
+      success: false,
+      error: `司机 ${driver.name} 在 ${effectiveDate} 的该班次已存在分配记录`,
+      assignment: fallback,
+      isDuplicate: true
+    };
+  }
 
   return {
     success: true,

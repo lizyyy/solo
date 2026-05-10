@@ -84,7 +84,8 @@ function initializeTables(db) {
       student_id TEXT NOT NULL,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
-      FOREIGN KEY (student_id) REFERENCES students(id)
+      FOREIGN KEY (student_id) REFERENCES students(id),
+      UNIQUE(student_id, phone)
     );
 
     CREATE TABLE IF NOT EXISTS drivers (
@@ -119,7 +120,8 @@ function initializeTables(db) {
       created_at TEXT NOT NULL,
       FOREIGN KEY (driver_id) REFERENCES drivers(id),
       FOREIGN KEY (line_id) REFERENCES lines(id),
-      FOREIGN KEY (shift_id) REFERENCES shifts(id)
+      FOREIGN KEY (shift_id) REFERENCES shifts(id),
+      UNIQUE(driver_id, line_id, shift_id, effective_date)
     );
 
     CREATE TABLE IF NOT EXISTS diversions (
@@ -171,7 +173,7 @@ function initializeTables(db) {
       FOREIGN KEY (student_id) REFERENCES students(id),
       FOREIGN KEY (diversion_id) REFERENCES diversions(id),
       FOREIGN KEY (parent_id) REFERENCES parents(id),
-      UNIQUE(student_id, diversion_id, notification_type)
+      UNIQUE(student_id, diversion_id, parent_id, notification_type)
     );
   `);
 }

@@ -196,8 +196,21 @@ function insertParent(parent) {
     INSERT INTO parents (id, name, phone, relationship, student_id, created_at, updated_at)
     VALUES (@id, @name, @phone, @relationship, @studentId, @createdAt, @updatedAt)
   `);
-  stmt.run(parent);
-  return parent;
+  try {
+    stmt.run(parent);
+    return parent;
+  } catch (e) {
+    if (e.message.includes('UNIQUE constraint failed')) {
+      return null;
+    }
+    throw e;
+  }
+}
+
+function findParentByStudentAndPhone(studentId, phone) {
+  const db = getDatabase();
+  const row = db.prepare('SELECT * FROM parents WHERE student_id = ? AND phone = ?').get(studentId, phone);
+  return row ? mapToParent(row) : null;
 }
 
 function getParentsByStudentId(studentId) {
@@ -242,5 +255,6 @@ module.exports = {
   findStudentLine,
   updateStudentLine,
   insertParent,
-  getParentsByStudentId
+  getParentsByStudentId,
+  findParentByStudentAndPhone
 };
